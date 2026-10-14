@@ -4,6 +4,14 @@ authoritative_for: worktree isolation state session-scoped hazard, EnterWorktree
 
 # The worktree-isolation race in concurrent fanout, precisely characterized — and the fix that actually works
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `tsk-u87` resolved a live-blocking hazard for `fgos-fanout`'s concurrent
 dispatch: Claude Code's worktree-isolation state (which worktree
 Bash/Edit/Write/git may target) is tracked at the **session** level, not

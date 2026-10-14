@@ -4,6 +4,14 @@ authoritative_for: executor dispatch manual in-session logging gap, Step B.5 exe
 
 # Why manual out-of-process dispatches went unlogged, and how Step B.5 fixes it
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `src/runner/dispatch.mjs` has always exposed `logExecutorDispatch` (and its
 CLI form, `dispatch.mjs log <executorId> --id <id> --provider <p> --command
 <c> [--model <m>]`), which appends an `executor.dispatch` event to

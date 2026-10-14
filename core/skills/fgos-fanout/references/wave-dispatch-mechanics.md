@@ -40,35 +40,35 @@ fgos schedule --candidates "<openCandidates-comma-separated>"
 membership AND every dep already resolved. This pre-check is advisory
 only — it never substitutes for the real claim in Step 3.
 
-## Step 3: Fire batches of up to 5 via fanout-batch
+## Step 3: Fire batches of up to 5 via the fanout entry
 
 For each batch of up to 5 ids from `ready` (5 is the max batch size):
 
-Run the consolidated `fanout-batch` verb:
+Run the fanout entry (a `node` entry point, not an `fgos` verb):
 
 > **Execution rule — background execution required:**
-> Always run this backgrounded (`run_in_background: true`) from the start, never foreground. `fanout-batch` executes candidates concurrently, but a batch of long-running candidates can still exceed the Bash tool's 2-minute default timeout (exit 143 for multi-item batches).
+> Always run this backgrounded (`run_in_background: true`) from the start, never foreground. The fanout entry executes candidates concurrently, but a batch of long-running candidates can still exceed the Bash tool's 2-minute default timeout (exit 143 for multi-item batches).
 >
 > **Waiting rule:**
 > Wait for the harness's own background-completion notification before proceeding to gather results (end the turn with no further tool call once background execution is started; the harness delivers a task-notification automatically and resumes the session with the output in context). Do NOT use `ScheduleWakeup` or polling — `ScheduleWakeup` is for `/loop` dynamic pacing only (requires `prompt` unless `stop:true`) and fails immediately in this context.
 
 ```bash
-node src/runner/dispatch.mjs fanout-batch "<batch-comma-separated>" --has-live-task-access
+node src/runner/fanout-batch.mjs "<batch-comma-separated>" --has-live-task-access
 ```
 
-This single call checks worker-slot capacity, trims the batch if needed, re-confirms each candidate's mechanism, and executes out-of-process candidates through the full `pick` -> `execute` -> `return` loop.
+This single call checks worker-slot capacity, trims the batch if needed, re-confirms each candidate's mechanism, and runs each out-of-process candidate through `pick`, its worker run, and `return`. The output always carries the keys `fired`, `mechanismChanged`, `unavailable` and `deferred`, plus `slotsFull: true` when no slot was free.
 
 - If `slotsFull: true`: the lane is full — wait ~60s and retry. After 10 consecutive refusals (~10 min), STOP and hand back to the caller.
-- `fired`: array of out-of-process candidates that were picked, executed out-of-process, and returned.
+- `fired`: one entry per out-of-process candidate that was picked, run and returned (or blocked); read each item's real state in Step 5, never the entry alone.
 - `mechanismChanged`: candidates whose mechanism resolved to `in-process`. Add to `firing` for native Agent dispatch in Step 4.
 - `unavailable`: candidates with no registered executor. Report back as needing a person and add to `dispatchUnavailable`.
 - `deferred`: candidates deferred due to slot trimming. Retain in `ready` for the next batch.
 
 ### Handling orphaned claims (background process failure)
 
-If the backgrounded `fanout-batch` process itself dies mid-run (e.g. shell/session reset or unexpected process termination):
+If the backgrounded fanout process itself dies mid-run (e.g. shell/session reset or unexpected process termination):
 - **Symptom / Detection:** The session's own background job is gone, but one or more candidate items remain in status `doing` with no further progress.
-- **System Detection Mechanism:** The graph advisory `classifyStaleDoing` (accessible via `/fgOS:stale` or `fgos stale`) detects stuck `doing` items. Note: claims made by `fanout-batch` record `claimRole: session`, placing them under human grace period (~24 hours) in `classifyStaleDoing`, so `/fgOS:stale` will not flag them immediately.
+- **System Detection Mechanism:** The graph advisory `classifyStaleDoing` (accessible via `/fgOS:stale` or `fgos stale`) detects stuck `doing` items. Note: claims made by the fanout entry record `claimRole: session`, placing them under human grace period (~24 hours) in `classifyStaleDoing`, so `/fgOS:stale` will not flag them immediately.
 - **Recovery / Resuming:** First verify that the background job is dead and not still legitimately running.
   - If the item's implementation changes are already committed on its branch, it is safe to return/re-drive (`/fgOS:pick <id>`).
   - If the item has uncommitted work-in-progress on its worktree branch, inspect the work-in-progress before deciding whether to resume or reclaim.

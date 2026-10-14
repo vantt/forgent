@@ -38,32 +38,11 @@ function runFgos(args, options = {}) {
   });
 }
 
-function runDispatchDirect(args, options = {}) {
-  return spawnSync(process.execPath, ['src/runner/dispatch.mjs', ...args], {
-    cwd: REPO,
-    encoding: 'utf8',
-    ...options,
-  });
-}
-
 // ─── 1. F4: Explicit Unregistered Executor Fails Closed ──────────────────────
 
-test('F4: explicit unregistered executor fails closed across public CLI, compat door, and executeExecutorCli', async () => {
+test('an explicitly named unregistered executor fails closed in executeExecutorCli', async () => {
   const unregisteredId = 'unregistered-test-executor-f4-' + Date.now();
 
-  // 1a. Public CLI door (fgos dispatch execute <id>)
-  const cliRes = runFgos(['dispatch', 'execute', unregisteredId]);
-  assert.equal(cliRes.status, 1, `expected exit code 1, got ${cliRes.status}\nstderr: ${cliRes.stderr}\nstdout: ${cliRes.stdout}`);
-  assert.match(cliRes.stdout + cliRes.stderr, /executor-not-found/);
-
-  // 1b. Compat door (node src/runner/dispatch.mjs execute <id>)
-  const compatRes = runDispatchDirect(['execute', unregisteredId]);
-  assert.equal(compatRes.status, 1, `expected exit code 1, got ${compatRes.status}\nstderr: ${compatRes.stderr}`);
-  const compatParsed = JSON.parse(compatRes.stdout.trim());
-  assert.equal(compatParsed.errorClass, 'executor-not-found');
-  assert.match(compatParsed.error, new RegExp(unregisteredId));
-
-  // 1c. Programmatic executeExecutorCli
   await assert.rejects(
     executeExecutorCli(unregisteredId, { prompt: 'test' }),
     (err) => {

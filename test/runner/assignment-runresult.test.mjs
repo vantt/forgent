@@ -11,7 +11,7 @@ import {
   reconcileCliSpawnRun,
   snapshotDirtyBeforeFiles,
 } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { findMutatedDirtyBeforeFiles } from '../../src/runner/dispatch/settlement.mjs';
+import { findMutatedDirtyBeforeFiles, safeGitStatusFiles, safeGitCommittedDiffFiles } from '../../src/runner/dispatch/settlement.mjs';
 import { sha256FileSync } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { validateRunResultV2, validateRunResultV3, runOutcome } from '../../src/runner/dispatch/run-result.mjs';
 import { interpretAssignmentRunResult } from '../../src/runner/operation-choice.mjs';
@@ -672,9 +672,11 @@ test('executeAssignment persists mutatedDirtyBeforeFiles (in both evidence.json 
 
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
 
-  // A read-only op that mutates a pre-existing dirty file must fail closed.
-  assert.equal(runOutcome(result).category, 'policy');
-  assert.equal(runOutcome(result).evidence, 'failed');
+  // A changed pre-existing dirty file is correlated evidence (another session may
+  // have edited it): the run is not refused, and the change is named as a warning.
+  assert.notEqual(runOutcome(result).category, 'policy');
+  assert.equal(result.classification.policy?.disposition === 'refuse', false);
+  assert.deepEqual(result.warnings?.map((w) => [w.code, w.paths]), [['mutated-dirty-before-correlated', ['preexisting-dirty.txt']]]);
   assert.deepEqual(result.evidence.mutatedDirtyBeforeFiles, ['preexisting-dirty.txt'],
     'result.json evidence must persist the mutated pre-existing dirty file (R6)');
 
@@ -1647,4 +1649,175 @@ test('done findings survive both settlement branches; verified mutating work sti
       assert.equal(disposition.reason, 'assignment-implement-item-findings');
     }
   }
+});
+
+// A round's changes are matched against the scope its assignment declared: inside it they are
+// covered, outside it they warn. Without a declared scope, coverage was never checked at all.
+function scopedWriteRun({ writes, claim, stage = 'executing', operation = 'implement-item', files = { 'docs/guide/a.md': 'inside\n', 'src/out.mjs': 'outside\n' } }) {
+  const tempDir = mkTempDir();
+  execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: tempDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tempDir, 'README.md'), 'seed\n');
+  execFileSync('git', ['add', '.'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'seed'], { cwd: tempDir, stdio: 'ignore' });
+  const executorScript = path.join(os.tmpdir(), `fgos-scoped-writer-${path.basename(tempDir)}.mjs`);
+  fs.writeFileSync(executorScript, `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    for (const [rel, body] of Object.entries(${JSON.stringify(files)})) {
+      fs.mkdirSync(path.dirname(path.join(cwd, rel)), { recursive: true });
+      fs.writeFileSync(path.join(cwd, rel), body);
+    }
+    const runsDir = path.join(cwd, '.fgos', 'assignments');
+    for (const asgn of fs.readdirSync(runsDir)) {
+      const runDir = path.join(runsDir, asgn, 'runs', '01');
+      if (fs.existsSync(runDir)) fs.writeFileSync(path.join(runDir, 'agent-result.json'), ${JSON.stringify(JSON.stringify(claim))});
+    }
+    process.exit(0);
+  `);
+  const runnerConfig = {
+    executors: { claude: { kind: 'agent', command: process.execPath, args: [executorScript, '{prompt}'], allowCrossProvider: true } },
+    modelPolicies: { claude: { standard: 'test-model' } },
+    timeoutMs: 5000,
+  };
+  const declared = buildAssignment({ workId: `tsk-scoped-${path.basename(tempDir).slice(-6).toLowerCase()}`, stage, operation });
+  const assignment = writes === undefined ? declared : { ...declared, writes };
+  return executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig })
+    .finally(() => fs.rmSync(executorScript, { force: true }));
+}
+
+const DONE_CLAIM = {
+  contract: { id: 'agent-result-claim', version: 2 },
+  status: 'done',
+  summary: 'docs(guide): write the guide',
+  needsWrites: ['src/out.mjs'],
+};
+
+test('a change inside the declared writes is covered and only the one outside warns; both attribution passes read the scope', async () => {
+  const result = await scopedWriteRun({ writes: ['./docs'], claim: DONE_CLAIM });
+  const byPath = Object.fromEntries(result.evidence.attribution.map((a) => [a.path, a]));
+  assert.equal(byPath['docs/guide/a.md'].coverageMatched, true);
+  assert.equal(byPath['docs/guide/a.md'].level, 'correlated', 'coverage is not authorship: no attestation, still correlated');
+  assert.equal(byPath['src/out.mjs'].coverageMatched, false);
+  const outside = (result.warnings ?? []).filter((w) => w.code === 'outside-write-scope-correlated');
+  assert.deepEqual(outside.map((w) => w.paths), [['src/out.mjs']]);
+  assert.equal(result.classification.policy.disposition, 'allow');
+});
+
+test('needsWrites leaves a claim valid and reaches the RunResult agentClaim unchanged', async () => {
+  const result = await scopedWriteRun({ writes: ['docs/**/*.md'], claim: DONE_CLAIM });
+  assert.equal(result.classification.outcome.category, 'ok', 'a claim made invalid by needsWrites would settle failed');
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.deepEqual(result.agentClaim.needsWrites, ['src/out.mjs']);
+  const byPath = Object.fromEntries(result.evidence.attribution.map((a) => [a.path, a]));
+  assert.equal(byPath['docs/guide/a.md'].coverageMatched, true, 'a glob entry covers a file it matches whole');
+});
+
+test('an assignment without writes keeps the old attribution: nothing covered, no scope warning', async () => {
+  const result = await scopedWriteRun({ writes: undefined, claim: DONE_CLAIM });
+  assert.ok(result.evidence.attribution.length >= 2);
+  assert.ok(result.evidence.attribution.every((a) => a.coverageMatched === false));
+  assert.equal((result.warnings ?? []).some((w) => w.code === 'outside-write-scope-correlated'), false);
+});
+
+test('a read-only seat that carries its unit\'s writes gets no coverage from them: none of them are its own', async () => {
+  const result = await scopedWriteRun({ writes: ['docs'], claim: DONE_CLAIM, stage: 'planning', operation: 'validate-plan' });
+  assert.equal(result.evidence.operationMutability ?? 'read-only', 'read-only');
+  assert.ok(result.evidence.attribution.every((a) => a.coverageMatched === false));
+  assert.ok((result.warnings ?? []).some((w) => w.code === 'read-only-mutation-correlated'));
+});
+
+// git quotes a path with a non-ASCII byte, a quote or a control character (core.quotePath) and
+// pads nothing, but a line-split read kept the quoted spelling and trimmed edge spaces: such a file
+// matched no write scope, so an in-scope change went unseen and a missing one settled as a pass.
+function quotedNameRepo() {
+  const dir = mkTempDir();
+  const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'ignore' });
+  git('init');
+  git('config', 'user.email', 'test@example.com');
+  git('config', 'user.name', 'Tester');
+  git('config', 'core.quotePath', 'true');
+  fs.writeFileSync(path.join(dir, 'a b.md'), 'seed\n');
+  fs.writeFileSync(path.join(dir, 'cũ.md'), 'seed\n');
+  git('add', '.');
+  git('commit', '-m', 'seed');
+  return { dir, git };
+}
+
+test('safeGitStatusFiles reads Vietnamese names, spaces, edge spaces and renames byte for byte', () => {
+  const { dir, git } = quotedNameRepo();
+  fs.writeFileSync(path.join(dir, 'a b.md'), 'changed\n');
+  fs.mkdirSync(path.join(dir, 'tài liệu'));
+  fs.writeFileSync(path.join(dir, 'tài liệu', 'ghi chú.md'), 'new\n');
+  fs.writeFileSync(path.join(dir, ' lề .md'), 'new\n');
+  fs.writeFileSync(path.join(dir, 'tab\there.md'), 'new\n');
+  git('mv', 'cũ.md', 'mới.md');
+  fs.mkdirSync(path.join(dir, '.fgos'));
+  fs.writeFileSync(path.join(dir, '.fgos', 'state.json'), '{}\n');
+  assert.deepEqual(safeGitStatusFiles(dir).sort(), [' lề .md', 'a b.md', 'cũ.md', 'mới.md', 'tab\there.md', 'tài liệu/ghi chú.md'].sort());
+});
+
+test('safeGitCommittedDiffFiles reads a committed Vietnamese name with spaces byte for byte', () => {
+  const { dir, git } = quotedNameRepo();
+  const before = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
+  fs.writeFileSync(path.join(dir, 'đã commit.md'), 'x\n');
+  fs.writeFileSync(path.join(dir, ' lề .md'), 'x\n');
+  git('add', '.');
+  git('commit', '-m', 'more');
+  const after = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
+  assert.deepEqual(safeGitCommittedDiffFiles(dir, before, after).sort(), [' lề .md', 'đã commit.md'].sort());
+});
+
+test('a Vietnamese name with spaces reaches changedFiles byte for byte and is covered by its scope', async () => {
+  const result = await scopedWriteRun({
+    writes: ['tài liệu'],
+    claim: DONE_CLAIM,
+    files: { 'tài liệu/ghi chú.md': 'mới\n', 'ngoài phạm vi.md': 'x\n' },
+  });
+  assert.deepEqual(result.evidence.changedFiles, ['ngoài phạm vi.md', 'tài liệu/ghi chú.md']);
+  const byPath = Object.fromEntries(result.evidence.attribution.map((a) => [a.path, a]));
+  assert.equal(byPath['tài liệu/ghi chú.md'].coverageMatched, true);
+  assert.deepEqual((result.warnings ?? []).filter((w) => w.code === 'outside-write-scope-correlated').map((w) => w.paths), [['ngoài phạm vi.md']]);
+});
+
+// Settlement reads a worktree exactly as the runner's commit does (commit-unit-work changedPaths):
+// a rename is both its halves, a nested repo has no trailing slash, a submodule's own dirt is not a
+// change here. A rename read as its new path only hid an out-of-scope deletion from outOfScope.
+test('safeGitStatusFiles lists both halves of a staged or intent-to-add rename, like the runner commit', () => {
+  const { dir, git } = quotedNameRepo();
+  git('mv', 'cũ.md', 'docs mới.md');
+  fs.renameSync(path.join(dir, 'a b.md'), path.join(dir, 'ab.md'));
+  git('add', '-N', 'ab.md');
+  git('rm', '--cached', '-q', 'a b.md');
+  assert.deepEqual(safeGitStatusFiles(dir).sort(), ['a b.md', 'ab.md', 'cũ.md', 'docs mới.md'].sort());
+});
+
+test('safeGitCommittedDiffFiles lists both halves of a committed rename', () => {
+  const { dir, git } = quotedNameRepo();
+  const before = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
+  git('mv', 'cũ.md', 'tài liệu.md');
+  git('commit', '-m', 'move');
+  const after = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
+  assert.deepEqual(safeGitCommittedDiffFiles(dir, before, after).sort(), ['cũ.md', 'tài liệu.md'].sort());
+});
+
+test('safeGitStatusFiles names an untracked nested repo without a trailing slash and skips a submodule\'s own dirt', () => {
+  const { dir, git } = quotedNameRepo();
+  const sub = mkTempDir();
+  const subGit = (...args) => execFileSync('git', args, { cwd: sub, stdio: 'ignore' });
+  subGit('init');
+  subGit('config', 'user.email', 'test@example.com');
+  subGit('config', 'user.name', 'Tester');
+  fs.writeFileSync(path.join(sub, 'x.md'), 'x\n');
+  subGit('add', '.');
+  subGit('commit', '-m', 'sub');
+  git('-c', 'protocol.file.allow=always', 'submodule', 'add', '-q', sub, 'mô-đun');
+  git('commit', '-m', 'add submodule');
+  fs.writeFileSync(path.join(dir, 'mô-đun', 'x.md'), 'dirty inside\n');
+  fs.mkdirSync(path.join(dir, 'lồng'));
+  execFileSync('git', ['init', '-q'], { cwd: path.join(dir, 'lồng') });
+  fs.writeFileSync(path.join(dir, 'lồng', 'y.md'), 'y\n');
+  assert.deepEqual(safeGitStatusFiles(dir), ['lồng']);
 });

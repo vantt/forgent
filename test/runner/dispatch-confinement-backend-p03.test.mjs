@@ -1296,13 +1296,13 @@ test('a workspace-write producer in a linked worktree cannot write git metadata;
     assert.equal(fs.readFileSync(path.join(wt, 'f'), 'utf8').trim(), 'produced', 'the worker could write its file');
 
     // Then the runner, outside the sandbox, commits it.
-    const commit = commitUnitWork({ worktree: wt, unitId: 'u1', summary: 'Added f\nmore detail' });
+    const commit = commitUnitWork({ worktree: wt, repoRoot: main, unitId: 'u1', summary: 'Added f\nmore detail', scope: ['**'] });
     assert.equal(commit.status, 'committed');
     assert.deepEqual(commit.files, ['f']);
-    assert.equal(git(wt, 'log', '-1', '--format=%s'), 'Added f\n');
+    assert.equal(git(wt, 'log', '-1', '--format=%s'), 'chore(u1): Added f\n');
     assert.equal(git(main, 'rev-parse', 'main'), mainBefore, 'refs/heads/main did not move');
     assert.notEqual(objectCount(), objectsBefore, 'the runner (not the worker) added the commit objects');
-    assert.equal(commitUnitWork({ worktree: wt, unitId: 'u1', summary: 'again' }).status, 'no-changes');
+    assert.equal(commitUnitWork({ worktree: wt, repoRoot: main, unitId: 'u1', summary: 'again', scope: ['**'] }).status, 'no-changes');
   } finally {
     fs.rmSync(base, { recursive: true, force: true });
   }

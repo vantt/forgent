@@ -650,3 +650,155 @@ test('architecture guard: bind.mjs does NOT import src/state or src/runner/coord
   assert.doesNotMatch(content, /from\s+['"][^'"]*worktree/);
   assert.doesNotMatch(content, /from\s+['"][^'"]*merge/);
 });
+
+// A unit's own `prefer` is a soft preference: its candidates go ahead of the capability's pool and
+// pass every filter the capability's candidates pass; each candidate carries where it came from.
+const preferAsk = (unit, extra = {}) => ({ unit: { id: 'u1', capability: 'code:implement', writes: [], ...unit }, role: 'producer', ...extra });
+
+test('bind prefer: a unit-preferred executor is chosen ahead of the capability pool and says so', () => {
+  const result = bind(preferAsk({ prefer: ['gemini-cli'] }), { runnerConfig: createMockRunnerConfig(), session: {} });
+  assert.equal(result.executor, 'gemini-cli');
+  assert.equal(result.candidateIndex, 0);
+  assert.equal(result.provenance.executor.source, 'unit-prefer');
+  assert.equal(result.provenance.invocation.source, 'unit-prefer');
+});
+
+test('bind prefer: a filtered unit candidate falls to the capability pool, whose source is the capability', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.governance = { disallowedProviders: ['gemini'] };
+  const result = bind(preferAsk({ prefer: ['gemini-cli'] }), { runnerConfig, session: {} });
+  assert.equal(result.executor, 'claude');
+  assert.equal(result.candidateIndex, 1);
+  assert.equal(result.provenance.executor.source, 'capability:code:implement');
+});
+
+test('bind prefer: independence filters a unit-preferred executor of the same family', () => {
+  const result = bind(
+    preferAsk({ prefer: ['gemini-cli'] }, { role: 'reviewer', readOnly: true, independentOf: ['gemini'] }),
+    { runnerConfig: createMockRunnerConfig(), session: {} },
+  );
+  assert.equal(result.executor, 'claude');
+  assert.equal(result.provenance.executor.source, 'capability:code:implement');
+});
+
+test('bind prefer: a unit-preferred executor with no invocation able to carry the posture is skipped', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.executors['herdr-only'] = {
+    kind: 'agent',
+    provider: 'gemini',
+    command: 'agy',
+    invocations: [{ id: 'herdr-only-spawn', via: 'cli', adapter: 'herdr-spawn', confinement: { backend: 'bwrap' } }],
+  };
+  const result = bind(preferAsk({ prefer: ['herdr-only'] }), { runnerConfig, session: { headless: true } });
+  assert.equal(result.executor, 'claude');
+});
+
+test('bind prefer: an executor that is not registered is skipped like a filter, never thrown', () => {
+  const runnerConfig = createMockRunnerConfig();
+  const skipped = bind(preferAsk({ prefer: ['nope'] }), { runnerConfig, session: {} });
+  assert.equal(skipped.executor, 'claude');
+  assert.equal(skipped.candidateIndex, 1);
+
+  delete runnerConfig.capabilities['code:implement'].prefer;
+  delete runnerConfig.capabilities.implement;
+  const refused = bind(preferAsk({ prefer: ['nope'] }), { runnerConfig, session: { headless: true } });
+  assert.equal(refused.refused.reason, 'unknown-executor');
+});
+
+test('bind prefer: a human override that names an executor still pins it over the unit preference', () => {
+  const result = bind(
+    preferAsk({ prefer: ['gemini-cli'] }, { overrides: [{ origin: 'human-cli', executor: 'codex' }] }),
+    { runnerConfig: createMockRunnerConfig(), session: {} },
+  );
+  assert.equal(result.executor, 'codex');
+  assert.equal(result.provenance.executor.source, 'override');
+});
+
+test('bind prefer: duplicates of a unit candidate are dropped from the capability pool, order kept', () => {
+  const runnerConfig = createMockRunnerConfig();
+  const ask = preferAsk({ prefer: [{ executor: 'codex', invocation: 'codex-cli' }] }, { unit: { id: 'u1', capability: 'code:implement', writes: ['src/a.js'], prefer: [{ executor: 'codex', invocation: 'codex-cli' }] } });
+  const ctx = { runnerConfig, session: {} };
+  const walked = [];
+  let bound = bind(ask, ctx);
+  while (!bound.refused) {
+    walked.push([bound.executor, bound.provenance.executor.source]);
+    bound = nextCandidate(bound, ask, ctx);
+  }
+  assert.deepEqual(walked, [
+    ['codex', 'unit-prefer'],
+    ['claude', 'capability:code:implement'],
+    ['gemini-cli', 'capability:code:implement'],
+  ]);
+});
+
+test('bind prefer: nextCandidate after a unit-preferred executor walks into the capability pool', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
+  const ask = preferAsk({ prefer: ['gemini-cli'], writes: ['src/a.js'] });
+  const first = bind(ask, ctx);
+  assert.equal(first.executor, 'gemini-cli');
+  const second = nextCandidate(first, ask, ctx);
+  assert.equal(second.executor, 'claude');
+  assert.equal(second.provenance.executor.source, 'capability:code:implement');
+  assert.equal(second.provenance.fallbackFrom.executor, 'gemini-cli');
+});
+
+test('bind prefer: a unit without prefer binds exactly as before', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: true } };
+  const ask = { unit: { id: 'u1', capability: 'code:implement', writes: ['src/a.js'] }, role: 'producer' };
+  const withEmpty = { ...ask, unit: { ...ask.unit, prefer: [] } };
+  const result = bind(ask, ctx);
+  assert.deepEqual(bind(withEmpty, ctx), result);
+  assert.equal(result.executor, 'claude');
+  assert.equal(result.candidateIndex, 0);
+  assert.deepEqual(result.provenance.executor, { value: 'claude', source: 'capability:code:implement' });
+  assert.deepEqual(result.provenance.invocation, { value: 'claude-herdr', source: 'capability:code:implement' });
+});
+
+test('bind persona: the unit persona beats the capability persona and is recorded as the unit', () => {
+  const result = bind(preferAsk({ persona: 'unit-voice' }), { runnerConfig: createMockRunnerConfig(), session: {} });
+  assert.equal(result.persona, 'unit-voice');
+  assert.deepEqual(result.provenance.persona, { value: 'unit-voice', source: 'unit' });
+});
+
+test('bind persona: an override persona beats the unit persona', () => {
+  const result = bind(
+    preferAsk({ persona: 'unit-voice' }, { overrides: [{ origin: 'human-cli', persona: 'override-voice' }] }),
+    { runnerConfig: createMockRunnerConfig(), session: {} },
+  );
+  assert.equal(result.persona, 'override-voice');
+  assert.equal(result.provenance.persona.source, 'override:human-cli');
+});
+
+test('bind persona: a locked persona that disagrees with the unit persona refuses the binding', () => {
+  const runnerConfig = createMockRunnerConfig();
+  const refused = bind(preferAsk({ persona: 'unit-voice' }, { lockedPersona: 'locked-voice' }), { runnerConfig, session: {} });
+  assert.equal(refused.refused.reason, 'locked-persona');
+  const agreed = bind(preferAsk({ persona: 'locked-voice' }, { lockedPersona: 'locked-voice' }), { runnerConfig, session: {} });
+  assert.equal(agreed.persona, 'locked-voice');
+});
+
+test('bind prefer: a bare unit executor id covers every capability entry of that executor, so failover never returns to it', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
+  const ask = preferAsk({ prefer: ['codex'], writes: ['src/a.js'] });
+  const walked = [];
+  let bound = bind(ask, ctx);
+  while (!bound.refused) {
+    walked.push(bound.executor);
+    bound = nextCandidate(bound, ask, ctx);
+  }
+  assert.deepEqual(walked, ['codex', 'claude', 'gemini-cli']);
+});
+
+test('bind: an invocation a unit names in its prefer stays bound inside herdr, while a bare executor id still takes the herdr transport', () => {
+  const herdr = { headless: true, herdrPresent: true };
+  const pinned = bind(preferAsk({ capability: 'docs:write', prefer: [{ executor: 'duo', invocation: 'duo-confined' }] }), { runnerConfig: twoInvocationConfig(), session: herdr });
+  assert.equal(pinned.invocation, 'duo-confined');
+  assert.equal(pinned.transport, 'cli');
+  assert.deepEqual(pinned.provenance.invocation, { value: 'duo-confined', source: 'unit-prefer' });
+
+  // A bare executor id leaves the transport to bind(): the herdr invocation is not something the unit named.
+  const bare = bind(preferAsk({ capability: 'docs:write', prefer: ['duo'] }), { runnerConfig: twoInvocationConfig(), session: herdr });
+  assert.equal(bare.invocation, 'duo-herdr');
+  assert.equal(bare.transport, 'herdr');
+  assert.equal(bare.provenance.executor.source, 'unit-prefer');
+});

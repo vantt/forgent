@@ -190,6 +190,29 @@ test('with herdr present the run goes through a pane and the record says so', { 
   assert.ok(calls.some((c) => c[0] === 'pane' && c[1] === 'run'), 'the agent must have been launched in the pane');
 });
 
+test('a pane run leaves a stdout log holding the settled report text, not the pane output', { skip: SKIP }, async () => {
+  const { repoRoot, worktreeDir, signalDir } = setup(['alpha']);
+  const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true }] });
+  const res = await withHerdrBin(fake.herdrBin, () => runUnit({
+    unitData: readOnlyUnit('u-herdr-output'),
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    session: { herdrPresent: true, headless: true },
+  }));
+  assert.equal(res.outcome, 'pass');
+  const result = readJson(path.join(runDirOf(repoRoot, res.unitRunId, 'producer', 1), 'result.json'));
+  assert.equal(result.adapter, 'herdr-spawn');
+  // A pane has no captured terminal output: the run's stdout log exists and holds the settled
+  // report's text, so a caller that needs the worker's words reads the report, never the pane.
+  const stdoutLog = path.resolve(repoRoot, result.runtime.stdoutLog);
+  assert.ok(fs.existsSync(stdoutLog), 'a pane run still leaves a stdout log');
+  assert.equal(result.settleReports.length, 1);
+  const report = fs.readFileSync(path.resolve(repoRoot, result.settleReports[0].path), 'utf8');
+  assert.match(report, /^# Report/);
+  assert.equal(fs.readFileSync(stdoutLog, 'utf8'), report, 'the stdout log of a pane run is the settled report text');
+});
+
 test('the agent in the pane runs inside the posture wrapper: repo read-only, run outbox writable', { skip: SKIP }, async () => {
   const { repoRoot, worktreeDir, signalDir } = setup(['alpha']);
   const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true }] });

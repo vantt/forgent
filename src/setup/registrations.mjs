@@ -68,7 +68,7 @@ import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
@@ -497,6 +497,21 @@ function checkRunnerRigorConfig(cwd) {
   return problems.length > 0
     ? { passed: false, message: problems.join('; ') }
     : { passed: true, message: 'runner rigor maps and capability floors are valid at every configured level' };
+}
+
+export function checkRunnerGeneratedPathsConfig(cwd) {
+  const projectRunner = readSharedConfig(cwd)?.runner;
+  const globalRunner = loadGlobalConfig()?.runner;
+  const [level, runner] = projectRunner ? ['project', projectRunner] : globalRunner ? ['global', globalRunner] : [];
+  if (!runner || runner.generatedPaths === undefined) {
+    return { passed: true, message: 'warning: runner.generatedPaths missing -- write scopes are not widened to generated trees; run fgos setup' };
+  }
+  try {
+    validateGeneratedPathsShape(runner.generatedPaths, `${level} runner`);
+  } catch (err) {
+    return { passed: false, message: `${level} ${err.message}` };
+  }
+  return { passed: true, message: `${level} runner.generatedPaths is valid (${runner.generatedPaths.length} mapping(s))` };
 }
 
 export function checkRunnerPatternsConfig(cwd) {
@@ -1424,6 +1439,12 @@ registerCheck({
   id: 'runner-rigor-config',
   description: 'project and global runner rigorToTier maps are complete and capabilities declare only rigor floors',
   check: (cwd) => checkRunnerRigorConfig(cwd),
+});
+
+registerCheck({
+  id: 'runner-generated-paths',
+  description: 'runner.generatedPaths maps generated sources to render targets with well-formed write-scope entries',
+  check: (cwd) => checkRunnerGeneratedPathsConfig(cwd),
 });
 
 registerCheck({
@@ -2488,11 +2509,19 @@ function workflowCapabilityUses(root) {
   return uses;
 }
 
+// Capabilities the runner loop's worker asks for that no Workflow unit names. A coding item's
+// executing step runs as a Unit of `code:implement` (work-compat.mjs's curated mapping); its other
+// steps ask for `<domain>:<verb>`, the names the domain's Workflow units already use.
+const RUNNER_LOOP_CAPABILITY_USES = Object.freeze([['code:implement', 'runner loop: coding executing step']]);
+
 function checkWorkflowCapabilitiesConfigured(cwd) {
   const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
   const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
   const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
   const uses = workflowCapabilityUses(packageRoot);
+  for (const [capability, id] of RUNNER_LOOP_CAPABILITY_USES) {
+    uses.set(capability, new Set([...(uses.get(capability) ?? []), id]));
+  }
   if (path.resolve(cwd) !== packageRoot) {
     for (const [capability, ids] of workflowCapabilityUses(cwd)) {
       uses.set(capability, new Set([...(uses.get(capability) ?? []), ...ids]));
@@ -4340,12 +4369,18 @@ export function checkTrustStoresReadable(cwd, runnerCfg = {}) {
  * logged out, and the first symptom is a pane sitting at a sign-in screen until the idle limit. This is the
  * doctor line that names it, per invocation, before a run does.
  */
-export function checkConfinedPaneAccounts(runnerCfg = {}) {
+export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = undefined) {
   let inventory;
-  try {
-    inventory = providerAccountInventory(runnerCfg);
-  } catch (err) {
-    return { passed: false, message: `provider account inventory is invalid: ${err.message}` };
+  if (providerInventory) {
+    // The machine-global read: an unusable global config is reported by its reason (code and path only).
+    if (providerInventory.inventoryUnreadable) return { passed: false, message: `provider account inventory is unreadable: ${providerInventory.inventoryUnreadable}` };
+    inventory = providerInventory.inventory;
+  } else {
+    try {
+      inventory = providerAccountInventory(runnerCfg);
+    } catch (err) {
+      return { passed: false, message: `provider account inventory is invalid: ${err.message}` };
+    }
   }
   const expandHome = (value) => String(value ?? '').replace(/^\$\{HOME\}(?=\/|$)/, os.homedir()).replace(/^\$HOME(?=\/|$)/, os.homedir()).replace(/^~(?=\/|$)/, os.homedir());
   const problems = [];
@@ -4355,7 +4390,9 @@ export function checkConfinedPaneAccounts(runnerCfg = {}) {
       if (inv?.adapter !== 'herdr-spawn' || !(inv.resourceBindings ?? []).some((b) => b?.resource === 'private-home')) continue;
       const label = `executor "${id}" invocation "${inv.id ?? '?'}"`;
       const provider = normalizeProviderFamily(executor.providerModel ?? executor.provider);
-      const accounts = Object.values(inventory[provider]?.accounts ?? {});
+      const providerEntry = Object.hasOwn(inventory, provider) ? inventory[provider] : undefined;
+      const accountMap = providerEntry?.accounts;
+      const accounts = accountMap && typeof accountMap === 'object' ? Object.keys(accountMap).filter((key) => Object.hasOwn(accountMap, key)).map((key) => accountMap[key]) : [];
       if (accounts.length === 0) {
         problems.push(`${label}: no runner.providers.${provider}.accounts in the global config, so its pane starts in an empty private home, logged out`);
         continue;
@@ -4585,11 +4622,23 @@ registerCheck({
   id: 'confined-pane-accounts',
   description: 'every confined herdr invocation that binds a private home has an account in the global provider inventory whose credential files exist, so its pane starts logged in',
   check: (cwd) => {
+    // The account inventory lives only in the global config, so it is read from there whatever the cwd.
+    // Executors come from the project config merged with the global one; with no usable project config the
+    // global config's own executors are judged.
+    const providerInventory = readDoctorProviderInventory();
+    let runnerCfg;
     try {
-      return checkConfinedPaneAccounts(loadRunnerConfigFromDir(cwd));
+      runnerCfg = loadRunnerConfigFromDir(cwd);
     } catch (err) {
-      return { passed: true, message: `runner config not loadable here, confined pane accounts not evaluated: ${err.message}` };
+      let globalRunner = {};
+      try { globalRunner = loadGlobalConfig().runner ?? {}; } catch { /* the inventory read reports an unreadable global config */ }
+      if (!globalRunner.executors || typeof globalRunner.executors !== 'object') {
+        if (providerInventory.inventoryUnreadable) return checkConfinedPaneAccounts({}, providerInventory);
+        return { passed: true, message: `runner config not loadable here, confined pane accounts not evaluated: ${err.message}` };
+      }
+      runnerCfg = { executors: globalRunner.executors };
     }
+    return checkConfinedPaneAccounts(runnerCfg, providerInventory);
   },
 });
 

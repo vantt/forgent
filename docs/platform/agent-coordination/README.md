@@ -30,6 +30,8 @@ The surviving Assignment/Run dispatch chain is also current: Assignment building
 
 Read [the runner spec](../../specs/runner.md) for the current execution contract, then [this area's current-owner map](spec.md). Do not treat CoordinationSession, CoordinationProtocol or FlowDefinition in the preserved documents as current implemented engine entities.
 
+> **Ghi chú (2026-10-14, decision 0062 trong `docs/specs/runner.md`):** các cửa dispatch thô mà tài liệu, proof và roadmap trong thư mục này nhắc tới — `dispatch execute` (cả `--contract`, `--assignment`), `dispatch log`, `dispatch fanout-batch` — đã bị xoá. Việc chạy qua `fgos run "<prompt>"` / `fgos run --unit` hoặc `fgos workflow start`. Các bản ghi verification/proof giữ nguyên lệnh đã chạy lúc đó, như bằng chứng lịch sử.
+
 ## Preserved History
 
 The [complete previous portal](history/retired-engine/README.md#literal-snapshot) and [previous spec](history/retired-engine/spec.md#literal-snapshot) remain verbatim, including all original qualifications and statuses. They are non-authority history, not present implementation claims.

@@ -9,11 +9,12 @@ import { RunnerConfigError } from '../runner/dispatch/config.mjs';
  * RunnerConfigError every CLI/runner caller already handles.
  *
  * @param {unknown} raw
+ * @param {object} [options] passed through to validateWorkflow (e.g. `{ source: 'units-file' }`)
  * @returns {Readonly<object>}
  */
-export function validateWorkflowChecked(raw) {
+export function validateWorkflowChecked(raw, options) {
   try {
-    return validateWorkflow(raw);
+    return validateWorkflow(raw, options);
   } catch (err) {
     if (err instanceof WorkflowDefinitionError) throw new RunnerConfigError(err.message);
     throw err;

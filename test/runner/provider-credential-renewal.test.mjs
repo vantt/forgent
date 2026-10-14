@@ -1466,7 +1466,8 @@ test('a marker file that is no fgOS marker at all stops the removal; one that na
 
 test('every dispatch caller hands the renewal the configured temp roots', () => {
   const root = path.join(path.dirname(new URL(import.meta.url).pathname), '../../src/runner');
-  for (const file of ['dispatch/cli.mjs', 'operation-choice.mjs', 'execution/run.mjs']) {
+  // A Work driver step dispatches through runUnit (execution/run.mjs), not on its own.
+  for (const file of ['dispatch/cli.mjs', 'execution/run.mjs']) {
     const text = fs.readFileSync(path.join(root, file), 'utf8');
     const calls = text.match(/createConfinementCredentialRenewal\(/g) ?? [];
     const wired = text.match(/createConfinementCredentialRenewal\(\{ tempRoots: defaultConfinementTempRoots \}\)/g) ?? [];

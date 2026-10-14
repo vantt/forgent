@@ -1,10 +1,12 @@
 // src/workflow/definition.mjs — Workflow definition contract and schema validator
-// Architecture guard: MUST NOT import src/state/** or src/runner/** (kernel layer)
+// Architecture guard: MUST NOT import src/state/** or src/runner/** (kernel layer). The one exception is
+// src/runner/dispatch/write-scope.mjs, an import-free leaf, so a workflow and a unit read writes one way.
 
 import path from 'node:path';
+import { canonicalizeWrites } from '../runner/dispatch/write-scope.mjs';
 
-/** Thrown for a malformed Workflow definition. Kept free of runner imports so the
- * Work-lifecycle kernel can read step data without depending on dispatch. */
+/** Thrown for a malformed Workflow definition. Kept free of runner imports (bar the import-free
+ * write-scope leaf) so the Work-lifecycle kernel can read step data without depending on dispatch. */
 export class WorkflowDefinitionError extends Error {
   constructor(message) {
     super(message);
@@ -109,13 +111,22 @@ function normalizeOperation(raw, label) {
   });
 }
 
+// Where a definition comes from, as the caller that loaded it says -- never a field of the data.
+// Only a units file (`fgos workflow start --units`) is a one-off list of Units, so only its unit
+// templates may carry a soft executor `prefer`; a preset or plan is shipped to other projects
+// and keeps the G2 rule (its seats are tuned with --seats and personas instead).
+const UNITS_FILE_SOURCE = 'units-file';
+
 /**
  * Validate a Workflow definition object.
  *
  * @param {unknown} raw Raw workflow object from YAML or parser
+ * @param {object} [options]
+ * @param {string} [options.source] Who loaded the definition; 'units-file' lets unit templates carry `prefer`
  * @returns {Readonly<object>} Frozen, normalized Workflow object
  */
-export function validateWorkflow(raw) {
+export function validateWorkflow(raw, { source } = {}) {
+  const templateAllowsPrefer = source === UNITS_FILE_SOURCE;
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
     throw new WorkflowDefinitionError('Workflow definition must be a non-null object');
   }
@@ -260,6 +271,7 @@ export function validateWorkflow(raw) {
 
         const template = u.template && typeof u.template === 'object' ? u.template : u;
         for (const field of DISALLOWED_G2_FIELDS) {
+          if (field === 'prefer' && templateAllowsPrefer) continue;
           if (template[field] !== undefined) {
             throw new WorkflowDefinitionError(`${unitLabel}.template contains disallowed infrastructure field "${field}" (G2 constraint).`);
           }
@@ -279,21 +291,14 @@ export function validateWorkflow(raw) {
           throw new WorkflowDefinitionError(`${unitLabel} invalid rigor "${rigor}", must be one of [${[...VALID_RIGORS].join(', ')}]`);
         }
 
-        const writes = Array.isArray(template.writes)
-          ? template.writes.map((w, wIdx) => {
-              if (typeof w !== 'string' || !w.trim()) {
-                throw new WorkflowDefinitionError(`${unitLabel}.writes[${wIdx}] must be a non-empty string`);
-              }
-              const clean = w.trim();
-              if (path.isAbsolute(clean) || clean.startsWith('/') || clean.startsWith('\\')) {
-                throw new WorkflowDefinitionError(`${unitLabel}.writes contains absolute path "${clean}". Must be repo-relative.`);
-              }
-              if (clean.includes('..')) {
-                throw new WorkflowDefinitionError(`${unitLabel}.writes contains path escape ".." in "${clean}". Must be repo-relative.`);
-              }
-              return clean;
-            })
-          : [];
+        let writes = [];
+        if (template.writes !== undefined) {
+          try {
+            writes = canonicalizeWrites(template.writes);
+          } catch (err) {
+            throw new WorkflowDefinitionError(`${unitLabel}.writes: ${err.message}`);
+          }
+        }
 
         const uDependsOn = Array.isArray(u.dependsOn)
           ? u.dependsOn.map((ud) => String(ud).trim()).filter(Boolean)
@@ -349,6 +354,8 @@ export function validateWorkflow(raw) {
               writes,
               taskSpec: typeof template.taskSpec === 'string' ? template.taskSpec.trim() : undefined,
               persona: typeof template.persona === 'string' && template.persona.trim() ? template.persona.trim() : undefined,
+              // Shape is checked by the Unit contract (validateUnit) before a units file gets here and again at run.
+              ...(templateAllowsPrefer && template.prefer !== undefined ? { prefer: Object.freeze(structuredClone(template.prefer)) } : {}),
               params: template.params === undefined ? undefined : structuredClone(template.params),
               contextRefs,
               ...(template.pattern === 'reviewed' ? { acceptOutcomes: Object.freeze([...acceptOutcomes]) } : {}),

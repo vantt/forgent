@@ -919,7 +919,7 @@ test('after a producer round passes, the runner commits what the worker wrote, w
   assert.equal(res.outcome, 'pass');
   assert.equal(res.results[0].commit.status, 'committed');
   assert.deepEqual(res.results[0].commit.files, ['src/feature.txt']);
-  assert.equal(execFileSync('git', ['log', '-1', '--format=%s'], { cwd: worktreeDir, encoding: 'utf8' }).trim(), 'Added the feature file');
+  assert.equal(execFileSync('git', ['log', '-1', '--format=%s'], { cwd: worktreeDir, encoding: 'utf8' }).trim(), 'chore(u-commit): Added the feature file');
   assert.notEqual(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: worktreeDir, encoding: 'utf8' }).trim(), before);
   assert.equal(execFileSync('git', ['status', '--porcelain'], { cwd: worktreeDir, encoding: 'utf8' }).trim(), '', 'nothing left uncommitted');
   const unitRecord = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit.json'), 'utf8'));
@@ -1417,4 +1417,337 @@ test('a failed settlement write never replaces the execution error that caused i
   assert.equal(fixture.readRecord().execution.status, 'running', 'the record keeps the last state that was written');
   assert.equal(fixture.readRecord().settlement, undefined);
   assert.deepEqual(fs.readdirSync(fixture.unitDir).filter((name) => name.endsWith('.tmp')), [], 'no partial record is left behind');
+});
+
+function setGeneratedPaths(repoRoot, generatedPaths) {
+  const configPath = path.join(repoRoot, '.fgos', 'config.json');
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  config.runner.generatedPaths = generatedPaths;
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+}
+
+const SKILL_RENDERS = [{ from: 'core/skills/**', also: ['.agents/skills/**', 'plugins/fgOS/skills/**'] }];
+
+test('runUnit records the write scope widened by generatedPaths and hands it to the assignment', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  setGeneratedPaths(repoRoot, SKILL_RENDERS);
+  const res = await runUnit({
+    unitData: { id: 'u-skill', objective: 'Edit a skill', capability: 'docs:write', writes: ['./core/skills/x/SKILL.md', 'docs/'] },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);
+  const record = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
+  const expected = ['core/skills/x/SKILL.md', 'docs', '.agents/skills/**', 'plugins/fgOS/skills/**'];
+  assert.deepEqual(record.unit.writes, ['core/skills/x/SKILL.md', 'docs']);
+  assert.deepEqual(record.writeScope, expected);
+  const assignment = JSON.parse(fs.readFileSync(path.join(unitDir, 'producer', '1', 'assignment.json'), 'utf8'));
+  assert.deepEqual(assignment.writes, expected);
+});
+
+test('a resumed unit keeps its recorded write scope even after generatedPaths changes', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  setGeneratedPaths(repoRoot, SKILL_RENDERS);
+  const unitData = { id: 'u-resume-scope', objective: 'Edit a skill', capability: 'not-configured:answer', writes: ['core/skills/y.md'] };
+  const first = await runUnit({ unitData, repoRoot, cwd: worktreeDir });
+  const unitJson = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId, 'unit.json');
+  const expected = ['core/skills/y.md', '.agents/skills/**', 'plugins/fgOS/skills/**'];
+  assert.deepEqual(JSON.parse(fs.readFileSync(unitJson, 'utf8')).writeScope, expected);
+  setGeneratedPaths(repoRoot, []);
+  await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
+  assert.deepEqual(JSON.parse(fs.readFileSync(unitJson, 'utf8')).writeScope, expected);
+});
+
+test('a resumed unit recorded before write scopes existed hands its own writes to the assignment', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  setGeneratedPaths(repoRoot, SKILL_RENDERS);
+  const first = await runUnit({
+    unitData: { id: 'u-old-record', objective: 'Edit a skill', capability: 'docs:write', writes: ['core/skills/z.md'] },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId);
+  const unitJson = path.join(unitDir, 'unit.json');
+  const record = JSON.parse(fs.readFileSync(unitJson, 'utf8'));
+  delete record.writeScope;
+  delete record.settlement;
+  record.execution = { status: 'running' };
+  fs.writeFileSync(unitJson, JSON.stringify(record, null, 2));
+  fs.rmSync(path.join(unitDir, 'producer'), { recursive: true, force: true });
+  await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
+  const assignment = JSON.parse(fs.readFileSync(path.join(unitDir, 'producer', '1', 'assignment.json'), 'utf8'));
+  assert.deepEqual(assignment.writes, ['core/skills/z.md']);
+  assert.equal(JSON.parse(fs.readFileSync(unitJson, 'utf8')).writeScope, undefined);
+});
+
+test('a resume is refused while a live process holds the dispatch lock of the unit worktree, and proceeds once that holder is dead', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  const unitData = { id: 'resume-lock', capability: 'not-configured:answer', objective: 'Answer question', writes: [] };
+  const refused = await runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir });
+  assert.equal(refused.outcome, 'policy-refusal');
+  const runDir = path.join(repoRoot, '.fgos', 'assignments', refused.unitRunId, 'producer', '1', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
+    runId: 'synthetic-resumed-run', settledAt: '2026-10-05T01:00:00Z',
+    classification: { outcome: { category: 'ok' } },
+  }));
+  // The lock name and the composite holder identity are exactly what a mutating dispatch writes.
+  const lockPath = path.join(repoRoot, '.fgos', `dispatch--${encodeURIComponent(path.resolve(worktreeDir))}.lock`);
+  const resume = () => runUnit({ resumeUnitRunId: refused.unitRunId, repoRoot, cwd: worktreeDir, worktree: worktreeDir });
+
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: `${process.pid}:${Date.now()}:live`, ts: Date.now() }));
+  await assert.rejects(resume, /holds lock/);
+
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: `2147483646:${Date.now()}:dead`, ts: Date.now() }));
+  assert.equal((await resume()).outcome, 'pass');
+});
+
+// A worker that writes `files` (path -> content) in its worktree and settles done. With `waitFor`, it
+// first writes `.started` and waits (up to 20s) for that file to appear, so a test can act mid-round.
+function writeScopedWorker(repoRoot, { files, waitFor = null, summary = 'Wrote the files' }) {
+  const script = path.join(repoRoot, 'scoped-worker.mjs');
+  fs.writeFileSync(
+    script,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const files = ${JSON.stringify(files)};
+    for (const [rel, content] of Object.entries(files)) {
+      fs.mkdirSync(path.dirname(rel), { recursive: true });
+      fs.writeFileSync(rel, content);
+    }
+    const waitFor = ${JSON.stringify(waitFor)};
+    if (waitFor) {
+      fs.writeFileSync('.started', '');
+      const until = Date.now() + 20000;
+      while (!fs.existsSync(waitFor) && Date.now() < until) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+    }
+    if (match) {
+      const claimDir = path.dirname(match[1]);
+      const outbox = path.join(claimDir, 'worker-output', 'outbox');
+      const runDir = fs.existsSync(outbox) ? outbox : claimDir;
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe assigned work was carried out and checked in full detail.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: ${JSON.stringify(summary)}, assessment: { verdict: 'pass' } }));
+    }
+    `,
+  );
+  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  for (const executor of Object.values(cfg.runner.executors)) {
+    executor.args = [script, '{prompt}'];
+    for (const invocation of executor.invocations) invocation.args = [script, '{prompt}'];
+  }
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+}
+
+const gitIn = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+const headOf = (cwd) => gitIn(cwd, 'rev-parse', 'HEAD').trim();
+/** How many producer rounds were actually spawned (each settled spawn leaves a result.json). */
+function producerSpawns(repoRoot, unitRunId) {
+  const roleDir = path.join(repoRoot, '.fgos', 'assignments', unitRunId, 'producer');
+  if (!fs.existsSync(roleDir)) return 0;
+  let n = 0;
+  for (const attempt of fs.readdirSync(roleDir)) {
+    const runs = path.join(roleDir, attempt, 'runs');
+    if (fs.existsSync(runs)) n += fs.readdirSync(runs).filter((r) => fs.existsSync(path.join(runs, r, 'result.json'))).length;
+  }
+  return n;
+}
+const unitRecordOf = (repoRoot, unitRunId) => JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
+
+async function waitForFile(file, ms = 20000) {
+  const until = Date.now() + ms;
+  while (!fs.existsSync(file)) {
+    if (Date.now() > until) throw new Error(`timed out waiting for ${file}`);
+    await new Promise((r) => setTimeout(r, 50));
+  }
+}
+
+test('a mutating unit with a foreign staged index is refused before any producer is spawned', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  writeScopedWorker(repoRoot, { files: { 'docs/a.md': 'a\n' } });
+  fs.writeFileSync(path.join(worktreeDir, 'staged.txt'), 's\n');
+  gitIn(worktreeDir, 'add', 'staged.txt');
+  const res = await runUnit({
+    unitData: { id: 'u-foreign', objective: 'Write docs', capability: 'docs:write', writes: ['docs'] },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  assert.equal(res.outcome, 'policy-refusal');
+  assert.equal(res.results[0].refused.reason, 'foreign-staged-index');
+  assert.deepEqual(res.results[0].refused.paths, ['staged.txt']);
+  assert.match(res.results[0].refused.detail, /staged\.txt/);
+  assert.equal(producerSpawns(repoRoot, res.unitRunId), 0, 'the worker never ran');
+  assert.equal(fs.existsSync(path.join(worktreeDir, 'docs', 'a.md')), false);
+  assert.equal(gitIn(worktreeDir, 'diff', '--cached', '--name-only').trim(), 'staged.txt', 'the index is left as it was');
+});
+
+test('a file dirty in scope before launch is not committed and is recorded as preExistingInScope', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  writeScopedWorker(repoRoot, { files: { 'docs/new.md': 'n\n' } });
+  fs.mkdirSync(path.join(worktreeDir, 'docs'));
+  fs.writeFileSync(path.join(worktreeDir, 'docs', 'wip.md'), 'a person is half way through this\n');
+  const res = await runUnit({
+    unitData: { id: 'u-wip', objective: 'Write docs', capability: 'docs:write', writes: ['docs'] },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  assert.equal(res.outcome, 'pass');
+  const commit = res.results[0].commit;
+  assert.equal(commit.status, 'committed');
+  assert.deepEqual(commit.files, ['docs/new.md']);
+  assert.deepEqual(commit.preExistingInScope, ['docs/wip.md']);
+  assert.match(gitIn(worktreeDir, 'status', '--porcelain', '--untracked-files=all'), /\?\? docs\/wip\.md/);
+  const attempt = unitRecordOf(repoRoot, res.unitRunId).bindings['producer/1'][0];
+  assert.deepEqual(attempt.preExistingInScope, ['docs/wip.md']);
+  assert.deepEqual(attempt.commit.preExistingInScope, ['docs/wip.md']);
+});
+
+test('a producer writing in and out of scope gets only the in-scope file committed and still passes', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  writeScopedWorker(repoRoot, { files: { 'docs/in.md': 'i\n', 'src/out.txt': 'o\n' }, summary: 'feat(docs): add the page' });
+  const res = await runUnit({
+    unitData: { id: 'u-scope', objective: 'Write docs', capability: 'docs:write', writes: ['docs'] },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  assert.equal(res.outcome, 'pass');
+  const commit = res.results[0].commit;
+  assert.deepEqual(commit.files, ['docs/in.md']);
+  assert.deepEqual(commit.outOfScope, ['src/out.txt']);
+  assert.equal(commit.subject, 'feat(docs): add the page');
+  assert.equal(gitIn(worktreeDir, 'show', '--name-only', '--format=', 'HEAD').trim(), 'docs/in.md');
+  assert.deepEqual(unitRecordOf(repoRoot, res.unitRunId).bindings['producer/1'][0].commit.outOfScope, ['src/out.txt']);
+});
+
+test('resume after a foreign index appeared mid-round only commits: the producer is not spawned again', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  writeScopedWorker(repoRoot, { files: { 'docs/in.md': 'i\n' }, waitFor: '.go' });
+  const unitData = { id: 'u-midround', objective: 'Write docs', capability: 'docs:write', writes: ['docs'] };
+  const running = runUnit({ unitData, repoRoot, cwd: worktreeDir, pattern: 'solo' });
+  await waitForFile(path.join(worktreeDir, '.started'));
+  fs.writeFileSync(path.join(worktreeDir, 'foreign.txt'), 'f\n');
+  gitIn(worktreeDir, 'add', 'foreign.txt');
+  fs.writeFileSync(path.join(worktreeDir, '.go'), '');
+  const first = await running;
+  assert.equal(first.outcome, 'execution-failure');
+  assert.equal(first.results[0].commit.reason, 'foreign-staged-index');
+  assert.equal(producerSpawns(repoRoot, first.unitRunId), 1);
+  const before = headOf(worktreeDir);
+
+  gitIn(worktreeDir, 'reset', '-q', 'foreign.txt');
+  const resumed = await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
+  assert.equal(resumed.outcome, 'pass');
+  assert.equal(producerSpawns(repoRoot, first.unitRunId), 1, 'resume committed without spawning the producer again');
+  assert.equal(resumed.results[0].commit.status, 'committed');
+  assert.deepEqual(resumed.results[0].commit.files, ['docs/in.md']);
+  assert.notEqual(headOf(worktreeDir), before);
+  const record = unitRecordOf(repoRoot, first.unitRunId);
+  assert.equal(record.bindings['producer/1'].length, 1);
+  assert.equal(record.bindings['producer/1'][0].commit.status, 'committed');
+  assert.equal(record.bindings['producer/1'][0].outcome, 'pass');
+  assert.equal(record.settlement.outcome, 'pass');
+});
+
+test('resume after committed-set-mismatch refuses while the commit is on the branch', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  writeScopedWorker(repoRoot, { files: { 'docs/in.md': 'i\n' } });
+  const hooks = path.join(repoRoot, 'test-hooks');
+  fs.mkdirSync(hooks);
+  fs.writeFileSync(path.join(hooks, 'pre-commit'), '#!/bin/sh\necho sneaky > sneaky.txt\ngit add sneaky.txt\n', { mode: 0o755 });
+  gitIn(repoRoot, 'config', 'core.hooksPath', hooks);
+  const first = await runUnit({
+    unitData: { id: 'u-hooked', objective: 'Write docs', capability: 'docs:write', writes: ['docs'] },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  assert.equal(first.outcome, 'execution-failure');
+  const commit = first.results[0].commit;
+  assert.equal(commit.reason, 'committed-set-mismatch');
+  assert.equal(commit.sha, headOf(worktreeDir));
+
+  await assert.rejects(
+    () => runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir }),
+    (error) => error instanceof RunnerConfigError
+      && error.message.includes(commit.sha)
+      && /sneaky\.txt/.test(error.message)
+      && /outside the scope/.test(error.message),
+  );
+  assert.equal(producerSpawns(repoRoot, first.unitRunId), 1);
+
+  // Once a person takes that commit off the branch (keeping its files), resume commits again.
+  gitIn(repoRoot, 'config', '--unset', 'core.hooksPath');
+  gitIn(worktreeDir, 'reset', '-q', 'HEAD~1');
+  fs.rmSync(path.join(worktreeDir, 'sneaky.txt'));
+  const resumed = await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
+  assert.equal(resumed.outcome, 'pass');
+  assert.deepEqual(resumed.results[0].commit.files, ['docs/in.md']);
+  assert.equal(producerSpawns(repoRoot, first.unitRunId), 1, 'still no second spawn');
+});
+
+test('a commit-only resume whose in-scope work is gone fails as work-missing instead of passing empty', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  writeScopedWorker(repoRoot, { files: { 'docs/in.md': 'i\n' }, waitFor: '.go' });
+  const running = runUnit({ unitData: { id: 'u-gone', objective: 'Write docs', capability: 'docs:write', writes: ['docs'] }, repoRoot, cwd: worktreeDir, pattern: 'solo' });
+  await waitForFile(path.join(worktreeDir, '.started'));
+  fs.writeFileSync(path.join(worktreeDir, 'foreign.txt'), 'f\n');
+  gitIn(worktreeDir, 'add', 'foreign.txt');
+  fs.writeFileSync(path.join(worktreeDir, '.go'), '');
+  const first = await running;
+  assert.equal(first.results[0].commit.reason, 'foreign-staged-index');
+
+  // The person clears the index and, with it, the agent's file.
+  gitIn(worktreeDir, 'reset', '-q', 'foreign.txt');
+  fs.rmSync(path.join(worktreeDir, 'docs'), { recursive: true, force: true });
+  const resumed = await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
+  assert.equal(resumed.outcome, 'execution-failure');
+  assert.equal(resumed.results[0].commit.status, 'failed');
+  assert.equal(resumed.results[0].commit.reason, 'work-missing');
+  assert.deepEqual(resumed.results[0].commit.missing, ['docs/in.md']);
+  assert.equal(producerSpawns(repoRoot, first.unitRunId), 1);
+});
+
+test('a unit persona defined in the workspace tier reaches the prompt as text pinned when the unit run starts', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  const personaText = [
+    'name: ledger-keeper',
+    'version: 0.1.0',
+    'description: Keeps the ledger straight for {objective}',
+    'role: Producer',
+    'persona:',
+    '  voice: Plain ledger voice',
+    '  style: Numbers first',
+    '  archetype: A careful bookkeeper',
+    'decision_boundary:',
+    '  can_decide:',
+    '    - How to order the entries',
+    '  must_escalate:',
+    '    - Anything that moves money',
+    '',
+  ].join('\n');
+  fs.mkdirSync(path.join(repoRoot, 'fgos', 'agents'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'fgos', 'agents', 'ledger-keeper.yaml'), personaText);
+  const res = await runUnit({
+    unitData: { id: 'u-persona', objective: 'Write docs', capability: 'docs:write', writes: [], persona: 'ledger-keeper' },
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);
+  const assignment = JSON.parse(fs.readFileSync(path.join(unitDir, 'producer', '1', 'assignment.json'), 'utf8'));
+  assert.equal(assignment.policy.personaPin?.name, 'ledger-keeper');
+  assert.equal(assignment.policy.personaPin?.text, personaText);
+  // The pin is recorded once, so an edit to the file after the start never reaches a resume.
+  assert.equal(JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).personaPin.text, personaText);
 });

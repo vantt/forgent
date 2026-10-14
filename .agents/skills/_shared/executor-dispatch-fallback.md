@@ -40,7 +40,7 @@ None of these shared fragments is coding-specific.
 
 ## Activation doctrine: Decide before execute
 
-Before executing any independently executable unit (e.g. `code:implement` for coding implementation), select the canonical capability for the job — see `capability-catalog.md` for the registered vocabulary — and call `decide` (`node src/runner/dispatch.mjs decide --for <PURPOSE> [--has-live-task-access]`) before proceeding. The returned `mechanism` controls execution: `unavailable` means execute inline directly in this session; `in-process` or `out-of-process` delegates according to the control plane. The resolved provider is not necessarily agent-shaped — a capability may resolve to an MCP/tool provider or another registered adapter instead of an agent executor (`capability-catalog.md`'s "Capability execution guidance"); read the resolved `mechanism`/executor `kind` rather than assuming an Agent/Task hand-off.
+Before executing any independently executable unit (e.g. `code:implement` for coding implementation), select the canonical capability for the job — see `capability-catalog.md` for the registered vocabulary — and call `decide` (`fgos dispatch decide --for <PURPOSE> [--has-live-task-access]`) before proceeding. The returned `mechanism` controls execution: `unavailable` means execute inline directly in this session; `in-process` or `out-of-process` delegates according to the control plane. The resolved provider is not necessarily agent-shaped — a capability may resolve to an MCP/tool provider or another registered adapter instead of an agent executor (`capability-catalog.md`'s "Capability execution guidance"); read the resolved `mechanism`/executor `kind` rather than assuming an Agent/Task hand-off.
 
 Five valid reasons justify configuring an executor for a capability:
 a cheaper model, a stronger model (when the unit's required `rigor` exceeds
@@ -61,10 +61,10 @@ calls in a row (e.g. a research pass running `WebSearch` repeatedly).
 ## Step A — ask `decide` (never read the config yourself)
 
 ```bash
-node src/runner/dispatch.mjs decide <EXECUTOR_ID> [--has-live-task-access]
+fgos dispatch decide <EXECUTOR_ID> [--has-live-task-access]
 # when you have no executor id, use the door that matches what you know:
 #   decide --for <PURPOSE>  [--has-live-task-access]
-#   decide --work <WORK_ID> [--step <STEP>] [--has-live-task-access]
+#   decide --work <WORK_ID> [--stage <STAGE>] [--has-live-task-access]
 #   decide --for <LABEL> --needs-soul [--has-live-task-access]
 ```
 
@@ -83,115 +83,69 @@ When `--for`/`--work` resolved a `executorId` (carried in this same JSON
 response, additive), reuse that exact value for `<EXECUTOR_ID>` in every
 step below — never re-derive it.
 
-## Step B — execute (out-of-process only)
+## Step B — run it as a Unit (out-of-process only)
 
 Reached only when Step A's `decide` call answered `mechanism:
 "out-of-process"`. Deciding the mechanism a second time here would be
-deciding it twice — Step A already did that; this step only self-executes
-(tsk-5tm-3 D5, matching marketing-cockpit's `run_task()` contract).
-
-**Run this through the Monitor tool, not a plain synchronous Bash call**
-(tsk-37ij): `dispatch.mjs`'s own `execute` CLI path already tees the
-child executor's live output to its own stderr as it happens
-(`dispatch.mjs:2154`, tsk-129's live-progress feature) — but a
-synchronous Bash call blocks until the whole subprocess exits and only
-then delivers the entire captured output as one block, so a human
-watching this session sees nothing while the executor is actually
-running. Monitor's own event stream is stdout-only, so fold the live
-stderr tee into it with `2>&1`; each line then becomes its own live
-notification while the process is still running — this is the real,
-intended relay channel for a live agent session, not a workaround.
-
-**Filter the tee — never pipe it raw** (tsk-4bq's own dispatch of itself
-hit exactly the failure mode this line exists to prevent: an executor
-that iterates by re-running its own full verify command several times
-mid-run flooded the relay with repeated full-suite output, tripping
-Monitor's own rate-limit and needing a manual `TaskStop`). Monitor's own
-tool guidance already says this generally — "never pipe raw logs; filter
-to exactly the success and failure signals you care about" — apply it
-here specifically: keep the executor's real signal lines (`[DONE]`,
-`[BLOCKED]`, an error/failure marker) and the one line that matters
-structurally, the final JSON result (always starts a line with `{`, since
-it is `JSON.stringify` output) — drop everything else, including a
-verbose test runner's own line-by-line pass output:
+deciding it twice — Step A already did that; this step only runs the work
+through the one execution door, `fgos run`, which builds a Unit from the
+prompt, binds it through `bind()` with `<EXECUTOR_ID>` as a soft preference,
+runs it and settles it:
 
 ```bash
-node "$root/src/runner/dispatch.mjs" execute <EXECUTOR_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access] 2>&1 | grep -E --line-buffered '\[DONE\]|\[BLOCKED\]|Error|FAIL|✗|^\{'
+fgos run "<PROMPT_TEMPLATE built as below>" --provider <EXECUTOR_ID> --capability <PURPOSE> [--effort <level>] --json
+# work that changes files names its scope and a linked worktree:
+fgos run "<PROMPT_TEMPLATE>" --provider <EXECUTOR_ID> --capability <PURPOSE> --writes <path>[,<path>...] --worktree <linked-worktree> --json
 ```
 
-When dispatching a worktree-backed item with explicit directory flags, pass `--cwd <worktree path>` (so the spawned executor runs in the worktree) and `--repo-root "$root"` (so state and locks stay on main) as two separate flags — never pass `$root` as `--dir`/`--cwd` alone. Runner config is read from the worktree's own `.fgos/config.json` when it has one, so a worktree branch behind main dispatches with its older executors and model tiers until it catches up.
+`--provider` takes an agent executor only. When `<EXECUTOR_ID>` is a
+`kind: "tool"` executor, `fgos run` refuses it as a provider: call that
+tool directly instead (the dispatch-decide hook says the same).
 
-An agent executor (`kind: "agent"`) needs `--for <CAPABILITY>` on `execute`: the capability, not the executor, says whether the work may change files, and `execute <agent>` without it is refused before spawning. This door carries writing work only (`--for execute`, `code:implement`, `code:refactor`, or another capability with `serves.mutates` and no required confinement); it runs the invocation the capability `prefer`s for that executor, else the executor's first plain cli invocation. Read-only work runs sandboxed as a Workflow unit with `"writes": []` (`fgos workflow start --units <file>`), which binds the posture and leases the provider account; `execute --contract <file> --executor <EXECUTOR_ID>` with `"mutation": "read-only"` keeps a named provider and leases its account, but enforces read-only by instruction only, without a sandbox. A confined capability on `execute <agent> --for` is refused with both pointers. `--timeout-ms <ms>` and `--idle-timeout-ms <ms>` override the configured `runner.timeoutMs`/`runner.idleTimeoutMs` for that one call.
+`--capability` is the same `<PURPOSE>` Step A asked `decide` for: left
+out, the Unit runs under the writing capability `execute`, with its own
+executor pool and posture. Without `--writes` the Unit is read-only and runs sandboxed; `--writes`
+needs a linked worktree and is refused from the main checkout before
+anything runs. The worker never runs `git add`/`git commit`: after a
+passing round the runner commits only the paths inside `--writes`. Work
+already written as a Unit file runs as `fgos run --unit <file>`. Never run
+the resolved command yourself through Bash.
+
+When herdr is present the worker runs in a watched pane, so a person can
+follow it live; otherwise the call blocks until the Unit settles. Run a
+long call backgrounded (`run_in_background: true`) and wait for the
+harness's own completion notification — do NOT use `ScheduleWakeup` or
+polling.
 
 **When this session is isolated in a worktree and `<PROMPT_TEMPLATE>` is
 built from a file via `$(cat ...)`, the worktree-isolation guard may
 refuse this line outright** — "too complex to verify that it stays
-inside the worktree; break it into plain, separate commands" — even
-though the command has no `git` subcommand in it (tsk-38w, extending
-tsk-3rg's own finding that this guard is a harness-level built-in this
-repo cannot change). Unlike the `root=$(...)` + `node ... --dir "$root"`
-pattern tsk-3rg fixed by splitting into two tool calls, this line is one
-logical action (dispatch + live-tee, per the Monitor rule above) that
-cannot be split without losing the live-tee. When refused, run
+inside the worktree; break it into plain, separate commands" (tsk-38w,
+a harness-level built-in this repo cannot change). When refused, run
 `node scripts/write-wrapper-script.mjs --command "<full shell command>" --dir "$root"`
 to produce the wrapper script file inside the worktree, and invoke that
-returned single file path through Monitor instead — a single-file
-invocation carries no compound shell syntax for the guard to flag.
+returned single file path instead — a single-file invocation carries no
+compound shell syntax for the guard to flag.
 
-(pass the line above as Monitor's own `command`, with a `description`
-naming the executor/purpose; a reasonable `timeout_ms` for the tier at
-hand; `persistent: false`.)
-
-> **Waiting rule:**
-> Wait for the harness's own background-completion notification before proceeding to gather results (end the turn with no further tool call once Monitor/background dispatch is started; the harness delivers a task-notification automatically and resumes the session with the output in context). Do NOT use `ScheduleWakeup` or polling — `ScheduleWakeup` is for `/loop` dynamic pacing only (requires `prompt` unless `stop:true`) and fails immediately in this context.
-
-Once Monitor reports the command exited, read its final line: the real
-result as JSON — `{"mechanism":"out-of-process", ...real result fields
-(status, stdout, stderr, tier, model, provider, command)}`. Print the
-announce line, then read `stdout` the same way a consumer used to read a
-hand-run command's own output:
+Read the result JSON (the payload sits under `data`): `data.outcome`
+(`pass` or why not), `data.unitRunId`, and the last round at
+`data.results[-1]` — the worker's answer is
+`data.results[-1].runResult.agentClaim.summary`, and for writing work the
+runner's commit is `data.results[-1].commit` (`status`, `sha`, `files`,
+`outOfScope`, `needsWrites`). Print the announce line from the bound
+executor, provider and model, then read the summary the same way a
+consumer used to read a hand-run command's own output:
 
 ```
 <EXECUTOR_ID> - out-of-process - <provider> - <model>
 ```
 
-## Step B.5 — log the dispatch
+There is nothing to log by hand: the run's provenance (Unit, binding,
+round results, commit) is already under `.fgos/assignments/<unitRunId>/`.
 
-Immediately after Step B's own final JSON result is read (the
-`{"mechanism":"out-of-process", status, stdout, stderr, tier, model,
-provider, command}` line), record it durably so a later reader can find
-this dispatch without inferring it from a git commit:
-
-```bash
-node "$root/src/runner/dispatch.mjs" log <EXECUTOR_ID> --id "<id>" \
-  --provider "<provider>" --command "<command>" [--model "<model>"] \
-  --capability "<PURPOSE>" --mechanism "out-of-process" [--tier "<tier>"] \
-  [--outcome "<status>"]
-```
-
-`<provider>`, `<command>`, `<model>`, `<tier>`, and `<status>` come
-straight from Step B's own JSON result above (`status` there — e.g.
-`"done"`/`"failed"` — is `<status>` here) — no new value to resolve.
-`<PURPOSE>` is the same canonical capability Step A already asked
-`decide` for (this whole fragment consumes `capability-catalog.md`'s
-vocabulary), and `--mechanism` is always `"out-of-process"` here — Step
-B.5 is only ever reached after Step B's own `mechanism: "out-of-process"`
-branch (P4 observability, `docs/history/agent-coordination-foundation/plan.md`:
-this durably records the requested capability, dispatch mechanism/tier,
-and completion outcome alongside the executor/provider/model already
-logged — `--outcome` completes the read side `classifyDispatchConfidence`
-already had for a "reported" confidence event; a caller with no clean
-status omits `--outcome` and the existing log/inferred fallback ladder
-applies unchanged — so a later reader never has to re-derive any of this
-from a git commit or re-run `decide`). `<id>` is the item currently
-claimed by this session. This call is mechanical bookkeeping, never a
-gate: never stop, retry, or branch on its result — if it fails, continue
-exactly as if it had not been called; the dispatch itself already
-succeeded.
-
-An error from this call (a thrown `RunnerConfigError`, a spawn failure, a
-timeout, or Monitor's own timeout) means fall straight to Step C — treat
-it exactly like a malformed response, never retry blind.
+An error from this call (a refusal before the run, a failed bind, or a
+timeout) means fall straight to Step C — treat it exactly like a malformed
+response, never retry blind.
 
 ## Ad-hoc executor: a runtime-composed task instead of `<PROMPT_TEMPLATE>`
 
@@ -200,8 +154,8 @@ whose consuming skill has no single fixed question to ask — the parent
 composes a different command each time, depending on what it just decided
 to split off — cannot fill in a registered `<PROMPT_TEMPLATE>` at all.
 This is not a second dispatch mechanism: it still goes through Steps A/B
-unchanged (`decide`, then `execute`), it only replaces what text goes
-into Step B's own `--prompt` flag.
+unchanged (`decide`, then `fgos run`), it only replaces what text goes
+into Step B's own prompt.
 
 What is lost by dropping the fixed template is a real guarantee — "the
 exact same question every call" — so the replacement has to be an honest
@@ -221,12 +175,11 @@ for any other malformed response, never dispatch a partial task:
 
 Plus two fields that may be left blank (D10): `provider` and `tier`. No
 selection logic sits behind either yet — deciding them is a separate,
-later concern — but the slots exist now on purpose: `resolveExecutorCommand`
-already threads `model`/`tier` end-to-end (`src/runner/dispatch.mjs`), and
-leaving them out at this layer would nail every ad-hoc dispatch to
-`executor.model ?? resolveTierModel(cfg, work.tier)` — always the default
-backend — forcing every call site written against this shape to be
-revisited later just to add them.
+later concern — but the slots exist now on purpose: `fgos run` already
+carries them into `bind()` (`--provider` as a soft preference, `--rigor`
+for the tier), and leaving them out at this layer would nail every ad-hoc
+dispatch to the capability's default backend — forcing every call site
+written against this shape to be revisited later just to add them.
 
 `<scope>` inside `id` (D11): the id of the work item currently claimed, or
 — when there is none — `s` followed by the first 8 characters of
@@ -249,15 +202,13 @@ close.
 
 Once the six-field task is built (or the fallback triggered on a missing
 field), continue at Step B above, substituting the task for
-`<PROMPT_TEMPLATE>` in the `--prompt` flag — every later step is
-unchanged. When the task's own optional `tier`/`model` fields were
-filled in, pass them through as `--tier <tier>`/`--model <model>` on that
-same `execute` call (`tsk-2k1`, D10) — either flag, when given, wins over
-the executor's own declared tier/model and the computed default; omitted
-(every registered-`<EXECUTOR_ID>` call that names neither) resolves
-exactly as before this plumbing existed. Which tier/model a task SHOULD
-choose is not decided here — `#task-tier-judged-at-dispatch` — this is
-only the pass-through.
+`<PROMPT_TEMPLATE>` as the prompt — every later step is unchanged. The
+task's own optional `provider` field becomes `--provider`; its `tier` is a
+rigor, not a pin: pass it as `--rigor <low|standard|high|critical>` (and a reasoning budget as
+`--effort <level>`), and `bind()` picks the model for it. Omitted, the
+capability's own defaults apply. Which tier a task SHOULD choose is not
+decided here — `#task-tier-judged-at-dispatch` — this is only the
+pass-through.
 
 ## Step C — malformed-response fallback
 
@@ -276,9 +227,8 @@ per-dispatch REFINEMENT on top of everything above — it never adds a
 second dispatch mechanism, and it never requires splitting `work.tier`
 into a separate field (D12 picked the smaller path over a field split:
 `work.tier` keeps carrying both its existing meanings unchanged; this
-section only adds an override at dispatch TIME, resolved through the
-`--model`/`--tier` flags `dispatch.mjs execute` already accepts,
-tsk-2k1/D10). Skip this section entirely for a registered `<EXECUTOR_ID>`
+section only adds a preference at dispatch TIME, passed as `fgos run`'s
+`--provider`/`--rigor`/`--effort` flags and resolved by `bind()`). Skip this section entirely for a registered `<EXECUTOR_ID>`
 dispatch with no reason to deviate from its own declared tier/model —
 nothing here changes that path.
 
@@ -300,9 +250,9 @@ against at intake, just applied per-dispatch instead of once.
 This judgment produces ONLY `provider`/`tier` — never a mechanism.
 Mechanism stays entirely `decide`'s own decision, already resolved at Step
 A above, never re-derived here; a judged `provider` that resolves to a
-non-Claude command still has to clear the same `allowCrossProvider` gate
-`resolveExecutorConfig` already enforces
-(`src/runner/dispatch.mjs:703-707`) — nothing here bypasses it.
+non-Claude executor still goes through every filter `bind()` applies to
+a preference (governance, independence, posture) and fails over when it
+cannot run — nothing here bypasses them.
 
 Fail-safe is the INVERSE of the six-field task's own (there, a missing
 required field means "do not dispatch, fall back to
@@ -357,9 +307,8 @@ scarcity signal needs the full denominator, not just the misses.
   list directly when explaining their own never-delegate-reasoning rule,
   and it remains the ready-made pattern for the next real cross-provider
   consumer. Step A's `in-process`/`out-of-process` branching (`decide`,
-  tsk-3ik-1) and Step B's out-of-process self-execute (`execute`,
-  tsk-5tm-3 D5) are proven by `src/runner/dispatch.mjs`'s own unit tests
-  instead, per `docs/history/tsk-5tm-3/iron-law-evidence.md` if applicable.
+  tsk-3ik-1) is proven by `src/runner/dispatch.mjs`'s own unit tests, and
+  Step B's run by `fgos run`'s (`src/runner/execution/run.mjs`).
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
   — Native-First Dispatch Doctrine, Step A's own governing rules 1/2/4,
   applied internally by `decide` now (tsk-3ik-1) rather than by hand.

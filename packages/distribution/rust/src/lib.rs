@@ -200,11 +200,12 @@ pub fn resolve_git_commit() -> Option<String> {
 }
 
 /// Resolves the sorted list of command verb selectors from embedded command-routes.json.
+/// The help door's option selectors (`--help`, `-h`) are routes, not verbs.
 pub fn resolve_verbs() -> Vec<String> {
     let routes: std::collections::HashMap<String, serde_json::Value> =
         serde_json::from_str(COMMAND_ROUTES_JSON)
             .expect("embedded command-routes.json must be valid JSON");
-    let mut verbs: Vec<String> = routes.into_keys().collect();
+    let mut verbs: Vec<String> = routes.into_keys().filter(|k| !k.starts_with('-')).collect();
     verbs.sort();
     verbs
 }
@@ -413,7 +414,8 @@ mod tests {
             serde_json::from_str(COMMAND_ROUTES_JSON)
                 .expect("embedded command-routes.json must be valid JSON");
         let verbs = resolve_verbs();
-        assert_eq!(verbs.len(), routes.len());
+        assert_eq!(verbs.len(), routes.keys().filter(|k| !k.starts_with('-')).count());
+        assert!(!verbs.iter().any(|v| v.starts_with('-')));
         let mut sorted = verbs.clone();
         sorted.sort();
         assert_eq!(verbs, sorted);
@@ -453,7 +455,10 @@ mod tests {
                 let routes: std::collections::HashMap<String, serde_json::Value> =
                     serde_json::from_str(COMMAND_ROUTES_JSON)
                         .expect("embedded command-routes.json must be valid JSON");
-                assert_eq!(info.verbs.len(), routes.len());
+                assert_eq!(
+                    info.verbs.len(),
+                    routes.keys().filter(|k| !k.starts_with('-')).count()
+                );
             }
             _ => panic!("expected completed outcome"),
         }

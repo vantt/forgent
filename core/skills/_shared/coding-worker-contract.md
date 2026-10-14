@@ -4,10 +4,11 @@ tsk-2uf-2 (`docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md`):
 the execution-boundary contract every WORKER follows — in
 this fgOS repo, "worker" is a role, not an identity (`CONTEXT.md`'s pinned
 terminology): it can be a live in-process session doing the work itself,
-or an out-of-process executor (`agy`, `pi`, Codex, …) dispatched through
-`dispatch.mjs execute`. Whoever is holding the pen while real edits get
+or an out-of-process executor (`agy`, `pi`, Codex, …) run as a Unit
+through `fgos run`. Whoever is holding the pen while real edits get
 made follows this contract; the **driver** — the session that claimed the
-unit, decided the mechanism, and will verify/commit/return it — never
+unit, decided the mechanism, and will verify/return it (the runner commits
+a worker's edits) — never
 delegates that half away, and never does the driver's own job through this
 file (see the negative rule at the end).
 
@@ -178,7 +179,7 @@ Full evidence: `docs/history/tsk-5gd/RESEARCH.md` Round 1.
   the two-layer generic/coding-specific shape, and the per-domain registry
   seam), and the V3 finding the negative rule above closes.
 - `../_shared/executor-dispatch-fallback.md` — the dispatch MECHANISM
-  (`decide`/`execute`) this contract's worker is reached through; that
+  (`decide`, then `fgos run`) this contract's worker is reached through; that
   fragment's own six-field ad-hoc task shape is the ephemeral-unit
   counterpart to Layer 2's lifecycle-bearing rules above.
 - `.agents/skills/fgos-coding-implement/SKILL.md` — the driver half this

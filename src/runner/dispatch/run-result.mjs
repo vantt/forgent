@@ -365,6 +365,7 @@ export function normalizeRunResult({
   settledAt,
   durationMs = null,
   planContentHash,
+  inputDigests,
   claimSha256,
   settleReports = [],
   runtime = {},
@@ -382,6 +383,9 @@ export function normalizeRunResult({
   execStatusOverride = null,
   runnerNote = null,
   usage = null,
+  // Findings the evidence supports only by correlation (a checkout changed
+  // while the run was in flight); reported, never a reason to refuse.
+  warnings = null,
 } = {}) {
   const isV2 = contractVersion === 2;
   const exitCode = typeof runtime.exitCode === 'number' ? runtime.exitCode : null;
@@ -525,10 +529,6 @@ export function normalizeRunResult({
     policy = policyOverride;
   } else if (claimInvalid) {
     policy = { disposition: 'refuse', code: 'invalid-agent-result-claim' };
-  } else if (Array.isArray(evidence?.mutatedDirtyBeforeFiles) && evidence.mutatedDirtyBeforeFiles.length > 0) {
-    policy = { disposition: 'refuse', code: 'mutated-dirty-before-files' };
-  } else if (isReadOnlyOperation && Array.isArray(evidence?.changedFiles) && evidence.changedFiles.length > 0) {
-    policy = { disposition: 'refuse', code: 'read-only-mutation' };
   } else if (execStatus === 'completion-unknown') {
     policy = { disposition: 'needs-input', code: 'completion-unknown' };
   } else if (failure && (failure.family === 'provider' || failure.family === 'resource')) {
@@ -598,6 +598,7 @@ export function normalizeRunResult({
     settledAt: settledAt || new Date().toISOString(),
     durationMs: typeof durationMs === 'number' ? durationMs : null,
     ...(planContentHash ? { planContentHash } : {}),
+    ...(Array.isArray(inputDigests) && inputDigests.length ? { inputDigests } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports: settleReports ?? [],
     classification,
@@ -620,6 +621,7 @@ export function normalizeRunResult({
             : (executionError ? executionError.message : (isTimeout ? 'Execution timed out' : 'Settled')),
         },
     usage: usage ?? null,
+    ...(Array.isArray(warnings) && warnings.length > 0 ? { warnings } : {}),
     evidence: {
       ...evidence,
       gitBefore: evidence?.gitBefore ?? null,
@@ -1099,6 +1101,7 @@ export function interpretRunResult(input, options = {}) {
     ...(rawObj.settledAt !== undefined ? { settledAt: rawObj.settledAt } : {}),
     ...(rawObj.durationMs !== undefined ? { durationMs: rawObj.durationMs } : {}),
     ...(rawObj.planContentHash ? { planContentHash: rawObj.planContentHash } : {}),
+    ...(Array.isArray(rawObj.inputDigests) ? { inputDigests: rawObj.inputDigests } : {}),
     ...(rawObj.claimSha256 ? { claimSha256: rawObj.claimSha256 } : {}),
     settleReports: rawObj.settleReports ?? [],
     classification: derivedClassification,
@@ -1266,10 +1269,9 @@ function deriveEvidenceFloor(evidenceFloor) {
     return { status: 'failed', confidence: 'failed' };
   }
 
+  // A checkout change seen across a read-only run is correlated evidence (another
+  // session may have made it), so it never fails the run here either.
   const hasExternalEvidence = changedFiles.length > 0 || hasDirtyBeforeMutation;
-  if (isReadOnlyOperation && hasExternalEvidence) {
-    return { status: 'failed', confidence: 'failed' };
-  }
   if (agentClaim?.status === 'blocked') {
     return { status: 'blocked', confidence: 'reported' };
   }

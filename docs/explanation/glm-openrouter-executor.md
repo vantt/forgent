@@ -4,6 +4,14 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 
 # Giving one executor its own environment without touching the default one
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 > **Update 2026-10-05: glm no longer uses the claude CLI.** Behind the
 > OpenRouter gateway, the claude CLI in a herdr pane stopped at
 > "Please run /login · API Error: 401 Missing Authentication header" every

@@ -204,7 +204,7 @@ import { execFileSync } from 'node:child_process';
 import { classifyIronLaw } from './src/evolve/iron-law.mjs';
 const id = process.argv[1];
 const description = process.argv[2];
-console.log(JSON.stringify(classifyIronLaw({ filesChanged: execFileSync('git', ['status', '--porcelain', '-uall'], { encoding: 'utf8' }).split('\\n').filter(Boolean).map((l) => l.slice(3)), description })));
+console.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-only', '--no-renames', '--no-relative', '-z', 'HEAD'], ['ls-files', '--others', '--exclude-standard', '--full-name', '-z']].flatMap((args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\\0').filter(Boolean)), description })));
 " "<your item id — your current branch name, \`git branch --show-current\`, with the fgw/ prefix stripped>" "<your item's own Description text, verbatim, from the Description section above>"
 \`\`\`
 

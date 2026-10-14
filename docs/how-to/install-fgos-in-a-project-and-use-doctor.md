@@ -130,10 +130,13 @@ refuses outside one).
 Later, to move the project to a newer release:
 
 ```bash
+fgctl upgrade
+# or a specific tag / local archive:
+FGCTL_VERSION=v0.2.0 fgctl upgrade
 fgctl upgrade --from ./fgos-<new-version>-x86_64-unknown-linux-gnu.tar.gz
 ```
 
-`fgctl upgrade` records the previous release so `fgctl repair` can roll back.
+`fgctl upgrade` downloads and verifies the release when no `--from` is given, updates `.fgos/distribution.json` (recording the tag when downloaded), and records the previous release so `fgctl repair` can roll back.
 Check what is active with `fgctl status` (`--json` for machines).
 
 ### 2.1. What each command does
@@ -143,7 +146,7 @@ Check what is active with `fgctl status` (`--json` for machines).
 | `install.sh` | Installs the `fgctl` binary | `~/.local/bin/fgctl` |
 | `fgctl stage --from <release>` | Puts a release into the machine store without activating it | machine store |
 | `fgctl init [--from <release or URL>]` | Downloads the release when none is given or pinned, stages (if needed), activates in this project, runs the init/doctor tail | `.fgos/installation/`, machine store |
-| `fgctl upgrade --from <release>` | Moves the project to another release, keeps the previous one, runs the tail | `.fgos/installation/` |
+| `fgctl upgrade [--from <release or URL>]` | Downloads the latest or `FGCTL_VERSION` release when none is given, moves the project to it, updates `.fgos/distribution.json`, keeps the previous release, runs the tail | `.fgos/installation/`, `.fgos/distribution.json`, machine store |
 | `fgctl repair` | Rolls back to the previous release if one is recorded, otherwise re-verifies and re-publishes the same one | `.fgos/installation/` |
 | `fgctl verify` | Verifies the active release's files against its manifest and quarantines it on drift | quarantine on failure |
 | `fgctl status` | Shows the active and previous release and staged releases | nothing |
@@ -229,6 +232,7 @@ file or key in their message; the message always names the exact target.
 | `config-not-stale` | `.fgos/config.json` exists and has every current default key | `not yet configured -- run fgos setup`; `stale config -- missing keys: ...` | setup | `fgos setup` (only adds missing keys, never overwrites yours) |
 | `runner-rigor-config` | `runner.rigorToTier` is complete in the project and global config | `project runner.rigorToTier missing -- run fgos setup` | setup | `fgos setup`; or fix the named key by hand |
 | `runner-patterns-config` | `runner.patterns` is present, well formed and cumulative | `runner.patterns missing -- falling back to setup defaults` | setup | `fgos setup` |
+| `runner-generated-paths` | `runner.generatedPaths` maps a generated source to its render targets with well-formed write-scope entries | `runner.generatedPaths missing -- write scopes are not widened to generated trees` | setup | `fgos setup` |
 | `tier-vocabulary-dead-keys` | No retired tier keys (`runner.models`, `minTier`, `rigorOverrides`) | names the dead key | you | Delete or migrate the named key |
 | `model-policy-tier-coverage` | `runner.modelPolicies` has a model for every tier `rigorToTier` produces, for every provider | `global provider "openai" missing model for tier "standard"` | you | Add the model for that provider and tier under `runner.modelPolicies` in the named config file |
 | `advise-execute-capabilities-configured` | `runner.capabilities` declares `advise`, `execute`, `code:implement` | `runner.capabilities section missing -- run fgos setup` | setup | `fgos setup` |

@@ -4,6 +4,14 @@ authoritative_for: dispatch execute --repo-root flag, cwd vs repoRoot separation
 
 # `dispatch execute` had one `cwd` for two different jobs — now it has two
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `tsk-43z` closed a real, high-severity bug: `dispatch.mjs execute`
 (`executeExecutorCli`, `src/runner/dispatch/cli.mjs`) passed the *same*
 `cwd` value used for main-checkout/config resolution straight through as

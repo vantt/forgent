@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 import { execFileSync, execSync } from 'node:child_process';
 import {
   chooseStageOperation,
-  executeDriverOperationChoice,
+  executeDriverOperationChoice as driverExecute,
   hasPlanMd,
   interpretAssignmentRunResult,
   deriveCandidateReviewRefs,
@@ -18,11 +18,35 @@ import {
 import { operationsForStep, getDomain } from '../../src/state/domain-registry.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { runOnce } from '../../src/runner/loop.mjs';
+import { resolveRunWorkerArtifactPath } from '../../src/runner/dispatch/settlement.mjs';
+import { listAssignmentRuns } from '../../src/runner/dispatch/assignment-layout.mjs';
+import { runOnce as loopRunOnce } from '../../src/runner/loop.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
+import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { confinedUnitConfig, ensureGitRepo } from './driver-unit-fixture.helper.mjs';
 
+// A driver operation runs as a Unit (runUnit): its worker runs confined (bwrap), and it binds
+// from the runner config the caller hands over, so that config needs confined executors.
+seedFileLocalBwrapRegistry();
+
+function unitReady(opts = {}) {
+  if (!opts.runnerConfig) return opts;
+  ensureGitRepo(opts.repoRoot ?? opts.cwd);
+  return { ...opts, runnerConfig: confinedUnitConfig(opts.runnerConfig) };
+}
+
+const executeDriverOperationChoice = (work, choice, opts) => driverExecute(work, choice, unitReady(opts));
+// The loop hands its config to its driver steps, so it gets the confined one too.
+const runOnce = (options) => {
+  if (!options.config) return loopRunOnce(options);
+  ensureGitRepo(options.repoRoot);
+  return loopRunOnce({ ...options, config: confinedUnitConfig(options.config) });
+};
+
+// Outside /tmp: a confined worker sees a private tmpfs there, not these files.
 function mkTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-op-choice-test-'));
+  return fs.realpathSync.native(makeFixtureDir('fgos-op-choice-test-'));
 }
 
 function initRepo(dir) {
@@ -161,8 +185,9 @@ function assertAssignmentRunFiles(root, assignmentId) {
   assert.ok(fs.existsSync(path.join(assignmentDir, 'assignment.json')), 'assignment.json must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'run.json')), 'run.json must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'dispatch-plan.json')), 'dispatch-plan.json must exist');
-  assert.ok(fs.existsSync(path.join(runDir, 'agent-result.json')), 'agent-result.json must exist');
-  assert.ok(fs.existsSync(path.join(runDir, 'agent-report.md')), 'agent-report.md must exist');
+  // A confined worker writes only its run's outbox; the runner reads its artifacts from there.
+  assert.ok(fs.existsSync(resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json')), 'agent-result.json must exist');
+  assert.ok(fs.existsSync(resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md')), 'agent-report.md must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'evidence.json')), 'evidence.json must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'result.json')), 'result.json must exist');
 }
@@ -489,6 +514,157 @@ test('Step 06 planning.validate-plan failed stops safely and does not advance Wo
   assert.equal(outcome.reason, 'assignment-validate-plan-failed');
   assert.equal(work.status, 'doing');
   assert.equal(work.workflowStep, 'planning');
+});
+
+test('a read-only run that would advance Work stops instead when its result carries a correlated mutation', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_corr', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const reportPath = path.join(runDir, 'agent-report.md');
+  fs.writeFileSync(
+    reportPath,
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/operation-choice.mjs)\n'
+  );
+
+  const lastRunResult = {
+    status: 'done',
+    confidence: 'reported',
+    runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+    agentClaim: {
+      status: 'done',
+      verdict: 'READY WITH CONSTRAINTS',
+      summary: 'Proceed only after constraints are captured',
+      realityGate: {
+        'mode-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'repo-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'assumptions-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'smaller-path-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'proof-surface-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'impact-analysis-posture': 'PASS (citation: src/runner/operation-choice.mjs)',
+      },
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
+    },
+    evidence: {
+      artifacts: [reportPath],
+    },
+  };
+
+  const accepted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: lastRunResult,
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.equal(accepted.canAdvanceEdge, true, 'fixture must advance before any mutation is attached');
+
+  for (const code of ['read-only-mutation-correlated', 'mutated-dirty-before-correlated']) {
+    const warned = interpretAssignmentRunResult({
+      choice: { operation: 'validate-plan' },
+      runResult: { ...lastRunResult, warnings: [{ code, level: 'correlated', paths: ['plans/x.md'] }] },
+      contextSignals: { constraintsWritten: true },
+      repoRoot: tempDir,
+    });
+    assert.equal(warned.canAdvanceEdge, false, code);
+    assert.equal(warned.stop, true, code);
+    assert.equal(warned.reason, 'assignment-validate-plan-correlated-mutation', code);
+  }
+
+  // A main-checkout change seen while an isolated round ran is not a change to what Work advances on.
+  const strayOnly = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: { ...lastRunResult, warnings: [{ code: 'stray-write-correlated', level: 'correlated', paths: ['plans/'] }] },
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.equal(strayOnly.canAdvanceEdge, true);
+
+  // A stored result cannot declare itself mutating to slip past the gate.
+  const forged = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      ...lastRunResult,
+      assignment: { mutation: 'mutating' },
+      warnings: [{ code: 'read-only-mutation-correlated', level: 'correlated', paths: ['docs/plan.md'] }],
+    },
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.equal(forged.canAdvanceEdge, false);
+  assert.equal(forged.reason, 'assignment-validate-plan-correlated-mutation');
+
+  // A stored result whose warnings were stripped still re-derives the mutation from its evidence.
+  const stripped = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: { ...lastRunResult, evidence: { ...lastRunResult.evidence, changedFiles: ['docs/plan.md'] } },
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.equal(stripped.canAdvanceEdge, false);
+  assert.equal(stripped.reason, 'assignment-validate-plan-correlated-mutation');
+
+  // A round whose process itself broke keeps its own failure reason.
+  const broke = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      ...lastRunResult,
+      runtime: { ...(lastRunResult.runtime ?? {}), exitCode: 1 },
+      warnings: [{ code: 'read-only-mutation-correlated', level: 'correlated', paths: ['plans/x.md'] }],
+    },
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.equal(broke.canAdvanceEdge, false);
+  assert.equal(broke.reason, 'assignment-validate-plan-failed');
+
+  // A round refused by policy or failing its contract keeps its own failure reason:
+  // a proven write is not relabelled as a correlated one.
+  for (const outcome of [
+    { category: 'policy', executed: 'failed', refused: true, evidence: 'failed', satisfied: false, failure: { family: 'policy', code: 'read-only-mutation' } },
+    { category: 'contract', executed: 'completed', evidence: 'failed', satisfied: false, failure: { family: 'contract', code: 'invalid-agent-result-claim' } },
+  ]) {
+    const own = interpretAssignmentRunResult({
+      choice: { operation: 'validate-plan' },
+      runResult: { ...lastRunResult, outcome, evidence: { ...lastRunResult.evidence, changedFiles: ['docs/plan.md'] } },
+      contextSignals: { constraintsWritten: true },
+      repoRoot: tempDir,
+    });
+    assert.equal(own.canAdvanceEdge, false, outcome.failure.code);
+    assert.equal(own.reason, 'assignment-validate-plan-failed', outcome.failure.code);
+  }
+
+  // Changed files are a mutating run's expected output, never a correlated mutation.
+  const mutating = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan', assignment: { mutation: 'mutating', resultKind: 'gate-verdict' } },
+    runResult: { ...lastRunResult, evidence: { ...lastRunResult.evidence, changedFiles: ['docs/plan.md'] } },
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.equal(mutating.canAdvanceEdge, true);
+});
+
+test('a stored review-item result read back without its assignment is gated as read-only by its reviewer role', () => {
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'review-item' },
+    runResult: {
+      role: 'reviewer',
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: { status: 'done', verdict: 'APPROVED', summary: 'Looks right' },
+      warnings: [{ code: 'read-only-mutation-correlated', level: 'correlated', paths: ['src/x.mjs'] }],
+      evidence: { changedFiles: ['src/x.mjs'], artifacts: [] },
+    },
+  });
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'assignment-review-item-correlated-mutation');
 });
 
 test('Step 06 planning.validate-plan READY WITH CONSTRAINTS requires recorded constraints before advancing edge', () => {
@@ -1205,7 +1381,7 @@ test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker 
   assert.equal(item.workflowStep, 'planning');
 });
 
-test('driver loop runOnce: validate-plan modifying dirty-before plan.md fails closed and does not advance Work (Finding 2 fix)', async () => {
+test('driver loop runOnce: a confined validate-plan worker cannot modify the dirty-before plan.md and Work does not advance', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -1242,6 +1418,14 @@ test('driver loop runOnce: validate-plan modifying dirty-before plan.md fails cl
 
   const item = listWork(tempDir).work['tsk-driver-recorded'];
   assert.equal(item.workflowStep, 'planning');
+
+  // The round runs as a Unit: its worker is confined read-only, so the edit it tried never
+  // reaches plan.md, and the round still settled a result of its own.
+  assert.equal(fs.readFileSync(path.join(docsDir, 'plan.md'), 'utf8'), '# Mode: tiny\nPlan with constraints.\n');
+  const storedResults = [...listAssignmentRuns(path.join(tempDir, '.fgos'))]
+    .map((run) => path.join(run.runDir, 'result.json'))
+    .filter((f) => fs.existsSync(f));
+  assert.ok(storedResults.length > 0, 'the validate-plan round must have settled a result.json');
 });
 
 test('interpretAssignmentRunResult maps REJECTED verdict to NOT READY - RETURN TO PLANNING (Finding 3)', () => {
@@ -1326,7 +1510,7 @@ test('Step 06 executing.scout-blast-radius report with fake executor stores all 
   assert.equal(work.workflowStep, 'executing');
 });
 
-test('Step 06 executing.scout-blast-radius mutating repository state fails closed and stops driver execution', async () => {
+test('executing.scout-blast-radius that tries to write the repository is refused by its sandbox and stops driver execution', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   seedTaskSpecs(tempDir, ['scout-blast-radius']);
@@ -1370,7 +1554,10 @@ test('Step 06 executing.scout-blast-radius mutating repository state fails close
     runnerConfig: runnerConfigFor(executorScript),
   });
 
+  // The operation runs as a confined read-only Unit: the write fails inside the sandbox, the
+  // worker exits non-zero, and nothing lands in the checkout.
   assert.equal(outcome.executed, true);
+  assert.equal(fs.existsSync(path.join(tempDir, 'accidental.txt')), false);
   assert.equal(outcome.runResult.confidence, 'failed');
   assert.equal(outcome.canAdvanceEdge, false);
   assert.equal(outcome.stop, true);
@@ -2773,7 +2960,7 @@ test('Positive test: valid structured review-item claim with real findings tied 
   assert.equal(interpreted.reason, 'review-item-approved');
 });
 
-test('Finding 2: executeAssignment fails closed on read-only validate-plan mutations without running automatic rollback', async () => {
+test('executeAssignment reports read-only validate-plan mutations as a warning, Work does not advance on them, and no automatic rollback runs', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -2831,8 +3018,21 @@ test('Finding 2: executeAssignment fails closed on read-only validate-plan mutat
     runnerConfig: cfg,
   });
 
-  assert.equal(runResult.status, 'failed');
-  assert.equal(runResult.confidence, 'failed');
+  // The round is accepted at the dispatch layer: a before/after snapshot cannot
+  // prove the change is the round's own, so it travels as a warning.
+  assert.equal(runResult.status, 'done');
+  assert.ok((runResult.warnings ?? []).some((w) => w.code === 'read-only-mutation-correlated'));
+
+  // Work, the consumer, does not advance on it.
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan', assignment, work: listWork(tempDir).work['tsk-iso-val'] },
+    runResult,
+    work: listWork(tempDir).work['tsk-iso-val'],
+    repoRoot: tempDir,
+  });
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'assignment-validate-plan-correlated-mutation');
 
   // Verify evidence recorded the mutations
   assert.ok(runResult.evidence.changedFiles.some((f) => f.includes('plan-validation.tmp')));
@@ -5299,7 +5499,7 @@ test('reviewer LOW: a stored failed result from a read-only dirty mutation never
   assert.equal(choice.reason, 'validation-failed-do-not-advance-work', 'the lost dirty-mutation fact may not upgrade the recorded failed verdict');
 });
 
-test('R6/G3: cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles fact and correctly reports failed, not silently downgraded to no-evidence', () => {
+test('cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles fact, reports a correlated mutation and does not advance Work, not silently downgraded to no-evidence', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -5341,8 +5541,9 @@ test('R6/G3: cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles 
 
   const choice = choosePlanning(tempDir, planningWorkFor('tsk-r6-dirty-persisted', docsRef));
   assert.equal(choice.canAdvanceEdge, false);
-  assert.equal(choice.reason, 'validation-failed-do-not-advance-work',
-    'the persisted mutatedDirtyBeforeFiles fact must re-derive to failed, not silently downgrade to no-evidence');
+  assert.equal(choice.stop, true);
+  assert.equal(choice.reason, 'validation-correlated-mutation-do-not-advance-work',
+    'the persisted mutatedDirtyBeforeFiles fact must re-derive to a correlated mutation, not silently downgrade to no-evidence');
 });
 
 test('R6/G3: an empty (but present) persisted mutatedDirtyBeforeFiles correctly derives false -- unchanged dirty files never block a legitimate reported verdict', () => {

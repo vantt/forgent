@@ -11,7 +11,12 @@ import { appendEvent } from '../../src/state/events.mjs';
 import { acquireClaim } from '../../src/state/runtime-coordination.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
-import { runOnce, runWatch, resolveRepoRoot } from '../../src/runner/loop.mjs';
+import { runOnce as loopRunOnce, runWatch as loopRunWatch, resolveRepoRoot } from '../../src/runner/loop.mjs';
+import { confinedRunnerConfig, persistRunnerConfig, countWorkerRuns, priorUnitRunsSource, unitRuns } from './loop-worker-fixture.helper.mjs';
+import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
+import { confinedUnitConfig } from './driver-unit-fixture.helper.mjs';
+import { resolveRunWorkerArtifactPath } from '../../src/runner/dispatch/settlement.mjs';
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { createMissBreaker } from '../../src/runner/anti-loop.mjs';
 
@@ -25,6 +30,24 @@ function readFrictionRecords(dir) {
     .filter((f) => f.endsWith('.jsonl'))
     .flatMap((f) => fs.readFileSync(path.join(frictionDir, f), 'utf8').trim().split('\n').filter(Boolean).map((line) => JSON.parse(line)));
 }
+
+// Workers run confined (bwrap) as Unit runs: posture checks consult the
+// machine backend registry, kept file-local here.
+seedFileLocalBwrapRegistry();
+
+/** The loop reads its worker config from the repo's own .fgos/config.json
+ * (runUnit), so every config a test hands the loop is also put on disk, with
+ * a confined invocation each worker can bind. */
+function withConfinedConfig(options) {
+  if (!options?.config) return options;
+  // The loop hands this config to its driver steps too, whose operations need a review pool.
+  const config = confinedUnitConfig(confinedRunnerConfig(options.config));
+  const repoRoot = options.repoRoot ?? resolveRepoRoot(options.cwd ?? process.cwd());
+  persistRunnerConfig(repoRoot, config);
+  return { ...options, config };
+}
+const runOnce = (options) => loopRunOnce(withConfinedConfig(options));
+const runWatch = (options) => loopRunWatch(withConfinedConfig(options));
 
 // Fake executors only — every "worker" spawned here is a node script this
 // file writes into a mkdtemp directory. Every test builds its own
@@ -42,7 +65,7 @@ const noLog = () => {};
 // codepath fail here even though the real forgent/repo (whose default branch
 // really is "main") is unaffected.
 function initTempRepo() {
-  const repoRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-loop-test-repo-')));
+  const repoRoot = fs.realpathSync.native(makeFixtureDir('fgos-loop-test-repo-'));
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
@@ -52,8 +75,9 @@ function initTempRepo() {
   return repoRoot;
 }
 
+// Outside /tmp: a confined worker sees a private tmpfs there, not these files.
 function mkTempDir(prefix) {
-  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
+  return fs.realpathSync.native(makeFixtureDir(prefix));
 }
 
 function seedItem(dir, overrides = {}) {
@@ -72,8 +96,8 @@ function seedItem(dir, overrides = {}) {
   return item;
 }
 
-/** A worker that behaves: bumps a run counter, produces a file, commits it
- * on its branch. Never touches `.fgos/`. */
+/** A worker that behaves: produces a file and leaves it in its worktree for
+ * the runner to commit. Never touches git or `.fgos/`. */
 function writeCommittingExecutor(scriptDir, counterFile, produce = 'output.txt') {
   const scriptPath = path.join(scriptDir, 'committing-executor.mjs');
   fs.writeFileSync(
@@ -82,13 +106,7 @@ function writeCommittingExecutor(scriptDir, counterFile, produce = 'output.txt')
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
 fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker ' + Date.now() + '\\n');
-execFileSync('git', ['add', ${JSON.stringify(produce)}]);
-const statusStr = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' });
-if (statusStr.trim().length > 0) {
-  execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`)}]);
-}
 `,
   );
   return scriptPath;
@@ -96,9 +114,8 @@ if (statusStr.trim().length > 0) {
 
 /** A worker that writes several DISTINCT stdout chunks (separate write()
  * calls, keyed by the item's own produce target so two concurrent items
- * never share a marker) before producing and committing its file — for
- * proving the live tee (P39) persists each chunk to `.fgos/logs/<id>.log`
- * as it arrives, not just in the terminal recap block. */
+ * never share a marker) before producing its file — for proving the item's
+ * `.fgos/logs/<id>.log` carries that worker's full stdout, and only its own. */
 function writeChunkyCommittingExecutor(scriptDir, counterFile) {
   const scriptPath = path.join(scriptDir, 'chunky-committing-executor.mjs');
   fs.writeFileSync(
@@ -109,12 +126,9 @@ import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
 const match = prompt.match(/test -f (\\S+)/);
 const file = match ? match[1] : 'output.txt';
-fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
 process.stdout.write('chunk-1-for-' + file + '\\n');
 process.stdout.write('chunk-2-for-' + file + '\\n');
 fs.writeFileSync(file, 'produced by worker\\n');
-execFileSync('git', ['add', file]);
-execFileSync('git', ['commit', '-q', '-m', 'worker: ' + file]);
 `,
   );
   return scriptPath;
@@ -128,7 +142,6 @@ function writeNonCommittingExecutor(scriptDir, counterFile) {
     scriptPath,
     `
 import fs from 'node:fs';
-fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
 fs.writeFileSync('output.txt', 'uncommitted\\n');
 `,
   );
@@ -142,73 +155,57 @@ function writeNoChangeExecutor(scriptDir, counterFile) {
     scriptPath,
     `
 import fs from 'node:fs';
-fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
 `,
   );
   return scriptPath;
 }
 
-/** A rogue writer that races the runner: does the work, commits it, then
- * moves the item doing -> blocked in the MAIN repo's .fgos behind the
- * runner's back — so the runner's own doing -> awaiting-approval CAS must conflict. */
-function writeRacingExecutor(scriptDir, counterFile, mainDir, id) {
-  const storeUrl = pathToFileURL(path.resolve(import.meta.dirname, '../../src/state/store.mjs')).href;
-  const scriptPath = path.join(scriptDir, 'racing-executor.mjs');
+/** A worker that produces the verify target, then holds still until the
+ * test releases it: it writes `.started` in its worktree and waits (up to
+ * 20s) for `.go`, then removes both. A confined worker cannot write the main
+ * repo's .fgos, so a race "behind the runner's back" is played by the test
+ * itself while the worker holds (see `raceWhileWorkerHolds`). */
+function writeHoldingExecutor(scriptDir) {
+  const scriptPath = path.join(scriptDir, 'holding-executor.mjs');
   fs.writeFileSync(
     scriptPath,
     `
 import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
-fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
 fs.writeFileSync('output.txt', 'produced by worker\\n');
-execFileSync('git', ['add', 'output.txt']);
-execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);
-const { moveWork } = await import(${JSON.stringify(storeUrl)});
-moveWork(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, to: 'blocked', expectedStatus: 'todo' });
+fs.writeFileSync('.started', '');
+const until = Date.now() + 20000;
+while (!fs.existsSync('.go') && Date.now() < until) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+fs.rmSync('.go', { force: true });
+fs.rmSync('.started', { force: true });
 `,
   );
   return scriptPath;
 }
 
-/** tsk-40m code-review finding (blocker): a rogue writer that races the
- * runner's CLAIM (not its status move) — does the work, commits it, then
- * releases the runner's own runtime claim and acquires a fresh one under a
- * DIFFERENT actor, behind the runner's back. Simulates a stale-claim
- * reclaim happening mid-dispatch (bypassing claim-port.mjs's own liveness
- * gate directly, the same way writeRacingExecutor above bypasses moveWork's
- * normal callers to force the race deterministically). The runner's own
- * settleClaim call must still carry the EXACT claimId it acquired at claim
- * time — never re-derive "whichever claim is active now" — so this must
- * conflict instead of silently settling the different actor's claim. */
-function writeClaimReclaimingExecutor(scriptDir, counterFile, mainDir, id) {
-  const runtimeCoordUrl = pathToFileURL(path.resolve(import.meta.dirname, '../../src/state/runtime-coordination.mjs')).href;
-  const scriptPath = path.join(scriptDir, 'claim-reclaiming-executor.mjs');
-  fs.writeFileSync(
-    scriptPath,
-    `
-import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
-fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
-fs.writeFileSync('output.txt', 'produced by worker\\n');
-execFileSync('git', ['add', 'output.txt']);
-execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);
-const { readClaim, releaseClaim, acquireClaim } = await import(${JSON.stringify(runtimeCoordUrl)});
-const stale = readClaim(${JSON.stringify(mainDir)}, ${JSON.stringify(id)});
-releaseClaim(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, claimId: stale.claimId });
-acquireClaim(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, actor: 'a-different-actor', preClaimStatus: 'todo' });
-`,
-  );
-  return scriptPath;
+/** Run `race()` once the holding worker of `id` has started, then release it. */
+async function raceWhileWorkerHolds(worktreeDir, id, race) {
+  const until = Date.now() + 20000;
+  for (;;) {
+    const started = fs.readdirSync(worktreeDir).find((name) => name.includes(id) && fs.existsSync(path.join(worktreeDir, name, '.started')));
+    if (started) {
+      await race();
+      fs.writeFileSync(path.join(worktreeDir, started, '.go'), '');
+      return;
+    }
+    if (Date.now() > until) throw new Error(`the holding worker for "${id}" never started`);
+    await new Promise((r) => setTimeout(r, 50));
+  }
 }
 
-/** A worker that records a real execution INTERVAL: it writes a start marker,
+/** A worker that records a real execution INTERVAL: it prints a start mark,
  * waits long enough that two concurrent dispatches must overlap in wall time,
- * then writes+commits its proof file and an end marker. Each item writes to
+ * then writes its proof file and prints an end mark (stdout, since a confined
+ * worker writes nothing outside its worktree; the item's log keeps it). Each item writes to
  * its OWN marker files (keyed by the produce target parsed out of the prompt's
  * `test -f <file>` verify line, exactly as the real e2e decompose-aware
  * executor does), so two concurrent executors never race on the same file —
  * the overlap is proven by interval intersection, not a delay-only proxy. */
-function writeIntervalExecutor(scriptDir, markerDir, sleepMs = 300) {
+function writeIntervalExecutor(scriptDir, sleepMs = 300) {
   const scriptPath = path.join(scriptDir, 'interval-executor.mjs');
   fs.writeFileSync(
     scriptPath,
@@ -219,13 +216,10 @@ import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
 const match = prompt.match(/test -f (\\S+)/);
 const file = match ? match[1] : 'output.txt';
-const marker = path.join(${JSON.stringify(markerDir)}, file);
-fs.writeFileSync(marker + '.start', String(Date.now()));
+process.stdout.write('interval-start=' + Date.now() + '\\n');
 await new Promise((r) => setTimeout(r, ${sleepMs}));
 fs.writeFileSync(file, 'produced by worker\\n');
-execFileSync('git', ['add', file]);
-execFileSync('git', ['commit', '-q', '-m', 'worker: ' + file]);
-fs.writeFileSync(marker + '.end', String(Date.now()));
+process.stdout.write('interval-end=' + Date.now() + '\\n');
 `,
   );
   return scriptPath;
@@ -239,23 +233,17 @@ fs.writeFileSync(marker + '.end', String(Date.now()));
  * retry loop already drives. */
 function writeFlakyThenFixingExecutor(scriptDir, counterFile) {
   const scriptPath = path.join(scriptDir, 'flaky-then-fixing-executor.mjs');
+  // A confined worker cannot keep a counter of its own; it counts the unit
+  // runs the runner already made for this repo (read-only to the worker).
   fs.writeFileSync(
     scriptPath,
     `
 import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
-const priorRuns = fs.existsSync(${JSON.stringify(counterFile)})
-  ? fs.readFileSync(${JSON.stringify(counterFile)}, 'utf8').split('\\n').filter(Boolean).length
-  : 0;
-fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
+const priorRuns = ${priorUnitRunsSource(repoOfCounter(counterFile))};
 if (priorRuns === 0) {
   fs.writeFileSync('junk.txt', 'wrong output from the failed first attempt\\n');
-  execFileSync('git', ['add', 'junk.txt']);
-  execFileSync('git', ['commit', '-q', '-m', 'worker: junk.txt (attempt 1, fails verify)']);
 } else {
   fs.writeFileSync('output.txt', 'correct output from the retry\\n');
-  execFileSync('git', ['add', 'output.txt']);
-  execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt (retry, passes verify)']);
 }
 `,
   );
@@ -294,9 +282,14 @@ function branchExists(repoRoot, branch) {
   }
 }
 
+/** The repo a `setup()` counter path names (`<repo>/.fgos/worker-runs`). */
+function repoOfCounter(counterFile) {
+  return path.dirname(path.dirname(counterFile));
+}
+
+/** How many workers the loop launched: one settled run directory per launch. */
 function countRuns(counterFile) {
-  if (!fs.existsSync(counterFile)) return 0;
-  return fs.readFileSync(counterFile, 'utf8').split('\n').filter(Boolean).length;
+  return countWorkerRuns(repoOfCounter(counterFile));
 }
 
 /** Plant a real commit directly on `branch` via a throwaway worktree
@@ -336,7 +329,9 @@ function setup() {
   initStore(dir);
   const scriptDir = mkTempDir('fgos-loop-test-exec-');
   const worktreeDir = mkTempDir('fgos-loop-test-wt-');
-  const counterFile = path.join(scriptDir, 'runs.log');
+  // Never written: a confined worker cannot reach it. It only names the repo
+  // whose runner-made run directories `countRuns` counts.
+  const counterFile = path.join(dir, 'worker-runs');
   return { repoRoot, dir, scriptDir, worktreeDir, counterFile };
 }
 
@@ -358,7 +353,8 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   assert.equal(listWork(dir).work['item-happy'].status, 'awaiting-approval');
   assert.equal(branchExists(repoRoot, 'fgw/item-happy'), true);
   const log = execFileSync('git', ['log', '--oneline', 'fgw/item-happy'], { cwd: repoRoot, encoding: 'utf8' });
-  assert.match(log, /worker: output\.txt/);
+  // the worker only wrote the file; the runner committed it inside the Unit run
+  assert.match(log, /chore\(work-item-happy-executing\): /);
   // worktree torn down, branch survives (D4 proposal artifact)
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
   // one door: the log carries exactly the runner's writes — the worker
@@ -413,7 +409,9 @@ test('runOnce logs the "<executorId> — <provider> — <model>" announce line a
   // production spawnWorker path end-to-end, not just the dispatch.mjs unit
   // tests (found missing by independent review after tsk-4hl merged --
   // this whole test file was outside that item's own verify scope).
-  const { baseCommit, headRef, ...rest } = auditEvent.payload;
+  const { baseCommit, headRef, unitRunId, ...rest } = auditEvent.payload;
+  assert.match(unitRunId, /^unit-run-/, 'the event names the Unit run that carried this dispatch');
+  assert.ok(fs.existsSync(path.join(dir, 'assignments', unitRunId, 'unit.json')), 'and that run exists');
   assert.deepEqual(rest, {
     id: 'item-announce',
     executorId: 'fgos-coding-implement',
@@ -426,12 +424,13 @@ test('runOnce logs the "<executorId> — <provider> — <model>" announce line a
     command: process.execPath,
     model: 'sonnet',
     // governance (self-review finding, 2026-08-25): computed by
-    // resolveExecutorConfig for the global-executor fallback path this
-    // fixture takes -- process.execPath is neither a Claude CLI command
-    // nor a declared executors.* entry, so it resolves cross-provider with
-    // no declared providerModel/carries override (defaults apply).
+    // resolveExecutorConfig for the executor bind chose. A Unit binds only
+    // registered executors (the fixture registers the global executor under
+    // the step's id), so the family is the registered executor's own
+    // (`node`, from its command) where the retired global-executor path
+    // reported the raw command. Still cross-provider with defaults applied.
     governance: {
-      providerFamily: process.execPath,
+      providerFamily: 'node',
       egress: { kind: 'cross-provider', target: process.execPath, content: 'repo-content' },
     },
   });
@@ -650,7 +649,12 @@ test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fai
 test('runOnce clarify+decompose sweeps never touch a synthetic-domain item with no Clarify/Divide-mapped stage — it dispatches straight through instead of being wrongly swept', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-synthetic', domain: 'synthetic', verify: 'test -f output.txt' });
-  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+  // The synthetic domain's step asks for its own capability; a Unit binds only
+  // from a pool the config names, never a guessed global executor.
+  const config = {
+    ...configFor(writeCommittingExecutor(scriptDir, counterFile)),
+    capabilities: { assembling: { prefer: [{ executor: 'fgos-coding-implement' }] } },
+  };
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -692,10 +696,10 @@ test('runOnce decompose sweep still fires normally for a coding-domain item adva
 
 test('real concurrency: two independent ready items dispatched in ONE runOnce overlap in wall time (interval intersection) and both reach proposed with a consistent event log', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir } = setup();
-  const markerDir = mkTempDir('fgos-loop-test-marker-');
+
   seedItem(dir, { id: 'item-a', verify: 'test -f a.txt' });
   seedItem(dir, { id: 'item-b', verify: 'test -f b.txt' });
-  const config = configFor(writeIntervalExecutor(scriptDir, markerDir, 1000));
+  const config = configFor(writeIntervalExecutor(scriptDir, 1000));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -715,7 +719,10 @@ test('real concurrency: two independent ready items dispatched in ONE runOnce ov
   // CONCRETE overlap proof: item-a's [start,end] and item-b's [start,end]
   // genuinely intersect — impossible under sequential dispatch, where b would
   // not start until a's worker had fully finished (b.start > a.end).
-  const readMarker = (f, suffix) => parseInt(fs.readFileSync(path.join(markerDir, `${f}.${suffix}`), 'utf8'), 10);
+  const readMarker = (f, suffix) => {
+    const log = fs.readFileSync(path.join(dir, 'logs', `item-${f.replace(/\.txt$/, '')}.log`), 'utf8');
+    return parseInt(new RegExp(`interval-${suffix}=(\\d+)`).exec(log)[1], 10);
+  };
   const aStart = readMarker('a.txt', 'start');
   const aEnd = readMarker('a.txt', 'end');
   const bStart = readMarker('b.txt', 'start');
@@ -1082,8 +1089,8 @@ test('a worker that only edits files is committed by the runner before goal-chec
   assert.equal(fileAtRef(repoRoot, branch, 'output.txt'), true, 'the runner committed the worker file');
   assert.equal(
     execFileSync('git', ['log', '--format=%s', `HEAD..${branch}`], { cwd: repoRoot, encoding: 'utf8' }).trim(),
-    'item-nocommit: Produce the output file',
-    'subject falls back to "<id>: <title>" when the worker reported no Result summary',
+    'chore(work-item-nocommit-executing): Produce the output file (kind: feature)',
+    'the Unit run commits under the Unit id; a worker that wrote no claim is named after its goal',
   );
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
 });
@@ -1125,9 +1132,12 @@ test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to 
   assert.match(fs.readFileSync(logFile, 'utf8'), /worker-spawn-fail/);
 });
 
-// --- live tee: chunks land in .fgos/logs/<id>.log as they arrive (P39) ----
+// --- live log: the item's log points at the running Unit run --------------
+// A worker runs as a Unit run, which streams nothing back. The moment the run
+// exists the item's log names it and where its stdout lives; the terminal
+// block, once the worker settles, still carries the full stdout recap.
 
-test('live tee: each stdout chunk is persisted to .fgos/logs/<id>.log AS IT ARRIVES, and the terminal block still follows it intact', async () => {
+test('live log: the item log names the Unit run and its stdout log before the worker settles, and the terminal block carries the full stdout', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-live' });
   const config = configFor(writeChunkyCommittingExecutor(scriptDir, counterFile));
@@ -1139,18 +1149,20 @@ test('live tee: each stdout chunk is persisted to .fgos/logs/<id>.log AS IT ARRI
   const logFile = path.join(dir, 'logs', 'item-live.log');
   const content = fs.readFileSync(logFile, 'utf8');
 
-  // both chunks landed, raw and unwrapped, in arrival order
-  const rawChunk1 = content.indexOf('chunk-1-for-output.txt');
-  const rawChunk2 = content.indexOf('chunk-2-for-output.txt');
-  assert.ok(rawChunk1 >= 0 && rawChunk2 > rawChunk1, 'chunks are live-teed in order');
-  // the terminal block (D1/D3/D4 recap) still appends after, unchanged
+  const [{ unitRunId }] = unitRuns(repoRoot);
+  const pointer = content.indexOf(`worker running as unit run ${unitRunId}`);
+  assert.ok(pointer >= 0, 'the log names the Unit run as soon as it exists');
+  assert.match(content, new RegExp(`\\.fgos/assignments/${unitRunId}/producer/\\*/runs/\\*/protected/capture/`), 'and where its output is captured while it runs');
+  assert.match(content, /stdout\.log once it settles/);
+  // the terminal block (D1/D3/D4 recap) appends after the pointer
   const terminalBlock = content.indexOf('=== ');
-  assert.ok(terminalBlock > rawChunk2, 'terminal block appended after the live-teed chunks');
+  assert.ok(terminalBlock > pointer, 'terminal block appended after the run pointer');
   assert.match(content, /exit 0/);
-  assert.match(content.slice(terminalBlock), /chunk-1-for-output\.txt/, 'terminal block still carries the full stdout recap');
+  const recap = content.slice(terminalBlock);
+  assert.ok(recap.indexOf('chunk-1-for-output.txt') >= 0 && recap.indexOf('chunk-2-for-output.txt') > recap.indexOf('chunk-1-for-output.txt'), 'terminal block carries the full stdout, in order');
 });
 
-test('live tee: two items dispatched in the same parallel wave never interleave into each other\'s log file', async () => {
+test('live log: two items dispatched in the same parallel wave never interleave into each other\'s log file', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-live-a', verify: 'test -f a.txt', refs: ['a.txt'] });
   seedItem(dir, { id: 'item-live-b', verify: 'test -f b.txt', refs: ['b.txt'] });
@@ -1175,7 +1187,7 @@ test('live tee: two items dispatched in the same parallel wave never interleave 
   assert.doesNotMatch(contentB, /for-a\.txt/, 'item-b\'s log carries no trace of item-a\'s chunks');
 });
 
-test('live tee: .fgos/logs is never committed (live tee did not change the committed surface)', async () => {
+test('live log: .fgos/logs is never committed (the item log did not change the committed surface)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-live-clean' });
   const config = configFor(writeChunkyCommittingExecutor(scriptDir, counterFile));
@@ -1183,8 +1195,8 @@ test('live tee: .fgos/logs is never committed (live tee did not change the commi
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.ok(fs.existsSync(path.join(dir, 'logs', 'item-live-clean.log')));
-  // main only ever gains the worker's own commit (produced by the committing
-  // executor) — .fgos/logs never enters a git object at all, tracked or not.
+  // main only ever gains the runner's commit of the worker's file —
+  // .fgos/logs never enters a git object at all, tracked or not.
   // .fgos/events.jsonl itself IS expected to be committed here (tsk-1ji:
   // claimWork's own opportunistic periodic checkpoint runs on every claim),
   // so this only asserts the live-tee surface, not .fgos as a whole.
@@ -1501,9 +1513,13 @@ test('startup reap: a wontfix branch with an open descendant is kept, not pruned
 test('state-conflict: a racing write under the runner\'s claim makes its own CAS fail -> cleanup, clean halt, exit 3', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-race' });
-  const config = configFor(writeRacingExecutor(scriptDir, counterFile, dir, 'item-race'));
+  const config = configFor(writeHoldingExecutor(scriptDir));
 
-  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const run = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  await raceWhileWorkerHolds(worktreeDir, 'item-race', async () => {
+    moveWork(dir, { id: 'item-race', to: 'blocked', expectedStatus: 'todo' });
+  });
+  const result = await run;
 
   assert.equal(result.outcome, 'drained');
   assert.equal(result.exitCode, 3);
@@ -1519,16 +1535,22 @@ test('state-conflict: a racing write under the runner\'s claim makes its own CAS
 test('tsk-40m code-review finding (blocker): a claim reclaimed by a DIFFERENT actor mid-dispatch is never silently settled by the runner\'s own stale claimId -- CAS conflict, clean halt, exit 3', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-race-claim' });
-  const config = configFor(writeClaimReclaimingExecutor(scriptDir, counterFile, dir, 'item-race-claim'));
+  const config = configFor(writeHoldingExecutor(scriptDir));
+  const { readClaim, releaseClaim } = await import('../../src/state/runtime-coordination.mjs');
 
-  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const run = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  await raceWhileWorkerHolds(worktreeDir, 'item-race-claim', async () => {
+    const stale = readClaim(dir, 'item-race-claim');
+    releaseClaim(dir, { id: 'item-race-claim', claimId: stale.claimId });
+    acquireClaim(dir, { id: 'item-race-claim', actor: 'a-different-actor', preClaimStatus: 'todo' });
+  });
+  const result = await run;
 
   assert.equal(result.outcome, 'drained');
   assert.equal(result.exitCode, 3);
   assert.equal(result.dispatched[0].outcome, 'halted');
   assert.equal(result.dispatched[0].errorClass, 'state-conflict');
   // the reclaiming actor's claim stands untouched — the runner never settled it
-  const { readClaim } = await import('../../src/state/runtime-coordination.mjs');
   const currentClaim = readClaim(dir, 'item-race-claim');
   assert.ok(currentClaim, 'the different actor\'s claim must still be active');
   assert.equal(currentClaim.actor, 'a-different-actor');
@@ -1569,11 +1591,11 @@ test('bin/fgos-runner.mjs run from a SUBDIRECTORY of another repo operates on th
   fs.writeFileSync(
     path.join(repoRoot, '.fgos', 'config.json'),
     JSON.stringify({
-      runner: {
+      runner: confinedRunnerConfig({
         executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
         modelPolicies: { node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
         timeoutMs: 30000,
-      },
+      }),
     }),
   );
   const nested = path.join(repoRoot, 'nested');
@@ -1611,16 +1633,13 @@ function writeDiscoveringExecutor(scriptDir, counterFile, bodies, { commit = tru
     .map((body) => `process.stdout.write(${JSON.stringify('```fgos-discovered\n' + body + '\n```\n')});`)
     .join('\n');
   const commitLines = commit
-    ? `fs.writeFileSync('output.txt', 'produced by worker\\n');
-execFileSync('git', ['add', 'output.txt']);
-execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);`
+    ? `fs.writeFileSync('output.txt', 'produced by worker\\n');`
     : '';
   fs.writeFileSync(
     scriptPath,
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
-fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
 ${emit}
 ${commitLines}
 `,
@@ -2080,11 +2099,8 @@ function writeDiscoveryVerdictExecutor(scriptDir, counterFile, verdictBody) {
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
-fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
 ${emit}
 fs.writeFileSync('RESEARCH.md', 'findings\\n');
-execFileSync('git', ['add', 'RESEARCH.md']);
-execFileSync('git', ['commit', '-q', '-m', 'worker: RESEARCH.md']);
 `,
   );
   return scriptPath;
@@ -2320,8 +2336,11 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
     import path from 'node:path';
     import { execFileSync } from 'node:child_process';
     const prompt = process.argv.slice(2).join(' ');
+    // The loop's own worker prompt (# Goal) carries the claim line too, since it
+    // runs as a Unit; only a driver operation's prompt is answered with a claim.
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-    if (match) {
+    const operationPrompt = match && !prompt.includes('# Goal');
+    if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
@@ -2329,12 +2348,6 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Scouted 2 symbols', findings: [] }));
     } else {
       fs.writeFileSync('output.txt', 'done\\n');
-      try {
-        execFileSync('git', ['add', 'output.txt']);
-        execFileSync('git', ['commit', '-m', 'feat: implement']);
-      } catch (err) {
-        fs.writeFileSync('commit-error.txt', err.stack || String(err));
-      }
     }
     process.exit(0);
     `,
@@ -2360,10 +2373,14 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
 
   const asgnDir = path.join(dir, 'assignments');
   assert.ok(fs.existsSync(asgnDir));
-  const assignments = fs.readdirSync(asgnDir);
-  assert.ok(assignments.length > 0);
-  const scoutAsgn = assignments.find((a) => a.includes('scout_blast_radius')) || assignments[0];
-  const runsDir = path.join(asgnDir, scoutAsgn, 'runs', '01');
+  // The scout ran as a Unit: its operation is on the producer seat of that unit run.
+  const scoutAsgn = fs.readdirSync(asgnDir).filter((a) => a.startsWith('unit-run-'))
+    .map((unitRunId) => path.join(asgnDir, unitRunId, 'producer', '1'))
+    .find((seat) => {
+      try { return JSON.parse(fs.readFileSync(path.join(seat, 'assignment.json'), 'utf8')).operation === 'scout-blast-radius'; } catch { return false; }
+    });
+  assert.ok(scoutAsgn, 'a scout-blast-radius unit run exists');
+  const runsDir = path.join(scoutAsgn, 'runs', '01');
   assert.ok(fs.existsSync(path.join(runsDir, 'result.json')));
   assert.ok(fs.existsSync(path.join(runsDir, 'dispatch-plan.json')));
 });
@@ -2434,30 +2451,25 @@ test('driver loop routes done review findings with REJECT to fix-verify-red inst
     import path from 'node:path';
     import { execFileSync } from 'node:child_process';
     const prompt = process.argv.slice(2).join(' ');
+    // The loop's own worker prompt (# Goal) carries the claim line too, since it
+    // runs as a Unit; only a driver operation's prompt is answered with a claim.
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const operationPrompt = match && !prompt.includes('# Goal');
     if (match && prompt.includes('review-item')) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nREJECT: evidence:candidate-diff implementation failed verify check in evidence:verify-fail.\\nEvaluation: REJECT.\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'REJECT', assessment: { verdict: 'findings' }, summary: 'Verify failed', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-fail'] }));
-    } else if (match) {
+    } else if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Fix Report\\nFix applied.\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Fix applied', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] }));
       fs.writeFileSync('output.txt', 'done\\n');
-      try {
-        execFileSync('git', ['add', 'output.txt']);
-        execFileSync('git', ['commit', '-m', 'feat: implement fix']);
-      } catch (err) {}
     } else {
       fs.writeFileSync('output.txt', 'done\\n');
-      try {
-        execFileSync('git', ['add', 'output.txt']);
-        execFileSync('git', ['commit', '-m', 'feat: implement fix']);
-      } catch (err) {}
     }
     process.exit(0);
     `,
@@ -2513,8 +2525,11 @@ test('driver loop runOnce: executing review-item with APPROVED verdict and passi
     import path from 'node:path';
     import { execFileSync } from 'node:child_process';
     const prompt = process.argv.slice(2).join(' ');
+    // The loop's own worker prompt (# Goal) carries the claim line too, since it
+    // runs as a Unit; only a driver operation's prompt is answered with a claim.
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-    if (match) {
+    const operationPrompt = match && !prompt.includes('# Goal');
+    if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
@@ -2522,10 +2537,6 @@ test('driver loop runOnce: executing review-item with APPROVED verdict and passi
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'APPROVED', summary: 'Clean code', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] }));
     } else {
       fs.writeFileSync('output.txt', 'done\\n');
-      try {
-        execFileSync('git', ['add', 'output.txt']);
-        execFileSync('git', ['commit', '-m', 'feat: implement']);
-      } catch (err) {}
     }
     process.exit(0);
     `,
@@ -2584,8 +2595,11 @@ test('driver loop runOnce: executing review-item with APPROVED verdict but faili
     import path from 'node:path';
     import { execFileSync } from 'node:child_process';
     const prompt = process.argv.slice(2).join(' ');
+    // The loop's own worker prompt (# Goal) carries the claim line too, since it
+    // runs as a Unit; only a driver operation's prompt is answered with a claim.
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-    if (match) {
+    const operationPrompt = match && !prompt.includes('# Goal');
+    if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
@@ -2593,10 +2607,6 @@ test('driver loop runOnce: executing review-item with APPROVED verdict but faili
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'APPROVED', summary: 'Clean code', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-fail'] }));
     } else {
       fs.writeFileSync('output.txt', 'done\\n');
-      try {
-        execFileSync('git', ['add', 'output.txt']);
-        execFileSync('git', ['commit', '-m', 'feat: implement fix']);
-      } catch (err) {}
     }
     process.exit(0);
     `,
@@ -2644,8 +2654,11 @@ test('driver loop runOnce: executing review-item on Work with NO candidate diff/
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
+    // The loop's own worker prompt (# Goal) carries the claim line too, since it
+    // runs as a Unit; only a driver operation's prompt is answered with a claim.
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-    if (match) {
+    const operationPrompt = match && !prompt.includes('# Goal');
+    if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
@@ -2696,8 +2709,11 @@ test('Finding 5 regression test: scout-blast-radius/review-item assignment paths
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
+    // The loop's own worker prompt (# Goal) carries the claim line too, since it
+    // runs as a Unit; only a driver operation's prompt is answered with a claim.
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-    if (match) {
+    const operationPrompt = match && !prompt.includes('# Goal');
+    if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
@@ -2776,7 +2792,7 @@ test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assig
   execFileSync('git', ['add', docsRef], { cwd: wt.path });
   execFileSync('git', ['commit', '-m', 'add plan.md in worktree'], { cwd: wt.path });
 
-  const cwdCheckLog = path.join(scriptDir, 'cwd-check.log');
+  // A confined worker writes only its run's outbox, so it reports its own cwd in its report there.
   const executorScript = path.join(scriptDir, 'validate-wt-executor.mjs');
   fs.writeFileSync(
     executorScript,
@@ -2784,33 +2800,28 @@ test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assig
     import fs from 'node:fs';
     import path from 'node:path';
     const cwd = process.cwd();
-    fs.writeFileSync(${JSON.stringify(cwdCheckLog)}, cwd);
-
-    const runsDir = path.join(cwd, '.fgos', 'assignments');
-    if (fs.existsSync(runsDir)) {
-      for (const asgn of fs.readdirSync(runsDir)) {
-        const runDir = path.join(runsDir, asgn, 'runs', '01');
-        if (fs.existsSync(runDir)) {
-          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nPlan in worktree is sound.\\n');
-          fs.writeFileSync(
-            path.join(runDir, 'agent-result.json'),
-            JSON.stringify({
-              status: 'done',
-              verdict: 'READY',
-              summary: 'Plan sound',
-              realityGate: {
-                modeFit: { status: 'PASS', citation: 'src/index.mjs' },
-                repoFit: { status: 'PASS', citation: 'src/index.mjs' },
-                assumptions: { status: 'PASS', citation: 'src/index.mjs' },
-                smallerPath: { status: 'PASS', citation: 'src/index.mjs' },
-                proofSurface: { status: 'PASS', citation: 'src/index.mjs' },
-                impactAnalysisPosture: { status: 'PASS', citation: 'src/index.mjs' },
-              },
-              feasibilityMatrix: [{ risk: 'medium risk', backing: 'src/index.mjs' }],
-            }),
-          );
-        }
-      }
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '));
+    if (match) {
+      const runDir = path.dirname(match[1]);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nPlan in worktree is sound.\\ncwd: ' + cwd + '\\n');
+      fs.writeFileSync(
+        match[1],
+        JSON.stringify({
+          status: 'done',
+          verdict: 'READY',
+          summary: 'Plan sound',
+          realityGate: {
+            modeFit: { status: 'PASS', citation: 'src/index.mjs' },
+            repoFit: { status: 'PASS', citation: 'src/index.mjs' },
+            assumptions: { status: 'PASS', citation: 'src/index.mjs' },
+            smallerPath: { status: 'PASS', citation: 'src/index.mjs' },
+            proofSurface: { status: 'PASS', citation: 'src/index.mjs' },
+            impactAnalysisPosture: { status: 'PASS', citation: 'src/index.mjs' },
+          },
+          feasibilityMatrix: [{ risk: 'medium risk', backing: 'src/index.mjs' }],
+        }),
+      );
     }
     process.exit(0);
     `,
@@ -2829,7 +2840,10 @@ test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assig
 
   await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
 
-  const executedCwd = fs.existsSync(cwdCheckLog) ? fs.readFileSync(cwdCheckLog, 'utf8').trim() : '';
+  const [asgnId] = validatePlanDispatches(repoRoot).asgnIds;
+  assert.ok(asgnId, 'executor was called');
+  const report = fs.readFileSync(resolveRunWorkerArtifactPath(path.join(repoRoot, '.fgos', 'assignments', asgnId, 'runs', '01'), /^report-(\d+)\.md$/, 'agent-report.md'), 'utf8');
+  const executedCwd = /^cwd: (.*)$/m.exec(report)?.[1] ?? '';
   assert.ok(executedCwd, 'executor was called');
   assert.equal(fs.existsSync(path.join(executedCwd, docsRef, 'plan.md')), true, 'cwd was content root containing plan.md');
 });
@@ -2857,8 +2871,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 const prompt = process.argv.slice(2).join(' ');
+// The loop's own worker prompt (# Goal) carries the claim line too, since it
+// runs as a Unit; only a driver operation's prompt is answered with a claim.
 const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-if (match) {
+const operationPrompt = match && !prompt.includes('# Goal');
+if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(
@@ -2884,10 +2901,8 @@ if (match) {
   );
 } else {
   fs.writeFileSync('output.txt', 'produced by worker\\n');
-  execFileSync('git', ['add', 'output.txt']);
   const statusStr = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' });
   if (statusStr.trim().length > 0) {
-    execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);
   }
 }
 process.exit(0);
@@ -2931,9 +2946,26 @@ function setupValidatePlanFixture({ planModeLine = '', executorFactory = writeVa
   return { ...base, id, docsRef, cfg };
 }
 
-function cell61RunDir(repoRoot) {
+// Each validate-plan dispatch is its own Unit run; its operation lives on the producer seat
+// (`<unitRunId>/producer/1`). Oldest first: unit run ids start with their creation time.
+function validatePlanDispatches(repoRoot) {
   const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
-  const asgnIds = fs.readdirSync(assignmentsDir).filter((d) => d.startsWith('asgn_'));
+  const asgnIds = fs.readdirSync(assignmentsDir)
+    .filter((d) => d.startsWith('unit-run-'))
+    .sort()
+    .map((unitRunId) => `${unitRunId}/producer/1`)
+    .filter((asgnId) => {
+      try {
+        return JSON.parse(fs.readFileSync(path.join(assignmentsDir, asgnId, 'assignment.json'), 'utf8')).operation === 'validate-plan';
+      } catch {
+        return false;
+      }
+    });
+  return { assignmentsDir, asgnIds };
+}
+
+function cell61RunDir(repoRoot) {
+  const { assignmentsDir, asgnIds } = validatePlanDispatches(repoRoot);
   assert.equal(asgnIds.length, 1, 'exactly one validate-plan Assignment ran');
   return { assignmentsDir, asgnId: asgnIds[0], runDir: path.join(assignmentsDir, asgnIds[0], 'runs', '01') };
 }
@@ -2997,9 +3029,13 @@ test('Cell 6.1 happy path: run evidence is complete and the verdict artifact is 
   // Immutable assignment input lives at the assignment root; the run dir
   // carries the per-run evidence set.
   assert.ok(fs.existsSync(path.join(asgnDir, 'assignment.json')), 'assignment.json persisted at the assignment root');
-  for (const f of ['run.json', 'agent-result.json', 'agent-report.md', 'result.json', 'evidence.json']) {
+  for (const f of ['run.json', 'result.json', 'evidence.json']) {
     assert.ok(fs.existsSync(path.join(runDir, f)), `runs/01 must contain ${f}`);
   }
+  // The worker's own artifacts: a confined worker writes only its run's outbox.
+  const claimPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
+  assert.ok(fs.existsSync(claimPath), 'runs/01 must hold agent-result.json');
+  assert.ok(fs.existsSync(resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md')), 'runs/01 must hold agent-report.md');
 
   const evidence = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
   assert.equal(evidence.operationMutability, 'read-only');
@@ -3020,9 +3056,9 @@ test('Cell 6.1 happy path: run evidence is complete and the verdict artifact is 
     );
   }
 
-  const claim = JSON.parse(fs.readFileSync(path.join(runDir, 'agent-result.json'), 'utf8'));
+  const claim = JSON.parse(fs.readFileSync(claimPath, 'utf8'));
   assert.equal(claim.verdict, 'READY');
-  assert.equal(asgnId.startsWith('asgn_'), true);
+  assert.match(asgnId, /^unit-run-[^/]+\/producer\/1$/);
 });
 
 // ---------------------------------------------------------------------------
@@ -3168,18 +3204,23 @@ const CELL62_READY_ARTIFACTS = `
  * READY claim + report; any later invocation writes nothing. */
 function writeValidatePlanOnceExecutor(scriptDir) {
   const scriptPath = path.join(scriptDir, 'validate-plan-once-executor.mjs');
-  const counterFile = path.join(scriptDir, 'validate-plan-once-counter');
+  // A confined worker cannot keep a counter of its own; it counts the validate-plan Unit runs the
+  // runner already made in this repo (readable to it), its own included.
   fs.writeFileSync(
     scriptPath,
     `
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
-const counterFile = ${JSON.stringify(counterFile)};
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-if (match) {
-  const count = parseInt(fs.existsSync(counterFile) ? fs.readFileSync(counterFile, 'utf8') : '0', 10) + 1;
-  fs.writeFileSync(counterFile, String(count));
+// The loop's own worker prompt (\"# Goal\") also carries the claim line now
+    // (it runs as a Unit); only a driver operation's prompt is answered with a claim.
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const operationPrompt = match && !prompt.includes('# Goal');
+if (operationPrompt) {
+  const assignmentsDir = match[1].slice(0, match[1].indexOf('/.fgos/assignments/') + '/.fgos/assignments'.length);
+  const count = fs.readdirSync(assignmentsDir).filter((d) => {
+    try { return d.startsWith('unit-run-') && JSON.parse(fs.readFileSync(path.join(assignmentsDir, d, 'unit.json'), 'utf8')).declared?.operation === 'validate-plan'; } catch { return false; }
+  }).length;
   if (count === 1) {
     const runDir = path.dirname(match[1]);
     fs.mkdirSync(runDir, { recursive: true });
@@ -3219,8 +3260,11 @@ function writeEvidenceRefsOnlyExecutor(scriptDir) {
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
+// The loop's own worker prompt (# Goal) carries the claim line too, since it
+// runs as a Unit; only a driver operation's prompt is answered with a claim.
 const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-if (match) {
+const operationPrompt = match && !prompt.includes('# Goal');
+if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(
@@ -3257,8 +3301,11 @@ function writeBrokenResultExecutor(scriptDir) {
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
+// The loop's own worker prompt (# Goal) carries the claim line too, since it
+// runs as a Unit; only a driver operation's prompt is answered with a claim.
 const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-if (match) {
+const operationPrompt = match && !prompt.includes('# Goal');
+if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(path.join(runDir, 'agent-result.json'), '{ "status": "done", ');
@@ -3279,8 +3326,11 @@ function writeNotReadyExecutor(scriptDir) {
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
+// The loop's own worker prompt (# Goal) carries the claim line too, since it
+// runs as a Unit; only a driver operation's prompt is answered with a claim.
 const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-if (match) {
+const operationPrompt = match && !prompt.includes('# Goal');
+if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(
@@ -3330,8 +3380,11 @@ function writeReadyNoReportExecutor(scriptDir) {
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
+// The loop's own worker prompt (# Goal) carries the claim line too, since it
+// runs as a Unit; only a driver operation's prompt is answered with a claim.
 const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-if (match) {
+const operationPrompt = match && !prompt.includes('# Goal');
+if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(
@@ -3370,8 +3423,11 @@ function writeReadyFailExitExecutor(scriptDir) {
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
+// The loop's own worker prompt (# Goal) carries the claim line too, since it
+// runs as a Unit; only a driver operation's prompt is answered with a claim.
 const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
-if (match) {
+const operationPrompt = match && !prompt.includes('# Goal');
+if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(
@@ -3410,12 +3466,13 @@ function readWorkSnapshot(dir, id) {
   return JSON.parse(JSON.stringify(listWork(dir).work[id]));
 }
 
+// `runs` numbers the validate-plan dispatches ('01', '02', ...); `runsDir` is the runs dir of
+// the first one, where its own run '01' lives.
 function cell62RunDirs(repoRoot) {
-  const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
-  const asgnIds = fs.readdirSync(assignmentsDir).filter((d) => d.startsWith('asgn_'));
-  assert.equal(asgnIds.length, 1, 'exactly one validate-plan Assignment dir exists');
+  const { assignmentsDir, asgnIds } = validatePlanDispatches(repoRoot);
+  assert.ok(asgnIds.length >= 1, 'a validate-plan Assignment dir exists');
   const runsDir = path.join(assignmentsDir, asgnIds[0], 'runs');
-  const runs = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d)).sort();
+  const runs = asgnIds.map((_, i) => String(i + 1).padStart(2, '0'));
   return { assignmentsDir, asgnId: asgnIds[0], runsDir, runs };
 }
 
@@ -3544,7 +3601,7 @@ test('Cell 6.2 read-back tamper: a deleted agent-report.md is never consumed cro
 
   await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
   const { runsDir } = cell62RunDirs(repoRoot);
-  fs.rmSync(path.join(runsDir, '01', 'agent-report.md'));
+  fs.rmSync(resolveRunWorkerArtifactPath(path.join(runsDir, '01'), /^report-(\d+)\.md$/, 'agent-report.md'));
 
   const secondLogs = [];
   await runOnce({ repoRoot, config: cfg, worktreeDir, log: (l) => secondLogs.push(l) });
@@ -3818,6 +3875,8 @@ test('P4a composed: a planted pinned-dir report and result.json field edits cann
     status: 'done',
     confidence: 'reported',
     planContentHash: crypto.createHash('sha256').update(planV2).digest('hex'),
+    // The plan identity recorded at launch, recomputed for V2 the same way.
+    inputDigests: (res.inputDigests ?? []).map((d) => ({ ...d, sha256: crypto.createHash('sha256').update(planV2).digest('hex') })),
     evidence: { ...res.evidence, artifacts: [
       path.join('.fgos', 'assignments', first.asgnId, 'runs', '01', 'agent-report.md'),
       path.join('.fgos', 'assignments', first.asgnId, 'runs', '01', 'agent-result.json'),

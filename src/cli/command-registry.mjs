@@ -45,7 +45,39 @@
 // via `isMainWorktree`), not this one. Every entry carries this field, same
 // discipline as `paginated` above.
 
-export const MANIFEST_SCHEMA_VERSION = '2.0';
+//
+// `subcommands` (optional) is set on a verb whose first positional is a
+// sub-verb: {<sub>: {description, parameters, examples}}, each sub-verb's
+// `parameters` in the same JSON-Schema shape, holding only the flags that
+// sub-verb reads. The verb-level `parameters` of such a verb is derived from
+// it by withSubcommands(), so the sub-verb list has one source.
+// test/cli/subcommand-flag-drift.test.mjs checks each sub-verb's schema
+// against the flags its handler really reads.
+
+export const MANIFEST_SCHEMA_VERSION = '3.0';
+
+// Top-level tokens the Rust host routes to the legacy-node payload as the
+// manifest door (`fgos --help [<verb>] [--json]`), next to the verb
+// selectors: scripts/export-command-selectors.mjs writes a route for each.
+export const HELP_SELECTORS = ['--help', '-h'];
+
+function withSubcommands(entry) {
+  return {
+    ...entry,
+    parameters: {
+      type: 'object',
+      properties: {
+        sub: {
+          type: 'string',
+          description: 'Sub-verb (positional); its own flags are under subcommands.<sub>.parameters.',
+          enum: Object.keys(entry.subcommands),
+        },
+      },
+      positional: ['sub'],
+      required: ['sub'],
+    },
+  };
+}
 
 export const COMMAND_REGISTRY = [
   {
@@ -60,11 +92,126 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
+  withSubcommands({
     name: 'metrics',
     invoke: 'fgos metrics <subcommand>',
     description: 'Observation metrics suite (cases, harness scorecard, runs, run coverage, discussions and passive agreement, eval records, outcomes, entropy, snapshot). Native Rust host command.',
-    parameters: { type: 'object', properties: {}, required: [] },
+    subcommands: {
+      ping: {
+        description: 'Health check: echoes the resolved root and any stdin length.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos metrics ping'],
+      },
+      case: {
+        description: 'Measured cases: "open <name> --harness fgos|cook-plan|plain [--task]" starts one, "close <name> --interventions <N> --verdict usable|fixed|discarded" ends it, "list" lists them (--open: only open ones).',
+        parameters: {
+          type: 'object',
+          properties: {
+            action: { type: 'string', description: 'Positional: open, close or list.', enum: ['open', 'close', 'list'] },
+            name: { type: 'string', description: 'Positional after open/close: the case name.' },
+            harness: { type: 'string', description: 'open: the harness measured (fgos, cook-plan, plain).' },
+            task: { type: 'string', description: 'open: a one-line task description.' },
+            interventions: { type: 'string', description: 'close: how many times a person had to step in.' },
+            verdict: { type: 'string', description: 'close: usable, fixed or discarded.' },
+            note: { type: 'string', description: 'close: free-text note.' },
+            items: { type: 'string', description: 'close: comma-separated work item ids the case produced.' },
+            sessions: { type: 'string', description: 'close: comma-separated session ids.' },
+            open: { type: 'boolean', description: 'list: only cases still open.' },
+          },
+          positional: ['action', 'name'],
+          required: ['action'],
+        },
+        examples: ['fgos metrics case open login-fix --harness fgos --task "fix login"', 'fgos metrics case close login-fix --interventions 1 --verdict usable', 'fgos metrics case list --open'],
+      },
+      harness: {
+        description: 'Harness scorecard over closed cases.',
+        parameters: {
+          type: 'object',
+          properties: {
+            case: { type: 'string', description: 'Only this case.' },
+            since: { type: 'string', description: 'ISO date-time lower bound.' },
+            until: { type: 'string', description: 'ISO date-time upper bound.' },
+          },
+          required: [],
+        },
+        examples: ['fgos metrics harness', 'fgos metrics harness --since 2026-10-01T00:00:00Z'],
+      },
+      faults: {
+        description: 'Recorded faults, newest first.',
+        parameters: {
+          type: 'object',
+          properties: {
+            class: { type: 'string', description: 'Only this fault class.' },
+            since: { type: 'string', description: 'ISO date-time lower bound.' },
+            until: { type: 'string', description: 'ISO date-time upper bound.' },
+            limit: { type: 'string', description: 'Positive integer: at most this many.' },
+          },
+          required: [],
+        },
+        examples: ['fgos metrics faults --limit 20'],
+      },
+      runs: {
+        description: 'Run outcomes grouped by executor, adapter or role.',
+        parameters: {
+          type: 'object',
+          properties: {
+            by: { type: 'string', description: 'executor, adapter or role.', enum: ['executor', 'adapter', 'role'] },
+            case: { type: 'string', description: 'Only runs of this case.' },
+            since: { type: 'string', description: 'ISO date-time lower bound.' },
+            until: { type: 'string', description: 'ISO date-time upper bound.' },
+          },
+          required: [],
+        },
+        examples: ['fgos metrics runs --by executor'],
+      },
+      coverage: {
+        description: 'How many unit runs carry a readable run result.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos metrics coverage'],
+      },
+      discussions: {
+        description: 'Discussion panels and their passive stance agreement, grouped by workflow, executor or persona.',
+        parameters: {
+          type: 'object',
+          properties: {
+            by: { type: 'string', description: 'workflow, executor or persona.', enum: ['workflow', 'executor', 'persona'] },
+            since: { type: 'string', description: 'ISO date-time lower bound.' },
+            until: { type: 'string', description: 'ISO date-time upper bound.' },
+          },
+          required: [],
+        },
+        examples: ['fgos metrics discussions --by workflow'],
+      },
+      eval: {
+        description: 'Eval records: "record" appends one read as a JSON object from stdin, "list" lists them (filters --harness, --question).',
+        parameters: {
+          type: 'object',
+          properties: {
+            action: { type: 'string', description: 'Positional: record or list.', enum: ['record', 'list'] },
+            harness: { type: 'string', description: 'list: only this harness.' },
+            question: { type: 'string', description: 'list: only this question.' },
+          },
+          positional: ['action'],
+          required: ['action'],
+        },
+        examples: ['fgos metrics eval list', 'fgos metrics eval record < eval.json'],
+      },
+      outcomes: {
+        description: 'Work item outcome counts from the work store.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos metrics outcomes'],
+      },
+      entropy: {
+        description: 'Work-graph entropy indicators.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos metrics entropy'],
+      },
+      snapshot: {
+        description: 'A point-in-time snapshot of the work store metrics.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos metrics snapshot'],
+      },
+    },
     examples: ['fgos metrics ping', 'fgos metrics coverage', 'fgos metrics discussions --by workflow', 'fgos metrics eval list'],
     touchesState: true,
     requiresExistingStore: false,
@@ -72,25 +219,153 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
     nativeOnly: true,
-  },
-  {
+  }),
+  withSubcommands({
     name: 'friction',
     invoke: 'fgos friction <subcommand>',
     description: 'Observation friction recording, resolution, inspection, and ranking. Native Rust host command.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos friction ping'],
+    subcommands: {
+      record: {
+        description: 'Record one friction against a subject. --detail-stdin reads the detail text from stdin.',
+        parameters: {
+          type: 'object',
+          properties: {
+            subject: { type: 'string', description: 'kind:id, kind one of run, session, executor, case, work (e.g. work:tsk-abc).' },
+            layer: { type: 'string', description: 'Where it hit: verification, state, environment, docs, spec, context, task, task-spec, executor or attestation.' },
+            'error-class': { type: 'string', description: 'Error class.' },
+            disposition: { type: 'string', description: 'advisory, blocked, parked or halted.' },
+            producer: { type: 'string', description: 'Who records it.' },
+            attempts: { type: 'string', description: 'Attempts before it resolved (integer).' },
+            'doc-type': { type: 'string', description: 'Optional: tutorial, how-to, reference or explanation.' },
+            detail: { type: 'string', description: 'Detail text.' },
+            'detail-stdin': { type: 'boolean', description: 'Read the detail text from stdin instead of --detail.' },
+          },
+          required: ['subject', 'layer', 'error-class', 'disposition', 'producer'],
+        },
+        examples: ['fgos friction record --subject work:tsk-abc --layer verification --error-class usage --disposition advisory --producer agent --detail "flag missing"'],
+      },
+      resolve: {
+        description: 'Mark a subject\'s friction resolved.',
+        parameters: {
+          type: 'object',
+          properties: {
+            subject: { type: 'string', description: 'kind:id, kind one of run, session, executor, case, work.' },
+            reason: { type: 'string', description: 'answer, done, wontfix, clarify-pass or migrated.' },
+            by: { type: 'string', description: 'Who resolved it.' },
+          },
+          required: ['subject', 'reason', 'by'],
+        },
+        examples: ['fgos friction resolve --subject work:tsk-abc --reason done --by agent'],
+      },
+      list: {
+        description: 'List recorded frictions.',
+        parameters: {
+          type: 'object',
+          properties: {
+            kind: { type: 'string', description: 'Only subjects of this kind.' },
+            layer: { type: 'string', description: 'Only this layer (see record --layer).' },
+            since: { type: 'string', description: 'ISO date-time lower bound.' },
+          },
+          required: [],
+        },
+        examples: ['fgos friction list --layer verification'],
+      },
+      show: {
+        description: 'Show one subject\'s frictions.',
+        parameters: {
+          type: 'object',
+          properties: { subject: { type: 'string', description: 'Positional or --subject: kind:id (e.g. work:tsk-abc).' } },
+          positional: ['subject'],
+          required: ['subject'],
+        },
+        examples: ['fgos friction show work:tsk-abc'],
+      },
+      rank: {
+        description: 'Subjects ranked by friction.',
+        parameters: {
+          type: 'object',
+          properties: { limit: { type: 'string', description: 'At most this many (integer).' } },
+          required: [],
+        },
+        examples: ['fgos friction rank --limit 10'],
+      },
+      ping: {
+        description: 'Health check: echoes the resolved root.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos friction ping'],
+      },
+      migrate: {
+        description: 'Migrate legacy friction records into the friction store.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos friction migrate'],
+      },
+    },
+    examples: ['fgos friction ping', 'fgos friction rank --limit 10'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
     nativeOnly: true,
-  },
-  {
+  }),
+  withSubcommands({
     name: 'convention',
-    invoke: 'fgos convention <subcommand>',
-    description: 'Generate and check repository artifact names and paths through the native Convention component.',
-    parameters: { type: 'object', properties: {}, required: [] },
+    invoke: 'fgos convention <name|path|check|classify>',
+    description: 'Generate and check repository artifact names and paths (reports, plans, journals) through the native Convention component. Use it instead of constructing such paths by hand.',
+    subcommands: {
+      name: {
+        description: 'The file name for a new artifact of a kind.',
+        parameters: {
+          type: 'object',
+          properties: {
+            kind: { type: 'string', description: 'Artifact kind: report, plan or journal (inferred from --type when omitted).' },
+            type: { type: 'string', description: 'Artifact type, e.g. audit, review; "plan" and "journal" imply that kind.' },
+            slug: { type: 'string', description: 'Descriptive kebab-case slug.' },
+            at: { type: 'string', description: 'Timestamp to name it at (default: now).' },
+          },
+          required: ['slug'],
+        },
+        examples: ['fgos convention name --kind report --type audit --slug x'],
+      },
+      path: {
+        description: 'The repo-relative path for a new artifact of a kind.',
+        parameters: {
+          type: 'object',
+          properties: {
+            kind: { type: 'string', description: 'Artifact kind: report, plan or journal (inferred from --type when omitted).' },
+            type: { type: 'string', description: 'Artifact type, e.g. audit, review; "plan" and "journal" imply that kind.' },
+            slug: { type: 'string', description: 'Descriptive kebab-case slug.' },
+            at: { type: 'string', description: 'Timestamp to name it at (default: now).' },
+            plan: { type: 'string', description: 'Name (not path) of the plan directory a report belongs under, YYMMDD-HHMM-slug.' },
+          },
+          required: ['slug'],
+        },
+        examples: ['fgos convention path --kind report --type review --slug lane-x --plan 261014-1400-two-doors-one-rununit'],
+      },
+      check: {
+        description: 'Check paths against the convention rules: exactly one of --all or explicit paths after "--".',
+        parameters: {
+          type: 'object',
+          properties: {
+            all: { type: 'boolean', description: 'Check every artifact in the repository.' },
+            paths: { type: 'array', items: { type: 'string' }, description: 'Positional after "--": the paths to check.' },
+          },
+          positional: ['paths'],
+          required: [],
+        },
+        examples: ['fgos convention check --all', 'fgos convention check -- plans/261014-1400-two-doors-one-rununit/reports/review-261014-2115-lane-x.md'],
+      },
+      classify: {
+        description: 'Which placement rule (kind, cardinality, scope) one path falls under; a path no placement rule matches is refused (unknown-kind).',
+        parameters: {
+          type: 'object',
+          properties: { path: { type: 'string', description: 'Positional after "--": the one path to classify.' } },
+          positional: ['path'],
+          required: ['path'],
+        },
+        examples: ['fgos convention classify -- fixtures/demo/spec.md'],
+      },
+    },
     examples: [
       'fgos convention name --kind report --type audit --slug x',
       'fgos convention check --all',
@@ -101,7 +376,7 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
     nativeOnly: true,
-  },
+  }),
   {
     name: 'init',
     invoke: 'fgos init',
@@ -796,20 +1071,35 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
+  withSubcommands({
     name: 'merge',
-    invoke: 'fgos merge',
-    description: '"list" (read-only) returns which awaiting-approval items are ready to merge now (every dep already done, no footprint conflict) ordered by rankImpact, which are still waiting on an unmerged dep, and which are footprint-conflicted pairs (same shape as fgos conflicts). "next" merges the single top-ranked ready item by recursing into the same approve logic (never a parallel merge path) -- if that item trips the Iron Law gate it reports which item and why and merges nothing, it never auto-acknowledges or falls through to the next-ranked item.',
-    parameters: {
-      type: 'object',
-      properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['list', 'next'] },
-        timeout: { type: 'integer', description: '"next" only: forwarded to the underlying approve call, same as approve --timeout.' },
-        wait: { type: 'number', description: '"next" only: forwarded to the underlying approve call, same as approve --wait.' },
-        'no-wait': { type: 'boolean', description: '"next" only: forwarded to the underlying approve call, same as approve --no-wait.' },
+    invoke: 'fgos merge <list|next>',
+    description: 'Merge the awaiting-approval items that are ready: "list" (read-only) ranks them, "next" merges the top-ranked one through the same approve/sync-root logic (never a parallel merge path).',
+    subcommands: {
+      list: {
+        description: 'Read-only: which awaiting-approval items are ready to merge now (every dep already done, no footprint conflict) ordered by rankImpact, which are still waiting on an unmerged dep, and which are footprint-conflicted pairs (same shape as fgos conflicts).',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos merge list'],
       },
-      positional: ['sub'],
-      required: ['sub'],
+      next: {
+        description: 'Merge the single top-ranked ready item by recursing into the same approve (or sync-root, for a root) logic. If that item trips the Iron Law gate it reports which item and why and merges nothing; it never auto-acknowledges or falls through to the next-ranked item. An idle turn returns {picked: null}.',
+        parameters: {
+          type: 'object',
+          properties: {
+            timeout: { type: 'number', description: 'Forwarded to approve/sync-root: verify timeout in milliseconds (default: the runner config\'s timeoutMs).' },
+            'no-timeout': { type: 'boolean', description: 'Forwarded to approve/sync-root: run verify with no time limit. Exclusive with --timeout.' },
+            wait: { type: 'number', description: 'Forwarded to approve/sync-root: millisecond ceiling for the default retry-with-backoff on lock contention (at most 900000).' },
+            'no-wait': { type: 'boolean', description: 'Forwarded to approve/sync-root: fail immediately on lock contention instead of waiting.' },
+            'acknowledge-iron-law': { type: 'boolean', description: 'Acknowledge the Iron Law gate for the picked item\'s self-modifying runner diff before merging.' },
+            'acknowledge-drift': { type: 'boolean', description: 'Forwarded to approve: close a milestone anyway even though a targeted item\'s root branch has unsynced drift.' },
+            github: { type: 'boolean', description: 'Forwarded to approve: merge a prior review --github PR through GitHub instead of a local git merge.' },
+            pr: { type: 'string', description: 'With --github: the PR number to merge.' },
+            'trust-dir': { type: 'boolean', description: 'Run verify from the --dir store\'s checkout instead of the current directory.' },
+          },
+          required: [],
+        },
+        examples: ['fgos merge next', 'fgos merge next --no-wait'],
+      },
     },
     examples: ['fgos merge list', 'fgos merge next'],
     touchesState: true,
@@ -821,99 +1111,188 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-  },
-  {
+  }),
+  withSubcommands({
     name: 'dispatch',
-    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|execute|log|probe-account> [runId]',
-    description: '"inspect" is Dispatch-owned runtime inspection. "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine clear door; it never recovers, launches, signals, or controls a Run. "recover" remains the semantic recovery door for a STANDALONE Run. "decide", "execute", and "log" provide canonical control-plane decisions, execution dispatch, and logging. "probe-account" is diagnostic: it starts every CLI configured for one provider account at the same moment through the real dispatch door (confinement, leased login, herdr pane) with a read-only prompt, reports per CLI an outcome class (ok, blocked-trust-prompt, auth, quota, sandbox, timeout, other) with its evidence line and run/pane refs plus an account-fault vs cli-fault verdict, and closes the panes it opened. It selects and schedules nothing.',
-    parameters: {
-      type: 'object',
-      properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'inspect', 'watch', 'recover', 'reconcile', 'decide', 'execute', 'log', 'probe-account'] },
-        invocation: { type: 'string', description: '"probe-account" only: comma-separated invocation ids to limit the probe to (default: every invocation that runs as the account).' },
-        executor: { type: 'string', description: '"probe-account" only: limit the probe to one executor id (default: every executor of the provider).' },
-        'timeout-ms': { type: 'string', description: '"probe-account"/"execute": per-call timeout in milliseconds.' },
-        run: { type: 'string', description: '"inspect" selector, and "reconcile plan --action collect-result" only: Run id selector / target runId.' },
-        assignment: { type: 'string', description: '"inspect" selector, and "reconcile plan --action clear-assignment-claim" only: Assignment id selector.' },
-        cwd: { type: 'string', description: 'Working directory path for inspect, reconcile, or execute/decide.' },
-        'provider-capacity': { type: 'boolean', description: '"inspect" only: report provider-capacity inventory/state/quarantine/leases from global config/state.' },
-        'run-id': { type: 'string', description: 'The runId to read (positional or --run-id).' },
-        interval: { type: 'string', description: '"watch" only: milliseconds between readings (default 1000).' },
-        ticks: { type: 'string', description: '"watch" only: stop after this many readings; omitted, watch until the run stops.' },
-        intent: { type: 'string', description: '"recover" without --action only: the requested recovery intent, "resume" (default) or "reassign" (needs replacement-authority evidence in the run\'s controller directory, or the recommendation comes back "needs-input").' },
-        action: { type: 'string', description: '"recover" only: JSON-encoded action object to apply, exactly as returned by a prior "recover" call\'s own `action` field. Presence of this flag is what selects the apply path over the observe path; giving it requires all four --expected-* fields and --action-key too. "reconcile plan" only (different meaning): the plain action-kind string to plan, one of "clear-cwd-lock" (default), "collect-result" (requires --run), "clear-assignment-claim" (requires --assignment), or "repair-projection" (requires --run).' },
-        provider: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" or "quarantine", "log", or "probe-account": provider id as `inspect --provider-capacity` lists it, e.g. openai-codex.' },
-        account: { type: 'string', description: '"reconcile provider-capacity clear-quarantine", "quarantine" or "probe-account": account id from ~/.fgos/config.json.' },
-        reason: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" or "quarantine": operator reason, e.g. token refreshed or quota exhausted.' },
-        until: { type: 'string', description: '"reconcile provider-capacity quarantine" only: ISO date-time (in the future) when the account is selectable again.' },
-        force: { type: 'boolean', description: '"reconcile provider-capacity clear-quarantine" only: permit clearing an account that is not currently quarantined.' },
-        plan: { type: 'string', description: '"reconcile apply" only: JSON-encoded plan returned by `dispatch reconcile plan`.' },
-        'expected-snapshot': { type: 'string', description: '"recover" apply only: the `snapshotHash` from the recommendation being applied.' },
-        'expected-control-epoch': { type: 'string', description: '"recover" apply only: the `expectedControlEpoch` from the recommendation being applied.' },
-        'expected-expires-at': { type: 'string', description: '"recover" apply only: the `expiresAt` from the recommendation being applied.' },
-        'action-key': { type: 'string', description: '"recover" apply only: the `actionKey` from the recommendation being applied. Consumed exactly once -- a repeat call with the same key returns the prior recorded outcome instead of repeating the effect.' },
-        json: { type: 'boolean', description: 'Accepted as a no-op -- the envelope is always JSON.' },
-        for: { type: 'string', description: '"decide" only: capability or purpose name to resolve.' },
-        prompt: { type: 'string', description: '"execute" only: prompt text for the executor.' },
-        model: { type: 'string', description: '"execute"/"log" only: model override.' },
-        tier: { type: 'string', description: '"execute"/"log" only: tier override.' },
-        carries: { type: 'string', description: '"execute" only: data classification carried (e.g. repo-content, user-text).' },
-        'has-live-task-access': { type: 'boolean', description: '"decide"/"execute" only: caller has live task/subagent access.' },
-        'needs-soul': { type: 'boolean', description: '"decide" only: task requires an agent soul.' },
-        work: { type: 'string', description: '"decide" only: work item id.' },
-        stage: { type: 'string', description: '"decide" only: work item stage.' },
-        id: { type: 'string', description: '"log" only: work item id.' },
-        command: { type: 'string', description: '"log" only: command string.' },
-        capability: { type: 'string', description: '"log" only: capability name.' },
-        mechanism: { type: 'string', description: '"log" only: dispatch mechanism.' },
-        'fallback-reason': { type: 'string', description: '"log" only: fallback explanation.' },
-        outcome: { type: 'string', description: '"log" only: execution outcome.' },
-        contract: { type: 'string', description: '"execute" only: path to inline execution contract file.' },
-        'repo-root': { type: 'string', description: '"decide"/"execute" only: main checkout repository root.' },
+    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|probe-account> [args]',
+    description: 'Dispatch-owned reads and repairs; it runs no work itself (one task runs through `fgos run`, planned work through `fgos workflow start`). "decide" answers which mechanism and executor a dispatch resolves to; "show-run"/"watch"/"inspect" read Run state; "recover" observes or applies recovery of a STANDALONE Run; "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine door that never recovers, launches, signals, or controls a Run; "probe-account" is a diagnostic over one provider account.',
+    subcommands: {
+      'show-run': {
+        description: 'Read one Run\'s recorded state.',
+        parameters: {
+          type: 'object',
+          properties: {
+            'run-id': { type: 'string', description: 'The runId to read (positional, --run-id or --run).' },
+            run: { type: 'string', description: 'Same as --run-id.' },
+          },
+          positional: ['run-id'],
+          required: ['run-id'],
+        },
+        examples: ['fgos dispatch show-run run_abc123'],
       },
-      positional: ['sub', 'run-id'],
-      required: ['sub'],
+      inspect: {
+        description: 'Dispatch-owned runtime inspection of a Run, an Assignment, a working directory\'s dispatch lock, or provider capacity.',
+        parameters: {
+          type: 'object',
+          properties: {
+            run: { type: 'string', description: 'Run id selector.' },
+            assignment: { type: 'string', description: 'Assignment id selector.' },
+            cwd: { type: 'string', description: 'Working directory selector.' },
+            'provider-capacity': { type: 'boolean', description: 'Report provider-capacity inventory/state/quarantine/leases from global config/state.' },
+          },
+          required: [],
+        },
+        examples: [
+          'fgos dispatch inspect --run run_abc123',
+          'fgos dispatch inspect --assignment asgn_abc123',
+          'fgos dispatch inspect --cwd /workspace/project',
+          'fgos dispatch inspect --provider-capacity',
+        ],
+      },
+      watch: {
+        description: 'Poll one Run\'s state until it stops (or for --ticks readings).',
+        parameters: {
+          type: 'object',
+          properties: {
+            'run-id': { type: 'string', description: 'The runId to watch (positional, --run-id or --run).' },
+            run: { type: 'string', description: 'Same as --run-id.' },
+            interval: { type: 'string', description: 'Milliseconds between readings (default 1000).' },
+            ticks: { type: 'string', description: 'Stop after this many readings; omitted, watch until the run stops.' },
+          },
+          positional: ['run-id'],
+          required: ['run-id'],
+        },
+        examples: ['fgos dispatch watch run_abc123', 'fgos dispatch watch run_abc123 --interval 2000 --ticks 30'],
+      },
+      recover: {
+        description: 'Without --action: a read-only recovery recommendation for a STANDALONE Run. With --action: apply exactly that recommendation, re-verified against current state (all four --expected-* fields and --action-key required).',
+        parameters: {
+          type: 'object',
+          properties: {
+            'run-id': { type: 'string', description: 'The runId to recover (positional, --run-id or --run).' },
+            run: { type: 'string', description: 'Same as --run-id.' },
+            intent: { type: 'string', description: 'Without --action only: "resume" (default) or "reassign" (needs replacement-authority evidence in the run\'s controller directory, or the recommendation comes back "needs-input").' },
+            action: { type: 'string', description: 'JSON-encoded action object to apply, exactly as returned by a prior recover call\'s own `action` field. Its presence selects the apply path.' },
+            'expected-snapshot': { type: 'string', description: 'Apply only: the `snapshotHash` from the recommendation being applied.' },
+            'expected-control-epoch': { type: 'string', description: 'Apply only: the `expectedControlEpoch` from the recommendation being applied.' },
+            'expected-expires-at': { type: 'string', description: 'Apply only: the `expiresAt` from the recommendation being applied.' },
+            'action-key': { type: 'string', description: 'Apply only: the `actionKey` from the recommendation being applied. Consumed exactly once -- a repeat call with the same key returns the prior recorded outcome instead of repeating the effect.' },
+          },
+          positional: ['run-id'],
+          required: ['run-id'],
+        },
+        examples: [
+          'fgos dispatch recover run_abc123',
+          'fgos dispatch recover run_abc123 --intent reassign',
+          'fgos dispatch recover run_abc123 --action \'{"type":"resume-driver"}\' --expected-snapshot <hash> --expected-control-epoch 0 --expected-expires-at <iso> --action-key <key>',
+        ],
+      },
+      reconcile: {
+        description: '"plan" (the default) plans one guard repair, "apply --plan" applies a plan it returned, "provider-capacity quarantine|clear-quarantine" sets or clears an account\'s quarantine. Never recovers, launches, signals, or controls a Run.',
+        parameters: {
+          type: 'object',
+          properties: {
+            mode: { type: 'string', description: 'Positional: plan (default), apply, or provider-capacity.', enum: ['plan', 'apply', 'provider-capacity'] },
+            'capacity-action': { type: 'string', description: 'Positional after provider-capacity: quarantine or clear-quarantine.', enum: ['quarantine', 'clear-quarantine'] },
+            action: { type: 'string', description: '"plan" only: the action kind to plan, one of "clear-cwd-lock" (default), "collect-result" (requires --run), "clear-assignment-claim" (requires --assignment), or "repair-projection" (requires --run).' },
+            run: { type: 'string', description: '"plan" only: target runId for collect-result or repair-projection.' },
+            'run-id': { type: 'string', description: '"plan" only: same as --run.' },
+            assignment: { type: 'string', description: '"plan" only: target Assignment id for clear-assignment-claim.' },
+            cwd: { type: 'string', description: '"plan" only: the working directory whose per-cwd dispatch lock clear-cwd-lock targets (default: the current directory).' },
+            plan: { type: 'string', description: '"apply" only: JSON-encoded plan returned by `dispatch reconcile plan`.' },
+            provider: { type: 'string', description: 'provider-capacity: provider id as `inspect --provider-capacity` lists it, e.g. openai-codex.' },
+            account: { type: 'string', description: 'provider-capacity: account id from ~/.fgos/config.json.' },
+            reason: { type: 'string', description: 'provider-capacity: operator reason, e.g. token refreshed or quota exhausted.' },
+            until: { type: 'string', description: 'quarantine only: ISO date-time (in the future) when the account is selectable again.' },
+            force: { type: 'boolean', description: 'clear-quarantine only: permit clearing an account that is not currently quarantined.' },
+          },
+          positional: ['mode', 'capacity-action'],
+          required: [],
+        },
+        examples: [
+          'fgos dispatch reconcile plan',
+          'fgos dispatch reconcile plan --action collect-result --run run_abc123',
+          'fgos dispatch reconcile apply --plan \'<plan-json>\'',
+          'fgos dispatch reconcile provider-capacity quarantine --provider openai-codex --account acct1 --reason "quota exhausted" --until 2026-12-31T00:00:00Z',
+          'fgos dispatch reconcile provider-capacity clear-quarantine --provider openai-codex --account acct1 --reason "token refreshed"',
+        ],
+      },
+      decide: {
+        description: 'Answer which mechanism (in-process, out-of-process, unavailable) and executor a dispatch resolves to, via bind(); runs nothing. Name an executor, a purpose (--for), or a work item (--work).',
+        parameters: {
+          type: 'object',
+          properties: {
+            'executor-id': { type: 'string', description: 'Positional: an exact executor id to resolve.' },
+            for: { type: 'string', description: 'Capability or purpose name to resolve when no executor is named.' },
+            work: { type: 'string', description: 'Work item id to resolve.' },
+            stage: { type: 'string', description: 'With --work: the work item stage.' },
+            assignment: { type: 'string', description: 'Assignment id to resolve against.' },
+            'has-live-task-access': { type: 'boolean', description: 'Caller self-declares it has a live Agent/Task tool.' },
+            'needs-soul': { type: 'boolean', description: 'The task requires an agent soul.' },
+            cwd: { type: 'string', description: 'Working directory to resolve from (default: the current directory; --dir is accepted too).' },
+            'repo-root': { type: 'string', description: 'Main checkout repository root.' },
+          },
+          positional: ['executor-id'],
+          required: [],
+        },
+        examples: [
+          'fgos dispatch decide judge-discovery',
+          'fgos dispatch decide --for general-purpose --has-live-task-access',
+          'fgos dispatch decide --work tsk-abc --stage planning',
+        ],
+      },
+      'probe-account': {
+        description: 'Diagnostic: start every CLI configured for one provider account at the same moment through the real dispatch door (confinement, leased login, herdr pane) with a read-only prompt; report per CLI an outcome class (ok, blocked-trust-prompt, auth, quota, sandbox, timeout, other) with its evidence line and run/pane refs plus an account-fault vs cli-fault verdict, and close the panes it opened. Selects and schedules nothing.',
+        parameters: {
+          type: 'object',
+          properties: {
+            provider: { type: 'string', description: 'Provider id, e.g. openai.' },
+            account: { type: 'string', description: 'Account id from ~/.fgos/config.json.' },
+            executor: { type: 'string', description: 'Limit the probe to one executor id (default: every executor of the provider).' },
+            invocation: { type: 'string', description: 'Comma-separated invocation ids to limit the probe to (default: every invocation that runs as the account).' },
+            'timeout-ms': { type: 'string', description: 'Per-call timeout in milliseconds.' },
+            cwd: { type: 'string', description: 'Working directory the probe runs in (default: the current directory; --dir is accepted too).' },
+            'repo-root': { type: 'string', description: 'Main checkout repository root.' },
+          },
+          required: ['provider', 'account'],
+        },
+        examples: ['fgos dispatch probe-account --provider openai --account tetcu72'],
+      },
     },
     examples: [
+      'fgos dispatch decide --for general-purpose --has-live-task-access',
       'fgos dispatch show-run run_abc123',
       'fgos dispatch inspect --run run_abc123',
-      'fgos dispatch inspect --assignment asgn_abc123',
-      'fgos dispatch inspect --cwd /workspace/project',
-      'fgos dispatch watch run_abc123',
-      'fgos dispatch watch run_abc123 --interval 2000 --ticks 30',
-      'fgos dispatch recover run_abc123',
       'fgos dispatch reconcile plan',
-      'fgos dispatch reconcile plan --action collect-result --run run_abc123',
-      'fgos dispatch reconcile apply --plan \'<plan-json>\'',
-      'fgos dispatch recover run_abc123 --intent reassign',
-      'fgos dispatch recover run_abc123 --action \'{"type":"resume-driver"}\' --expected-snapshot <hash> --expected-control-epoch 0 --expected-expires-at <iso> --action-key <key>',
-      'fgos dispatch decide --for general-purpose --has-live-task-access',
-      'fgos dispatch execute <executorId> --prompt "..."',
-      'fgos dispatch log <executorId> --id <id> --provider <p> --command <c>',
-      'fgos dispatch probe-account --provider openai --account tetcu72',
     ],
     touchesState: true,
-    // "execute" writes Run directories and state projections; "log"
-    // calls logExecutorDispatch which appends to .fgos/events/<writer>.jsonl
-    // (touchesState: true); "execute" spawns external processes on the host /
-    // containers (externalEffect: true). Per the registry invariant, a verb
-    // with multiple sub-modes is classified by its most-privileged effect on
-    // each axis (renders [write+external] in help).
+    // "reconcile"/"recover" write guard and Run state (touchesState: true);
+    // "probe-account" spawns provider CLIs (externalEffect: true). A verb with
+    // several sub-modes is classified by its most-privileged effect on each axis.
     requiresExistingStore: false,
     externalEffect: true,
     paginated: false,
     deprecated: null,
-  },
+  }),
   {
     name: 'run',
-    invoke: 'fgos run [--unit <file|->] [--pattern <name|preset>] [--override <json>] [--resume <unitRunId>] [--dir <mainRoot>] [--json]',
-    description: 'Single execution door for Unit runs: headless execution of Units through collaboration patterns (solo, reviewed, panel). Also supports "record" for inline producer turns.',
+    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--account <id>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
+    description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`. Also "record" for inline producer turns.',
     parameters: {
       type: 'object',
+      positional: ['prompt'],
       properties: {
+        prompt: { type: 'string', description: 'One-liner: the objective of a Unit built from the flags below (id adhoc-<slug>-<hex>). Use instead of --unit.' },
+        provider: { type: 'string', description: 'One-liner: comma-separated executor ids the Unit prefers, ahead of the capability\'s pool; still filtered like the pool (governance, independence, posture), and an --override executor still pins.' },
+        persona: { type: 'string', description: 'One-liner: persona name for the Unit; must resolve (fgos/agents, domains/*/agents, core/agents) before the run starts.' },
+        writes: { type: 'string', description: 'One-liner: comma-separated repo-relative paths the Unit may write; needs a linked worktree (--worktree, or run from inside one). Omitted: a read-only Unit.' },
+        capability: { type: 'string', description: 'One-liner: capability the Unit asks for (default "execute").' },
+        rigor: { type: 'string', description: 'One-liner: Unit rigor (low, standard, high, critical).' },
         unit: { type: 'string', description: 'Path to unit YAML/JSON file or "-" for stdin.' },
         pattern: { type: 'string', description: 'Pattern name or preset (solo, reviewed, panel, code-change).' },
         override: { type: 'string', description: 'JSON-encoded array or object of overrides.' },
+        effort: { type: 'string', description: 'Reasoning effort for this run (low, medium, high, max), rendered into the provider CLI\'s own flag; a level the bound executor does not declare refuses the binding.' },
+        account: { type: 'string', description: 'Pin a provider account (an id in providers.<provider>.accounts of ~/.fgos/config.json; same as "account" in --override). It pins each seat whose bound executor\'s provider lists it (a checker on another provider binds unpinned) and does not choose the executor: pair it with --provider. Refused before the unit run exists when no seat takes it or it is quarantined; the lease still takes it, and a provider limit on it ends the seat instead of rotating or failing over. Not with --resume.' },
         resume: { type: 'string', description: 'Unit run ID to resume.' },
         dir: { type: 'string', description: 'Main repository root directory. Storage follows it; workers start in the current directory, so run from inside that project or pass --worktree (a different project than the current directory is warned about as dir-differs-from-cwd).' },
         worktree: { type: 'string', description: 'Target worktree directory.' },
@@ -924,12 +1303,16 @@ export const COMMAND_REGISTRY = [
         round: { type: 'number', description: '"record" only: round number.' },
         nonce: { type: 'string', description: '"record" only: issued once-nonce.' },
         evidence: { type: 'string', description: '"record" only: comma-separated evidence file references.' },
+        result: { type: 'string', description: '"record" only: JSON-encoded result object.' },
       },
       required: [],
     },
     examples: [
+      'fgos run "Summarize the open review findings"',
       'fgos run --unit path/to/unit.yaml --pattern solo',
       'fgos run --unit path/to/unit.yaml --pattern reviewed',
+      'fgos run "Summarize the open review findings" --provider openai',
+      'fgos run "Fix the typo in the README" --writes README.md --worktree ../wt-typo',
     ],
     touchesState: true,
     requiresExistingStore: false,
@@ -1333,20 +1716,43 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
+  withSubcommands({
     name: 'session',
-    invoke: 'fgos session',
-    description: 'Per-session git worktree lifecycle: "start" opens a detached-HEAD worktree, "end" removes it, "list" (read-only) prints the registry, "gc" reclaims entries whose worktree is gone from git or whose start-CLI pid has since exited (sparing diverged or uncommitted-work sessions).',
-    parameters: {
-      type: 'object',
-      properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['start', 'end', 'list', 'gc'] },
-        'session-id': { type: 'string', description: 'Session id (positional, required for "end").' },
-        item: { type: 'string', description: '"start" only: optional work item id to bind the session to.' },
-        force: { type: 'boolean', description: '"end" only: force-remove a diverged (dangling-commit) session.' },
+    invoke: 'fgos session <start|end|list|gc>',
+    description: 'Per-session git worktree lifecycle: "start" opens a detached-HEAD worktree, "end" removes it, "list" (read-only) prints the registry, "gc" reclaims stale entries.',
+    subcommands: {
+      start: {
+        description: 'Open a detached-HEAD session worktree with a .fgos symlink to the main store.',
+        parameters: {
+          type: 'object',
+          properties: { item: { type: 'string', description: 'Optional work item id to bind the session to.' } },
+          required: [],
+        },
+        examples: ['fgos session start', 'fgos session start --item tsk-abc'],
       },
-      positional: ['sub', 'session-id'],
-      required: ['sub'],
+      end: {
+        description: 'Remove a session worktree and its registry entry.',
+        parameters: {
+          type: 'object',
+          properties: {
+            'session-id': { type: 'string', description: 'Positional: the session id to end.' },
+            force: { type: 'boolean', description: 'Force-remove a diverged (dangling-commit) session.' },
+          },
+          positional: ['session-id'],
+          required: ['session-id'],
+        },
+        examples: ['fgos session end <session-id>', 'fgos session end <session-id> --force'],
+      },
+      list: {
+        description: 'Read-only: print the session registry.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos session list'],
+      },
+      gc: {
+        description: 'Reclaim entries whose worktree is gone from git or whose start-CLI pid has since exited, sparing diverged or uncommitted-work sessions.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos session gc'],
+      },
     },
     examples: ['fgos session start', 'fgos session end <session-id>', 'fgos session list', 'fgos session gc'],
     touchesState: true,
@@ -1354,18 +1760,27 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-  },
-  {
+  }),
+  withSubcommands({
     name: 'gateway',
-    invoke: 'fgos gateway',
-    description: 'One-door lifecycle for the fgos gateway (REST API + web dashboard, apps/fgos-gateway/src/gateway.rs) as a detached background process (tsk-31v): "start" builds the release binary then spawns it detached, refusing if already running; "stop" sends SIGTERM to the recorded pid; "status" (read-only) reports pid/port/liveness plus a real reachability check against /v1/contract. Use this instead of a hand-rolled nohup/tmux/systemd invocation — AGENTS.md names it the mandatory entry point.',
-    parameters: {
-      type: 'object',
-      properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['start', 'stop', 'status'] },
+    invoke: 'fgos gateway <start|stop|status>',
+    description: 'One-door lifecycle for the fgos gateway (REST API + web dashboard, apps/fgos-gateway/src/gateway.rs) as a detached background process (tsk-31v). Use this instead of a hand-rolled nohup/tmux/systemd invocation — AGENTS.md names it the mandatory entry point.',
+    subcommands: {
+      start: {
+        description: 'Build the release binary, then spawn it detached; refuses if already running.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos gateway start'],
       },
-      positional: ['sub'],
-      required: ['sub'],
+      stop: {
+        description: 'Send SIGTERM to the recorded pid and clear the registry.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos gateway stop'],
+      },
+      status: {
+        description: 'Read-only: pid/port/liveness plus a real reachability check against /v1/contract.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos gateway status'],
+      },
     },
     examples: ['fgos gateway start', 'fgos gateway status', 'fgos gateway stop'],
     touchesState: true,
@@ -1373,19 +1788,27 @@ export const COMMAND_REGISTRY = [
     externalEffect: true,
     paginated: false,
     deprecated: null,
-  },
-  {
+  }),
+  withSubcommands({
     name: 'goal',
-    invoke: 'fgos goal',
-    description: 'Persisted-focus pointer (str67-goal-directed-planning D3/D4/D6/D7): "set" points focus at an existing goalTier item (rejects a non-goal id, required for "set"); "show" (read-only) returns the current focus plus its goal-scoped ranking, or {focus: null} when nothing is set.',
-    parameters: {
-      type: 'object',
-      properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['set', 'show'] },
-        id: { type: 'string', description: 'Goal item id (positional, required for "set"; not used by "show").' },
+    invoke: 'fgos goal <set|show>',
+    description: 'Persisted-focus pointer (str67-goal-directed-planning D3/D4/D6/D7): "set" points focus at an existing goalTier item; "show" (read-only) returns the current focus plus its goal-scoped ranking.',
+    subcommands: {
+      set: {
+        description: 'Point focus at an existing goalTier item; rejects a non-goal id.',
+        parameters: {
+          type: 'object',
+          properties: { id: { type: 'string', description: 'Positional: the goal item id.' } },
+          positional: ['id'],
+          required: ['id'],
+        },
+        examples: ['fgos goal set <id>'],
       },
-      positional: ['sub', 'id'],
-      required: ['sub'],
+      show: {
+        description: 'Read-only: the current focus plus its goal-scoped ranking, or {focus: null} when nothing is set.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos goal show'],
+      },
     },
     examples: ['fgos goal set <id>', 'fgos goal show'],
     touchesState: true,
@@ -1393,44 +1816,59 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-  },
-  {
+  }),
+  withSubcommands({
     name: 'tool',
-    invoke: 'fgos tool',
-    description: 'Tool registry (tsk-1dj, ported from repository-harness; tsk-in1-1 D1: a tool provider is declared directly in runner.executors.<id> in .fgos/config.json — config-edited, not a CLI verb): "check" probes every declared tool\'s presence on THIS machine and writes it to a local, gitignored overlay file, never the shared event log, and always succeeds even when a probed tool is missing; "query" returns the provider set for a capability, merging the config-declared tools with the local overlay ("unknown" for one never checked here).',
-    parameters: {
-      type: 'object',
-      properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['check', 'query'] },
-        name: { type: 'string', description: '"check": optional filter, a declared tool\'s executor id — omitted checks every tool-capable executor.' },
-        capability: { type: 'string', description: '"query" only, optional filter: free-text capability label, normalized to kebab-case.' },
-        status: { type: 'string', description: '"query" only, optional filter: one of present/missing/unknown/stale ("stale" is mcp/skill-only: the tool is installed but its own on-disk metadata records a commit behind the repo\'s current HEAD, tsk-j7y).' },
+    invoke: 'fgos tool <check|query>',
+    description: 'Tool registry (tsk-1dj, ported from repository-harness; tsk-in1-1 D1: a tool provider is declared directly in runner.executors.<id> in .fgos/config.json — config-edited, not a CLI verb): "check" probes presence on THIS machine into a local, gitignored overlay; "query" returns the provider set for a capability.',
+    subcommands: {
+      check: {
+        description: 'Probe every declared tool\'s presence on THIS machine and write it to a local, gitignored overlay file, never the shared event log; always succeeds even when a probed tool is missing.',
+        parameters: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Optional filter: a declared tool\'s executor id; omitted checks every tool-capable executor.' },
+            config: { type: 'string', description: 'Read executors from this runner config file instead of the project\'s.' },
+          },
+          required: [],
+        },
+        examples: ['fgos tool check', 'fgos tool check --name gitnexus'],
       },
-      positional: ['sub', 'name'],
-      required: ['sub'],
+      query: {
+        description: 'Return the provider set for a capability, merging the config-declared tools with the local overlay ("unknown" for one never checked here).',
+        parameters: {
+          type: 'object',
+          properties: {
+            capability: { type: 'string', description: 'Optional filter: free-text capability label, normalized to kebab-case.' },
+            status: { type: 'string', description: 'Optional filter: one of present/missing/unknown/stale ("stale" is mcp/skill-only: the tool is installed but its own on-disk metadata records a commit behind the repo\'s current HEAD, tsk-j7y).' },
+            config: { type: 'string', description: 'Read executors from this runner config file instead of the project\'s.' },
+          },
+          required: [],
+        },
+        examples: ['fgos tool query --capability impact-analysis --status present'],
+      },
     },
-    examples: [
-      'fgos tool check',
-      'fgos tool query --capability impact-analysis --status present',
-    ],
+    examples: ['fgos tool check', 'fgos tool query --capability impact-analysis --status present'],
     touchesState: true,
     requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
-  },
-  {
+  }),
+  withSubcommands({
     name: 'agents',
-    invoke: 'fgos agents',
-    description: 'Personas a panel seat can name with `--seats "@name"`: "list" shows every definition the seat lookup can find from the project (fgos/agents, then domains/*/agents, then core/agents; the first tier holding a name wins), the tier it comes from, the one-line description, any key the renderer would drop, and the installed definitions that the project\'s own domains/ or core/agents/ folder hides. Read-only.',
-    parameters: {
-      type: 'object',
-      properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['list'] },
-        worktree: { type: 'string', description: 'Project root to read from; defaults to the git worktree of the current directory.' },
+    invoke: 'fgos agents list',
+    description: 'Personas a panel seat can name with `--seats "@name"`. Read-only.',
+    subcommands: {
+      list: {
+        description: 'Every definition the seat lookup can find from the project (fgos/agents, then domains/*/agents, then core/agents; the first tier holding a name wins), the tier it comes from, the one-line description, any key the renderer would drop, and the installed definitions that the project\'s own domains/ or core/agents/ folder hides.',
+        parameters: {
+          type: 'object',
+          properties: { worktree: { type: 'string', description: 'Project root to read from; defaults to the git worktree of the current directory.' } },
+          required: [],
+        },
+        examples: ['fgos agents list'],
       },
-      positional: ['sub'],
-      required: ['sub'],
     },
     examples: ['fgos agents list'],
     touchesState: false,
@@ -1438,7 +1876,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-  },
+  }),
   {
     name: 'setup',
     invoke: 'fgos setup',
@@ -1601,47 +2039,111 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
+  withSubcommands({
     name: 'workflow',
-    invoke: 'fgos workflow <start|status|answer|resume|operations|stages> [id]',
-    description: 'Workflow runner and definition manager: execute multi-step workflows with DAG scheduling, human review gates, and pure git integration. Legacy stage operations inspection remains under "operations"/"stages".',
-    parameters: {
-      type: 'object',
-      properties: {
-        sub: { type: 'string', description: 'Subcommand: start, status (run state plus advance: running, pid, logPath, lastLines, hint), answer, resume, operations, stages.' },
-        id: { type: 'string', description: 'Workflow ID or Workflow Run ID.' },
-        plan: { type: 'string', description: '"start" only: path to AgentKit plan.md or plan directory.' },
-        request: { type: 'string', description: '"start" only: the owner request this run serves; every unit receives it in its objective.' },
-        'context-ref': { type: 'array', items: { type: 'string' }, description: '"start" only, repeatable: safe repo-relative path or handoff reference; first-step Units receive these alongside template.contextRefs.' },
-        seats: { type: 'string', description: '"start" only (and a consistency check on "resume"): pipe-separated entries, at least 2; a lens is 3-160 characters on one line without braces, distinct case-insensitively; rebuilds a base whose panel is generic (group-cognition, business-discussion, nominal-group, delphi) with one panel seat per lens, in order. Topology, gates, checkers and the synthesizer stay as registered; there is no seat maximum, seats beyond the provider families share one (reported as seatsPreflight). An entry "@name" (lowercase letters, digits and "-") seats a named persona on that seat only: looked up in fgos/agents of the project, then domains/*/agents, then the installed core/agents, pinned at start, never silently replaced; an unknown or duplicated name refuses the start. Bases with curated seats (council-lite, architecture-advisory) are refused. Context refs are also copied to the later steps so every seat and checker receives them.' },
-        foreground: { type: 'boolean', description: '"start", "answer" and "resume" only: advance the run in this process and return when it completes, fails, or parks. Without it, they record the run (or the answer), hand advancing to a detached process (log: .fgos/workflow-runs/<id>/advance.log) and return the run id at once; read progress with "status", which also reports `advance: { running, pid, logPath, lastLines, hint }`. A run already being advanced by a live process refuses a second advance.' },
-        step: { type: 'string', description: '"answer" only: step ID to answer.' },
-        answer: { type: 'string', description: '"answer" only: answer text.' },
-        approve: { type: 'boolean', description: '"answer" only: explicit approval signal. Consent gates (default mode: consent) release only when this is true; without it, the answer is recorded as a clarification note and the gate remains parked. Input gates (mode: input) release on answer alone.' },
-        dir: { type: 'string', description: 'Main checkout root directory. Storage follows it; workers start in the current directory, so run from inside that project or pass --worktree (a different project than the current directory is warned about as dir-differs-from-cwd).' },
-        worktree: { type: 'string', description: 'Target worktree directory.' },
-        stage: { type: 'string', description: 'Legacy operations/stages: Workflow stage name.' },
-        domain: { type: 'string', description: 'Legacy operations/stages: Domain name.' },
-        workflow: { type: 'string', description: 'Legacy operations/stages: Workflow name.' },
+    invoke: 'fgos workflow <start|status|answer|resume|operations> [id]',
+    description: 'Door for planned work: a registered Workflow preset, an AgentKit plan, or a file of several Units run as steps (DAG ordering, human review gates, pure git integration). One task with no planning takes the other door, `fgos run "<prompt>"`. start/answer/resume advance in a detached process by default; read progress with "status".',
+    subcommands: {
+      start: {
+        description: 'Start a run from exactly one of: a registered Workflow id (a preset such as delphi or group-cognition), --plan <AgentKit plan>, or --units <file> (one step per Unit). Returns the run id at once and advances it in a detached process unless --foreground.',
+        parameters: {
+          type: 'object',
+          properties: {
+            'workflow-id': { type: 'string', description: 'Positional (or --id): a registered Workflow id / preset.' },
+            id: { type: 'string', description: 'Same as the positional workflow id.' },
+            plan: { type: 'string', description: 'Path to an AgentKit plan.md or plan directory.' },
+            units: { type: 'string', description: 'A YAML or JSON units file, { id?, title?, units: [Unit...] } or a list of Units, run as a one-off Workflow with one step per Unit; a Unit\'s dependsOn orders the steps and hands it the earlier reports. A Unit may carry a soft "prefer" executor list and a "persona". A writing Unit that builds on exactly one writing Unit starts from that Unit\'s branch; building on two or more is refused (merge them into one unit, or make one depend on the other). Nothing is merged for you: the result lists every writing Unit\'s branch and worktree (writeBranches). Not combinable with --seats.' },
+            effort: { type: 'string', description: 'Reasoning effort every unit of the run asks for (low, medium, high, max), checked against each chosen executor; kept for resume.' },
+            request: { type: 'string', description: 'The owner request this run serves; every unit receives it in its objective.' },
+            'stance-options': { type: 'string', description: 'Pipe-separated option labels a measured panelist picks a stance from ("a|b|c"); refused on resume with different options.' },
+            'context-ref': { type: 'array', items: { type: 'string' }, description: 'Repeatable: safe repo-relative path or handoff reference; first-step Units receive these alongside template.contextRefs.' },
+            seats: { type: 'string', description: 'Pipe-separated entries, at least 2; a lens is 3-160 characters on one line without braces, distinct case-insensitively; rebuilds a base whose panel is generic (group-cognition, business-discussion, nominal-group, delphi) with one panel seat per lens, in order. Topology, gates, checkers and the synthesizer stay as registered; there is no seat maximum, seats beyond the provider families share one (reported as seatsPreflight). An entry "@name" (lowercase letters, digits and "-") seats a named persona on that seat only: looked up in fgos/agents of the project, then domains/*/agents, then the installed core/agents, pinned at start, never silently replaced; an unknown or duplicated name refuses the start. Bases with curated seats (council-lite, architecture-advisory) are refused. Context refs are also copied to the later steps so every seat and checker receives them.' },
+            foreground: { type: 'boolean', description: 'Advance the run in this process and return when it completes, fails, or parks. Without it the run is handed to a detached process (log: .fgos/workflow-runs/<id>/advance.log); a run already being advanced by a live process refuses a second advance.' },
+            worktree: { type: 'string', description: 'Target worktree directory.' },
+          },
+          positional: ['workflow-id'],
+          required: [],
+        },
+        examples: [
+          'fgos workflow start delphi --request "Should we split the billing service?"',
+          'fgos workflow start --units units.yaml --effort high --foreground',
+          'fgos workflow start --plan plans/my-plan',
+          'fgos workflow start group-cognition --request "Why does month-end close slip?" --seats "reconciliation bottlenecks|handoff timing|automation failure modes" --context-ref docs/finance/close-policy.md',
+        ],
       },
-      required: [],
+      status: {
+        description: 'Read-only: run state plus advance: { running, pid, logPath, lastLines, hint }.',
+        parameters: {
+          type: 'object',
+          properties: {
+            'run-id': { type: 'string', description: 'Positional (or --id): the Workflow Run id.' },
+            id: { type: 'string', description: 'Same as the positional run id.' },
+          },
+          positional: ['run-id'],
+          required: ['run-id'],
+        },
+        examples: ['fgos workflow status wf-run-1234'],
+      },
+      answer: {
+        description: 'Answer a parked gate step. Consent gates (default mode) release only with --approve; without it the answer is a clarification note and the gate stays parked. Input gates release on the answer alone.',
+        parameters: {
+          type: 'object',
+          properties: {
+            'run-id': { type: 'string', description: 'Positional (or --id): the Workflow Run id.' },
+            id: { type: 'string', description: 'Same as the positional run id.' },
+            step: { type: 'string', description: 'Step id to answer.' },
+            answer: { type: 'string', description: 'Answer text.' },
+            approve: { type: 'boolean', description: 'Explicit approval signal for a consent gate.' },
+            foreground: { type: 'boolean', description: 'Advance the run in this process after answering instead of a detached process.' },
+            worktree: { type: 'string', description: 'Target worktree directory.' },
+          },
+          positional: ['run-id'],
+          required: ['run-id', 'step', 'answer'],
+        },
+        examples: ['fgos workflow answer wf-run-1234 --step approve --answer yes --approve'],
+      },
+      resume: {
+        description: 'Resume advancing a run (detached unless --foreground). --seats is only a consistency check: the run keeps the seats it started with.',
+        parameters: {
+          type: 'object',
+          properties: {
+            'run-id': { type: 'string', description: 'Positional (or --id): the Workflow Run id.' },
+            id: { type: 'string', description: 'Same as the positional run id.' },
+            seats: { type: 'string', description: 'Must equal the seats the run started with.' },
+            foreground: { type: 'boolean', description: 'Advance the run in this process.' },
+            worktree: { type: 'string', description: 'Target worktree directory.' },
+          },
+          positional: ['run-id'],
+          required: ['run-id'],
+        },
+        examples: ['fgos workflow resume wf-run-1234', 'fgos workflow resume wf-run-1234 --foreground'],
+      },
+      operations: {
+        description: 'Read-only: the operations a stage step offers, read from the Workflow definition.',
+        parameters: {
+          type: 'object',
+          properties: {
+            step: { type: 'string', description: 'Positional (or --step): the Workflow stage step name.' },
+            domain: { type: 'string', description: 'Domain name (default: the default domain).' },
+            workflow: { type: 'string', description: 'Workflow name within the domain.' },
+          },
+          positional: ['step'],
+          required: ['step'],
+        },
+        examples: ['fgos workflow operations planning', 'fgos workflow operations --step planning --domain coding'],
+      },
     },
     examples: [
-      'fgos workflow start coding/feature',
-      'fgos workflow start --plan plans/my-plan',
-      'fgos workflow start delphi --foreground',
-      'fgos workflow start group-cognition --request "Why does month-end close slip?" --seats "reconciliation bottlenecks|handoff timing|automation failure modes" --context-ref docs/finance/close-policy.md',
+      'fgos workflow start delphi --request "Should we split the billing service?"',
+      'fgos workflow start --units units.yaml --foreground',
       'fgos workflow status wf-run-1234',
       'fgos workflow answer wf-run-1234 --step approve --answer yes --approve',
-      'fgos workflow answer wf-run-1234 --step approve --answer yes --approve --foreground',
       'fgos workflow resume wf-run-1234',
-      'fgos workflow resume wf-run-1234 --foreground',
-      'fgos workflow operations --stage planning',
     ],
     touchesState: true,
     requiresExistingStore: false,
     externalEffect: true,
     paginated: false,
     deprecated: null,
-  },
+  }),
 ];

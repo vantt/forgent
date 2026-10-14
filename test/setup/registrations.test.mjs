@@ -1103,6 +1103,36 @@ test('domain-workflow-operations-coverage doctor check is registered and passes 
   assert.match(result.message, /every step operation across domain workflows resolves/);
 });
 
+test('doctor check runner-generated-paths accepts an absent or well-formed list and flags a malformed one', () => {
+  const tmpDir = mkTempDir();
+  const fgosDir = path.join(tmpDir, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  const write = (runner) => fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner }, null, 2), 'utf8');
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-generated-paths');
+  assert.ok(check, 'runner-generated-paths doctor check must be registered');
+
+  write({ capabilities: DEFAULT_CAPABILITY_SLOTS });
+  const missing = check.check(tmpDir);
+  assert.equal(missing.passed, true);
+  assert.match(missing.message, /warning/);
+
+  write({ generatedPaths: [{ from: 'core/skills/**', also: ['.agents/skills/**'] }] });
+  const valid = check.check(tmpDir);
+  assert.equal(valid.passed, true);
+  assert.match(valid.message, /valid/);
+
+  write({ generatedPaths: [{ from: '**', also: ['x'] }] });
+  const bare = check.check(tmpDir);
+  assert.equal(bare.passed, false);
+  assert.match(bare.message, /project/);
+  assert.match(bare.message, /generatedPaths\[0\]\.from/);
+
+  write({ generatedPaths: [{ from: 'core', also: ['x'], extra: true }] });
+  const unknownKey = check.check(tmpDir);
+  assert.equal(unknownKey.passed, false);
+  assert.match(unknownKey.message, /unknown key "extra"/);
+});
+
 test('doctor check runner-patterns-config passes with defaults or warns when missing', () => {
   const tmpDir = mkTempDir();
   const fgosDir = path.join(tmpDir, '.fgos');

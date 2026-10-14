@@ -93,7 +93,7 @@ no tool calls retrieve them. It does not mean tools, hooks, MCP, skills or
 user instructions were unavailable.
 
 The default `claude` executor uses `-p {prompt} --model {model}
---permission-mode acceptEdits`. `dispatch execute` has no pass-through for
+--permission-mode acceptEdits`. `fgos run` has no pass-through for
 extra Claude flags. Do not attach a flags list to a report and assume it was
 applied, or bypass the project's dispatch door with a raw provider command.
 Until an explicitly configured invocation has been exercised and audited,
@@ -108,7 +108,7 @@ setting sources. `--safe-mode` still permits admin-managed policy; do not
 claim that every setting is disabled. `--bare` is a different mode that skips
 OAuth/keychain authentication, so it is not an interchangeable switch.
 
-The 2026-10-06 [availability canary](../../plans/reports/observe-independent-comparison-261006/isolation-canary.json) is not an A/B judgment. The later [actual comparison judge](../../plans/reports/observe-independent-comparison-261006/completion-judge-evidence.json) retains applied argv and SDK capabilities; its two-file before/after inventory is a coordinator-authored assertion, not an independently retained listing. That judge profile was a temporary configuration, not a committed one: re-declare and re-audit it each time. Three builtin plugins remain; no complete hidden-instruction inventory is claimed. Native Unit prepared argv/cwd do not alone prove effective execution: compare actual SDK initialization and execution evidence. `dispatch execute` chooses the first CLI invocation when no invocation ID is supplied; editing only a differently named profile does not apply its flags. Preserve referenced IDs and verify the invocation actually selected before a paid run.
+The 2026-10-06 [availability canary](../../plans/reports/observe-independent-comparison-261006/isolation-canary.json) is not an A/B judgment. The later [actual comparison judge](../../plans/reports/observe-independent-comparison-261006/completion-judge-evidence.json) retains applied argv and SDK capabilities; its two-file before/after inventory is a coordinator-authored assertion, not an independently retained listing. That judge profile was a temporary configuration, not a committed one: re-declare and re-audit it each time. Three builtin plugins remain; no complete hidden-instruction inventory is claimed. Native Unit prepared argv/cwd do not alone prove effective execution: compare actual SDK initialization and execution evidence. `fgos run` binds whatever invocation `bind()` picks unless an `--override` names one; editing only a differently named profile does not apply its flags. Preserve referenced IDs and verify the invocation actually selected before a paid run.
 
 A confined Pi worker needs a provisioned writable private authentication runtime: ordinary Pi CLI reads take an adjacent auth-file lock. Redirecting its agent directory without provisioning does not supply credentials. Inspect the owning project's public runner projection for an existing account-backed private-home profile (`PI_CODING_AGENT_DIR` for Pi, `HOME` for agy) and let fgOS's declared account inventory/driver provision the allowlisted files opaquely. Do not manually read/extract/copy credential contents or silently widen host credential-write grants. The earlier readonly failure was configuration, not quota exhaustion or an absent platform mechanism.
 
@@ -121,14 +121,22 @@ judge executor and explicit separate project root and scratch cwd:
 
 ```bash
 node /home/vantt/projects/forgentX/bin/fgos.mjs dispatch decide "$judge_executor" \
-  --cwd "$scratch" --repo-root "$project_root"
-node /home/vantt/projects/forgentX/bin/fgos.mjs dispatch execute "$judge_executor" \
-  --prompt-file "$judge_input" --model opus --tier flagship \
-  --cwd "$scratch" --repo-root "$project_root"
+  --dir "$project_root"
+cd "$scratch"
+node /home/vantt/projects/forgentX/bin/fgos.mjs run "$(cat "$judge_input")" \
+  --dir "$project_root" --capability review \
+  --override "{\"executor\":\"$judge_executor\",\"invocation\":\"$judge_invocation\"}" --json
 ```
 
-Execute only if `decide` returns out-of-process; follow its returned mechanism
-otherwise. A name alone does not configure an isolated invocation. Preserve
+Run only if `decide` returns out-of-process; follow its returned mechanism
+otherwise. The worker starts in the current directory (`$scratch`) while
+storage follows `--dir`. Without `--writes` the Unit is read-only. The
+override pins the judge executor and the invocation declared for it, so the
+model is whatever that invocation's configuration names (Opus here); check
+`data.results[-1]` and the binding under `.fgos/assignments/<unitRunId>/`
+for the model that actually ran. `fgos dispatch execute` (with
+`--prompt-file`, `--model`, `--tier`, `--cwd`, `--repo-root`) was removed;
+see `docs/specs/runner.md` decision 0062. A name alone does not configure an isolated invocation. Preserve
 the effective prepared argv, model/session identity and actual transcript or
 stream outside scratch. Audit available tools/MCP, loaded instruction and hook
 events, and actual tool calls separately. No `--continue`, `--resume`,

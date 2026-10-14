@@ -90,11 +90,27 @@ test('outcome classes come from what the run settled with, what it printed and t
 });
 
 test('the verdict says account fault only when every CLI failed the same account-level way', () => {
-  assert.equal(accountProbeVerdict([{ outcome: 'ok' }, { outcome: 'ok' }]), 'healthy');
-  assert.equal(accountProbeVerdict([{ outcome: 'auth' }, { outcome: 'quota' }]), 'account-fault');
-  assert.equal(accountProbeVerdict([{ outcome: 'ok' }, { outcome: 'blocked-trust-prompt' }]), 'cli-fault');
-  assert.equal(accountProbeVerdict([{ outcome: 'sandbox' }, { outcome: 'auth' }]), 'mixed');
+  const sandboxed = (outcome) => ({ outcome, confined: true });
+  assert.equal(accountProbeVerdict([sandboxed('ok'), sandboxed('ok')]), 'healthy');
+  assert.equal(accountProbeVerdict([sandboxed('auth'), sandboxed('quota')]), 'account-fault');
+  assert.equal(accountProbeVerdict([sandboxed('ok'), sandboxed('blocked-trust-prompt')]), 'cli-fault');
+  assert.equal(accountProbeVerdict([sandboxed('sandbox'), sandboxed('auth')]), 'mixed');
   assert.equal(accountProbeVerdict([]), 'nothing-to-probe');
+});
+
+test('the verdict reads only the invocations that declare their own sandbox', () => {
+  // The read-only door confines every probe round. An invocation that declares no sandbox has no private
+  // home either, so its CLI meets its own login directory mounted read-only and stops on EROFS before it
+  // answers: the shape of a real openai/tetcu72 probe, where every sandboxed invocation answered.
+  const rows = [
+    { outcome: 'ok', confined: true },
+    { outcome: 'ok', confined: true },
+    { outcome: 'sandbox', confined: false },
+    { outcome: 'sandbox', confined: false },
+  ];
+  assert.equal(accountProbeVerdict(rows), 'healthy');
+  assert.equal(accountProbeVerdict([{ outcome: 'auth', confined: true }, { outcome: 'sandbox', confined: false }]), 'account-fault');
+  assert.equal(accountProbeVerdict([{ outcome: 'sandbox', confined: false }]), 'no-confined-cli');
 });
 
 test('the door gets a config pinned to the one account, and other providers and accounts are left alone', () => {
@@ -174,5 +190,6 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
   assert.equal(row.outcome, 'blocked-trust-prompt');
   assert.equal(row.pane, 'closed-by-probe');
   assert.equal(report.results.filter((r) => r.outcome === 'ok').length, 3);
+  assert.deepEqual(report.results.filter((r) => r.inVerdict).map((r) => r.invocationId).sort(), ['codex-herdr-static', 'pi-cli-bwrap-acct']);
   assert.equal(report.verdict, 'cli-fault');
 });

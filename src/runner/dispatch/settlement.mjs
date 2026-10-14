@@ -22,7 +22,7 @@ import { markRunSettled } from './visibility-session.mjs';
 import { normalizeRunResultV2, normalizeRunResultV3, interpretRunResult } from './run-result.mjs';
 import { validateAgentResultClaim, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
-import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
+import { attributeWorkspaceChanges, evaluateAttributionPolicy } from './evidence-attribution.mjs';
 import { parseUsageForAdapter } from './usage-parsers.mjs';
 
 export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
@@ -38,7 +38,8 @@ import {
   classifyProviderCapacityFault,
   quarantineProviderAccount,
 } from './provider-capacity.mjs';
-import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine } from './provider-auth-failure.mjs';
+import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
+import { nulPaths, statusPaths, GIT_LIST_MAX_BUFFER } from '../../util/git-paths.mjs';
 
 /**
  * Safely resolve root path without failing if not in a git repository.
@@ -149,56 +150,74 @@ export function safeGitHead(dir) {
   }
 }
 
+const isStorePath = (filePath) => filePath === '.fgos' || filePath.startsWith('.fgos/');
+
 /**
  * Read current dirty file paths relative to git root safely, excluding .fgos/ internal files.
+ * Read exactly as the runner's commit reads a worktree (commit-unit-work changedPaths, same git
+ * arguments and the shared statusPaths parser), so what settlement reports and what the commit
+ * judges are one list; dirt inside a submodule is left out.
  */
 export function safeGitStatusFiles(dir) {
   if (!dir) return [];
   try {
-    const output = execFileSync('git', ['status', '--porcelain', '-uall'], {
+    const output = execFileSync('git', ['status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignore-submodules=dirty'], {
       cwd: dir,
       encoding: 'utf8',
+      maxBuffer: GIT_LIST_MAX_BUFFER,
       shell: false,
       stdio: ['ignore', 'pipe', 'ignore'],
     });
-    const lines = output.split('\n');
-    const files = [];
-    for (const rawLine of lines) {
-      if (!rawLine || rawLine.length < 4) continue;
-      const match = rawLine.slice(3).trim();
-      if (match) {
-        const filePath = match.includes(' -> ') ? match.split(' -> ')[1].trim() : match;
-        if (!filePath.startsWith('.fgos/') && filePath !== '.fgos') {
-          files.push(filePath);
-        }
-      }
-    }
-    return files;
+    return statusPaths(output).filter((filePath) => !isStorePath(filePath));
   } catch {
     return [];
   }
 }
 
 /**
- * List files modified between two commit SHAs, excluding .fgos/ internal files.
+ * List files modified between two commit SHAs, excluding .fgos/ internal files, byte for byte and
+ * a rename as both its halves like safeGitStatusFiles.
  */
 export function safeGitCommittedDiffFiles(dir, gitBefore, gitAfter) {
   if (!dir || !gitBefore || !gitAfter || gitBefore === gitAfter) return [];
   try {
-    const output = execFileSync('git', ['diff', '--name-only', `${gitBefore}..${gitAfter}`], {
+    const output = execFileSync('git', ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${gitBefore}..${gitAfter}`], {
       cwd: dir,
       encoding: 'utf8',
+      maxBuffer: GIT_LIST_MAX_BUFFER,
       shell: false,
       stdio: ['ignore', 'pipe', 'ignore'],
     });
-    return output
-      .trim()
-      .split('\n')
-      .map((s) => s.trim())
-      .filter((s) => s && !s.startsWith('.fgos/') && s !== '.fgos');
+    return nulPaths(output).filter((s) => !isStorePath(s));
   } catch {
     return [];
   }
+}
+
+/**
+ * The sandbox backend the worker really ran under, or null when it ran without one.
+ *
+ * Read from what the Confinement Authority prepared for this launch (its
+ * prepared-invocation record names the backend instance, `none` when there was
+ * none), else from an attestation the dispatch returned as enforced. The mode a
+ * caller requested is never evidence: a required posture can still resolve to an
+ * unconfined launch, and a requested mode named nothing that ran.
+ */
+export function ranConfinementBackend(runDir, launchCommandId, attestation = null) {
+  if (runDir && launchCommandId) {
+    try {
+      const record = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'prepared-invocation', `${launchCommandId}.json`), 'utf8'));
+      const type = record?.backend?.type;
+      if (typeof type === 'string' && type) return type === 'none' ? null : type;
+    } catch {
+      // No record for this launch: fall through to the attestation.
+    }
+  }
+  if (attestation?.outcome === 'enforced') {
+    const type = attestation.backend?.type;
+    if (typeof type === 'string' && type && type !== 'none') return type;
+  }
+  return null;
 }
 
 /**
@@ -235,8 +254,8 @@ function classifyEvidenceToOutcomeFacts({
   claimInvalid = false,
   workerArtifacts = [],
   changedFiles = [],
-  hasDirtyBeforeMutation = false,
   isReadOnlyOperation = true,
+  attributionRefusal = null,
   role,
   assignment,
 }) {
@@ -288,15 +307,17 @@ function classifyEvidenceToOutcomeFacts({
     };
   }
 
-  const hasExternalEvidence = changedFiles.length > 0 || hasDirtyBeforeMutation;
+  const hasExternalEvidence = changedFiles.length > 0;
 
-  if (isReadOnlyOperation && hasExternalEvidence) {
+  // Only a write proven to be the run's own is refused (evaluateAttributionPolicy);
+  // a change merely seen across the run travels as a warning instead.
+  if (attributionRefusal) {
     return {
       execStatus: 'failed',
       confidenceLevel: 'failed',
       verdict: 'not-applicable',
-      failure: { family: 'policy', code: 'read-only-mutation' },
-      policy: { disposition: 'refuse', code: 'read-only-mutation' },
+      failure: { family: 'policy', code: attributionRefusal.code },
+      policy: { disposition: 'refuse', code: attributionRefusal.code },
     };
   }
 
@@ -462,6 +483,24 @@ export function commitRunSettlement({
 /**
  * Unified settlement pipeline for successful or evaluated Run outcomes.
  */
+/**
+ * The policy a receipt records, plus what the launch itself did with it: the effort level as
+ * the provider CLI's own flag (`provenance.reasoningEffort.rendered`) and every place the model
+ * that ran differs from the one bound (`provenance.modelDrift`, provider-adapter.mjs's model
+ * check). Unchanged when neither applies.
+ */
+function withLaunchProvenance(policy, { reasoningEffort, modelWarnings = [] } = {}) {
+  if (!reasoningEffort && modelWarnings.length === 0) return policy;
+  const provenance = { ...(policy.provenance ?? {}) };
+  if (reasoningEffort) {
+    provenance.reasoningEffort = { ...(provenance.reasoningEffort ?? {}), rendered: reasoningEffort };
+  }
+  if (modelWarnings.length > 0) {
+    provenance.modelDrift = { value: modelWarnings, source: 'launch-and-provider-output' };
+  }
+  return { ...policy, provenance };
+}
+
 export async function settleRunOutcome({
   runDir,
   runMeta,
@@ -482,10 +521,12 @@ export async function settleRunOutcome({
   dirtyBefore = [],
   dirtyAfter = null,
   dirtyBeforeSnapshots = null,
-  planContentHash,
+  inputDigests,
   resolvedExecutorId,
   effectivePolicy,
   executorRedirected = false,
+  reasoningEffort,
+  modelWarnings = [],
   providerCapacitySelection = null,
   providerCapacityEvidence = null,
   fallbackEvidence = null,
@@ -493,6 +534,10 @@ export async function settleRunOutcome({
   launchCommandId = null,
   receipt = null,
   adapterOutcome = null,
+  attestation = null,
+  // Correlated findings the launching door already made (the executor CLI door's
+  // repo-root watch, `stray-write-correlated`); kept beside settle's own.
+  dispatchWarnings = [],
   opts = {},
 }) {
   const root = resolveSafeRoot(runDir, opts?.repoRoot);
@@ -584,17 +629,30 @@ export async function settleRunOutcome({
   // found for openrouter.") stopped because the provider cannot serve it, which is a provider limit
   // like any other: the account is quarantined and the caller moves on instead of failing the role.
   // A claim the worker managed to write means the worker did report, so it is judged as reported.
+  // A process that exits the same way with a used-up quota as its last words (codex: "ERROR: You've
+  // hit your usage limit ...") is the same kind of stop, read from the same stderr tail and without
+  // needing an account lease: the walk moves to another account or candidate, and a leased account is
+  // quarantined until the reset time the provider printed.
   const alreadyProviderStop = adapterOutcome === 'provider-limit' || adapterOutcome === 'paused-limit' || adapterOutcome === 'blocked';
-  const exitedOnDeadCredential = !alreadyProviderStop
+  const exitedOnProviderStop = !alreadyProviderStop
     && !isTimeout
     && typeof exitCode === 'number' && exitCode !== 0
-    && !agentClaim
+    && !agentClaim;
+  const exitedOnDeadCredential = exitedOnProviderStop
     && matchAuthFailureLine(stderrText, { tailLines: AUTH_FAILURE_TAIL_LINES }) !== null;
-  const settledAdapterOutcome = exitedOnDeadCredential ? 'provider-limit' : adapterOutcome;
+  const exitedOnQuota = exitedOnProviderStop
+    && !exitedOnDeadCredential
+    && matchQuotaLimitLine(stderrText, { tailLines: AUTH_FAILURE_TAIL_LINES }) !== null;
+  const settledAdapterOutcome = exitedOnDeadCredential || exitedOnQuota ? 'provider-limit' : adapterOutcome;
   // Whether the stop is a dead credential, as opposed to a quota: a caller that walks to another
   // candidate must not land on the provider whose login just failed.
-  const credentialFault = (settledAdapterOutcome === 'provider-limit' || settledAdapterOutcome === 'paused-limit')
-    && matchAuthFailureLine(stderrText) !== null;
+  // A quota sentence in the stderr tail is the provider's own last word and outranks a login
+  // wording further up, which in a streamed transcript may be the agent quoting it.
+  const quotaInTail = matchQuotaLimitLine(stderrText, { tailLines: AUTH_FAILURE_TAIL_LINES }) !== null;
+  const credentialFault = exitedOnDeadCredential
+    || ((settledAdapterOutcome === 'provider-limit' || settledAdapterOutcome === 'paused-limit')
+      && !quotaInTail
+      && matchAuthFailureLine(stderrText) !== null);
 
   let providerCapacityFault = null;
   if (providerCapacitySelection?.status === 'selected') {
@@ -643,6 +701,11 @@ export async function settleRunOutcome({
     }
   }
 
+  // The scope the assignment declared (a unit's writes): a change inside it is covered, one outside
+  // it warns. Coverage says "inside the declared scope", never "written by this run".
+  // A read-only seat in a writing unit carries the unit's writes too, but none of them are its own.
+  const declaredWrites = !isReadOnly && Array.isArray(assignment?.writes) && assignment.writes.length > 0 ? assignment.writes : null;
+  const declaredCoverage = declaredWrites ? { paths: declaredWrites } : null;
   const evidenceData = {
     operationMutability: isReadOnly ? 'read-only' : 'mutates-repo',
     gitBefore,
@@ -653,7 +716,7 @@ export async function settleRunOutcome({
     mutatedDirtyBeforeFiles,
     changedFiles,
     changedFileReasons,
-    attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: resolvedDirtyAfter }),
+    attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: resolvedDirtyAfter, declaredCoverage }),
     artifacts: workerArtifacts,
     tests: [],
     ...(providerCapacityFault ? { providerCapacity: providerCapacityFault } : {}),
@@ -671,6 +734,15 @@ export async function settleRunOutcome({
     stdout: stdoutContent,
     stderr: stderrContent,
   });
+  // A before/after snapshot of the run's checkout cannot tell the run's writes from
+  // another session's (a commit landing on a shared checkout mid-run moves HEAD), so
+  // every change it shows is correlated: no attestation is passed, nothing is proven.
+  const attributionPolicy = evaluateAttributionPolicy({
+    attributions: attributeWorkspaceChanges({ postRunDirt: changedFiles, declaredCoverage }),
+    isReadOnly,
+    writeScope: declaredWrites,
+    mutatedDirtyBeforeFiles,
+  });
   const evidenceFacts = classifyEvidenceToOutcomeFacts({
     exitCode,
     signal,
@@ -679,8 +751,8 @@ export async function settleRunOutcome({
     claimInvalid,
     workerArtifacts: workerArtifactPaths,
     changedFiles,
-    hasDirtyBeforeMutation: mutatedDirtyBeforeFiles.length > 0,
     isReadOnlyOperation: isReadOnly,
+    attributionRefusal: attributionPolicy.disposition === 'refuse' ? attributionPolicy : null,
     role: assignment?.role,
     assignment,
   });
@@ -694,12 +766,18 @@ export async function settleRunOutcome({
     controlToken,
     executorId: resolvedExecutorId || runMeta.executorId || null,
     adapter: opts?.adapter || (resolvedExecutorId?.includes('herdr') ? 'herdr-spawn' : 'cli-spawn'),
-    confinement: (effectivePolicy?.confinement?.requirement?.mode === 'confined' ? (effectivePolicy?.confinement?.backend?.type ?? 'bwrap') : null),
+    confinement: ranConfinementBackend(runDir, launchCommandId, attestation),
+    warnings: [
+      ...(Array.isArray(attributionPolicy.warnings) ? attributionPolicy.warnings : []),
+      ...(Array.isArray(dispatchWarnings) ? dispatchWarnings : []),
+    ],
     role: assignment?.role ?? null,
-    ...(effectivePolicy ? { policy: effectivePolicy, executorRedirected } : {}),
+    ...(effectivePolicy ? { policy: withLaunchProvenance(effectivePolicy, { reasoningEffort, modelWarnings }), executorRedirected } : {}),
     settledAt,
     durationMs: typeof durationMs === 'number' ? durationMs : null,
-    ...(planContentHash ? { planContentHash } : {}),
+    // The pinned input digests taken at launch; a run settled by recovery reads them from the
+    // run.json the admission wrote.
+    ...((inputDigests ?? runMeta?.inputDigests)?.length ? { inputDigests: inputDigests ?? runMeta.inputDigests } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports,
     operation: assignment?.operation,
@@ -712,7 +790,7 @@ export async function settleRunOutcome({
     // next candidate instead of retrying the same provider. One waiting on a prompt only
     // a person can answer is `blocked`: retrying or moving on does not clear it.
     ...(settledAdapterOutcome === 'provider-limit' || settledAdapterOutcome === 'paused-limit' || settledAdapterOutcome === 'blocked'
-      ? { failureOverride: { family: 'provider', code: settledAdapterOutcome, ...(credentialFault ? { cause: 'credential' } : {}) } }
+      ? { failureOverride: { family: 'provider', code: settledAdapterOutcome, ...(credentialFault ? { cause: 'credential' } : exitedOnQuota ? { cause: 'quota' } : {}) } }
       : evidenceFacts.failure ? { failureOverride: evidenceFacts.failure } : {}),
     ...(evidenceFacts.policy ? { policyOverride: evidenceFacts.policy } : {}),
     runtime: {

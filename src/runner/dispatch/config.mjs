@@ -18,6 +18,7 @@
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
 import { RIGOR_VALUES } from '../rigor.mjs';
+import { canonicalizeWriteEntry } from './write-scope.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { mergeConfigDefaults } from '../../setup/config-merge.mjs';
@@ -232,6 +233,9 @@ export const DEFAULT_RUNNER_CONFIG = {
       },
     },
   },
+  // Generated trees a unit's write scope widens to when it touches their source:
+  // [{ from: '<source scope entry>', also: ['<render target entry>', ...] }].
+  generatedPaths: [],
 };
 
 /**
@@ -471,6 +475,23 @@ export const EXECUTOR_CARRIES = Object.freeze(['user-text', 'repo-content']);
 // -> config.mjs import cycle. `assignment-policy.mjs` re-exports this name
 // unchanged for its own existing callers.
 export const REASONING_EFFORT_VALUES = Object.freeze(['low', 'medium', 'high', 'max']);
+
+/**
+ * The one validation every requested reasoningEffort goes through, whichever
+ * door asked for it: the canonical vocabulary first, then the levels the
+ * executor itself declares in `supports.reasoningEffort` (a narrower list
+ * there is a deliberate limit, never bypassed by a command-line flag).
+ * Returns the value unchanged when it passes.
+ */
+export function assertReasoningEffort(value, { supported, executorId } = {}) {
+  if (!REASONING_EFFORT_VALUES.includes(value)) {
+    throw new RunnerConfigError(`invalid reasoningEffort "${value}". Valid values: [${REASONING_EFFORT_VALUES.join(', ')}]`);
+  }
+  if (Array.isArray(supported) && !supported.includes(value)) {
+    throw new RunnerConfigError(`executor "${executorId}" supports reasoningEffort [${supported.join(', ')}], not "${value}"`);
+  }
+  return value;
+}
 
 /**
  * CLI commands recognized as staying within the Claude ecosystem for
@@ -1435,6 +1456,48 @@ export function supportsPolicyTier(cfg, providerModel, policyTier) {
   return typeof cfg?.modelPolicies?.[providerModel]?.[policyTier] === 'string';
 }
 
+const GENERATED_PATH_KEYS = ['from', 'also'];
+
+/**
+ * Shape of runner.generatedPaths. `from` must open with a literal directory (a bare `**` or a
+ * leading glob would widen every unit's scope); every entry must read as a write-scope entry.
+ */
+export function validateGeneratedPathsShape(generatedPaths, label) {
+  if (!Array.isArray(generatedPaths)) {
+    throw new RunnerConfigError(`runner config (${label}) generatedPaths must be an array of {from, also} entries.`);
+  }
+  generatedPaths.forEach((entry, i) => {
+    const at = label;
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      throw new RunnerConfigError(`runner config (${at}) generatedPaths[${i}] must be an object {from, also}.`);
+    }
+    for (const key of Object.keys(entry)) {
+      if (!GENERATED_PATH_KEYS.includes(key)) {
+        throw new RunnerConfigError(`runner config (${at}) generatedPaths[${i}] contains unknown key "${key}". Allowed keys: ${GENERATED_PATH_KEYS.join(', ')}.`);
+      }
+    }
+    let from;
+    try {
+      from = canonicalizeWriteEntry(entry.from);
+    } catch (err) {
+      throw new RunnerConfigError(`runner config (${at}) generatedPaths[${i}].from: ${err.message}`);
+    }
+    if (from.split('/')[0].includes('*')) {
+      throw new RunnerConfigError(`runner config (${at}) generatedPaths[${i}].from must start with a literal directory, got ${JSON.stringify(entry.from)}.`);
+    }
+    if (!Array.isArray(entry.also) || entry.also.length === 0) {
+      throw new RunnerConfigError(`runner config (${at}) generatedPaths[${i}].also must be a non-empty array of write-scope entries.`);
+    }
+    entry.also.forEach((also, j) => {
+      try {
+        canonicalizeWriteEntry(also);
+      } catch (err) {
+        throw new RunnerConfigError(`runner config (${at}) generatedPaths[${i}].also[${j}]: ${err.message}`);
+      }
+    });
+  });
+}
+
 function validateRunnerConfigShape(cfg, sourceLabel) {
   if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must be an object.`);
@@ -1562,6 +1625,9 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   }
   if (cfg.patterns !== undefined) {
     validateRunnerPatternsShape(cfg.patterns, `${sourceLabel} patterns`);
+  }
+  if (cfg.generatedPaths !== undefined) {
+    validateGeneratedPathsShape(cfg.generatedPaths, sourceLabel);
   }
 
   // Phase 01 R1/R5: Project config cannot define or override machine backend instances.

@@ -33,3 +33,12 @@ Read the [role doctrine](../architecture-advisory-role-doctrine.md) for reasonin
 ## Historical Manual Prompt
 
 The complete prior manual prompt, input examples, roster and retirement proposal are [preserved verbatim](../../history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md#literal-snapshot). They are dated history, not current APIs or safety proof. The former coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; `docs/specs/runner.md` records that retirement in its historical CoordinationSession section.
+
+## Upstream Execution Door Transition
+
+Upstream removed the raw `dispatch execute` door (decision 0062 in
+`docs/specs/runner.md`). Its out-of-process invocation now uses a read-only
+Unit: `fgos run "$(cat <immutable prompt file>)" --provider <safe-executor-id>
+--capability review --json` (no `--writes`), from the actor's cwd.
+This records the upstream public-door change within the current quality
+companion; the preserved manual runtime recipe remains historical.

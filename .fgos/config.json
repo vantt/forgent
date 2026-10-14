@@ -79,8 +79,9 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "agy-cli-mucdong"
-          }
+            "invocation": "agy-cli-bwrap-mucdong"
+          },
+          "claude"
         ],
         "serves": {
           "outputKind": "change",
@@ -604,9 +605,45 @@
         ]
       },
       "coding:discover": {
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
+          }
+        ],
         "description": "Workflow unit capability \"coding:discover\" -- declare a \"prefer\" pool to choose which executors serve it."
       },
       "coding:explore": {
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
+          }
+        ],
         "description": "Workflow unit capability \"coding:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
       },
       "coding:plan": {
@@ -631,9 +668,34 @@
         ]
       },
       "coding:validate": {
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
+          }
+        ],
         "description": "Workflow unit capability \"coding:validate\" -- declare a \"prefer\" pool to choose which executors serve it."
       },
       "coding:implement": {
+        "prefer": [
+          {
+            "executor": "gemini",
+            "invocation": "agy-cli-bwrap-mucdong"
+          },
+          "claude"
+        ],
         "description": "Workflow unit capability \"coding:implement\" -- declare a \"prefer\" pool to choose which executors serve it."
       }
     },
@@ -1445,7 +1507,13 @@
           ]
         }
       }
-    }
+    },
+    "generatedPaths": [
+      {
+        "from": "core/skills/**",
+        "also": [".agents/skills/**", "plugins/fgOS/skills/**", ".claude/skills/**"]
+      }
+    ]
   },
   "gateBypass": {
     "level": "standard"

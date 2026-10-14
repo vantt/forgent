@@ -4,6 +4,14 @@ authoritative_for: whether dispatch execute()'s main-checkout lock (acquireMainC
 
 # A suspected over-broad lock, audited and confirmed already fine
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `tsk-2e7` set out to audit whether dispatch `execute()`'s main-checkout
 lock (`acquireMainCheckoutLock`, `src/runner/dispatch/cli.mjs:487-517`)
 serializes ALL out-of-process dispatch — including items that are already

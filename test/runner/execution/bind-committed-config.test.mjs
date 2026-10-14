@@ -92,7 +92,12 @@ test('Workflow capabilities that name a same-verb pool bind headless', () => {
 });
 
 test('a Workflow capability with no prefer pool is refused with a structured reason, never guessed', () => {
-  const result = bind(ask('coding:discover'), { runnerConfig, session: headless });
+  // A name the committed config does not declare, so no pool added to the config later can
+  // turn this into a bind.
+  const capability = 'coding:no-pool-declared';
+  assert.equal(runnerConfig.capabilities[capability], undefined);
+  assert.equal(runnerConfig.capabilities['no-pool-declared'], undefined);
+  const result = bind(ask(capability), { runnerConfig, session: headless });
   assert.equal(result.refused.reason, 'headless-no-executor');
-  assert.match(result.refused.detail, /coding:discover/);
+  assert.match(result.refused.detail, /coding:no-pool-declared/);
 });

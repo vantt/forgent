@@ -16,14 +16,15 @@ import { createRoleExecutorLedger } from './role-ledger.mjs';
  * @param {object} runnerConfig Runner config (capabilities, executors, patterns, ...).
  * @param {object} [options]
  * @param {object} [options.session] bind() session context. Defaults to a headless session.
- * @returns {Promise<{ outcome: string, roles: Array<{ role: string, executor?: string, invocation?: string|null, sharesFamilyWith?: string[], refused?: { reason: string, detail: string } }> }>}
+ * @param {Array} [options.overrides] Overrides bind() reads, as a unit run would pass them. Defaults to none.
+ * @returns {Promise<{ outcome: string, roles: Array<{ role: string, executor?: string, invocation?: string|null, account?: { provider: string, id: string }, sharesFamilyWith?: string[], refused?: { reason: string, detail: string } }> }>}
  */
-export async function simulateUnitBindings(unit, runnerConfig, { session = {} } = {}) {
+export async function simulateUnitBindings(unit, runnerConfig, { session = {}, overrides = [] } = {}) {
   const ledger = createRoleExecutorLedger();
   const roles = [];
   const runRole = async ({ role, unit: roleUnit, readOnly = false, independentOf = [], preferIndependentOf = [] }) => {
     const bound = bind(
-      { unit: roleUnit || unit, role, readOnly, independentOf: ledger.resolve(independentOf), ...(preferIndependentOf.length > 0 ? { preferIndependentOf: ledger.seats(preferIndependentOf) } : {}), overrides: [] },
+      { unit: roleUnit || unit, role, readOnly, independentOf: ledger.resolve(independentOf), ...(preferIndependentOf.length > 0 ? { preferIndependentOf: ledger.seats(preferIndependentOf) } : {}), overrides },
       { runnerConfig, session: { headless: true, ...session } },
     );
     if (bound.refused) {
@@ -35,6 +36,8 @@ export async function simulateUnitBindings(unit, runnerConfig, { session = {} } 
       role,
       executor: bound.executor,
       invocation: bound.invocation,
+      ...(bound.account ? { account: bound.account } : {}),
+      ...(bound.provenance?.account?.skipped ? { accountSkipped: bound.provenance.account.skipped } : {}),
       ...(bound.provenance?.familySpread?.value.sharedWith.length ? { sharesFamilyWith: bound.provenance.familySpread.value.sharedWith } : {}),
     });
     return { outcome: 'pass', role };

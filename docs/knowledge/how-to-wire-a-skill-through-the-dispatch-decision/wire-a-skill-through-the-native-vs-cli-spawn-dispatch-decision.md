@@ -45,13 +45,15 @@ the caller, never an environment probe.
 - `in-process` - call the returned hand-back yourself: use `agentType`
   with your Agent/Task tool, or call the returned `mcpTool` directly. If
   neither is returned, use the skill's normal default for that live call.
-- `out-of-process` - run `node "$root/src/runner/dispatch.mjs" execute`.
-  Do not run a resolved command yourself through Bash; `execute` invokes
-  the configured adapter and returns the real result.
+- `out-of-process` - run the work as a Unit: `fgos run "<prompt>"
+  --provider <executorId> --capability <purpose> --json`. Do not run a
+  resolved command yourself through Bash; `fgos run` binds, runs and
+  settles the Unit and returns the real result under `data`.
 
-For a worktree-backed item, pass explicit directory flags as
-`--cwd <worktree path>` and `--repo-root <main checkout path>`. Do not
-pass the main checkout as `--dir`/`--cwd` alone for worker execution.
+Work that changes files adds `--writes <paths> --worktree <linked
+worktree>`; the runner commits only those paths. (`dispatch.mjs execute`,
+with its `--cwd`/`--repo-root` flags, was removed; decision 0062 in
+`docs/specs/runner.md`.)
 
 ## Reuse The Shared Fragment
 

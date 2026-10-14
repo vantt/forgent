@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { matchAuthFailureLine } from './provider-auth-failure.mjs';
+import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
 import { getProcessStartTime, resolveHolderLiveness } from './process-identity.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
@@ -1194,7 +1194,11 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
   if (adapterOutcome === 'paused-limit' || adapterOutcome === 'provider-limit' || structuredAgent?.stopReason === 'paused-limit' || structuredAgent?.stopReason === 'provider-limit') {
     // A round that ended on a dead credential is not a quota hit: the account stays out until a
     // person logs in again, and the reset-window rule below must not retry it in an hour.
-    if (matchAuthFailureLine(text)) {
+    // A dead-credential line in the tail decides; further up it only decides when the tail does
+    // not end on a quota sentence (a streamed transcript may quote a login error).
+    const authInTail = matchAuthFailureLine(text, { tailLines: AUTH_FAILURE_TAIL_LINES });
+    const quotaInTail = !authInTail && matchQuotaLimitLine(text, { tailLines: AUTH_FAILURE_TAIL_LINES });
+    if (authInTail || (!quotaInTail && matchAuthFailureLine(text))) {
       return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
     }
     // The text carries the reset window when the provider named one; otherwise the
@@ -1207,7 +1211,9 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
     };
   }
   if (provider === 'openai' || provider === 'openai-codex') {
-    if (/you(?:'|’)ve hit your usage limit/i.test(text) || /usage limit has been reached/i.test(text) || /individual quota reached/i.test(text)) {
+    // The shared quota wordings, read from the stderr tail only: codex streams the agent's whole
+    // transcript to stderr, so a wording anywhere in it may be the agent quoting it.
+    if (matchQuotaLimitLine(text, { tailLines: AUTH_FAILURE_TAIL_LINES })) {
       // Missing/unparseable reset text falls back to the SAME conservative
       // default TTL -- never an expiry-less "temporary" quarantine, which
       // isQuarantined() would otherwise have to catch defensively instead.

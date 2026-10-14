@@ -1,3 +1,16 @@
+# Boundary merge checkpoint
+
+Step: 5
+State: authoring
+Main input: 554401219ddbc4676c3b57381a468904442855e9
+A37 checkpoint: c18020da3
+
+Four conflicts resolved preserving candidate structure and importing main content changes. Eight changed legacy source digests accounted in ratchet exceptions; ratchet passes. Upstream code remains main bytes. GitNexus reports CRITICAL upstream import risk (403 symbols, 61 processes); no own production-symbol edit. The merge must finish with git merge --continue because Git disallows a path-limited partial commit under MERGE_HEAD; all conflict/own paths are staged explicitly, with a conventional MERGE_MSG. The inherited local config change is safely saved in the recorded exact stash and will be reapplied uncommitted.
+
+Next: record the completed SYNC pin, re-carry changed source units, rebind all native consequences and code receipts, prove and persist registry, then package bounded reviews and stop.
+
+---
+
 # Active resume — truth correction proof complete; boundary sync next
 
 Date: 2026-10-14

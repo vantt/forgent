@@ -6,17 +6,9 @@
 // inventory lists it and it is not quarantined. Which account the retry then runs on stays the
 // lease's choice; this module only says whether a retry has anything to rotate to.
 
-import { deriveProviderFamily } from '../dispatch/resolve.mjs';
-import { normalizeProviderFamily } from '../dispatch/provider-adapter.mjs';
 import { inspectProviderCapacity } from '../dispatch/provider-capacity.mjs';
 import { getProviderFamily } from './bind.mjs';
-
-/** The provider bucket the capacity lease keys an executor's accounts under. */
-export function capacityProviderOf(runnerConfig, executorId) {
-  const executors = runnerConfig?.executors ?? runnerConfig?.runner?.executors ?? {};
-  const fallbackExecutor = runnerConfig?.executor ?? runnerConfig?.runner?.executor;
-  return normalizeProviderFamily(deriveProviderFamily(executors[executorId] ?? fallbackExecutor));
-}
+import { capacityProviderOf } from './account-pin.mjs';
 
 /**
  * What an account rotation for `executorId` has to work with, read after the failed attempt was

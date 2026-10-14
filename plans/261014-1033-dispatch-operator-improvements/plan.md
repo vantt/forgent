@@ -1,6 +1,6 @@
 # Cải tiến cửa dispatch cho người điều phối
 
-Status: in-progress (2026-10-14). Lead: phiên e9e8fb82 (pane wS:p4T5).
+Status: superseded by plans/261014-1400-two-doors-one-rununit — [plan mới](../261014-1400-two-doors-one-rununit/plan.md); lanes A–D folded into that plan (2026-10-14 14:00).
 
 ## Nguồn
 
@@ -36,7 +36,19 @@ Lane D chỉ được sửa code sau khi `fix/dispatch-followups` đã merge và
 
 ## Trạng thái lane
 
-- A: chưa giao
-- B: chưa giao
-- C: chưa giao
-- D: chưa giao
+- A: đang chạy — herdr agent lane-a, pane wS:p4X2 (tab dispatch-lanes), nhánh feat/dispatch-log-result
+- B: đang chạy — lane-b, pane wS:p4X4, nhánh feat/dispatch-effort-model
+- C: đang chạy — lane-c, pane wS:p4X3, nhánh feat/dispatch-usage-limit (council trước)
+- D: đang chạy — lane-d, pane wS:p4X5, nhánh feat/dispatch-write-boundary (council trước; code đề xuất 6 chờ fix/dispatch-followups merge)
+
+## Cổng một-cửa (thêm 2026-10-14 10:45, anh vantt duyệt)
+
+Nghi vấn gốc: dispatch có nhiều cửa (execute --for thô, execute --contract, workflow unit, herdr round, fgos run) với contract output/log/confinement khác nhau; nhiều đề xuất là triệu chứng của việc đó (vd. `finalMessage` = `summary` mà cửa thô không có).
+1. Quét: door-scout → reports/scout-261014-1045-dispatch-door-map.md.
+2. Hội đồng: `fgos-architecture-panel` trên báo cáo quét → kết luận cửa chuẩn + lộ trình hợp nhất.
+3. Trong lúc chờ: lane A, C, D và Việc 2/3 của fix/dispatch-followups chỉ đọc/chứng minh/test đỏ, không sửa code production. Lane B làm tiếp, logic đặt ở tầng dùng chung cho mọi cửa. Việc 1/4/5 của fix/dispatch-followups làm tiếp.
+4. Sau kết luận: chỉnh lại brief từng lane (bỏ đề xuất nào tự biến mất khi hợp nhất).
+
+## Kết luận hội đồng (2026-10-14 12:40)
+
+Bản ghi: [reports/council-261014-1231-dispatch-one-door-conclusion.md](reports/council-261014-1231-dispatch-one-door-conclusion.md). Hợp nhất cửa hợp đồng (Assignment), giữ hai tầng cài đặt; cửa thô hạ xuống compat, chưa xoá. Lane A/B/C/D gỡ lệnh chờ theo mục "Cập nhật sau hội đồng" trong từng brief; lane C thu hẹp theo RUL65b; lane D làm bước 1 (confinement null) + bước 2 (#8 → warning), #6 chờ owner. Bước 0 còn af132275b chờ owner; bước 3 (doctrine) Lead làm sau bước 0; bước 4–6 owner quyết.

@@ -97,7 +97,6 @@ const ALLOWED = new Map([
   ['src/runner/dispatch/assignment.mjs: createAssignmentId: readdirSync(assignmentsDir)', { count: 1, reason: 'id allocation: top-level names sharing a new flat id prefix' }],
   // Work-driver gate evidence: flat work assignments only (work assignments are
   // never nested); restricted to dispatched attempts of a matching assignment.
-  ['src/runner/operation-choice.mjs: findLatestAssignmentRunResult: readdirSync(assignmentsDir)', { count: 1, reason: 'work-driver gate evidence: flat work assignments only' }],
   ['src/runner/operation-choice.mjs: findLatestAssignmentRunResult: readdirSync(dispatchedDir)', { count: 1, reason: 'dispatch markers of one known assignment' }],
   ['src/runner/operation-choice.mjs: findLatestAssignmentRunResult: readdirSync(runsDir)', { count: 1, reason: 'attempts of one known assignment, filtered to dispatched markers' }],
   // Run-attempt admission and command queues of one already-resolved

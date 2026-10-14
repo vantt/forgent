@@ -6,6 +6,14 @@ mode: explanation
 
 # Why `dispatch decide` is a hard, hook-enforced gate, not a convention
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `tsk-5tm` had already written and gotten approval for the final wording of
 `AGENTS.md`'s `## Dispatch` section — but approval alone didn't make it
 real: the agreed text sat unread inside `docs/history/

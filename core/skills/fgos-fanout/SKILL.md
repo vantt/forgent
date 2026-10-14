@@ -94,15 +94,16 @@ own judgment.
   batch, in the same per-candidate serial step the announce line below
   already runs in (never a separate synchronous pass over the whole
   batch — that would risk turning the parallel fire step below
-  sequential), run `node src/runner/dispatch.mjs decide --work <id>
+  sequential), run `fgos dispatch decide --work <id>
   --has-live-task-access` (this skill always has live Task access — it is
   what fires the Agent batch below). A `mechanism: "in-process"` result
   confirms this candidate's dispatch executor expects native Task-tool dispatch
   (fire an Agent running `/fgOS:pick <id>`) — proceed to that candidate's
   announce line, using the result's own `agentType` for `<subagent_type>`
-  when present. A `mechanism: "out-of-process"` result fires out-of-process directly
-  via `fgos pick "<id>"`, `dispatch.mjs execute "<executorId>" --cwd "<worktree-path>"`,
-  and `fgos return "<id>"`. Only a `mechanism: "unavailable"` result means no executor
+  when present. A `mechanism: "out-of-process"` result is fired by the fanout entry
+  `node src/runner/fanout-batch.mjs "<ids>" --has-live-task-access`
+  (`references/wave-dispatch-mechanics.md` Step 3), which picks, runs and
+  returns the item itself — never hand-run the resolved command. Only a `mechanism: "unavailable"` result means no executor
   is registered, and reports that id back to the caller as needing a person.
 - **Announce every dispatch before firing it.** Print one line per
   candidate, the same shape every dispatch path in the repo uses for
@@ -183,8 +184,8 @@ consolidation below:** this hazard sits entirely in the in-process branch
 (native Agent's own `EnterWorktree` call, a harness-level limitation —
 the Claude Code harness tracks "current worktree" per session, not per
 concurrently-dispatched Agent). Consolidating the out-of-process chain
-into `dispatch.mjs fanout-batch` and `fgos schedule --candidates` never
-touches, fixes, or claims to improve this hazard — `dispatch.mjs` never
+into `src/runner/fanout-batch.mjs` and `fgos schedule --candidates` never
+touches, fixes, or claims to improve this hazard — the fanout entry never
 participates in the in-process branch beyond the initial `decide` call.
 
 ## Workflow

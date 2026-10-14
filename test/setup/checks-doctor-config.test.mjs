@@ -515,6 +515,20 @@ test('workflow-capabilities-configured is clean when each capability resolves to
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
+test('workflow-capabilities-configured also names the runner loop executing capability when it has no prefer pool', () => {
+  const cwd = mkTemp('doctor-workflow-caps-loop-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  const capabilities = {};
+  for (const [name, slot] of Object.entries(DEFAULT_CAPABILITY_SLOTS)) {
+    capabilities[name] = name.includes(':') && name !== 'code:implement' ? { ...slot, prefer: [{ executor: 'x' }] } : slot;
+  }
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities } }));
+  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /^warning: .*code:implement \(runner loop: coding executing step\)/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
 test('gate-bypass-configured check fails when the shared file has no gateBypass key at all', () => {
   const cwd = mkTemp('doctor-gatebypass-absent-');
   const { passed, message } = checkById('gate-bypass-configured').check(cwd);

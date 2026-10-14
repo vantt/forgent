@@ -7,6 +7,8 @@
 // - Policy decides whether the round may be accepted.
 // These dimensions are independent and stored/read independently.
 
+import { matchesWriteScope } from './write-scope.mjs';
+
 export const ATTRIBUTION_LEVELS = Object.freeze(['proven', 'correlated', 'excluded', 'unattributed']);
 export const POLICY_DISPOSITIONS = Object.freeze(['allow', 'refuse', 'needs-input', 'not-applicable']);
 
@@ -123,8 +125,8 @@ export function attributeWorkspaceChanges({
 function checkCoverage(filePath, declaredCoverage) {
   if (!declaredCoverage) return false;
   const paths = declaredCoverage.paths || declaredCoverage.writeScope || [];
-  if (!Array.isArray(paths)) return false;
-  return paths.some((p) => p === filePath || filePath.startsWith(p.endsWith('/') ? p : `${p}/`));
+  if (!Array.isArray(paths) || paths.length === 0) return false;
+  return matchesWriteScope(filePath, paths);
 }
 
 function checkAttestation(filePath, adapterAttestation) {
@@ -156,17 +158,21 @@ export function attributeClaimEvidenceRefs(agentClaim, opts = {}) {
 /**
  * Evaluate safety and attribution policy.
  *
- * Policy refusal preserves execution and assessment facts:
- * an unsafe or contradictory change refuses policy disposition ('refuse'),
- * but does not erase completed execution or substantive findings.
+ * A before/after snapshot of a checkout shows what changed there, never who
+ * changed it: the checkout may be shared with other sessions that write and
+ * commit while a run is in flight. So every finding resting on correlated
+ * evidence is reported as a warning and the run is accepted. Only a write
+ * proven to belong to the run -- attested by a run-bound observer within its
+ * coverage -- is refused. Policy refusal preserves execution and assessment
+ * facts; it does not erase completed execution or substantive findings.
  *
  * @param {object} params
  * @param {Array<object>} [params.attributions] Attribution records from attributeWorkspaceChanges
  * @param {boolean} [params.isReadOnly] Whether the operation is read-only
  * @param {string[]} [params.writeScope] Allowed write scope paths
- * @param {string[]} [params.mutatedDirtyBeforeFiles] Files that were dirty before and mutated
+ * @param {string[]} [params.mutatedDirtyBeforeFiles] Files that were dirty before and changed content during the run
  * @param {boolean} [params.contradictoryClaim] Whether worker claim contradicts independent evidence
- * @returns {{ disposition: 'allow'|'refuse'|'needs-input'|'not-applicable', code: string|null, reason?: string }}
+ * @returns {{ disposition: 'allow'|'refuse', code: string|null, reason?: string, warnings: Array<object> }}
  */
 export function evaluateAttributionPolicy({
   attributions = [],
@@ -175,54 +181,70 @@ export function evaluateAttributionPolicy({
   mutatedDirtyBeforeFiles = [],
   contradictoryClaim = false,
 } = {}) {
+  const warnings = [];
+
   if (contradictoryClaim) {
     return {
       disposition: 'refuse',
       code: 'contradictory-worker-claim',
       reason: 'Worker claim contradicts independent evidence',
+      warnings,
     };
+  }
+
+  const postRun = attributions.filter((a) => a.firstObserved === 'post-run');
+  const proven = postRun.filter((a) => a.level === 'proven');
+  const correlated = postRun.filter((a) => a.level === 'correlated');
+
+  if (isReadOnly && proven.length > 0) {
+    return {
+      disposition: 'refuse',
+      code: 'read-only-mutation',
+      reason: `Read-only operation wrote: ${proven.map((a) => a.path).join(', ')}`,
+      warnings,
+    };
+  }
+
+  const inScope = (p) => matchesWriteScope(p, writeScope);
+  const hasScope = Array.isArray(writeScope) && writeScope.length > 0;
+  if (hasScope) {
+    const provenOutside = proven.filter((a) => !inScope(a.path));
+    if (provenOutside.length > 0) {
+      return {
+        disposition: 'refuse',
+        code: 'outside-write-scope',
+        reason: `Run wrote outside its allowed write scope: ${provenOutside.map((a) => a.path).join(', ')}`,
+        warnings,
+      };
+    }
   }
 
   if (Array.isArray(mutatedDirtyBeforeFiles) && mutatedDirtyBeforeFiles.length > 0) {
-    return {
-      disposition: 'refuse',
-      code: 'mutated-dirty-before-files',
-      reason: `Pre-existing dirty files were mutated during run: ${mutatedDirtyBeforeFiles.join(', ')}`,
-    };
-  }
-
-  // Check read-only operation mutations
-  if (isReadOnly) {
-    const mutations = attributions.filter(
-      (a) => a.firstObserved === 'post-run' && (a.level === 'correlated' || a.level === 'proven'),
-    );
-    if (mutations.length > 0) {
-      return {
-        disposition: 'refuse',
-        code: 'read-only-mutation',
-        reason: `Read-only operation produced workspace mutations: ${mutations.map((m) => m.path).join(', ')}`,
-      };
-    }
-  }
-
-  // Check outside write scope changes
-  if (Array.isArray(writeScope) && writeScope.length > 0) {
-    const outsideChanges = attributions.filter((a) => {
-      if (a.level !== 'correlated' && a.level !== 'proven') return false;
-      if (a.firstObserved !== 'post-run') return false;
-      return !writeScope.some((scoped) => a.path === scoped || a.path.startsWith(scoped.endsWith('/') ? scoped : `${scoped}/`));
+    warnings.push({
+      code: 'mutated-dirty-before-correlated',
+      level: 'correlated',
+      basis: ['dirty-before-hash-changed'],
+      paths: [...mutatedDirtyBeforeFiles],
     });
-    if (outsideChanges.length > 0) {
-      return {
-        disposition: 'refuse',
-        code: 'outside-workspace-change-correlated',
-        reason: `Workspace changes observed outside allowed write scope: ${outsideChanges.map((c) => c.path).join(', ')}`,
-      };
+  }
+  if (isReadOnly && correlated.length > 0) {
+    warnings.push({
+      code: 'read-only-mutation-correlated',
+      level: 'correlated',
+      basis: ['pre-post-git-snapshot'],
+      paths: correlated.map((a) => a.path),
+    });
+  } else if (hasScope) {
+    const outside = correlated.filter((a) => !inScope(a.path));
+    if (outside.length > 0) {
+      warnings.push({
+        code: 'outside-write-scope-correlated',
+        level: 'correlated',
+        basis: ['pre-post-git-snapshot'],
+        paths: outside.map((a) => a.path),
+      });
     }
   }
 
-  return {
-    disposition: 'allow',
-    code: null,
-  };
+  return { disposition: 'allow', code: null, warnings };
 }

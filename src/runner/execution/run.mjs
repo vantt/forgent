@@ -7,15 +7,22 @@ import crypto from 'node:crypto';
 import { execFileSync, execSync } from 'node:child_process';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
+import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
 import { bind, nextCandidate, retrySameCandidate, getProviderFamily } from './bind.mjs';
 import { credentialFaultFamilies, inspectAccountRotation, mayRotateAccount } from './account-rotation.mjs';
+import { assertPinnedAccountsUsable, runnerConfigForBinding } from './account-pin.mjs';
+import { simulateUnitBindings } from './dry-bind.mjs';
+import { worktreeSnapshot, writesSince } from './partial-writes.mjs';
 import { createRoleExecutorLedger } from './role-ledger.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
+import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
-import { commitUnitWork } from './commit-unit-work.mjs';
+import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
+import { resolveAgentDefinition } from '../agent-definitions.mjs';
+import { dispatchLockFile, parseCompositePidIdentity } from '../main-checkout-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
@@ -43,13 +50,32 @@ function publishUnitSummary(unitDir) {
 }
 
 /**
- * `{ personaPin }` for an assignment policy when an override scoped to this very role bound `persona`
- * with pinned text, else nothing. Matching on role and name keeps one role's pin from reaching another
- * role that happens to resolve the same persona name from the capability.
+ * `{ personaPin }` for an assignment policy when the persona bound for this role carries pinned
+ * text, else nothing. An override scoped to this very role wins; otherwise the unit's own persona,
+ * pinned when the unit run started, applies to whichever role bound that same name. Matching on
+ * name keeps a pin from reaching a role that resolved a different persona.
  */
-function pinnedPersonaFor(overrides, role, persona) {
-  const hit = (overrides ?? []).find((o) => o?.personaPin && o.scope?.role === role && o.persona === persona);
-  return hit ? { personaPin: hit.personaPin } : {};
+function pinnedPersonaFor(unitRecord, role, persona) {
+  const hit = (unitRecord.overrides ?? []).find((o) => o?.personaPin && o.scope?.role === role && o.persona === persona);
+  if (hit) return { personaPin: hit.personaPin };
+  const unitPin = unitRecord.personaPin;
+  return unitPin && unitPin.name === persona ? { personaPin: unitPin } : {};
+}
+
+/**
+ * The text of a unit's persona, read once from the persona tiers so every attempt and resume
+ * renders the same definition, including one that lives only in the workspace tier. A name no tier
+ * defines keeps today's rendering by name; the one-liner already refuses it before the run.
+ */
+function unitPersonaPin(persona, mainRoot) {
+  if (typeof persona !== 'string') return null;
+  try {
+    const { name, digest, text } = resolveAgentDefinition(persona, { projectRoot: mainRoot });
+    return { name, digest, text };
+  } catch (err) {
+    if (err instanceof RunnerConfigError) return null;
+    throw err;
+  }
 }
 
 /**
@@ -114,8 +140,8 @@ export function resolveGitRoots(cwd = process.cwd()) {
 /**
  * Capture snapshot of runner config from the main checkout root.
  */
-export function snapshotRunnerConfig(mainCheckoutRoot) {
-  const cfg = ensureRunnerConfigForDir(mainCheckoutRoot);
+export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
+  const cfg = runnerConfig ?? ensureRunnerConfigForDir(mainCheckoutRoot);
   const filtered = {
     capabilities: cfg.capabilities || {},
     patterns: cfg.patterns || {},
@@ -132,6 +158,116 @@ export function snapshotRunnerConfig(mainCheckoutRoot) {
   };
 }
 
+/** The last attempt of each role/round: the one a resume continues from. */
+function lastAttempts(unitRecord) {
+  return Object.values(unitRecord.bindings ?? {}).map((attempts) => attempts[attempts.length - 1]).filter(Boolean);
+}
+
+/**
+ * A producer attempt whose agent turn passed but whose runner commit failed: a resume commits it
+ * again without spawning the agent. Not when the failed commit is still on the branch carrying
+ * paths outside the scope; a person has to take that commit off first.
+ */
+function commitPending(attempt, worktree, mainRoot) {
+  const commit = attempt?.commit;
+  if (commit?.status !== 'failed') return false;
+  return !(commit.reason === 'committed-set-mismatch' && commit.sha && commitOnBranch(worktree, commit.sha, mainRoot));
+}
+
+/** A resume cannot go past a commit that landed holding paths outside the unit's write scope. */
+function assertNoStrayCommit(unitRunId, unitRecord, mainRoot) {
+  for (const attempt of lastAttempts(unitRecord)) {
+    const commit = attempt.commit;
+    if (commit?.status !== 'failed' || commit.reason !== 'committed-set-mismatch' || !commit.sha) continue;
+    if (!commitOnBranch(unitRecord.worktree, commit.sha, mainRoot)) continue;
+    const diff = [
+      ...(commit.unexpected ?? []).map((p) => `+${p}`),
+      ...(commit.missing ?? []).map((p) => `-${p}`),
+    ].join(', ');
+    throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": commit ${commit.sha} is already on the branch but does not hold exactly the files of its write scope (${diff}; + is outside the scope, - is missing); inspect it and take it off the branch by hand (git reset HEAD~1 keeps its files in the worktree), then resume`);
+  }
+}
+
+/**
+ * The operation a Work step declared for this unit, checked before anything is dispatched: the
+ * operation must be one the step declares, never human-only, its stamped mutation must agree
+ * with the unit's write scope, and the unit runs `solo` (one assignment for one operation).
+ * Returns the operation fields every producer assignment of the unit carries.
+ */
+function declaredOperationOf(declared, unit, patternName, { taskSpecRoot } = {}) {
+  if (!declared || typeof declared !== 'object') throw new RunnerConfigError('runUnit: declared must be an object');
+  for (const key of ['workId', 'domain', 'stage', 'operation']) {
+    if (typeof declared[key] !== 'string' || !declared[key].trim()) {
+      throw new RunnerConfigError(`runUnit: declared.${key} must be a non-empty string`);
+    }
+  }
+  if (!Array.isArray(declared.operations)) {
+    throw new RunnerConfigError('runUnit: declared.operations must be the step\'s operations');
+  }
+  const fields = declaredOperationFields({
+    domain: declared.domain,
+    workflow: declared.workflow ?? null,
+    stage: declared.stage,
+    operation: declared.operation,
+    operations: declared.operations,
+    taskSpecRoot,
+  });
+  if (fields.dispatch === 'human-only') {
+    throw new RunnerConfigError(`runUnit: operation "${declared.operation}" is human-only and is never dispatched`);
+  }
+  const unitReadOnly = (unit.writes ?? []).length === 0;
+  if ((fields.mutation === 'read-only') !== unitReadOnly) {
+    throw new RunnerConfigError(`runUnit: operation "${declared.operation}" is ${fields.mutation} but the unit ${unitReadOnly ? 'writes nothing' : 'declares writes'}`);
+  }
+  // Through the same resolver the run uses, so a preset or an object form cannot slip past.
+  const { patternName: resolved } = resolvePattern(patternName);
+  if (resolved !== 'solo') {
+    throw new RunnerConfigError(`runUnit: a unit carrying operation "${declared.operation}" runs solo, not "${resolved}"`);
+  }
+  return fields;
+}
+
+/** Absolute paths whose bytes a result is bound to; anything else is refused before the run. */
+function checkedPinInputs(pinInputs) {
+  if (pinInputs === undefined) return [];
+  if (!Array.isArray(pinInputs) || pinInputs.some((p) => typeof p !== 'string' || !path.isAbsolute(p))) {
+    throw new RunnerConfigError('runUnit: pinInputs must be absolute paths');
+  }
+  return [...new Set(pinInputs)];
+}
+
+function foreignIndexRefusal(role, round, paths) {
+  return {
+    outcome: 'policy-refusal',
+    role,
+    round,
+    refused: { reason: 'foreign-staged-index', detail: foreignIndexDetail(paths), paths },
+  };
+}
+
+/**
+ * Refuse a pinned account before a unit run exists: each seat an `account` override applies to
+ * (bound the way the run would bind it) must take that account, at least one seat must, and the
+ * account must not be quarantined now.
+ */
+async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
+  const overrides = options.overrides ?? [];
+  if (!overrides.some((o) => o && typeof o === 'object' && o.account !== undefined)) return;
+  const callerPattern = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
+  const { roles } = await simulateUnitBindings(
+    { ...unit, pattern: callerPattern || unit.pattern || options.pattern || 'solo' },
+    runnerConfig,
+    { session: { herdrPresent: options.session?.herdrPresent ?? detectHerdrPresent(), ...(options.session ?? {}) }, overrides },
+  );
+  const refused = roles.find((r) => r.refused?.reason?.startsWith('account-pin'));
+  if (refused) throw new RunnerConfigError(`cannot pin the account for role "${refused.role}": ${refused.refused.detail}`);
+  if (!roles.some((r) => r.account)) {
+    const why = roles.filter((r) => r.accountSkipped).map((r) => `role "${r.role}": ${r.accountSkipped.detail}`);
+    throw new RunnerConfigError(`the pinned account applies to no seat of this unit${why.length ? ` (${why.join('; ')})` : ': no role its override names binds here'}`);
+  }
+  assertPinnedAccountsUsable(roles, { runnerConfig, runtimeDir: options.providerCapacityRuntimeDir, what: 'cannot start the unit run' });
+}
+
 /**
  * Main headless unit execution entrypoint.
  *
@@ -145,6 +281,12 @@ export function snapshotRunnerConfig(mainCheckoutRoot) {
  * @param {string} [options.cwd] Current working directory / worktree
  * @param {string} [options.worktree] Explicit worktree path
  * @param {object} [options.session] Session context { provider, tier, hasNativeAgent, herdrPresent, headless }
+ * @param {object} [options.declared] Work step operation this unit runs: { workId, domain, workflow,
+ *   stage, operation, operations } (operations are the step's operation objects). Stored in unit.json.
+ * @param {string[]} [options.pinInputs] Absolute paths whose bytes the dispatch hashes at launch
+ *   (`inputDigests` of the result). Stored in unit.json.
+ * @param {object} [options.runnerConfig] Runner config the caller already resolved (e.g. from
+ *   `--config <path>`); snapshotted into unit.json instead of reading `.fgos/config.json`.
  * @param {Function} [options.onLog] Log callback
  * @returns {Promise<{unitRunId: string, outcome: string, rounds: number, results: Array}>}
  */
@@ -167,6 +309,7 @@ export async function runUnit(options = {}) {
   let unit;
   let unitRunId;
   let unitRecord;
+  let declaredOp = null;
   const assignmentsDir = path.join(mainRoot, '.fgos', 'assignments');
 
   if (options.resumeUnitRunId) {
@@ -182,30 +325,40 @@ export async function runUnit(options = {}) {
       throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json has no resolvedInputs`);
     }
 
-    // Check in-flight lock for holder
-    const safeKey = worktreePath.replace(/[^a-zA-Z0-9_-]/g, '_');
-    const lockPath = path.join(mainRoot, '.fgos', `dispatch--${safeKey}.lock`);
-    if (fs.existsSync(lockPath)) {
+    // A mutating dispatch holds `.fgos/dispatch--<cwd>.lock` with a composite
+    // "pid:acquiredAtMs:rand" identity while its worker runs; resuming under a
+    // live holder would launch a second worker into the same worktree.
+    const lockPath = path.join(mainRoot, '.fgos', dispatchLockFile(worktreePath));
+    let holder;
+    try {
+      holder = JSON.parse(fs.readFileSync(lockPath, 'utf8'))?.pid;
+    } catch {
+      holder = undefined;
+    }
+    const pid = Number.isInteger(holder) ? holder : parseCompositePidIdentity(holder)?.pid;
+    if (Number.isInteger(pid) && pid > 0) {
+      let alive;
       try {
-        const lockData = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
-        const pid = lockData?.pid;
-        if (typeof pid === 'number') {
-          let alive = false;
-          try {
-            process.kill(pid, 0);
-            alive = true;
-          } catch {
-            alive = false;
-          }
-          if (alive) {
-            throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": another process (PID ${pid}) holds lock at "${lockPath}"`);
-          }
-        }
+        process.kill(pid, 0);
+        alive = true;
       } catch (err) {
-        if (err instanceof RunnerConfigError) throw err;
+        alive = err.code === 'EPERM';
+      }
+      if (alive) {
+        throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": another process (PID ${pid}) holds lock at "${lockPath}"`);
       }
     }
+    assertNoStrayCommit(unitRunId, unitRecord, mainRoot);
+    assertPinnedAccountsUsable(lastAttempts(unitRecord).filter((a) => a.outcome !== 'pass').map((a) => a.binding ?? {}), {
+      runnerConfig: unitRecord.configSnapshot?.runner,
+      runtimeDir: options.providerCapacityRuntimeDir,
+      what: `cannot resume unit run "${unitRunId}"`,
+    });
+    if (unitRecord.declared) declaredOp = declaredOperationOf(unitRecord.declared, unit, unitRecord.pattern);
   } else {
+    if (options.declared === undefined && options.pinInputs !== undefined) {
+      throw new RunnerConfigError('runUnit: pinInputs needs declared');
+    }
     let raw;
     if (options.unitData) {
       raw = options.unitData;
@@ -230,6 +383,17 @@ export async function runUnit(options = {}) {
     }
 
     unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
+    // Checked before the unit directory exists: an operation the step does not allow leaves nothing
+    // behind. The pattern checked is the one the run will use (see patternName below).
+    if (options.declared !== undefined) {
+      const callerPatternObject = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
+      declaredOp = declaredOperationOf(options.declared, unit, callerPatternObject || unit.pattern || options.pattern || 'solo', { taskSpecRoot: mainRoot });
+    }
+    const pinInputs = options.declared !== undefined ? checkedPinInputs(options.pinInputs) : [];
+    const configSnapshot = snapshotRunnerConfig(mainRoot, options.runnerConfig);
+    // A pinned account is checked before the unit run exists: every seat it applies to must bind an
+    // executor whose provider lists it, and it must not be quarantined now.
+    await assertAccountPinsBeforeRun(unit, configSnapshot.runner, options);
     // Resolved before the unit directory exists, so a ref that points nowhere leaves nothing behind.
     unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const unitDir = path.join(assignmentsDir, unitRunId);
@@ -249,17 +413,34 @@ export async function runUnit(options = {}) {
     }
     fs.mkdirSync(unitDir, { recursive: true });
 
-    const configSnapshot = snapshotRunnerConfig(mainRoot);
+    const personaPin = unitPersonaPin(unit.persona, mainRoot);
     unitRecord = {
       unit,
       workflow: workflowLink,
       pattern: options.pattern ?? unit.pattern ?? 'solo',
       overrides: options.overrides || [],
       configSnapshot,
+      // The scope this run may write, widened once to the render targets of generated sources it
+      // touches. A resumed run reads it back and never recomputes it against a changed config.
+      writeScope: expandGenerated(unit.writes, configSnapshot.runner.generatedPaths ?? []),
+      ...(personaPin ? { personaPin } : {}),
       resolvedInputs: resolved.refs,
       // Which input each neutral name stands for; only the owner reads this, never a role.
       ...(unit.anonymizeInputs || unit.blind ? { inputMap: resolved.inputMap } : {}),
       worktree: fs.realpathSync(worktreePath),
+      // The Work step operation and the files its verdict is bound to; a resume reads them back
+      // from here and never takes them from its caller again.
+      ...(options.declared !== undefined ? {
+        declared: {
+          workId: options.declared.workId,
+          domain: options.declared.domain,
+          ...(options.declared.workflow ? { workflow: options.declared.workflow } : {}),
+          stage: options.declared.stage,
+          operation: options.declared.operation,
+          operations: options.declared.operations,
+        },
+        pinInputs,
+      } : {}),
       createdBy: process.env.USER || 'system',
       createdAt: new Date().toISOString(),
       execution: { status: 'running' },
@@ -295,7 +476,15 @@ export async function runUnit(options = {}) {
   let executionSettled = false;
   try {
 
-  const history = () => readUnitRunHistory(unitDir);
+  // A producer round whose commit is still pending is not settled yet: the pattern asks for it
+  // again, and runRole commits it without spawning the agent.
+  const pendingCommitKeys = () => new Set(Object.entries(unitRecord.bindings ?? {})
+    .filter(([, attempts]) => commitPending(attempts[attempts.length - 1], unitRecord.worktree, mainRoot))
+    .map(([key]) => key));
+  const history = () => {
+    const pending = pendingCommitKeys();
+    return readUnitRunHistory(unitDir).filter((h) => !pending.has(`${h.role}/${h.round ?? 1}`));
+  };
 
   // Which executors played which role; `independentOf` role names resolve through it (see role-ledger.mjs).
   const roleLedger = createRoleExecutorLedger();
@@ -316,7 +505,8 @@ export async function runUnit(options = {}) {
 
   // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
   const dispatchBound = async ({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective }) => {
-    const runnerConfig = unitRecord.configSnapshot.runner;
+    // A pinned account leases from an inventory holding only that account (account-pin.mjs).
+    const runnerConfig = runnerConfigForBinding(unitRecord.configSnapshot.runner, bound);
     fs.mkdirSync(assignmentDir, { recursive: true });
 
     // What the unit names (already resolved to paths), then the accounts of the roles whose
@@ -339,11 +529,29 @@ export async function runUnit(options = {}) {
       contextRefs = [...contextRefs, ...copyHandoffsInto(assignmentDir, resolveUnitInputs(unit.inputs, mainRoot, { seat: role }).inputMap)];
     }
 
+    // A unit that runs a Work step operation is that operation's assignment: its seat keeps its
+    // name in provenance.role and its directory, the assignment carries the operation's role and stamp.
+    const carriesOperation = declaredOp && role === 'producer';
+    const operationFields = carriesOperation ? {
+      workId: unitRecord.declared.workId,
+      domain: declaredOp.domain,
+      ...(declaredOp.workflow ? { workflow: declaredOp.workflow } : {}),
+      stage: declaredOp.stage,
+      operation: declaredOp.operation,
+      dispatch: declaredOp.dispatch,
+      taskSpec: declaredOp.taskSpec,
+      skills: declaredOp.skills,
+      ...(declaredOp.contractTemplate ? { contractTemplate: declaredOp.contractTemplate } : {}),
+      evidence: declaredOp.evidence,
+      resultKind: declaredOp.resultKind,
+      ...(declaredOp.onAdvance ? { onAdvance: declaredOp.onAdvance } : {}),
+    } : {};
     const assignment = {
       assignmentId,
       unitRunId,
-      role,
+      role: carriesOperation ? declaredOp.role : role,
       round,
+      ...operationFields,
       // The role's own task when the pattern gave it a unit of its own (a reviewer is told to
       // review, not to redo the work); otherwise the unit's objective.
       objective,
@@ -355,18 +563,21 @@ export async function runUnit(options = {}) {
         role,
         round,
         binding: bound,
+        ...(carriesOperation ? { declared: declaredOp.declared } : {}),
       },
       expectedOutputs: unit.expectedOutputs || [],
       contextRefs,
-      writes: unit.writes || [],
+      writes: unitRecord.writeScope ?? unit.writes ?? [],
       policy: {
         tier: bound.tier,
         preferExecutor: bound.executor,
         preferInvocation: bound.invocation,
         preferPersona: bound.persona,
+        // The rigor the unit asked for, so the policy's own rigor reads match what bind tiered on.
+        ...(unit.rigor ? { rigor: unit.rigor } : {}),
         // The persona text a caller pinned for this role when it supplied the override: the prompt
         // renders that text, never a file read again at dispatch time.
-        ...pinnedPersonaFor(unitRecord.overrides, role, bound.persona),
+        ...pinnedPersonaFor(unitRecord, role, bound.persona),
       },
     };
 
@@ -383,9 +594,12 @@ export async function runUnit(options = {}) {
         preferInvocation: bound.invocation,
         tier: bound.tier,
         model: bound.model,
+        // A level bind() accepted from an override; the launch renders it into the CLI's flag.
+        ...(bound.reasoningEffort ? { reasoningEffort: bound.reasoningEffort } : {}),
       },
       isReadOnlyMode: readOnly,
       session,
+      ...(carriesOperation ? { operations: unitRecord.declared.operations, pinInputs: unitRecord.pinInputs ?? [] } : {}),
       ...(options.providerCapacityRuntimeDir ? { providerCapacityRuntimeDir: options.providerCapacityRuntimeDir } : {}),
       // Every role of a blind unit is dispatched blind or refused, never run unblind.
       ...(unit.blind ? { blind: true } : {}),
@@ -440,6 +654,44 @@ export async function runUnit(options = {}) {
     // other in this same tick, so each sees the executors its siblings were just given.
     noteRoleExecutor(role, bound.executor);
 
+    const writeScope = unitRecord.writeScope ?? unit.writes ?? [];
+    const commitWork = (summarySource, runResult, excludePaths) => commitUnitWork({
+      worktree: unitRecord.worktree,
+      // The gitdir and hooks come from the main checkout, never from the worker-writable worktree.
+      repoRoot: mainRoot,
+      unitId: summarySource.id,
+      summary: runResult?.agentClaim?.summary,
+      objective: summarySource.objective,
+      scope: writeScope,
+      changedFiles: runResult?.evidence?.changedFiles ?? null,
+      excludePaths,
+      needsWrites: runResult?.agentClaim?.needsWrites,
+    });
+
+    // The agent already did this round's work and only the runner commit failed: commit again,
+    // never spawn the agent a second time.
+    const lastRecorded = recorded[recorded.length - 1];
+    if (!readOnly && commitPending(lastRecorded, unitRecord.worktree, mainRoot)) {
+      const { foreignStaged } = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope });
+      if (foreignStaged.length > 0) return foreignIndexRefusal(role, round, foreignStaged);
+      const prior = readUnitRunHistory(unitDir).find((h) => h.role === role && (h.round ?? 1) === round);
+      const excludePaths = lastRecorded.preExistingInScope ?? [];
+      let commit = commitWork(rUnit || unit, prior?.runResult, excludePaths);
+      if (commit.status === 'no-changes') {
+        // The agent's in-scope files are gone (cleaned up with the index): that is not a pass.
+        const missing = partitionPaths((prior?.runResult?.evidence?.changedFiles ?? [])
+          .filter((p) => !excludePaths.includes(p)), writeScope).inScope;
+        if (missing.length > 0) {
+          commit = { ...commit, status: 'failed', reason: 'work-missing', missing,
+            error: `the files this round changed in scope are no longer in the worktree: ${missing.join(', ')}; run the unit again` };
+        }
+      }
+      lastRecorded.commit = commit;
+      lastRecorded.outcome = commit.status === 'failed' ? 'execution-failure' : 'pass';
+      persistUnitRecord();
+      return { outcome: lastRecorded.outcome, role, round, runResult: prior?.runResult, binding: lastRecorded.binding, commit };
+    }
+
     if (bound.mechanism === 'inline') {
       if (role !== 'producer') {
         throw new RunnerConfigError(`checker role "${role}" cannot be bound inline (G2 / Q-A violation)`);
@@ -460,6 +712,16 @@ export async function runUnit(options = {}) {
         round,
         pendingInline: { nonce, role, round },
       };
+    }
+
+    // Before a mutating producer is spawned: an index someone else staged refuses the run (the
+    // runner stages only what it chose), and files already dirty in scope are recorded so the
+    // runner never commits them. A resumed attempt keeps what its first launch saw.
+    let preExistingInScope = [];
+    if (!readOnly) {
+      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope });
+      if (preflight.foreignStaged.length > 0) return foreignIndexRefusal(role, round, preflight.foreignStaged);
+      preExistingInScope = recorded[0]?.preExistingInScope ?? preflight.preExistingInScope;
     }
 
     // Out-of-process dispatch, with provider-limit failover: when the agent stops on a provider
@@ -487,21 +749,31 @@ export async function runUnit(options = {}) {
             : bound.provenance?.fallbackFrom?.kind === 'account-rotation' ? (attempts[attemptNo - 1]?.skipCandidateIndex ?? -1)
               : (attempts[attemptNo - 1]?.binding?.candidateIndex ?? -1),
           candidateIndex: bound.candidateIndex ?? null,
+          ...(readOnly ? {} : { preExistingInScope }),
           boundAt: new Date().toISOString(),
         });
+        persistUnitRecord();
+      }
+      // What the worktree looks like as this writing seat launches, so a provider limit can tell
+      // whether the seat changed it (partial-writes.mjs). Taken again at every launch, a resumed
+      // one included: what a person kept before resuming is not this launch's work. A read-only
+      // seat is sandboxed and records none, so a change it could not have made never stops it.
+      if (!readOnly) {
+        try {
+          attempts[attemptNo].writeBaseline = worktreeSnapshot({ worktree: unitRecord.worktree, repoRoot: mainRoot });
+        } catch (error) {
+          attempts[attemptNo].writeBaseline = { error: error.message };
+        }
         persistUnitRecord();
       }
 
       const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs, objective: (rUnit || unit).objective });
 
-      // The worker only writes files; this trusted code, outside the confinement, commits them.
-      // No change is recorded as such, and a commit that cannot be made fails the round.
+      // The worker only writes files; this trusted code, outside the confinement, commits the
+      // ones inside the write scope. No change is recorded as such, and a commit that cannot be
+      // made fails the round. Paths changed outside the scope are reported, never committed.
       if (!readOnly && result.outcome === 'pass') {
-        const commit = commitUnitWork({
-          worktree: unitRecord.worktree,
-          unitId: (rUnit || unit).id,
-          summary: result.runResult?.agentClaim?.summary,
-        });
+        const commit = commitWork(rUnit || unit, result.runResult, attempts[attemptNo].preExistingInScope ?? preExistingInScope);
         result.commit = commit;
         attempts[attemptNo].commit = commit;
         if (commit.status === 'failed') result.outcome = 'execution-failure';
@@ -521,6 +793,42 @@ export async function runUnit(options = {}) {
       // accounts (never a loop on one account), and only then does the walk leave the provider.
       let rotationsSpent = 0;
       for (let at = attemptNo; at > 0 && attempts[at]?.fallbackFrom?.kind === 'account-rotation'; at -= 1) rotationsSpent += 1;
+      // Two cases end the seat here and leave the decision to a person. A writing seat that already
+      // changed the worktree is never run again on top of its own half-done work (checked first, so
+      // a pinned seat still names what it changed). And a pinned account is hard: its limit is never
+      // answered with another account or executor.
+      const stopRetry = (reason, detail, extra = {}) => {
+        attempts[attemptNo].retryStopped = { reason, ...extra };
+        persistUnitRecord();
+        return {
+          ...result,
+          fallbackExhausted: {
+            from: { executor: bound.executor, invocation: bound.invocation, transport: bound.transport },
+            reason,
+            detail,
+            ...extra,
+            ...(rotationsSpent > 0 ? { accountRotations: rotationsSpent } : {}),
+          },
+        };
+      };
+      const pinned = bound.account ? { accountPinned: bound.account.id } : {};
+      const baseline = attempts[attemptNo].writeBaseline;
+      if (baseline) {
+        let changed;
+        try {
+          if (baseline.error) throw new Error(`no baseline was taken at launch: ${baseline.error}`);
+          changed = writesSince(baseline, { worktree: unitRecord.worktree, repoRoot: mainRoot });
+        } catch (error) {
+          return stopRetry('partial-writes', `could not tell whether the seat changed the worktree (${error.message}), so it is not run again by itself`, { paths: [], ...pinned });
+        }
+        if (changed.paths.length > 0 || changed.headMoved) {
+          const what = [changed.paths.join(', '), changed.headMoved ? 'HEAD moved' : ''].filter(Boolean).join('; ');
+          return stopRetry('partial-writes', `the seat changed the worktree before its provider limit (${what}); it is not run again on top of that work: keep, finish or undo the changes, then resume`, { paths: changed.paths, headMoved: changed.headMoved, ...pinned });
+        }
+      }
+      if (bound.account) {
+        return stopRetry('account-pinned', `account "${bound.account.id}" of provider "${bound.account.provider}" was pinned, so the seat is not moved to another account or executor; pin another account or wait for this one`);
+      }
       const rotation = inspectAccountRotation({ runnerConfig, executorId: bound.executor, runtimeDir: options.providerCapacityRuntimeDir });
       if (mayRotateAccount(rotation, rotationsSpent)) {
         bound = retrySameCandidate(bound, { provider: rotation.provider, accountsHealthy: rotation.healthy });
@@ -576,8 +884,11 @@ export async function runUnit(options = {}) {
 
   // A caller that passes `{ pattern, params }` is choosing the pattern's params as well as its
   // name, so that object form wins over the unit's own pattern string.
+  // A resume runs the pattern its unit.json recorded, never one its caller names now.
   const callerPattern = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
-  const patternName = callerPattern || unit.pattern || options.pattern || 'solo';
+  const patternName = options.resumeUnitRunId && unitRecord.pattern
+    ? unitRecord.pattern
+    : callerPattern || unit.pattern || options.pattern || 'solo';
   unitRecord.pattern = patternName;
   persistUnitRecord();
   const patternResult = await runPattern(patternName, unit, unitRecord.configSnapshot.runner, {

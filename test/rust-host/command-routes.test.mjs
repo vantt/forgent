@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
+import { COMMAND_REGISTRY, HELP_SELECTORS } from '../../src/cli/command-registry.mjs';
 import {
   DEFAULT_ANNOTATIONS_PATH,
   DEFAULT_ROUTES_PATH,
@@ -30,7 +30,13 @@ test('all COMMAND_REGISTRY selectors appear exactly once in generated output', (
   // Derived from COMMAND_REGISTRY.length itself, never a fresh hardcoded
   // literal -- a verb addition or removal moves both sides together instead
   // of needing this assertion edited every time the registry changes size.
-  assert.equal(routeKeys.length, COMMAND_REGISTRY.length, `command-routes.json must contain exactly ${COMMAND_REGISTRY.length} selectors (COMMAND_REGISTRY.length)`);
+  // Plus the help door's option selectors (--help, -h), routed to legacy-node.
+  const expectedCount = COMMAND_REGISTRY.length + HELP_SELECTORS.length;
+  assert.equal(routeKeys.length, expectedCount, `command-routes.json must contain exactly ${expectedCount} selectors (COMMAND_REGISTRY + HELP_SELECTORS)`);
+  for (const selector of HELP_SELECTORS) {
+    assert.equal(routes[selector]?.route_kind, 'legacy-cli', `help selector "${selector}" must route to legacy-node`);
+  }
+  assert.deepEqual(routeKeys.filter((k) => k.startsWith('-')).sort(), [...HELP_SELECTORS].sort(), 'no option selector other than the help door may have a route');
 
   // Lexicographical sort check
   const sortedKeys = [...routeKeys].sort();

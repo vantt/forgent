@@ -1,14 +1,9 @@
-// dispatch/cli.mjs — dispatch behavior + the thin CLI doors over it (D7,
-// tsk-2uf-1): `logExecutorDispatch`, and the `execute`/`decide`/
-// `log` CLI subcommands (`executeExecutorCli`/`decideExecutorCli`, plus the
-// raw `node src/runner/dispatch.mjs <subcommand> ...` argv-parsing entry
-// point, now `runDispatchCli` — called from `src/runner/dispatch.mjs`'s own
-// unchanged script guard so every existing `node .../dispatch.mjs execute
-// ...` invocation stays byte-identical). Split out of the former
-// `src/runner/dispatch.mjs` (2204 lines, 6 concerns in one file) — pure
-// move, no behavior change; `src/runner/dispatch.mjs` re-exports every name
-// below unchanged as a barrel. See `docs/history/dispatch-activation-and-
-// handoff-redesign/CONTEXT.md` D7 for the split rationale.
+// dispatch/cli.mjs — dispatch behavior + the thin CLI doors over it (D7, tsk-2uf-1):
+// `executeExecutorCli` (the transport step runUnit's assignment runner calls), and the
+// `decide`/`probe-account`/`reconcile` subcommands of `node src/runner/dispatch.mjs`
+// (`runDispatchCli`). One task runs through `fgos run`, planned work through a Workflow;
+// the raw `execute` and `log` subcommands are gone. See `docs/history/dispatch-activation-
+// and-handoff-redesign/CONTEXT.md` D7 for the module split.
 
 import path from 'node:path';
 import fs from 'node:fs';
@@ -26,7 +21,7 @@ class StoreError extends Error {
 }
 
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily, resolveCapabilityDetailsFromHints } from './resolve.mjs';
 import { resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
@@ -36,10 +31,9 @@ import { executeThroughConfinement, buildConfinementAttestation } from './confin
 import { buildConfinementRequest } from './confinement/request.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { compileDispatchPlan } from './plan.mjs';
-import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { buildDispatchResult } from './result-ladder.mjs';
+import { collectModelWarnings } from './provider-adapter.mjs';
 import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs';
-import { createCredentialProbe } from './provider-credential-probe.mjs';
 import { runAccountProbe } from './provider-account-probe.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot, createConfinementCredentialRenewal } from './confinement/cleanup.mjs';
 import { defaultConfinementTempRoots } from './confinement/backend-registry.mjs';
@@ -145,15 +139,14 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
  * A round settles when the worker writes its own result file. That establishes
  * the worker DID something; it establishes nothing about WHERE. Measured: agy
  * was given a worktree, reported settled, and had written six files into the
- * main checkout instead -- onto another track's branch. Nothing in the ladder
- * can catch that, because the ladder's whole subject is whether the round
- * ended, not where it ran.
+ * main checkout instead -- onto another track's branch.
  *
  * This compares the main checkout's dirty paths before and after. It is
- * EVIDENCE, not proof: the main checkout is a live working tree and somebody
- * else may dirty it while a round is in flight, so the refusal below names
- * what it observed rather than asserting who did it. A false positive costs a
- * re-run; the failure it exists to catch costs a stranger's branch.
+ * EVIDENCE, not proof: the main checkout is a live working tree other sessions
+ * write to while a round is in flight (measured 2026-10-14: a Doer's whole
+ * round was refused for three reports another session wrote into main). So
+ * what it sees is reported as a warning on the result, never a refusal; a
+ * refusal needs a write observed and bound to the run, which this is not.
  *
  * Nothing is watched when the worker was given the repo root itself as its
  * workspace -- there is no outside to write to.
@@ -184,17 +177,23 @@ export function watchWritesOutsideWorkspace({ repoRoot, cwd }) {
 }
 
 /**
- * The error a settled-but-misplaced round becomes. `worktree-fail` is the
- * existing class for "the isolated checkout was not respected", so the
- * recovery matrix already knows to retry it a bounded number of times rather
- * than treating it as a worker that needs a person.
+ * The warning a round carries when paths outside its workspace became dirty
+ * while it ran, or null when none did. Correlated evidence only: it names what
+ * appeared and where, and says nothing about who wrote it. Also printed to
+ * stderr so a caller reading only the process output sees it.
  */
-export function strayWriteError({ workId, tier, model, cwd, repoRoot, strayPaths }) {
-  return new DispatchError(
-    'worktree-fail',
-    `executor for work "${workId}" reported success but wrote outside its workspace. It was given ${cwd}; these paths became dirty in ${repoRoot} during the round: ${strayPaths.join(', ')}. The round is refused rather than accepted: work in the wrong checkout is not this item's work, and it may belong to whoever else has that checkout open.`,
-    { workId, tier, model, reason: 'wrote-outside-workspace', cwd, repoRoot, strayPaths },
+export function strayWriteWarning({ repoRoot, strayPaths }) {
+  if (!Array.isArray(strayPaths) || strayPaths.length === 0) return null;
+  process.stderr.write(
+    `fgos: warning: paths outside the worker's workspace became dirty in ${repoRoot} during the round (another session may have written them): ${strayPaths.join(', ')}\n`,
   );
+  return {
+    code: 'stray-write-correlated',
+    level: 'correlated',
+    basis: ['pre-post-git-snapshot'],
+    repoRoot,
+    paths: strayPaths,
+  };
 }
 
 export function openRunnerRun({ fgosDir, workId, executorId, cwd }) {
@@ -308,32 +307,46 @@ function selectInvocationForCapability(cfg, executorId, executor, capabilityName
   return unconfined?.id;
 }
 
-// The two doors for read-only work. Only a Workflow unit runs sandboxed with
-// the account's login; the inline contract keeps the named provider but its
-// read-only posture is an instruction to the worker, not a sandbox.
+// Confined read-only work goes through runUnit, which binds the posture and leases
+// the account's login for the sandbox.
 function readOnlyDoors(executorId) {
-  return `Read-only work: a Workflow unit with "writes": [] (\`fgos workflow start --units <file>\`) runs sandboxed with the account's login; to keep this executor, \`execute --contract <file> --executor ${executorId}\` with "mutation": "read-only" leases the account but enforces read-only by instruction only, without a sandbox.`;
-}
-
-function describeCapabilityChoices(cfg, executorId) {
-  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
-  const writes = Object.entries(capabilities)
-    .filter(([, entry]) => entry?.serves?.mutates && entry.confinement?.mode !== 'required')
-    .map(([name]) => `--for ${name}`);
-  const changes = writes.length ? `Work that changes files: ${writes.join(', ')}. ` : '';
-  return `${changes}${readOnlyDoors(executorId)}`;
+  return `Read-only work runs sandboxed with the account's login through runUnit: \`fgos run "<prompt>" --provider ${executorId}\` (read-only without --writes), or a Workflow unit with "writes": [] (\`fgos workflow start --units <file>\`).`;
 }
 
 /**
- * `execute <executorId>` CLI subcommand (tsk-5tm-3 D5): the self-execute
- * counterpart to `resolve` above, matching marketing-cockpit's `run_task()`
+ * The `fgos run` command a caller uses instead of dispatching `executorId` directly, read from
+ * the config at `cwd` without writing it. `--provider` names agent executors only, and only as a
+ * preference bind may override; a tool executor has no run door, so the hint says to call the
+ * tool itself. `capability` is kept when it is a registered one.
+ */
+export function runDoorHint({ cwd = process.cwd(), executorId, capability } = {}) {
+  let cfg = null;
+  try {
+    cfg = loadRunnerConfigFromDir(resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));
+  } catch { /* no readable config: the hint names no executor */ }
+  const executor = executorId && cfg?.executors && Object.hasOwn(cfg.executors, executorId) ? cfg.executors[executorId] : null;
+  const isAgent = executor !== null && (executor.kind ?? 'agent') === 'agent';
+  const registeredCapability = capability && cfg ? resolveRegisteredCapability(cfg, capability) : undefined;
+  const command = ['fgos run "<prompt>"'];
+  if (isAgent) command.push(`--provider ${executorId}`);
+  if (registeredCapability) command.push(`--capability ${registeredCapability}`);
+  command.push('[--writes <paths> --worktree <path>]');
+  const hint = `\`${command.join(' ')}\``;
+  if (isAgent) return `${hint} (--provider is a preference: bind may choose another executor that serves the capability)`;
+  if (executor) return `${hint}; "${executorId}" is a ${executor.kind} executor, which fgos run cannot name -- call that tool directly instead`;
+  return hint;
+}
+
+/**
+ * Run one executor (tsk-5tm-3 D5) — the transport step under runUnit's
+ * assignment runner (it once also backed a raw `execute` CLI subcommand): matching marketing-cockpit's `run_task()`
  * contract (`task-executor.py:550-611`) — self-execute for every case that
  * can be, hand back only for the one case that genuinely can't. `resolve`
  * always hands back `{command,args}` for the caller to run itself via
  * Bash, even for a `kind:"cli"` executor that `EXECUTOR_ADAPTERS` could
  * already run directly (`EXECUTOR_ADAPTERS['cli-spawn']` was validated at
  * config-load time but, before this item, only ever CALLED by `spawnWorker`
- * — Flow A never called it). `execute` closes that gap:
+ * — Flow A never called it). This function closes that gap:
  *
  * - **`mechanism: "in-process"`** (native, same-family, live session) —
  *   dispatch itself has no Task/Agent tool to call (a passive CLI/library),
@@ -367,6 +380,11 @@ export async function executeExecutorCli(
     repoRoot,
     runnerConfig,
     model: modelOverride,
+    // The model the caller asked for, when `model` above is what policy made of
+    // it (an Assignment's redirect can replace it); defaults to `model` itself.
+    requestedModel,
+    // A canonical reasoning-effort level for this one run (`--effort`).
+    reasoningEffort,
     tier: tierOverride,
     rigor: rigorOverride,
     for: purposeArg,
@@ -415,9 +433,6 @@ export async function executeExecutorCli(
     // Names which `via:"cli"` invocation of the executor runs (bind() pins the
     // herdr-spawn one when herdr is the transport). Unset keeps the first cli one.
     invocationId,
-    // The CLI door sets this: an agent executor named without `for` is refused
-    // instead of running under a guessed posture.
-    requireCapability = false,
     // The confinement requirement the caller already resolved (an Assignment's
     // posture). Unset leaves it to the capability/invocation declaration.
     requirement,
@@ -440,7 +455,7 @@ export async function executeExecutorCli(
   const purpose = purposeArg;
   if (!executorIdArg && !purpose) {
     throw new RunnerConfigError(
-      'executeExecutorCli requires an executorIdArg or a `for` purpose (the CLI\'s own `execute` subcommand only ever supplies executorIdArg positionally -- `for` is a programmatic-caller-only parameter, e.g. spawnWorker\'s own work-item-derived purpose; usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access])',
+      'executeExecutorCli requires an executorIdArg or a `for` purpose',
     );
   }
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
@@ -524,16 +539,6 @@ export async function executeExecutorCli(
         );
       }
       invocationId ??= selectInvocationForCapability(cfg, realExecutorId, resolvedExecutor, capabilityName);
-    } else if (requireCapability && resolved.bindingSource === 'executor-id' && resolvedExecutor?.kind === 'agent') {
-      // An agent executor can do any kind of work, so nothing about it says
-      // whether this dispatch reads or writes. Ask the caller instead of
-      // guessing: a wrong guess either blocks a write minutes into the run or
-      // lets a review write.
-      throw new DispatchError(
-        'capability-required',
-        `execute ${executorIdArg} needs --for <capability>: name the kind of work this dispatch does. ${describeCapabilityChoices(cfg, executorIdArg)}`,
-        { executorId: executorIdArg },
-      );
     }
   }
 
@@ -697,9 +702,11 @@ export async function executeExecutorCli(
   const resolvedAgentType = agentType ?? null;
   // Same reason as `spawnWorker`: a confinement the profile declares has to
   // reach the adapter, or the invariant that accepted the profile is fiction.
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, resourceBindings } = resolveExecutorCommand(cfg, {
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, resourceBindings, reasoningEffort: effortApplied, modelCheck } = resolveExecutorCommand(cfg, {
     prompt,
     model,
+    requestedModel: requestedModel ?? modelOverride,
+    reasoningEffort,
     tier,
     executorId,
     fgosDir,
@@ -880,10 +887,7 @@ export async function executeExecutorCli(
     opened.closeRun('settled');
 
     // Same question as the runner path asks: the round ended, but where?
-    const strayPaths = outsideWatch.strayPaths();
-    if (strayPaths.length > 0) {
-      throw strayWriteError({ workId: executorId, tier, model, cwd, repoRoot: root, strayPaths });
-    }
+    const strayWarning = strayWriteWarning({ repoRoot: root, strayPaths: outsideWatch.strayPaths() });
 
     const headAfter = captureHeadSha(cwd);
     const dirtyAfter = checkoutDirtyPaths(root, cwd);
@@ -902,8 +906,15 @@ export async function executeExecutorCli(
     const resultToBuild = {
       ...execResult,
       attestation: result?.attestation,
+      ...(strayWarning ? { warnings: [...(Array.isArray(execResult?.warnings) ? execResult.warnings : []), strayWarning] } : {}),
     };
-    const base = buildDispatchResult({ mechanism, result: resultToBuild, headBefore, headAfter, lostUncommittedPaths, provider, command });
+    const built = buildDispatchResult({ mechanism, result: resultToBuild, headBefore, headAfter, lostUncommittedPaths, provider, command });
+    const modelWarnings = collectModelWarnings(modelCheck, execResult ?? {});
+    const base = {
+      ...built,
+      ...(effortApplied ? { reasoningEffort: effortApplied } : {}),
+      ...(modelWarnings.length > 0 ? { modelWarnings } : {}),
+    };
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
     if (heartbeat) clearInterval(heartbeat);
@@ -1020,7 +1031,7 @@ export async function decideExecutorCli(
   if (!executorIdArg && workIdArg) {
     if (typeof resolveWork !== 'function') {
       throw new RunnerConfigError(
-        `--work needs the Work layer to resolve "${workIdArg}" to its dispatch executor; run it through "fgos dispatch decide" instead of the bare dispatch module.`,
+        `--work needs the Work layer to resolve "${workIdArg}" to its dispatch executor; run "fgos dispatch decide --work ${workIdArg}" instead of the bare dispatch module.`,
       );
     }
     const resolved = resolveWork({ workId: workIdArg, stage: stageArg, fgosDir: fgosDirFromRoot(root) });
@@ -1107,14 +1118,10 @@ export function guardCwdRepoRootDivergence(cwd, repoRoot) {
 }
 
 /**
- * CLI entry point body (D7 module split): was an inline `if
- * (import.meta.url === ...)` script guard directly in `dispatch.mjs`
- * before this split — now a named export so the barrel `dispatch.mjs`
- * (the file every existing `node src/runner/dispatch.mjs <subcommand> ...`
- * invocation still names) can call it from its own unchanged script guard.
- * Pure relocation: every line of argv-parsing/dispatch logic below is
- * byte-identical to before the split, only wrapped in a function instead
- * of an `if` block.
+ * Body of `node src/runner/dispatch.mjs <decide|probe-account|reconcile> ...`, called from the
+ * barrel's script guard; `fgos dispatch decide|probe-account` reach it with `returnResult`.
+ * `resolveWork` is the Work lookup `decide --work` needs, handed in by bin; without it
+ * `decide --work` refuses.
  */
 export async function runDispatchCli(argv = process.argv.slice(2), { returnResult = false, resolveWork } = {}) {
   const [subcommand, ...afterSubcommand] = argv;
@@ -1140,423 +1147,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
     }
     return value;
   };
-  // R9: "Reject duplicate/conflicting flags ... before launch" -- applies to
-  // every `cliOverride` flag (`--executor`/`--model`/`--tier`), not just
-  // `--executor`. Returns the first duplicated flag name found, or null.
-  // Walks `rest` left to right, exactly mirroring `flagValue()`'s own
-  // convention that the token immediately after a flag name is that flag's
-  // value: once a token is read as a flag position, the next token is
-  // consumed as its value and is never itself re-examined as a flag
-  // position. This keeps the two functions from disagreeing about what
-  // counts as "this flag, with this value" vs. "a flag-looking string that
-  // is actually someone else's value" -- and, unlike a bare `indexOf`/
-  // `includes` scan, counts every flag position regardless of where in
-  // `rest` it falls, including the very last token.
-  const findDuplicateOverrideFlag = () => {
-    const flagNames = new Set(['--executor', '--model', '--tier']);
-    const counts = new Map();
-    let i = 0;
-    while (i < rest.length) {
-      if (flagNames.has(rest[i])) {
-        counts.set(rest[i], (counts.get(rest[i]) ?? 0) + 1);
-        i += 2;
-      } else {
-        i += 1;
-      }
-    }
-    for (const name of ['--executor', '--model', '--tier']) {
-      if ((counts.get(name) ?? 0) > 1) return name;
-    }
-    return null;
-  };
   switch (subcommand) {
-    case 'execute': {
-      // tsk-129: tee the spawned executor's own live stdout/stderr chunks to
-      // THIS process's stderr as they arrive, reusing the P39 onChunk hook
-      // executeExecutorCli already threads through to the adapter (this CLI
-      // branch was the one caller that never passed it -- RESEARCH.md).
-      // stdout is left untouched, still carrying only the single final JSON
-      // line below, so a scripted caller's JSON.parse(stdout) sees no change.
-      // Dispatch-path unification: `execute --for <purpose>` is retired.
-      // It was the "purpose door" -- resolving a purpose straight to a
-      // spawn with zero provider-capacity lease and zero fallback (unlike
-      // every other real dispatch door here) -- and had zero live callers
-      // (docs/knowledge/how-to-wire-a-skill-to-an-executor-by-purpose-not-
-      // by-name/... 's own "Status: pattern proven, no live consumer
-      // today"). The correct, real pattern (already how every live caller
-      // works) is two-phase: `decide --for <purpose>` resolves the
-      // purpose to a real executorId first, then `execute <that id>`
-      // dispatches it positionally -- `decide --for` is unaffected by
-      // this, only `execute --for` is refused. `execute <executorId> --for
-      // <capability>` is phase two carrying the purpose along: the executor is
-      // already named, and `--for` only states which capability's posture the
-      // dispatch runs under (refused for an executor that does not serve it).
-      if (flagValue('--for') && (!executorId || flagValue('--assignment') || flagValue('--contract'))) {
-        const msg = 'execute --for is no longer supported -- resolve the purpose first (`decide --for <purpose>`), then dispatch the resolved executorId positionally (`execute <executorId> [--for <capability>]`)';
-        if (returnResult) throw new StoreError('validation', msg);
-        process.stderr.write(`${msg}\n`);
-        process.exitCode = 1;
-        break;
-      }
-      const assignmentId = flagValue('--assignment');
-      const contractFile = flagValue('--contract');
-      // ADR-007 R3: `--contract <file>` is its own dispatch door -- an
-      // inline, no-Work/no-Stage Assignment built straight from a
-      // caller-authored execution contract file. Reject it combined with
-      // `--assignment` up front, before anything else in this subcommand
-      // happens (parse, build, dispatch), mirroring how `--assignment`
-      // already short-circuits the rest of this branch on its own flag
-      // alone, immediately below.
-      if (contractFile && assignmentId) {
-        const msg = 'execute --contract cannot be combined with --assignment -- pick exactly one dispatch door';
-        if (returnResult) throw new StoreError('validation', msg);
-        process.stderr.write(`${msg}\n`);
-        process.exitCode = 1;
-        break;
-      }
-      if (assignmentId) {
-        const cwd = flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd();
-        let root = flagValue('--repo-root') ?? resolveMainCheckoutRoot(cwd);
-        if (!root) {
-          try {
-            root = resolveRepoRoot(cwd);
-          } catch {
-            root = cwd;
-          }
-        }
-        const fgosDir = fgosDirFromRoot(root);
-        const asgnPath = path.isAbsolute(assignmentId) || assignmentId.endsWith('.json')
-          ? path.resolve(root, assignmentId)
-          : path.join(fgosDir, 'assignments', assignmentId, 'assignment.json');
-        if (!fs.existsSync(asgnPath)) {
-          const msg = `assignment "${assignmentId}" not found at ${asgnPath}`;
-          if (returnResult) throw new StoreError('precondition', msg);
-          process.stderr.write(`${msg}\n`);
-          process.exitCode = 1;
-          break;
-        }
-        let asgnObj;
-        try {
-          asgnObj = JSON.parse(fs.readFileSync(asgnPath, 'utf8'));
-        } catch (err) {
-          const msg = `failed to parse assignment at ${asgnPath}: ${err.message}`;
-          if (returnResult) throw new StoreError('validation', msg);
-          process.stderr.write(`${msg}\n`);
-          process.exitCode = 1;
-          break;
-        }
-        const hasLiveTaskAccess = rest.includes('--has-live-task-access');
-        let decided;
-        try {
-          decided = await decideExecutorCli(undefined, {
-            cwd,
-            repoRoot: root,
-            assignment: assignmentId,
-            hasLiveTaskAccess,
-          });
-        } catch (err) {
-          const msg = `dispatch decide failed: ${err.message}`;
-          if (returnResult) throw new StoreError('validation', msg);
-          process.stderr.write(`${msg}\n`);
-          process.exitCode = 1;
-          break;
-        }
-        if (decided && (decided.mechanism === 'unavailable' || decided.mechanism === null)) {
-          const msg = `dispatch decide blocked assignment execution: ${decided.blockedReason ?? decided.reason ?? 'unexecutable mechanism'}`;
-          if (returnResult) throw new StoreError('validation', msg);
-          process.stderr.write(`${msg}\n`);
-          process.exitCode = 1;
-          break;
-        }
-        const duplicateFlag = findDuplicateOverrideFlag();
-        if (duplicateFlag) {
-          const msg = `duplicate flag "${duplicateFlag}" -- pass it at most once before launch`;
-          if (returnResult) throw new StoreError('validation', msg);
-          process.stderr.write(`${msg}\n`);
-          process.exitCode = 1;
-          break;
-        }
-        const cliOverride = {};
-        if (flagValue('--model')) cliOverride.model = flagValue('--model');
-        if (flagValue('--tier')) cliOverride.tier = flagValue('--tier');
-        if (flagValue('--executor')) cliOverride.preferExecutor = flagValue('--executor');
-        try {
-          const result = await executeAssignment(asgnObj, {
-            cwd: flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd(),
-            repoRoot: root,
-            cliOverride,
-            hasLiveTaskAccess,
-            isReadOnlyMode: asgnObj.provenance?.kind === 'inline',
-            forceSharedCwd: rest.includes('--force-shared-cwd'),
-            providerCredentialProbe: createCredentialProbe(),
-            providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
-            onChunk: (stream, chunk) => process.stderr.write(chunk),
-          });
-          if (returnResult) return result;
-          process.stdout.write(`${JSON.stringify(result)}\n`);
-        } catch (err) {
-          if (returnResult) throw err;
-          process.stderr.write(`${err.message}\n`);
-          process.exitCode = 1;
-        }
-        break;
-      }
-
-      if (contractFile) {
-        // Same cwd/root resolution as the `--assignment` branch just above
-        // (ADR-007 R3 explicitly asks this door to match it, not diverge).
-        // Note this branch, like `--assignment`, does NOT call
-        // `guardCwdRepoRootDivergence` -- that guard is only wired into the
-        // plain-prompt path further below; `--assignment` never called it
-        // either, so this stays consistent with the closest existing
-        // precedent rather than adding a new check unasked.
-        const cwd = flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd();
-        let root = flagValue('--repo-root') ?? resolveMainCheckoutRoot(cwd);
-        if (!root) {
-          try {
-            root = resolveRepoRoot(cwd);
-          } catch {
-            root = cwd;
-          }
-        }
-        const fgosDir = fgosDirFromRoot(root);
-
-        // `--contract <file>` reads a raw path exactly like `--prompt-file`
-        // above resolves it (relative to process.cwd(), no path.resolve
-        // against root/cwd flags) -- same convention, not a new one.
-        let raw;
-        try {
-          raw = fs.readFileSync(contractFile, 'utf8');
-        } catch (err) {
-          const msg = `failed to read contract file at ${contractFile}: ${err.message}`;
-          if (returnResult) throw new StoreError('precondition', msg);
-          process.stderr.write(`${msg}\n`);
-          process.exitCode = 1;
-          break;
-        }
-        let parsed;
-        try {
-          parsed = JSON.parse(raw);
-        } catch (err) {
-          const msg = `failed to parse contract file at ${contractFile}: ${err.message}`;
-          if (returnResult) throw new StoreError('validation', msg);
-          process.stderr.write(`${msg}\n`);
-          process.exitCode = 1;
-          break;
-        }
-
-        // The file IS the contract (ADR-006 §4's field list, flat) -- the
-        // one exception is an optional top-level `caller` key, pulled out
-        // here rather than left for execution-contract.mjs's own
-        // unknown-field gate to reject it (`caller` is caller PROVENANCE,
-        // never one of execution-contract.mjs's ACCEPTED_CONTRACT_FIELDS).
-        let fileCaller;
-        let contractFields = parsed;
-        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-          ({ caller: fileCaller, ...contractFields } = parsed);
-        }
-
-        // `caller.writerId` is auto-resolved via resolveWriterIdentity()
-        // only when the file does not already supply a non-empty one --
-        // this door is the SECOND real call site for that function
-        // (mission-lite.mjs's createMissionAssignment is the first). A
-        // file-supplied `parentAssignmentId` always survives untouched
-        // either way. See this cell's trace (P03.2.md Gaps) for why
-        // "only when absent" was chosen over unconditionally overwriting
-        // whatever the file says.
-        let caller;
-        if (
-          fileCaller &&
-          typeof fileCaller === 'object' &&
-          typeof fileCaller.writerId === 'string' &&
-          fileCaller.writerId.trim() !== ''
-        ) {
-          caller = fileCaller;
-        } else {
-          const resolvedWriter = resolveWriterIdentity(fgosDir);
-          caller = {
-            ...(fileCaller && typeof fileCaller === 'object' ? fileCaller : {}),
-            writerId: String(resolvedWriter.id),
-          };
-        }
-
-        // ADR-007 §1/R5: reuse the exact `--work <id>` lookup `decide
-        // --work` already established (cli.mjs, `listWork(fgosDir).work[workIdArg]`)
-        // -- this is what lets the domain harness seam actually fire for an
-        // inline contract attached to a real Work at a declared Stage.
-        const workIdArg = flagValue('--work');
-        let work;
-        if (workIdArg) {
-          work = typeof resolveWork === 'function'
-            ? resolveWork({ workId: workIdArg, fgosDir })?.workItem
-            : undefined;
-          if (!work) {
-            const msg = `no work item "${workIdArg}" found -- cannot attach inline contract to it`;
-            if (returnResult) throw new StoreError('precondition', msg);
-            process.stderr.write(`${msg}\n`);
-            process.exitCode = 1;
-            break;
-          }
-        }
-
-        // A mutating contract (or any other execution-contract.mjs /
-        // domain-harness rejection) must exit non-zero HERE, before
-        // executeAssignment (and therefore any executor) is ever reached --
-        // buildAssignment()'s inline path throws RunnerConfigError
-        // synchronously for exactly this (ADR-006 §6).
-        // ADR-006 R4 / Red-Team fix (P03.2): createAssignmentId's own
-        // directory scan is check-then-act, so two genuinely concurrent
-        // invocations under the same writer identity or Work can compute
-        // the same candidate id before either directory exists. Claim the
-        // id atomically (claimAssignmentId, assignment.mjs) instead of
-        // building once -- this rebuilds and rescans on collision without
-        // writing assignment.json's content itself (R3.5), which stays
-        // executeAssignment()'s own lazy first-write responsibility.
-        const assignmentsDir = path.join(fgosDir, 'assignments');
-        let assignment;
-        try {
-          assignment = claimAssignmentId(
-            () =>
-              buildAssignment({
-                ...(work ? { work } : {}),
-                options: { assignmentsDir },
-                provenance: {
-                  kind: 'inline',
-                  contract: contractFields,
-                  caller,
-                },
-              }),
-            assignmentsDir,
-          );
-        } catch (err) {
-          if (returnResult) throw err;
-          process.stderr.write(`${err.message}\n`);
-          process.exitCode = 1;
-          break;
-        }
-
-        const hasLiveTaskAccess = rest.includes('--has-live-task-access');
-        try {
-          // No separate decideExecutorCli pre-flight here -- mirrors
-          // mission-lite's own real call site (mission-lite.mjs's
-          // runMissionAssignment), which never calls it either:
-          // executeAssignment() already runs the identical governance gate
-          // (compileDispatchPlan) internally before ever spawning an
-          // executor, so a second, earlier call here would only duplicate
-          // that same check under a different error message, not add one.
-          // `isReadOnlyMode: true` unconditionally -- this Assignment's
-          // `provenance.kind` is always 'inline' by construction, the exact
-          // condition the `--assignment` branch above already treats as
-          // mission-lite-strictly-read-only (ADR-006 R8).
-          const duplicateFlag = findDuplicateOverrideFlag();
-          if (duplicateFlag) {
-            const msg = `duplicate flag "${duplicateFlag}" -- pass it at most once before launch`;
-            if (returnResult) throw new StoreError('validation', msg);
-            process.stderr.write(`${msg}\n`);
-            process.exitCode = 1;
-            break;
-          }
-          const cliOverride = {};
-          if (flagValue('--model')) cliOverride.model = flagValue('--model');
-          if (flagValue('--tier')) cliOverride.tier = flagValue('--tier');
-          if (flagValue('--executor')) cliOverride.preferExecutor = flagValue('--executor');
-          const result = await executeAssignment(assignment, {
-            cwd,
-            repoRoot: root,
-            cliOverride,
-            hasLiveTaskAccess,
-            isReadOnlyMode: true,
-            forceSharedCwd: rest.includes('--force-shared-cwd'),
-            providerCredentialProbe: createCredentialProbe(),
-            providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
-            onChunk: (stream, chunk) => process.stderr.write(chunk),
-          });
-          if (returnResult) return result;
-          process.stdout.write(`${JSON.stringify(result)}\n`);
-        } catch (err) {
-          if (returnResult) throw err;
-          process.stderr.write(`${err.message}\n`);
-          process.exitCode = 1;
-        }
-        break;
-      }
-
-      let prompt = flagValue('--prompt') ?? '';
-      const promptFile = flagValue('--prompt-file');
-      if (promptFile) {
-        try {
-          prompt = fs.readFileSync(promptFile, 'utf8');
-        } catch (err) {
-          if (returnResult) throw new StoreError('precondition', err.message);
-          process.stdout.write(
-            `${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`,
-          );
-          process.stderr.write(`${err.message}\n`);
-          process.exitCode = 1;
-          break;
-        }
-      }
-      try {
-        guardCwdRepoRootDivergence(flagValue('--cwd') ?? flagValue('--dir'), flagValue('--repo-root'));
-      } catch (err) {
-        if (returnResult) throw err;
-        process.stdout.write(
-          `${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`,
-        );
-        process.stderr.write(`${err.message}\n`);
-        process.exitCode = 1;
-        break;
-      }
-      let timeoutMs;
-      let idleTimeoutMs;
-      try {
-        timeoutMs = positiveIntFlag('--timeout-ms');
-        idleTimeoutMs = positiveIntFlag('--idle-timeout-ms');
-      } catch (err) {
-        if (returnResult) throw err;
-        process.stdout.write(`${JSON.stringify({ error: err.message })}\n`);
-        process.stderr.write(`${err.message}\n`);
-        process.exitCode = 1;
-        break;
-      }
-      try {
-        const executed = await executeExecutorCli(executorId, {
-          prompt,
-          for: flagValue('--for'),
-          requireCapability: true,
-          timeoutMs,
-          idleTimeoutMs,
-          model: flagValue('--model'),
-          tier: flagValue('--tier'),
-          carries: flagValue('--carries'),
-          cwd: flagValue('--cwd') ?? flagValue('--dir'),
-          repoRoot: flagValue('--repo-root'),
-          hasLiveTaskAccess: rest.includes('--has-live-task-access'),
-          onChunk: (stream, chunk) => process.stderr.write(chunk),
-        });
-        if (returnResult) return executed;
-        process.stdout.write(`${JSON.stringify(executed)}\n`);
-      } catch (err) {
-        if (returnResult) throw err;
-        // Structured errorClass on stdout (dispatch-execute optimization
-        // pass): a caller (a skill following executor-dispatch-fallback.md,
-        // or the runner loop) can now tell "dispatch-in-flight -- back off
-        // and retry shortly" apart from "dispatch-depth-exceeded -- stop,
-        // this needs a human" apart from every other failure, instead of
-        // only ever seeing a bare exit-1 + a human-readable message on
-        let errorClass = err.errorClass;
-        if (!errorClass) {
-          const code = err.code ?? '';
-          if (code.startsWith('governance') || code.startsWith('redirect.') || (err.message && (/governance gate rejected/.test(err.message) || /cross-provider/.test(err.message)))) {
-            errorClass = 'governance-refused';
-          }
-        }
-        process.stdout.write(`${JSON.stringify(errorClass ? { error: err.message, errorClass } : { error: err.message })}\n`);
-        process.stderr.write(`${err.message}\n`);
-        process.exitCode = 1;
-      }
-      break;
-    }
     case 'decide': {
       try {
         guardCwdRepoRootDivergence(flagValue('--cwd') ?? flagValue('--dir'), flagValue('--repo-root'));
@@ -1673,7 +1264,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     default: {
-      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--for <capability>] [--prompt <text>|--prompt-file <path>] [--model <name>] [--tier <name>] [--carries <class>] [--timeout-ms <ms>] [--idle-timeout-ms <ms>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>] | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]\n`;
+      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>] | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]. To run a task: fgos run "<prompt>"; decide --work: fgos dispatch decide --work <workId>\n`;
       if (returnResult) throw new StoreError('validation', msg.trim());
       process.stderr.write(msg);
       process.exitCode = 1;

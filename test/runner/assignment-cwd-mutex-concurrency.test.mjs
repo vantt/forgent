@@ -8,11 +8,9 @@
 // assignment-dispatch.test.mjs's own S1 live-probe test style for the same
 // adapter. Uses `implement-item` (a KNOWN_MUTATING_OPS operation) rather
 // than a read-only one deliberately: the lock is gated on
-// `effectiveMutation === 'mutating'` because this repo's own test suite
-// (assignment-dispatch.test.mjs's "genuinely concurrent invocations under
-// the same --work id" Red-Team fix tests) already proves concurrent
-// READ-ONLY dispatch to the SAME cwd through this exact door is intentional
-// and must keep working unblocked.
+// `effectiveMutation === 'mutating'`: concurrent READ-ONLY dispatch to the
+// SAME cwd is intentional and must keep working unblocked (the last test
+// below proves it).
 //
 // Two concurrent executeAssignment() calls in the SAME process (rather than
 // two spawned OS processes) is deliberate and still proves real admission-
@@ -204,5 +202,45 @@ test('executeAssignment: a second, DIFFERENT Assignment targeting the same cwd i
       }
     }
     await Promise.allSettled([pendingA, pendingC]);
+  }
+});
+
+test('executeAssignment: two DIFFERENT read-only Assignments on the same cwd run side by side -- the cwd lock is taken only for mutating work', { timeout: 30000 }, async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeStallingExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const readOnly = (id) => buildAssignment({
+    work: { id, status: 'doing', workflowStep: 'planning', domain: 'coding' },
+    stage: 'planning', operation: 'validate-plan',
+  });
+  const assignments = [readOnly('tsk-cwd-ro-a'), readOnly('tsk-cwd-ro-b')];
+  const runDirs = assignments.map((a) => path.join(tempDir, '.fgos', 'assignments', a.assignmentId, 'runs', '01'));
+  const markers = runDirs.map((d) => path.join(d, 'worker-alive.pid'));
+  const pending = [];
+
+  try {
+    for (const [i, assignment] of assignments.entries()) {
+      assert.notEqual(assignment.mutation, 'mutating', 'precondition: validate-plan is a read-only operation');
+      pending.push(executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig }).catch((err) => ({ __rejected: err })));
+      // Each worker really starts while the other is still live: neither is refused dispatch-in-flight.
+      await waitFor(() => fs.existsSync(markers[i]) && fs.readFileSync(markers[i], 'utf8'));
+      assert.ok(isPidAliveForTest(Number(fs.readFileSync(markers[i], 'utf8'))));
+    }
+    const pendingMark = Symbol('pending');
+    for (const p of pending) {
+      assert.equal(await Promise.race([p, new Promise((r) => setTimeout(() => r(pendingMark), 50))]), pendingMark);
+    }
+  } finally {
+    for (const runDir of runDirs) {
+      for (const pid of supervisorBindingPids(runDir)) {
+        if (isPidAliveForTest(pid)) try { process.kill(pid, 'SIGKILL'); } catch {}
+      }
+    }
+    for (const marker of markers) {
+      if (!fs.existsSync(marker)) continue;
+      const pid = Number(fs.readFileSync(marker, 'utf8'));
+      if (isPidAliveForTest(pid)) try { process.kill(pid, 'SIGKILL'); } catch {}
+    }
+    await Promise.allSettled(pending);
   }
 });

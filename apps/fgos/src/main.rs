@@ -96,7 +96,9 @@ fn main() {
     let cli_args = if args.len() > 1 { &args[1..] } else { &[] };
 
     // R1: No host-global options are recognized in R1 -- the first positional
-    // token is always the selector, dash-prefixed or not. Do NOT skip past a
+    // token is always the selector, dash-prefixed or not. `--help` and `-h`
+    // are selectors in the route table like any verb (the manifest door);
+    // every other dash-prefixed token has no route. Do NOT skip past a
     // leading dash-prefixed token while searching for "the real" selector:
     // that would let an unlisted option in front of a real selector (e.g.
     // `fgos --made-up version`) slip past R3's unknown-verb rejection and
@@ -149,7 +151,18 @@ fn main() {
     service.register_provider(Arc::new(fgos_convention::ConventionProvider::new()));
     let tracker = service.tracker();
 
-    match route.route_kind.as_str() {
+    // Help is answered by the legacy-node payload, which owns the verb
+    // manifest (src/cli/command-registry.mjs): `fgos <native-verb> ... --help`
+    // returns that verb's manifest entry instead of running the operation.
+    // Only an exact `--help`/`-h` token after the selector counts.
+    let wants_help = cli_args.iter().skip(1).any(|a| a == "--help" || a == "-h");
+    let route_kind = if wants_help {
+        "legacy-cli"
+    } else {
+        route.route_kind.as_str()
+    };
+
+    match route_kind {
         "legacy-cli" => {
             // Check recursion guard immediately. Fails closed if already set.
             if let Err(err) = legacy_exec::check_recursion_guard() {
@@ -174,7 +187,6 @@ fn main() {
                         eprintln!("fgos: error: missing subcommand table for \"{selector}\"");
                         std::process::exit(1);
                     });
-                let has_help = cli_args.iter().skip(1).any(|a| a == "--help" || a == "-h");
                 let sub_opt = if cli_args.len() > 1 {
                     let s = cli_args[1].to_string_lossy();
                     if !s.starts_with('-') && !s.is_empty() {
@@ -185,14 +197,6 @@ fn main() {
                 } else {
                     None
                 };
-                if has_help && sub_opt.is_none() {
-                    println!(
-                        "Usage: fgos {} <subcommand> [args...]\n\nAvailable subcommands:\n  {}",
-                        name,
-                        available.join(", ")
-                    );
-                    std::process::exit(0);
-                }
                 match &sub_opt {
                     Some(sub) if available.contains(&sub.as_str()) => {}
                     Some(sub) => {

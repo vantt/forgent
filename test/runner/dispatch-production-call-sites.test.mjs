@@ -1,4 +1,9 @@
-// The two production call sites, exercised the way production calls them.
+// The in-session production call site, exercised the way production calls it.
+//
+// The runner loop's worker no longer launches through here: spawnWorker runs it as a Unit run
+// (runUnit), whose confinement and pane wiring are tested in test/runner/spawn-worker.test.mjs
+// and test/runner/execution/run-herdr.test.mjs; the fan-out batch's in
+// test/runner/fanout-batch-runner-commit.test.mjs.
 //
 // Every other herdr-spawn test builds the adapter's invocation by hand and
 // hands it straight to `EXECUTOR_ADAPTERS['herdr-spawn']`. That is a fine way
@@ -15,9 +20,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
-import { spawnWorker } from '../../src/runner/work-dispatch.mjs';
-import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
-import { loadRunnerConfigFromDir, normalizeLegacyConfinement } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
 const WORKER_SESSION = 'fgos-worker';
 
@@ -183,16 +186,6 @@ async function withMockHerdr(bin, fn) {
   }
 }
 
-const dispatch = (root, workId, opts = {}) => withMockHerdr(
-  path.join(root, 'herdr'),
-  () => spawnWorker(
-    { id: workId, kind: 'task', title: workId, domain: 'coding', stage: 'executing' },
-    loadRunnerConfigFromDir(root),
-    root,
-    { executorId: 'herdr-worker', fgosDir: path.join(root, '.fgos'), tier: 'standard', ...opts },
-  ),
-);
-
 const runStatus = (runDir) => JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8')).status;
 
 /** The single run directory an execution left (under assignments/ or dispatch-runs/). */
@@ -214,97 +207,6 @@ function soleRunDir(root) {
   assert.equal(stamps.length, 1);
   return path.join(base, workIds[0], stamps[0]);
 }
-
-test('a confinement the config declares reaches herdr, from the config file down', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
-  const root = fixtureRepo(confinedExecutor);
-  const mock = mockHerdr(root);
-  try {
-    assert.deepEqual(
-      loadRunnerConfigFromDir(root).executors['herdr-worker'].confinement,
-      normalizeLegacyConfinement({ privateHome: false, isolatedSession: true }),
-      'the config door accepted the declaration',
-    );
-
-    await dispatch(root, 'tsk-conf');
-
-    // A worker session is given a workspace to split from before any pane
-    // exists in it. If the declaration never reached the adapter, the round
-    // splits a pane in the operator's own session and this call never happens.
-    const calls = mock.calls();
-    assert.ok(
-      calls.some((c) => c[0] === 'workspace' && c[1] === 'create'),
-      `herdr was asked for the worker session's workspace; saw: ${JSON.stringify(calls.map((c) => c.slice(0, 2)))}`,
-    );
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
-
-test('a confinement that cannot be established refuses the dispatch instead of running unconfined', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
-  const root = fixtureRepo(confinedExecutor);
-  const mock = mockHerdr(root, { failWorkspaceCreate: true });
-  try {
-    await assert.rejects(
-      () => dispatch(root, 'tsk-conf-fail'),
-      (err) => {
-        assert.equal(err.errorClass, 'invalid-config');
-        // The reason is herdr's own code when herdr named one; the generic
-        // `confinement-unavailable` is the fallback for a failure that did not.
-        assert.match(err.message, /confinement was declared but could not be established/);
-        assert.ok(err.reason, `the refusal names a cause, got: ${err.reason}`);
-        return true;
-      },
-    );
-    // The refusal has to land before a pane exists, or a worker was already
-    // launched somewhere the profile said it must not be.
-    assert.ok(
-      !mock.calls().some((c) => c[0] === 'pane' && c[1] === 'split'),
-      'no pane was opened for a worker that could not be confined',
-    );
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
-
-test('an executor that declares no confinement dispatches exactly as before', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
-  const root = fixtureRepo();
-  const mock = mockHerdr(root);
-  try {
-    await dispatch(root, 'tsk-plain');
-    const calls = mock.calls();
-    assert.ok(!calls.some((c) => c[0] === 'workspace'), 'no worker session was made for an unconfined executor');
-    assert.ok(calls.some((c) => c[0] === 'pane' && c[1] === 'split'), 'the pane came from the ordinary path');
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
-
-test('a run this path opened is a run this path closes', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
-  const root = fixtureRepo();
-  mockHerdr(root);
-  try {
-    await dispatch(root, 'tsk-settle');
-    assert.equal(runStatus(soleRunDir(root)), 'settled');
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
-
-test('a dispatch that fails still closes its run -- a failure is an answer, not an unfinished round', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
-  const root = fixtureRepo(() => ({
-    ...HERDR_EXECUTOR,
-    interactiveMode: { exitCommand: '/exit', kind: 'agy', promptTimeoutMs: 10000, maxResends: 0 },
-  }));
-  mockHerdr(root, { silentWorker: true });
-  try {
-    await assert.rejects(() => dispatch(root, 'tsk-fails', { timeoutMs: 1500 }));
-    // `running` here would be the exact defect visibility-session.mjs exists
-    // to close: a round that ended long ago reading like one still in flight.
-    assert.notEqual(runStatus(soleRunDir(root)), 'running');
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
 
 test('the in-session entry point carries confinement too -- both call sites or neither', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo(confinedExecutor);
@@ -370,37 +272,35 @@ test('a caller that supplies its own run directory keeps it', { skip: process.pl
   }
 });
 
-test('a worker that reports success from the wrong checkout is refused, and the stray paths are named', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
-  // The failure this closes was measured, not imagined: agy was handed a
+test('a worker that writes into the main checkout instead of its workspace is flagged in the result, and the stray paths are named', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
+  // The failure this guards was measured, not imagined: agy was handed a
   // worktree, wrote six files into the main checkout -- onto a branch
-  // belonging to somebody else's work -- and reported settled. The ladder
-  // cannot see it: its subject is whether the round ended, never where.
+  // belonging to somebody else's work -- and reported settled. A snapshot of
+  // the main checkout cannot tell that worker from another session writing
+  // there at the same time, so the round is accepted and the paths travel as
+  // a warning on its result instead of a refusal.
   const root = fixtureRepo();
   const worktree = path.join(root, 'wt');
   fs.mkdirSync(worktree, { recursive: true });
   // The worker writes into the repo root instead of the worktree it was given.
   mockHerdr(root, { writesTo: path.join(root, 'src', 'setup') });
   try {
-    await assert.rejects(
-      () => withMockHerdr(path.join(root, 'herdr'), () => executeExecutorCli('herdr-worker', {
-        prompt: 'do the thing',
-        repoRoot: root,
-        cwd: worktree,
-        tier: 'standard',
-      })),
-      (err) => {
-        assert.equal(err.errorClass, 'worktree-fail');
-        assert.equal(err.reason, 'wrote-outside-workspace');
-        // git collapses a wholly-untracked directory to one entry, so what is
-        // named here is `src/` rather than the file inside it. In the incident
-        // this guards against the directory already existed and git listed the
-        // individual files; either way the refusal points at where to look.
-        assert.ok(err.strayPaths.some((p) => p.startsWith('src')),
-          `the refusal names where it appeared, got: ${JSON.stringify(err.strayPaths)}`);
-        assert.match(err.message, /wrote outside its workspace/);
-        return true;
-      },
-    );
+    const res = await withMockHerdr(path.join(root, 'herdr'), () => executeExecutorCli('herdr-worker', {
+      prompt: 'do the thing',
+      repoRoot: root,
+      cwd: worktree,
+      tier: 'standard',
+    }));
+    assert.equal(res.status, 0);
+    const [warning] = res.warnings ?? [];
+    assert.equal(warning?.code, 'stray-write-correlated');
+    assert.equal(warning?.level, 'correlated');
+    // git collapses a wholly-untracked directory to one entry, so what is
+    // named here is `src/` rather than the file inside it. In the incident
+    // this guards against the directory already existed and git listed the
+    // individual files; either way the warning points at where to look.
+    assert.ok(warning.paths.some((p) => p.startsWith('src')),
+      `the warning names where it appeared, got: ${JSON.stringify(warning.paths)}`);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -419,6 +319,7 @@ test('a worker that stays in its workspace is not accused of anything', { skip: 
       tier: 'standard',
     }));
     assert.equal(res.status, 0);
+    assert.equal(res.warnings, undefined, 'nothing appeared outside the workspace, so nothing is flagged');
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -584,94 +485,6 @@ test('http adapter routes through executeThroughConfinement and returns result w
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
-
-test('fanoutBatchExecutorCli in Work Driver coordinates pick -> execute -> return and recovers with return --to blocked on execution failure (R1)', async () => {
-  const root = fixtureRepo();
-  const fgosDir = path.join(root, '.fgos');
-
-  // Script that succeeds and commits
-  const okScript = path.join(root, 'ok-executor.mjs');
-  fs.writeFileSync(
-    okScript,
-    `
-    import { execFileSync } from 'node:child_process';
-    execFileSync('git', ['commit', '--allow-empty', '-m', 'worker work done'], { stdio: 'ignore' });
-    process.exit(0);
-    `,
-  );
-
-  // Script that fails with an exit code
-  const failScript = path.join(root, 'fail-executor.mjs');
-  fs.writeFileSync(
-    failScript,
-    `
-    console.error('fatal executor failure');
-    process.exit(1);
-    `,
-  );
-
-  const cfg = JSON.parse(fs.readFileSync(path.join(fgosDir, 'config.json'), 'utf8'));
-  cfg.runner.executors['worker-ok'] = {
-    kind: 'agent',
-    command: process.execPath,
-    args: [okScript],
-    allowCrossProvider: true,
-  };
-  cfg.runner.executors['worker-fail'] = {
-    kind: 'agent',
-    command: process.execPath,
-    args: [failScript],
-    allowCrossProvider: true,
-  };
-  cfg.runner.capabilities['fgos-coding-planning'] = { prefer: 'worker-ok' };
-  cfg.runner.capabilities[IMPLEMENT_CAPABILITY] = { prefer: 'worker-fail' };
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(cfg, null, 2));
-
-  addWork(fgosDir, {
-    id: 'cand-ok',
-    title: 'Candidate OK',
-    kind: 'task',
-    status: 'todo',
-    domain: 'coding',
-    workflowStep: 'planning',
-    deps: [],
-    refs: [],
-    risk: 'light',
-    verify: process.platform === 'win32' ? 'node -e "process.exit(0)"' : 'true',
-  });
-
-  addWork(fgosDir, {
-    id: 'cand-fail',
-    title: 'Candidate Fail',
-    kind: 'task',
-    status: 'todo',
-    domain: 'coding',
-    workflowStep: 'executing',
-    deps: [],
-    refs: [],
-    risk: 'light',
-    verify: process.platform === 'win32' ? 'node -e "process.exit(0)"' : 'true',
-  });
-
-  try {
-    const result = await fanoutBatchExecutorCli(['cand-ok', 'cand-fail'], { repoRoot: root, cwd: root });
-
-    assert.equal(result.fired.length, 2);
-    const okFired = result.fired.find((e) => e.id === 'cand-ok');
-    assert.equal(okFired?.status, 0);
-
-    const failFired = result.fired.find((e) => e.id === 'cand-fail');
-    assert.equal(failFired?.status, 1);
-
-    // Verify real store state
-    const view = listWork(fgosDir);
-    assert.equal(view.work['cand-ok'].status, 'awaiting-approval');
-    assert.equal(view.work['cand-fail'].status, 'blocked', 'failed executor must be settled to blocked rather than lingering in doing');
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
-
 
 test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.json', async () => {
   const root = fixtureRepo();

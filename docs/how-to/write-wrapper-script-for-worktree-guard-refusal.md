@@ -30,13 +30,12 @@ through Monitor in place of the refused compound line.
 ## When to use it
 
 Same trigger condition as before: a worktree-isolated session's Bash/
-Monitor tool refuses a compound command (e.g. `dispatch.mjs execute ...
---prompt "$(cat <file>)" ... 2>&1`) with "too complex to verify that it
+Monitor tool refuses a compound command (e.g. `fgos run "$(cat <file>)"
+--provider <executor> ... 2>&1`) with "too complex to verify that it
 stays inside the worktree" — even when the command has no `git`
 subcommand in it. See `docs/how-to/handle-worktree-guard-refusal-of-
 compound-dispatch-command.md` for the full background on why splitting
-into two tool calls doesn't work for this shape (it would lose the
-live-tee Monitor requirement).
+into two tool calls doesn't work for this shape.
 
 ## What this doesn't cover
 

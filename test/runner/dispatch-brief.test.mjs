@@ -4,6 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { briefPaths, renderBrief, renderPointer } from '../../src/runner/dispatch/brief.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
+import { renderAssignmentPrompt } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
 const RUN_DIR = path.join(os.tmpdir(), 'assignments', 'a1', 'runs', '01');
 
@@ -128,6 +130,51 @@ test('F2: renderBrief preserves read-only report-REQUIRED warning and unifies Ef
 
   // Claim path in Effective execution contract unified to result-1.json
   assert.match(brief, /Claim path: .*result-1\.json/);
+});
+
+test('a read-only pane brief keeps the line that says its outbox files are still to be written', () => {
+  const effectiveContract = {
+    contract: { id: 'effective-execution-contract', version: 1 },
+    mutation: 'read-only',
+    resultClaim: { path: path.join(RUN_DIR, 'outbox', 'result-1.json') },
+    limits: { timeoutMs: 30000 },
+    workspace: { writeScope: [] },
+    enforcementPosture: 'confined',
+  };
+  const prompt = renderAssignmentPrompt(
+    buildAssignment({ workId: 'tsk-brief-ro', stage: 'planning', operation: 'validate-plan' }),
+    { runDir: RUN_DIR, effectiveContract },
+  );
+  const brief = renderBrief({ prompt, round: 1, runDir: RUN_DIR, agentName: 'fgos-w1', effectiveContract });
+  assert.match(brief, /This operation is read-only: change nothing in the workspace\. Your result files are the exception/);
+  assert.match(brief, /Write scope: none in the workspace \(read-only\); your result files are still required/);
+  assert.match(brief, /Write only inside .*outbox/);
+});
+
+test('a mutating unit-run pane brief carries the write scope and leaves the commit to the runner', () => {
+  const effectiveContract = {
+    contract: { id: 'effective-execution-contract', version: 1 },
+    mutation: 'mutating',
+    resultClaim: { path: path.join(RUN_DIR, 'outbox', 'result-1.json') },
+    limits: { timeoutMs: 30000 },
+    workspace: { writeScope: ['/tmp/fgos-pane-brief/worktree'] },
+    enforcementPosture: 'confined',
+  };
+  const assignment = {
+    assignmentId: 'unit-run-2-def/producer-r1',
+    unitRunId: 'unit-run-2-def',
+    role: 'producer',
+    round: 1,
+    objective: 'Write the guide.',
+    mutation: 'mutating',
+    provenance: { kind: 'unit-run', unitRunId: 'unit-run-2-def', role: 'producer', round: 1 },
+    writes: ['docs/guide.md'],
+  };
+  const prompt = renderAssignmentPrompt(assignment, { runDir: RUN_DIR, effectiveContract });
+  const brief = renderBrief({ prompt, round: 1, runDir: RUN_DIR, agentName: 'fgos-w1', effectiveContract });
+  assert.match(brief, /Write only files inside this scope \(repo-relative\):\n {2}- docs\/guide\.md/);
+  assert.match(brief, /Do not run `git add` or `git commit`/);
+  assert.match(brief, /"needsWrites" must be an array of repo-relative paths if provided/);
 });
 
 test('R6 / M7 lock: resolveExecutorCommand warns on argv exceeding MAX_ARG_STRLEN (128 KiB)', () => {

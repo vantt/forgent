@@ -21,7 +21,7 @@
  * already dispatching this cwd, try again shortly"):
  *   - worker-spawn-fail  — the executor process could not be started.
  *   - worker-timeout     — the executor ran past its time budget.
- *   - dispatch-in-flight — another `dispatch.mjs execute` call already
+ *   - dispatch-in-flight — another dispatch of the same cwd already
  *                          holds the per-cwd lock for this dispatch (or the
  *                          lock file itself is corrupt/ambiguous) — a
  *                          transient condition, same shape as
@@ -58,6 +58,24 @@
  *                          it. Resolution needs branch-state facts the
  *                          runner already knows (has a commit, did that
  *                          commit's verify pass) — see `resolveStaleDoing`.
+ *   - provider-limit     — every candidate executor of the work's pool hit its
+ *                          provider limit (quota, paused account, refused
+ *                          capacity), after the Unit run already moved to
+ *                          each other account and candidate. Retrying now
+ *                          would meet the same limits, so it parks; the
+ *                          runner keeps serving other items.
+ *   - worker-failed      — the worker ran but its round did not pass (it failed,
+ *                          reported findings, or left a claim the runner
+ *                          refused) and it left uncommitted changes. The
+ *                          runner commits only a passing round, so those
+ *                          files are never judged by goal-check; a fresh
+ *                          attempt starts from the item's dispatch baseline.
+ *   - no-executor        — no executor may run the item's Unit (its capability
+ *                          has no pool it can bind, every candidate was
+ *                          refused, or none can carry the confined posture),
+ *                          decided before any worker started. A config gap
+ *                          of one capability parks that item and leaves the
+ *                          runner serving every other item.
  *   - state-conflict     — a CAS conflict on the RUNNER'S OWN write (i.e. the
  *                          runner raced someone else's write to the same
  *                          item). The runner never fights a human for a
@@ -75,6 +93,9 @@ export const ERROR_CLASSES = Object.freeze([
   'state-conflict',
   'dispatch-in-flight',
   'dispatch-depth-exceeded',
+  'provider-limit',
+  'worker-failed',
+  'no-executor',
 ]);
 
 /**
@@ -114,6 +135,9 @@ export const RECOVERY = Object.freeze({
   'state-conflict': Object.freeze({ action: 'halt' }),
   'dispatch-in-flight': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),
   'dispatch-depth-exceeded': Object.freeze({ action: 'park' }),
+  'provider-limit': Object.freeze({ action: 'park' }),
+  'worker-failed': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),
+  'no-executor': Object.freeze({ action: 'park' }),
 });
 
 /**

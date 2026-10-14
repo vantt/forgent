@@ -186,3 +186,33 @@ test('validateRunnerPatternsShape: enforces cumulative checkers across rigors', 
     },
   }, 'patterns'));
 });
+
+test('DEFAULT_RUNNER_CONFIG declares an empty generatedPaths list', () => {
+  assert.deepEqual(DEFAULT_RUNNER_CONFIG.generatedPaths, []);
+});
+
+test('runner.generatedPaths: well-formed {from, also} entries load', () => {
+  const { configPath } = mkTempConfig({
+    ...DEFAULT_RUNNER_CONFIG,
+    generatedPaths: [{ from: 'core/skills/**', also: ['.agents/skills/**', 'plugins/fgOS/skills/**'] }],
+  });
+  assert.deepEqual(loadRunnerConfig(configPath).generatedPaths[0].also, ['.agents/skills/**', 'plugins/fgOS/skills/**']);
+});
+
+test('runner.generatedPaths: malformed entries are refused at load', () => {
+  const cases = [
+    ['not-an-array', /generatedPaths must be an array/],
+    [[{ from: '**', also: ['x'] }], /generatedPaths\[0\]\.from/],
+    [[{ from: '*/x', also: ['y'] }], /generatedPaths\[0\]\.from/],
+    [[{ from: 'core', also: ['x'], extra: 1 }], /unknown key "extra"/],
+    [[{ from: 'core' }], /generatedPaths\[0\]\.also/],
+    [[{ from: 'core', also: [] }], /generatedPaths\[0\]\.also/],
+    [[{ from: 'core', also: ['../out'] }], /generatedPaths\[0\]\.also\[0\]/],
+    [[{ from: ':!core', also: ['x'] }], /generatedPaths\[0\]\.from/],
+    [['core'], /generatedPaths\[0\] must be an object/],
+  ];
+  for (const [generatedPaths, pattern] of cases) {
+    const { configPath } = mkTempConfig({ ...DEFAULT_RUNNER_CONFIG, generatedPaths });
+    assert.throws(() => loadRunnerConfig(configPath), (err) => err instanceof RunnerConfigError && pattern.test(err.message), JSON.stringify(generatedPaths));
+  }
+});

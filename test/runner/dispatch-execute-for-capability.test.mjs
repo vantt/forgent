@@ -1,8 +1,8 @@
-// `execute <executorId> --for <capability>`: the work names its capability and
-// the capability owns the posture. An agent executor declares no `for` of its
-// own (it can do any kind of work), so its posture is never inferred from the
-// executor; the CLI door refuses an agent dispatch that names no capability, and
-// the invocation that runs is the one that can carry the capability's posture.
+// `executeExecutorCli(executorId, { for: <capability> })`: the work names its
+// capability and the capability owns the posture. An agent executor declares no
+// `for` of its own (it can do any kind of work), so its posture is never inferred
+// from the executor, and the invocation that runs is the one that can carry the
+// capability's posture.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -99,15 +99,15 @@ test('execute <agent> --for <capability> runs the invocation the capability pref
   assert.equal(written(root), 'second:hello');
 });
 
-test('execute <agent> --for <confined capability> refuses before spawning and names both read-only doors', async () => {
+test('execute <agent> --for <confined capability> refuses before spawning and names the two runUnit doors for read-only work', async () => {
   const { root } = fixtureRepo();
   await assert.rejects(
     executeExecutorCli('fake', { for: 'code:review', prompt: 'hello', cwd: root, repoRoot: root }),
     (err) => {
       assert.equal(err.errorClass, 'posture-needs-assignment');
       assert.match(err.message, /fgos workflow start --units <file>/);
-      assert.match(err.message, /execute --contract <file> --executor fake/);
-      assert.match(err.message, /by instruction only, without a sandbox/);
+      assert.match(err.message, /fgos run "<prompt>" --provider fake/);
+      assert.doesNotMatch(err.message, /execute --contract/);
       return true;
     },
   );
@@ -126,48 +126,10 @@ test('execute <agent> --for refuses an unregistered capability', async () => {
   );
 });
 
-test('dispatch CLI execute <agent> without --for refuses before spawning and names the capabilities to choose from', async () => {
+test('dispatch CLI probe-account rejects a non-positive --timeout-ms', async () => {
   const { root } = fixtureRepo();
   await assert.rejects(
-    runDispatchCli(['execute', 'fake', '--prompt', 'hello', '--cwd', root, '--repo-root', root], { returnResult: true }),
-    (err) => {
-      assert.equal(err.errorClass, 'capability-required');
-      assert.match(err.message, /--for <capability>/);
-      assert.match(err.message, /--for execute/);
-      assert.match(err.message, /execute --contract <file> --executor fake/);
-      return true;
-    },
-  );
-  assert.equal(fs.existsSync(path.join(root, 'written.txt')), false);
-});
-
-test('dispatch CLI execute accepts --for next to a positional executor id', async () => {
-  const { root } = fixtureRepo();
-  const result = await runDispatchCli(
-    ['execute', 'fake', '--for', 'execute', '--prompt', 'from-cli', '--cwd', root, '--repo-root', root],
-    { returnResult: true },
-  );
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(written(root), 'first:from-cli');
-});
-
-test('dispatch CLI execute --timeout-ms overrides the configured timeout', async () => {
-  const { root } = fixtureRepo({ workerEnv: { FAKE_WORKER_SLEEP_MS: '5000' } });
-  const started = Date.now();
-  const result = await runDispatchCli(
-    ['execute', 'fake', '--for', 'execute', '--prompt', 'slow', '--timeout-ms', '500', '--cwd', root, '--repo-root', root],
-    { returnResult: true },
-  ).catch((err) => err);
-  assert.doesNotMatch(String(result?.message ?? ''), /--for|--timeout-ms must be/);
-  assert.ok(Date.now() - started < 4500, 'the 500ms override must end the run before the worker finishes');
-  assert.equal(fs.existsSync(path.join(root, 'written.txt')), false);
-  assert.ok(result instanceof Error || result.status !== 0, 'a timed-out run must not report success');
-});
-
-test('dispatch CLI execute rejects a non-positive --timeout-ms', async () => {
-  const { root } = fixtureRepo();
-  await assert.rejects(
-    runDispatchCli(['execute', 'fake', '--for', 'execute', '--timeout-ms', '0', '--cwd', root, '--repo-root', root], { returnResult: true }),
+    runDispatchCli(['probe-account', '--provider', 'fake', '--account', 'a1', '--timeout-ms', '0', '--cwd', root, '--repo-root', root], { returnResult: true }),
     /--timeout-ms must be a positive integer/,
   );
 });

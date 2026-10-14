@@ -54,14 +54,15 @@ import { execFileSync } from 'node:child_process';
 import { bind } from '../execution/bind.mjs';
 import { credentialFaultFamilies } from '../execution/account-rotation.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
-import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveContentRoot } from '../paths.mjs';
+import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolveTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
-import { normalizeProviderFamily, checkProviderDisallowed } from './provider-adapter.mjs';
+import { normalizeProviderFamily, checkProviderDisallowed, collectModelWarnings } from './provider-adapter.mjs';
+import { explicitReasoningEffort } from './assignment-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -269,82 +270,6 @@ export function isSubstantiveEvidenceRef(ref, opts = {}) {
 }
 
 /**
- * Roll back any repository state modifications caused by a read-only operation.
- * Restores modified tracked files and removes newly created untracked files in dir,
- * ignoring pre-existing dirty files in dirtyBefore.
- */
-function rollbackReadOnlyMutations(dir, changedFiles, dirtyBefore, gitBefore, gitAfter) {
-  if (!dir || !Array.isArray(changedFiles) || changedFiles.length === 0) return;
-  const dirtyBeforeSet = new Set(dirtyBefore ?? []);
-
-  if (gitBefore && gitAfter && gitBefore !== gitAfter) {
-    try {
-      execFileSync('git', ['reset', '--soft', gitBefore], {
-        cwd: dir,
-        stdio: ['ignore', 'ignore', 'ignore'],
-      });
-    } catch {
-      // ignore
-    }
-  }
-
-  for (const relPath of changedFiles) {
-    if (dirtyBeforeSet.has(relPath)) {
-      continue;
-    }
-    const fullPath = path.join(dir, relPath);
-    let existedAtBefore = false;
-    if (gitBefore) {
-      try {
-        execFileSync('git', ['cat-file', '-e', `${gitBefore}:${relPath}`], {
-          cwd: dir,
-          stdio: ['ignore', 'ignore', 'ignore'],
-        });
-        existedAtBefore = true;
-      } catch {
-        existedAtBefore = false;
-      }
-    } else {
-      try {
-        execFileSync('git', ['ls-files', '--error-unmatch', relPath], {
-          cwd: dir,
-          stdio: ['ignore', 'ignore', 'ignore'],
-        });
-        existedAtBefore = true;
-      } catch {
-        existedAtBefore = false;
-      }
-    }
-
-    try {
-      execFileSync('git', ['reset', 'HEAD', '--', relPath], {
-        cwd: dir,
-        stdio: ['ignore', 'ignore', 'ignore'],
-      });
-    } catch {
-      // ignore
-    }
-
-    if (existedAtBefore) {
-      try {
-        execFileSync('git', ['checkout', 'HEAD', '--', relPath], {
-          cwd: dir,
-          stdio: ['ignore', 'ignore', 'ignore'],
-        });
-      } catch {
-        // ignore
-      }
-    } else if (fs.existsSync(fullPath)) {
-      try {
-        fs.rmSync(fullPath, { recursive: true, force: true });
-      } catch {
-        // ignore
-      }
-    }
-  }
-}
-
-/**
  * Classify RunResult status and confidence from execution outcome and evidence
  * (Step 01 §11 / Step 03 §5.1 / Step 04 §5.2).
  *
@@ -522,7 +447,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
     const recomputed = bind(
       {
         unit: unitRecord.unit,
-        role: asgn.role,
+        role: seatRoleOf(asgn),
         readOnly: false,
         overrides: unitRecord.overrides || [],
       },
@@ -1244,8 +1169,14 @@ function attemptProviderCapacityFallback({
  * Anything else (first attempt, unknown assignment, earlier attempt not limited) binds from
  * the start of the pool, exactly as before.
  */
+// The seat a unit-run assignment fills: a unit running a Work step operation stamps the
+// operation's role on the assignment and keeps the seat's own name in provenance.
+function seatRoleOf(asgn) {
+  return asgn.provenance?.kind === 'unit-run' ? (asgn.provenance.role ?? asgn.role) : asgn.role;
+}
+
 function fallbackSkipIndex(unitRecord, asgn) {
-  const attempts = unitRecord.bindings?.[`${asgn.role}/${asgn.round}`];
+  const attempts = unitRecord.bindings?.[`${seatRoleOf(asgn)}/${asgn.round}`];
   if (!Array.isArray(attempts)) return -1;
   const at = attempts.findIndex((attempt) => attempt?.assignmentId === asgn.assignmentId);
   return skipIndexOfAttempt(attempts, at);
@@ -1253,7 +1184,7 @@ function fallbackSkipIndex(unitRecord, asgn) {
 
 // When the runner bound this attempt, from its own persisted record; null when it recorded none.
 function attemptBoundAt(unitRecord, asgn) {
-  const attempts = unitRecord.bindings?.[`${asgn.role}/${asgn.round}`];
+  const attempts = unitRecord.bindings?.[`${seatRoleOf(asgn)}/${asgn.round}`];
   const bound = Date.parse(attempts?.find((attempt) => attempt?.assignmentId === asgn.assignmentId)?.boundAt);
   return Number.isFinite(bound) ? bound : -Infinity;
 }
@@ -1296,6 +1227,59 @@ function releaseSelectedProviderLease(selection, runId, runtimeDir) {
   } catch (err) {
     process.stderr.write(`fgos: could not release the provider lease of ${selection.provider}/${selection.accountId} for ${runId}: ${err?.message ?? err}\n`);
   }
+}
+
+/** Real paths of the main checkout and of every worktree git lists for it. */
+function allowedInputRoots(mainRoot) {
+  const roots = new Set();
+  const add = (p) => { try { roots.add(fs.realpathSync(p)); } catch { /* a listed root that is gone holds nothing */ } };
+  add(mainRoot);
+  try {
+    // `-z` is not in every git this runs on; a worktree path holding a newline is then unlisted
+    // and its inputs get a null digest, which only ever fails closed.
+    const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], {
+      cwd: mainRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    for (const field of listing.split('\n')) {
+      if (!field.startsWith('worktree ')) continue;
+      const listed = field.slice('worktree '.length);
+      // A listed path that is now a symlink is not that worktree any more.
+      try { if (fs.lstatSync(listed).isSymbolicLink()) continue; } catch { continue; }
+      add(listed);
+    }
+  } catch { /* no git: only the main checkout is allowed */ }
+  return [...roots];
+}
+
+/**
+ * Hash each pinned input before the worker starts. An input is read only when its real path
+ * lies inside the main checkout or a worktree git lists for it; anything else (outside, a
+ * symlink pointing out, missing) is recorded with `sha256: null` and never read. `rel` is the
+ * path inside the root that holds it, so a consumer compares the same file across checkouts.
+ *
+ * @param {string[]|undefined} pinInputs absolute paths
+ * @param {string} mainRoot main checkout root
+ * @returns {Array<{path: string, root?: string, rel?: string, sha256: string|null, warning?: string}>}
+ */
+export function digestPinnedInputs(pinInputs, mainRoot) {
+  if (!Array.isArray(pinInputs) || pinInputs.length === 0) return [];
+  const roots = allowedInputRoots(mainRoot);
+  return pinInputs.map((p) => {
+    let real;
+    try { real = fs.realpathSync(p); } catch { return { path: p, sha256: null, warning: 'pin-missing' }; }
+    // The innermost root that holds it: a worktree may sit inside the main checkout.
+    const root = roots
+      .filter((r) => real === r || real.startsWith(`${r}${path.sep}`))
+      .sort((a, b) => b.length - a.length)[0];
+    if (!root) return { path: p, sha256: null, warning: 'pin-outside-allowed-roots' };
+    const rel = path.relative(root, real).split(path.sep).join('/');
+    try {
+      if (!fs.statSync(real).isFile()) return { path: p, root, rel, sha256: null, warning: 'pin-not-a-file' };
+      return { path: p, root, rel, sha256: crypto.createHash('sha256').update(fs.readFileSync(real)).digest('hex') };
+    } catch {
+      return { path: p, root, rel, sha256: null, warning: 'pin-unreadable' };
+    }
+  });
 }
 
 export async function executeAssignment(assignment, opts = {}) {
@@ -1521,24 +1505,11 @@ export async function executeAssignment(assignment, opts = {}) {
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
   const startedAt = new Date().toISOString();
 
-  // Plan content identity, recorded runner-side BEFORE the worker runs: the
-  // sha256 of the Work's plan.md at dispatch time. Cross-pass consumption
-  // recomputes this hash so a verdict computed against an older plan
-  // revision is never consumed, even when the worker hides the edit by
-  // rewinding file mtimes (the worker controls mtimes; it never controls
-  // this runner-recorded hash).
-  let planContentHash = null;
-  if (effectiveAssignment.workId && opts.work?.docsRef) {
-    try {
-      const planContentRoot = resolveContentRoot(root, effectiveAssignment.workId, opts.work.docsRef);
-      const planInputPath = path.join(planContentRoot, opts.work.docsRef, 'plan.md');
-      if (fs.existsSync(planInputPath)) {
-        planContentHash = crypto.createHash('sha256').update(fs.readFileSync(planInputPath)).digest('hex');
-      }
-    } catch {
-      planContentHash = null;
-    }
-  }
+  // Input identity, recorded runner-side BEFORE the worker runs: the sha256 of
+  // every file the Work layer pinned (its plan.md). Cross-pass consumption
+  // recomputes it so a verdict computed against older bytes is never consumed,
+  // even when the worker hides the edit by rewinding file mtimes.
+  const inputDigests = digestPinnedInputs(opts.pinInputs, root);
 
   // Atomic admission (replaces the prior readdirSync + max-attempt scan --
   // see admitRunAttempt's own doc comment for the full commit algorithm).
@@ -1613,7 +1584,7 @@ export async function executeAssignment(assignment, opts = {}) {
       ...(templateResolution ? { template: templateResolution.templateProvenance } : (effectiveAssignment.provenance?.template ? { template: effectiveAssignment.provenance.template } : {})),
       ...(compiledPlan ? { dispatchPlanPath: path.relative(root, path.join(runsDir, record.attemptStr, 'dispatch-plan.json')) } : {}),
       effectiveContractPath: path.relative(root, path.join(runsDir, record.attemptStr, EFFECTIVE_EXECUTION_CONTRACT_FILE)),
-      ...(planContentHash ? { planContentHash } : {}),
+      ...(inputDigests.length ? { inputDigests } : {}),
       cwd,
       startedAt,
       timeoutMs,
@@ -2141,6 +2112,9 @@ export async function executeAssignment(assignment, opts = {}) {
 
   const startTime = Date.now();
   let rawResult;
+  // What the launch rendered for effort and model, whichever spawn path ran.
+  let launchModelCheck = null;
+  let launchReasoningEffort;
   let executionError = null;
 
   const executorId = resolvedExecutorId;
@@ -2182,8 +2156,8 @@ export async function executeAssignment(assignment, opts = {}) {
   // racing the same lock file -- the second would see the first as HELD by
   // "a different holder" and refuse), so this is scoped to cli-spawn only.
   // Keyed on the SAME dispatchLockFile(cwd) name executeExecutorCli already
-  // uses, so a cli-spawn Assignment, a herdr-spawn Assignment, and an ad-hoc
-  // `dispatch execute` all contend on ONE lock file per cwd. A per-call
+  // uses, so a cli-spawn Assignment, a herdr-spawn Assignment, and a direct
+  // executeExecutorCli call all contend on ONE lock file per cwd. A per-call
   // string identity (matching executeExecutorCli's own scheme, not a bare
   // process.pid) is required because one long-lived process can dispatch
   // several different Assignments in a row (or concurrently) against the
@@ -2195,14 +2169,11 @@ export async function executeAssignment(assignment, opts = {}) {
   // -- an operator who already knows concurrent mutation here is safe skips
   // the acquisition entirely, same as never having contended for the lock.
   // Gated on `effectiveMutation === 'mutating'`: S4's own problem statement
-  // is concurrent MUTATING Assignments racing a cwd, and this repo's own
-  // test suite (assignment-dispatch.test.mjs's "genuinely concurrent
-  // invocations under the same --work id" Red-Team fix tests) already
-  // proves concurrent READ-ONLY dispatch to the SAME cwd through this exact
-  // cli-spawn/`--contract` door is intentional, existing, relied-upon
-  // behavior -- an unconditional lock here regressed both tests outright
-  // (verified by running them). Read-only Assignments never acquire and are
-  // therefore never blocked by, nor able to block, this lock.
+  // is concurrent MUTATING Assignments racing a cwd; concurrent READ-ONLY
+  // dispatch to the SAME cwd is intentional, relied-upon behavior
+  // (assignment-cwd-mutex-concurrency.test.mjs proves both). Read-only
+  // Assignments never acquire and are therefore never blocked by, nor able
+  // to block, this lock.
   let cwdLockRes = null;
   let cwdLockHeartbeat = null;
 
@@ -2393,6 +2364,8 @@ export async function executeAssignment(assignment, opts = {}) {
         resolvedCmd = resolveExecutorCommand(cfg, {
           prompt,
           model: effectivePolicy.model,
+          requestedModel: opts.cliOverride?.model,
+          reasoningEffort: explicitReasoningEffort(effectivePolicy),
           tier: effectivePolicy.tier,
           executorId: resolvedExecutorId,
           fgosDir,
@@ -2408,6 +2381,8 @@ export async function executeAssignment(assignment, opts = {}) {
           // source; neither pins anything for the unsubstituted
           invocationId: (hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : undefined) ?? fallbackInvocationId,
         });
+        launchModelCheck = resolvedCmd.modelCheck;
+        launchReasoningEffort = resolvedCmd.reasoningEffort;
       } catch (err) {
         const commandOutcome = {
           kind: 'submission-refused',
@@ -2673,6 +2648,8 @@ export async function executeAssignment(assignment, opts = {}) {
           repoRoot: root,
           runnerConfig: cfg,
           model: effectivePolicy.model,
+          requestedModel: opts.cliOverride?.model,
+          reasoningEffort: explicitReasoningEffort(effectivePolicy),
           tier: effectivePolicy.tier,
           timeoutMs,
           onChunk: opts.onChunk,
@@ -2762,6 +2739,9 @@ export async function executeAssignment(assignment, opts = {}) {
       executorId,
     };
 
+    const modelWarnings = launchModelCheck
+      ? collectModelWarnings(launchModelCheck, { stdout: rawResult?.stdout, stderr: rawResult?.stderr })
+      : (rawResult?.modelWarnings ?? []);
     const outcome = await settleRunOutcome({
       runDir,
       runMeta,
@@ -2784,10 +2764,12 @@ export async function executeAssignment(assignment, opts = {}) {
       dirtyBefore,
       dirtyAfter: safeGitStatusFiles(effectiveCwd),
       dirtyBeforeSnapshots,
-      planContentHash,
+      inputDigests,
       resolvedExecutorId,
       effectivePolicy,
       executorRedirected,
+      reasoningEffort: launchReasoningEffort ?? rawResult?.reasoningEffort,
+      modelWarnings,
       providerCapacitySelection,
       providerCapacityEvidence,
       fallbackEvidence,
@@ -2795,6 +2777,9 @@ export async function executeAssignment(assignment, opts = {}) {
       launchCommandId: useSupervisorRecovery ? launchCommandId : null,
       receipt: supervisorReceipt,
       adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,
+      // Which sandbox really ran: the herdr door's prepared launch or the dispatch's own attestation.
+      attestation: rawResult?.attestation ?? null,
+      dispatchWarnings: rawResult?.warnings ?? [],
       // The adapter that really ran, so result.json states the transport instead of a guess.
       opts: { ...opts, adapter: resolvedAdapter, repoRoot: root, cwd },
     });

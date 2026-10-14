@@ -575,6 +575,22 @@ test('findOverdue picks only in-tree test-file processes past their own limit; t
   assert.deepEqual(treeOf(procs, 300), [400, 300]);
 });
 
+test('findOverdue skips a process whose elapsed time is implausible for the run it belongs to', () => {
+  // A ps race on a just-forked process can report a start time near the epoch,
+  // which prints as an etime of hundreds of millions of days.
+  const procs = parsePs([
+    '  100     1    10:00 node run-tests.mjs',
+    '  200   100    10:00 node --test test/a.test.mjs',
+    '  300   200 441077234-00:18:40 /usr/bin/node test/a.test.mjs',
+    '  310   200    09:00 /usr/bin/node test/b.test.mjs',
+  ].join('\n'));
+  const limits = { 'test/a.test.mjs': 600_000, 'test/b.test.mjs': 60_000 };
+  assert.deepEqual(findOverdue(procs, 100, limits).map((o) => o.pid), [310]);
+  // Without the root's own elapsed time the absolute ceiling still applies.
+  const noRoot = parsePs('  300   100 441077234-00:18:40 /usr/bin/node test/a.test.mjs');
+  assert.deepEqual(findOverdue(noRoot, 100, limits), []);
+});
+
 for (const pauseAfterKill of [false, true]) {
   test(pauseAfterKill
     ? 'timeout evidence survives the nested runner finishing while the watchdog is paused after killing a file'

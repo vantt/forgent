@@ -859,3 +859,96 @@ test('P7: Repair local tail failure leaves workspace in diagnosable state with r
     fs.rmSync(tailFailCandidateDir, { recursive: true, force: true });
   }
 });
+
+test('download: fgctl upgrade downloads the target release, verifies SHA256SUMS, and records the tag in the pin so a teammate can init from it', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-dl-'));
+  const projA = path.join(root, 'proj-a');
+  const projB = path.join(root, 'proj-b');
+  const stateA = path.join(root, 'state-a');
+  const stateB = path.join(root, 'state-b');
+  const homeA = path.join(root, 'home-a');
+  const homeB = path.join(root, 'home-b');
+  const assets = path.join(root, 'assets');
+  const target = 'x86_64-unknown-linux-gnu';
+
+  try {
+    for (const d of [projA, projB, stateA, stateB, homeA, homeB, assets]) {
+      fs.mkdirSync(d, { recursive: true });
+    }
+    for (const p of [projA, projB]) {
+      execFileSync('git', ['init'], { cwd: p });
+      execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: p });
+      execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: p });
+    }
+
+    const assetA = `fgos-v0.1.0-${target}.tar.gz`;
+    const assetB = `fgos-v0.2.0-${target}.tar.gz`;
+    execFileSync('tar', ['-czf', assetA, '-C', releaseDirA, '.'], { cwd: assets });
+    execFileSync('tar', ['-czf', assetB, '-C', releaseDirB, '.'], { cwd: assets });
+    const sums = [
+      `${hashFile(path.join(assets, assetA))}  ${assetA}`,
+      `${hashFile(path.join(assets, assetB))}  ${assetB}`,
+    ].join('\n') + '\n';
+    fs.writeFileSync(path.join(assets, 'SHA256SUMS'), sums);
+
+    const baseUrl = `file://${assets.replace(/\\/g, '/')}`;
+
+    // 1. Init project A on v0.1.0 via download
+    const initRes = runFgctl(['init'], {
+      cwd: projA,
+      stateHome: stateA,
+      env: { HOME: homeA, FGCTL_VERSION: 'v0.1.0', FGCTL_TARGET: target, FGCTL_ASSET_BASE_URL: baseUrl },
+    });
+    assert.equal(initRes.status, 0, initRes.stderr);
+
+    // 2. Tampered SHA256SUMS for v0.2.0 refuses upgrade and leaves activation A untouched
+    fs.writeFileSync(path.join(assets, 'SHA256SUMS'), `${'0'.repeat(64)}  ${assetB}\n`);
+    const badUpg = runFgctl(['upgrade'], {
+      cwd: projA,
+      stateHome: stateA,
+      env: { HOME: homeA, FGCTL_VERSION: 'v0.2.0', FGCTL_TARGET: target, FGCTL_ASSET_BASE_URL: baseUrl },
+    });
+    assert.notEqual(badUpg.status, 0);
+    assert.match(badUpg.stderr, /checksum verification failed/);
+    const actAfterBad = JSON.parse(fs.readFileSync(path.join(projA, '.fgos', 'installation', 'activation.json'), 'utf8'));
+    assert.equal(actAfterBad.artifactDigest, digestA);
+
+    // Restore valid SHA256SUMS and upgrade to v0.2.0 via download
+    fs.writeFileSync(path.join(assets, 'SHA256SUMS'), sums);
+    const upgRes = runFgctl(['upgrade'], {
+      cwd: projA,
+      stateHome: stateA,
+      env: { HOME: homeA, FGCTL_VERSION: 'v0.2.0', FGCTL_TARGET: target, FGCTL_ASSET_BASE_URL: baseUrl },
+    });
+    assert.equal(upgRes.status, 0, upgRes.stderr);
+    assert.match(upgRes.stderr, /downloaded and verified fgos-v0\.2\.0-/);
+
+    const actB = JSON.parse(fs.readFileSync(path.join(projA, '.fgos', 'installation', 'activation.json'), 'utf8'));
+    assert.equal(actB.artifactDigest, digestB);
+    assert.equal(actB.previousArtifactDigest, digestA);
+    assert.equal(actB.pinSnapshot?.projectRuntime?.releaseVersion, 'v0.2.0');
+
+    const pinB = JSON.parse(fs.readFileSync(path.join(projA, '.fgos', 'distribution.json'), 'utf8'));
+    assert.equal(pinB.projectRuntime.artifactDigest, digestB);
+    assert.equal(pinB.projectRuntime.releaseVersion, 'v0.2.0', 'upgrade from a downloaded release must record the tag in .fgos/distribution.json');
+
+    // 3. Teammate clones only the updated .fgos/distribution.json into an empty machine store and runs plain `fgctl init`
+    fs.mkdirSync(path.join(projB, '.fgos'), { recursive: true });
+    fs.copyFileSync(
+      path.join(projA, '.fgos', 'distribution.json'),
+      path.join(projB, '.fgos', 'distribution.json'),
+    );
+    const teammateRes = runFgctl(['init'], {
+      cwd: projB,
+      stateHome: stateB,
+      env: { HOME: homeB, FGCTL_TARGET: target, FGCTL_ASSET_BASE_URL: baseUrl },
+    });
+    assert.equal(teammateRes.status, 0, teammateRes.stderr);
+    assert.match(teammateRes.stderr, /pinned release v0\.2\.0 is not staged on this machine; downloading it/);
+    const actTeammate = JSON.parse(fs.readFileSync(path.join(projB, '.fgos', 'installation', 'activation.json'), 'utf8'));
+    assert.equal(actTeammate.artifactDigest, digestB);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+

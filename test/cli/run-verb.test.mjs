@@ -158,3 +158,182 @@ test('fgos run record completes pending inline turn with verified evidence', () 
   assert.ok(stdout.includes('"ok": true'));
   assert.ok(stdout.includes(unitRunId));
 });
+
+// `fgos run "<prompt>"`: the CLI builds the unit itself and runs it through the same door.
+const runCli = (args, cwd) => execFileSync(process.execPath, [BIN_FGOS, 'run', ...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+const failCli = (args, cwd) => {
+  try {
+    runCli(args, cwd);
+  } catch (err) {
+    return err.stderr + err.stdout;
+  }
+  assert.fail(`fgos run ${args.join(' ')} should have failed`);
+};
+const unitRunsOf = (tmp) => {
+  const dir = path.join(tmp, '.fgos', 'assignments');
+  return fs.existsSync(dir) ? fs.readdirSync(dir).filter((name) => name.startsWith('unit-run-')) : [];
+};
+const unitRecordOf = (tmp, stdout) => {
+  const unitRunId = /"unitRunId": "([^"]+)"/.exec(stdout)[1];
+  return JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
+};
+
+test('fgos run "<prompt>" builds a read-only unit from the prompt and runs it', () => {
+  const tmp = setupTestRepo();
+  const stdout = runCli(['Write the release notes', '--capability', 'docs:write', '--dir', tmp], tmp);
+  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
+  const { unit } = unitRecordOf(tmp, stdout);
+  assert.match(unit.id, /^adhoc-write-the-release-notes-[0-9a-f]{4}$/);
+  assert.equal(unit.objective, 'Write the release notes');
+  assert.equal(unit.capability, 'docs:write');
+  assert.deepEqual(unit.writes, []);
+  assert.equal(unit.prefer, undefined);
+});
+
+test('fgos run "<prompt>" turns --provider, --persona and --rigor into the unit', () => {
+  const tmp = setupTestRepo();
+  fs.mkdirSync(path.join(tmp, 'fgos', 'agents'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'fgos', 'agents', 'test-voice.yaml'), 'name: test-voice\ndescription: A test voice\n');
+  const stdout = runCli(['Check it', '--capability', 'docs:write', '--provider', 'test-node', '--persona', 'test-voice', '--rigor', 'high', '--dir', tmp], tmp);
+  const record = unitRecordOf(tmp, stdout);
+  assert.deepEqual(record.unit.prefer, ['test-node']);
+  assert.equal(record.unit.persona, 'test-voice');
+  assert.equal(record.unit.rigor, 'high');
+  const binding = record.bindings['producer/1'][0].binding;
+  assert.equal(binding.provenance.executor.source, 'unit-prefer');
+  assert.deepEqual(binding.provenance.persona, { value: 'test-voice', source: 'unit' });
+});
+
+test('fgos run "<prompt>" refuses an unknown --provider and names the valid ones, before any unit run exists', () => {
+  const tmp = setupTestRepo();
+  const out = failCli(['Check it', '--capability', 'docs:write', '--provider', 'test-node,nope', '--dir', tmp], tmp);
+  assert.match(out, /unknown --provider "nope"/);
+  assert.match(out, /test-node/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run "<prompt>" refuses an unknown --persona before any unit run exists', () => {
+  const tmp = setupTestRepo();
+  const out = failCli(['Check it', '--capability', 'docs:write', '--persona', 'no-such-voice', '--dir', tmp], tmp);
+  assert.match(out, /persona "no-such-voice" not found/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run "<prompt>" --writes from the main checkout without --worktree asks for a worktree', () => {
+  const tmp = setupTestRepo();
+  const out = failCli(['Write notes', '--capability', 'docs:write', '--writes', 'notes.md', '--dir', tmp], tmp);
+  assert.match(out, /--writes needs a linked worktree: create one with `git worktree add <path>` and pass --worktree <path>/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run "<prompt>" --writes from a linked worktree records the write scope', () => {
+  const tmp = setupTestRepo();
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: tmp, stdio: 'ignore' });
+  const wt = makeFixtureDir('fgos-cli-run-wt-');
+  fs.rmSync(wt, { recursive: true, force: true });
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: tmp, stdio: 'ignore' });
+  let stdout;
+  try {
+    stdout = runCli(['Write notes', '--capability', 'docs:write', '--writes', 'notes.md,docs/a.md', '--dir', tmp], wt);
+  } catch (err) {
+    stdout = err.stdout;
+  }
+  const record = unitRecordOf(tmp, stdout);
+  assert.deepEqual(record.unit.writes, ['notes.md', 'docs/a.md']);
+  assert.equal(record.worktree, fs.realpathSync(wt));
+});
+
+test('fgos run "<prompt>" --effort reaches the override bind() reads', () => {
+  const tmp = setupTestRepo();
+  // The fixture's executor has no reasoning-effort flag, so the launch refuses the level; the
+  // override the unit run recorded is what this checks.
+  failCli(['Check it', '--capability', 'docs:write', '--effort', 'high', '--dir', tmp], tmp);
+  const [unitRunId] = unitRunsOf(tmp);
+  const record = JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
+  assert.deepEqual(record.overrides, [{ origin: 'human-cli', reasoningEffort: 'high' }]);
+  assert.equal(record.unit.objective, 'Check it');
+});
+
+test('fgos run "<prompt>" with both --provider and an --override executor: the override pins', () => {
+  const tmp = setupTestRepo();
+  const stdout = runCli(['Check it', '--capability', 'docs:write', '--provider', 'test-node', '--override', '{"executor":"test-node"}', '--dir', tmp], tmp);
+  const record = unitRecordOf(tmp, stdout);
+  assert.deepEqual(record.unit.prefer, ['test-node']);
+  assert.equal(record.bindings['producer/1'][0].binding.provenance.executor.source, 'override');
+});
+
+test('fgos run "<prompt>" makes an ascii id of bounded length from any prompt', () => {
+  const tmp = setupTestRepo();
+  const prompt = `Sửa lỗi đăng nhập: "quote" & <tag> ${'x'.repeat(200)}`;
+  const first = unitRecordOf(tmp, runCli([prompt, '--capability', 'docs:write', '--dir', tmp], tmp)).unit;
+  const second = unitRecordOf(tmp, runCli([prompt, '--capability', 'docs:write', '--dir', tmp], tmp)).unit;
+  assert.match(first.id, /^adhoc-[a-z0-9-]{1,40}-[0-9a-f]{4}$/);
+  assert.ok(first.id.startsWith('adhoc-sua-loi-dang-nhap-quote-tag-xxxxxxx'), first.id);
+  assert.equal(first.id.slice(0, -5), second.id.slice(0, -5), 'the same prompt gives the same slug');
+  assert.equal(first.objective, prompt);
+  const symbols = unitRecordOf(tmp, runCli(['!!! ???', '--capability', 'docs:write', '--dir', tmp], tmp)).unit;
+  assert.match(symbols.id, /^adhoc-task-[0-9a-f]{4}$/);
+});
+
+test('fgos run refuses a prompt together with --unit or --resume', () => {
+  const tmp = setupTestRepo();
+  assert.match(failCli(['Check it', '--unit', 'x.yaml', '--dir', tmp], tmp), /either a "<prompt>", --unit or --resume/);
+});
+
+test('fgos run "<prompt>" --writes with a --worktree that is the main checkout is refused before any unit run exists', () => {
+  const tmp = setupTestRepo();
+  const out = failCli(['Write notes', '--capability', 'docs:write', '--writes', 'notes.md', '--worktree', tmp, '--dir', tmp], tmp);
+  assert.match(out, /--writes needs a linked worktree/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run refuses one-liner flags without a prompt, an unquoted multi-word prompt, and an empty --writes', () => {
+  const tmp = setupTestRepo();
+  assert.match(failCli(['--unit', 'x.yaml', '--provider', 'test-node', '--dir', tmp], tmp), /--provider only applies to fgos run "<prompt>"/);
+  assert.match(failCli(['fix', 'the', 'typo', '--capability', 'docs:write', '--dir', tmp], tmp), /quote the prompt/);
+  assert.match(failCli(['Write notes', '--capability', 'docs:write', '--writes', '--dir', tmp], tmp), /--writes needs at least one path/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+// `--account <id>` pins the provider account through the same override field `--override` carries.
+// The fixture's executor has no account list, so a pin on it is refused before any unit run exists.
+const accountHome = () => {
+  const home = makeFixtureDir('fgos-cli-run-home-');
+  fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner: {} }));
+  return home;
+};
+const failCliHome = (args, cwd, home) => {
+  try {
+    execFileSync(process.execPath, [BIN_FGOS, 'run', ...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, HOME: home } });
+  } catch (err) {
+    return err.stderr + err.stdout;
+  }
+  assert.fail(`fgos run ${args.join(' ')} should have failed`);
+};
+
+test('fgos run "<prompt>" --account on an executor without an account list is refused before any unit run exists', () => {
+  const tmp = setupTestRepo();
+  const out = failCliHome(['Check it', '--capability', 'docs:write', '--account', 'acct1', '--dir', tmp], tmp, accountHome());
+  assert.match(out, /account "acct1" cannot be pinned: executor "test-node" \(provider "node"\) has no account list/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run --override with an "account" key is checked the same way', () => {
+  const tmp = setupTestRepo();
+  const out = failCliHome(['Check it', '--capability', 'docs:write', '--override', '{"account":"acct1"}', '--dir', tmp], tmp, accountHome());
+  assert.match(out, /has no account list/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run --resume refuses --account: a resumed run keeps the account it started with', () => {
+  const tmp = setupTestRepo();
+  const out = failCliHome(['--resume', 'unit-run-1-abc', '--account', 'acct1', '--dir', tmp], tmp, accountHome());
+  assert.match(out, /--account cannot change a resumed unit run/);
+});
+
+test('fgos run --account needs an account id', () => {
+  const tmp = setupTestRepo();
+  const out = failCliHome(['Check it', '--capability', 'docs:write', '--account', '--dir', tmp], tmp, accountHome());
+  assert.match(out, /--account requires an account id/);
+});

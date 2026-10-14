@@ -61,6 +61,10 @@ jobs:
           test/install/install-ps1.test.mjs
           test/install/install-sh.test.mjs
           test/rust-host/fgctl-init.test.mjs
+          test/rust-host/fgctl-init-activation.test.mjs
+          test/rust-host/fgctl-init-preflight-tail.test.mjs
+          test/rust-host/fgctl-init-download.test.mjs
+          test/rust-host/fgctl-init-download-sources.test.mjs
           test/rust-host/fgctl-upgrade.test.mjs
           test/rust-host/release-targets.test.mjs
           test/rust-host/release-tree.test.mjs

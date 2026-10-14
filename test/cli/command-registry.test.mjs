@@ -19,7 +19,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SRC_DIR = path.resolve(__dirname, '../../src');
 
 /** Every prose string a reader of `fgos --help`/`--help --json` can see:
- * the verb's own description plus each parameter's. */
+ * the verb's own description plus each parameter's, and the same for each sub-verb. */
 function describedStrings() {
   const out = [];
   for (const entry of COMMAND_REGISTRY) {
@@ -27,6 +27,14 @@ function describedStrings() {
     for (const [param, schema] of Object.entries(entry.parameters?.properties ?? {})) {
       if (typeof schema?.description === 'string') {
         out.push({ where: `${entry.name}.${param}.description`, text: schema.description });
+      }
+    }
+    for (const [sub, spec] of Object.entries(entry.subcommands ?? {})) {
+      out.push({ where: `${entry.name}.${sub}.description`, text: spec.description });
+      for (const [param, schema] of Object.entries(spec.parameters?.properties ?? {})) {
+        if (typeof schema?.description === 'string') {
+          out.push({ where: `${entry.name}.${sub}.${param}.description`, text: schema.description });
+        }
       }
     }
   }
@@ -105,7 +113,8 @@ test('no registry description names a step the default domain has retired', () =
   const offenders = [];
   for (const { where, text } of describedStrings()) {
     for (const step of retired) {
-      if (new RegExp(`\\b${step}\\b`).test(text)) offenders.push(`${where} names retired step "${step}"`);
+      // a standalone word only: a hyphenated value such as the friction reason `clarify-pass` is not the step
+      if (new RegExp(`(?<![\\w-])${step}(?![\\w-])`).test(text)) offenders.push(`${where} names retired step "${step}"`);
     }
   }
   assert.deepEqual(offenders, [], `registry prose names retired step(s):\n${offenders.join('\n')}`);

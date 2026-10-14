@@ -12,7 +12,7 @@ import { ensureMachineBackendRegistryDefaults } from "../../src/runner/dispatch/
 import { resolveConfinementPolicy } from "../../src/runner/dispatch/confinement/policies.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
 import { executeExecutorCli } from "../../src/runner/dispatch/cli.mjs";
-import { spawnWorker, workDispatchContext } from "../../src/runner/work-dispatch.mjs";
+import { workUnitFor, workDispatchContext } from "../../src/runner/work-dispatch.mjs";
 import { loadRunnerConfigFromDir, RunnerConfigError } from "../../src/runner/dispatch/config.mjs";
 
 test("buildConfinementRequest builds valid confinement-request.v1 shape at dispatch seam", () => {
@@ -252,71 +252,11 @@ test("confinement execution failure wraps into named DispatchError with attestat
   );
 });
 
-test("H1: spawnWorker resolves and binds curated capability confinement (code:implement) instead of ignoring it", async () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-h1-test-"));
-  // H10/D2: a missing backendId now defaults to 'bwrap' (never an outright
-  // refusal on its own), so this fixture must isolate itself from whatever
-  // 'bwrap' backend is ACTUALLY registered on the machine running the test
-  // (real dev machines commonly have one at ~/.fgos/confinement-backends.json)
-  // -- an empty registry keeps this test's own "no backend configured ->
-  // refuse" intent deterministic instead of racing real machine state.
-  const regPath = path.join(tmpDir, "confinement-backends.json");
-  fs.writeFileSync(regPath, JSON.stringify({ contract: "confinement-backend-registry.v1", confinementBackends: {} }));
-  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
-  const cfg = {
-    capabilities: {
-      "code:implement": {
-        confinement: { mode: "required", policy: "workspace-write" },
-      },
-    },
-    executors: {
-      "agy-cli": {
-        command: "agy",
-        adapter: "cli-spawn",
-        args: ["-p", "{prompt}"],
-        invocations: [{ via: "cli", command: "agy", args: ["-p", "{prompt}"] }],
-      },
-    },
-    executor: {
-      command: "agy",
-      adapter: "cli-spawn",
-      args: ["-p", "{prompt}"],
-      invocations: [{ via: "cli", command: "agy", args: ["-p", "{prompt}"] }],
-    },
-    modelPolicies: {
-      claude: { standard: "sonnet" },
-      gemini: { standard: "gemini-flash" },
-    },
-  };
-
-  const sampleWork = {
-    id: "work-h1",
-    domain: "coding",
-    workflowStep: "executing",
-    tier: "standard",
-    kind: "feat",
-  };
-
-  try {
-    await assert.rejects(
-      () => spawnWorker(sampleWork, cfg, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
-      (err) => {
-        assert.ok(err instanceof DispatchError);
-        assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
-        // H10/D2: the isolated empty registry above refuses at the shared
-        // backend-instance-resolution step (before the "required" branch's
-        // own message is ever built), since 'bwrap' -- the now-defaulted
-        // backendId -- simply isn't registered in it.
-        assert.match(err.message, /confinement backend instance "bwrap" not found in machine registry/);
-        return true;
-      },
-    );
-  } finally {
-    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
-  }
-});
+// spawnWorker no longer builds a confinement request of its own: it runs the worker as a Unit
+// run, whose posture comes from the Unit's writes (a writing Unit is always confined). A missing
+// backend refusing instead of running unconfined is tested in
+// test/runner/execution/run-posture.test.mjs; the loop-facing refusal in
+// test/runner/spawn-worker.test.mjs.
 
 test("M1: buildConfinementAttestation surfaces legacy confinement and bwrap observation in effectiveControls, coverage, grants, channels, and evidence", () => {
   const req = buildConfinementRequest({
@@ -546,93 +486,7 @@ test("HIGH-1 regression: fake adapter returning status/contract/result does not 
   assert.deepEqual(res.result.result, { custom: true }, "wrapped result preserves adapter result key");
 });
 
-test("MED-1: required policy on execute, advise, and stage names binds on spawnWorker", async () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med1-test-"));
-  // H10/D2: isolate from whatever 'bwrap' backend is actually registered on
-  // this machine -- see the H1 test above for the full rationale.
-  const regPath = path.join(tmpDir, "confinement-backends.json");
-  fs.writeFileSync(regPath, JSON.stringify({ contract: "confinement-backend-registry.v1", confinementBackends: {} }));
-  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
-  try {
-    const baseCfg = {
-      executors: {
-        claude: {
-          command: "claude",
-          adapter: "cli-spawn",
-          args: ["-p", "{prompt}"],
-          invocations: [{ via: "cli", command: "claude", args: ["-p", "{prompt}"] }],
-        },
-      },
-      executor: {
-        command: "claude",
-        adapter: "cli-spawn",
-        args: ["-p", "{prompt}"],
-        invocations: [{ via: "cli", command: "claude", args: ["-p", "{prompt}"] }],
-      },
-      modelPolicies: {
-        claude: { standard: "sonnet" },
-      },
-    };
-
-    // 1. Required policy on 'execute'
-    const cfgExecute = {
-      ...baseCfg,
-      capabilities: {
-        execute: { confinement: { mode: "required", policy: "workspace-write" } },
-      },
-    };
-    await assert.rejects(
-      () => spawnWorker({ id: "w-exec", domain: "coding", workflowStep: "executing", tier: "standard" }, cfgExecute, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
-      (err) => {
-        assert.ok(err instanceof DispatchError);
-        assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
-        assert.equal(err.capability, "execute");
-        return true;
-      },
-    );
-
-    // 2. Required policy on 'advise'
-    const cfgAdvise = {
-      ...baseCfg,
-      capabilities: {
-        advise: { confinement: { mode: "required", policy: "workspace-write" } },
-      },
-    };
-    await assert.rejects(
-      () => spawnWorker({ id: "w-adv", domain: "coding", workflowStep: "exploring", kind: "advise", tier: "standard" }, cfgAdvise, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
-      (err) => {
-        assert.ok(err instanceof DispatchError);
-        assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
-        assert.equal(err.capability, "advise");
-        return true;
-      },
-    );
-
-    // 3. Required policy on domain-folded stage name 'discovery'
-    const cfgDiscovery = {
-      ...baseCfg,
-      capabilities: {
-        discovery: { confinement: { mode: "required", policy: "workspace-write" } },
-      },
-    };
-    await assert.rejects(
-      () => spawnWorker({ id: "w-disc", domain: "coding", workflowStep: "discovery", tier: "standard" }, cfgDiscovery, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
-      (err) => {
-        assert.ok(err instanceof DispatchError);
-        assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
-        assert.equal(err.capability, "discovery");
-        return true;
-      },
-    );
-  } finally {
-    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
-    fs.rmSync(tmpDir, { recursive: true, force: true });
-  }
-});
-
-test("MED-2: spawnWorker and executeExecutorCli agree on capability identity for research domain", async () => {
+test("MED-2: the loop worker Unit and executeExecutorCli agree on capability identity for research domain", async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med2-test-"));
   // H10/D2: isolate from whatever 'bwrap' backend is actually registered on
   // this machine -- see the H1 test above for the full rationale.
@@ -667,13 +521,9 @@ test("MED-2: spawnWorker and executeExecutorCli agree on capability identity for
 
     const researchWork = { id: "w-research", domain: "research", workflowStep: "executing", tier: "standard" };
 
-    let spawnRefusedCap;
-    try {
-      await spawnWorker(researchWork, cfg, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") });
-    } catch (err) {
-      spawnRefusedCap = err.capability;
-    }
-    assert.equal(spawnRefusedCap, "code:implement", "spawnWorker folded research domain to coding and resolved code:implement");
+    // The loop's worker asks for the capability its Unit names.
+    const unitCapability = workUnitFor(researchWork, { cfg, worktree: tmpDir }).unitData.capability;
+    assert.equal(unitCapability, "code:implement", "the Unit folded research domain to coding and named code:implement");
 
     let cliRefusedCap;
     try {
@@ -798,80 +648,6 @@ test("MED-4: executor named bwrap without real bwrap invocation does not claim s
     "detail must state unverified or no policy declared",
   );
   assert.ok(!att.evidence.some((e) => e.ref.startsWith("bwrap-argv:")), "must not emit bwrap-argv evidence");
-});
-
-test("MED-5: fail-closed policy errors produce structured DispatchError with attestation and settled run.json", async () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med5-test-"));
-  const fgosDir = path.join(tmpDir, ".fgos");
-  fs.mkdirSync(fgosDir, { recursive: true });
-
-  try {
-    const cfg = {
-      capabilities: {
-        "code:implement": {
-          confinement: { mode: "required", policy: "non-existent-policy" },
-        },
-      },
-      executors: {
-        "agy-cli": {
-          command: "agy",
-          adapter: "cli-spawn",
-          args: ["-p", "{prompt}"],
-          invocations: [{ via: "cli", command: "agy", args: ["-p", "{prompt}"] }],
-        },
-      },
-      executor: {
-        command: "agy",
-        adapter: "cli-spawn",
-        args: ["-p", "{prompt}"],
-        invocations: [{ via: "cli", command: "agy", args: ["-p", "{prompt}"] }],
-      },
-      modelPolicies: { claude: { standard: "sonnet" }, gemini: { standard: "gemini-flash" } },
-    };
-
-    let caughtErr;
-    try {
-      await spawnWorker(
-        { id: "wleak", domain: "coding", workflowStep: "executing", tier: "standard" },
-        cfg,
-        tmpDir,
-        { fgosDir },
-      );
-    } catch (err) {
-      caughtErr = err;
-    }
-
-    assert.ok(caughtErr, "error must be thrown");
-    assert.ok(caughtErr instanceof DispatchError, "must be a DispatchError");
-    assert.equal(caughtErr.errorClass, "confinement-policy-error");
-    assert.equal(caughtErr.status, "refused");
-    assert.ok(caughtErr.dispatchId, "dispatchId must be present");
-    assert.ok(caughtErr.attestation, "attestation must be attached");
-    assert.equal(caughtErr.attestation.phase, "refused");
-    assert.equal(caughtErr.attestation.outcome, "refused");
-
-    // The dispatch-runs store is retired: a refused dispatch must not leave one behind,
-    // and no run record under assignments may be left at status 'running'.
-    assert.equal(fs.existsSync(path.join(fgosDir, "dispatch-runs")), false, "no dispatch-runs store is written");
-    const assignmentsDir = path.join(fgosDir, "assignments");
-    const stuck = [];
-    if (fs.existsSync(assignmentsDir)) {
-      const walk = (dir) => {
-        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-          const p = path.join(dir, entry.name);
-          if (entry.isDirectory()) walk(p);
-          else if (entry.name === "run.json") {
-            const rec = JSON.parse(fs.readFileSync(p, "utf8"));
-            if (rec.status === "running") stuck.push(p);
-          }
-        }
-      };
-      walk(assignmentsDir);
-    }
-    assert.deepEqual(stuck, [], "run.json must be closed, never stuck at running");
-  } finally {
-    fs.rmSync(tmpDir, { recursive: true, force: true });
-  }
 });
 
 test("HIGH-1: required confinement threads requirement through the REAL production door (executeThroughConfinement) into herdr-spawn adapterOpts", async () => {
