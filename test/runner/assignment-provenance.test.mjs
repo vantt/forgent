@@ -2,11 +2,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import { createAssignmentId } from '../../src/runner/dispatch/assignment.mjs';
+import { createAssignmentId, buildAssignment as buildAssignmentInDispatch } from '../../src/runner/dispatch/assignment.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { domainHarnessFor, loadHarnessModule } from '../../src/runner/work-dispatch.mjs';
+import os from 'node:os';
 
 function inlineContract(overrides = {}) {
   return {
@@ -235,15 +235,21 @@ function planningWorkFor(overrides = {}) {
   return { id: 'tsk-harness-wiring', workflowStep: 'planning', domain: 'coding', workflow: 'feature', ...overrides };
 }
 
-test('buildAssignment (inline) fires the domain harness seam when a Work with a domain and declared Stage is attached', () => {
-  const assignment = buildAssignment({
-    provenance: {
-      kind: 'inline',
-      contract: inlineContract({ role: 'reviewer', supports: 'validate-plan' }),
-      caller: inlineCaller(),
-    },
-    work: planningWorkFor({ docsRef: 'docs/history/harness-wiring' }),
+// The Work layer resolves the domain's harness for an item and hands it in; dispatch only runs it.
+async function inlineFor(work, contract, { domain, ...rest } = {}) {
+  const domainHarness = await domainHarnessFor(work, { domain });
+  return buildAssignment({
+    provenance: { kind: 'inline', contract, caller: inlineCaller() },
+    ...rest,
+    options: domainHarness ? { domainHarness } : {},
   });
+}
+
+test('buildAssignment (inline) fires the domain harness seam the Work layer resolved for a Work with a domain and declared Stage', async () => {
+  const assignment = await inlineFor(
+    planningWorkFor({ docsRef: 'docs/history/harness-wiring' }),
+    inlineContract({ role: 'reviewer', supports: 'validate-plan' }),
+  );
 
   assert.deepEqual(assignment.contextRefs, [
     'src/foo.mjs',
@@ -257,50 +263,38 @@ test('buildAssignment (inline) fires the domain harness seam when a Work with a 
   assert.deepEqual(assignment.provenance.validators, ['execution-contract-schema', 'domain-harness-seam']);
 });
 
-test('buildAssignment (inline) rejects a contract.supports illegal for the attached Work\'s stage (ADR-007 §3, exercised end to end)', () => {
-  assert.throws(
-    () =>
-      buildAssignment({
-        provenance: {
-          kind: 'inline',
-          contract: inlineContract({ role: 'reviewer', supports: 'implement-item' }),
-          caller: inlineCaller(),
-        },
-        work: planningWorkFor(),
-      }),
+test('buildAssignment (inline) rejects a contract.supports illegal for the attached Work\'s stage (ADR-007 §3, exercised end to end)', async () => {
+  await assert.rejects(
+    () => inlineFor(planningWorkFor(), inlineContract({ role: 'reviewer', supports: 'implement-item' })),
     (err) => err instanceof RunnerConfigError && /not a legal operation for step "planning"/.test(err.message),
   );
 });
 
-test('buildAssignment (inline) skips the harness seam entirely when no domain is resolvable (Work attached but no domain, no options.domain) -- ADR-007 §2', () => {
-  const assignment = buildAssignment({
-    provenance: { kind: 'inline', contract: inlineContract(), caller: inlineCaller() },
-    work: { id: 'tsk-no-domain', workflowStep: 'planning' },
-  });
+test('domainHarnessFor gives no harness when no domain is resolvable (Work attached but no domain, no domain option) -- ADR-007 §2', async () => {
+  const work = { id: 'tsk-no-domain', workflowStep: 'planning' };
+  assert.equal(await domainHarnessFor(work), undefined);
+  const assignment = await inlineFor(work, inlineContract());
   assert.deepEqual(assignment.provenance.validators, ['execution-contract-schema']);
   assert.equal(assignment.policy, undefined);
   // contextRefs/constraints are the agent-proposed contract's own, untouched.
   assert.deepEqual(assignment.contextRefs, ['src/foo.mjs']);
 });
 
-test('buildAssignment (inline) skips the harness seam when the Work has no declared stage yet, even with a domain present', () => {
-  const assignment = buildAssignment({
-    provenance: { kind: 'inline', contract: inlineContract(), caller: inlineCaller() },
-    work: { id: 'tsk-no-stage-yet', domain: 'coding' },
-  });
-  assert.deepEqual(assignment.provenance.validators, ['execution-contract-schema']);
+test('domainHarnessFor gives no harness when the Work has no declared stage yet, even with a domain present', async () => {
+  assert.equal(await domainHarnessFor({ id: 'tsk-no-stage-yet', domain: 'coding' }), undefined);
 });
 
-test('buildAssignment (inline) resolves domain from options.domain when the Work carries no domain field of its own', () => {
-  const assignment = buildAssignment({
-    provenance: {
-      kind: 'inline',
-      contract: inlineContract({ role: 'reviewer', supports: 'validate-plan' }),
-      caller: inlineCaller(),
-    },
-    work: { id: 'tsk-options-domain', workflowStep: 'planning', workflow: 'feature' },
-    options: { domain: 'coding' },
-  });
+test('domainHarnessFor gives no harness for a domain name that is not a registered domain', async () => {
+  assert.equal(await domainHarnessFor({ id: 'tsk-traversal', workflowStep: 'planning', domain: '../coding' }), undefined);
+  assert.equal(await domainHarnessFor({ id: 'tsk-unknown', workflowStep: 'planning', domain: 'no-such-domain' }), undefined);
+});
+
+test('domainHarnessFor resolves domain from the domain option when the Work carries no domain field of its own', async () => {
+  const assignment = await inlineFor(
+    { id: 'tsk-options-domain', workflowStep: 'planning', workflow: 'feature' },
+    inlineContract({ role: 'reviewer', supports: 'validate-plan' }),
+    { domain: 'coding' },
+  );
   assert.deepEqual(assignment.provenance.validators, ['execution-contract-schema', 'domain-harness-seam']);
 });
 
@@ -310,6 +304,17 @@ test('buildAssignment (inline) with no work attached at all never fires the harn
   });
   assert.deepEqual(assignment.provenance.validators, ['execution-contract-schema']);
   assert.equal(assignment.policy, undefined);
+});
+
+test('buildAssignment refuses a Work item instead of ignoring it, on both shapes', () => {
+  assert.throws(
+    () => buildAssignment({ provenance: { kind: 'inline', contract: inlineContract(), caller: inlineCaller() }, work: planningWorkFor() }),
+    (err) => err instanceof RunnerConfigError && /takes no Work item \(work\)/.test(err.message),
+  );
+  assert.throws(
+    () => buildAssignmentInDispatch({ domain: 'coding', operations: [], stage: 'planning', operation: 'validate-plan', work: planningWorkFor({ docsRef: 'docs/x' }) }),
+    (err) => err instanceof RunnerConfigError && /takes no Work item \(work\)/.test(err.message),
+  );
 });
 
 // ─── Inline contract explicit tier policy ───────────────────────────────────
@@ -350,89 +355,56 @@ test('buildAssignment (inline) rejects contract.policy = {preferExecutor: "x"} e
   );
 });
 
-test('buildAssignment (inline) preserves an explicit tier alongside a domain harness rigor policy', () => {
+test('buildAssignment (inline) preserves an explicit tier alongside a domain harness rigor policy', async () => {
   const assignment = buildAssignment({
     provenance: {
       kind: 'inline',
       contract: inlineContract({ role: 'reviewer', supports: 'validate-plan', policy: { tier: 'frontier' } }),
       caller: inlineCaller(),
     },
-    work: { id: 'tsk-harness-tier', workflowStep: 'planning', domain: 'coding', workflow: 'feature' },
+    options: { domainHarness: await domainHarnessFor({ id: 'tsk-harness-tier', workflowStep: 'planning', domain: 'coding', workflow: 'feature' }) },
   });
 
   assert.equal(assignment.policy.rigor, 'standard');
   assert.equal(assignment.policy.tier, 'frontier');
 });
 
-test('DOMAIN_HARNESS_SEAMS discovery isolates a broken domain harness module: it is skipped, not fatal to loading assignment.mjs for every other domain', () => {
-  // assignment.mjs resolves domainsRoot relative to its own on-disk location
-  // (path.resolve(thisDir, '../../../domains')), so the probe has to live
-  // under the real repo's domains/ directory -- there is no override for
-  // this. ESM caches a module by resolved path, so re-importing
-  // assignment.mjs from *this* process would just return the already-loaded
-  // (already-evaluated-without-the-probe) module; a fresh child process is
-  // the only way to force a fresh, uncached module evaluation that actually
-  // walks the discovery loop with the probe present (mirrors this repo's
-  // own precedent of exercising module/process behavior via
-  // execFileSync(process.execPath, [...]), e.g. test/runner/dispatch.test.mjs).
-  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-  const probeDomain = 'zzz-test-broken-harness-probe';
-  const probeHarnessDir = path.join(repoRoot, 'domains', probeDomain, 'harness');
-  const probeHarnessFile = path.join(probeHarnessDir, 'enrich-and-validate-contract.mjs');
+test('loadHarnessModule isolates a broken domain harness module: it counts as no harness, it does not throw', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-harness-probe-'));
   try {
-    fs.mkdirSync(probeHarnessDir, { recursive: true });
-    fs.writeFileSync(probeHarnessFile, "throw new Error('probe: broken harness module');\n");
-
-    const assignmentUrl = pathToFileURL(path.join(repoRoot, 'src/runner/dispatch/assignment.mjs')).href;
-    const script = `import(${JSON.stringify(assignmentUrl)})` +
-      `.then(() => { console.log('OK'); })` +
-      `.catch((e) => { console.error('FAILED:' + e.message); process.exitCode = 1; });`;
-    const out = execFileSync(process.execPath, ['-e', script], { encoding: 'utf8' });
-    assert.match(out, /OK/);
+    const broken = path.join(dir, 'broken.mjs');
+    fs.writeFileSync(broken, "throw new Error('probe: broken harness module');\n");
+    assert.equal(await loadHarnessModule(broken), undefined);
+    const noExport = path.join(dir, 'no-export.mjs');
+    fs.writeFileSync(noExport, 'export const other = 1;\n');
+    assert.equal(await loadHarnessModule(noExport), undefined);
+    assert.equal(await loadHarnessModule(path.join(dir, 'missing.mjs')), undefined);
+    const good = path.join(dir, 'good.mjs');
+    fs.writeFileSync(good, 'export function enrichAndValidateContract(contract) { return { contract }; }\n');
+    assert.equal(typeof (await loadHarnessModule(good)), 'function');
   } finally {
-    fs.rmSync(path.join(repoRoot, 'domains', probeDomain), { recursive: true, force: true });
+    fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
 test('buildAssignment (inline) re-validates the harness-enriched contract: an adversarial harness returning role/budget/capabilities values validateExecutionContract would reject pre-seam is caught, not smuggled through to the frozen Assignment', () => {
-  // Same fresh-child-process rationale as the broken-harness-module test
-  // above: DOMAIN_HARNESS_SEAMS is populated once, at module load time, so
-  // a probe domain added to domains/ after this test file's own top-level
-  // `buildAssignment` import would never be discovered by the already-
-  // evaluated module in this process.
-  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-  const probeDomain = 'zzz-test-adversarial-harness-probe';
-  const probeHarnessDir = path.join(repoRoot, 'domains', probeDomain, 'harness');
-  const probeHarnessFile = path.join(probeHarnessDir, 'enrich-and-validate-contract.mjs');
-  try {
-    fs.mkdirSync(probeHarnessDir, { recursive: true });
-    // A harness that imports cleanly but returns a contract with fields
-    // outside its own stated remit (role/budget/capabilities) tampered to
-    // values validateExecutionContract would already reject if a caller
-    // sent them directly, pre-seam.
-    fs.writeFileSync(
-      probeHarnessFile,
-      "export function enrichAndValidateContract(contract) {\n" +
-      "  return { contract: { ...contract, role: '', budget: { timeoutMs: -999, maxRuns: -5 }, capabilities: [123, null, {}] } };\n" +
-      "}\n",
-    );
-
-    const assignmentUrl = pathToFileURL(path.join(repoRoot, 'src/runner/dispatch/assignment.mjs')).href;
-    const script = `import(${JSON.stringify(assignmentUrl)}).then(async (mod) => {` +
-      `const work = { id: 'tsk-adversarial-probe', workflowStep: 'planning', domain: ${JSON.stringify(probeDomain)}, workflow: 'feature' };` +
-      `try {` +
-      `  mod.buildAssignment({ work, provenance: { kind: 'inline', contract: {` +
-      `    objective: 'probe', contextRefs: [], constraints: [], expectedOutputs: ['agent-report.md'],` +
-      `    mutation: 'read-only', evidence: { required: 'reported' }, role: 'researcher',` +
-      `    capabilities: [], budget: { timeoutMs: 1000, maxRuns: 1 } },` +
-      `    caller: { writerId: 'writer-probe' } } });` +
-      `  console.log('SUCCEEDED');` +
-      `} catch (e) { console.log('THREW:' + e.constructor.name + ':' + e.message); }` +
-      `}).catch((e) => { console.error('LOAD-FAILED:' + e.message); process.exitCode = 1; });`;
-    const out = execFileSync(process.execPath, ['-e', script], { encoding: 'utf8' });
-    assert.match(out, /^THREW:RunnerConfigError:/m);
-    assert.doesNotMatch(out, /SUCCEEDED/);
-  } finally {
-    fs.rmSync(path.join(repoRoot, 'domains', probeDomain), { recursive: true, force: true });
-  }
+  // A harness that runs cleanly but returns a contract with fields outside its own stated remit
+  // (role/budget/capabilities) tampered to values validateExecutionContract would already
+  // reject if a caller sent them directly, pre-seam.
+  const domainHarness = (contract) => ({ contract: { ...contract, role: '', budget: { timeoutMs: -999, maxRuns: -5 }, capabilities: [123, null, {}] } });
+  assert.throws(
+    () => buildAssignment({
+      provenance: {
+        kind: 'inline',
+        contract: {
+          objective: 'probe', contextRefs: [], constraints: [], expectedOutputs: ['agent-report.md'],
+          mutation: 'read-only', evidence: { required: 'reported' }, role: 'researcher',
+          capabilities: [], budget: { timeoutMs: 1000, maxRuns: 1 },
+        },
+        caller: { writerId: 'writer-probe' },
+      },
+      options: { domainHarness },
+    }),
+    (err) => err instanceof RunnerConfigError,
+  );
 });

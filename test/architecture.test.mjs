@@ -333,9 +333,6 @@ const RUN_DOOR_CALLERS = {
   commitUnitWork: ['src/runner/execution/run.mjs'],
   executeThroughConfinement: ['src/runner/dispatch/cli.mjs'],
 };
-// Work-layer callers that still reach these symbols directly until Work runs on runUnit.
-// This list only shrinks: a caller that leaves must leave this list in the same change.
-const R3_PENDING_WORK_CALLERS = {};
 // Where each symbol is defined. Its home and the dispatch barrel may define or re-export it; calling it still counts.
 const RUN_DOOR_HOMES = {
   executeAssignment: 'src/runner/dispatch/assignment-runner.mjs',
@@ -358,15 +355,12 @@ export function usesSymbol(rawSource, symbol) {
   return new RegExp(`\\b${symbol}\\b`).test(stripped);
 }
 
-/** Pure check: files using each symbol, against its allowed set plus the R3 allowlist (equality). */
+/** Pure check: files using each symbol, against exactly its named callers. */
 export function checkRunDoorCallers(usesBySymbol) {
   const violations = [];
   for (const [symbol, files] of Object.entries(usesBySymbol)) {
-    const allowed = new Set([...(RUN_DOOR_CALLERS[symbol] ?? []), ...(R3_PENDING_WORK_CALLERS[symbol] ?? [])]);
+    const allowed = new Set(RUN_DOOR_CALLERS[symbol] ?? []);
     for (const file of files) if (!allowed.has(file)) violations.push(`${symbol}: unexpected caller ${file}`);
-    for (const file of R3_PENDING_WORK_CALLERS[symbol] ?? []) {
-      if (!files.includes(file)) violations.push(`${symbol}: ${file} no longer calls it -- drop it from R3_PENDING_WORK_CALLERS`);
-    }
   }
   return violations;
 }
@@ -402,8 +396,11 @@ function runDoorUses() {
   return uses;
 }
 
-test('run-door call sites: executeAssignment, executeExecutorCli, commitUnitWork and executeThroughConfinement are called only from their named files plus R3_PENDING_WORK_CALLERS', () => {
-  assert.deepEqual(checkRunDoorCallers(runDoorUses()), []);
+test('run-door call sites: executeAssignment, executeExecutorCli, commitUnitWork and executeThroughConfinement are called only from their named files', () => {
+  const uses = runDoorUses();
+  assert.deepEqual(checkRunDoorCallers(uses), []);
+  // Each named caller still calls it: a door nobody uses any more leaves this table.
+  for (const [symbol, files] of Object.entries(RUN_DOOR_CALLERS)) assert.deepEqual([...uses[symbol]].sort(), [...files].sort(), symbol);
   const relays = runDoorScanFiles().flatMap((file) => findStarRelaysOfRunDoors(file, fs.readFileSync(path.join(root, file), 'utf8')));
   assert.deepEqual(relays, []);
 });
@@ -892,4 +889,134 @@ test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workfl
     }
   }
   assert.deepEqual(violations, [], `Expected no domain/step literal in dispatch/execution, found:\n${violations.join('\n')}`);
+});
+
+// Work is only a consumer of dispatch: the A4-guarded files take generic inputs (a rigor, a
+// domain, an executor identity, capability hints, an agent type) and never handle a Work item.
+// Any identifier, property or key named `work`, `workItem` or `docsRef` is that item's shape,
+// and resolveContentRoot() is the Work layer's own way of finding its documents.
+const WORK_SHAPED_TOKEN = /(?<![\w$])(work|workItem|docsRef)(?![\w$])|(?<![\w$])resolveContentRoot\s*\(/g;
+// A quoted name used as a computed key (`opts['work']`) or a property key (`{ 'work': w }`).
+const WORK_SHAPED_QUOTED_KEY = /\[\s*(['"`])(work|workItem|docsRef)\1\s*\]|(['"`])(work|workItem|docsRef)\3\s*:/g;
+
+/** Lines of `rawSource` that hand a Work-shaped input around, comments and literal text ignored. */
+export function findWorkShapedInputs(file, rawSource) {
+  const { code, shape } = lexSource(rawSource);
+  const shapeLines = shape.split('\n');
+  const codeLines = code.split('\n');
+  const rawLines = rawSource.split('\n');
+  const hits = [];
+  shapeLines.forEach((line, i) => {
+    const token = [...line.matchAll(WORK_SHAPED_TOKEN)];
+    const quoted = [...codeLines[i].matchAll(WORK_SHAPED_QUOTED_KEY)];
+    if (token.length || quoted.length) hits.push(`${file}:${i + 1}: ${rawLines[i].trim()}`);
+  });
+  return hits;
+}
+
+// A dynamic import() or require() whose specifier is not one plain literal, createRequire, and
+// node:module itself load code the import guards above cannot follow. Each file allowed one is
+// named here with the reason; nothing else in the guarded set may load code by a computed name.
+const DYNAMIC_LOAD_ALLOWLIST = {
+  'src/runner/dispatch/provider-credential-renewal.mjs': 'createRequire loads the node:sqlite builtin by its literal name, nothing else',
+};
+const LITERAL_SPECIFIER = /^\s*(?:'[^'\\\n]*'|"[^"\\\n]*"|`[^`$\\]*`)\s*[,)]/;
+
+/** Code loads in `rawSource` that name their target only at run time. */
+export function findDynamicLoads(file, rawSource) {
+  const { code, shape } = lexSource(rawSource);
+  const hits = [];
+  const lineOf = (index) => shape.slice(0, index).split('\n').length;
+  for (const m of shape.matchAll(/(?<![\w$.])(import|require)\s*\(/g)) {
+    const after = code.slice(m.index + m[0].length);
+    if (!LITERAL_SPECIFIER.test(after)) hits.push(`${file}:${lineOf(m.index)}: ${m[1]}() of a computed specifier`);
+  }
+  for (const m of shape.matchAll(/(?<![\w$])(createRequire|eval)(?![\w$])|(?<![\w$.])new\s+Function\b/g)) {
+    hits.push(`${file}:${lineOf(m.index)}: ${m[0]}`);
+  }
+  for (const spec of extractImports(code)) {
+    if (spec === 'module' || spec === 'node:module') hits.push(`${file}: imports ${spec}`);
+  }
+  return hits;
+}
+
+test('Work stays a consumer: dispatch, execution, the dispatch barrel and src/workflow/** take no Work-shaped input', () => {
+  const violations = a4GuardedFiles().flatMap((file) => findWorkShapedInputs(file, fs.readFileSync(path.join(root, file), 'utf8')));
+  assert.deepEqual(violations, [], `Expected no Work-shaped input in the A4-guarded files, found:\n${violations.join('\n')}`);
+});
+
+test('Work-shaped input guard catches each way a Work item can come in, and ignores comments, strings and longer names', () => {
+  const caught = [
+    'function f(opts) { return opts.work.id; }',
+    'const r = opts?.work?.refs;',
+    'const w = opts.work;',
+    "const w = opts['work'];",
+    'const w = opts[`workItem`];',
+    "const { 'work': w } = opts;",
+    'const x = assignment.provenance.work;',
+    'if (work?.rigor) {}',
+    'const { work, stage } = opts;',
+    'const {\n  stage,\n  work: item,\n} = opts;',
+    'function build({ work }) {}',
+    'function build(work) {}',
+    'const f = (work) => work;',
+    'const f = work => 1;',
+    'call({ work });',
+    'const plan = item.docsRef;',
+    'const { workItem } = resolved;',
+    'const root = resolveContentRoot(stateRoot, id, ref);',
+    'const t = `${opts.work.id}`;',
+  ];
+  for (const source of caught) assert.equal(findWorkShapedInputs('x.mjs', source).length, 1, source);
+  const ignored = [
+    '// opts.work used to arrive here',
+    '/* work.rigor */ const a = 1;',
+    "const msg = 'no work item found';",
+    "import { a } from './commit-unit-work.mjs';",
+    'const id = assignment.workId ?? workIdArg;',
+    'const n = workflow.steps; const k = frameworks;',
+    "const selector = { type: 'work', value: id };",
+    'const t = `work ${id}`;',
+  ];
+  for (const source of ignored) assert.deepEqual(findWorkShapedInputs('x.mjs', source), [], source);
+});
+
+test('A4 dynamic-load guard: no computed import()/require(), createRequire or eval in the guarded files beyond the named allowlist', () => {
+  const violations = [];
+  const allowedSeen = new Set();
+  for (const file of a4GuardedFiles()) {
+    const hits = findDynamicLoads(file, fs.readFileSync(path.join(root, file), 'utf8'));
+    if (!hits.length) continue;
+    if (Object.hasOwn(DYNAMIC_LOAD_ALLOWLIST, file)) allowedSeen.add(file);
+    else violations.push(...hits);
+  }
+  assert.deepEqual(violations, [], `Expected no computed code load in the A4-guarded files, found:\n${violations.join('\n')}`);
+  // An allowlisted file that stopped loading dynamically leaves the list.
+  assert.deepEqual([...allowedSeen].sort(), Object.keys(DYNAMIC_LOAD_ALLOWLIST).sort());
+});
+
+test('A4 dynamic-load guard catches a computed specifier, createRequire and eval, and passes literal loads', () => {
+  const caught = [
+    'const m = await import(pathToFileURL(p).href);',
+    'const m = await import(spec);',
+    'const m = await import(`../${name}.mjs`);',
+    "const m = await import('../' + name);",
+    'const m = require(name);',
+    "import { createRequire } from 'node:module';",
+    "import * as nodeModule from 'module';",
+    'const r = nodeModule.createRequire(import.meta.url);',
+    "eval('1');",
+    "const f = new Function('return 1');",
+  ];
+  for (const source of caught) assert.ok(findDynamicLoads('x.mjs', source).length >= 1, source);
+  const passed = [
+    "const YAML = await import('yaml');",
+    "spawnPromise = import('./herdr-round.mjs').then((m) => m);",
+    'const m = await import(`./fixed.mjs`);',
+    "const url = new URL('./x', import.meta.url);",
+    'const t = `const fs = require(${JSON.stringify(x)});`;',
+    '// await import(spec)',
+    'obj.require(name); obj.import(x);',
+  ];
+  for (const source of passed) assert.deepEqual(findDynamicLoads('x.mjs', source), [], source);
 });

@@ -8,10 +8,14 @@
 import { buildAssignment as buildAssignmentCore } from '../../src/runner/dispatch/assignment.mjs';
 import { getDomain, operationsForStep, resolveDomainName } from '../../src/state/domain-registry.mjs';
 
+// A test may hand in the Work item it stands for; like the Work layer, this reads the item's id,
+// domain, kind and workflow off it and never passes the item itself to dispatch.
 export function buildAssignment(params = {}) {
   if (params?.provenance?.kind === 'inline') return buildAssignmentCore(params);
-  const domain = params.domain ?? resolveDomainName(params.work?.domain, { onUnrecognized: () => {} });
-  const operations = params.operations ?? operationsForStep(getDomain(domain, { onUnrecognized: () => {} }), params.stage, params.work?.kind);
-  const workflow = params.workflow ?? params.work?.workflow ?? getDomain(domain, { onUnrecognized: () => {} }).defaultWorkflow;
-  return buildAssignmentCore({ ...params, domain, operations, workflow });
+  const { work: item, ...rest } = params;
+  const domain = rest.domain ?? resolveDomainName(item?.domain, { onUnrecognized: () => {} });
+  const operations = rest.operations ?? operationsForStep(getDomain(domain, { onUnrecognized: () => {} }), rest.stage, item?.kind);
+  const workflow = rest.workflow ?? item?.workflow ?? getDomain(domain, { onUnrecognized: () => {} }).defaultWorkflow;
+  const workId = rest.workId ?? item?.id;
+  return buildAssignmentCore({ ...rest, ...(workId !== undefined ? { workId } : {}), domain, operations, workflow });
 }

@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath, resolveContentRoot } from './paths.mjs';
 import { loadAgentDefs, readTaskSpecHeader } from './agent-roster.mjs';
 import { selectTemplate, hashTemplate } from './prompt-templates.mjs';
@@ -21,7 +22,7 @@ import { DispatchError } from './dispatch/dispatch-error.mjs';
 import { resolveAgentTypeForTaskSpec, watchWritesOutsideWorkspace, strayWriteWarning } from './dispatch/cli.mjs';
 import { runUnit, resolveGitRoots } from './execution/run.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHints, buildPrompt } from './work-compat.mjs';
-import { getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';
+import { DOMAINS, getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';
 import { listWork } from '../state/store.mjs';
 
 /**
@@ -254,21 +255,69 @@ function describeBinding(mainRoot, unitRunId, binding) {
  */
 export function resolveWorkForDispatch({ workId, stage, fgosDir }) {
   const work = listWork(fgosDir).work?.[workId];
-  if (!work) return null;
-  return { workItem: work, executorId: executorIdForWork(work, stage) };
+  return work ? workDispatchHint(work, stage) : null;
 }
 
 /**
- * The generic, Work-agnostic inputs a Work-driven dispatch hands dispatch: the Work
- * item as data, the capability hints its step implies, and the agent type its task spec
- * resolves to. Spread into `executeAssignment` options.
+ * What dispatch needs to know about `work` at `stage` to decide its executor, as plain
+ * generic fields: the executor identity its step resolves to (null when the Workflow declares
+ * none), the item's own agent type, its rigor demand (`rigor`, or `risk: heavy` read as high)
+ * and its domain. The item itself never crosses into dispatch.
+ */
+export function workDispatchHint(work, stage) {
+  const rigor = workRigorFor(work);
+  return {
+    workExecutorId: executorIdForWork(work, stage) ?? null,
+    agentType: typeof work.agentType === 'string' && work.agentType ? work.agentType : null,
+    ...(rigor !== undefined ? { rigor } : {}),
+    ...(typeof work.domain === 'string' && work.domain ? { domain: work.domain } : {}),
+  };
+}
+
+/**
+ * The generic, Work-agnostic inputs a Work-driven dispatch hands dispatch: the capability
+ * hints its step implies and the agent type its task spec resolves to. Spread into
+ * `executeExecutorCli` options; the Work item itself never crosses.
  */
 export function workDispatchContext({ work, stage, cwd, executorId } = {}) {
   return {
-    work,
     capabilityHints: workCapabilityHints({ work, stage, executorId }),
     agentType: work ? resolveAgentTypeForWork(work, cwd, stage) : null,
   };
+}
+
+// Each harness module, loaded once on first use. A module that fails to import (syntax error,
+// missing dependency, a throw at import time) counts as no harness, so one broken domain never
+// takes down every other one.
+const harnessModules = new Map();
+
+/** The `enrichAndValidateContract` export of the harness module at `harnessPath`, or undefined. */
+export async function loadHarnessModule(harnessPath) {
+  if (!harnessModules.has(harnessPath)) {
+    let enrich;
+    if (fs.existsSync(harnessPath)) {
+      try {
+        const mod = await import(pathToFileURL(harnessPath).href);
+        if (typeof mod.enrichAndValidateContract === 'function') enrich = mod.enrichAndValidateContract;
+      } catch { /* treated as no harness, see above */ }
+    }
+    harnessModules.set(harnessPath, enrich);
+  }
+  return harnessModules.get(harnessPath);
+}
+
+/**
+ * The domain harness seam (ADR-007 §1/§2) for an inline contract proposed on behalf of `work`,
+ * as the `options.domainHarness` function dispatch's inline `buildAssignment` takes. Only an
+ * item at a declared Stage with a domain (its own, or `domain`) gets one, and only when that
+ * domain ships a harness module; otherwise `undefined` and the contract passes on generic
+ * validation alone.
+ */
+export async function domainHarnessFor(work, { domain } = {}) {
+  const domainName = work?.workflowStep ? (work.domain ?? domain) : undefined;
+  if (!domainName || typeof domainName !== 'string' || !DOMAINS[domainName]) return undefined;
+  const enrich = await loadHarnessModule(path.resolve(import.meta.dirname, '../../domains', domainName, 'harness', 'enrich-and-validate-contract.mjs'));
+  return enrich ? (contract) => enrich(contract, { domain: domainName, work }) : undefined;
 }
 
 /**

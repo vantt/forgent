@@ -62,7 +62,7 @@ import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolveTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
 import { normalizeProviderFamily, checkProviderDisallowed, collectModelWarnings } from './provider-adapter.mjs';
-import { explicitReasoningEffort } from './assignment-policy.mjs';
+import { explicitReasoningEffort, refuseWorkItemInput } from './assignment-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -255,7 +255,6 @@ export function isSubstantiveEvidenceRef(ref, opts = {}) {
 
   const known = new Set([
     ...(opts.assignment?.contextRefs || []),
-    ...(opts.work?.refs || []),
     ...(opts.choice?.contextRefs || []),
   ]);
   if (known.has(trimmed)) {
@@ -1024,7 +1023,6 @@ function attemptProviderCapacityFallback({
   runId,
   cliOverride,
   options,
-  work,
   hasLiveTaskAccess,
   providerCapacityRuntimeDir,
   providerCapacityRunIsDead,
@@ -1048,7 +1046,6 @@ function attemptProviderCapacityFallback({
         compilePlan: (id) => compileDispatchPlan(cfg, {
           assignment: effectiveAssignment.assignmentId,
           assignmentItem: effectiveAssignment,
-          workItem: work,
           hasLiveTaskAccess: hasLiveTaskAccess ?? false,
           cliOverride: {
             ...(cliOverride || {}),
@@ -1283,6 +1280,7 @@ export function digestPinnedInputs(pinInputs, mainRoot) {
 }
 
 export async function executeAssignment(assignment, opts = {}) {
+  refuseWorkItemInput(opts, 'executeAssignment');
   validateAssignmentLegality(assignment, opts);
 
   const cwd = opts.cwd ?? process.cwd();
@@ -1430,10 +1428,9 @@ export async function executeAssignment(assignment, opts = {}) {
   // decided-executor-vs-policy-executor agreement internally -- this call
   // site no longer resolves policy a second time or re-checks that
   // agreement; both used to happen here, separately, and could only ever
-  // agree or throw, never usefully disagree. `workItem: opts.work` is
-  // threaded through so the merged policy resolution sees the real Work
-  // object for rigor monotonicity (work.rigor/work.risk), the same object
-  // the removed direct call used to pass as `work`.
+  // agree or throw, never usefully disagree. Rigor monotonicity reads the
+  // assignment's own policy and `rigor` (the caller's demand); dispatch is
+  // never handed a Work item.
   // `let`, not `const`: a provider-capacity refusal below (Phase B,
   // plans/260917-executor-profile-schema-migration/plan.md) may replace
   // this with a governance-scoped fallback candidate's own compiled plan,
@@ -1442,7 +1439,6 @@ export async function executeAssignment(assignment, opts = {}) {
   let compiledPlan = compileDispatchPlan(cfg, {
     assignment: effectiveAssignment.assignmentId,
     assignmentItem: effectiveAssignment,
-    workItem: opts.work,
     hasLiveTaskAccess: opts.hasLiveTaskAccess ?? false,
     cliOverride: opts.cliOverride,
     options: opts.options,
@@ -1766,7 +1762,6 @@ export async function executeAssignment(assignment, opts = {}) {
         runId,
         cliOverride: opts.cliOverride,
         options: opts.options,
-        work: opts.work,
         hasLiveTaskAccess: opts.hasLiveTaskAccess,
         providerCapacityRuntimeDir: opts.providerCapacityRuntimeDir,
         providerCapacityRunIsDead: opts.providerCapacityRunIsDead,
@@ -2653,8 +2648,7 @@ export async function executeAssignment(assignment, opts = {}) {
           tier: effectivePolicy.tier,
           timeoutMs,
           onChunk: opts.onChunk,
-          // Work-layer inputs the caller resolved from the item's Workflow step.
-          work: opts.work,
+          // Generic inputs the caller resolved from the item's Workflow step.
           capabilityHints: opts.capabilityHints,
           agentType: opts.agentType,
           runDir: path.resolve(runDir),

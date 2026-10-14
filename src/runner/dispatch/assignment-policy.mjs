@@ -39,6 +39,21 @@ export const TIER_STRENGTH = Object.freeze({
 
 export { RIGOR_VALUES, RIGOR_RANK };
 
+// Option names that once carried a Work item (or the pieces dispatch used to read off one)
+// into dispatch. Dispatch takes generic inputs only, so a caller still passing one is refused
+// instead of having it silently ignored.
+const WORK_ITEM_INPUT_KEYS = Object.freeze(['work', 'workItem', 'workExecutorId']);
+
+/** Throws when `params` still carries a Work item input; `where` names the entry point. */
+export function refuseWorkItemInput(params, where) {
+  const found = params && typeof params === 'object' ? WORK_ITEM_INPUT_KEYS.filter((key) => Object.hasOwn(params, key)) : [];
+  if (found.length) {
+    throw new RunnerConfigError(
+      `${where} takes no Work item (${found.join(', ')}): pass its demand as generic inputs (assignment rigor/domain, a work hint, capability hints, agent type)`,
+    );
+  }
+}
+
 // Phase 03 (executor-policy-dispatch-seams) — canonical reasoningEffort.
 // Most-specific-wins (design.md §4 field rules table).
 // executor-profile-schema-migration) so `validateExecutorEntryShape`'s new
@@ -174,8 +189,9 @@ export function resolveExecutorGovernance({ primaryExecutor, providerModel, opti
  * Resolve effective dispatch policy for an Assignment before execution attempt (Step 03 §3.1).
  *
  * @param {object} params
- * @param {object} params.assignment Assignment object (required)
- * @param {object} [params.work] Work item context (optional)
+ * @param {object} params.assignment Assignment object (required). Its own `rigor` and
+ *   `domain` are the caller's demand: the Work layer folds an item's rigor and risk into
+ *   `rigor` before dispatch sees it, so dispatch never reads a Work item.
  * @param {object} [params.runnerConfig] Runner configuration (optional)
  * @param {object} [params.cliOverride] Human / CLI overrides (optional)
  * @param {object} [params.options] Governance and lookup options
@@ -192,7 +208,6 @@ export function resolveExecutorGovernance({ primaryExecutor, providerModel, opti
 // supplies both.
 export function resolveAssignmentDispatchPolicy({
   assignment,
-  work,
   runnerConfig,
   cliOverride = {},
   policyInputs,
@@ -204,6 +219,7 @@ export function resolveAssignmentDispatchPolicy({
   // this rename) since reassigning the one binding here covers all of them
   // without a large, error-prone rename sweep across this whole function.
   if (policyInputs !== undefined) cliOverride = policyInputs;
+  refuseWorkItemInput(arguments[0], 'resolveAssignmentDispatchPolicy');
   if (!assignment || typeof assignment !== 'object') {
     throw new RunnerConfigError('resolveAssignmentDispatchPolicy requires an assignment object');
   }
@@ -243,21 +259,15 @@ export function resolveAssignmentDispatchPolicy({
   // The implicit standard is a fallback, not a floor. The first explicit
   // source may therefore select low; only later explicit sources are
   // monotonic raise-only.
-  if (work) {
-    if (work.rigor !== undefined) {
-      if (!RIGOR_VALUES.includes(work.rigor)) {
-        throw new RunnerConfigError(`invalid work rigor "${work.rigor}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
-      }
-      if (rigorSource.scope === 'default' || rigorStrength(work.rigor) > rigorStrength(effectiveRigor)) {
-        effectiveRigor = rigorSource.scope === 'default' ? work.rigor : resolveStrongerRigor(effectiveRigor, work.rigor);
-        rigorSource = { scope: 'work', id: work.id };
-      }
-    } else if (work.risk === 'heavy') {
-      // D18: work.risk: heavy of item without rigor is read as rigor: high
-      if (rigorStrength('high') > rigorStrength(effectiveRigor)) {
-        rigorSource = { scope: 'work', id: work.id };
-        effectiveRigor = resolveStrongerRigor(effectiveRigor, 'high');
-      }
+  // The caller's own rigor demand (a Work item's rigor or risk, folded by the Work layer).
+  // First explicit source may select it outright; after an operation rigor it only raises.
+  if (assignment.rigor !== undefined) {
+    if (!RIGOR_VALUES.includes(assignment.rigor)) {
+      throw new RunnerConfigError(`invalid assignment rigor "${assignment.rigor}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
+    }
+    if (rigorSource.scope === 'default' || rigorStrength(assignment.rigor) > rigorStrength(effectiveRigor)) {
+      effectiveRigor = rigorSource.scope === 'default' ? assignment.rigor : resolveStrongerRigor(effectiveRigor, assignment.rigor);
+      rigorSource = { scope: 'assignment', id: assignment.assignmentId ?? assignment.workId ?? null };
     }
   }
 
@@ -266,7 +276,7 @@ export function resolveAssignmentDispatchPolicy({
   // shared with coordination binding; never import the verb layer here.
   const derivedCapability = deriveOperationCapability(
     { id: assignment.operation, policy: opPolicy, result: assignment.result ?? { kind: assignment.resultKind } },
-    { domain: work?.domain, primaryCapability: assignment.primaryCapability },
+    { domain: assignment.domain, primaryCapability: assignment.primaryCapability },
     runnerConfig,
   );
   const targetCap = opPolicy.capability ?? assignment.capability ?? derivedCapability.name;

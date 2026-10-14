@@ -25,6 +25,7 @@ import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { confinedUnitConfig, ensureGitRepo } from './driver-unit-fixture.helper.mjs';
+import { workUnitFor } from '../../src/runner/work-dispatch.mjs';
 
 // A driver operation runs as a Unit (runUnit): its worker runs confined (bwrap), and it binds
 // from the runner config the caller hands over, so that config needs confined executors.
@@ -1157,7 +1158,8 @@ test('driver loop runOnce: validate-plan reported READY advances Work from plann
   assert.equal(item.workflowStep, 'executing');
 });
 
-test('buildAssignment populates contextRefs and expectedOutputs when work has docsRef (Finding 1)', () => {
+test('the Work layer turns docsRef and refs into the Unit inputs, and dispatch derives the expected outputs (Finding 1)', () => {
+  const tempDir = mkTempDir();
   const work = {
     id: 'tsk-refs-1',
     workflowStep: 'planning',
@@ -1166,16 +1168,14 @@ test('buildAssignment populates contextRefs and expectedOutputs when work has do
     docsRef: 'docs/history/feat-refs',
     refs: ['extra-ref.txt'],
   };
-  const assignment = buildAssignment({
-    work,
-    stage: 'planning',
-    operation: 'validate-plan',
-  });
-
-  assert.ok(assignment.contextRefs.includes('docs/history/feat-refs'));
-  assert.ok(assignment.contextRefs.includes(path.posix.join('docs/history/feat-refs', 'plan.md')));
-  assert.ok(assignment.contextRefs.includes(path.posix.join('docs/history/feat-refs', 'CONTEXT.md')));
-  assert.ok(assignment.contextRefs.includes('extra-ref.txt'));
+  const { unitData } = workUnitFor(work, { cfg: {}, stateRoot: tempDir, stage: 'planning', operation: 'validate-plan' });
+  assert.deepEqual(unitData.inputs, [
+    'docs/history/feat-refs',
+    path.posix.join('docs/history/feat-refs', 'plan.md'),
+    path.posix.join('docs/history/feat-refs', 'CONTEXT.md'),
+    'extra-ref.txt',
+  ]);
+  const assignment = buildAssignment({ workId: work.id, stage: 'planning', operation: 'validate-plan' });
   assert.ok(assignment.expectedOutputs.some((o) => o.includes('agent-result.json')));
 });
 

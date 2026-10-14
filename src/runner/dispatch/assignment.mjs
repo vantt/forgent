@@ -18,10 +18,10 @@
 //   validates an agent-proposed execution contract via
 //   ./execution-contract.mjs and builds an Assignment straight from it, no
 //   domain/workflow/stage/operation/taskSpec involved -- except that,
-//   when a domain is resolvable for the call (a Work with a declared
-//   Stage attached, carrying or paired with a domain name), it also
-//   conditionally consults that domain's own harness seam
-//   (ADR-007 §1/§2) between the generic validator and the normalizer.
+//   when the caller hands in a domain harness (`options.domainHarness`, the
+//   Work layer resolves it for an item at a declared Stage), it runs between
+//   the generic validator and the normalizer (ADR-007 §1/§2), and its output
+//   is validated again.
 //   Both shapes stamp
 //   `provenance`/`mutation`/`evidence` via ./assignment-normalizer.mjs
 //   (ADR-006 R1/R2); the declared shape additionally stamps
@@ -42,7 +42,6 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath } from '../paths.mjs';
 
 import { RunnerConfigError } from './config.mjs';
@@ -62,54 +61,8 @@ import {
 // comparison `resolveAssignmentDispatchPolicy` itself uses to guarantee a
 // more-specific scope can only RAISE a tier requirement, never lower one
 // never-weaken invariant.
-import { resolveStrongerTier } from './assignment-policy.mjs';
+import { refuseWorkItemInput, resolveStrongerTier } from './assignment-policy.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
-
-// ADR-007 §1: the domain harness seam. Foundation code (this module) must
-// never reference one specific domain's module by a hardcoded, literal
-// source-code path -- test/architecture.test.mjs's domain-siloing check
-// (core cannot couple to a named domain) forbids that, confirmed
-// empirically while building this block. So this discovers every domain's
-// own harness module that actually exists on disk, once, at module load,
-// entirely off filesystem enumeration -- mirroring
-// `domain-registry.mjs`'s own `DOMAINS` registry
-// (`loadDomainsFromDisk`, same module-load-time `readdirSync` rationale,
-// same file). The directory name loaded on each loop pass is always a
-// runtime value read off the filesystem, never a source-code literal, so
-// no specific domain name is ever hardcoded in this file.
-//
-// Top-level await, used below to load each discovered harness module:
-// by the time any caller can reach `buildAssignment()`/
-// `buildInlineAssignment()` further down, this ESM module's own graph has
-// already finished loading (Node guarantees full module evaluation before
-// an importer can observe its exports) -- so every export below stays a
-// plain, synchronous function. No public signature changes.
-const DOMAIN_HARNESS_SEAMS = new Map();
-{
-  const thisDir = path.dirname(fileURLToPath(import.meta.url));
-  const domainsRoot = path.resolve(thisDir, '../../../domains');
-  if (fs.existsSync(domainsRoot)) {
-    const entries = fs.readdirSync(domainsRoot, { withFileTypes: true });
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      const domainName = entry.name;
-      const harnessPath = path.join(domainsRoot, domainName, 'harness', 'enrich-and-validate-contract.mjs');
-      if (!fs.existsSync(harnessPath)) continue;
-      try {
-        const harnessModule = await import(pathToFileURL(harnessPath).href);
-        if (typeof harnessModule.enrichAndValidateContract === 'function') {
-          DOMAIN_HARNESS_SEAMS.set(domainName, harnessModule.enrichAndValidateContract);
-        }
-      } catch {
-        // A domain's own harness module failing to import (syntax error,
-        // missing dependency, a throw at import time, etc.) must not take
-        // down Assignment building for every other domain or the whole
-        // process -- treat it the same as that domain simply not having a
-        // harness module yet (an already-legal, tested state below).
-      }
-    }
-  }
-}
 
 /**
  * Sanitize a string token for use in assignment / run IDs.
@@ -278,9 +231,10 @@ export function claimAssignmentId(buildCandidate, assignmentsDir) {
 // field individually, so this closes the whole class of bug (any
 // declared-only field, present or future) instead of needing a new named
 // exception every time another one is discovered.
-const INLINE_ASSIGNMENT_PARAM_WHITELIST = new Set(['provenance', 'work', 'workId', 'createdBy', 'options']);
+const INLINE_ASSIGNMENT_PARAM_WHITELIST = new Set(['provenance', 'workId', 'createdBy', 'options']);
 
 export function buildAssignment(params = {}) {
+  refuseWorkItemInput(params, 'buildAssignment');
   if (params?.provenance?.kind === 'inline') {
     const conflicting = Object.keys(params).filter((key) => !INLINE_ASSIGNMENT_PARAM_WHITELIST.has(key));
     if (conflicting.length > 0) {
@@ -356,7 +310,6 @@ export function declaredOperationFields({ domain, workflow, stage, operation, op
 }
 
 function buildDeclaredAssignment({
-  work,
   workId,
   domain,
   workflow,
@@ -392,8 +345,8 @@ function buildDeclaredAssignment({
       'buildAssignment requires "operations": the legal operations of the step, resolved from its Workflow by the caller',
     );
   }
-  const resolvedWorkflow = workflow ?? work?.workflow ?? null;
-  const resolvedWorkId = work?.id ?? workId ?? null;
+  const resolvedWorkflow = workflow ?? null;
+  const resolvedWorkId = workId ?? null;
 
   const fields = declaredOperationFields({
     domain: resolvedDomain,
@@ -434,18 +387,6 @@ function buildDeclaredAssignment({
   const defaultObjective = objective ?? `Execute ${stage}.${matchedOp.id} operation`;
 
   const derivedContextRefs = Array.isArray(contextRefs) ? [...contextRefs] : [];
-  if (work) {
-    if (work.docsRef && derivedContextRefs.length === 0) {
-      derivedContextRefs.push(work.docsRef);
-      derivedContextRefs.push(path.posix.join(work.docsRef, 'plan.md'));
-      derivedContextRefs.push(path.posix.join(work.docsRef, 'CONTEXT.md'));
-    }
-    if (Array.isArray(work.refs)) {
-      for (const r of work.refs) {
-        if (r && !derivedContextRefs.includes(r)) derivedContextRefs.push(r);
-      }
-    }
-  }
 
   const derivedExpectedOutputs = Array.isArray(expectedOutputs) ? [...expectedOutputs] : [];
   if (derivedExpectedOutputs.length === 0) {
@@ -527,48 +468,31 @@ function buildDeclaredAssignment({
  *
  * @param {object} params
  * @param {object} params.provenance `{ kind: 'inline', contract, caller }`
- * @param {object} [params.work] Optional work item to attach (not required for inline)
- * @param {string} [params.workId] Optional work item id (if work object omitted)
+ * @param {string} [params.workId] Optional work item id
  * @param {string} [params.createdBy] Identity of creator
- * @param {object} [params.options] Optional execution / lookup options
+ * @param {object} [params.options] Optional execution / lookup options. `options.domainHarness`
+ *   is `(contract) => ({ contract, policy })`, a domain's own seam the caller resolved; dispatch
+ *   never finds or loads one itself.
  * @returns {Readonly<object>} Frozen Assignment object
  */
-function buildInlineAssignment({ provenance, work, workId, createdBy, options = {} }) {
+function buildInlineAssignment({ provenance, workId, createdBy, options = {} }) {
   const { contract: rawContract, caller } = provenance ?? {};
 
   validateExecutionContract({ contract: rawContract, caller });
 
-  // ADR-007 §1/§2: the domain harness seam fires ONLY when a domain is
-  // resolvable for this call, on a Work at a declared Stage -- a work
-  // attached with its own `domain` field, or an explicit `options.domain`
-  // supplied alongside that same attached work. A standalone inline call
-  // (no work, e.g. mission-lite's own shape) or a work with no `.workflowStep`
-  // yet skips the seam entirely and passes on generic validation alone
-  // (the `validateExecutionContract` call above) -- this is the actual
-  // evidence the foundation boundary does not depend on any domain.
-  // Deliberately NOT the declared path's `resolveDomainName(... ??
-  // DEFAULT_DOMAIN)` silent fold: an inline Work with no explicit
-  // `domain`/`options.domain` skips rather than assuming 'coding'.
-  const resolvedDomain = work?.workflowStep ? (work.domain ?? options.domain) : undefined;
-  // Seam enforcement -- including the ADR-007 §3 `contract.supports`
-  // legality check below -- is per-domain opt-in, gated on that domain
-  // actually having shipped a harness/enrich-and-validate-contract.mjs
-  // file on disk (see DOMAIN_HARNESS_SEAMS above). A domain with a
-  // declared Stage graph but no harness module still resolves a domain
-  // here, but `.get()` returns undefined and the seam is silently
-  // skipped for it -- by design (ADR-007 §4: "no registry... yet,
-  // additional seams require a second real consumer"), not a bug.
-  const harnessSeam = resolvedDomain ? DOMAIN_HARNESS_SEAMS.get(resolvedDomain) : undefined;
+  // ADR-007 §1/§2: the domain harness seam runs only when the caller hands one in. The
+  // Work layer resolves it for an item at a declared Stage (a domain that ships no harness,
+  // or no Work at all, hands none in); a standalone inline call passes on generic validation
+  // alone (the `validateExecutionContract` call above).
+  const harnessSeam = typeof options.domainHarness === 'function' ? options.domainHarness : undefined;
 
   let contract = rawContract;
   let harnessPolicy;
   if (harnessSeam) {
-    // A call-time throw from the harness (as opposed to an import-time
-    // failure, which IS isolated by the DOMAIN_HARNESS_SEAMS discovery
-    // loop's own try/catch above) propagates uncaught to the caller of
-    // buildAssignment() -- intentional: an unexpected bug in a harness
+    // A call-time throw from the harness propagates uncaught to the caller
+    // of buildAssignment() -- intentional: an unexpected bug in a harness
     // must surface, not be silently swallowed.
-    const enriched = harnessSeam(rawContract, { domain: resolvedDomain, work });
+    const enriched = harnessSeam(rawContract);
     contract = enriched.contract;
     harnessPolicy = enriched.policy;
 
@@ -584,7 +508,7 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
 
   const stamped = stampInlineAssignment(contract);
 
-  const resolvedWorkId = work?.id ?? workId ?? null;
+  const resolvedWorkId = workId ?? null;
 
   const existingIds = options.existingIds ?? [];
   const assignmentId = createAssignmentId({
