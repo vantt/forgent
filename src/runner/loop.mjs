@@ -84,7 +84,7 @@ import { resolveTierModel } from './dispatch.mjs';
 import { spawnWorker } from './work-dispatch.mjs';
 import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
-import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
+import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, findCheckoutPath, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, claimRoot, steerFrontier } from './root-affinity.mjs';
@@ -350,17 +350,6 @@ function workerRunPointer(unitRunId) {
   return `fgos-runner: worker running as unit run ${unitRunId}; while it runs its output is captured under .fgos/assignments/${unitRunId}/producer/*/runs/*/protected/capture/, and lands in that run's stdout.log once it settles\n`;
 }
 
-/** Where `branch` is checked out in a worktree of `repoRoot`, or null. */
-function checkoutPathOf(repoRoot, branch) {
-  const listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
-  let current = null;
-  for (const line of listing.split('\n')) {
-    if (line.startsWith('worktree ')) current = line.slice('worktree '.length);
-    else if (line === `branch refs/heads/${branch}`) return current;
-  }
-  return null;
-}
-
 /** Branch facts the recovery matrix needs (stale-doing resolution, goal-
  * check's has-a-commit requirement): does `fgw/<id>` exist, and how many
  * commits does it carry beyond its merge-base with HEAD? */
@@ -580,7 +569,7 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
     // holding the worker's uncommitted files (the runner commits only after a
     // round settles). Deleting the branch would fail, and removing that
     // checkout would lose the work, so both stay for a person or a resume.
-    const checkedOut = aheadCount === 0 ? checkoutPathOf(repoRoot, branch) : null;
+    const checkedOut = aheadCount === 0 ? findCheckoutPath(git(repoRoot, ['worktree', 'list', '--porcelain']), branch) : null;
     if (checkedOut) {
       log(`fgos-runner: keeping ${branch} (0 commits, but still checked out at ${checkedOut}; a killed round may have left uncommitted work there)`);
       kept.push({ branch, aheadCount, reason: 'checked-out', path: checkedOut });
@@ -1060,6 +1049,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
 
       const worker = await spawnWorker(item, config, wt.path, {
         fgosDir: dir,
+        repoRoot,
         feedback: {
           answer: feedbackView.gates?.[item.id]?.answer,
           reason: feedbackView.work?.[item.id]?.reason,
@@ -1464,6 +1454,7 @@ export async function runOnce(options = {}) {
           const feedbackView = listWork(dir);
           const worker = await spawnWorker(item, config, wt.path, {
             fgosDir: dir,
+            repoRoot,
             stage: discoverEntry,
             feedback: {
               answer: feedbackView.gates?.[item.id]?.answer,

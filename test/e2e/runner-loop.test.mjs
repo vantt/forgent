@@ -978,7 +978,7 @@ test('e2e runner commit: with no result claim the commit subject is the Unit run
   assert.match(branchLog(repoRoot, 'fgw/item-fallback'), /chore\(work-item-fallback-executing\): producer changes/);
 });
 
-test('e2e runner commit: a worker cannot commit itself (its git dir is read-only) -- the round fails, nothing is committed, verify-miss', () => {
+test('e2e runner commit: a worker cannot commit itself (its git dir is read-only) -- the round fails, nothing is committed, and its uncommitted file is never verified (worker-failed)', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
   const scriptPath = path.join(scriptDir, 'self-committing-executor.mjs');
@@ -998,9 +998,9 @@ execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);
   assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
   assert.equal(stateView(repoRoot).work['item-self'].status, 'blocked');
   assert.equal(branchAheadCount(repoRoot, 'fgw/item-self'), 0);
-  assert.match(`${result.stdout}${result.stderr}`, /commit for "item-self": none/);
+  assert.match(`${result.stdout}${result.stderr}`, /worker-failed for "item-self"/);
   const actual = events(repoRoot).find((e) => e.type === 'work.outcome' && e.payload.actual);
-  assert.equal(actual.payload.actual.errorClass, 'verify-miss');
+  assert.equal(actual.payload.actual.errorClass, 'worker-failed');
 });
 
 test('e2e runner commit: a worker that changes nothing leaves no commit -> verify-miss, parked, never proposed', () => {
