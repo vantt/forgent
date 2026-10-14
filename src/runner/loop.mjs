@@ -370,9 +370,11 @@ function workerResultSummary(output) {
  * `none` (no change at all). A failed commit throws a `worktree-fail`
  * (environment) error so the recovery matrix routes it like any other
  * infrastructure failure. */
-function commitWorkerChanges(item, worktree, headBeforeWorker, workerOutput) {
+function commitWorkerChanges(repoRoot, item, worktree, headBeforeWorker, workerOutput) {
   const result = commitUnitWork({
     worktree,
+    // The gitdir and hooks come from the main checkout, never from the worker-writable worktree.
+    repoRoot,
     unitId: item.id,
     summary: workerResultSummary(workerOutput) ?? `${item.id}: ${item.title}`,
     // A Work item declares no write scope: everything outside .fgos is the worker's.
@@ -1146,7 +1148,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       // verify-miss are both captured (goal-check runs next). The runner
       // commits the worker's file changes first, so goal-check judges the
       // committed branch.
-      const commit = commitWorkerChanges(item, wt.path, headBeforeWorker, worker.stdout);
+      const commit = commitWorkerChanges(repoRoot, item, wt.path, headBeforeWorker, worker.stdout);
       log(`fgos-runner: commit for "${item.id}": ${commit}`);
       appendWorkerLog(dir, item.id, {
         attempt,
@@ -1516,7 +1518,7 @@ export async function runOnce(options = {}) {
             onChunk: (stream, chunk) => appendWorkerLogChunk(dir, item.id, chunk),
           });
           log(`fgos-runner: research worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
-          const commit = commitWorkerChanges(item, wt.path, headBeforeWorker, worker.stdout);
+          const commit = commitWorkerChanges(repoRoot, item, wt.path, headBeforeWorker, worker.stdout);
           appendWorkerLog(dir, item.id, {
             commit,
             tier: worker.tier,

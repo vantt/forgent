@@ -27,10 +27,15 @@ const CONVENTIONAL_SUBJECT = /^(feat|fix|docs|refactor|test|chore|perf|build|ci|
 
 const SUBJECT_MAX = 100;
 
-/** The caller's environment without any GIT_* variable: none of them may redirect these calls. */
+/** GIT_* variables that name who commits or which user config applies, never which repository. */
+const KEPT_GIT_ENV = /^GIT_(AUTHOR|COMMITTER)_(NAME|EMAIL|DATE)$|^GIT_CONFIG_(GLOBAL|SYSTEM|NOSYSTEM)$/;
+
+/** The caller's environment without the GIT_* variables that could redirect these calls. */
 function cleanEnv(extra = {}) {
   const env = {};
-  for (const [key, value] of Object.entries(process.env)) if (!key.startsWith('GIT_')) env[key] = value;
+  for (const [key, value] of Object.entries(process.env)) {
+    if (!key.startsWith('GIT_') || KEPT_GIT_ENV.test(key)) env[key] = value;
+  }
   return { ...env, ...extra };
 }
 
@@ -42,18 +47,21 @@ function rawGit(cwd, args) {
 class UntrustedWorktreeError extends Error {}
 
 /**
- * How to run git on `worktree`. With `repoRoot` (the main checkout, which a confined worker cannot
- * write), the gitdir is looked up from the repository's own worktree list, never read from the
- * worktree's `.git` file. Without it (a caller whose worker runs unconfined anyway) git finds the
- * gitdir as usual.
+ * How to run git on `worktree`. `repoRoot` must be the main checkout, which a confined worker
+ * cannot write: the gitdir is looked up from that repository's own worktree list, never read from
+ * the worktree's `.git` file.
  */
-export function gitContext({ worktree, repoRoot = null }) {
+export function gitContext({ worktree, repoRoot }) {
+  if (!repoRoot) throw new TypeError('the runner commit requires repoRoot (the main checkout): the gitdir is never read from the worktree');
   const workTree = fs.realpathSync(worktree);
   const prefix = ['-c', 'core.fsmonitor=false'];
-  if (!repoRoot) return { cwd: workTree, prefix };
 
   const mainRoot = fs.realpathSync(repoRoot);
   const commonDir = path.resolve(mainRoot, rawGit(mainRoot, ['rev-parse', '--git-common-dir']).trim());
+  // A linked worktree named as the root would hand its own (worker-writable) pointer the trust.
+  if (fs.realpathSync(path.dirname(commonDir)) !== mainRoot) {
+    throw new UntrustedWorktreeError(`${mainRoot} is not the main checkout of its repository; pass the main checkout as repoRoot`);
+  }
   let gitDir = null;
   if (workTree === mainRoot) {
     gitDir = commonDir;
@@ -175,7 +183,7 @@ function withPaths(ctx, args, paths) {
  *
  * @param {object} p
  * @param {string} p.worktree
- * @param {string} [p.repoRoot] the main checkout; required whenever the producer ran confined
+ * @param {string} p.repoRoot the main checkout; the trusted source of the gitdir and hooks
  * @param {string} p.unitId
  * @param {string} [p.summary]
  * @param {string[]} p.scope canonical write scope; `['**']` for "everything outside .fgos"
@@ -185,8 +193,9 @@ function withPaths(ctx, args, paths) {
  * @returns {{ status: 'committed'|'no-changes'|'failed', sha?: string, subject?: string, files?: string[],
  *   outOfScope: string[], preExistingInScope: string[], needsWrites?: string[], reason?: string, error?: string }}
  */
-export function commitUnitWork({ worktree, repoRoot = null, unitId, summary, scope, changedFiles = null, excludePaths = [], needsWrites }) {
+export function commitUnitWork({ worktree, repoRoot, unitId, summary, scope, changedFiles = null, excludePaths = [], needsWrites }) {
   if (!Array.isArray(scope)) throw new TypeError('commitUnitWork requires a write scope (use ["**"] for the whole worktree)');
+  if (!repoRoot) throw new TypeError('commitUnitWork requires repoRoot (the main checkout): the gitdir is never read from the worktree');
   const base = {
     outOfScope: [],
     preExistingInScope: [...excludePaths],
@@ -264,10 +273,10 @@ export function commitUnitWork({ worktree, repoRoot = null, unitId, summary, sco
   }
 }
 
-/** Whether `sha` is still in the history of the worktree's HEAD. */
-export function commitOnBranch(worktree, sha, repoRoot = null) {
+/** Whether `sha` is still in the history of the worktree's HEAD. A worktree it cannot trust throws. */
+export function commitOnBranch(worktree, sha, repoRoot) {
+  const ctx = gitContext({ worktree, repoRoot });
   try {
-    const ctx = gitContext({ worktree, repoRoot });
     git(ctx, ['merge-base', '--is-ancestor', sha, 'HEAD']);
     return true;
   } catch {
