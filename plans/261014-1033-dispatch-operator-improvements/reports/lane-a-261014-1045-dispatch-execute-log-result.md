@@ -1,10 +1,47 @@
 # Lane A — log và kết quả của `dispatch execute`
 
-Trạng thái: **dừng ở bước test đỏ** theo chỉ thị Lead 2026-10-14 (hội đồng "một cửa" đang chạy, không sửa code production). Chưa có commit code. Thiết kế mục 1 đã viết xong và chạy xanh trước khi dừng; bản sửa được cất thành patch, chưa áp.
+Trạng thái: **làm theo kết luận hội đồng một-cửa** (`reports/council-261014-1231-dispatch-one-door-conclusion.md`, mục "Cập nhật sau hội đồng" của brief lane A). Phần "Trước hội đồng" bên dưới giữ làm lịch sử; chỗ nào mâu thuẫn thì mục "Sau hội đồng" thắng.
 
-- Worktree: `/home/vantt/projects/forgentX-worktrees/dispatch-log-result`, nhánh `feat/dispatch-log-result` (từ main `88315d5de`).
-- Test đỏ (chưa commit, theo chỉ thị): `test/runner/dispatch-execute-log.test.mjs` — 7 fail / 1 pass trên code hiện tại.
-- Patch production đã cất: `/home/vantt/projects/forgentX/.fgos/runtime/tmp/lane-a-dispatch-execute-log.patch` (210 dòng, `src/runner/dispatch.mjs`, `src/runner/dispatch/cli.mjs`, `src/runner/dispatch-log.mjs`). Với patch áp vào: test mới 8/8 xanh; `dispatch.test`, `dispatch-reconciliation-import-graph.test`, `dispatch-production-call-sites.test`, `dispatch-execute-for-capability.test` 434/434 xanh. `npm test` toàn bộ: **chưa chạy** (dừng trước bước đó).
+- Worktree: `/home/vantt/projects/forgentX-worktrees/dispatch-log-result`, nhánh `feat/dispatch-log-result`, rebase lên main `f69a446f0`.
+- Commit: `cec1452a8` feat(run) plan/work provenance; `9fc8af4b2` docs(cli) sửa mô tả cờ dispatch. Không merge, không push.
+
+## Sau hội đồng một-cửa
+
+### #1/#2 — log → provenance plan/work trên Assignment
+
+- Bỏ hướng execute tự ghi `dispatch log` (patch `.fgos/runtime/tmp/lane-a-dispatch-execute-log.patch` KHÔNG áp, test đỏ cũ đã xoá). Không thêm verb.
+- Cửa chuẩn `fgos run` nhận `--plan <dir|plan.md>` và `--work <id>`:
+  - `unit.json` ghi `plan` (đường dẫn tương đối checkout chứa plan, main hoặc worktree của run; tuyệt đối nếu ngoài cả hai) và `workId`.
+  - Mỗi Assignment: `provenance.plan`, và `workId` — field Assignment sẵn có, đã chảy tới RunResult (`workId`) và `run-meta.v1` (`assignment-runner.mjs:1879,2636,2760`). Không đổi schema RunResult.
+  - Từ chối trước khi có run: plan thiếu `plan.md`; work item không tồn tại (kiểm ở `bin/fgos.mjs` qua `listWork`, vì `run.mjs` bị guard A4 cấm import `src/state/**`). Resume giữ plan/work ban đầu, truyền lại khi resume bị từ chối.
+- Prior art dùng lại: field `workId` của Assignment/RunResult; khuôn từ chối-trước-khi-có-run của `stanceOptions`/`resolveUnitInputs`. Thiếu: chưa có khoá plan nào trước đây. Run theo Workflow sinh từ plan (`fgos workflow start --plan`) đã có liên kết gián tiếp qua `workflow.id = plan/<slug>`; không đụng.
+- Không làm `execute --contract --plan`: Doer có ghi file đi qua `fgos run`; `--contract` chỉ read-only và đang chờ af132275b (bước 0) — tránh va.
+
+### #3 — câu báo cáo cuối = `agentClaim.summary`
+
+- Không code mới: `runUnit` đã trả `results[].runResult.agentClaim.summary` (claim v2). Đã khoá ở tầng Assignment từ trước (`test/runner/assignment-dispatch.test.mjs:2270`); thêm một test đầu-cuối ở tầng `fgos run` (`run-plan-work-provenance.test.mjs`, ca cuối). Nguyên nhân lặp hai lần giữ như mục "Trước hội đồng" 3(b).
+
+### #2 help — chỉ sửa chỗ sai
+
+`fgos dispatch --help` ghi `for`, `work`, `executor`, `assignment` là "only" của verb khác trong khi `execute` cũng đọc chúng (cli.mjs `flagValue('--for')` ở đường thô, `--work`/`--executor` ở `--contract`/`--assignment`, `--assignment`). Sửa đúng phạm vi, không thêm hướng dẫn dùng cửa thô, không đụng AGENTS.md:167 / `executor-dispatch-fallback.md` (bước 3 của Lead).
+
+### Test
+
+- Đỏ trước: `test/runner/execution/run-plan-work-provenance.test.mjs` 5 fail / 2 pass (2 ca pass là đặc tả hành vi đã có: không cờ → không ghi; `agentClaim.summary`); 2 ca CLI mới trong `test/cli/run-verb.test.mjs` đỏ với `bin/fgos.mjs` của HEAD.
+- Xanh: 7/7 + 6/6; `test/runner/execution/*` + `test/cli/run-verb|command-registry|fgos-help` 226/226.
+- `npm test` toàn bộ: exit 0 (`env -u CLAUDE_CODE_SESSION_ID npm test` trên `9fc8af4b2`): tests 7372, pass 7297, fail 0, cancelled 0, skipped 10.
+
+### Rủi ro
+
+- `detect_changes` báo **high**: chạm `dispatchBound`/`runRole` (9 luồng). Thay đổi chỉ là spread có điều kiện; không cờ thì Assignment/unit.json byte như cũ. Index GitNexus stale (b334695) — đã cross-check bằng grep: caller của `runUnit` là `bin/fgos.mjs` và `src/workflow/runner.mjs`, không truyền option mới.
+- `provenance.plan` là key mới trong `provenance` của Assignment unit-run (hội đồng duyệt "plan/work provenance id on the Assignment"). Normalizer/validator không chặn key lạ trong `provenance` của unit-run (test xanh trên đường thật).
+
+### Còn để ngỏ
+
+- Phụ thuộc bước 0 (af132275b, chờ owner) mà hội đồng ghi cho lane A: phần đã làm không đụng `--contract`, nên không chờ; nếu owner muốn `execute --contract` cũng mang plan thì làm sau af132275b.
+- Đọc theo plan: chưa có lệnh liệt kê run theo plan (`unit.json.plan` đọc được bằng file). Không thêm verb khi chưa được yêu cầu.
+
+## Trước hội đồng (lịch sử)
 
 ## Mục 1 — log tự động sau `execute`
 
@@ -54,4 +91,3 @@ Bản `finalMessage` em đã viết trước khi brief đổi: đã gỡ hết, 
 
 - Áp hay bỏ patch mục 1 tuỳ kết luận một-cửa (nếu cửa thô bị gộp vào đường Assignment thì log nên đi theo RunResult, patch có thể bỏ).
 - Mục 2, 3(c) chờ kết luận.
-- `npm test` toàn bộ chưa chạy.
