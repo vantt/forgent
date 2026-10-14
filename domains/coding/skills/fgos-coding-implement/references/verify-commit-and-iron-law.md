@@ -36,7 +36,7 @@ reconstruct proof once `approve` correctly catches it later. So:
 
 Commit the real implementation (and its now-passing verify from Step 3)
 FIRST — for an `out-of-process` mechanism run through `fgos run` the
-runner already committed the worker's edits (`results[-1].commit.status`
+runner already committed the worker's edits (`data.results[-1].commit.status`
 `committed`), so skip the commit and classify against that commit; commit
 by hand only what this session itself changed afterwards —
 

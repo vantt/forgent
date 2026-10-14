@@ -92,12 +92,14 @@ prompt, binds it through `bind()` with `<EXECUTOR_ID>` as a soft preference,
 runs it and settles it:
 
 ```bash
-fgos run "<PROMPT_TEMPLATE built as below>" --provider <EXECUTOR_ID> [--capability <PURPOSE>] [--effort <level>] --json
+fgos run "<PROMPT_TEMPLATE built as below>" --provider <EXECUTOR_ID> --capability <PURPOSE> [--effort <level>] --json
 # work that changes files names its scope and a linked worktree:
 fgos run "<PROMPT_TEMPLATE>" --provider <EXECUTOR_ID> --capability <PURPOSE> --writes <path>[,<path>...] --worktree <linked-worktree> --json
 ```
 
-Without `--writes` the Unit is read-only and runs sandboxed; `--writes`
+`--capability` is the same `<PURPOSE>` Step A asked `decide` for: left
+out, the Unit runs under the writing capability `execute`, with its own
+executor pool and posture. Without `--writes` the Unit is read-only and runs sandboxed; `--writes`
 needs a linked worktree and is refused from the main checkout before
 anything runs. The worker never runs `git add`/`git commit`: after a
 passing round the runner commits only the paths inside `--writes`. Work
@@ -120,10 +122,11 @@ to produce the wrapper script file inside the worktree, and invoke that
 returned single file path instead — a single-file invocation carries no
 compound shell syntax for the guard to flag.
 
-Read the result JSON: `outcome` (`pass` or why not), `unitRunId`, and the
-last round at `results[-1]` — the worker's answer is
-`results[-1].runResult.agentClaim.summary`, and for writing work the
-runner's commit is `results[-1].commit` (`status`, `sha`, `files`,
+Read the result JSON (the payload sits under `data`): `data.outcome`
+(`pass` or why not), `data.unitRunId`, and the last round at
+`data.results[-1]` — the worker's answer is
+`data.results[-1].runResult.agentClaim.summary`, and for writing work the
+runner's commit is `data.results[-1].commit` (`status`, `sha`, `files`,
 `outOfScope`, `needsWrites`). Print the announce line from the bound
 executor, provider and model, then read the summary the same way a
 consumer used to read a hand-run command's own output:

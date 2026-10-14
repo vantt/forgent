@@ -18,20 +18,27 @@ its answer:
   `agentType`.
 - **`out-of-process`** — run the Implement step as a writing Unit
   instead of writing the change yourself:
-  `fgos run "<prompt>" --provider <executorId> --capability code:implement --writes '**' --worktree <item worktree> --json`
-  (narrow `--writes` to the item's own paths when they are known). Read
-  `results[-1].runResult.agentClaim.summary` as the work product.
+  `fgos run "<prompt>" --provider <executorId> --capability code:implement --writes <item paths> --worktree <item worktree> --json`.
+  `--writes` lists the files the item's plan says it changes (`'**'` only
+  when the item genuinely spans the tree). The prompt carries the item's
+  own `verify` command and points the worker at
+  `../_shared/coding-worker-contract.md`, so the worker runs verify before
+  it stops. Read `data.results[-1].runResult.agentClaim.summary` as the work
+  product.
   **Commit ownership:** per `../_shared/coding-worker-contract.md`'s
   Layer 2 rules, the worker ran the item's own verify and left its edits
   in the worktree — it never commits. After a passing round the runner
-  commits the paths inside `--writes`; `results[-1].commit` says what it
+  commits the paths inside `--writes`; `data.results[-1].commit` says what it
   did (`committed` with `sha`/`files`, `no-changes`, or `failed` with a
   `reason`). `no-changes` means the worker changed nothing; `failed` or a
   non-empty `outOfScope`/`needsWrites` is a driver-side problem to handle
   (park the item / widen `--writes` and run again) — never write the change
   yourself to paper over a worker that didn't finish its own half. If the
   worker returned `[BLOCKED]` (`outcome` other than `pass`), the same
-  holds. Call `fgos return` bare afterwards; it re-runs verify on the
+  holds. A file that was already dirty inside `--writes` before the run is
+  listed in `preExistingInScope` and never committed by the runner; commit
+  or restore it before `fgos return`, whose clean-tree check refuses
+  otherwise. Call `fgos return` bare afterwards; it re-runs verify on the
   runner's commit.
 
 Either way, before editing a symbol yourself, apply `CLAUDE.md`'s

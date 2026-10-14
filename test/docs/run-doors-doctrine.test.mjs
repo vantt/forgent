@@ -53,29 +53,30 @@ for (const surface of ['core/skills', '.agents/skills', 'plugins/fgOS/skills']) 
 // and `decide --work` runs only through `fgos dispatch decide`.
 const REMOVED_DOOR_PATTERNS = [
   /dispatch\.mjs"?\s+(execute|log|fanout-batch)\b/,
-  /\bdispatch (execute|log)\b/,
+  /\bdispatch (execute|log|fanout-batch)\b/,
+  /\bexecute [a-z][\w-]* --for\b/,
   /--contract\b/,
   /\bexecute <(executor|agent|EXECUTOR_ID|executorId)/i,
   /dispatch\.mjs"?\s+decide --work/,
 ];
 
-function markdownFiles(rel) {
+function doctrineFiles(rel) {
   const abs = path.join(repoRoot, rel);
   if (!fs.existsSync(abs)) return [];
   if (fs.statSync(abs).isFile()) return [rel];
   const out = [];
   for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
     const child = path.join(rel, entry.name);
-    if (entry.isDirectory()) out.push(...markdownFiles(child));
-    else if (entry.name.endsWith('.md')) out.push(child);
+    if (entry.isDirectory()) out.push(...doctrineFiles(child));
+    else if (/\.(md|txt|ya?ml)$/.test(entry.name)) out.push(child);
   }
   return out;
 }
 
-for (const surface of ['AGENTS.md', 'core/skills', 'domains', '.agents/skills', 'plugins/fgOS/skills', '.claude/skills']) {
+for (const surface of ['AGENTS.md', 'core/skills', 'core/instructions', 'core/prompt-templates', 'domains', '.agents/skills', 'plugins/fgOS/skills', '.claude/skills']) {
   test(`${surface} teaches no removed dispatch door`, () => {
     const hits = [];
-    for (const file of markdownFiles(surface)) {
+    for (const file of doctrineFiles(surface)) {
       read(file).split('\n').forEach((line, i) => {
         if (REMOVED_DOOR_PATTERNS.some((re) => re.test(line))) hits.push(`${file}:${i + 1}: ${line.trim().slice(0, 160)}`);
       });
