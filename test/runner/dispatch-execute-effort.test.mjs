@@ -368,3 +368,47 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   assert.equal(data.outcome, 'policy-refusal');
   assert.deepEqual(data.results[0].refused, { reason: 'reasoning-effort', detail: 'executor "claude" supports reasoningEffort [low, medium, high], not "max"' });
 });
+
+test('one settled run keeps effort and model drift provenance beside a correlated warning and the sandbox that ran', async () => {
+  const { settleRunOutcome } = await import('../../src/runner/dispatch/assignment-runner.mjs');
+  const { acquireRunControl } = await import('../../src/runner/dispatch/run-lock.mjs');
+  const base = makeFixtureDir('fgos-settle-effort-warning-');
+  const cwd = path.join(base, 'repo');
+  fs.mkdirSync(cwd);
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  git('init', '-q'); git('config', 'user.email', 't@e.com'); git('config', 'user.name', 'T');
+  fs.writeFileSync(path.join(cwd, 'plan.md'), 'x\n');
+  git('add', '.'); git('commit', '-qm', 'init');
+  const gitBefore = git('rev-parse', 'HEAD');
+  const runDir = path.join(base, 'run');
+  fs.mkdirSync(path.join(runDir, 'protected', 'prepared-invocation'), { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'protected', 'prepared-invocation', 'lc-1.json'), JSON.stringify({ backend: { id: 'bwrap', type: 'bwrap' } }));
+  // Another session edits the checkout while the read-only round runs.
+  fs.writeFileSync(path.join(cwd, 'plan.md'), 'edited by another session\n');
+  const { controlToken } = acquireRunControl(runDir, { controllerId: 'effort-warning-test' });
+  const { runResult } = await settleRunOutcome({
+    runDir,
+    runMeta: { runId: 'run_ew_01', assignmentId: 'asgn_ew' },
+    assignment: { assignmentId: 'asgn_ew', role: 'reviewer', operation: 'validate-plan', mutation: 'read-only' },
+    controlEpoch: 1,
+    controlToken,
+    exitCode: 0,
+    settledAt: new Date().toISOString(),
+    effectiveCwd: cwd,
+    gitBefore,
+    dirtyBefore: [],
+    launchCommandId: 'lc-1',
+    effectivePolicy: { tier: 'standard', model: 'm1', reasoningEffort: 'high', provenance: { reasoningEffort: { value: 'high', source: { scope: 'cliOverride' } } } },
+    reasoningEffort: 'high',
+    modelWarnings: [{ code: 'model-drift', requested: 'm1', launched: 'm2' }],
+    opts: { cwd, repoRoot: base },
+  });
+  const stored = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  for (const r of [runResult, stored]) {
+    assert.equal(r.policy.provenance.reasoningEffort.value, 'high');
+    assert.equal(r.policy.provenance.reasoningEffort.rendered, 'high');
+    assert.ok(r.policy.provenance.modelDrift, 'model drift recorded');
+    assert.ok(r.warnings.some((w) => w.code === 'read-only-mutation-correlated'));
+    assert.equal(r.confinement, 'bwrap');
+  }
+});
