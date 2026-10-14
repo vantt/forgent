@@ -249,7 +249,7 @@ fn test_native_version_succeeds_with_envelope() {
         serde_json::from_str(&routes_str).expect("command-routes.json must be valid JSON");
     assert_eq!(
         parsed["data"]["verbs"].as_array().map(|v| v.len()),
-        Some(routes.len())
+        Some(routes.keys().filter(|k| !k.starts_with('-')).count())
     );
 }
 

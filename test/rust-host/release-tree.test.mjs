@@ -223,15 +223,13 @@ test('R3: Staged release tree runs P02 harness from outside checkout with cleane
       }
       process.env.FGOS_HARNESS_ENTRY = `bin:${stagedBinary}`;
 
-      // Generate the coverage-floor cases. Native `version` always emits JSON
-      // with a dynamic ISO timestamp. `gate-bypass --help` may route through a
-      // JSON envelope or a help-text path depending on the staged config, so it
-      // allows semantic JSON when present and exact bytes otherwise.
+      // Generate the coverage-floor cases. `<verb> --help` prints the manifest
+      // entry for every route kind, native included, so it is exact bytes.
+      // `gate-bypass --help` may route through a JSON envelope or a help-text
+      // path depending on the staged config, so it allows semantic JSON when
+      // present and exact bytes otherwise.
       const rawCases = generateCoverageFloorCases({ repoRoot: REPO_ROOT, routesPath: ROUTES_PATH });
       const cases = rawCases.map((c) => {
-        if (c.id === 'coverage-help-version') {
-          return { ...c, modes: ['semantic-json'] };
-        }
         if (c.id === 'coverage-help-gate-bypass') {
           return { ...c, modes: ['semantic-json-or-exact-bytes'] };
         }
