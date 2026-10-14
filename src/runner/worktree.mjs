@@ -59,6 +59,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { StoreError } from '../state/store.mjs';
 import { readWorktreeSetupCommands } from '../config/shared-config-file.mjs';
+import { statusPaths } from '../util/git-paths.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
  * reuses the vocabulary declared in `recovery.mjs`'s `ERROR_CLASSES` (per
@@ -399,8 +400,10 @@ export function isCheckoutDirty(repoRoot, worktreePath) {
 /**
  * Return an array of relative file paths that are currently dirty (uncommitted
  * or untracked) in `worktreePath`, excluding `.fgos` artifacts (reusing the
- * exact `:!.fgos` pathspec exclusion from `isCheckoutDirty`). Fails open
- * (returns empty array) on git error.
+ * exact `:!.fgos` pathspec exclusion from `isCheckoutDirty`). Read through
+ * `statusPaths`: byte for byte, a rename as both halves, a collapsed untracked
+ * directory without its trailing slash. Fails open (returns empty array) on
+ * git error.
  *
  * Exported (tsk-3bh): `executeExecutorCli` (src/runner/dispatch/cli.mjs)
  * uses this to detect uncommitted paths lost across an out-of-process dispatch.
@@ -412,20 +415,7 @@ export function checkoutDirtyPaths(repoRoot, worktreePath) {
   } catch {
     return [];
   }
-  const records = statusOutput.split('\0').filter((entry) => entry.length > 0);
-  const paths = [];
-  for (let i = 0; i < records.length; i += 1) {
-    const entry = records[i];
-    const statusCode = entry.slice(0, 2);
-    const filePath = entry.slice(3);
-    if (filePath) {
-      paths.push(filePath);
-    }
-    if (statusCode.includes('R') || statusCode.includes('C')) {
-      i += 1;
-    }
-  }
-  return paths;
+  return statusPaths(statusOutput);
 }
 
 

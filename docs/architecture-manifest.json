@@ -169,6 +169,7 @@
     "src/util/format-bytes.mjs": "kernel",
     "src/util/format-duration.mjs": "kernel",
     "src/util/normalize-path.mjs": "kernel",
+    "src/util/git-paths.mjs": "kernel",
     "src/util/release-binary-path.mjs": "kernel",
     "src/util/release-targets.mjs": "kernel",
     "src/util/session-identity.mjs": "kernel",

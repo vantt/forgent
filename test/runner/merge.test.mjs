@@ -13,7 +13,7 @@ import {
   cleanupMergedBranch,
   changedFiles,
   isWorkingTreeClean,
-  isFgosOnlyStatusLine,
+  isIgnorableStatusPath,
   buildOwnFileSet,
   classifyDecisionIndexCollision,
   abortMergeIfPossible,
@@ -369,49 +369,54 @@ test('isWorkingTreeClean(repoRoot) with no ownFileSet argument reproduces the st
   assert.equal(isWorkingTreeClean(repoRoot), false);
 });
 
-// --- isFgosOnlyStatusLine's prefix parameter -----------------------------
+// --- isIgnorableStatusPath's prefix parameter ----------------------------
 
-test('isFgosOnlyStatusLine with no prefix (default) matches only a bare top-level .fgos/ path — unchanged prior behavior', () => {
-  assert.equal(isFgosOnlyStatusLine(' M .fgos/events.jsonl'), true);
-  assert.equal(isFgosOnlyStatusLine('?? .fgos'), true);
-  assert.equal(isFgosOnlyStatusLine(' M sub/.fgos/events.jsonl'), false, 'without a matching prefix, a nested .fgos/ path must not match');
+test('isIgnorableStatusPath with no prefix (default) matches only a bare top-level .fgos/ path', () => {
+  assert.equal(isIgnorableStatusPath('.fgos/events.jsonl'), true);
+  assert.equal(isIgnorableStatusPath('.fgos'), true);
+  assert.equal(isIgnorableStatusPath('sub/.fgos/events.jsonl'), false, 'without a matching prefix, a nested .fgos/ path must not match');
 });
 
-test('isFgosOnlyStatusLine with a prefix matches that prefix\'s own .fgos/ path, not a bare top-level one', () => {
-  assert.equal(isFgosOnlyStatusLine(' M sub/.fgos/events.jsonl', 'sub/'), true);
-  assert.equal(isFgosOnlyStatusLine('?? sub/.fgos', 'sub/'), true);
-  assert.equal(isFgosOnlyStatusLine(' M .fgos/events.jsonl', 'sub/'), false, 'a top-level .fgos/ must not match a subdirectory prefix');
-  assert.equal(isFgosOnlyStatusLine(' M sub/other.txt', 'sub/'), false, 'a real non-.fgos path under the prefix must still be rejected');
+test('isIgnorableStatusPath with a prefix matches that prefix\'s own .fgos/ path, not a bare top-level one', () => {
+  assert.equal(isIgnorableStatusPath('sub/.fgos/events.jsonl', 'sub/'), true);
+  assert.equal(isIgnorableStatusPath('sub/.fgos', 'sub/'), true);
+  assert.equal(isIgnorableStatusPath('.fgos/events.jsonl', 'sub/'), false, 'a top-level .fgos/ must not match a subdirectory prefix');
+  assert.equal(isIgnorableStatusPath('sub/other.txt', 'sub/'), false, 'a real non-.fgos path under the prefix must still be rejected');
 });
 
-// --- isFgosOnlyStatusLine's ownFileSet parameter (tsk-598 D1-D3) ---------
+// --- isIgnorableStatusPath's ownFileSet parameter (tsk-598 D1-D3) --------
 
-test('isFgosOnlyStatusLine: omitted ownFileSet (default null) still blocks any non-.fgos path — fail-safe, unchanged from before tsk-598', () => {
-  assert.equal(isFgosOnlyStatusLine(' M other.txt'), false);
-  assert.equal(isFgosOnlyStatusLine(' M other.txt', '', null), false);
+test('isIgnorableStatusPath: omitted ownFileSet (default null) still blocks any non-.fgos path — fail-safe, unchanged from before tsk-598', () => {
+  assert.equal(isIgnorableStatusPath('other.txt'), false);
+  assert.equal(isIgnorableStatusPath('other.txt', '', null), false);
 });
 
-test('isFgosOnlyStatusLine: a non-.fgos path OUTSIDE ownFileSet is ignorable (does not block)', () => {
+test('isIgnorableStatusPath: a non-.fgos path OUTSIDE ownFileSet is ignorable (does not block)', () => {
   const ownFileSet = new Set(['src/a.mjs']);
-  assert.equal(isFgosOnlyStatusLine(' M unrelated.txt', '', ownFileSet), true);
-  assert.equal(isFgosOnlyStatusLine('?? unrelated.txt', '', ownFileSet), true);
+  assert.equal(isIgnorableStatusPath('unrelated.txt', '', ownFileSet), true);
 });
 
-test('isFgosOnlyStatusLine: a non-.fgos path INSIDE ownFileSet still blocks — a real conflict', () => {
+test('isIgnorableStatusPath: a non-.fgos path INSIDE ownFileSet still blocks — a real conflict', () => {
   const ownFileSet = new Set(['src/a.mjs']);
-  assert.equal(isFgosOnlyStatusLine(' M src/a.mjs', '', ownFileSet), false);
+  assert.equal(isIgnorableStatusPath('src/a.mjs', '', ownFileSet), false);
 });
 
-test('isFgosOnlyStatusLine: a .fgos/ path is always ignorable regardless of ownFileSet', () => {
+test('isIgnorableStatusPath: a .fgos/ path is always ignorable regardless of ownFileSet', () => {
   const ownFileSet = new Set(['.fgos/events.jsonl']);
-  assert.equal(isFgosOnlyStatusLine(' M .fgos/events.jsonl', '', ownFileSet), true);
-  assert.equal(isFgosOnlyStatusLine(' M .fgos/events.jsonl', '', new Set()), true);
+  assert.equal(isIgnorableStatusPath('.fgos/events.jsonl', '', ownFileSet), true);
+  assert.equal(isIgnorableStatusPath('.fgos/events.jsonl', '', new Set()), true);
 });
 
-test('isFgosOnlyStatusLine: a rename line ("a -> b") blocks if EITHER side is in ownFileSet', () => {
-  const ownFileSet = new Set(['new-name.txt']);
-  assert.equal(isFgosOnlyStatusLine('R  old-name.txt -> new-name.txt', '', ownFileSet), false);
-  assert.equal(isFgosOnlyStatusLine('R  old-name.txt -> other-new-name.txt', '', ownFileSet), true);
+test('isWorkingTreeClean: a staged rename blocks if EITHER half is in ownFileSet', () => {
+  const repoRoot = initRepo();
+  fs.writeFileSync(path.join(repoRoot, 'old-name.txt'), 'x\n');
+  git(repoRoot, ['add', 'old-name.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'old']);
+  git(repoRoot, ['mv', 'old-name.txt', 'new-name.txt']);
+  assert.equal(isWorkingTreeClean(repoRoot, new Set(['new-name.txt'])), false);
+  assert.equal(isWorkingTreeClean(repoRoot, new Set(['old-name.txt'])), false);
+  assert.equal(isWorkingTreeClean(repoRoot, new Set(['other-new-name.txt'])), true);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
 test('buildOwnFileSet: unions committed-diff paths and footprint, normalized the same way frozenJudgeHits normalizes footprint', () => {

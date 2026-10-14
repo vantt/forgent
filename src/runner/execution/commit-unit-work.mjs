@@ -19,6 +19,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { partitionPaths } from '../dispatch/write-scope.mjs';
+import { nulPaths, statusPaths } from '../../util/git-paths.mjs';
 
 const STORE_PREFIX = '.fgos/';
 
@@ -97,8 +98,6 @@ function git(ctx, args, { env, input } = {}) {
   });
 }
 
-const nulList = (out) => out.split('\0').filter(Boolean);
-
 function hasConfigured(ctx, key) {
   try {
     return git(ctx, ['config', '--get', key]).trim() !== '';
@@ -109,7 +108,7 @@ function hasConfigured(ctx, key) {
 
 /** Paths in the index that differ from HEAD; renames are reported as their two halves. */
 export function stagedPaths(ctx) {
-  return nulList(git(ctx, ['diff', '--cached', '--name-only', '--no-renames', '-z']));
+  return nulPaths(git(ctx, ['diff', '--cached', '--name-only', '--no-renames', '-z']));
 }
 
 /**
@@ -119,17 +118,7 @@ export function stagedPaths(ctx) {
 export function changedPaths(ctx) {
   // Content changes inside a submodule are not a change of this repository: staging the
   // submodule path would stage nothing and the staged-set check would fail.
-  const fields = git(ctx, ['status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignore-submodules=dirty']).split('\0');
-  const paths = [];
-  for (let i = 0; i < fields.length; i += 1) {
-    const entry = fields[i];
-    if (entry.length < 4) continue;
-    // An untracked nested repository is listed as `dir/` but staged (as a gitlink) as `dir`.
-    paths.push(entry.slice(3).replace(/\/$/, ''));
-    // A rename or copy, staged or intent-to-add, is followed by its source path.
-    if ('RC'.includes(entry[0]) || 'RC'.includes(entry[1])) paths.push(fields[++i]);
-  }
-  return [...new Set(paths)];
+  return statusPaths(git(ctx, ['status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignore-submodules=dirty']));
 }
 
 const outsideStore = (p) => !p.startsWith(STORE_PREFIX) && p !== '.fgos';
@@ -258,7 +247,7 @@ export function commitUnitWork({ worktree, repoRoot, unitId, summary, scope, cha
     const sha = git(ctx, ['rev-parse', 'HEAD']).trim();
 
     // A pre-commit hook can still change the index between the check above and the commit.
-    const inCommit = nulList(git(ctx, ['show', '--name-only', '--no-renames', '--format=', '-z', 'HEAD']));
+    const inCommit = nulPaths(git(ctx, ['show', '--name-only', '--no-renames', '--format=', '-z', 'HEAD']));
     if (!sameSet(inCommit, inScope)) {
       const unexpected = inCommit.filter((p) => !inScope.includes(p));
       const missing = inScope.filter((p) => !inCommit.includes(p));

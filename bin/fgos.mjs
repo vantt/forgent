@@ -75,7 +75,8 @@ import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFa
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
 import { normalizePath } from '../src/util/normalize-path.mjs';
 import { collectOutcomeEntry } from '../src/report/item-trace.mjs';
-import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet } from '../src/runner/merge.mjs';
+import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet } from '../src/runner/merge.mjs';
+import { nulPaths } from '../src/util/git-paths.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { rejectUseCase } from '../src/verbs/merge/reject.mjs';
 import { reviewUseCase } from '../src/verbs/merge/review.mjs';
@@ -197,10 +198,10 @@ function commitsSince(cwd, from, to) {
 // A literal tree diff (not a merge-base range): `commitsSince` above walks
 // `from..to` because it's counting commits, but a two-ref `git diff` already
 // compares the two trees directly, so no `..`/`...` range syntax is needed.
+// Byte for byte and a rename as both halves, like the clean-tree gate's own
+// status read: a path moved out of the footprint still counts as touched.
 function changedFilesSince(cwd, from, to) {
-  return gitAt(cwd, ['diff', '--name-only', from, to])
-    .split('\n')
-    .filter((line) => line.trim() !== '');
+  return nulPaths(gitAt(cwd, ['diff', '--name-only', '--no-renames', '-z', from, to]));
 }
 
 // tsk-4hl: an item's own docs/history/<id>/iron-law-evidence.md is a
@@ -223,7 +224,7 @@ function excludeIronLawEvidence(files, id) {
 // tsk-x5r: `.fgos/` is fgOS's own live event-sourced store, mutated by the
 // very take/return/approve lifecycle operations this advisory guards --
 // `isWorkingTreeClean` already exempts it for exactly this reason
-// (`isFgosOnlyStatusLine`, src/runner/merge.mjs: "never signals an
+// (`isIgnorableStatusPath`, src/runner/merge.mjs: "never signals an
 // actually-dirty code tree"). `footprintDiffHits` missed the same
 // exemption: on the main-source `return` path, a `.fgos/` change from ANY
 // concurrent session's own take/return/approve landing on the shared main

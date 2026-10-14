@@ -202,9 +202,10 @@ the changed files come from the working tree, not from a branch diff):
 node --input-type=module -e "
 import { execFileSync } from 'node:child_process';
 import { classifyIronLaw } from './src/evolve/iron-law.mjs';
+import { statusPaths } from './src/util/git-paths.mjs';
 const id = process.argv[1];
 const description = process.argv[2];
-console.log(JSON.stringify(classifyIronLaw({ filesChanged: execFileSync('git', ['status', '--porcelain', '-uall'], { encoding: 'utf8' }).split('\\n').filter(Boolean).map((l) => l.slice(3)), description })));
+console.log(JSON.stringify(classifyIronLaw({ filesChanged: statusPaths(execFileSync('git', ['status', '--porcelain=v1', '-z', '-uall'], { encoding: 'utf8' })), description })));
 " "<your item id — your current branch name, \`git branch --show-current\`, with the fgw/ prefix stripped>" "<your item's own Description text, verbatim, from the Description section above>"
 \`\`\`
 

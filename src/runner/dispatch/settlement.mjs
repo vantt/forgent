@@ -39,6 +39,7 @@ import {
   quarantineProviderAccount,
 } from './provider-capacity.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
+import { nulPaths, statusPaths } from '../../util/git-paths.mjs';
 
 /**
  * Safely resolve root path without failing if not in a git repository.
@@ -153,10 +154,9 @@ const isStorePath = (filePath) => filePath === '.fgos' || filePath.startsWith('.
 
 /**
  * Read current dirty file paths relative to git root safely, excluding .fgos/ internal files.
- * Read exactly as the runner's commit reads a worktree (commit-unit-work changedPaths), so what
- * settlement reports and what the commit judges are one list: NUL-separated (a name git would
- * quote, or one with edge spaces, comes back byte for byte), a rename or copy as both its halves,
- * an untracked nested repo without its trailing slash, and dirt inside a submodule left out.
+ * Read exactly as the runner's commit reads a worktree (commit-unit-work changedPaths, same git
+ * arguments and the shared statusPaths parser), so what settlement reports and what the commit
+ * judges are one list; dirt inside a submodule is left out.
  */
 export function safeGitStatusFiles(dir) {
   if (!dir) return [];
@@ -167,24 +167,15 @@ export function safeGitStatusFiles(dir) {
       shell: false,
       stdio: ['ignore', 'pipe', 'ignore'],
     });
-    const entries = output.split('\0');
-    const paths = [];
-    for (let i = 0; i < entries.length; i += 1) {
-      const entry = entries[i];
-      if (entry.length < 4) continue;
-      paths.push(entry.slice(3).replace(/\/$/, ''));
-      // `XY new\0orig\0`: a rename or copy, staged or intent-to-add, is followed by its source path.
-      if ('RC'.includes(entry[0]) || 'RC'.includes(entry[1])) paths.push(entries[++i]);
-    }
-    return [...new Set(paths)].filter((filePath) => filePath && !isStorePath(filePath));
+    return statusPaths(output).filter((filePath) => !isStorePath(filePath));
   } catch {
     return [];
   }
 }
 
 /**
- * List files modified between two commit SHAs, excluding .fgos/ internal files (NUL-separated,
- * byte for byte like safeGitStatusFiles; a rename as both its halves).
+ * List files modified between two commit SHAs, excluding .fgos/ internal files, byte for byte and
+ * a rename as both its halves like safeGitStatusFiles.
  */
 export function safeGitCommittedDiffFiles(dir, gitBefore, gitAfter) {
   if (!dir || !gitBefore || !gitAfter || gitBefore === gitAfter) return [];
@@ -195,7 +186,7 @@ export function safeGitCommittedDiffFiles(dir, gitBefore, gitAfter) {
       shell: false,
       stdio: ['ignore', 'pipe', 'ignore'],
     });
-    return output.split('\0').filter((s) => s && !isStorePath(s));
+    return nulPaths(output).filter((s) => !isStorePath(s));
   } catch {
     return [];
   }

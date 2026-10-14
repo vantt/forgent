@@ -8,6 +8,7 @@
 import { execFileSync } from 'node:child_process';
 import { openLeavesSharingTarget } from './graph-harness.mjs';
 import { listSessions } from '../runner/session.mjs';
+import { nulPaths } from '../util/git-paths.mjs';
 
 function requireTrunk(fnName, trunk) {
   if (typeof trunk !== 'string' || trunk === '') {
@@ -81,10 +82,9 @@ export function postLandDrift(repoRoot, view, { trunk, sessions } = {}) {
     let leafFiles = [];
     let targetFiles = [];
     try {
-      const leafOut = git(repoRoot, ['diff', '--name-only', `${mergeBase}...${leafBranch}`]).trim();
-      if (leafOut) leafFiles = leafOut.split('\n').filter(Boolean);
-      const targetOut = git(repoRoot, ['diff', '--name-only', `${mergeBase}...${targetBranch}`]).trim();
-      if (targetOut) targetFiles = targetOut.split('\n').filter(Boolean);
+      // Byte for byte, a rename as both halves: one side moving a file the other edits is shared.
+      leafFiles = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-renames', '-z', `${mergeBase}...${leafBranch}`]));
+      targetFiles = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-renames', '-z', `${mergeBase}...${targetBranch}`]));
     } catch {
       continue;
     }

@@ -8,6 +8,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { branchNameFor, findCheckoutPath } from './worktree.mjs';
 import { STALE_DOING_DEFAULTS } from '../state/graph-metrics.mjs';
+import { statusPaths } from '../util/git-paths.mjs';
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
@@ -68,22 +69,9 @@ export function lastActivityAt(repoRoot, id) {
   }
 
   let newestMtime;
-  // Each record is `XY<space>path`, NUL-terminated -- never newline-
-  // terminated, so a path itself containing a literal newline (unusual,
-  // but valid on POSIX filesystems) can never be mistaken for a record
-  // boundary either, a second correctness gain `-z` gives for free. A
-  // rename/copy record (X or Y is 'R'/'C') is followed by ONE MORE
-  // NUL-terminated token, the origin path -- consumed and discarded here,
-  // exactly mirroring the old code's own behavior of taking only the
-  // destination path for a "orig -> path" rename line, never the origin.
-  const records = statusOutput.split('\0').filter((entry) => entry.length > 0);
-  for (let i = 0; i < records.length; i += 1) {
-    const entry = records[i];
-    const statusCode = entry.slice(0, 2);
-    const filePath = entry.slice(3);
-    if (statusCode.includes('R') || statusCode.includes('C')) {
-      i += 1; // skip the origin-path token that follows a rename/copy record
-    }
+  // Parsed by `statusPaths`: a rename or copy gives both halves, and the
+  // source half no longer exists, so its statSync fails and is skipped.
+  for (const filePath of statusPaths(statusOutput)) {
     try {
       const mtime = fs.statSync(path.join(worktreePath, filePath)).mtimeMs;
       if (newestMtime === undefined || mtime > newestMtime) newestMtime = mtime;
