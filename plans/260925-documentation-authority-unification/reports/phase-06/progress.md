@@ -1,3 +1,17 @@
+# Active resume — bounded review packaging and final native proof
+
+Date: 2026-10-15
+Step: 5
+State: authoring
+Last committed checkpoint: e1b75bc70
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+
+Part 3 only. Inherited partial files are explicitly authorized for recovery by the owner; they have been listed against the committed tree. The interrupted native sync is restarted in the background with a separate log at /tmp/fgos-work/resume-truth/native-resume.log, using the unchanged full native API and both prior registries. Earlier progress statements about complete proof refer to the preceding proof and do not certify this interrupted rerun. Review packs, full digests, differing-digest lists and merge-only scope will be validated before committing. No promotion, main merge, push or Step 6.
+
+Next: finish sync, validate/package truth, pending and merge review requests, commit reviewable content, rerun final-pin D/E/native equality, persist compact registry under 90 MB, record remaining Step 5 closure obligations and stop.
+
+---
+
 # Boundary proof complete — bounded review packaging next
 
 Step: 5
