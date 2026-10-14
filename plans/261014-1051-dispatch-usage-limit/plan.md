@@ -1,6 +1,8 @@
 # Nhận diện hết hạn mức (usage limit) ở cửa dispatch
 
-Status: **done trong phạm vi đã thu hẹp** (2026-10-14 12:45). Ngày 10:45 bị chặn chờ council một-cửa; kết luận [council-261014-1231-dispatch-one-door-conclusion.md](../261014-1033-dispatch-operator-improvements/reports/council-261014-1231-dispatch-one-door-conclusion.md) đã thu hẹp lane C (xem "Sau hội đồng một-cửa" ở cuối). Phase 1/2 bên dưới là bản trước council, chỉ giữ để tra cứu. Nhánh `feat/dispatch-usage-limit`. Plan cha: [dispatch-operator-improvements](../261014-1033-dispatch-operator-improvements/plan.md), lane C.
+Status: superseded by plans/261014-1400-two-doors-one-rununit — [plan mới](../261014-1400-two-doors-one-rununit/plan.md). Trạng thái cũ giữ bên dưới để tra cứu.
+
+Trạng thái cũ: **done trong phạm vi đã thu hẹp** (2026-10-14 12:45). Ngày 10:45 bị chặn chờ council một-cửa; kết luận [council-261014-1231-dispatch-one-door-conclusion.md](../261014-1033-dispatch-operator-improvements/reports/council-261014-1231-dispatch-one-door-conclusion.md) đã thu hẹp lane C (xem "Sau hội đồng một-cửa" ở cuối). Phase 1/2 bên dưới là bản trước council, chỉ giữ để tra cứu. Nhánh `feat/dispatch-usage-limit`. Plan cha: [dispatch-operator-improvements](../261014-1033-dispatch-operator-improvements/plan.md), lane C.
 
 Council: [council-261014-1051-usage-limit.md](../261014-1033-dispatch-operator-improvements/reports/council-261014-1051-usage-limit.md). Báo cáo lane: [lane-c-261014-1051-usage-limit.md](../261014-1033-dispatch-operator-improvements/reports/lane-c-261014-1051-usage-limit.md).
 

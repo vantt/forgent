@@ -1,6 +1,8 @@
 # Ranh giới ghi của dispatch: quy trách nhiệm ghi lạc, Doer docs-only confined
 
-Status: **một phần xong; phần còn lại chờ owner** (cập nhật 2026-10-14 sau hội đồng một-cửa).
+Status: superseded by plans/261014-1400-two-doors-one-rununit — [plan mới](../261014-1400-two-doors-one-rununit/plan.md). Trạng thái cũ giữ bên dưới để tra cứu.
+
+Trạng thái cũ: **một phần xong; phần còn lại chờ owner** (cập nhật 2026-10-14 sau hội đồng một-cửa).
 
 ## Cập nhật sau hội đồng một-cửa (thay thế phần dưới khi mâu thuẫn)
 
