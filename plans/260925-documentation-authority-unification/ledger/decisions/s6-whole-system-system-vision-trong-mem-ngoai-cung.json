@@ -1,0 +1,507 @@
+{
+  "version": 1,
+  "shard": "s6-whole-system-system-vision-trong-mem-ngoai-cung.json",
+  "authorSession": "codex-session:37@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/architect/system-vision-trong-mem-ngoai-cung.md"
+  ],
+  "files": [
+    {
+      "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+      "disposition": "move",
+      "rationale": "Complete source carriage into the frozen whole-system architecture owner. Original current/design/historical qualifications retained; no retirement or promotion. Every source unit has an individual pending decision.",
+      "targets": [
+        "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_7af08f7b19633c3efc3c54cb870ad5f5",
+      "sourceUnitDigest": "3c6cade55629a91704628da7ada07f43360fff62bcc6e8d1c23abae9ddce8d81",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "system-vision-trong-mem-ngoai-cung",
+      "targetUnitDigest": "ed8092dd2b9cd330bc467efd0472a61b70765f53bbaeab1087126c74beff1e28",
+      "targetAncestry": [],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#system-vision-trong-mem-ngoai-cung (lines 1–1) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#system-vision-trong-mem-ngoai-cung (lines 1–1), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_733bbbdcf82cccec0ae64f0d51bbae35",
+      "sourceUnitDigest": "2d38a8b85750e2ad698eb5bada7baa91dea80b0d4f430179ebde5f51b9cb27d6",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "2d38a8b85750e2ad698eb5bada7baa91dea80b0d4f430179ebde5f51b9cb27d6",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-1 (lines 3–7) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-3 (lines 26–30), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_64a8c8baf09cc399d820a25f51c530aa",
+      "sourceUnitDigest": "2b97a7318c1621bd5bcc1f1a4cee9c4f76466582a7101067669f6782ecfc78f6",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "1-vision",
+      "targetUnitDigest": "2b97a7318c1621bd5bcc1f1a4cee9c4f76466582a7101067669f6782ecfc78f6",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#1-vision (lines 9–9) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#1-vision (lines 32–32), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_c7c23597f0f59066744415e2b42c32ee",
+      "sourceUnitDigest": "df0a9ebc856762709c383a1a7a6543ab58134e65953ec5d8d8ca58e5c423c055",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "df0a9ebc856762709c383a1a7a6543ab58134e65953ec5d8d8ca58e5c423c055",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "1. Vision"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-2 (lines 11–12) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-4 (lines 34–35), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_74f677288b1f88a2bd061f430885442c",
+      "sourceUnitDigest": "08c06530837bcf99e37c66ace553bb05831af473a279e2cd6c5b5c7c818c8c96",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "08c06530837bcf99e37c66ace553bb05831af473a279e2cd6c5b5c7c818c8c96",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "1. Vision"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-3 (lines 14–14) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-5 (lines 37–37), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_4908c7e38d4253d644d9510066b39e3e",
+      "sourceUnitDigest": "fb65608afa835d405a300ecefaaf8480c43f37269313e38862d84f63c10d908d",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "fb65608afa835d405a300ecefaaf8480c43f37269313e38862d84f63c10d908d",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "1. Vision"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-4 (lines 16–21) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-6 (lines 39–44), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_a8b24a3334af5b6a3479f38a98d7e591",
+      "sourceUnitDigest": "d572c64d9c10974762e52ca0ee4d031be1d60d87a100be8300b050560e27b84e",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetUnitDigest": "d572c64d9c10974762e52ca0ee4d031be1d60d87a100be8300b050560e27b84e",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "1. Vision"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-5 (lines 23–23) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-7 (lines 46–46), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_85adced2ecd69234b52d791b5832428a",
+      "sourceUnitDigest": "b46b3d5d129c035af4920c4cd50a01e8ec422a50ef71bdfd7f9c2c7dc55d9577",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetUnitDigest": "b46b3d5d129c035af4920c4cd50a01e8ec422a50ef71bdfd7f9c2c7dc55d9577",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "1. Vision"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-6 (lines 25–29) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-8 (lines 48–52), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_248240ca25f66e964188accd00df526a",
+      "sourceUnitDigest": "6c3bd16867cc227601af8bb4bde1ba0a1ff5ffc21d4a837447614ba84dcb4841",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "6c3bd16867cc227601af8bb4bde1ba0a1ff5ffc21d4a837447614ba84dcb4841",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "1. Vision"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-7 (lines 31–33) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-9 (lines 54–56), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_4b3408bc120b2ab7f05bdcdca3a78dab",
+      "sourceUnitDigest": "6a940230eb3172ac0cd44665b6d492a11ff8d99fe92c0f3b5c5eff8ae521ae54",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-10",
+      "targetUnitDigest": "6a940230eb3172ac0cd44665b6d492a11ff8d99fe92c0f3b5c5eff8ae521ae54",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "1. Vision"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-8 (lines 35–41) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-10 (lines 58–64), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7276e16ef23d0ab1850dd9d91d5121ae",
+      "sourceUnitDigest": "cb4b7a3b8e29e4d9f3f0ebaf1119a98d6120fd6afd834d9827d2085a459da741",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "2-why-this-exists",
+      "targetUnitDigest": "cb4b7a3b8e29e4d9f3f0ebaf1119a98d6120fd6afd834d9827d2085a459da741",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#2-why-this-exists (lines 43–43) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#2-why-this-exists (lines 66–66), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_93023a4db20504781b44efb9be5b3726",
+      "sourceUnitDigest": "20121b5ea8cfc91a1d4c5ebcb8cf5598f35e34ca4c6d5ac1701811d632822ad8",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetUnitDigest": "20121b5ea8cfc91a1d4c5ebcb8cf5598f35e34ca4c6d5ac1701811d632822ad8",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "2. Why This Exists"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-9 (lines 45–45) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-11 (lines 68–68), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_11d2f816f621c7c9cffad344a3356475",
+      "sourceUnitDigest": "8d0bcb622e3057582d231b81a0380adecdd47c78593bd957b1e525a262907264",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-12",
+      "targetUnitDigest": "8d0bcb622e3057582d231b81a0380adecdd47c78593bd957b1e525a262907264",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "2. Why This Exists"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-10 (lines 47–52) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-12 (lines 70–75), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_08fe56b6dc3b93c6a86a2e22d854dd21",
+      "sourceUnitDigest": "15e599a2a3eea6213b50f3592b57fe4e61c5acb2abece954f8ccba3592f3d526",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetUnitDigest": "15e599a2a3eea6213b50f3592b57fe4e61c5acb2abece954f8ccba3592f3d526",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "2. Why This Exists"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-11 (lines 54–54) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-13 (lines 77–77), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_25de6efa8826e2668318a047142018af",
+      "sourceUnitDigest": "627a8d63f3cfc6aded622ed5a0ee8d94bfd02db2f1bef025a222f7aabe3fbfa5",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-14",
+      "targetUnitDigest": "627a8d63f3cfc6aded622ed5a0ee8d94bfd02db2f1bef025a222f7aabe3fbfa5",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "2. Why This Exists"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-12 (lines 56–60) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-14 (lines 79–83), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_e4e0ea54bef3a6f4df33df1e89117a52",
+      "sourceUnitDigest": "50ece70c24c1b92b362e6c7ff56b912a0c5b78eb36c9100c7ca17485f709840f",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "3-design-rule",
+      "targetUnitDigest": "50ece70c24c1b92b362e6c7ff56b912a0c5b78eb36c9100c7ca17485f709840f",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#3-design-rule (lines 62–62) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#3-design-rule (lines 85–85), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_8131735458780d1b62ca74659cfc799c",
+      "sourceUnitDigest": "7c5ed9fada4f9b791729caac8e955dd61dbfe816823a487a11ef2645554773b5",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetUnitDigest": "7c5ed9fada4f9b791729caac8e955dd61dbfe816823a487a11ef2645554773b5",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "3. Design Rule"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-13 (lines 64–64) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-15 (lines 87–87), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_2275036ae98e72ef435eda28e34cf9d2",
+      "sourceUnitDigest": "6f0d45f5c5dbbf7d3e3e74922e12c7f1134180596600911678b7a13e6acb6247",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetUnitDigest": "6f0d45f5c5dbbf7d3e3e74922e12c7f1134180596600911678b7a13e6acb6247",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "3. Design Rule"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-14 (lines 66–69) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-16 (lines 89–92), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_98cab524d25ac00b1a7bcb55efe5911a",
+      "sourceUnitDigest": "cf1e4001906c60969581b98dc6f1032d1f2ed7a381b41f54721c4e18c6027981",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetUnitDigest": "cf1e4001906c60969581b98dc6f1032d1f2ed7a381b41f54721c4e18c6027981",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "3. Design Rule"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-15 (lines 71–71) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-17 (lines 94–94), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_389cbb0ed16d03193f95b1050307bcf6",
+      "sourceUnitDigest": "2ecb29da7677f901380af32f4dca8c03d15d215ee209dc90040b06996e0e0d41",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetUnitDigest": "2ecb29da7677f901380af32f4dca8c03d15d215ee209dc90040b06996e0e0d41",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "3. Design Rule"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-16 (lines 73–78) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-18 (lines 96–101), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7f2039017fff407a6508c008fb041b42",
+      "sourceUnitDigest": "849ba120da172940f121e38eb77aae29220eab3d801e6386280429b752f99cdd",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetUnitDigest": "849ba120da172940f121e38eb77aae29220eab3d801e6386280429b752f99cdd",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "3. Design Rule"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-17 (lines 80–80) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-19 (lines 103–103), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_9d8a8f3ba46e861451c6a746db376790",
+      "sourceUnitDigest": "e1c93afc8ed61db724f1964d6adfd49dce4718dca284326ec01ec1972d14cda7",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetUnitDigest": "e1c93afc8ed61db724f1964d6adfd49dce4718dca284326ec01ec1972d14cda7",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "3. Design Rule"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-18 (lines 82–89) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-20 (lines 105–112), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_e646d72e1faf2dc7eb5c65ab6a6d8030",
+      "sourceUnitDigest": "1a2f6b42c2f140f62743961f6c8c9f5e4d19c3689a10d9f25b6b00ee8524dbb3",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetUnitDigest": "1a2f6b42c2f140f62743961f6c8c9f5e4d19c3689a10d9f25b6b00ee8524dbb3",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "3. Design Rule"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-19 (lines 91–92) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-21 (lines 114–115), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_f39b608c75acacbeb51a223279bb0eaf",
+      "sourceUnitDigest": "d22ed3853aa5ec5870f7788b671d6a4dda1c71cfa0a576f1a6aaf46ec75cfd4e",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "4-practical-consequences",
+      "targetUnitDigest": "d22ed3853aa5ec5870f7788b671d6a4dda1c71cfa0a576f1a6aaf46ec75cfd4e",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#4-practical-consequences (lines 94–94) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#4-practical-consequences (lines 117–117), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_44599eb7c20796c8f57eed75cc90078f",
+      "sourceUnitDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "4. Practical Consequences"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-20 (lines 96–112) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-22 (lines 119–135), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_0583c8bb44ff974331b0f6ab9bf1c48c",
+      "sourceUnitDigest": "71aa65673aba4c74dcf3d07f63fd2f24e26532bd0ade6287704941f029fa3474",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "5-relation-to-current-streams",
+      "targetUnitDigest": "71aa65673aba4c74dcf3d07f63fd2f24e26532bd0ade6287704941f029fa3474",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#5-relation-to-current-streams (lines 114–114) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#5-relation-to-current-streams (lines 137–137), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_680989c22bdb9826c28cce48c76e5154",
+      "sourceUnitDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "5. Relation To Current Streams"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-21 (lines 116–122) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-23 (lines 139–145), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_fdb1974174f4354153d278b30ce7fc3e",
+      "sourceUnitDigest": "1780923c86e3bee776a803dd0fce20831dffce0fa5488395cefd9df2c8bf865f",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "6-review-check",
+      "targetUnitDigest": "1780923c86e3bee776a803dd0fce20831dffce0fa5488395cefd9df2c8bf865f",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#6-review-check (lines 124–124) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#6-review-check (lines 147–147), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_005e747bd6d72d5767f4924add1279c0",
+      "sourceUnitDigest": "d30d1d88e0a0f5bdd55976afadd8b1ecedb13cec31644d4eb712b97a62a21b09",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "d30d1d88e0a0f5bdd55976afadd8b1ecedb13cec31644d4eb712b97a62a21b09",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "6. Review Check"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-22 (lines 126–127) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-24 (lines 149–150), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_185ab46fc4e465d5bc8d3f4d6c39aa3a",
+      "sourceUnitDigest": "1c0173b5499b6b851a29c1646acd710e7c10a5ffc05c02d2c8ec41bf881f1b7d",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "1c0173b5499b6b851a29c1646acd710e7c10a5ffc05c02d2c8ec41bf881f1b7d",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "6. Review Check"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-23 (lines 129–134) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-25 (lines 152–157), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_aabd6ef5fad2a6259f57c8651dda00b6",
+      "sourceUnitDigest": "c97f69912beb73486665712ba778bae7cf1ceec3915ebc8360150a085844aab9",
+      "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetUnitDigest": "c97f69912beb73486665712ba778bae7cf1ceec3915ebc8360150a085844aab9",
+      "targetAncestry": [
+        "System Vision: Trong Mem Ngoai Cung",
+        "6. Review Check"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-24 (lines 136–136) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-26 (lines 159–159), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    }
+  ]
+}

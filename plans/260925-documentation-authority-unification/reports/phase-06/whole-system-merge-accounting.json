@@ -1,0 +1,660 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:37@2026-10-15",
+  "sourceCommit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+  "previousPlanCommit": "a216ddfc06fe718b34c1acf2e50fe1c631ea71d9",
+  "previousSync": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+  "SYNC": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+  "noConflicts": true,
+  "upstreamDocsPaths": [
+    "docs/architecture-manifest.json",
+    "docs/specs/runner.md"
+  ],
+  "manifest": {
+    "sourcePath": "docs/architecture-manifest.json",
+    "targetPath": "docs/platform/contracts/architecture-manifest.json",
+    "sourceBlob": "6c1b0903e56ec312f329283d792f118cbfd32426",
+    "beforeBlob": "dd99d861b3c1dab741f07b94d3031005c167dac7",
+    "sourceAndTargetSHA256": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
+    "beforeTargetSHA256": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+    "byteEqual": true,
+    "mainDiff": "diff --git a/docs/architecture-manifest.json b/docs/architecture-manifest.json\nindex dd99d861b..6c1b0903e 100644\n--- a/docs/architecture-manifest.json\n+++ b/docs/architecture-manifest.json\n@@ -55,6 +55,7 @@\n     \"src/runner/dispatch/agent-result-claim-contract.mjs\": \"infra\",\n     \"src/runner/dispatch/evidence-attribution.mjs\": \"infra\",\n     \"src/runner/dispatch/write-scope.mjs\": \"kernel\",\n+    \"src/runner/dispatch/run-timeout.mjs\": \"kernel\",\n     \"src/runner/dispatch/run-result.mjs\": \"infra\",\n     \"src/runner/dispatch/usage-parsers.mjs\": \"infra\",\n     \"src/runner/dispatch/runtime-inspection.mjs\": \"infra\",\n@@ -230,6 +231,7 @@\n     \"src/runner/execution/role-ledger.mjs\": \"infra\",\n     \"src/runner/execution/commit-unit-work.mjs\": \"infra\",\n     \"src/runner/execution/partial-writes.mjs\": \"infra\",\n+    \"src/runner/execution/unit-sync.mjs\": \"infra\",\n     \"src/runner/execution/handoff-refs.mjs\": \"infra\",\n     \"src/runner/execution/unit-run-history.mjs\": \"infra\",\n     \"src/runner/execution/unit-summary.mjs\": \"infra\",\n",
+    "reopenedBindings": [
+      {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "collection": "claims",
+        "previousReviewedDecision": {
+          "claimId": "claim_0416642260519cf992931a4968e80c03",
+          "sourceUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+          "claimKind": "contract",
+          "disposition": "supersede",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:27@2026-10-14",
+          "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+          "targetAnchor": "file-block",
+          "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+          "reviewNote": "deep: Sampled. Whole-file digest of source and candidate manifest equal; byte-identical copy of main's manifest including the 7 changed entries.",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+          "targetAncestry": [],
+          "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+        }
+      },
+      {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+        "collection": "registryGaps",
+        "previousReviewedDecision": {
+          "claimId": "claim_2f7cbb5fabfc5e77f7014c54f020c524",
+          "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+          "sourceAnchor": "file-block",
+          "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+          "disposition": "supersede",
+          "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+          "targetAnchor": "file-block",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:27@2026-10-14",
+          "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+          "reviewNote": "deep: whole file equals main docs/architecture-manifest.json byte for byte (sha256 0eab58e6...); diff to the old copy is exactly the dispatch-log removal, five added modules and two kind changes; anchor check is not defined for a JSON file-block so I proved it with the extractor",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+          "targetAncestry": [],
+          "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+        }
+      },
+      {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+        "collection": "registryGaps",
+        "previousReviewedDecision": {
+          "claimId": "claim_4b96f4f42ea417623dcc794155fa17ce",
+          "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+          "claimKind": "contract",
+          "disposition": "supersede",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:30@2026-10-15",
+          "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+          "targetAnchor": "file-block",
+          "rationale": "The complete merged architecture manifest is carried byte-for-byte at docs/platform/contracts/architecture-manifest.json#file-block. It differs from this historical source: upstream removes src/runner/dispatch-log.mjs; adds kernel mappings for src/runner/dispatch/write-scope.mjs and src/util/git-paths.mjs; adds infra mappings for src/runner/execution/account-pin.mjs, src/runner/execution/partial-writes.mjs and src/workflow/units-source.mjs; and changes src/runner/fanout-batch.mjs and src/runner/work-dispatch.mjs from infra to use-case. The old source digest is retained; the current target digest is different. A22/A31 independent conservation re-review is pending with no approval carry or truth certification.",
+          "sourcePath": "docs/architecture-manifest.json",
+          "sourceAnchor": "file-block",
+          "reviewNote": "deep: manifest file-block; rationale now admits the old digest c1c23046 differs from the merged 0eab58e6 and lists the changes. I diffed them: dispatch-log removed, write-scope and git-paths kernel, account-pin partial-writes units-source infra, fanout-batch and work-dispatch infra to use-case, exactly as listed (7 added, 3 removed). Root and platform manifest are byte-equal at 7e9fd4bd5.",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+          "targetAncestry": [],
+          "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
+        }
+      }
+    ],
+    "currentSourceProposal": {
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceAnchor": "file-block",
+      "sourceUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
+      "nativeClaimId": null,
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "A31 new upstream source file-block: complete main manifest recarried exactly. Pending native current identity allocation; no synthetic claim ID. Next turn promotes this proposal into a native-ID decision after carry, with historical predecessors pending independently. Main-only diff is the conservation witness, no truth claim."
+    }
+  },
+  "runnerPinOnly": {
+    "sourcePath": "docs/specs/runner.md",
+    "beforeBlob": "8f1aee310bcce2f364cb8abcc2c0b0ab36e7a6b3",
+    "currentBlob": "f97e36bf111c7bc0c3eedc68945b29a0aa159027",
+    "laterOwner": "Step 9 specs; no runner candidate content/row authored here"
+  },
+  "receiptScope": {
+    "method": "Read every reviewed live classification reference at its immutable receiptCommit; select citations (including typed supporting context) to paths actually changed in this merge. Historical/nonlive refs and already-unverified receipts are not revived. Recompute every selected full shown unit tuple against persisted live registry. Supporting references that are strings are labels, not pinned code spans.",
+    "affectedReferences": 4,
+    "unchangedRepins": 4,
+    "changedCodeCandidateUnverified": 0,
+    "receiptArtifact": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+    "receiptPin": "next turn: runner-produced commit containing this artifact; no invented receiptCommit",
+    "independentMachineReviewPending": true,
+    "rows": [
+      {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+        "ref": {
+          "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+          "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+          "reviewedAt": "2026-10-12",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+          "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+          "reviewMode": "ordinary",
+          "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_de1bde6579325220fa5ddea79b9cd77f; bytes equal"
+        },
+        "receipt": {
+          "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-39",
+          "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+          "shownText": "Current compiled fields (`src/runner/dispatch/plan.mjs:444-461`) are\n`selector`, `caller`, `mechanism`, `executorId`, `capability`, `invocation`,\n`governance`, `reasonCodes`, optional `agentType`/`mcpTool`, `configured`,\n`bindingSource`, `tier`, `model`, `providerModel`, `provenance`, and `policy`.\nGovernance uses its actual provider/egress shape; there is no top-level\n`target`, `handback` or `execution` wrapper and no `egress.allowed` flag.",
+          "shownTextDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.1 Shape, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "61-shape",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "af6c116f0e2af1f31f5e1d57830dc60de0c65411",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 80,
+                "endLine": 93,
+                "blobSha": "07dea2a62267ec3554b2b1d459dca82eb04e5483"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 444,
+                "endLine": 461,
+                "blobSha": "07dea2a62267ec3554b2b1d459dca82eb04e5483"
+              }
+            ],
+            "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+            "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          }
+        },
+        "live": {
+          "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "unitDigest": "e5cd1cd0d3e53b2caf96a299b01329f656896bd5c0c907b63ba746bcde573427",
+          "identityFingerprint": "e5cd1cd0d3e53b2caf96a299b01329f656896bd5c0c907b63ba746bcde573427",
+          "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+          "sourceAnchor": "unheaded-block-39",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "citationWitnesses": [
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "oldBlob": "07dea2a62267ec3554b2b1d459dca82eb04e5483",
+            "oldStartLine": 80,
+            "oldEndLine": 93,
+            "newBlob": "819f4727c6f348e03d2c6c42a2714c0ec49857ab",
+            "newStartLine": 91,
+            "newEndLine": 104,
+            "uniqueShiftMatches": [
+              91
+            ],
+            "oldExcerpt": "  let selector;\n  if (executorIdArg) {\n    selector = { type: 'executor', value: executorIdArg };\n  } else if (assignmentArg) {\n    selector = {\n      type: 'assignment',\n      value: typeof assignmentArg === 'string' ? assignmentArg : assignmentArg.assignmentId,\n    };\n  } else if (workIdArg) {\n    selector = { type: 'work', value: workIdArg };\n  } else if (purpose) {\n    selector = { type: 'purpose', value: purpose };\n  } else {\n    selector = { type: 'adHocAgent', value: true };",
+            "oldExcerptSHA256": "a2a98693ed0da801a132f5346fa9b382431c18fc83039ad55a6c2fbe723dce8b",
+            "newExcerpt": "  let selector;\n  if (executorIdArg) {\n    selector = { type: 'executor', value: executorIdArg };\n  } else if (assignmentArg) {\n    selector = {\n      type: 'assignment',\n      value: typeof assignmentArg === 'string' ? assignmentArg : assignmentArg.assignmentId,\n    };\n  } else if (workIdArg) {\n    selector = { type: 'work', value: workIdArg };\n  } else if (purpose) {\n    selector = { type: 'purpose', value: purpose };\n  } else {\n    selector = { type: 'adHocAgent', value: true };",
+            "unchanged": true
+          },
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "oldBlob": "07dea2a62267ec3554b2b1d459dca82eb04e5483",
+            "oldStartLine": 444,
+            "oldEndLine": 461,
+            "newBlob": "819f4727c6f348e03d2c6c42a2714c0ec49857ab",
+            "newStartLine": 455,
+            "newEndLine": 472,
+            "uniqueShiftMatches": [
+              455
+            ],
+            "oldExcerpt": "  return {\n    selector,\n    caller: callerObj,\n    mechanism: finalMechanism,\n    executorId,\n    capability,\n    invocation,\n    governance,\n    reasonCodes,\n    ...(agentType ? { agentType } : {}),\n    ...(mcpTool ? { mcpTool } : {}),\n    configured,\n    bindingSource: resolved.bindingSource ?? null,\n    tier: effectivePolicy?.tier ?? null,\n    model: effectivePolicy?.model ?? null,\n    providerModel: effectivePolicy?.providerModel ?? null,\n    provenance: effectivePolicy?.provenance ?? null,\n    policy: effectivePolicy,",
+            "oldExcerptSHA256": "0c95320f7d90b9f7f92cfc22a5a0bba3b70acab8079ca04342d800e181b70664",
+            "newExcerpt": "  return {\n    selector,\n    caller: callerObj,\n    mechanism: finalMechanism,\n    executorId,\n    capability,\n    invocation,\n    governance,\n    reasonCodes,\n    ...(agentType ? { agentType } : {}),\n    ...(mcpTool ? { mcpTool } : {}),\n    configured,\n    bindingSource: resolved.bindingSource ?? null,\n    tier: effectivePolicy?.tier ?? null,\n    model: effectivePolicy?.model ?? null,\n    providerModel: effectivePolicy?.providerModel ?? null,\n    provenance: effectivePolicy?.provenance ?? null,\n    policy: effectivePolicy,",
+            "unchanged": true
+          }
+        ],
+        "outcome": "unchanged-excerpt-machine-repin"
+      },
+      {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+        "ref": {
+          "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+          "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+          "reviewedAt": "2026-10-12",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+          "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+          "reviewMode": "ordinary",
+          "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_271c8a780dde80cb18e612f908a4eca1; bytes equal"
+        },
+        "receipt": {
+          "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-40",
+          "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+          "shownText": "Values and reason codes depend on the resolved request/configuration. Inspect\nthe actual returned plan rather than treating an illustrative schema or an\nold executor selection as a observed result.",
+          "shownTextDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.1 Shape, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "61-shape",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "af6c116f0e2af1f31f5e1d57830dc60de0c65411",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 80,
+                "endLine": 93,
+                "blobSha": "07dea2a62267ec3554b2b1d459dca82eb04e5483"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 444,
+                "endLine": 461,
+                "blobSha": "07dea2a62267ec3554b2b1d459dca82eb04e5483"
+              }
+            ],
+            "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_271c8a780dde80cb18e612f908a4eca1",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_271c8a780dde80cb18e612f908a4eca1",
+            "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          }
+        },
+        "live": {
+          "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "unitDigest": "6aac4236a8850f948cf4697248c8a75b25b88481bf704f2750abc75bd2262bd4",
+          "identityFingerprint": "6aac4236a8850f948cf4697248c8a75b25b88481bf704f2750abc75bd2262bd4",
+          "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+          "sourceAnchor": "unheaded-block-40",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+          "claimKind": "contract",
+          "status": "future"
+        },
+        "citationWitnesses": [
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "oldBlob": "07dea2a62267ec3554b2b1d459dca82eb04e5483",
+            "oldStartLine": 80,
+            "oldEndLine": 93,
+            "newBlob": "819f4727c6f348e03d2c6c42a2714c0ec49857ab",
+            "newStartLine": 91,
+            "newEndLine": 104,
+            "uniqueShiftMatches": [
+              91
+            ],
+            "oldExcerpt": "  let selector;\n  if (executorIdArg) {\n    selector = { type: 'executor', value: executorIdArg };\n  } else if (assignmentArg) {\n    selector = {\n      type: 'assignment',\n      value: typeof assignmentArg === 'string' ? assignmentArg : assignmentArg.assignmentId,\n    };\n  } else if (workIdArg) {\n    selector = { type: 'work', value: workIdArg };\n  } else if (purpose) {\n    selector = { type: 'purpose', value: purpose };\n  } else {\n    selector = { type: 'adHocAgent', value: true };",
+            "oldExcerptSHA256": "a2a98693ed0da801a132f5346fa9b382431c18fc83039ad55a6c2fbe723dce8b",
+            "newExcerpt": "  let selector;\n  if (executorIdArg) {\n    selector = { type: 'executor', value: executorIdArg };\n  } else if (assignmentArg) {\n    selector = {\n      type: 'assignment',\n      value: typeof assignmentArg === 'string' ? assignmentArg : assignmentArg.assignmentId,\n    };\n  } else if (workIdArg) {\n    selector = { type: 'work', value: workIdArg };\n  } else if (purpose) {\n    selector = { type: 'purpose', value: purpose };\n  } else {\n    selector = { type: 'adHocAgent', value: true };",
+            "unchanged": true
+          },
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "oldBlob": "07dea2a62267ec3554b2b1d459dca82eb04e5483",
+            "oldStartLine": 444,
+            "oldEndLine": 461,
+            "newBlob": "819f4727c6f348e03d2c6c42a2714c0ec49857ab",
+            "newStartLine": 455,
+            "newEndLine": 472,
+            "uniqueShiftMatches": [
+              455
+            ],
+            "oldExcerpt": "  return {\n    selector,\n    caller: callerObj,\n    mechanism: finalMechanism,\n    executorId,\n    capability,\n    invocation,\n    governance,\n    reasonCodes,\n    ...(agentType ? { agentType } : {}),\n    ...(mcpTool ? { mcpTool } : {}),\n    configured,\n    bindingSource: resolved.bindingSource ?? null,\n    tier: effectivePolicy?.tier ?? null,\n    model: effectivePolicy?.model ?? null,\n    providerModel: effectivePolicy?.providerModel ?? null,\n    provenance: effectivePolicy?.provenance ?? null,\n    policy: effectivePolicy,",
+            "oldExcerptSHA256": "0c95320f7d90b9f7f92cfc22a5a0bba3b70acab8079ca04342d800e181b70664",
+            "newExcerpt": "  return {\n    selector,\n    caller: callerObj,\n    mechanism: finalMechanism,\n    executorId,\n    capability,\n    invocation,\n    governance,\n    reasonCodes,\n    ...(agentType ? { agentType } : {}),\n    ...(mcpTool ? { mcpTool } : {}),\n    configured,\n    bindingSource: resolved.bindingSource ?? null,\n    tier: effectivePolicy?.tier ?? null,\n    model: effectivePolicy?.model ?? null,\n    providerModel: effectivePolicy?.providerModel ?? null,\n    provenance: effectivePolicy?.provenance ?? null,\n    policy: effectivePolicy,",
+            "unchanged": true
+          }
+        ],
+        "outcome": "unchanged-excerpt-machine-repin"
+      },
+      {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+        "ref": {
+          "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+          "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+          "reviewedAt": "2026-10-12",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+          "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+          "reviewMode": "ordinary",
+          "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_c66cf74ca521ea390c33065fc83b28d7; bytes equal"
+        },
+        "receipt": {
+          "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-43",
+          "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+          "shownText": "- `work` - dispatch decision for a lifecycle work item.\n- `purpose` - dispatch decision for a named capability/purpose.\n- `executor` - dispatch decision for a concrete executor id.\n- `assignment` - dispatch decision for an actual Assignment or its id.\n- `adHocAgent` - dispatch decision for a runtime-composed agent assignment.",
+          "shownTextDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.2 Selector, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "62-selector",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "af6c116f0e2af1f31f5e1d57830dc60de0c65411",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 80,
+                "endLine": 93,
+                "blobSha": "07dea2a62267ec3554b2b1d459dca82eb04e5483"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 444,
+                "endLine": 461,
+                "blobSha": "07dea2a62267ec3554b2b1d459dca82eb04e5483"
+              }
+            ],
+            "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_c66cf74ca521ea390c33065fc83b28d7",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_c66cf74ca521ea390c33065fc83b28d7",
+            "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          }
+        },
+        "live": {
+          "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "unitDigest": "51ef8dcb17ca8cec35d54b4797f30f493a2e544eefc65c31a1caa9bdd0fec6db",
+          "identityFingerprint": "51ef8dcb17ca8cec35d54b4797f30f493a2e544eefc65c31a1caa9bdd0fec6db",
+          "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+          "sourceAnchor": "unheaded-block-43",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+          "claimKind": "decision",
+          "status": "future"
+        },
+        "citationWitnesses": [
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "oldBlob": "07dea2a62267ec3554b2b1d459dca82eb04e5483",
+            "oldStartLine": 80,
+            "oldEndLine": 93,
+            "newBlob": "819f4727c6f348e03d2c6c42a2714c0ec49857ab",
+            "newStartLine": 91,
+            "newEndLine": 104,
+            "uniqueShiftMatches": [
+              91
+            ],
+            "oldExcerpt": "  let selector;\n  if (executorIdArg) {\n    selector = { type: 'executor', value: executorIdArg };\n  } else if (assignmentArg) {\n    selector = {\n      type: 'assignment',\n      value: typeof assignmentArg === 'string' ? assignmentArg : assignmentArg.assignmentId,\n    };\n  } else if (workIdArg) {\n    selector = { type: 'work', value: workIdArg };\n  } else if (purpose) {\n    selector = { type: 'purpose', value: purpose };\n  } else {\n    selector = { type: 'adHocAgent', value: true };",
+            "oldExcerptSHA256": "a2a98693ed0da801a132f5346fa9b382431c18fc83039ad55a6c2fbe723dce8b",
+            "newExcerpt": "  let selector;\n  if (executorIdArg) {\n    selector = { type: 'executor', value: executorIdArg };\n  } else if (assignmentArg) {\n    selector = {\n      type: 'assignment',\n      value: typeof assignmentArg === 'string' ? assignmentArg : assignmentArg.assignmentId,\n    };\n  } else if (workIdArg) {\n    selector = { type: 'work', value: workIdArg };\n  } else if (purpose) {\n    selector = { type: 'purpose', value: purpose };\n  } else {\n    selector = { type: 'adHocAgent', value: true };",
+            "unchanged": true
+          },
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "oldBlob": "07dea2a62267ec3554b2b1d459dca82eb04e5483",
+            "oldStartLine": 444,
+            "oldEndLine": 461,
+            "newBlob": "819f4727c6f348e03d2c6c42a2714c0ec49857ab",
+            "newStartLine": 455,
+            "newEndLine": 472,
+            "uniqueShiftMatches": [
+              455
+            ],
+            "oldExcerpt": "  return {\n    selector,\n    caller: callerObj,\n    mechanism: finalMechanism,\n    executorId,\n    capability,\n    invocation,\n    governance,\n    reasonCodes,\n    ...(agentType ? { agentType } : {}),\n    ...(mcpTool ? { mcpTool } : {}),\n    configured,\n    bindingSource: resolved.bindingSource ?? null,\n    tier: effectivePolicy?.tier ?? null,\n    model: effectivePolicy?.model ?? null,\n    providerModel: effectivePolicy?.providerModel ?? null,\n    provenance: effectivePolicy?.provenance ?? null,\n    policy: effectivePolicy,",
+            "oldExcerptSHA256": "0c95320f7d90b9f7f92cfc22a5a0bba3b70acab8079ca04342d800e181b70664",
+            "newExcerpt": "  return {\n    selector,\n    caller: callerObj,\n    mechanism: finalMechanism,\n    executorId,\n    capability,\n    invocation,\n    governance,\n    reasonCodes,\n    ...(agentType ? { agentType } : {}),\n    ...(mcpTool ? { mcpTool } : {}),\n    configured,\n    bindingSource: resolved.bindingSource ?? null,\n    tier: effectivePolicy?.tier ?? null,\n    model: effectivePolicy?.model ?? null,\n    providerModel: effectivePolicy?.providerModel ?? null,\n    provenance: effectivePolicy?.provenance ?? null,\n    policy: effectivePolicy,",
+            "unchanged": true
+          }
+        ],
+        "outcome": "unchanged-excerpt-machine-repin"
+      },
+      {
+        "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+        "ref": {
+          "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+          "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+          "reviewedAt": "2026-10-12",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+          "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+          "reviewMode": "ordinary",
+          "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_56af2fc53f516253db192a78f0dddc70; bytes equal"
+        },
+        "receipt": {
+          "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+          "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-47",
+          "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+          "shownText": "For in-process plans, native capability fields are top-level `agentType` or\n`mcpTool` when supplied (`plan.mjs:453-454`), not a `handback` object.\nThe caller must actually possess the returned live facility; the decision\ndoes not invoke that facility itself.",
+          "shownTextDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+          "class": "candidate-native-content",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.3 Mechanism, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+          "truthSection": {
+            "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+            "anchor": "63-mechanism",
+            "status": "verified",
+            "reason": null
+          },
+          "currentEvidence": {
+            "commit": "af6c116f0e2af1f31f5e1d57830dc60de0c65411",
+            "finding": "true-and-current",
+            "citations": [
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 80,
+                "endLine": 93,
+                "blobSha": "07dea2a62267ec3554b2b1d459dca82eb04e5483"
+              },
+              {
+                "path": "src/runner/dispatch/plan.mjs",
+                "startLine": 444,
+                "endLine": 461,
+                "blobSha": "07dea2a62267ec3554b2b1d459dca82eb04e5483"
+              }
+            ],
+            "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+            "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+          },
+          "recoveryProvenance": {
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptClaimId": "claim_56af2fc53f516253db192a78f0dddc70",
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+            "verdictClaimId": "claim_56af2fc53f516253db192a78f0dddc70",
+            "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+            "originalAuthorSession": "codex-session:1@2026-10-10"
+          }
+        },
+        "live": {
+          "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "unitDigest": "cda55f39d35d91444244a46b03e33ec7598a6c356cee489ec19e6ef7b5d48441",
+          "identityFingerprint": "cda55f39d35d91444244a46b03e33ec7598a6c356cee489ec19e6ef7b5d48441",
+          "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+          "sourceAnchor": "unheaded-block-47",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "citationWitnesses": [
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "oldBlob": "07dea2a62267ec3554b2b1d459dca82eb04e5483",
+            "oldStartLine": 80,
+            "oldEndLine": 93,
+            "newBlob": "819f4727c6f348e03d2c6c42a2714c0ec49857ab",
+            "newStartLine": 91,
+            "newEndLine": 104,
+            "uniqueShiftMatches": [
+              91
+            ],
+            "oldExcerpt": "  let selector;\n  if (executorIdArg) {\n    selector = { type: 'executor', value: executorIdArg };\n  } else if (assignmentArg) {\n    selector = {\n      type: 'assignment',\n      value: typeof assignmentArg === 'string' ? assignmentArg : assignmentArg.assignmentId,\n    };\n  } else if (workIdArg) {\n    selector = { type: 'work', value: workIdArg };\n  } else if (purpose) {\n    selector = { type: 'purpose', value: purpose };\n  } else {\n    selector = { type: 'adHocAgent', value: true };",
+            "oldExcerptSHA256": "a2a98693ed0da801a132f5346fa9b382431c18fc83039ad55a6c2fbe723dce8b",
+            "newExcerpt": "  let selector;\n  if (executorIdArg) {\n    selector = { type: 'executor', value: executorIdArg };\n  } else if (assignmentArg) {\n    selector = {\n      type: 'assignment',\n      value: typeof assignmentArg === 'string' ? assignmentArg : assignmentArg.assignmentId,\n    };\n  } else if (workIdArg) {\n    selector = { type: 'work', value: workIdArg };\n  } else if (purpose) {\n    selector = { type: 'purpose', value: purpose };\n  } else {\n    selector = { type: 'adHocAgent', value: true };",
+            "unchanged": true
+          },
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "oldBlob": "07dea2a62267ec3554b2b1d459dca82eb04e5483",
+            "oldStartLine": 444,
+            "oldEndLine": 461,
+            "newBlob": "819f4727c6f348e03d2c6c42a2714c0ec49857ab",
+            "newStartLine": 455,
+            "newEndLine": 472,
+            "uniqueShiftMatches": [
+              455
+            ],
+            "oldExcerpt": "  return {\n    selector,\n    caller: callerObj,\n    mechanism: finalMechanism,\n    executorId,\n    capability,\n    invocation,\n    governance,\n    reasonCodes,\n    ...(agentType ? { agentType } : {}),\n    ...(mcpTool ? { mcpTool } : {}),\n    configured,\n    bindingSource: resolved.bindingSource ?? null,\n    tier: effectivePolicy?.tier ?? null,\n    model: effectivePolicy?.model ?? null,\n    providerModel: effectivePolicy?.providerModel ?? null,\n    provenance: effectivePolicy?.provenance ?? null,\n    policy: effectivePolicy,",
+            "oldExcerptSHA256": "0c95320f7d90b9f7f92cfc22a5a0bba3b70acab8079ca04342d800e181b70664",
+            "newExcerpt": "  return {\n    selector,\n    caller: callerObj,\n    mechanism: finalMechanism,\n    executorId,\n    capability,\n    invocation,\n    governance,\n    reasonCodes,\n    ...(agentType ? { agentType } : {}),\n    ...(mcpTool ? { mcpTool } : {}),\n    configured,\n    bindingSource: resolved.bindingSource ?? null,\n    tier: effectivePolicy?.tier ?? null,\n    model: effectivePolicy?.model ?? null,\n    providerModel: effectivePolicy?.providerModel ?? null,\n    provenance: effectivePolicy?.provenance ?? null,\n    policy: effectivePolicy,",
+            "unchanged": true
+          }
+        ],
+        "outcome": "unchanged-excerpt-machine-repin"
+      }
+    ]
+  },
+  "candidateListDelta": {
+    "beforeCount": 568,
+    "afterCount": 572,
+    "addedTuples": [
+      {
+        "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+        "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "anchor": "unheaded-block-39",
+        "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+        "fileStatus": "Candidate",
+        "status": "candidate-unverified",
+        "reason": "A31 unchanged excerpt re-pin is machine-proven but pending independent Lead verification; interim reverse-open tuple, not an approval. Next turn binds the new committed receipt and closes only after Lead verdict.",
+        "evidenceReceipt": {
+          "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+          "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+          "reviewedAt": "2026-10-12",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+          "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+          "reviewMode": "ordinary",
+          "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_de1bde6579325220fa5ddea79b9cd77f; bytes equal"
+        }
+      },
+      {
+        "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+        "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "anchor": "unheaded-block-40",
+        "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+        "fileStatus": "Candidate",
+        "status": "candidate-unverified",
+        "reason": "A31 unchanged excerpt re-pin is machine-proven but pending independent Lead verification; interim reverse-open tuple, not an approval. Next turn binds the new committed receipt and closes only after Lead verdict.",
+        "evidenceReceipt": {
+          "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+          "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+          "reviewedAt": "2026-10-12",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+          "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+          "reviewMode": "ordinary",
+          "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_271c8a780dde80cb18e612f908a4eca1; bytes equal"
+        }
+      },
+      {
+        "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+        "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "anchor": "unheaded-block-43",
+        "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+        "fileStatus": "Candidate",
+        "status": "candidate-unverified",
+        "reason": "A31 unchanged excerpt re-pin is machine-proven but pending independent Lead verification; interim reverse-open tuple, not an approval. Next turn binds the new committed receipt and closes only after Lead verdict.",
+        "evidenceReceipt": {
+          "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+          "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+          "reviewedAt": "2026-10-12",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+          "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+          "reviewMode": "ordinary",
+          "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_c66cf74ca521ea390c33065fc83b28d7; bytes equal"
+        }
+      },
+      {
+        "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+        "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "anchor": "unheaded-block-47",
+        "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+        "fileStatus": "Candidate",
+        "status": "candidate-unverified",
+        "reason": "A31 unchanged excerpt re-pin is machine-proven but pending independent Lead verification; interim reverse-open tuple, not an approval. Next turn binds the new committed receipt and closes only after Lead verdict.",
+        "evidenceReceipt": {
+          "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+          "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+          "reviewedAt": "2026-10-12",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+          "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+          "reviewMode": "ordinary",
+          "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_56af2fc53f516253db192a78f0dddc70; bytes equal"
+        }
+      }
+    ],
+    "nativeEquality": "pending next native sync; local tuples recompute against unchanged candidate bytes and persisted live registry"
+  },
+  "nextTurn": "Run native sync first from persisted working registry at runner commit, allocate real source/gap IDs, bind repin receipt to that real commit, reconcile before/new conservation tuples, D/E/full known/live/list equality, persist registry; then separate bounded A31 merge-review request for current source/predecessor/gaps/main-only diff and four machine repins. No review pack in this turn."
+}

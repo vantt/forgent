@@ -71,3 +71,14 @@ The authorized tools are repository-only documentation gates. No runtime config 
 ## Review and owner routes
 
 No rows authored or reviewed in this baseline. No archive/delete list, real conflict adjudication, claim hold or promoted-document edit was created. Existing dropped claims and SC-1 remain open; later batches own them. Tooling acceptance, all tests, sensitivity probes, area maps and review are UNPROVEN until executed.
+
+## Step 6 authorized Plan B re-check — 2026-10-15
+
+SYNC: `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; previous recorded SYNC: `da8285e065835dc3136ca0daabb2cd19e05d10fb`. Lead performed the immediately preceding main merge (29 upstream commits, no conflicts); no producer git write. Plan B had already landed before the previous sync. The baseline below is retained, not reset.
+
+| File | Initial source-blobs pin | Last-sync blob | Current merge blob | Result |
+|---|---|---|---|---|
+| `docs/specs/system-overview.md` | `be00c90cf0f3bae695a65069897a926d4a699bca` | `c24c5561dc60cce7e53d0a0c5e34ff97414845ac` | `c24c5561dc60cce7e53d0a0c5e34ff97414845ac` | Changed since initial baseline; unchanged since last sync |
+| `docs/platform/component-boundary.md` | `a3479e382aa2062ec7685e946d4086a09131f9eb` | `38a437f37c21c14f5e0dedf94f70035c2e4407fd` | `38a437f37c21c14f5e0dedf94f70035c2e4407fd` | Changed since initial baseline; unchanged since last sync |
+
+Plan B did not land again in this merge: zero newly affected rows require rework from this boundary. Use the current system-overview blob for Step 6 source decisions and the last-sync component-boundary content as the existing anchor. The existing `docs/platform/convention/spec.md` route is present; no switchboard edit or renewed convention implementation claim. Authoring additions to component-boundary do not represent a new system design; they recarry the frozen-map sources. Native refresh and independent review of their binding consequences remain required next turn.

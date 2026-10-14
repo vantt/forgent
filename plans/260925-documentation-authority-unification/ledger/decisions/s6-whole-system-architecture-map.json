@@ -1,0 +1,2180 @@
+{
+  "version": 1,
+  "shard": "s6-whole-system-architecture-map.json",
+  "authorSession": "codex-session:37@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/architecture-map.md"
+  ],
+  "files": [
+    {
+      "path": "docs/architecture-map.md",
+      "disposition": "move",
+      "rationale": "Complete source carriage into the frozen whole-system architecture owner. Original current/design/historical qualifications retained; no retirement or promotion. Every source unit has an individual pending decision.",
+      "targets": [
+        "docs/platform/architecture-map.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_6e726db37ab7f5b0b8eca436792cf527",
+      "sourceUnitDigest": "e9b8dc72faf32ca302a347b6710b983f21132879e34fc0bf96d0038c46eb695f",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "bản-đồ-kiến-trúc-fgos-một-khung-chính-hai-lớp-phủ-hai-sổ-đăng-ký",
+      "targetUnitDigest": "8f88f101162dd30533c63d7e2c120a7b17ceedd994de0e295734aea563d27975",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#bản-đồ-kiến-trúc-fgos-một-khung-chính-hai-lớp-phủ-hai-sổ-đăng-ký (lines 1–1) into docs/platform/architecture-map.md#bản-đồ-kiến-trúc-fgos-một-khung-chính-hai-lớp-phủ-hai-sổ-đăng-ký (lines 78–78), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_63d932ce2cf2e02651341337917f55be",
+      "sourceUnitDigest": "0a323eca0f30fbe836d6962d2fcabc973b03ee842a69b31a627de9fd74d0c7e1",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetUnitDigest": "0a323eca0f30fbe836d6962d2fcabc973b03ee842a69b31a627de9fd74d0c7e1",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-1 (lines 3–13) into docs/platform/architecture-map.md#unheaded-block-15 (lines 80–90), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7c173579171253a4f8bcf878e65fbe65",
+      "sourceUnitDigest": "f7bf249643002ab4793c99f61795459947ce603f830cf43b69d2efefb8e29073",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetUnitDigest": "b959eb0477bf33775c17cf860175be2c70d1841d6995f5e43f6c96e1336c5751",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-2 (lines 15–23) into docs/platform/architecture-map.md#unheaded-block-16 (lines 92–100), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed."
+    },
+    {
+      "claimId": "claim_43157708757b0edbeca22d2c04e2ceca",
+      "sourceUnitDigest": "0e5e748475581b2a4a3563cbd7c318121b06b9ebd282d81703d74761a112849a",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetUnitDigest": "0e5e748475581b2a4a3563cbd7c318121b06b9ebd282d81703d74761a112849a",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-3 (lines 25–29) into docs/platform/architecture-map.md#unheaded-block-17 (lines 102–106), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_60966a9770965bb0799898e7e7b3b0f8",
+      "sourceUnitDigest": "3bddbf0b464a68c1652219ff2ed623699a7a203de6ced0d683b997b4e5179862",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetUnitDigest": "3bddbf0b464a68c1652219ff2ed623699a7a203de6ced0d683b997b4e5179862",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-4 (lines 31–31) into docs/platform/architecture-map.md#unheaded-block-18 (lines 108–108), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_20dca9a291f72fb95ec87c2d4f49c91b",
+      "sourceUnitDigest": "9acaf81339584d695bea2f1b4c5cace51f753b0045cd7d04d5ff02fc004c88a4",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetUnitDigest": "9acaf81339584d695bea2f1b4c5cace51f753b0045cd7d04d5ff02fc004c88a4",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-5 (lines 33–41) into docs/platform/architecture-map.md#unheaded-block-19 (lines 110–118), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_d2a0dfafca083a3802ad9362597f0ea2",
+      "sourceUnitDigest": "7228f310d90252e9edcbdc5f60296555cca821c86b4f7ea79ab24e7688aa9606",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetUnitDigest": "831e03f166d9357f7ac10e1dc6800468cdd03de41b71fcbe2a1c445b840864c1",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-6 (lines 43–43) into docs/platform/architecture-map.md#unheaded-block-20 (lines 120–120), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed."
+    },
+    {
+      "claimId": "claim_f4451b0812cb6c4c4b3d5f3146ceb22b",
+      "sourceUnitDigest": "e9b8e8cc3f84ad1eb58a0ef5bb971a550005805be9878f501a057a5faff5d41a",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetUnitDigest": "e9b8e8cc3f84ad1eb58a0ef5bb971a550005805be9878f501a057a5faff5d41a",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-7 (lines 45–55) into docs/platform/architecture-map.md#unheaded-block-21 (lines 122–132), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_52f6a74db75c041ef213f90557704b0a",
+      "sourceUnitDigest": "950f00563fc4f709fd945629f1747f74a1c7f4e1ea5e277d0f61ccf04017157a",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "5df9fb183f47a7fe45e8bd84d4eee75c9342304e5885382e531f9df3427c386e",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-8 (lines 57–57) into docs/platform/architecture-map.md#unheaded-block-22 (lines 134–134), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed."
+    },
+    {
+      "claimId": "claim_6796c9a5d940df2affe9d2fb3fb373d7",
+      "sourceUnitDigest": "3920d72b193dbc2941f9ce1add60ef5a0dc678cd99508b4006f2d1819f8ceca2",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "3920d72b193dbc2941f9ce1add60ef5a0dc678cd99508b4006f2d1819f8ceca2",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-9 (lines 59–68) into docs/platform/architecture-map.md#unheaded-block-23 (lines 136–145), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7802cf85d2049b2cefb33fdc7a6c2249",
+      "sourceUnitDigest": "befa1ff7771789b295cf61b4ffa0e8294a7dc594bddc49eeb0916c2bf64d353c",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "c764f5efde618d234aac9b4d0130d1b0f8d51297a38c4ba03d3feca28a554760",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-10 (lines 70–70) into docs/platform/architecture-map.md#unheaded-block-24 (lines 147–147), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed. Link-only restoration of the cited retired ADR to its existing numbered narrative is explicitly recorded; no decision text or meaning changed."
+    },
+    {
+      "claimId": "claim_0a5b8f442b2479d58fd5e90b045c40d9",
+      "sourceUnitDigest": "b04d5420e717a59303bcc3050718f8a20cf8ddc2fac4b56ae575560edfb5d37c",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "b04d5420e717a59303bcc3050718f8a20cf8ddc2fac4b56ae575560edfb5d37c",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-11 (lines 72–81) into docs/platform/architecture-map.md#unheaded-block-25 (lines 149–158), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_efe951180498d114417b19df1c2d3342",
+      "sourceUnitDigest": "cc2b0cac6c4667097d6154ee9e8ecc58c1eb1a446fd49bfecd6ea99a98818745",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "0-đọc-trong-5-phút",
+      "targetUnitDigest": "22384130c2ebf480b7fb037650f80c37f61b99501d7ea7f65e3bc631f165bdec",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#0-đọc-trong-5-phút (lines 83–83) into docs/platform/architecture-map.md#0-đọc-trong-5-phút (lines 160–160), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_fad2bbda6aa104f8b325bf16949581d8",
+      "sourceUnitDigest": "543db529013204b9403347a01b0846b6b8ad07b94a1c1770bfa478ee8d0ade2b",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetUnitDigest": "543db529013204b9403347a01b0846b6b8ad07b94a1c1770bfa478ee8d0ade2b",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "0 · Đọc trong 5 phút"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-12 (lines 85–96) into docs/platform/architecture-map.md#unheaded-block-26 (lines 162–173), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_4be5dff44f84666442bf2762740a6d92",
+      "sourceUnitDigest": "0748e80454f71f93dec844ed7d426672846ec46c2e7051c6fc5dc0f11be5ea99",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "1-vấn-đề-và-mục-tiêu",
+      "targetUnitDigest": "209b0ccc13110f00b9362179c4cf506178016c0952adcf90bc341aa485c82123",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#1-vấn-đề-và-mục-tiêu (lines 98–98) into docs/platform/architecture-map.md#1-vấn-đề-và-mục-tiêu (lines 175–175), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_cec9a0f48516b75d73372a7afa6165f5",
+      "sourceUnitDigest": "a024880983373f99315430748c8db4efbe2967d6a8e96f728be54f4acb252c64",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-27",
+      "targetUnitDigest": "a024880983373f99315430748c8db4efbe2967d6a8e96f728be54f4acb252c64",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "1 · Vấn đề và mục tiêu"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-13 (lines 100–102) into docs/platform/architecture-map.md#unheaded-block-27 (lines 177–179), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_9787d0954ec9e026ff10df4d1e9002f8",
+      "sourceUnitDigest": "01d2e4b59c3c184d9bc2638a700921ed0be23c6bd12fa084d7072762e430037e",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-28",
+      "targetUnitDigest": "01d2e4b59c3c184d9bc2638a700921ed0be23c6bd12fa084d7072762e430037e",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "1 · Vấn đề và mục tiêu"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-14 (lines 104–115) into docs/platform/architecture-map.md#unheaded-block-28 (lines 181–192), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_f65a6aa8199ac59581c0aab6be351f15",
+      "sourceUnitDigest": "d697c0e5c9285ded16e251cdb094868bda8fda656196b71cfb78ff8cc9e6cd28",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "2-ý-tưởng-trung-tâm-ba-câu-hỏi-ba-bản-vẽ",
+      "targetUnitDigest": "535f81d88d345b6dd559b53753016e339e9b3625a6746eb31dd28bb17ef02527",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#2-ý-tưởng-trung-tâm-ba-câu-hỏi-ba-bản-vẽ (lines 117–117) into docs/platform/architecture-map.md#2-ý-tưởng-trung-tâm-ba-câu-hỏi-ba-bản-vẽ (lines 194–194), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_890e21b79038aa1794bd09e2b254ddc6",
+      "sourceUnitDigest": "ec4c7a7b976a5948c9eea6e8bba78f2dba89ee5e79ae1c0c77854172ad43c7ce",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-29",
+      "targetUnitDigest": "ec4c7a7b976a5948c9eea6e8bba78f2dba89ee5e79ae1c0c77854172ad43c7ce",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "2 · Ý tưởng trung tâm: ba câu hỏi — ba bản vẽ"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-15 (lines 119–121) into docs/platform/architecture-map.md#unheaded-block-29 (lines 196–198), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_6daf93afa1630c93a3afb9a7c52b90cb",
+      "sourceUnitDigest": "cbcce05b26973de21276d88e72624ee0811bbbcdd560d558f7e4983ad3f3f9dc",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-30",
+      "targetUnitDigest": "cbcce05b26973de21276d88e72624ee0811bbbcdd560d558f7e4983ad3f3f9dc",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "2 · Ý tưởng trung tâm: ba câu hỏi — ba bản vẽ"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-16 (lines 123–131) into docs/platform/architecture-map.md#unheaded-block-30 (lines 200–208), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7f13ae11abfe6f1d83016e6787b575fb",
+      "sourceUnitDigest": "7d57451e756a90b4743f9f9b21b5375c31c193c6b99fcdb4f3d9460e2d67d86b",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-31",
+      "targetUnitDigest": "7d57451e756a90b4743f9f9b21b5375c31c193c6b99fcdb4f3d9460e2d67d86b",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "2 · Ý tưởng trung tâm: ba câu hỏi — ba bản vẽ"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-17 (lines 133–134) into docs/platform/architecture-map.md#unheaded-block-31 (lines 210–211), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_490a2e956091af1fb3e7a2132f667c91",
+      "sourceUnitDigest": "858b049e5982c2212bc07cdcefd46450e246731172108707325c9beb68f574f4",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-32",
+      "targetUnitDigest": "858b049e5982c2212bc07cdcefd46450e246731172108707325c9beb68f574f4",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "2 · Ý tưởng trung tâm: ba câu hỏi — ba bản vẽ"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-18 (lines 136–136) into docs/platform/architecture-map.md#unheaded-block-32 (lines 213–213), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_2ec0cc744594d083e766f513457352ab",
+      "sourceUnitDigest": "4c30a639b78ac113d9a19eef44e5144d31f78e0899b0d3f2958dd3c5335d31fa",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-33",
+      "targetUnitDigest": "4c30a639b78ac113d9a19eef44e5144d31f78e0899b0d3f2958dd3c5335d31fa",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "2 · Ý tưởng trung tâm: ba câu hỏi — ba bản vẽ"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-19 (lines 138–149) into docs/platform/architecture-map.md#unheaded-block-33 (lines 215–226), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_54d268e3ddd26956de4f4110a450e2f0",
+      "sourceUnitDigest": "14118a4f1bb85f9e34718cfc30c9917de6108ae7e5691fb78413adff1c008d2c",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "3-bản-vẽ-kết-cấu-structure-khung-chính",
+      "targetUnitDigest": "0dba53cd9957e5ebeff41882b1aa7992a5f52c8e3b326a1d4a83ec93edacea0a",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#3-bản-vẽ-kết-cấu-structure-khung-chính (lines 151–151) into docs/platform/architecture-map.md#3-bản-vẽ-kết-cấu-structure-khung-chính (lines 228–228), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_37f0977c8f50a61d1a8bddb814db9917",
+      "sourceUnitDigest": "843fbbc4c6c5be8641bf52a43dd368e0c51886a3c564ee2fd3711a25712b269b",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-34",
+      "targetUnitDigest": "843fbbc4c6c5be8641bf52a43dd368e0c51886a3c564ee2fd3711a25712b269b",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "3 · Bản vẽ kết cấu — STRUCTURE (khung chính)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-20 (lines 153–154) into docs/platform/architecture-map.md#unheaded-block-34 (lines 230–231), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_bdd118d466f1c55be7beeb62549cdea8",
+      "sourceUnitDigest": "d18869b6687f70af5e45ec731c9ed8d30807d63303cf828010145c8643b93fd9",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-35",
+      "targetUnitDigest": "d18869b6687f70af5e45ec731c9ed8d30807d63303cf828010145c8643b93fd9",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "3 · Bản vẽ kết cấu — STRUCTURE (khung chính)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-21 (lines 156–170) into docs/platform/architecture-map.md#unheaded-block-35 (lines 233–247), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_757c3cf0d6fc57a5e3f76267a56a0bc4",
+      "sourceUnitDigest": "d86f77243b866f73fd43b69c0a680da8cb1d5709a6812c4b26bc3b7688595439",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-36",
+      "targetUnitDigest": "d86f77243b866f73fd43b69c0a680da8cb1d5709a6812c4b26bc3b7688595439",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "3 · Bản vẽ kết cấu — STRUCTURE (khung chính)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-22 (lines 172–176) into docs/platform/architecture-map.md#unheaded-block-36 (lines 249–253), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_4b8ef7971db0ec75f2ef01b6392c56a1",
+      "sourceUnitDigest": "9e343dbd8e2c8d72eb4f58f45a4812a65e38186daa44cecd50bbb92eea3ebf5d",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-37",
+      "targetUnitDigest": "9e343dbd8e2c8d72eb4f58f45a4812a65e38186daa44cecd50bbb92eea3ebf5d",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "3 · Bản vẽ kết cấu — STRUCTURE (khung chính)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-23 (lines 178–185) into docs/platform/architecture-map.md#unheaded-block-37 (lines 255–262), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_63b99c2273d1ae1e221d4e557a7ba730",
+      "sourceUnitDigest": "4cd04447af1d3bae208acbeb0b0562e184784338cbaf994baa4e3ceea1cdcd3f",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-38",
+      "targetUnitDigest": "4cd04447af1d3bae208acbeb0b0562e184784338cbaf994baa4e3ceea1cdcd3f",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "3 · Bản vẽ kết cấu — STRUCTURE (khung chính)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-24 (lines 187–187) into docs/platform/architecture-map.md#unheaded-block-38 (lines 264–264), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7434a278bf6d4efb2083f62f135d2340",
+      "sourceUnitDigest": "aa06900fba2a6b00fc84bd5059abfd82c238fb117f67db29670a3e094e41021c",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-39",
+      "targetUnitDigest": "aa06900fba2a6b00fc84bd5059abfd82c238fb117f67db29670a3e094e41021c",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "3 · Bản vẽ kết cấu — STRUCTURE (khung chính)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-25 (lines 189–201) into docs/platform/architecture-map.md#unheaded-block-39 (lines 266–278), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_42741ae1f0ee0a21b5413d9fe85cf360",
+      "sourceUnitDigest": "f6d394ad6e48a81afbd01767a835b6917ffb3024e1a08da9250bcd5c37188626",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "4-bản-vẽ-điện-nước-physics-lớp-phủ-dữ-liệu",
+      "targetUnitDigest": "2f05d3705b20087a5bd5545b660032fbb35131510449b42abbc89c901db7ef0c",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#4-bản-vẽ-điện-nước-physics-lớp-phủ-dữ-liệu (lines 203–203) into docs/platform/architecture-map.md#4-bản-vẽ-điện-nước-physics-lớp-phủ-dữ-liệu (lines 280–280), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_b1ce5ba258c79ca63e40a9a0ef61d36a",
+      "sourceUnitDigest": "ea6b42f18d7db47a18ea59f14cffc16197d0db0f21042596c363522164eded65",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-40",
+      "targetUnitDigest": "ea6b42f18d7db47a18ea59f14cffc16197d0db0f21042596c363522164eded65",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "4 · Bản vẽ điện nước — PHYSICS (lớp phủ dữ liệu)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-26 (lines 205–206) into docs/platform/architecture-map.md#unheaded-block-40 (lines 282–283), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_393a8d4a883e213dc950e3f27e7c0622",
+      "sourceUnitDigest": "1abb53277a6a38000713e96df46018007d6fc8cf342f3a60671fc27f7e8355ea",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-41",
+      "targetUnitDigest": "1abb53277a6a38000713e96df46018007d6fc8cf342f3a60671fc27f7e8355ea",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "4 · Bản vẽ điện nước — PHYSICS (lớp phủ dữ liệu)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-27 (lines 208–214) into docs/platform/architecture-map.md#unheaded-block-41 (lines 285–291), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_ba66b044e9e7904e0785b216b9efcd64",
+      "sourceUnitDigest": "41721243d1bc6bf67b29f8a6aad3b5d2f13a419a288afeb3e4c5828c475ef821",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-42",
+      "targetUnitDigest": "41721243d1bc6bf67b29f8a6aad3b5d2f13a419a288afeb3e4c5828c475ef821",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "4 · Bản vẽ điện nước — PHYSICS (lớp phủ dữ liệu)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-28 (lines 216–216) into docs/platform/architecture-map.md#unheaded-block-42 (lines 293–293), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_436cbc9af2d335adc6a08ed580cc464d",
+      "sourceUnitDigest": "4b2cc424e77ccebdbd4b6c62b9fe7fde4c9e6b0980915248712ac8a7bd09b671",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-43",
+      "targetUnitDigest": "4b2cc424e77ccebdbd4b6c62b9fe7fde4c9e6b0980915248712ac8a7bd09b671",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "4 · Bản vẽ điện nước — PHYSICS (lớp phủ dữ liệu)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-29 (lines 218–230) into docs/platform/architecture-map.md#unheaded-block-43 (lines 295–307), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_06bf5bc36853c7099bb6b5eea8fe52bb",
+      "sourceUnitDigest": "ac1308934cadc057af82ed245b9ceb46ba36844b4dd5caf0d0f40ccb926b6253",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "event-signal-bảng-luật",
+      "targetUnitDigest": "ebc2692b733e2c8feb6b6c66648c6f6e954bba3d29b2bacc3ab30dfbeb58c92e",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "4 · Bản vẽ điện nước — PHYSICS (lớp phủ dữ liệu)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#event-signal-bảng-luật (lines 232–232) into docs/platform/architecture-map.md#event-signal-bảng-luật (lines 309–309), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_93159818f721598951336edc5f536285",
+      "sourceUnitDigest": "6e2c539f190ea9de130965f93331c7c6e54d60c8c203e05a2b9d1e95bf0bec46",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-44",
+      "targetUnitDigest": "6e2c539f190ea9de130965f93331c7c6e54d60c8c203e05a2b9d1e95bf0bec46",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "4 · Bản vẽ điện nước — PHYSICS (lớp phủ dữ liệu)",
+        "Event ≠ Signal — bảng luật"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-30 (lines 234–241) into docs/platform/architecture-map.md#unheaded-block-44 (lines 311–318), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_9477958057744deb2462f9e32c00dabd",
+      "sourceUnitDigest": "48862a59b8c617189900f32fece7c774c27636283ea271b38a0818c155bc85dd",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-45",
+      "targetUnitDigest": "48862a59b8c617189900f32fece7c774c27636283ea271b38a0818c155bc85dd",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "4 · Bản vẽ điện nước — PHYSICS (lớp phủ dữ liệu)",
+        "Event ≠ Signal — bảng luật"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-31 (lines 243–246) into docs/platform/architecture-map.md#unheaded-block-45 (lines 320–323), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_dda1e20b375c6881beb4dfd5f47de88c",
+      "sourceUnitDigest": "9bd62429b61da3e8ec6f487c54b70ccd8ac10eaee15fc211cbb8feffc4e29181",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "vòng-phản-ứng-động-cơ-tương-lai-của-fan-out",
+      "targetUnitDigest": "07133823fbbe8438c56ec4d17be7238443e1c39e0cbab89e16b53f10083c56c2",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "4 · Bản vẽ điện nước — PHYSICS (lớp phủ dữ liệu)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#vòng-phản-ứng-động-cơ-tương-lai-của-fan-out (lines 248–248) into docs/platform/architecture-map.md#vòng-phản-ứng-động-cơ-tương-lai-của-fan-out (lines 325–325), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_22a228b7d290e1e37d5760e1b0cd2294",
+      "sourceUnitDigest": "0a85f0781e3d6565bdfd04f0d53462e8f23681f3418c4d19e8850e0cc03c86ec",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-46",
+      "targetUnitDigest": "0a85f0781e3d6565bdfd04f0d53462e8f23681f3418c4d19e8850e0cc03c86ec",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "4 · Bản vẽ điện nước — PHYSICS (lớp phủ dữ liệu)",
+        "Vòng phản ứng — động cơ tương lai của fan-out"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-32 (lines 250–256) into docs/platform/architecture-map.md#unheaded-block-46 (lines 327–333), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_1fa35c74cbd060f84348550a427e45bd",
+      "sourceUnitDigest": "29a394cfeeaf99cc74dd612709d73ab99390ff16492d863b1409b10c5d956208",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-47",
+      "targetUnitDigest": "29a394cfeeaf99cc74dd612709d73ab99390ff16492d863b1409b10c5d956208",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "4 · Bản vẽ điện nước — PHYSICS (lớp phủ dữ liệu)",
+        "Vòng phản ứng — động cơ tương lai của fan-out"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-33 (lines 258–261) into docs/platform/architecture-map.md#unheaded-block-47 (lines 335–338), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_10c74c6722f0bf11d637b8e7d9e3236f",
+      "sourceUnitDigest": "d142a01eb94637cbb7f0ed5671c98a7dc963fe8d4eced0f26d4c764751f80b6e",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "5-bản-nội-quy-authority-lớp-phủ-quyền",
+      "targetUnitDigest": "2cf8364581f1b481bedf68d65ce1c79b8c134b0198c463201469a3a1ee830089",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#5-bản-nội-quy-authority-lớp-phủ-quyền (lines 263–263) into docs/platform/architecture-map.md#5-bản-nội-quy-authority-lớp-phủ-quyền (lines 340–340), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_18f66740ef1cdc0933735d6c3890bea2",
+      "sourceUnitDigest": "17d2f7abb69dc882fc83b4bcc43c1c5932ebbb3bc99706510529a1be2263e10d",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-48",
+      "targetUnitDigest": "17d2f7abb69dc882fc83b4bcc43c1c5932ebbb3bc99706510529a1be2263e10d",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "5 · Bản nội quy — AUTHORITY (lớp phủ quyền)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-34 (lines 265–266) into docs/platform/architecture-map.md#unheaded-block-48 (lines 342–343), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7acdc2c51f3ad190749ab5fc17fd1520",
+      "sourceUnitDigest": "e80e23bdd8c719385fbdb59dd2260e2b1beb915ed1adae359d8ffa9e7730934f",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-49",
+      "targetUnitDigest": "e80e23bdd8c719385fbdb59dd2260e2b1beb915ed1adae359d8ffa9e7730934f",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "5 · Bản nội quy — AUTHORITY (lớp phủ quyền)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-35 (lines 268–275) into docs/platform/architecture-map.md#unheaded-block-49 (lines 345–352), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_8cddb7f096fb182cf6c8970f68c026c5",
+      "sourceUnitDigest": "28c34854eb9629cf2ac629156c4de7c9abf68fcdc8e13791792382e93e71d0d2",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-50",
+      "targetUnitDigest": "28c34854eb9629cf2ac629156c4de7c9abf68fcdc8e13791792382e93e71d0d2",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "5 · Bản nội quy — AUTHORITY (lớp phủ quyền)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-36 (lines 277–280) into docs/platform/architecture-map.md#unheaded-block-50 (lines 354–357), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_0d54a3d543b4284b5a1feba47da62312",
+      "sourceUnitDigest": "ce16e4897b393ba192eb3d8f8d2a944607a2fea8160899cc193b7cf680bb2a70",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-51",
+      "targetUnitDigest": "ce16e4897b393ba192eb3d8f8d2a944607a2fea8160899cc193b7cf680bb2a70",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "5 · Bản nội quy — AUTHORITY (lớp phủ quyền)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-37 (lines 282–284) into docs/platform/architecture-map.md#unheaded-block-51 (lines 359–361), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_6b2e58f769214a06a763de0de50f9c60",
+      "sourceUnitDigest": "283bf698da4371293380f40bacddd142ac4dd5d188004769ab62ae5dde889e1f",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "mô-hình-tag-giải-tan-các-câu-hỏi-ranh-giới-cũ",
+      "targetUnitDigest": "43d6caa423df6a590e591806fac3065d58916eb524354581ae9c61086e9eeaee",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "5 · Bản nội quy — AUTHORITY (lớp phủ quyền)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#mô-hình-tag-giải-tan-các-câu-hỏi-ranh-giới-cũ (lines 286–286) into docs/platform/architecture-map.md#mô-hình-tag-giải-tan-các-câu-hỏi-ranh-giới-cũ (lines 363–363), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_8e4288dc975b0495eb952ae05bcd8012",
+      "sourceUnitDigest": "a8492053c0faef5767c5b5ea3fcc10ce89fa346b64d7d4394ce8f978c0e647d6",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-52",
+      "targetUnitDigest": "a8492053c0faef5767c5b5ea3fcc10ce89fa346b64d7d4394ce8f978c0e647d6",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "5 · Bản nội quy — AUTHORITY (lớp phủ quyền)",
+        "Mô hình tag giải tan các câu hỏi ranh giới cũ"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-38 (lines 288–288) into docs/platform/architecture-map.md#unheaded-block-52 (lines 365–365), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_45be1f2764c28d9ec53bc34317a67c88",
+      "sourceUnitDigest": "d8fa4afd625e291955e0d232130e595dbb05a3ed321ab9e86d36067df4c5a672",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-53",
+      "targetUnitDigest": "d8fa4afd625e291955e0d232130e595dbb05a3ed321ab9e86d36067df4c5a672",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "5 · Bản nội quy — AUTHORITY (lớp phủ quyền)",
+        "Mô hình tag giải tan các câu hỏi ranh giới cũ"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-39 (lines 290–299) into docs/platform/architecture-map.md#unheaded-block-53 (lines 367–376), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_28ad3bd623dc4ecb5fb6c706d513e61e",
+      "sourceUnitDigest": "05b90a963e77317cb3d254d8a05dbcf3a229957529cb4918be284070c88aeba0",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "6-sổ-đăng-ký-component",
+      "targetUnitDigest": "2f2f503137703729b1fdb8fe9d754a5c80a4da315bbc8aaaa47807716dfdc530",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#6-sổ-đăng-ký-component (lines 301–301) into docs/platform/architecture-map.md#6-sổ-đăng-ký-component (lines 378–378), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7bea210730f7983feef7c0451c7d34ce",
+      "sourceUnitDigest": "62a9eeb0380d89a16e373a8baf61a49e88d40d830993f68ff492ddf003eb670d",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-54",
+      "targetUnitDigest": "62a9eeb0380d89a16e373a8baf61a49e88d40d830993f68ff492ddf003eb670d",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "6 · Sổ đăng ký component"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-40 (lines 303–308) into docs/platform/architecture-map.md#unheaded-block-54 (lines 380–385), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_c90da11438441f065108421d5572dc32",
+      "sourceUnitDigest": "e5cae3614b8d5b702d8f90986d0f7f6a755146793c1c1139e9cd21a156e64909",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "component-live-1414-file-có-thẻ",
+      "targetUnitDigest": "7a03c5a99ef868cf6f378688ea5689639dffa942f98c3c55bc4b403b7dddf779",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "6 · Sổ đăng ký component"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#component-live-1414-file-có-thẻ (lines 310–310) into docs/platform/architecture-map.md#component-live-1414-file-có-thẻ (lines 387–387), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_a329c43ee109f8207a3c55c3e591d867",
+      "sourceUnitDigest": "7fe9b818a458a6bc6c4e0a5b055f9f85debbfa9a598aba802cade728bec9571d",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-55",
+      "targetUnitDigest": "7fe9b818a458a6bc6c4e0a5b055f9f85debbfa9a598aba802cade728bec9571d",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "6 · Sổ đăng ký component",
+        "Component — live (14/14 file có thẻ)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-41 (lines 312–329) into docs/platform/architecture-map.md#unheaded-block-55 (lines 389–406), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_eb80f5122d84be208d92efc81002ab0d",
+      "sourceUnitDigest": "c17f84d6cd4fe041ba81f9a1281919755bfb273d43d9abb8498112d025837aca",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "slice-live-tính-năng-xuyên-tầng-trỏ-về-component",
+      "targetUnitDigest": "8e5a892edabaf730ff713d855823d13e7456469b287225b1a19905ffa49f1862",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "6 · Sổ đăng ký component"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#slice-live-tính-năng-xuyên-tầng-trỏ-về-component (lines 331–331) into docs/platform/architecture-map.md#slice-live-tính-năng-xuyên-tầng-trỏ-về-component (lines 408–408), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_070614cd514c11c362142617891d9eb6",
+      "sourceUnitDigest": "1fe988be0df570a9294a1baef23df8c0aa3c355b2417e42c1f64e273156429dd",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-56",
+      "targetUnitDigest": "1fe988be0df570a9294a1baef23df8c0aa3c355b2417e42c1f64e273156429dd",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "6 · Sổ đăng ký component",
+        "Slice — live (tính năng xuyên tầng, trỏ về component)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-42 (lines 333–338) into docs/platform/architecture-map.md#unheaded-block-56 (lines 410–415), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_b1d5ea82bcdb17b0e8d02122f50c41d3",
+      "sourceUnitDigest": "f55793cc927c48ed6e6031041bf2e2e4c69d5e846d2d57ea42643f0a789fe4c5",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "slice-sắp-cắm-planned-mỗi-cái-phải-qua-nghi-thức-9-trỏ-pbi",
+      "targetUnitDigest": "756588b77b4eab41ced7a61c05339a669bbe0f0353bc33455ab976cc6e5548ea",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "6 · Sổ đăng ký component"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#slice-sắp-cắm-planned-mỗi-cái-phải-qua-nghi-thức-9-trỏ-pbi (lines 340–340) into docs/platform/architecture-map.md#slice-sắp-cắm-planned-mỗi-cái-phải-qua-nghi-thức-9-trỏ-pbi (lines 417–417), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_276f63e24757912c0eb5d75bcd05899b",
+      "sourceUnitDigest": "da4c6c341abb239f0c1394813e9d0c5f005ad558778af2dd559e9d813314b1c6",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-57",
+      "targetUnitDigest": "da4c6c341abb239f0c1394813e9d0c5f005ad558778af2dd559e9d813314b1c6",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "6 · Sổ đăng ký component",
+        "Slice — sắp cắm (planned; mỗi cái PHẢI qua nghi thức §9 + trỏ PBI)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-43 (lines 342–352) into docs/platform/architecture-map.md#unheaded-block-57 (lines 419–429), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_eb8fce1d75786d46e0838178e178d03e",
+      "sourceUnitDigest": "8291c090dbd95748736afb3dab2980bffbf56a2cd9270c12d457aeb3ff7d69fa",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "7-sổ-đăng-ký-contract",
+      "targetUnitDigest": "7d48f2f410a1a54125ac1df9f19a6df41c7c80297722dea78597bfd405219c79",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#7-sổ-đăng-ký-contract (lines 354–354) into docs/platform/architecture-map.md#7-sổ-đăng-ký-contract (lines 431–431), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_bac05af426e4e6667f2ccd55ca2188e1",
+      "sourceUnitDigest": "1623ec3126d179da1edd93bcc50ced972cd3bedf6979e3549870902833ead231",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-58",
+      "targetUnitDigest": "1623ec3126d179da1edd93bcc50ced972cd3bedf6979e3549870902833ead231",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "7 · Sổ đăng ký contract"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-44 (lines 356–359) into docs/platform/architecture-map.md#unheaded-block-58 (lines 433–436), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_c23a1ce540aef513298cbd7cd3091a1d",
+      "sourceUnitDigest": "f1679f888656c104006b21d352da9ea1ea1de936134566f7d04169d669c9fb14",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-59",
+      "targetUnitDigest": "f1679f888656c104006b21d352da9ea1ea1de936134566f7d04169d669c9fb14",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "7 · Sổ đăng ký contract"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-45 (lines 361–372) into docs/platform/architecture-map.md#unheaded-block-59 (lines 438–449), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_1ebc66d7d9aba4b700552d2e1595e09f",
+      "sourceUnitDigest": "15e60551adf0e42c61f600b33581fb1b7c56c9e08e3e0cf71bf4e5e125db7d75",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-60",
+      "targetUnitDigest": "15e60551adf0e42c61f600b33581fb1b7c56c9e08e3e0cf71bf4e5e125db7d75",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "7 · Sổ đăng ký contract"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-46 (lines 374–395) into docs/platform/architecture-map.md#unheaded-block-60 (lines 451–472), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_1442e58841d6032a44e35f169b73a0cc",
+      "sourceUnitDigest": "1993d4b95d7cce512c9a04664ade21ce504f47a8d4247fa7a686403bb12c7856",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-61",
+      "targetUnitDigest": "1993d4b95d7cce512c9a04664ade21ce504f47a8d4247fa7a686403bb12c7856",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "7 · Sổ đăng ký contract"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-47 (lines 397–403) into docs/platform/architecture-map.md#unheaded-block-61 (lines 474–480), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_761ef4ec079b700a1ee4bf95ade96e3f",
+      "sourceUnitDigest": "3e31586978acea1f78dff52f4adca347bef872811eef14ab52623827f8deaa6c",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "8-luồng-dữ-liệu-qua-một-vòng-đời-kể-cả-đường-thất-bại",
+      "targetUnitDigest": "21f693afdcd9758684d6ed2937897732c3a1693dc7a48b689debefce7265c258",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#8-luồng-dữ-liệu-qua-một-vòng-đời-kể-cả-đường-thất-bại (lines 405–405) into docs/platform/architecture-map.md#8-luồng-dữ-liệu-qua-một-vòng-đời-kể-cả-đường-thất-bại (lines 482–482), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_a93f9579dd8c17488fa0042385aaf76b",
+      "sourceUnitDigest": "3ed4dd4cdf711b604352a5631a65bace40289df0d8f3ffd2159f34efaf5d3382",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-62",
+      "targetUnitDigest": "3ed4dd4cdf711b604352a5631a65bace40289df0d8f3ffd2159f34efaf5d3382",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "8 · Luồng dữ liệu qua một vòng đời — kể cả đường thất bại"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-48 (lines 407–408) into docs/platform/architecture-map.md#unheaded-block-62 (lines 484–485), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_6ab065310204799a0e8dae2425a70d4a",
+      "sourceUnitDigest": "5111b60df271f8b4c27138979b1c5356b2848bc4e411b2093b8c29050325ee4e",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-63",
+      "targetUnitDigest": "5111b60df271f8b4c27138979b1c5356b2848bc4e411b2093b8c29050325ee4e",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "8 · Luồng dữ liệu qua một vòng đời — kể cả đường thất bại"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-49 (lines 410–439) into docs/platform/architecture-map.md#unheaded-block-63 (lines 487–516), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_a32f32479038919a298ff1ede0c77781",
+      "sourceUnitDigest": "eaf80371eb561abd60e25e15cb2d9d98a97a0c9b53ef06f5c78e2b0d53134cd1",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-64",
+      "targetUnitDigest": "eaf80371eb561abd60e25e15cb2d9d98a97a0c9b53ef06f5c78e2b0d53134cd1",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "8 · Luồng dữ liệu qua một vòng đời — kể cả đường thất bại"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-50 (lines 441–446) into docs/platform/architecture-map.md#unheaded-block-64 (lines 518–523), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_a8c8965ef9cb2ed7186905194ede1b04",
+      "sourceUnitDigest": "8b77cdada86713ddab6c73523cae0ee85cb8d04bd42f1c75c3355b66eafe7d24",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "9-luật-vận-hành-bản-đồ",
+      "targetUnitDigest": "9a72fc8058bd381d8a60eb0cbc7c6e74274a3c422913d42c80c8cee0beaa0cd1",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#9-luật-vận-hành-bản-đồ (lines 448–448) into docs/platform/architecture-map.md#9-luật-vận-hành-bản-đồ (lines 525–525), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_98b6ded848caa2ffa43a026dbf6e1952",
+      "sourceUnitDigest": "9b45c336702243e06347b4feb1207ddbad78e73d527e0bafe5c47dd210f3975d",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-65",
+      "targetUnitDigest": "9b45c336702243e06347b4feb1207ddbad78e73d527e0bafe5c47dd210f3975d",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "9 · Luật vận hành bản đồ"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-51 (lines 450–469) into docs/platform/architecture-map.md#unheaded-block-65 (lines 527–546), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_9467a475080c1d7ecc62a41dcdf25497",
+      "sourceUnitDigest": "bf2a339810cad0a83171b507de74c8adb1aa8bd6f6687eb86704c32ca5f0fe52",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-66",
+      "targetUnitDigest": "bf2a339810cad0a83171b507de74c8adb1aa8bd6f6687eb86704c32ca5f0fe52",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "9 · Luật vận hành bản đồ"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-52 (lines 471–475) into docs/platform/architecture-map.md#unheaded-block-66 (lines 548–552), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_0ae3f5f5a6e8cb541642098f6c0aef1e",
+      "sourceUnitDigest": "407efc3593c693c3ab358ed26b0ffb3a16e3132db980ccff4a80d183cb0c0ce8",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "10-kiểm-chứng-khung-chịu-được-5-thứ-sắp-cắm-chấm-theo-rubric",
+      "targetUnitDigest": "bb7fe19230581a060db6e8eaa3b0ae0f820e980883a020b388a08649deb56c95",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#10-kiểm-chứng-khung-chịu-được-5-thứ-sắp-cắm-chấm-theo-rubric (lines 477–477) into docs/platform/architecture-map.md#10-kiểm-chứng-khung-chịu-được-5-thứ-sắp-cắm-chấm-theo-rubric (lines 554–554), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_abb3769b8c6fd651650352b0c243d5ea",
+      "sourceUnitDigest": "207249f8c2ac0145983344b5c326d4e972a5054ed15d82f15f0aa4c9849e94eb",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-67",
+      "targetUnitDigest": "207249f8c2ac0145983344b5c326d4e972a5054ed15d82f15f0aa4c9849e94eb",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "10 · Kiểm chứng: khung chịu được 5 thứ sắp cắm — chấm theo rubric"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-53 (lines 479–481) into docs/platform/architecture-map.md#unheaded-block-67 (lines 556–558), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_ca800e2ad0afd2ca27590f0c9888f40f",
+      "sourceUnitDigest": "83a08a110c8be7002727ddf5415abfc3b28eed52a4298892eff14bda96db07ff",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-68",
+      "targetUnitDigest": "83a08a110c8be7002727ddf5415abfc3b28eed52a4298892eff14bda96db07ff",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "10 · Kiểm chứng: khung chịu được 5 thứ sắp cắm — chấm theo rubric"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-54 (lines 483–486) into docs/platform/architecture-map.md#unheaded-block-68 (lines 560–563), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_f50c27fdf0e5cf0a8cc3c8078ef4bdb1",
+      "sourceUnitDigest": "9e0a331ca996b2361254cb9353899b677d5f09a478bdcdb42a1309ba4d886232",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-69",
+      "targetUnitDigest": "9e0a331ca996b2361254cb9353899b677d5f09a478bdcdb42a1309ba4d886232",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "10 · Kiểm chứng: khung chịu được 5 thứ sắp cắm — chấm theo rubric"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-55 (lines 488–489) into docs/platform/architecture-map.md#unheaded-block-69 (lines 565–566), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_4f9a812595c9abbebc81e6b87a3b0061",
+      "sourceUnitDigest": "b4e461916e9bbee3f0dcf7d3b3428bad9f222c1a46b23618e21229c389e0f8e3",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-70",
+      "targetUnitDigest": "b4e461916e9bbee3f0dcf7d3b3428bad9f222c1a46b23618e21229c389e0f8e3",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "10 · Kiểm chứng: khung chịu được 5 thứ sắp cắm — chấm theo rubric"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-56 (lines 491–496) into docs/platform/architecture-map.md#unheaded-block-70 (lines 568–573), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_4f271cc84f7696bf19c411f9d5106775",
+      "sourceUnitDigest": "3cf9904afafed91efef2d61fd18c3cb9e89513612f34ca9eb3cee6dd22c9ac95",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "11-khác-gì-các-bản-trước-và-vì-sao",
+      "targetUnitDigest": "ee8326ea9add09a394bde54b414be1d5291527d97b68807c604c71ec082dae41",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#11-khác-gì-các-bản-trước-và-vì-sao (lines 498–498) into docs/platform/architecture-map.md#11-khác-gì-các-bản-trước-và-vì-sao (lines 575–575), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_b227a752049b979378c0b106a22bc2d3",
+      "sourceUnitDigest": "d6c354bbdcfae5e9a452c94245bdb85eb4586b647992f206c2fb7b8da3456d51",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-71",
+      "targetUnitDigest": "d6c354bbdcfae5e9a452c94245bdb85eb4586b647992f206c2fb7b8da3456d51",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "11 · Khác gì các bản trước — và vì sao"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-57 (lines 500–509) into docs/platform/architecture-map.md#unheaded-block-71 (lines 577–586), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_b971273c962fa699bae33457951da7a5",
+      "sourceUnitDigest": "f904fbd1c35f173bda507c6b547a512d07c4d44c8964058375997a0c8e15551a",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-72",
+      "targetUnitDigest": "f904fbd1c35f173bda507c6b547a512d07c4d44c8964058375997a0c8e15551a",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "11 · Khác gì các bản trước — và vì sao"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-58 (lines 511–514) into docs/platform/architecture-map.md#unheaded-block-72 (lines 588–591), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_e8ca4104666362071f7e005d64f34c6c",
+      "sourceUnitDigest": "d3604ea0e37a592a14fa409275284639747ca47f9b649b4151a5416759b998e3",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "12-chỗ-đứng-trong-hệ-tài-liệu",
+      "targetUnitDigest": "26f61d1c2ae759e8f815899257a58424152a0ef0a3d28aaf92c657c35c81567f",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#12-chỗ-đứng-trong-hệ-tài-liệu (lines 516–516) into docs/platform/architecture-map.md#12-chỗ-đứng-trong-hệ-tài-liệu (lines 593–593), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_180ca29d938b2d9aedc1911ea0f5a7ae",
+      "sourceUnitDigest": "f56837294bd95949cfb8f5061af8b79f6144653519755b5fcc7a9639005b4f64",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-73",
+      "targetUnitDigest": "f56837294bd95949cfb8f5061af8b79f6144653519755b5fcc7a9639005b4f64",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "12 · Chỗ đứng trong hệ tài liệu"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-59 (lines 518–518) into docs/platform/architecture-map.md#unheaded-block-73 (lines 595–595), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_54c706b837643578d93abff51fe0ae45",
+      "sourceUnitDigest": "46e33eb4d722b1d3783fc7d1707dbc84315c08c2886adc801e82a592809e443c",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-74",
+      "targetUnitDigest": "46e33eb4d722b1d3783fc7d1707dbc84315c08c2886adc801e82a592809e443c",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "12 · Chỗ đứng trong hệ tài liệu"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-60 (lines 520–525) into docs/platform/architecture-map.md#unheaded-block-74 (lines 597–602), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_18ab678aaebf90ac59c7fb81a78aafb5",
+      "sourceUnitDigest": "0210742b69578be4076a3b00b4ed33b5de4d5611603676fcc238fb0fa6c069c2",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-75",
+      "targetUnitDigest": "0210742b69578be4076a3b00b4ed33b5de4d5611603676fcc238fb0fa6c069c2",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "12 · Chỗ đứng trong hệ tài liệu"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-61 (lines 527–531) into docs/platform/architecture-map.md#unheaded-block-75 (lines 604–608), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7f76c2f307bb727f353ef7381941e90d",
+      "sourceUnitDigest": "bd78c04eeff896022adbfe596dea5fee30d4907bf4b908d4baa5e11eb8cd3442",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "phụ-lục-a-hai-luật-vàng-của-thang-phân-chia",
+      "targetUnitDigest": "a636042766b7653cb8fe958f4073b78bf378099f86b194f979fd992660cdfda8",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#phụ-lục-a-hai-luật-vàng-của-thang-phân-chia (lines 533–533) into docs/platform/architecture-map.md#phụ-lục-a-hai-luật-vàng-của-thang-phân-chia (lines 610–610), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_f271e57e8c5e2801173842a27933919c",
+      "sourceUnitDigest": "67d6a518a382823f2b125648ee1507aa667bdc02a02810e6c2c86830b7761067",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-76",
+      "targetUnitDigest": "67d6a518a382823f2b125648ee1507aa667bdc02a02810e6c2c86830b7761067",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Phụ lục A · Hai luật vàng của thang phân chia"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-62 (lines 535–540) into docs/platform/architecture-map.md#unheaded-block-76 (lines 612–617), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_b36347e8fcad294d0ee42962bf5df843",
+      "sourceUnitDigest": "ca2a9358a111abf2d642244ade351ade92e48e7bc2f33ac6d012d2f217001df1",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-77",
+      "targetUnitDigest": "ca2a9358a111abf2d642244ade351ade92e48e7bc2f33ac6d012d2f217001df1",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Phụ lục A · Hai luật vàng của thang phân chia"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-63 (lines 542–545) into docs/platform/architecture-map.md#unheaded-block-77 (lines 619–622), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_8c4173ddf096521c1e38ca75992fd7b7",
+      "sourceUnitDigest": "1aba694c0333a99c28a3e880821edf9fdc5dfd0f0128d040a7ad4483a9f2d25a",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "phụ-lục-b-sổ-đăng-ký-hệ-idtên-gọi-str47-record-adr0017",
+      "targetUnitDigest": "49ba35b1c685575f709d3a11505dcf75a0e9fad6db867deb03a5861a5eb12fb2",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#phụ-lục-b-sổ-đăng-ký-hệ-idtên-gọi-str47-record-adr0017 (lines 547–547) into docs/platform/architecture-map.md#phụ-lục-b-sổ-đăng-ký-hệ-idtên-gọi-str47-record-adr0017 (lines 624–624), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_07b62c23c3f96c1257d292c683a043d0",
+      "sourceUnitDigest": "8ac6fe66cae1699bd7bee9dc6b2761a2bb4767aee4a474dfd44aa2380d83868b",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-78",
+      "targetUnitDigest": "8ac6fe66cae1699bd7bee9dc6b2761a2bb4767aee4a474dfd44aa2380d83868b",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Phụ lục B · Sổ đăng ký hệ id/tên gọi (STR47, record ADR0017)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-64 (lines 549–549) into docs/platform/architecture-map.md#unheaded-block-78 (lines 626–626), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_5fe7a9b12f11f2fb629445c230b3b025",
+      "sourceUnitDigest": "f7d543cb422dbf67a32ba21672d7450ca1d8d9ffbcb56011cd1696be36861991",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-79",
+      "targetUnitDigest": "f7d543cb422dbf67a32ba21672d7450ca1d8d9ffbcb56011cd1696be36861991",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Phụ lục B · Sổ đăng ký hệ id/tên gọi (STR47, record ADR0017)"
+      ],
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-65 (lines 551–562) into docs/platform/architecture-map.md#unheaded-block-79 (lines 628–639), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_19b466522419976e53a5c637f94a0f6a",
+      "sourceUnitDigest": "5f10aa1d9a6a5736bcb7760a5b1495379265199c1a0fb25fe46232e14f7a6550",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-80",
+      "targetUnitDigest": "5f10aa1d9a6a5736bcb7760a5b1495379265199c1a0fb25fe46232e14f7a6550",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Phụ lục B · Sổ đăng ký hệ id/tên gọi (STR47, record ADR0017)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-66 (lines 564–569) into docs/platform/architecture-map.md#unheaded-block-80 (lines 641–646), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_dc33e5caba969ad06f15d0b1f46648c4",
+      "sourceUnitDigest": "8a0d7f63cb86303b06f36e0f56d7b9cd840e0e56e4b176c2c5d04f5f0a006d28",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "câu-hỏi-mở-đã-chốt-tại-record-adr0010-chấp-nhận-không-phản-biện-theo-đề-xuất",
+      "targetUnitDigest": "c2aa032c6cab348c576fb62269be72a645a70eb912a1b58311ab949a804d34e4",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#câu-hỏi-mở-đã-chốt-tại-record-adr0010-chấp-nhận-không-phản-biện-theo-đề-xuất (lines 571–571) into docs/platform/architecture-map.md#câu-hỏi-mở-đã-chốt-tại-record-adr0010-chấp-nhận-không-phản-biện-theo-đề-xuất (lines 648–648), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_d61dc5755f5cc670087a649e135074c8",
+      "sourceUnitDigest": "3efcc0c54a6306c056bc52b916d9bd6d6b09c7be5c84287ec124778d1a56b168",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-81",
+      "targetUnitDigest": "3efcc0c54a6306c056bc52b916d9bd6d6b09c7be5c84287ec124778d1a56b168",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Câu hỏi mở — đã chốt tại record ADR0010 (chấp nhận không phản biện, theo đề xuất)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-67 (lines 573–583) into docs/platform/architecture-map.md#unheaded-block-81 (lines 650–660), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_75c04dd05c52523221b9cd4aaa91fdd9",
+      "sourceUnitDigest": "bc78d75580f6f7b078f2b4654fd30fe4936587aa522476d1fcc02a89bf3c0ee3",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+      "targetUnitDigest": "62697107509703563f7e687e9069f5dc507bd7c27f5cdcd21ef391b5615d9977",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4 (lines 585–585) into docs/platform/architecture-map.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4 (lines 662–662), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Retired decision narrative remains explicitly dated provenance within its area owner, not fresh current truth. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_8e4300dbe2e2c6ee7cdeddbfbf97998a",
+      "sourceUnitDigest": "672c35bd5a15bf5222b5e6a305c17dd229a1cf32cc85ebce79c9eaffe864219f",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-82",
+      "targetUnitDigest": "672c35bd5a15bf5222b5e6a305c17dd229a1cf32cc85ebce79c9eaffe864219f",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+      ],
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-68 (lines 587–587) into docs/platform/architecture-map.md#unheaded-block-82 (lines 664–664), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_46b3e28983f6172dee7dbd1b7a1d6425",
+      "sourceUnitDigest": "7b5588cc6b4fe23b51e8ccf18ccf19de8dfbc4250e42fac354cf8f57340e73b8",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "0010-bản-đồ-kiến-trúc-là-bản-chuẩn",
+      "targetUnitDigest": "8f6bfa776a264ccdd2434f8c7864705d22b1e859955f393f919ec76a219b941f",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#0010-bản-đồ-kiến-trúc-là-bản-chuẩn (lines 590–590) into docs/platform/architecture-map.md#0010-bản-đồ-kiến-trúc-là-bản-chuẩn (lines 667–667), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_f9c8408485c625a5bf2abc9f9e28bf21",
+      "sourceUnitDigest": "3f94867a5e73998538f7ca0a824389ba7e39e977a363a7e5adfcef32488b68a3",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-83",
+      "targetUnitDigest": "3f94867a5e73998538f7ca0a824389ba7e39e977a363a7e5adfcef32488b68a3",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0010 — Bản đồ kiến trúc là bản chuẩn"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-69 (lines 592–592) into docs/platform/architecture-map.md#unheaded-block-83 (lines 669–669), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_0517abf08c7cf315ffcee0ea6727a164",
+      "sourceUnitDigest": "c5f5921dba3018eef02c3ba3f7a1f858a4917e698b862c034a73f34b6f16f905",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "bối-cảnh",
+      "targetUnitDigest": "c41a7144b53a4fe9ead770329ef185ffe47f2853b81a44f1c5247f51a7226275",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0010 — Bản đồ kiến trúc là bản chuẩn"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#bối-cảnh (lines 594–594) into docs/platform/architecture-map.md#bối-cảnh (lines 671–671), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_9894e6472c448813536cbeb289840b69",
+      "sourceUnitDigest": "f3b045e3b9a3214257bfc9f843c491f5c63d31526043f1aaedbbe56a45324f32",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-84",
+      "targetUnitDigest": "f3b045e3b9a3214257bfc9f843c491f5c63d31526043f1aaedbbe56a45324f32",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0010 — Bản đồ kiến trúc là bản chuẩn",
+        "Bối cảnh"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-70 (lines 596–603) into docs/platform/architecture-map.md#unheaded-block-84 (lines 673–680), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_cf495e74b983b3e0436a07b23719ea7a",
+      "sourceUnitDigest": "18c751cb725fcbe97a9dab556b828ce70997df68a899d0b4ec5384a7851c4371",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "quyết-định",
+      "targetUnitDigest": "6d72fd9b8065320bc79e7988acb045635ccff60ac5937da8f95d8278c1ac86bc",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0010 — Bản đồ kiến trúc là bản chuẩn"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#quyết-định (lines 605–605) into docs/platform/architecture-map.md#quyết-định (lines 682–682), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7da7ccf0c2211d11bdcc8bfdf0dac6f3",
+      "sourceUnitDigest": "dc2faabbdecd1934c105fe30fa697677ead2957990a360dac4d163b5db53e5f2",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-85",
+      "targetUnitDigest": "dc2faabbdecd1934c105fe30fa697677ead2957990a360dac4d163b5db53e5f2",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0010 — Bản đồ kiến trúc là bản chuẩn",
+        "Quyết định"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-71 (lines 607–623) into docs/platform/architecture-map.md#unheaded-block-85 (lines 684–700), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_09c8a0450eb9a4c11372dc71dc861376",
+      "sourceUnitDigest": "ea2b07f931bce54f5b39835c6b00d823c14df0cbcff727e0dc9f3492a0932f86",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "hệ-quả",
+      "targetUnitDigest": "0ffe8d51b6d5fdbd29feb75674e5e04d17642525098a54cf310617a25dea9eac",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0010 — Bản đồ kiến trúc là bản chuẩn"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#hệ-quả (lines 625–625) into docs/platform/architecture-map.md#hệ-quả (lines 702–702), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_9f257bfad56f10634ea68e690e6b293e",
+      "sourceUnitDigest": "a282068aced9fa7cf371dd6a23f95c4c80a21900965da3c57c18f8f999c39907",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-86",
+      "targetUnitDigest": "a282068aced9fa7cf371dd6a23f95c4c80a21900965da3c57c18f8f999c39907",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0010 — Bản đồ kiến trúc là bản chuẩn",
+        "Hệ quả"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-72 (lines 627–632) into docs/platform/architecture-map.md#unheaded-block-86 (lines 704–709), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_c9b5efd58eee31775ccb7a3a95a675b9",
+      "sourceUnitDigest": "6cdca6992f8ba23cec169622b22c9a75d358e57f3d253516e79103da6f0e2eb3",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009",
+      "targetUnitDigest": "c042446e9b325f9abb4ccef4675f374ef572de3a9afdcbc4e4feeb746fdadc92",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009 (lines 634–634) into docs/platform/architecture-map.md#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009 (lines 711–711), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_facf53c13cb93d580976c5f07bf16c36",
+      "sourceUnitDigest": "fc627f798834e44fa464d38ea60611957a081c5332e01ca67406494e1efd3199",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "bối-cảnh-1",
+      "targetUnitDigest": "fcb3fbc2dd0ae4d362690dca486a4f0b2b7ebaa2b70783d665c6e5da96b671f2",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#bối-cảnh-1 (lines 636–636) into docs/platform/architecture-map.md#bối-cảnh-1 (lines 713–713), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_dd57a5a91e11145ed11858fe9f03feb7",
+      "sourceUnitDigest": "5db60ba6149afed521832ded34c1cf5366d61c0eb0e97b8eea7c489c080d9cee",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-87",
+      "targetUnitDigest": "5db60ba6149afed521832ded34c1cf5366d61c0eb0e97b8eea7c489c080d9cee",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009",
+        "Bối cảnh"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-73 (lines 638–646) into docs/platform/architecture-map.md#unheaded-block-87 (lines 715–723), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_ef4ca79419892042710d7b1fdf930c56",
+      "sourceUnitDigest": "7219a80f915370e6a8a4714792dc020bddaacc39f62821019ba5b1cdabdb33d6",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-88",
+      "targetUnitDigest": "7219a80f915370e6a8a4714792dc020bddaacc39f62821019ba5b1cdabdb33d6",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009",
+        "Bối cảnh"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-74 (lines 648–650) into docs/platform/architecture-map.md#unheaded-block-88 (lines 725–727), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_e1ec652c882728067e70a1e31373e8f1",
+      "sourceUnitDigest": "ccae5bf0300e22a5a337ee36b115e48709ad46928a50cee4d55ef453a1fbe87b",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "quyết-định-1",
+      "targetUnitDigest": "7ae40818f7c0be1982db79d04ea00a6110a4b1f2db96bae4d948a93fccdc25e9",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#quyết-định-1 (lines 652–652) into docs/platform/architecture-map.md#quyết-định-1 (lines 729–729), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_15dcb04741ead9bc3a3d2ded61d95439",
+      "sourceUnitDigest": "52e715697820786d3f2dbb36c2d8ce6bc7f91fc949b5727a45ace623825e8677",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-89",
+      "targetUnitDigest": "52e715697820786d3f2dbb36c2d8ce6bc7f91fc949b5727a45ace623825e8677",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009",
+        "Quyết định"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-75 (lines 654–670) into docs/platform/architecture-map.md#unheaded-block-89 (lines 731–747), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_e191cbbce5d4f83c78026363188c4bf6",
+      "sourceUnitDigest": "104d3db24e940600d3d01448819602c9d162daf8a93517712af97177fb8daee5",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "hệ-quả-1",
+      "targetUnitDigest": "dba7adee03b9c7c868f8c2f364acfc3e22759737449c94ce87d5fa27415945e7",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#hệ-quả-1 (lines 672–672) into docs/platform/architecture-map.md#hệ-quả-1 (lines 749–749), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_2d4c69a3c963e28c172200df0c641de4",
+      "sourceUnitDigest": "35a06dabde538a28c7d1f33814e49318f975ead6273b8d0c2a64644387c9fe42",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-90",
+      "targetUnitDigest": "35a06dabde538a28c7d1f33814e49318f975ead6273b8d0c2a64644387c9fe42",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009",
+        "Hệ quả"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-76 (lines 674–680) into docs/platform/architecture-map.md#unheaded-block-90 (lines 751–757), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_f7e282b47557154231f0565bd30e5d7d",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-91",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009",
+        "Hệ quả"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: target digest repeats; ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-77 (lines 682–682) into docs/platform/architecture-map.md#unheaded-block-91 (lines 759–759), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_f6e78a761339fea3ff5b51a76f7ca1fa",
+      "sourceUnitDigest": "e8f57fc43b85c0af00d3946c1d6c879accbe652a79b429c49c1cfe52658c82e8",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "0017-đóng-audit-hệ-idtên-gọi-str47",
+      "targetUnitDigest": "7873c7592e67f6f269cfdfdf3507423222a9e3fe4b4ea1935ad4a666020d7a52",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47 (lines 684–684) into docs/platform/architecture-map.md#0017-đóng-audit-hệ-idtên-gọi-str47 (lines 761–761), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_cdbd65b487c20e2518c8b4fc4f3f9d21",
+      "sourceUnitDigest": "40c97e055534e1b0a433ed57afd01548e3052e89792ec7a9d2c45a4f15146ad0",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "bối-cảnh-2",
+      "targetUnitDigest": "ab5309ef4d12375f20cd4315a60d1d1a9c95cf8a2dc3143cd58c371324d9fb8a",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0017 — Đóng audit hệ id/tên gọi (STR47)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#bối-cảnh-2 (lines 686–686) into docs/platform/architecture-map.md#bối-cảnh-2 (lines 763–763), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_a8a5b93d5356541d527f50adfecd2909",
+      "sourceUnitDigest": "d5fc141eedf1aee0332da281d2e68509582f3a2e6c7f5db9e7ff44e121859017",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-92",
+      "targetUnitDigest": "d5fc141eedf1aee0332da281d2e68509582f3a2e6c7f5db9e7ff44e121859017",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0017 — Đóng audit hệ id/tên gọi (STR47)",
+        "Bối cảnh"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-78 (lines 688–694) into docs/platform/architecture-map.md#unheaded-block-92 (lines 765–771), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_bb5eca63aa454e15b1888694289b6188",
+      "sourceUnitDigest": "049237aa390992e09cf12c5099b7dfa0eae2356eb46828982eab6c3bfab7005d",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-93",
+      "targetUnitDigest": "049237aa390992e09cf12c5099b7dfa0eae2356eb46828982eab6c3bfab7005d",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0017 — Đóng audit hệ id/tên gọi (STR47)",
+        "Bối cảnh"
+      ],
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-79 (lines 696–701) into docs/platform/architecture-map.md#unheaded-block-93 (lines 773–778), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_9e7627a8ce26cfda0b9f13ba75e010de",
+      "sourceUnitDigest": "477356b8934572e764cd557b98fcd5b0c47c5119f533a1446569cc0a7c3cb83b",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-94",
+      "targetUnitDigest": "477356b8934572e764cd557b98fcd5b0c47c5119f533a1446569cc0a7c3cb83b",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0017 — Đóng audit hệ id/tên gọi (STR47)",
+        "Bối cảnh"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-80 (lines 703–708) into docs/platform/architecture-map.md#unheaded-block-94 (lines 780–785), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_28a7014f4b61295d24a6b2c06c8d65e4",
+      "sourceUnitDigest": "1863e837052e9e51ff7880acdc2dee031b288f8367f2cbb60633ebd6e0aa0603",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "quyết-định-2",
+      "targetUnitDigest": "78d1d4acb343aec78f72cb0056c792386cb7c5f262a86286dbce03167699e612",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0017 — Đóng audit hệ id/tên gọi (STR47)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#quyết-định-2 (lines 710–710) into docs/platform/architecture-map.md#quyết-định-2 (lines 787–787), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_f8c57b95150de6d340321be7cda76e69",
+      "sourceUnitDigest": "10bd320d3ebf3c6aa9fb7722994244eb37c4a0e358ee99317bbb0259b62c8f5d",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-95",
+      "targetUnitDigest": "10bd320d3ebf3c6aa9fb7722994244eb37c4a0e358ee99317bbb0259b62c8f5d",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0017 — Đóng audit hệ id/tên gọi (STR47)",
+        "Quyết định"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-81 (lines 712–747) into docs/platform/architecture-map.md#unheaded-block-95 (lines 789–824), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_0b812df6a0a21a8677eba1af4d33079f",
+      "sourceUnitDigest": "7003ddae36612619e2e27e1aaa1439e9c021eccd4f636cb17100c3cbcd617fb9",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "hệ-quả-2",
+      "targetUnitDigest": "d99967f99607f0c6b8df3862099e628c2486fbe884e0a7ae996280421bf27cc0",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0017 — Đóng audit hệ id/tên gọi (STR47)"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architecture-map.md#hệ-quả-2 (lines 749–749) into docs/platform/architecture-map.md#hệ-quả-2 (lines 826–826), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_301dc3d547781a9a12b9c1a78fa7c6e7",
+      "sourceUnitDigest": "0eae1136d99e795f748a0200fb2afe1813319fbdc4e1fe5df44c1d2958005d49",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-96",
+      "targetUnitDigest": "0eae1136d99e795f748a0200fb2afe1813319fbdc4e1fe5df44c1d2958005d49",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0017 — Đóng audit hệ id/tên gọi (STR47)",
+        "Hệ quả"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-82 (lines 751–761) into docs/platform/architecture-map.md#unheaded-block-96 (lines 828–838), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_15a3179944bc76f990fe1b965e40a9da",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetOwner": "docs/platform/architecture-map.md",
+      "targetAnchor": "unheaded-block-97",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetAncestry": [
+        "Architecture Map",
+        "Added in candidate: architecture-map source carriage",
+        "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0017 — Đóng audit hệ id/tên gọi (STR47)",
+        "Hệ quả"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: digest match points to another occurrence; use the source occurrence line-mapped carrier. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-83 (lines 763–763) into docs/platform/architecture-map.md#unheaded-block-97 (lines 840–840), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    }
+  ]
+}

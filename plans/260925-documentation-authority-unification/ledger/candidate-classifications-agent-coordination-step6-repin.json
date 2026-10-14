@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:37@2026-10-15",
+  "sourceCommit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+  "status": "pending-machine-repin-review",
+  "receipts": [
+    {
+      "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-39",
+      "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+      "shownText": "Current compiled fields (`src/runner/dispatch/plan.mjs:444-461`) are\n`selector`, `caller`, `mechanism`, `executorId`, `capability`, `invocation`,\n`governance`, `reasonCodes`, optional `agentType`/`mcpTool`, `configured`,\n`bindingSource`, `tier`, `model`, `providerModel`, `provenance`, and `policy`.\nGovernance uses its actual provider/egress shape; there is no top-level\n`target`, `handback` or `execution` wrapper and no `egress.allowed` flag.",
+      "shownTextDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.1 Shape, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "61-shape",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "startLine": 91,
+            "endLine": 104,
+            "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+          },
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "startLine": 455,
+            "endLine": 472,
+            "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+        "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-40",
+      "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+      "shownText": "Values and reason codes depend on the resolved request/configuration. Inspect\nthe actual returned plan rather than treating an illustrative schema or an\nold executor selection as a observed result.",
+      "shownTextDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.1 Shape, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "61-shape",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "startLine": 91,
+            "endLine": 104,
+            "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+          },
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "startLine": 455,
+            "endLine": 472,
+            "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_271c8a780dde80cb18e612f908a4eca1",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_271c8a780dde80cb18e612f908a4eca1",
+        "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-43",
+      "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+      "shownText": "- `work` - dispatch decision for a lifecycle work item.\n- `purpose` - dispatch decision for a named capability/purpose.\n- `executor` - dispatch decision for a concrete executor id.\n- `assignment` - dispatch decision for an actual Assignment or its id.\n- `adHocAgent` - dispatch decision for a runtime-composed agent assignment.",
+      "shownTextDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.2 Selector, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "62-selector",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "startLine": 91,
+            "endLine": 104,
+            "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+          },
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "startLine": 455,
+            "endLine": 472,
+            "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_c66cf74ca521ea390c33065fc83b28d7",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_c66cf74ca521ea390c33065fc83b28d7",
+        "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-47",
+      "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+      "shownText": "For in-process plans, native capability fields are top-level `agentType` or\n`mcpTool` when supplied (`plan.mjs:453-454`), not a `handback` object.\nThe caller must actually possess the returned live facility; the decision\ndoes not invoke that facility itself.",
+      "shownTextDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 6. DispatchPlan > 6.3 Mechanism, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "63-mechanism",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "startLine": 91,
+            "endLine": 104,
+            "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+          },
+          {
+            "path": "src/runner/dispatch/plan.mjs",
+            "startLine": 455,
+            "endLine": 472,
+            "blobSha": "819f4727c6f348e03d2c6c42a2714c0ec49857ab"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_56af2fc53f516253db192a78f0dddc70",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_56af2fc53f516253db192a78f0dddc70",
+        "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    }
+  ]
+}

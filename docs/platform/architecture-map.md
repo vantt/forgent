@@ -70,3 +70,771 @@ If a design changes whole-system structure, do all of the following:
 ## 5. Legacy Source
 
 `docs/architecture-map.md` is still the full legacy map. Do not delete or rewrite it wholesale until its component and contract registry content has been promoted or redirected.
+
+## Added in candidate: architecture-map source carriage
+
+Carriage from `docs/architecture-map.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.
+
+### Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký
+
+```txt
+Legacy status: Promoted source
+Promoted to: docs/platform/architecture-map.md
+Related target anchors:
+- docs/platform/component-boundary.md
+- docs/platform/platform-foundations.md
+- docs/platform/vision.md
+Use this legacy file for: Full historical architecture-map detail during migration
+Do not use this legacy file for: The target documentation entry path
+Last reviewed: 2026-09-13
+```
+
+**Phiên bản:** v0.6. **Trạng thái:** CHUẨN — chấp nhận 2026-07-16, record
+[0010](#0010-bản-đồ-kiến-trúc-là-bản-chuẩn); nâng v0.3 theo record
+[0012](../specs/work-state.md#0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời);
+nâng v0.4 theo record
+[0013](../specs/work-state.md#0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from); nâng v0.5
+theo record
+[0015](#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009); nâng v0.6 theo record
+[0017](#0017-đóng-audit-hệ-idtên-gọi-str47) (§12 thêm dòng id-systems-audit,
+Phụ lục B mới — sổ đăng ký 13 hệ id/tên gọi).
+
+Chưng từ tài liệu bàn luận ở xưởng và hai deep-dive distillery (`work-item-management`,
+`work-item-schema-and-io-contracts`); v0.2 sửa theo hai vòng tự phản biện có kiểm
+chứng trên code (hồ sơ hai vòng lưu ở xưởng). Tài liệu này là **bản chuẩn kiến trúc
+của sản phẩm**: mọi ví dụ là thành phần fgOS. Thay đổi bản đồ về sau đi qua decision
+record kèm nâng version — supersede, không sửa ngầm.
+
+**Changelog v0.1 → v0.2** (tóm tắt — chi tiết ở §11):
+
+1. Thứ tự tầng sửa theo import graph THẬT: `Entry → Use-case → Infra → Domain →
+   Kernel` (v0.1 đặt Domain trên Infra — bị chính đồ thị import bác bỏ).
+2. Host Adapter không còn là tầng đầu chuỗi — là **ổ cắm** (port + config) bên hông.
+3. Sổ component xây lại bottom-up từ inventory file: đủ 13 module (v0.1 thiếu 5),
+   tách hai loại row **component** (một nhà) và **slice** (lát dọc).
+4. Thêm contract **CTR009 · executor.v1** (biên model-gateway ↔ provider — đã live,
+   trước đây vô danh); CTR006 hạ maturity `live` → `designed` cho đúng sự thật.
+5. Sequence §8 thêm **nhánh fail** (park/halt → friction, chỗ S2 cắm vào).
+6. Thêm §12: quan hệ với `system-overview.md`, `reading-map.md`, `backlog.md`.
+
+**Changelog v0.2 → v0.3** (record [0012](../specs/work-state.md#0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời) — supersede ADR0002, chi tiết ở §11):
+
+1. `src/state/dep-graph.mjs` (§6) không còn chỉ kiểm chu trình trên `deps` —
+   đổi thành đồ thị cạnh-định-kiểu HỢP NHẤT `blocks`+`parent-child` (`deps`
+   chiếu `blocks`, `parent` chiếu `parent-child`), đã ship + verify xanh.
+2. Contract **CTR002** (§7) thêm mệnh đề bất biến phi-chu-trình: bảo đảm một-cửa-
+   ghi giờ phủ đồ thị hợp nhất `blocks`+`parent-child`, không chỉ `deps` —
+   đóng một lỗ hổng chu trình cha-con sống (benign) mà bản đồ chưa từng khai.
+3. "deps và parent tách rời có chủ đích" (decision ADR0002) được supersede: tách
+   rời về lưu trữ vẫn giữ, nhưng hợp nhất thành một đồ thị cho cycle-check +
+   compute. Không đổi schema tại thời điểm đó — `SCHEMA_VERSION` khi ấy vẫn là
+   2 (nay đã lên 3, per D19/D27 str46-io-contract), không có row §6/manifest
+   mới (mở rộng module đã có, không tạo module mới).
+
+**Changelog v0.3 → v0.4** (record [0013](../specs/work-state.md#0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from) — mở rộng CTR003, không supersede):
+
+1. Contract **CTR003** (§7, orchestrator ↔ worker) thêm một mệnh đề **kênh
+   báo-cáo-không-ghi** (report-not-write): worker CÓ THỂ phát một khối
+   `fgos-discovered` (dữ liệu thuần) trong output để nêu một việc mới phát
+   hiện; worker vẫn KHÔNG BAO GIỜ gọi `fgos` hay ghi `.fgos/` — RUNNER đọc
+   khối đó và tự tạo item với `discoveredFrom` trỏ về việc đang chạy. Bảo đảm
+   runner-một-cửa-ghi (D3) giữ nguyên tuyệt đối.
+2. Không đổi schema tại thời điểm đó, không module mới, không row §6/manifest
+   mới — `loop.mjs` và `dispatch.mjs` đã có (mở rộng tại chỗ). Trường `discoveredFrom`
+   là lineage phi-chặn (loại khỏi cycle-check theo thiết kế), cưỡi SCHEMA_VERSION
+   khi ấy vẫn là 2 (nay đã lên 3, per D19/D27 str46-io-contract).
+
+**Changelog v0.4 → v0.5** (record [0015](#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009) — đổi tên định danh, không supersede):
+
+1. Định danh contract một-chữ-số-trần cũ (§7, từ số 1 đến số 9) đổi tên
+   thành `CTR001`-`CTR009` (3-digit zero-padded, cùng quy ước padding với
+   `RUL<n>`), theo `docs/id-systems-audit.md` #6. Đổi tên thuần — không đổi
+   ý nghĩa, ranh giới, hay maturity của bất kỳ contract nào; mỗi contract
+   vẫn là cùng một contract, chỉ đổi cách viết định danh.
+2. Không đổi schema, không module mới, không row §6/manifest mới — chỉ đổi
+   nhãn ở mọi nơi contract ID xuất hiện trong file này (§6, §7, hai sơ đồ
+   mermaid, changelog, câu hỏi mở).
+
+---
+
+#### 0 · Đọc trong 5 phút
+
+- Toàn hệ được mô tả bằng **một khung chính** (kết cấu — code nằm đâu) và **hai lớp
+  phủ** (điện nước — dữ liệu là gì; nội quy — ai được làm gì). Không có bản vẽ thứ tư.
+- Thần chú giải tranh cãi "X để đâu":
+  **Ở đâu = kết cấu · Là gì = điện nước · Được làm gì = nội quy.**
+  Và khi tranh cãi dai dẳng không dứt: **đó là dấu hiệu phần tử cần TÁCH làm đôi,
+  không phải cần thêm tag** (mọi lời giải đẹp ở §5 đều là phép tách).
+- Mỗi **module** có một thẻ căn cước trong Sổ component (§6); mỗi **tính năng xuyên
+  tầng** là một slice trỏ về các thẻ module. Mỗi ranh giới đáng tin cậy có **một hợp
+  đồng có tên** trong Sổ contract (§7).
+- Luật duy nhất phải nhớ khi cắm thứ mới: **thẻ căn cước trước, code sau** (§9).
+
+---
+
+#### 1 · Vấn đề và mục tiêu
+
+Sắp tới hệ nhận một loạt thành phần mới (friction capture, intake, clarify, planner,
+PR lifecycle — S2, STR14–STR17). Nếu mỗi thành phần tự tìm chỗ ngồi theo cảm tính, sáu
+tháng nữa không ai vẽ lại được hệ thống. Bản đồ tồn tại để năm điều sau **luôn đúng**:
+
+1. **Tên dễ hiểu** — mỗi khái niệm một từ, mỗi từ một nghĩa, không va chạm.
+2. **Trách nhiệm phân định được** — mọi module trả lời "tôi là ai, tôi được làm gì"
+   bằng một dòng.
+3. **Luồng dữ liệu hình dung được** — người mới vẽ lại được đường đi của một
+   work-item, kể cả đường thất bại, mà không cần đọc code.
+4. **Người đến sau hiểu cách ta chia** — bản đồ dạy được, không chỉ tra được.
+5. **Bản đồ phản chiếu repo, không phản chiếu buổi bàn luận** — sổ đăng ký xây
+   bottom-up từ inventory file và được máy đối chiếu (§9.3), không xây top-down từ
+   trí nhớ. (Bài học trực tiếp từ v0.1: phía state — được bàn nhiều — đủ gần hết;
+   phía runner — ít được bàn — thiếu 5/7 module.)
+
+---
+
+#### 2 · Ý tưởng trung tâm: ba câu hỏi — ba bản vẽ
+
+Một ngôi nhà có bản vẽ kết cấu, bản vẽ điện nước, và nội quy sử dụng. Không ai đòi
+gộp ba tờ thành một — nhưng cũng không ai nói chúng mâu thuẫn: chúng trả lời **ba
+loại câu hỏi khác nhau về cùng một ngôi nhà**. fgOS y hệt:
+
+```mermaid
+flowchart TB
+    Q1["Code này nằm ĐÂU?<br/>Import chiều nào?"] --> V1["§3 Bản vẽ KẾT CẤU<br/>structure — KHUNG CHÍNH<br/>5 tầng lõi + 1 ổ cắm host"]
+    Q2["Dữ liệu này LÀ GÌ?<br/>Truth, view, hay chuông?"] --> V2["§4 Bản vẽ ĐIỆN NƯỚC<br/>physics — lớp phủ<br/>store · event · state · signal · run"]
+    Q3["Ai ĐƯỢC làm gì?"] --> V3["§5 Bản NỘI QUY<br/>authority — lớp phủ<br/>control · execution · tool<br/>gateway · memory · governance"]
+    V1 --> SYS[("fgOS<br/>một hệ thống<br/>ba bản vẽ")]
+    V2 --> SYS
+    V3 --> SYS
+```
+
+**Kết cấu là khung chính; hai bản còn lại là lớp phủ.** Mỗi module có **đúng một
+nhà** trên bản kết cấu và mang **tag** từ hai bản kia; mang nhiều tag là bình thường.
+
+Vì sao kết cấu làm khung chính chứ không phải sáu vai (planes):
+
+1. **Kết cấu là trục duy nhất kiểm được bằng máy** — chiều import là fact của đồ
+   thị file. *Trạng thái thật:* phép kiểm này **chưa chạy trong verify** — nó là
+   việc kèm theo khi chấp nhận bản đồ (§9.3); v0.2 đã chạy tay trên toàn đồ thị
+   import và chính nhờ đó phát hiện thứ tự tầng của v0.1 sai. Vai thì many-to-many
+   với file — bắt file "chọn vai" là bắt nó nói dối.
+2. **fgOS đã khóa hình này** (decision b0da87aa: functional-core/imperative-shell,
+   một execution path, parse-first tại biên). Bản đồ đặt tên cho cái đã chốt.
+3. **Ranh giới vai chỉ hóa vật lý khi tách tiến trình**, và luật vàng của ta là
+   *đừng mua bậc mạng khi interface đủ* (Phụ lục A). Chọn vai làm khung là mua
+   trước cái chưa cần trả tiền.
+
+---
+
+#### 3 · Bản vẽ kết cấu — STRUCTURE (khung chính)
+
+Năm tầng lõi, phụ thuộc **một chiều xuống** — đo trên đồ thị import thật, toàn bộ
+13 module hiện hành tuân thủ. Host Adapter đứng ngoài chuỗi: nó là **ổ cắm**.
+
+```mermaid
+flowchart TB
+    subgraph HOST["HOST ADAPTER — ổ cắm, không phải tầng import"]
+        CFG["runner config<br/>(executor: command, args)"]
+        HK["hooks / settings<br/>của harness"]
+    end
+    E["ENTRY SURFACE<br/>bin/fgos.mjs · bin/fgos-runner.mjs<br/><i>mỏng, 0 business logic</i>"]
+    U["USE-CASE / ORCHESTRATION<br/>src/runner/loop.mjs<br/><i>quyết trình tự, không đụng đĩa</i>"]
+    I["INFRA — các cổng side-effect<br/>store.mjs (đĩa state) · worktree.mjs (git) · dispatch.mjs (spawn)<br/><i>mỗi loại side-effect một cửa</i>"]
+    D["DOMAIN — functional core<br/>fsm · frontier · replay(fold) · recovery · anti-loop<br/><i>luật thuần</i>"]
+    K["STATE KERNEL<br/>events.mjs + work.mjs (schema) + log JSONL + views<br/><i>chất liệu truth</i>"]
+    E --> U --> I --> D --> K
+    CFG -. "cắm vào port executor — CTR009" .-> I
+    HK -. "gọi verb như một người dùng — CTR001" .-> E
+```
+
+**Vì sao Infra đứng TRÊN Domain** (điểm v0.2 sửa lớn nhất): đo trên import thật,
+`store.mjs` *import* `fsm/replay/frontier/work` — vỏ mệnh lệnh (imperative shell)
+bọc lõi thuần (functional core), đúng hình b0da87aa. Domain không biết gì ngoài
+Kernel; Kernel (schema + log) không biết ai. Đây cũng là hình chính thống của
+dependency-rule: adapter phụ thuộc domain, domain phụ thuộc mỗi chất liệu truth.
+
+| Tầng | Phận sự một dòng | File thật |
+|---|---|---|
+| Host Adapter | *ổ cắm*: nội dung config + hook đặc-thù-harness; **không có code trong repo** — code chỉ có port | runner config (executor claude CLI…), hooks |
+| Entry Surface | cửa vào mỏng — parse, gọi xuống, in kết quả + exit code | `bin/fgos.mjs` · `bin/fgos-runner.mjs` |
+| Use-case | dàn trình tự nghiệp vụ — "làm gì trước, gì sau" | `src/runner/loop.mjs` |
+| Infra | cổng side-effect, mỗi loại đúng một cửa | `store.mjs` · `worktree.mjs` · `dispatch.mjs` |
+| Domain | luật thuần — transition, ready, fold, recovery-matrix, anti-loop | `fsm` · `frontier` · `replay` · `recovery` · `anti-loop` |
+| State Kernel | chất liệu bền — schema + event log + views | `events.mjs` · `work.mjs` · JSONL |
+
+**Bốn luật của bản kết cấu:**
+
+1. **Phụ thuộc một chiều xuống, được nhảy tầng.** Tầng trên import mọi tầng dưới
+   tùy ý (`fgos.mjs` gọi thẳng store là hợp lệ); import ngược lên = bug kiến trúc.
+2. **Entry mỏng.** "Một execution path" đo được: *mỗi verb đúng một đường code từ
+   cửa tới store*. Hai binary là hai surface chia sẻ module — không nhân đôi logic;
+   hook làm việc của orchestrator là red flag.
+3. **Host-ism sống trong config, không trong code.** `dispatch.mjs` chỉ định nghĩa
+   port executor + validate; tên harness (claude CLI…) chỉ xuất hiện trong runner
+   config. Đổi harness = đổi config + hooks, **zero dòng code**.
+4. **Test đi theo nhà của module nó kiểm; e2e là công dân toàn chuỗi.** Cây
+   `test/{state,runner,cli,e2e}` hôm nay đã tự cắt đúng tầng — bằng chứng thực
+   nghiệm rằng trục kết cấu là trục tự nhiên của repo.
+
+---
+
+#### 4 · Bản vẽ điện nước — PHYSICS (lớp phủ dữ liệu)
+
+Năm chất liệu. **Năm từ này là từ dành riêng** của toàn hệ: `event`, `state`,
+`store`, `signal`, `run` chỉ mang nghĩa dưới đây, không dùng đặt tên thứ khác (§9).
+
+| Chất liệu | Là gì | Luật đã khóa |
+|---|---|---|
+| **store** | chất liệu lưu vật lý — append-only đã commit, một cửa ghi | RUL3 (platform-foundations) |
+| **event** | sự thật đã xảy ra — bất biến, đủ payload, nguồn truth | nhật ký đã commit bất khả xâm phạm |
+| **state** | view hiện tại — **dựng lại được từ zero** từ event log | rebuild-determinism test |
+| **signal** | lời báo "có đổi" — thoáng qua, con trỏ tối thiểu, mất cũng được | chưa dựng (STR8) |
+| **run** | một lần chạy có lifecycle — sandbox, crash-recovery, proof khi kết thúc | nhánh `fgw/` cô lập |
+
+Ghi chú ranh giới nghĩa (v0.2):
+
+- **`run` là chất liệu của WORKER**, không phải của vòng orchestrate — runner loop
+  không mang tag run (v0.1 tự vi phạm từ dành riêng ở chính sổ của nó).
+- **"Một cửa ghi" nghĩa là một cửa GHI** — `appendEvent` chỉ được gọi qua store
+  facade; *đọc* thì tự do (replay đọc thẳng log để fold — hợp lệ).
+- **Luật một-cửa hôm nay là per-process.** Nhiều tiến trình ghi đồng thời cần
+  lease/lock chưa tồn tại — chỗ yếu thật khi đi multi-process, ghi thẳng vào CTR002
+  (§7) làm nợ có tên, không giấu.
+- **`docs/specs/` KHÔNG nằm trong Kernel.** Kernel là truth máy-vận-hành (schema +
+  log + views, mỗi artifact một schema máy-đọc). Specs là tri thức người-viết cho
+  người-và-agent đọc — chất liệu của vai memory (§5), sống ở tầng tài liệu, không
+  phải component runtime. Chung "bền", khác họ.
+- **Config không phải chất liệu thứ sáu.** Nó là *tham số wiring* của Host Adapter,
+  validate tại cửa nạp (`dispatch.mjs` — RunnerConfigError), không phải dữ liệu hệ.
+
+##### Event ≠ Signal — bảng luật
+
+| | **Event** | **Signal** |
+|---|---|---|
+| là gì | sự thật đã xảy ra | lời báo "có đổi" |
+| thì | quá khứ, bất biến | hiện tại, thoáng qua |
+| hướng | pull — nằm chờ được đọc | push — bắn đi đánh thức |
+| nội dung | đủ payload | con trỏ tối thiểu |
+| khi mất | không được phép — đó là truth | chỉ trễ nhịp, không sai |
+| vai | ghi lịch sử | kích hoạt phản ứng |
+
+Ba hệ quả: (1) reactor nhận signal phải đọc lại event/state trước khi hành động;
+(2) signal lossy ⇒ reactor idempotent ⇒ **anti-loop là điều kiện tiên quyết của
+signal** (và anti-loop đã là module sống — `src/runner/anti-loop.mjs`, §6); (3) một
+signal thường gộp nhiều event.
+
+##### Vòng phản ứng — động cơ tương lai của fan-out
+
+```mermaid
+flowchart LR
+    RUN["run<br/>(một lần chạy)"] -- "emit" --> EV["event<br/>(sự thật)"]
+    EV -- "persist" --> ST[("store")]
+    ST -- "project" --> STATE["state<br/>(view)"]
+    STATE -. "signal: 'đổi rồi' (STR8)" .-> RUN
+```
+
+Hôm nay mũi tên signal chưa tồn tại — runner poll frontier. Nét đứt = chỗ STR8 cắm
+vào, không phải thiếu sót vô danh.
+
+---
+
+#### 5 · Bản nội quy — AUTHORITY (lớp phủ quyền)
+
+Sáu vai. **Vai là nội quy, không phải chỗ ở**: module nằm trên bản kết cấu và
+**mang tag vai**; mang hai tag là bình thường (loop vừa quyết chọn việc vừa giao việc).
+
+| Vai | Câu luật (SRP) | Bất biến |
+|---|---|---|
+| **control** | quyết *ai làm gì, khi nào* — không tự thực thi | mọi quyết định chọn-việc/route/gate truy về control |
+| **execution** | chạy vòng reason→act của một việc, cô lập | không tự chọn việc; nhận việc được giao |
+| **tool** | cổng side-effect ra thế giới | **nơi duy nhất** có side-effect thật |
+| **model gateway** | trừu tượng hóa LLM provider — chọn model, tier, fallback | code nghiệp vụ không biết tên provider |
+| **memory** *(xuyên suốt)* | giữ trạng thái và hiểu biết — ngắn hạn + bền | truth chỉ có một nguồn (event log) |
+| **governance** *(xuyên suốt)* | canh mọi luồng — gate, privacy, audit, chi phí | chèn vào được mọi biên, không sở hữu biên nào |
+
+**Bốn bất biến toàn cục:** (1) control quyết — execution làm, không trộn; (2) tool
+là nơi duy nhất có side-effect; (3) memory & governance là hai lớp phủ xuyên suốt;
+(4) mọi ranh giới agent↔agent và agent↔model là **phi tất định** ⇒ bắt buộc có
+contract (§7).
+
+Tinh chỉnh v0.2: **tag control không đặt trên cửa.** Entry "0 business logic" thì
+không quyết gì — control thuộc use-case/domain đứng sau verb (frontier quyết ready,
+loop quyết dispatch), không thuộc `bin/fgos.mjs`.
+
+##### Mô hình tag giải tan các câu hỏi ranh giới cũ
+
+Chú ý cách mọi lời giải đều là **phép tách** — đó chính là câu thần chú thứ hai §0:
+
+| Câu cũ | Lời giải bằng nhà + tag (+ tách) |
+|---|---|
+| R1 — gates thuộc control hay governance? | luật gate: tag **governance** · điểm đặt: nhà **Use-case**, tag control |
+| R2 — khóa file thuộc tool hay control? | chính sách: tag **control** · thực thi khóa: nhà **Infra**, tag tool |
+| R3 — working context thuộc memory hay execution? | sở hữu: tag **memory** · execution mượn-đọc |
+| R4 — handoff là luồng hay hợp đồng? | là **contract CTR006** (§7); phần quyết ở lại control |
+| R5 — specs/learnings tách tầng nào? | tri thức vai memory, tầng tài liệu — KHÔNG vào Kernel (§4) |
+| R6 — entry surface là plane riêng? | không — là **tầng Entry** của bản kết cấu, luật "mỏng" |
+
+---
+
+#### 6 · Sổ đăng ký component
+
+Hai loại row — **component** (một module, đúng một nhà) và **slice** (tính năng
+xuyên tầng, trỏ về các component). Cột maturity buộc sổ nói thật: `live` · `partial`
+· `planned` (có PBI) · `idea`. Sổ xây bottom-up từ `find src bin -name "*.mjs"` —
+**đủ 13/13 module** (bản máy-đọc: `docs/architecture-manifest.json`), và §9.3 giao
+cho máy giữ tình trạng "đủ" này. (v0.2 lúc đầu khai "14/14" — chính phép đếm bằng
+máy bắt được lỗi đếm tay này.)
+
+##### Component — live (14/14 file có thẻ)
+
+| Module | Nhà | Physics | Vai | Contracts |
+|---|---|---|---|---|
+| `bin/fgos.mjs` (add/list/ready/move/ask/answer/check + mọi verb) | Entry | — | — (cửa) | CTR001 *(live — envelope trên MỌI verb + exit-code taxonomy + sổ verb `--help --json`, STR37)*, CTR002 |
+| `bin/fgos-runner.mjs` | Entry | — | — (cửa) | CTR001, CTR003 (surface), CTR009 (nạp config) |
+| `src/runner/loop.mjs` | Use-case | — | control + execution | CTR002, CTR003 |
+| `src/runner/dispatch.mjs` — port executor + validate config + spawn | Infra | — | model gateway + tool | **CTR009 (định nghĩa port)**, CTR003 |
+| `src/runner/worktree.mjs` — vòng đời nhánh `fgw/` | Infra | — | tool | CTR003 (nửa sandbox) |
+| `src/state/store.mjs` — facade một cửa ghi | Infra | store | tool | CTR002 |
+| `src/runner/recovery.mjs` — ma trận crash-recovery | Domain | — | control | — (nội bộ) |
+| `src/runner/anti-loop.mjs` — chặn lặp vô hạn | Domain | — | governance | — (nội bộ) |
+| `src/state/status-fsm.mjs` — luật transition | Domain | — | memory | CTR002 |
+| `src/state/frontier.mjs` — truy vấn ready | Domain | state (derived) | control | — (nội bộ) |
+| `src/state/replay.mjs` — fold/rebuild view | Domain | state | memory | CTR002 |
+| `src/state/dep-graph.mjs` — kiểm tra chu trình trên đồ thị hợp nhất blocks+parent-child (supersede record ADR0012; trước v0.3 chỉ xét `deps`) | Domain | — | governance | — (nội bộ) |
+| `src/state/events.mjs` — engine đọc/ghi log | Kernel | event | memory | CTR002 |
+| `src/state/work.mjs` — schema + DEFAULTS | Kernel | — (schema) | memory | CTR002 (schema v2) |
+| `src/runner/dispatch/confinement/` — Agent Confinement Authority | Infra | — | control + execution + tool | CTR010 (confinement-authority.v1), CTR009, CTR003 |
+| *(test/{state,runner,cli,e2e} — đi theo nhà module nó kiểm, không row riêng)* | | | | |
+
+##### Slice — live (tính năng xuyên tầng, trỏ về component)
+
+| Slice | Ghép từ | Physics | Contracts | Maturity |
+|---|---|---|---|---|
+| human-gate (`awaiting-human`) | verbs ask/answer (Entry) + FSM edge (Domain) + fold (Domain) | event | CTR004 | live (STR19) |
+| outcome hai-nửa + `fgos metrics outcomes` | loop ghi 2 nửa (Use-case) + fold (Domain) + check (Entry) | event→state | CTR002 | live |
+| worker-run trên nhánh `fgw/` | dispatch spawn (Infra) + worktree sandbox (Infra) + loop giám sát (Use-case) | run | CTR003, CTR009 | live |
+| confinement-enforcement (Authority) | dispatch/confinement (Infra) + dispatch cli/transport (Infra) + backend registry (Infra) | run | CTR010, CTR009 | live |
+
+##### Slice — sắp cắm (planned; mỗi cái PHẢI qua nghi thức §9 + trỏ PBI)
+
+| Slice | Component con dự kiến (nhà) | Contracts | PBI |
+|---|---|---|---|
+| friction capture | fold friction (Domain) + điểm ghi tại park/halt (Use-case) | CTR002 | STR3-S2 |
+| `fgos submit` + auto-classify | verb (Entry) + use-case intake (Use-case) | **CTR001 port đầu tiên tại đây** (nay đủ mọi verb, STR37), CTR002 | STR14 |
+| runner sơ khởi clarify/discovery | use-case (Use-case) | CTR003, CTR004 | STR15 |
+| planner/decomposer | use-case (Use-case) — tag **control**, decide-altitude, không bao giờ là worker | CTR002 | STR16 |
+| PR adapter + merge policy | adapter (Infra) + policy (Use-case) | CTR005 | STR17 |
+| signal fabric | emit (Kernel) + reactor wiring (Use-case) | CTR007 | STR8 |
+| attention hub | ngoài process — bậc vật lý duy nhất của sổ | CTR008 | idea |
+
+---
+
+#### 7 · Sổ đăng ký contract
+
+**Luật phạm vi** (v0.2 — chốt cho hết bất nhất): ranh giới **phi tất định**
+(người↔hệ, agent↔agent, agent↔model) *bắt buộc* có contract row. Ranh giới
+in-process chỉ cần row khi nó public cho caller ngoài module (CTR002 là ví dụ);
+mũi tên nội bộ (frontier, recovery) không cần — đó không phải lỗ hổng.
+
+| ID | Ranh giới | Hợp đồng | Trạng thái | Định nghĩa ở |
+|---|---|---|---|---|
+| **CTR001** | người/agent ↔ CLI | `fgos.v1` envelope `{contract, generated_at, data_hash, data}` trên MỌI verb + exit-code taxonomy đóng (nguồn duy nhất: `store.mjs`'s `EXIT_CODES` + `loop.mjs`'s `EXIT_BUSY`, per D31) + stdout=data/stderr=chẩn-đoán + sổ verb máy-đọc `--help --json` (`{schema_version, commands[]}`, `schema_version` hiện `'2.0'` per D34; mỗi verb mang `touchesState`+`externalEffect` — hai trục thay `access` cũ — cộng `paginated` khai verb nào phân trang qua con trỏ đục `--cursor`/`--limit`, cộng `multiValueFormat` trên tham số nhiều-giá-trị, và `deprecated` khi một verb là legacy compatibility, per D34-D36 str46-io-contract + P8 packaging-distribution; xem `docs/io-contract.md` cho hợp đồng đầy đủ) | **live** — envelope `fgos.v1` bọc mọi verb mặc định trên CẢ HAI binary (`fgos.mjs` và, từ STR46 lát 2, `fgos-runner.mjs`'s `printResult()`), với đúng BỐN ngoại lệ có lý do (documented exception): sổ verb máy-đọc của `fgos.mjs` (`--help`/`--help --json`, gồm cả `<verb> --help`), `setup`/`doctor --pretty` của `fgos.mjs`, log worker text trần của `fgos-runner` (`.fgos/logs/<id>.log`), và dòng lifecycle "watch mode stopped" trần của chính `fgos-runner`; exit codes + categoryOf ở cả 2 binary; sổ verb công bố toàn mặt verb (STR37). Nhận diện một envelope thật bằng cách parse dòng stdout ra JSON rồi kiểm `contract === 'fgos.v1'` — không bao giờ bằng heuristic văn bản (vd. "dòng bắt đầu bằng {"), vì dòng progress-trace verify-tail chưa đụng của `loop.mjs` có thể tự chứa output worker bắt đầu bằng '{'. | deep-dive schema §5; porting-log `agent-output-envelope-contract`; spec work-state §envelope |
+| **CTR002** | mọi caller ↔ store | bốn vế: (a) verbs một-cửa-GHI — đọc tự do; (b) event schema v2; (c) luật evolution (additive event, lazy view key, tolerate-unknown-field, hard-fail-unknown-version); (d) **bất biến phi-chu-trình** (record ADR0012): đồ thị cạnh-định-kiểu hợp nhất `blocks`+`parent-child` (chiếu từ `deps`+`parent`) được cửa ghi bảo đảm phi-chu-trình — `addWork`/`editWork` từ chối mọi ghi khép một chu trình trên đồ thị hợp nhất, không chỉ trên `deps`. **Nợ có tên:** một-cửa là per-process; multi-process cần lease (chưa có) | **live** | `store.mjs` · `dep-graph.mjs` · spec work-state · luật RUL3 (work-state) |
+| **CTR003** | orchestrator ↔ worker | dispatch: việc + verify đòi hỏi + proof khi về; **trust boundary của worker**: sandbox = nhánh `fgw/` cô lập (worktree) + vay 3 field RUN_CONTRACT khi fan-out (`forbidden_paths`, `required_outputs`, `result_json_schema`); **kênh báo-cáo-không-ghi (record ADR0013):** worker CÓ THỂ phát khối `fgos-discovered` (dữ liệu thuần) để nêu việc mới phát hiện — vẫn không gọi `fgos`/ghi `.fgos/`; RUNNER đọc và tự tạo item `discoveredFrom` (runner vẫn một-cửa-ghi, D3); stdout surface of `fgos-runner.mjs` reuses CTR001's `fgos.v1` envelope mechanism (contract field `'fgos.v1'`) as its version token rather than minting a separate CTR003-specific tag, per D6 str46-io-contract | partial | `loop.mjs` · `dispatch.mjs` · `worktree.mjs`; deep-dive schema §3 |
+| **CTR004** | người ↔ hệ (bất đồng bộ) | ask/answer + trạng thái `awaiting-human`; frontier loại việc đang chờ; carries version token **CTR004/v1** embodied through the `SCHEMA_VERSION` field of source `work.move` events (currently 3) rather than a separate field on `gates[id]`, per D37 str46-io-contract | **live** (STR19) | spec work-state |
+| **CTR005** | hệ ↔ người (PR) | review gate + merge policy + integrated re-verify sau merge | planned (STR17) | lifecycle vision §4 |
+| **CTR006** | agent ↔ agent | routing-handoff contract + trust boundary | **designed** — spec đầy đủ, chưa có code implement | `docs/routing-handoff-contract.md` |
+| **CTR007** | state ↔ reactor | signal: con trỏ tối thiểu, lossy/at-least-once, consumer bắt buộc idempotent | planned (STR8) | §4 bảng event≠signal |
+| **CTR008** | hệ ↔ hub chú ý | attention envelope (`gate-opened`/`question-raised`/`blocked`), versioned | idea | deep-dive quản-lý §9 |
+| **CTR009** | model gateway ↔ provider | `executor.v1`: runner config `{command, args[]}` thay `{prompt}`/`{model}` per-element — không nối chuỗi; validate RunnerConfigError tại nạp | **live** (v0.1 để vô danh — chính là ranh giới doc cũ tự hỏi "còn thiếu contract nào") | `dispatch.mjs` |
+| **CTR010** | dispatch ↔ executor adapter | `confinement-authority.v1`: một cửa runtime duy nhất `executeThroughConfinement(request, adapterPort)` trước khi adapter được spawn agent; chuẩn hóa `confinement-policy.v1`, compile `confinement-plan.v1`, đối chiếu năng lực backend driver (`bwrap` v1 với 8 falsification probes), fail-closed cho `required`, cấm bypass thiếu full confinement, và phát `confinement-attestation.v1` bền | **live** | `src/runner/dispatch/confinement/` · spec `docs/specs/confinement-authority.md` |
+
+```mermaid
+flowchart LR
+    HU([Người])
+    HOST["Host Adapter<br/>(config + hooks)"]
+    CLI["Entry<br/>fgos · fgos-runner"]
+    UC["Use-case<br/>loop · intake · planner"]
+    ST["Infra<br/>store · worktree · dispatch"]
+    K[("Kernel<br/>schema + event log + views")]
+    WK["Worker<br/>(run, nhánh fgw/)"]
+    PR["PR / nhánh đề xuất"]
+
+    HU -- "CTR001 · fgos.v1" --> CLI
+    HOST -. "CTR009 · executor.v1" .-> ST
+    CLI --> UC
+    UC -- "CTR002 · một cửa ghi" --> ST
+    ST --> K
+    UC -- "CTR003 · dispatch + sandbox" --> WK
+    WK -- "commit + proof" --> PR
+    PR -- "CTR005 · review gate (STR17)" --> HU
+    HU -- "CTR004 · ask/answer" --> CLI
+    K -. "CTR007 · signal (STR8)" .-> UC
+```
+
+**Luồng lỗi giữa các tầng** (v0.2 — trước đây bản đồ im): mỗi cửa Infra/Kernel ném
+lỗi có tên (`StoreError`, `EventLogError`, `FsmError`, `WorkValidationError`,
+`RunnerConfigError`, lỗi dispatch/worktree) — tầng nào xử được thì xử, không thì để
+nổi lên; chỉ **Entry** convert lỗi thành exit code qua taxonomy `EXIT_CODES` +
+`categoryOf` (vế sống của CTR001). Domain không nuốt lỗi, Entry không đoán lỗi.
+
+---
+
+#### 8 · Luồng dữ liệu qua một vòng đời — kể cả đường thất bại
+
+Một work-item đi từ submit đến done — **và một nhánh fail**, vì khách hàng đầu tiên
+của bản đồ là S2-friction, thứ sống ở đúng nhánh đó:
+
+```mermaid
+sequenceDiagram
+    actor H as Người
+    participant E as Entry (fgos CLI)
+    participant U as Use-case (intake · loop)
+    participant S as Infra (store facade)
+    participant K as Kernel (event log → view)
+    participant W as Worker (run)
+
+    H->>E: fgos submit "vấn đề X" — CTR001 (STR14)
+    E->>U: use-case intake
+    U->>S: tạo work-item + phân loại — CTR002
+    S->>K: event work.add (truth, bất biến)
+    Note over K: view dựng lại → frontier thấy việc ready
+    U->>S: claim doing + ghi NỬA DỰ ĐOÁN outcome — CTR002
+    U->>W: giao việc — CTR003 (sandbox fgw/, executor CTR009)
+    alt verify xanh
+        W-->>U: commit + bằng chứng verify
+        U->>S: proposed + NỬA THỰC TẾ outcome — CTR002
+        H->>E: duyệt PR — CTR005 (STR17)
+        U->>S: done → việc phụ thuộc mở khóa — CTR002
+    else worker fail / verify đỏ / lặp quá ngưỡng
+        W-->>U: kết quả fail + log
+        Note over U: anti-loop đếm ngưỡng — quá thì không thử nữa
+        U->>S: park/halt + NỬA THỰC TẾ outcome (fail cũng ghi) — CTR002
+        Note over S,K: event fail = nguyên liệu FRICTION (S2)<br/>ghi ở cùng một cửa với đường thành công
+    end
+    Note over H,K: việc cần người giữa chừng? → awaiting-human, CTR004:<br/>hệ KHÔNG chặn, việc khác chạy tiếp
+    K-->>U: (tương lai) CTR007 signal đánh thức thay vì poll (STR8)
+```
+
+Bốn điều sơ đồ chứng minh: (1) **mọi ghi đi qua đúng một cửa** — CTR002 ở mọi mutation;
+(2) **đường thất bại cũng một cửa ấy** — friction không cần kênh riêng, chỉ cần fold
+riêng; (3) **người là participant có hợp đồng riêng** (CTR001/CTR004/CTR005); (4) các PBI tương
+lai (S2, STR14, STR17, STR8) **đã có chỗ ngồi vẽ sẵn**.
+
+---
+
+#### 9 · Luật vận hành bản đồ
+
+1. **Thẻ căn cước trước code.** Một *module hoặc slice mới* phải có row §6 (nhà,
+   tag, hợp đồng, maturity) trước khi có code; sửa cái đã có thẻ thì không nghi
+   thức gì. **Ràng buộc quy trình ghi rõ:** luật này *mở rộng definition-of-done* —
+   mà definition-of-done là luật khóa L5 của platform-foundations. Vậy nó **chỉ có
+   hiệu lực qua decision record chạm L5** khi bản đồ được chấp nhận, không tự động
+   có hiệu lực vì được viết ở đây (đúng quy trình "changing a locked law" của repo).
+2. **Năm từ dành riêng.** `event` · `state` · `store` · `signal` · `run` chỉ mang
+   nghĩa §4. Không đặt tên module, biến, khái niệm khác bằng năm từ này.
+3. **Bản đồ nói thật — và máy giữ lời.** Mọi row mang maturity; khát vọng ghi là
+   `planned`/`idea`. Hiện thực (STR20): **`docs/architecture-manifest.json`**
+   (file→tầng, contract `architecture-manifest.v1`) + **`test/architecture.test.mjs`**
+   chạy trong `npm test` — (a) chiều import một-chiều-xuống theo nhà đã khai;
+   (b) **đủ sổ**: mọi file `src/**` `bin/**` có row, một-một. Hai phép kiểm là hai
+   mặt một test; v0.1 thiếu cả hai nên vừa sai chiều tầng vừa thiếu 5 module mà
+   không ai thấy. Thêm module mới = thêm row manifest + row §6, không thì test đỏ.
+4. **Một nhà duy nhất cho component; slice khai là slice.** Tranh cãi "X để đâu"
+   giải bằng thần chú §0; một *component* thật sự cần hai nhà = tách nó làm hai;
+   một *tính năng* chạm nhiều nhà = nó là slice, khai đúng loại row.
+5. **Đổi bản đồ qua decision record + nâng version.** Bản đồ có version (đầu file);
+   supersede theo version, không edit ngầm.
+
+**Nghi thức cắm một thành phần mới** (3 bước, chạy trong exploring/planning của
+feature): ① điền row §6 (component hoặc slice + component con) → ② chọn contract
+có sẵn §7 hoặc đặt tên contract mới kèm version → ③ mới đến code.
+
+---
+
+#### 10 · Kiểm chứng: khung chịu được 5 thứ sắp cắm — chấm theo rubric
+
+Phép thử của bản đồ là thành phần *chưa xây*. **Rubric viết trước** (v0.1 tự chấm
+không rubric nên đã cho đậu một bài thi rớt — các thẻ nó sinh ra vi phạm luật
+một-nhà mà vẫn tuyên "khung đứng vững"): mỗi item planned phải ra được
+
+- (a) một slice row với component con, **mỗi con đúng một nhà** trong 5 tầng;
+- (b) **không nhà mới** ngoài 5 tầng (ngoại lệ duy nhất được khai báo: attention hub
+  — ngoài process, bậc vật lý, maturity `idea`);
+- (c) contract nêu tên có row §7.
+
+Kết quả trên bảng planned §6: **S2, STR14, STR15, STR16, STR17 đậu cả ba tiêu chí** (STR8
+đậu; hub là ngoại lệ khai báo). Hai ca đáng giá nhất:
+
+- **STR16 planner** lộ đúng bản chất nhờ tag: nó là **control** (quyết chia việc) dù
+  chạy bằng LLM — nghĩa là không bao giờ được giao cho worker tự quyết.
+- **STR17 PR lifecycle** chạm ba vai — mô hình cũ kẹt ở "thuộc plane nào"; mô hình
+  mới: slice gồm adapter (Infra) + policy (Use-case), ba tag, xong.
+
+---
+
+#### 11 · Khác gì các bản trước — và vì sao
+
+| Bản bàn luận (xưởng) | v0.1 | v0.2 (bản này) |
+|---|---|---|
+| 3 trục ngang hàng, người đọc tự hợp nhất | 1 khung chính + 2 lớp phủ | giữ |
+| `execution` hai nghĩa | foundation đổi tên `run` | giữ + vá chỗ v0.1 tự dùng sai tag run |
+| — | Host Adapter là tầng trên cùng | **ổ cắm** port+config — vì import thật cho thấy U/I gọi xuống port, host cắm từ ngoài |
+| — | thứ tự U→D→I→K | **E→U→I→D→K** — đo trên đồ thị import thật; shell bọc core |
+| contracts là nhãn mũi tên | Sổ CTR001–CTR008 | + **CTR009 executor.v1** (live, trước vô danh) · CTR006 hạ về designed · CTR001 live (envelope mọi verb + sổ verb, STR37) · luật phạm vi contract |
+| — | registry 11 row, thiếu 5 module runner | **14/14 bottom-up** + tách component/slice + máy giữ đủ sổ (§9.3) |
+| — | luồng chỉ happy path | + nhánh fail (chỗ S2 sống) + luồng lỗi/exit-code |
+| thang 7 bậc đứng đầu doc | rút thành Phụ lục A | giữ |
+
+Không nguyên liệu nào bị vứt: bảng event≠signal, 4 bất biến, 6 vai, 2 luật vàng —
+giữ nguyên; mọi thứ khác được đặt lại đúng chỗ theo bằng chứng import graph.
+
+---
+
+#### 12 · Chỗ đứng trong hệ tài liệu
+
+Ba bản ghi, ba câu hỏi, không giẫm chân:
+
+| Tài liệu | Trả lời | Sở hữu |
+|---|---|---|
+| `docs/specs/system-overview.md` + area specs | hệ **LÀM GÌ** (BA-grade, tech-agnostic) | entity nghiệp vụ, luồng nghiệp vụ |
+| `docs/architecture-map.md` (file này) | code **Ở ĐÂU** + ranh giới **KÝ GÌ** | tầng, tag, hai sổ đăng ký |
+| `docs/backlog.md` | **SẮP LÀM GÌ** | PBI — mọi row `planned` §6 phải trỏ về một PBI ở đây |
+| `docs/id-systems-audit.md` (nguồn) / Phụ lục B (file này, bản tóm tắt) | mọi id/tên gọi **KÝ HIỆU GÌ** (prefix, hình dạng, hệ nào sống ở đâu) | sổ đăng ký 13 hệ id/naming (STR47) |
+
+Entity xuất hiện ở cả hai bản đồ cross-link qua contract: work item ↔ CTR002 ·
+human-gate ↔ CTR004 · outcome ↔ CTR002 · handoff ↔ CTR006. Bản đồ nằm trong đường đọc
+chuẩn: `docs/specs/reading-map.md` + mục lục README (nối tại record ADR0010).
+
+---
+
+#### Phụ lục A · Hai luật vàng của thang phân chia
+
+1. **Logic vs vật lý gãy một lần, không fractal.** Ranh giới trong-tiến-trình đổi
+   rẻ; ranh giới qua-mạng đổi đắt — latency, partial failure, versioning. Một điểm
+   đứt gãy chất, không phải bản thu nhỏ của các bậc dưới.
+2. **Kéo ranh giới xuống bậc rẻ nhất vẫn đủ cô lập.** Đừng mua mạng khi interface
+   đủ. (Áp dụng: attention hub là thành phần ngoài-process duy nhất của sổ — và nó
+   ở maturity `idea`, đúng như luật này đòi.)
+
+Tiêu chí cắt khác nhau ở mỗi bậc — class cắt theo actor, service cắt theo
+deploy/team, agent cắt theo kinh tế context-window và tính phi tất định.
+
+---
+
+#### Phụ lục B · Sổ đăng ký hệ id/tên gọi (STR47, record ADR0017)
+
+Bản tóm tắt — nguồn đầy đủ + bằng chứng file:line: `docs/id-systems-audit.md`.
+
+| Prefix/hình dạng | Hệ | Tầng |
+|---|---|---|
+| `tsk-<hash>` (+ `-<n>` con) | Task (`work.id`) | fgOS — sản phẩm |
+| `STR<n>` | Story (backlog PBI) | fgOS — sản phẩm |
+| `ADR<n>` (trích rút gọn của `NNNN-slug.md`) | Decision record | fgOS — sản phẩm |
+| `RUL<n>` (không unique toàn cục, kèm tên area khi trích ngoài spec gốc) | Business rule | fgOS — sản phẩm |
+| `CTR<n>` (3-digit zero-pad) | Contract (sổ §7 file này) | fgOS — sản phẩm |
+| `D<hex>` (8-hex khi trích) | Quyết định toàn xưởng | bee — giàn giáo tạm |
+| `D<n>` (số nguyên nhỏ) | Quyết định cục bộ 1 feature — **không bao giờ trích ngoài `CONTEXT.md` gốc** | bee — giàn giáo tạm |
+| `<feature>-N` | cell-id | bee — giàn giáo tạm |
+| kebab tự do | feature slug | bee — giàn giáo tạm |
+| `P1`/`P2`/`P3` | Severity | bee — giàn giáo tạm |
+
+Ranh giới: cột fgOS là **sản phẩm vĩnh viễn** (fgOS tự sinh/tự đọc được, không
+phụ thuộc bee); cột bee là **giàn giáo tạm** cho giai đoạn xây fgOS — giữ
+nguyên định dạng hiện tại, không đầu tư đổi tên/migrate (khung quyết định:
+`docs/decisions/0004-pham-vi-va-non-goal.md`, chốt tại `docs/decisions/0017-...md`).
+
+---
+
+#### Câu hỏi mở — đã chốt tại record ADR0010 (chấp nhận không phản biện, theo đề xuất)
+
+1. **Đa tiến trình:** điểm yếu thật là **CTR002 một-cửa-ghi per-process** (JSONL + fs,
+   chưa lease/lock). **Chốt:** ghi nợ có tên trong CTR002; giải ở PBI riêng, bắt buộc
+   xong **trước STR6 (fan-out)** — không chặn STR15.
+2. **Nghi thức thẻ-trước-code chạm L5.** **Chốt:** hiệu lực như *phụ lục
+   definition-of-done* qua record ADR0010 — không sửa văn bản L5 tại chỗ, không mở
+   luật L9 mới; nếu L5 tới ngưỡng xem lại thì gộp chính thức khi supersede.
+3. **Nhà của `dispatch.mjs`.** **Chốt:** giữ một file ở Infra; chỉ tách port/spawn
+   khi STR8 hoặc STR16 thật sự cần hai nhịp đổi khác nhau (YAGNI).
+4. **CTR001 live.** Envelope port đầu tại STR14 (`submit`), nay đủ trên MỌI verb qua một cửa in duy nhất, kèm sổ verb máy-đọc `--help --json` (STR37, per D b2d18cc7/b0da87aa).
+5. **Registry-manifest + 2 phép kiểm máy (§9.3).** **Chốt:** đứng riêng **trước
+   S2** — là PBI **STR20** trong backlog; nó canh mọi feature sau.
+
+#### Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
+
+Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4, D5) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
+
+
+##### 0010 — Bản đồ kiến trúc là bản chuẩn
+
+**Ngày:** 2026-07-16 · **Trạng thái:** chốt
+
+###### Bối cảnh
+
+Hệ chuẩn bị nhận một loạt thành phần mới (S2 friction capture, STR14–STR17 lifecycle
+stages, STR8 signal). Trước đó các khái niệm kiến trúc nằm rải trong tài liệu bàn
+luận (ba trục ngang hàng, người đọc tự hợp nhất, tên va chạm, contract không tên).
+`docs/architecture-map.md` được viết làm đề xuất hợp nhất, qua hai vòng phản biện
+có kiểm chứng trên code: vòng 1 soi tự-nhất-quán (chiều phụ thuộc, maturity nói
+thật), vòng 2 soi không-gian-âm (sổ thiếu module, chỗ đứng trong hệ docs) — và
+việc dò tay toàn bộ đồ thị import khi viết lại đã phát hiện thứ tự tầng ban đầu
+sai giữa Domain và Infra.
+
+###### Quyết định
+
+1. **`docs/architecture-map.md` v0.2 là bản chuẩn kiến trúc của fgOS.** Khung
+   chính: 5 tầng `Entry → Use-case → Infra → Domain → Kernel`, phụ thuộc một
+   chiều xuống (được nhảy tầng), đo trên đồ thị import thật. Host Adapter là ổ
+   cắm (port + config), không phải tầng import. Hai lớp phủ: physics (5 từ dành
+   riêng `store/event/state/signal/run`) và authority (6 vai). Hai sổ đăng ký:
+   component (14/14 module, tách row component/slice) và contract (C1–C9).
+2. **Nghi thức "thẻ căn cước trước code"** (map §9.1) có hiệu lực như **phụ lục
+   definition-of-done**: một module/slice mới phải có row trong sổ §6 trước khi
+   có code. Không sửa văn bản luật L5 tại chỗ, không mở luật mới — khi L5 tới
+   ngưỡng xem lại thì gộp chính thức lúc supersede.
+3. **Năm câu hỏi mở của bản đồ chốt theo đề xuất:** (a) nợ C2 một-cửa-ghi
+   per-process giải ở PBI riêng trước STR6 fan-out, không chặn STR15; (b) xử lý L5
+   như trên; (c) `dispatch.mjs` giữ một file ở Infra, chỉ tách khi STR8/STR16 đòi;
+   (d) C1 envelope đợi STR14; (e) registry-manifest + 2 phép kiểm máy (chiều
+   import + đủ sổ) là **PBI STR20, đứng trước S2-friction**.
+4. Bản đồ nối vào đường đọc chuẩn: `docs/specs/reading-map.md` + mục lục README.
+   Tài liệu bàn luận gốc ở xưởng hạ thành thinking record.
+
+###### Hệ quả
+
+- Mọi feature mới đi qua nghi thức 3 bước của map §9 trong exploring/planning;
+  registry không drift vì STR20 giao cho máy giữ (verify đỏ khi import ngược tầng
+  hoặc file thiếu row).
+- Đổi bản đồ = decision record mới supersede 0010 + nâng version, không sửa ngầm.
+- Nợ có tên còn mở: C2 cross-process lease (trước STR6), C6 designed-chưa-code,
+  C3 partial (3 field RUN_CONTRACT vay khi fan-out).
+
+##### 0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009
+
+###### Bối cảnh
+
+`docs/id-systems-audit.md` (STR47) rà soát toàn bộ hệ đặt tên/đánh mã đang chạy
+song song trong repo và phát hiện contract registry (`architecture-map.md`
+§7) là hệ duy nhất còn dùng định danh một-chữ-cái-trần (`C1`-`C9`) — khác mọi
+hệ đã có tiền tố 3-chữ tự khai type (`TSK`, `ADR`, `RUL`, `STR`). Một định
+danh trần như `C2` không tự nói nó là contract khi xuất hiện lẻ trong chat,
+git diff, hay log — người đọc phải tra ngược ngữ cảnh. Audit #6 chốt hướng
+đổi sang tiền tố `CTR` (contract), cùng quy ước 3-digit zero-pad với `RUL<n>`
+(ví dụ `RUL042`) để số lượng contract có thể vượt quá 9 mà không đổi độ rộng
+định danh giữa chừng — ví dụ khoá trong audit: `CTR009`.
+
+Backlog `STR54` submit hướng này thành việc thi công cụ thể: đổi mọi citation
+`C1`-`C9` genuine trong 7 file + `architecture-map.md` chính nó, không đổi ý
+nghĩa/ranh giới/maturity của bất kỳ contract nào.
+
+###### Quyết định
+
+1. **Định danh contract đổi từ `C<n>` (một chữ số, không pad) sang `CTR<n>`
+   3-digit zero-padded** — `C1` → `CTR001`, …, `C9` → `CTR009`. Tiền tố `CTR`
+   bake-in type vào chính chuỗi id, tự khai "đây là contract" ở mọi nơi id
+   xuất hiện, không phụ thuộc tầng hiển thị nào ghép nhãn hộ.
+2. **Đây là đổi tên thuần (rename), không đổi nghĩa.** `CTR001` là cùng một
+   contract với `C1` trước đây — cùng ranh giới, cùng hợp đồng, cùng
+   maturity. Không có contract nào được thêm/bớt/định nghĩa lại bởi record
+   này.
+3. **`architecture-map.md` là bản chuẩn (record 0010) của registry này** —
+   đổi tên áp dụng trước tiên ở đó (§6, §7, hai sơ đồ mermaid, changelog,
+   câu hỏi mở), theo đúng nghi thức đổi bản đồ của chính nó (§9 luật 5: qua
+   decision record + nâng version, không sửa ngầm) — nâng v0.4 → v0.5.
+4. **Mọi nơi khác cite `C1`-`C9`** (specs, `platform-foundations.md`,
+   `docs/decisions/0000-index.md`, `docs/backlog.md`) đổi theo cùng quy ước,
+   trừ các chỗ đã xác nhận không phải citation của registry này (ví dụ một
+   bảng verdict nội bộ không liên quan dùng trùng ký hiệu `C1`/`C2`/`C3`) —
+   những chỗ đó giữ nguyên, không đổi.
+
+###### Hệ quả
+
+- **0010 không bị supersede** — 0015 chỉ đổi cách viết định danh của registry
+  đã khoá ở 0010, không đổi cấu trúc hay nội dung registry.
+- **Không đổi schema, không đổi code** — đây là rename thuần văn bản trong
+  tài liệu; không có contract nào đổi hành vi.
+- **Nhất quán với các hệ đã đổi trước đó** (`TSK<hash>` cho work id, `ADR<n>`
+  cho decision record, `RUL<n>` cho business rule) — hoàn tất mảnh #6 trong
+  bảng audit `id-systems-audit.md`.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+##### 0017 — Đóng audit hệ id/tên gọi (STR47)
+
+###### Bối cảnh
+
+`docs/id-systems-audit.md` (STR47, thảo luận đầu 2026-07-18) rà soát 13 hệ
+id/tên gọi song song đang sống trong workshop + sản phẩm fgOS, tách thành hai
+nhóm: 6 hệ **fgOS — sản phẩm vĩnh viễn** (#1-#6) và 7 hệ **bee — giàn giáo
+tạm** (#7-#13), theo khung quyết định `0004-pham-vi-va-non-goal.md` (fgOS
+chạy song song, không thay thế bee cho tới ngưỡng-có-tên). Sáu hướng đổi
+định dạng mà audit chốt cho nhóm fgOS (#1, #3, #4, #5, #6 — #2 giữ nguyên)
+đã lần lượt được submit thành các PBI riêng và thi công xong:
+
+- STR53 — `work.id` bỏ slug, đổi sang `tsk-<hash>`
+- STR54 — `C1`-`C9` → `CTR<n>` (decision `0015`)
+- STR55 — chuẩn hoá trích dẫn rút gọn ADR → `ADR<n>`
+- STR56 — `R#` → `RUL<n>`
+- STR57 — Story (đổi tên khỏi "PBI") `P<n>` → `STR<n>`
+- STR58 — script `next-doc-id` cho họ "next free integer thủ công"
+
+Cả sáu đều mang trạng thái `done` trong `docs/backlog.md`. Nhóm bee (#7-#10)
+— D-hex/D-local shape collision, cell-id, feature slug — chưa từng được bàn
+tới điểm chốt trong bản DRAFT 2026-07-18. Record này đóng audit: khoá hướng
+cho #7-#10, sửa `id-systems-audit.md` khỏi các chỗ đã trôi khỏi thực tế
+shipped (draft viết trước khi STR53-STR58 thi công), và trả lời câu hỏi CoS
+gốc của STR47 — giữ đa hệ có chủ đích hay hợp nhất.
+
+###### Quyết định
+
+1. **Giữ đa hệ có chủ đích — không hợp nhất.** Sáu hệ fgOS (#1-#6) và bảy hệ
+   bee (#7-#13) tiếp tục sống song song, mỗi hệ phục vụ đúng một tầng: fgOS
+   là sản phẩm vĩnh viễn (tự sinh/tự đọc không phụ thuộc bee), bee là giàn
+   giáo tạm cho giai đoạn xây fgOS (khung: `0004-pham-vi-va-non-goal.md`).
+   Ranh giới dùng-khi-nào của cả 13 hệ được tài liệu hoá tại
+   `docs/id-systems-audit.md` (nguồn) và `docs/architecture-map.md` Phụ lục B
+   (bản tóm tắt, §12 trỏ vào).
+2. **#7/#8 (D-hex global vs `D<n>` local) — không rename, khoá luật citation.**
+   Thay vì đổi D-local thành `L<n>` hay bỏ hẳn bảng cục bộ, luật được khoá:
+   **D-local không bao giờ được trích dẫn ngoài file `CONTEXT.md` gốc của
+   nó.** D-local vốn đã single-file trong thực tế — rủi ro thật chỉ là kỷ
+   luật trích dẫn, không phải hình dạng chữ `D` dùng chung; luật này đóng
+   đúng rủi ro đó với chi phí migrate bằng 0.
+3. **#9 (cell-id) và #10 (feature slug) — giữ nguyên, không format mới.**
+   Cả hai convention-scoped (không phải enforced bằng regex chặt): cell-id
+   (`.bee/bin/lib/cells.mjs` `ID_PATTERN`) chỉ có nguy cơ trùng trong PHẠM VI
+   một feature và chưa từng va chạm thật; feature slug có tính duy nhất nhờ
+   hiệu ứng phụ của cửa tạo worktree (`bee worktree new` từ chối branch/dir
+   đã tồn tại), không phải nhờ định dạng id. Theo khung "giàn giáo tạm", cả
+   hai không đáng đầu tư thêm.
+4. **Phụ lục boundary cuối cùng đặt tại `docs/architecture-map.md`** (Phụ lục
+   B mới, §12 thêm một dòng trỏ vào), không phải `docs/specs/reading-map.md`.
+   `architecture-map.md` đã là nhà của sổ đăng ký anh em (contract registry
+   §7, đổi tên bởi decision `0015`) — cùng một họ tài liệu. `reading-map.md`
+   là bản đồ locator thuần cho toàn bộ tài liệu khác trong repo (không có
+   mục `##` nào, mỗi dòng một bullet trỏ ra ngoài) — giữ nguyên vai trò đó,
+   chỉ sửa một dòng mô tả đã trôi (§ dưới).
+5. **`id-systems-audit.md` được cập nhật khỏi trạng thái DRAFT sang FINAL**,
+   sửa mọi chỗ đã trôi khỏi thực tế shipped: §1 dòng #1 (định dạng đúng là
+   `tsk-<hash>`, chữ thường + gạch nối — không phải `TSK<hash>` như draft đề
+   xuất ban đầu), §4 (6 dòng migrate đổi từ "chốt hướng/chưa migrate" sang
+   "đã migrate" kèm PBI đóng), câu "Chưa áp dụng gì vào code/docs thật" (sai
+   sau khi STR53-STR58 chạy xong), và frontmatter (`status: DRAFT` →
+   `FINAL`). `docs/specs/reading-map.md`'s mô tả `classify.mjs` (`generateId
+   (slug+hash chống trùng)`) cũng sửa theo cùng lý do — cùng gốc trôi thời
+   gian (draft viết 2026-07-18, trước khi migration chạy).
+
+###### Hệ quả
+
+- **STR47 đóng** (`docs/backlog.md`: `in-flight` → `done`) — không có
+  migration mới nào mở ra từ record này; mọi migration mà audit từng đề
+  xuất (#1, #3, #4, #5, #6) đã thi công xong trước record này qua
+  STR53-STR58.
+- **Không đổi schema, không đổi code.** Đây là record đóng-audit + sửa tài
+  liệu trôi thời gian; không hệ id nào đổi hành vi runtime bởi chính record
+  này (các hệ #1/#3/#4/#5/#6 đã đổi hành vi từ trước, qua các PBI riêng của
+  chúng — record này chỉ cập nhật tài liệu cho khớp).
+- **0004 và 0015 không bị supersede** — 0017 chỉ đóng vòng lặp mà 0004 mở ra
+  (khung giữ-đa-hệ) và xác nhận 0015 (CTR rename) là một trong sáu migration
+  đã hoàn tất, không đổi nội dung của cả hai.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

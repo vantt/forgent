@@ -1,10 +1,10 @@
 {
   "version": 1,
   "batch": "agent-coordination",
-  "authorization": "A28 + A31; committed machine re-pin verdicts applied",
+  "authorization": "A28 + A31; existing accepted list plus four interim machine-repin-review tuples; native equality owed next turn",
   "authoredCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
   "meaning": "Conservation-only candidate-unverified units, exactly the native scoped strict E reverse-open set after committed evidence-only re-pin review. The 134 actually changed-code receipts remain unverified; truth is sampled under A28 and checked in full at promotion.",
-  "count": 568,
+  "count": 572,
   "rows": [
     {
       "claimId": "claim_934febe56562f8195a08b9f82f9fcce5",
@@ -9409,6 +9409,94 @@
         "eligibility": "non-promoted Candidate/Draft"
       },
       "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-39",
+      "unitDigest": "2f26ef793b85a9534c07f2080df713367086ccdf91e96a8cf0652d28acf971a6",
+      "fileStatus": "Candidate",
+      "status": "candidate-unverified",
+      "reason": "A31 unchanged excerpt re-pin is machine-proven but pending independent Lead verification; interim reverse-open tuple, not an approval. Next turn binds the new committed receipt and closes only after Lead verdict.",
+      "evidenceReceipt": {
+        "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+        "reviewedAt": "2026-10-12",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+        "reviewMode": "ordinary",
+        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_de1bde6579325220fa5ddea79b9cd77f; bytes equal"
+      }
+    },
+    {
+      "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-40",
+      "unitDigest": "008c98d9c6445268a4d6e33133ec0871b7c7a23a48e51369cad11c0b20caa857",
+      "fileStatus": "Candidate",
+      "status": "candidate-unverified",
+      "reason": "A31 unchanged excerpt re-pin is machine-proven but pending independent Lead verification; interim reverse-open tuple, not an approval. Next turn binds the new committed receipt and closes only after Lead verdict.",
+      "evidenceReceipt": {
+        "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+        "reviewedAt": "2026-10-12",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+        "reviewMode": "ordinary",
+        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_271c8a780dde80cb18e612f908a4eca1; bytes equal"
+      }
+    },
+    {
+      "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-43",
+      "unitDigest": "4097ad349f818789dbce9534ea72cb57d15de4064f1996e24c34588a47c75d9e",
+      "fileStatus": "Candidate",
+      "status": "candidate-unverified",
+      "reason": "A31 unchanged excerpt re-pin is machine-proven but pending independent Lead verification; interim reverse-open tuple, not an approval. Next turn binds the new committed receipt and closes only after Lead verdict.",
+      "evidenceReceipt": {
+        "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+        "reviewedAt": "2026-10-12",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+        "reviewMode": "ordinary",
+        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_c66cf74ca521ea390c33065fc83b28d7; bytes equal"
+      }
+    },
+    {
+      "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-47",
+      "unitDigest": "1e2dd90c75bf8049d0ad5d55ea4677898a163a1229eb4528d65cc2ae4323effa",
+      "fileStatus": "Candidate",
+      "status": "candidate-unverified",
+      "reason": "A31 unchanged excerpt re-pin is machine-proven but pending independent Lead verification; interim reverse-open tuple, not an approval. Next turn binds the new committed receipt and closes only after Lead verdict.",
+      "evidenceReceipt": {
+        "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+        "reviewedAt": "2026-10-12",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+        "reviewMode": "ordinary",
+        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_56af2fc53f516253db192a78f0dddc70; bytes equal"
+      }
     }
   ],
   "previousCount": 568,
@@ -9422,5 +9510,10 @@
     "verification": "reports/phase-06/root-boundary-native-verification.json nativeProofResume",
     "reviewStatus": "pending independent conservation review of changed tuples only",
     "supplementalMetadata": "Preserved receipt/reason metadata is historical evidence from the prior list; current decisions/classification refs are read from unchanged shards at the verified commit. It does not grant current truth approval."
+  },
+  "currentOverlay": {
+    "sourceCommit": "69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539",
+    "fullNativeTupleEquality": false,
+    "status": "local four-tuple overlay; full native equality deferred to next turn"
   }
 }

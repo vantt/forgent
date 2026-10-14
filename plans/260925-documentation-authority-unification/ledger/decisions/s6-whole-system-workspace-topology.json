@@ -1,0 +1,987 @@
+{
+  "version": 1,
+  "shard": "s6-whole-system-workspace-topology.json",
+  "authorSession": "codex-session:37@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/architect/workspace-topology.md"
+  ],
+  "files": [
+    {
+      "path": "docs/architect/workspace-topology.md",
+      "disposition": "move",
+      "rationale": "Complete source carriage into the frozen whole-system architecture owner. Original current/design/historical qualifications retained; no retirement or promotion. Every source unit has an individual pending decision.",
+      "targets": [
+        "docs/platform/system-architecture/architecture/workspace-topology.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_b7836e79df85137e931c3b27fb212e1e",
+      "sourceUnitDigest": "dbbddecaa7d55c08594bb562576db34a91215ebbd035781a1dba012b2812b85c",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "workspace-topology-architecture",
+      "targetUnitDigest": "b0c3bdc7f48af0ef7eae16dc2ecbb7363504b33c1c1807c63a84ae2d4f989f90",
+      "targetAncestry": [],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/workspace-topology.md#workspace-topology-architecture (lines 1–1) into docs/platform/system-architecture/architecture/workspace-topology.md#workspace-topology-architecture (lines 1–1), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_2ff6ef0c9ddd759bfa5490b708036996",
+      "sourceUnitDigest": "23dfefb7d31af758f7248261a875778d05dc6fc597cb9090750673f0400f8343",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "23dfefb7d31af758f7248261a875778d05dc6fc597cb9090750673f0400f8343",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-1 (lines 3–7) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-3 (lines 26–30), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_285780516840ab4c8c6ea312fe5bbc71",
+      "sourceUnitDigest": "a31b60ed2d72b3b0ba574546dfe8278cc31b1d11a2f0cb803bed5650c3e2d375",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "a31b60ed2d72b3b0ba574546dfe8278cc31b1d11a2f0cb803bed5650c3e2d375",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-2 (lines 9–11) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-4 (lines 32–34), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_72606c7d6f06b680ab8bcba01db103cc",
+      "sourceUnitDigest": "8862efb32471a0fa299ff6201cabb9829f2e31da14a61646f20c99bf71b9e586",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "8862efb32471a0fa299ff6201cabb9829f2e31da14a61646f20c99bf71b9e586",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-3 (lines 13–15) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-5 (lines 36–38), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_8e142358fdebd169cef5a3b415f776b3",
+      "sourceUnitDigest": "a99e2e72140a05f40ca30f5cdca5ffda8953e8f45c25e325f9d2b9d1334d72cb",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "a99e2e72140a05f40ca30f5cdca5ffda8953e8f45c25e325f9d2b9d1334d72cb",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-4 (lines 17–19) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-6 (lines 40–42), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_081f727213d245958366e64c71c41bac",
+      "sourceUnitDigest": "b26dbf111de801c75d34547849213c54761519fb5aa83318057aa593857396c6",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetUnitDigest": "1a555fe16c47829985441102ae00adaaa4b71ddbe4679a5967a6b320f6b61ed3",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-5 (lines 21–26) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-7 (lines 44–49), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_0c484c800ecda9608ca05b2e11ab4eeb",
+      "sourceUnitDigest": "114e825bc363a72d08c881dc8bec9dca64c74bbee12ca50cb437a6a2ad5925aa",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "1-contract-goal",
+      "targetUnitDigest": "114e825bc363a72d08c881dc8bec9dca64c74bbee12ca50cb437a6a2ad5925aa",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#1-contract-goal (lines 28–28) into docs/platform/system-architecture/architecture/workspace-topology.md#1-contract-goal (lines 51–51), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_4ac23d5e83ef2434593a26dadd1bba6e",
+      "sourceUnitDigest": "0757916f75f1ca25022ad46fa5b6d27d2fa2908d683002614229ccb65eef09a8",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetUnitDigest": "0757916f75f1ca25022ad46fa5b6d27d2fa2908d683002614229ccb65eef09a8",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "1. Contract Goal"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-6 (lines 30–30) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-8 (lines 53–53), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_9b81a51cf5c2c76e4640b63fb0134297",
+      "sourceUnitDigest": "6ad9b74605a3192be97956615ee4478efb5977d2293bd2815758a7b67e1733ef",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "6ad9b74605a3192be97956615ee4478efb5977d2293bd2815758a7b67e1733ef",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "1. Contract Goal"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-7 (lines 32–32) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-9 (lines 55–55), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_e360f5283233730b3a87fc9372d9dfb3",
+      "sourceUnitDigest": "aea3b3b8d3b9d36a092fff11d20a41e9cd24544403dbc6c33924453a2b211af4",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-10",
+      "targetUnitDigest": "aea3b3b8d3b9d36a092fff11d20a41e9cd24544403dbc6c33924453a2b211af4",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "1. Contract Goal"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-8 (lines 34–40) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-10 (lines 57–63), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_ccb56167e070608b4b25b805550ec3c3",
+      "sourceUnitDigest": "dc2a9db68df12bba281865eb6d197ae783b80b9eb95270557abcb8969ddce9db",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetUnitDigest": "dc2a9db68df12bba281865eb6d197ae783b80b9eb95270557abcb8969ddce9db",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "1. Contract Goal"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-9 (lines 42–43) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-11 (lines 65–66), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_39ef8073b5e76da3ba7a7be103f1a5ee",
+      "sourceUnitDigest": "11e6c1b57e834019379aceacafaa01bc1a421cede5199824956cabcc74271290",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-12",
+      "targetUnitDigest": "11e6c1b57e834019379aceacafaa01bc1a421cede5199824956cabcc74271290",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "1. Contract Goal"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-10 (lines 45–52) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-12 (lines 68–75), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_4b468b3315e6fcb2540a98e6c3fa0657",
+      "sourceUnitDigest": "97bf68c704bf5b0577110801042b13e91d56a4f2b74e1c401befcc10e5ca5d47",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetUnitDigest": "97bf68c704bf5b0577110801042b13e91d56a4f2b74e1c401befcc10e5ca5d47",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "1. Contract Goal"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-11 (lines 54–55) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-13 (lines 77–78), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_2914e355f5fbb6f7d57fc842bae6f03f",
+      "sourceUnitDigest": "3d303a6ee14a2dce9909101f1c621c216ea3aea243846f15a267afe72f6ad85b",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "2-identities",
+      "targetUnitDigest": "3d303a6ee14a2dce9909101f1c621c216ea3aea243846f15a267afe72f6ad85b",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#2-identities (lines 57–57) into docs/platform/system-architecture/architecture/workspace-topology.md#2-identities (lines 80–80), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_e4091fccbb828619b627aa2ab32246d7",
+      "sourceUnitDigest": "b5fc7663663fd69af2ea721e53fa23158f1f70dd3e3f1f0319fa12802a14b956",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-14",
+      "targetUnitDigest": "b5fc7663663fd69af2ea721e53fa23158f1f70dd3e3f1f0319fa12802a14b956",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "2. Identities"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-12 (lines 59–59) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-14 (lines 82–82), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_80187f3dc0bcdc54a1cae6bd9ed4ef35",
+      "sourceUnitDigest": "9453a17513b11be8a9746eae9420b3a07161f70707f674b4d0d25fd12a6aad49",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetUnitDigest": "9453a17513b11be8a9746eae9420b3a07161f70707f674b4d0d25fd12a6aad49",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "2. Identities"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-13 (lines 61–66) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-15 (lines 84–89), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_fd65f6674343924ebc7a1b696085c339",
+      "sourceUnitDigest": "b7bccd9bcbb1e45920d6b8bf8a38ba0df7ad8422b05163beea7fb28ae797ceae",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetUnitDigest": "b7bccd9bcbb1e45920d6b8bf8a38ba0df7ad8422b05163beea7fb28ae797ceae",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "2. Identities"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-14 (lines 68–74) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-16 (lines 91–97), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_3e04d76aef6d34b77588108c8c22dad5",
+      "sourceUnitDigest": "0717b8fbbb2a0cd8f71d4b660c06b51649f3a10ae93f14fb3f046f4a1fff1a3a",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "3-state-classes",
+      "targetUnitDigest": "0717b8fbbb2a0cd8f71d4b660c06b51649f3a10ae93f14fb3f046f4a1fff1a3a",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#3-state-classes (lines 76–76) into docs/platform/system-architecture/architecture/workspace-topology.md#3-state-classes (lines 99–99), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_14c9a7a4552602674b153f2a72b7d2f1",
+      "sourceUnitDigest": "7a633ed06026d47649fc2d4ac35de02cd5fb252f3ab7687e152739b0d26e9090",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetUnitDigest": "7a633ed06026d47649fc2d4ac35de02cd5fb252f3ab7687e152739b0d26e9090",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "3. State Classes"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-15 (lines 78–79) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-17 (lines 101–102), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_23f6d99ca2848dda4830fcdfa3b9d4b7",
+      "sourceUnitDigest": "d9029278ed88bae0d1ac412cadc03b4ce8f827c44e37a153079811e5c1d460d1",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetUnitDigest": "d9029278ed88bae0d1ac412cadc03b4ce8f827c44e37a153079811e5c1d460d1",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "3. State Classes"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-16 (lines 81–90) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-18 (lines 104–113), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_4b396b3f1e4e17a69dca1a2d643d00eb",
+      "sourceUnitDigest": "5302f56b649e8c85081d6ada5a529e8b8e30e0de95c57a3cc0102a9c8e2cf787",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetUnitDigest": "5302f56b649e8c85081d6ada5a529e8b8e30e0de95c57a3cc0102a9c8e2cf787",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "3. State Classes"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-17 (lines 92–95) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-19 (lines 115–118), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_9a3700a1cec5fc00bc55825b1c474569",
+      "sourceUnitDigest": "c4705264d4dbd92ff84a092eb98088e97f6d81e044ae1c01abc4f32e4da3ca18",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "4-physical-placement-defaults",
+      "targetUnitDigest": "c4705264d4dbd92ff84a092eb98088e97f6d81e044ae1c01abc4f32e4da3ca18",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#4-physical-placement-defaults (lines 97–97) into docs/platform/system-architecture/architecture/workspace-topology.md#4-physical-placement-defaults (lines 120–120), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_a8066551ad92ae37f9a4add7ba9c9c6b",
+      "sourceUnitDigest": "5a6447ad5a9ac2b62b600edd0bf97bf58cb0ebc00086cf483c0ac1fb15c3f84c",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "git-workspace",
+      "targetUnitDigest": "5a6447ad5a9ac2b62b600edd0bf97bf58cb0ebc00086cf483c0ac1fb15c3f84c",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "4. Physical Placement Defaults"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#git-workspace (lines 99–99) into docs/platform/system-architecture/architecture/workspace-topology.md#git-workspace (lines 122–122), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_62872131629e0bd7f51787b238ce92f8",
+      "sourceUnitDigest": "c4ac2bd971d58a1d2ec9b50a37929ee8b930127fe75bf1a9c64f7cb104a5f5ef",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetUnitDigest": "c4ac2bd971d58a1d2ec9b50a37929ee8b930127fe75bf1a9c64f7cb104a5f5ef",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "4. Physical Placement Defaults",
+        "Git Workspace"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-18 (lines 101–134) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-20 (lines 124–157), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_fae641a90aea165eaa4e235a9c0bf2fe",
+      "sourceUnitDigest": "873f30bee0966ddc41b65e74790d3743429eca697fa81dbf4b921799e393f1f7",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetUnitDigest": "873f30bee0966ddc41b65e74790d3743429eca697fa81dbf4b921799e393f1f7",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "4. Physical Placement Defaults",
+        "Git Workspace"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-19 (lines 136–155) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-21 (lines 159–178), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7e96333ef3e28f8b31c56d7f37321d6c",
+      "sourceUnitDigest": "fa801a114199f20f5a732d34702bf427f88d579a80de6a05c194e80072c42727",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "non-git-workspace",
+      "targetUnitDigest": "fa801a114199f20f5a732d34702bf427f88d579a80de6a05c194e80072c42727",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "4. Physical Placement Defaults"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#non-git-workspace (lines 157–157) into docs/platform/system-architecture/architecture/workspace-topology.md#non-git-workspace (lines 180–180), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_22b553899c040e5b87a28bb4186ba42b",
+      "sourceUnitDigest": "7a3c4d696e93e9973d1eda0772fe405d039883c5f7dbf872cb0b875f7e79a583",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "7a3c4d696e93e9973d1eda0772fe405d039883c5f7dbf872cb0b875f7e79a583",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "4. Physical Placement Defaults",
+        "Non-Git Workspace"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-20 (lines 159–174) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-22 (lines 182–197), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_a06df27779e34f830988b51e1b2e5e42",
+      "sourceUnitDigest": "93025f3d5830761f7304b31eae197eb964c87646b5efb70e8152f808dcafabe1",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "93025f3d5830761f7304b31eae197eb964c87646b5efb70e8152f808dcafabe1",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "4. Physical Placement Defaults",
+        "Non-Git Workspace"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-21 (lines 176–178) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-23 (lines 199–201), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_734144fe4fd82cca5b846bc4e93b6a6e",
+      "sourceUnitDigest": "a6d766b27255be8d62e6e7ea6e0fb0f98eea1cb4deebca0e9876824cca374f52",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "5-workspace-modes",
+      "targetUnitDigest": "a6d766b27255be8d62e6e7ea6e0fb0f98eea1cb4deebca0e9876824cca374f52",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#5-workspace-modes (lines 180–180) into docs/platform/system-architecture/architecture/workspace-topology.md#5-workspace-modes (lines 203–203), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_cb618356d295f0ee4a7bad7847e2fa66",
+      "sourceUnitDigest": "2683190ccf93c7afe72ea8bf1bfc685c2b33181b00ea7de4c08f2f2de668ad00",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "single-workspace-mode",
+      "targetUnitDigest": "2683190ccf93c7afe72ea8bf1bfc685c2b33181b00ea7de4c08f2f2de668ad00",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "5. Workspace Modes"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#single-workspace-mode (lines 182–182) into docs/platform/system-architecture/architecture/workspace-topology.md#single-workspace-mode (lines 205–205), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_483255456130e67892e7cb6d5571c497",
+      "sourceUnitDigest": "539d65cdde4eeba0c0702fb00cdd3c6bb7c2972cd1b2ad2e9dc486916f3680d2",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "539d65cdde4eeba0c0702fb00cdd3c6bb7c2972cd1b2ad2e9dc486916f3680d2",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "5. Workspace Modes",
+        "Single-Workspace Mode"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-22 (lines 184–189) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-24 (lines 207–212), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_e73bbf1adacd32d754c3ab0c855e64e1",
+      "sourceUnitDigest": "6eecb972c3b80df631ead7d7dd34e8bed7d073eb3518d13e5691b196b06d425a",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "6eecb972c3b80df631ead7d7dd34e8bed7d073eb3518d13e5691b196b06d425a",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "5. Workspace Modes",
+        "Single-Workspace Mode"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-23 (lines 191–191) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-25 (lines 214–214), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_3290c078f70a7910f81242c87c10c51b",
+      "sourceUnitDigest": "433c66532240f295cb6f897da6022033aa8b5d0bc73255d940432573e43a56d7",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "isolated-worktree-mode",
+      "targetUnitDigest": "433c66532240f295cb6f897da6022033aa8b5d0bc73255d940432573e43a56d7",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "5. Workspace Modes"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#isolated-worktree-mode (lines 193–193) into docs/platform/system-architecture/architecture/workspace-topology.md#isolated-worktree-mode (lines 216–216), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_47df55083a4a390f6cf722f881c223ea",
+      "sourceUnitDigest": "1a24aada67229b4eee869b9fc5cfc8f453f9321bc5be5aac79003e715157ac60",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetUnitDigest": "1a24aada67229b4eee869b9fc5cfc8f453f9321bc5be5aac79003e715157ac60",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "5. Workspace Modes",
+        "Isolated-Worktree Mode"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-24 (lines 195–202) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-26 (lines 218–225), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_315efb6480d4dee277ba25d2ee2aec67",
+      "sourceUnitDigest": "2d2ed745f11c6953cf46af46918a46fb5d15945597690b27ed178abdadcf948b",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-27",
+      "targetUnitDigest": "2d2ed745f11c6953cf46af46918a46fb5d15945597690b27ed178abdadcf948b",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "5. Workspace Modes",
+        "Isolated-Worktree Mode"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-25 (lines 204–213) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-27 (lines 227–236), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_667c4b149f85122dc5a385988543d5d8",
+      "sourceUnitDigest": "af332495ce3fce9cd4cab76b916d7de3824b17ea7c29cc18fcd03d03cf0a7150",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "6-resolvetopology-protocol",
+      "targetUnitDigest": "af332495ce3fce9cd4cab76b916d7de3824b17ea7c29cc18fcd03d03cf0a7150",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#6-resolvetopology-protocol (lines 215–215) into docs/platform/system-architecture/architecture/workspace-topology.md#6-resolvetopology-protocol (lines 238–238), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_74809a844a73f3f186a9d07af689de0a",
+      "sourceUnitDigest": "383a9ffbe8b7d03da59e224cf6cfd6ceffa450a7d2927f96b5ca7008522fc4e4",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-28",
+      "targetUnitDigest": "383a9ffbe8b7d03da59e224cf6cfd6ceffa450a7d2927f96b5ca7008522fc4e4",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "6. `resolveTopology()` Protocol"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-26 (lines 217–218) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-28 (lines 240–241), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_f157598134832392bd620b6bfa36ea4f",
+      "sourceUnitDigest": "2ac6e628da454763bd60dbeb48237e399dace6413260ea15bdd0895fd2318ccf",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-29",
+      "targetUnitDigest": "2ac6e628da454763bd60dbeb48237e399dace6413260ea15bdd0895fd2318ccf",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "6. `resolveTopology()` Protocol"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-27 (lines 220–222) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-29 (lines 243–245), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_5e0387b7245ee5b86250690634f71cb1",
+      "sourceUnitDigest": "8f09480af87d9ef0e438db1337915e2232527398fd7e2ee70784c34509e0cb95",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-30",
+      "targetUnitDigest": "8f09480af87d9ef0e438db1337915e2232527398fd7e2ee70784c34509e0cb95",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "6. `resolveTopology()` Protocol"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-28 (lines 224–224) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-30 (lines 247–247), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_2f2d922f7e9abcd4e1155ba83e40106d",
+      "sourceUnitDigest": "fa079d9c52b2ebdb9f73771a76874d8af09fc59a23232219eb5a1378b6394540",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-31",
+      "targetUnitDigest": "fa079d9c52b2ebdb9f73771a76874d8af09fc59a23232219eb5a1378b6394540",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "6. `resolveTopology()` Protocol"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-29 (lines 226–241) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-31 (lines 249–264), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_77b6678948ed3bf89fdbe3b6e83a9666",
+      "sourceUnitDigest": "e6577db62d4cad57f81942a4e2f58d372385aa3f193e5e08fe1302a343813d4f",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-32",
+      "targetUnitDigest": "e6577db62d4cad57f81942a4e2f58d372385aa3f193e5e08fe1302a343813d4f",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "6. `resolveTopology()` Protocol"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-30 (lines 243–245) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-32 (lines 266–268), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_498a620f9e74d81a9c8be672efb7477c",
+      "sourceUnitDigest": "8ad1d3a8d5e55b17ff7634201efbab24887c3dc121d8de544060b3b8c5c6d59e",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "7-capability-and-lease-model",
+      "targetUnitDigest": "8ad1d3a8d5e55b17ff7634201efbab24887c3dc121d8de544060b3b8c5c6d59e",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#7-capability-and-lease-model (lines 247–247) into docs/platform/system-architecture/architecture/workspace-topology.md#7-capability-and-lease-model (lines 270–270), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_c8134ee912609354583c6b4eee28d064",
+      "sourceUnitDigest": "39f12dcc60d00513fe8cac8d5b29527c5a1509a80dded0dbbb2f4a954bbacd82",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-33",
+      "targetUnitDigest": "39f12dcc60d00513fe8cac8d5b29527c5a1509a80dded0dbbb2f4a954bbacd82",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "7. Capability And Lease Model"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-31 (lines 249–249) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-33 (lines 272–272), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_503b44c63198e44c9aa9d8b94c378477",
+      "sourceUnitDigest": "82bc0e6b0a5a42dba6e5126849e556083652d85102e7f48d05e3702dd4cfe8c7",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-34",
+      "targetUnitDigest": "82bc0e6b0a5a42dba6e5126849e556083652d85102e7f48d05e3702dd4cfe8c7",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "7. Capability And Lease Model"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-32 (lines 251–251) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-34 (lines 274–274), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_b015bb8b7df1191f8d4db01183027a5e",
+      "sourceUnitDigest": "38c0499a2c2c6ee84e2758e87ef3d2ea25ac7697bbe6b9d4dc8016e67930a7fb",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-35",
+      "targetUnitDigest": "38c0499a2c2c6ee84e2758e87ef3d2ea25ac7697bbe6b9d4dc8016e67930a7fb",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "7. Capability And Lease Model"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-33 (lines 253–259) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-35 (lines 276–282), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7f196f34a44aec9b8d7601dda4620344",
+      "sourceUnitDigest": "bafc5a6a0db6b3a2cc6146ccebfaa24b352f390ea832ec67665b8645a0688ee1",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-36",
+      "targetUnitDigest": "bafc5a6a0db6b3a2cc6146ccebfaa24b352f390ea832ec67665b8645a0688ee1",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "7. Capability And Lease Model"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-34 (lines 261–261) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-36 (lines 284–284), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_43228c7bdbb038087f9104fd20b64104",
+      "sourceUnitDigest": "9baabc6559384a84914378e18e03214959ef9990326d5c0bb8183fb053679c4f",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-37",
+      "targetUnitDigest": "9baabc6559384a84914378e18e03214959ef9990326d5c0bb8183fb053679c4f",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "7. Capability And Lease Model"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-35 (lines 263–263) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-37 (lines 286–286), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_00af275bc40f0df0f12b3407c9e12e5b",
+      "sourceUnitDigest": "51dc46a5d478151d94a61071561cd476661ecf863e6d591ba0d30caac2348365",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-38",
+      "targetUnitDigest": "51dc46a5d478151d94a61071561cd476661ecf863e6d591ba0d30caac2348365",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "7. Capability And Lease Model"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-36 (lines 265–275) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-38 (lines 288–298), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_5fc418b20c663d71ef9951a2dc04d5b8",
+      "sourceUnitDigest": "ce95f23bd6e77349342018d2429386a1a9e72b168f30c750557e84633ee7e541",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-39",
+      "targetUnitDigest": "ce95f23bd6e77349342018d2429386a1a9e72b168f30c750557e84633ee7e541",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "7. Capability And Lease Model"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-37 (lines 277–279) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-39 (lines 300–302), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_5e1b7cbf697efdf3f8be1df4939948bf",
+      "sourceUnitDigest": "5b29c2699c83837a0e610fe734a2c3fdad3498c86731a32987e796a9c8dea3bb",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "8-operation-capability-matrix",
+      "targetUnitDigest": "5b29c2699c83837a0e610fe734a2c3fdad3498c86731a32987e796a9c8dea3bb",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#8-operation-capability-matrix (lines 281–281) into docs/platform/system-architecture/architecture/workspace-topology.md#8-operation-capability-matrix (lines 304–304), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_50c47b582dbc95fbe5e8bdf4098bec03",
+      "sourceUnitDigest": "593a79d0267f12f63a60679bb1159c63d8d897c98878a929eac391fca6fd7985",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-40",
+      "targetUnitDigest": "593a79d0267f12f63a60679bb1159c63d8d897c98878a929eac391fca6fd7985",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "8. Operation Capability Matrix"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-38 (lines 283–297) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-40 (lines 306–320), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_51b16d6ef92fb91be81b9fcfa81102c3",
+      "sourceUnitDigest": "7f6a5e55a5b1fb8c55b28ede39ea32a1301aa8e37535dda2ad5d041de8176754",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "9-acceptance-scenarios",
+      "targetUnitDigest": "7f6a5e55a5b1fb8c55b28ede39ea32a1301aa8e37535dda2ad5d041de8176754",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#9-acceptance-scenarios (lines 299–299) into docs/platform/system-architecture/architecture/workspace-topology.md#9-acceptance-scenarios (lines 322–322), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_40528aff000b27d36b3df7cd434dec48",
+      "sourceUnitDigest": "2eb0b1a00dca210dd65d932bfd680288f7c2e18d1e0b9ea9118f9652a73450d6",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-41",
+      "targetUnitDigest": "2eb0b1a00dca210dd65d932bfd680288f7c2e18d1e0b9ea9118f9652a73450d6",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "9. Acceptance Scenarios"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-39 (lines 301–302) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-41 (lines 324–325), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_5133dedaf33a02681aacb2590da36701",
+      "sourceUnitDigest": "6d1d06bc72ab50a218b5b39d41f061319a01f2d12e223cfb6617b4f23ebcad8c",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-42",
+      "targetUnitDigest": "6d1d06bc72ab50a218b5b39d41f061319a01f2d12e223cfb6617b4f23ebcad8c",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "9. Acceptance Scenarios"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-40 (lines 304–323) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-42 (lines 327–346), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_cc6c4f59b7d4594b8db57b8ebbd96d16",
+      "sourceUnitDigest": "8ba447eac8e30eae6a221cbe3237a03b00ed068f81652b65bc98c5b9770ae26e",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "10-open-decision",
+      "targetUnitDigest": "8ba447eac8e30eae6a221cbe3237a03b00ed068f81652b65bc98c5b9770ae26e",
+      "targetAncestry": [
+        "Workspace Topology Architecture"
+      ],
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/workspace-topology.md#10-open-decision (lines 325–325) into docs/platform/system-architecture/architecture/workspace-topology.md#10-open-decision (lines 348–348), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_ffa1bff790cd60fb528a9f394c061678",
+      "sourceUnitDigest": "871aac64aa2d3ccbf21eba142c2cadf9db029948f1830110f08e914482d8e396",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-43",
+      "targetUnitDigest": "871aac64aa2d3ccbf21eba142c2cadf9db029948f1830110f08e914482d8e396",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "10. Open Decision"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-41 (lines 327–328) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-43 (lines 350–351), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_19bd2250a4ef180c9c8f31d839e744d6",
+      "sourceUnitDigest": "7d9256784fdd1a3c3e74792e3a15ee61822d1f1204bb63abfffd8772e853bf14",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-44",
+      "targetUnitDigest": "7d9256784fdd1a3c3e74792e3a15ee61822d1f1204bb63abfffd8772e853bf14",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "10. Open Decision"
+      ],
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-42 (lines 330–330) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-44 (lines 353–353), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_09d2e5848df7a846cafe63aa26bbc84b",
+      "sourceUnitDigest": "1ecdab79a500623f963fb6d538f35dfd0116d484727915930ecc47a94a0df7a6",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-45",
+      "targetUnitDigest": "1ecdab79a500623f963fb6d538f35dfd0116d484727915930ecc47a94a0df7a6",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "10. Open Decision"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-43 (lines 332–335) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-45 (lines 355–358), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_110036ff6506a3e5357d0a8c421bbed8",
+      "sourceUnitDigest": "eaf20036b6e6825243bd03edfe09be343ca0a91eda38672685b775203b346ee5",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-46",
+      "targetUnitDigest": "eaf20036b6e6825243bd03edfe09be343ca0a91eda38672685b775203b346ee5",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "10. Open Decision"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-44 (lines 337–337) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-46 (lines 360–360), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_ce0b03899dc057ddbc5fa02e070d7063",
+      "sourceUnitDigest": "03369e2b26f1efa8b4780a989d627330bc2b1b9e4871e6e514fada15a6ce9ebe",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-47",
+      "targetUnitDigest": "03369e2b26f1efa8b4780a989d627330bc2b1b9e4871e6e514fada15a6ce9ebe",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "10. Open Decision"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-45 (lines 339–345) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-47 (lines 362–368), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_68535041cafd06884dfaa35f9043b424",
+      "sourceUnitDigest": "637caeb7a71f38b59951b90ee9080eaf42e55ae78cbc9216ff7c9e7926759002",
+      "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "targetAnchor": "unheaded-block-48",
+      "targetUnitDigest": "637caeb7a71f38b59951b90ee9080eaf42e55ae78cbc9216ff7c9e7926759002",
+      "targetAncestry": [
+        "Workspace Topology Architecture",
+        "10. Open Decision"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-46 (lines 347–348) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-48 (lines 370–371), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    }
+  ]
+}

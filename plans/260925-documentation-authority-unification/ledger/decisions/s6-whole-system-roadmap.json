@@ -1,0 +1,596 @@
+{
+  "version": 1,
+  "shard": "s6-whole-system-roadmap.json",
+  "authorSession": "codex-session:37@2026-10-15",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/architect/roadmap.md"
+  ],
+  "files": [
+    {
+      "path": "docs/architect/roadmap.md",
+      "disposition": "move",
+      "rationale": "Complete source carriage into the frozen whole-system architecture owner. Original current/design/historical qualifications retained; no retirement or promotion. Every source unit has an individual pending decision.",
+      "targets": [
+        "docs/platform/system-architecture/architecture/roadmap.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_c1c9b1fba823738fc52c30de816c233b",
+      "sourceUnitDigest": "14baa7da6d628dddad76498d0e5564e5b5d47fff29137ebbaf924fd43ae03df7",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "architect-roadmap",
+      "targetUnitDigest": "1a0f208445f489e61d09f4d14d071ffdf2264934e00885f94fc7865a9944fe7b",
+      "targetAncestry": [],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/roadmap.md#architect-roadmap (lines 1–1) into docs/platform/system-architecture/architecture/roadmap.md#architect-roadmap (lines 1–1), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_60f6edf61f77cd31a40bd4e7d23be61d",
+      "sourceUnitDigest": "c41500ab364afc291b7b0bff5b6373420f16251c876602e8aac50d447cc78b54",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "c41500ab364afc291b7b0bff5b6373420f16251c876602e8aac50d447cc78b54",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-1 (lines 3–7) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-3 (lines 26–30), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_df79ecb132c646b624704774ed75d7ac",
+      "sourceUnitDigest": "c0b2bddfecfbead604082d26c2c92d55e66a8567b53337410184676e8e6167dd",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "c0b2bddfecfbead604082d26c2c92d55e66a8567b53337410184676e8e6167dd",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-2 (lines 9–14) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-4 (lines 32–37), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_f3eddd82c8614c393b22fde80ca52844",
+      "sourceUnitDigest": "7d2719b4ab11857c800283b1f76a0f5276d7e1eeba0ab804c465aef0f4fce182",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "7d2719b4ab11857c800283b1f76a0f5276d7e1eeba0ab804c465aef0f4fce182",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-3 (lines 16–16) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-5 (lines 39–39), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_7f275ff7eb2a6a72149d05f533eb57fd",
+      "sourceUnitDigest": "354f10ad35d975216101989dcad6dbfe5bb5bfc3134e4b5978389002f984466c",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "354f10ad35d975216101989dcad6dbfe5bb5bfc3134e4b5978389002f984466c",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-4 (lines 18–23) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-6 (lines 41–46), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_3ad84c4f53da80446a324e8e65a9e6ce",
+      "sourceUnitDigest": "907fe5aed1e12e0b4321f85be390d81c57491cf15563a0a19ccd67a77a272b15",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "1-current-active-streams",
+      "targetUnitDigest": "907fe5aed1e12e0b4321f85be390d81c57491cf15563a0a19ccd67a77a272b15",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/roadmap.md#1-current-active-streams (lines 25–25) into docs/platform/system-architecture/architecture/roadmap.md#1-current-active-streams (lines 48–48), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_c4bac2a1ec727560e4ea521fc5c3ab3b",
+      "sourceUnitDigest": "f07e30c4a860b7ec245abcbebcde39742b84acd56aa582a06c270ee97a387a4d",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetUnitDigest": "f07e30c4a860b7ec245abcbebcde39742b84acd56aa582a06c270ee97a387a4d",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "1. Current Active Streams"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-5 (lines 27–35) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-7 (lines 50–58), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_1364dba43b0ce6273740c06b92f67460",
+      "sourceUnitDigest": "55cda3b4b2d558ccff0d07dd19d8c9ccfcec7f8b068a486676e3db6cbcb347cf",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "2-dependency-shape",
+      "targetUnitDigest": "55cda3b4b2d558ccff0d07dd19d8c9ccfcec7f8b068a486676e3db6cbcb347cf",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/roadmap.md#2-dependency-shape (lines 37–37) into docs/platform/system-architecture/architecture/roadmap.md#2-dependency-shape (lines 60–60), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_40edae24ec6ef0e926209b1930f73f83",
+      "sourceUnitDigest": "7558f26cced62422c7b5b28d5839cb7e5dcdc06b5d1e3e37fc7f21eff8ba2af8",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetUnitDigest": "7558f26cced62422c7b5b28d5839cb7e5dcdc06b5d1e3e37fc7f21eff8ba2af8",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "2. Dependency Shape"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-6 (lines 39–39) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-8 (lines 62–62), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_3e5ba4bd0970f2ed12fe2a1b9e308a03",
+      "sourceUnitDigest": "97daf78a173cc2845ea39526301630435ae806a7d67519a6d404b485124cf3a3",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "97daf78a173cc2845ea39526301630435ae806a7d67519a6d404b485124cf3a3",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "2. Dependency Shape"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-7 (lines 41–50) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-9 (lines 64–73), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_5b9718f4d8fde7d44d45c0135762ed66",
+      "sourceUnitDigest": "fa99c444da87b82b895642407922400432a44453970eaa4cf9058920391c4b4e",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-10",
+      "targetUnitDigest": "fa99c444da87b82b895642407922400432a44453970eaa4cf9058920391c4b4e",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "2. Dependency Shape"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-8 (lines 52–53) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-10 (lines 75–76), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_0a3d7ee0f725fb0b9bc603d8edae9725",
+      "sourceUnitDigest": "4cd42929f2205d5b94edb65c3a9f5ad90a77aff089773a97507ba8b2fd248d54",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetUnitDigest": "4cd42929f2205d5b94edb65c3a9f5ad90a77aff089773a97507ba8b2fd248d54",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "2. Dependency Shape"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-9 (lines 55–67) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-11 (lines 78–90), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_88539b2416c67ed572bf0f06e3d8f8da",
+      "sourceUnitDigest": "f4130dd5451e9785379525600721ae4782f721a50a3bfc70dfd37dbff38fb2a9",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-12",
+      "targetUnitDigest": "f4130dd5451e9785379525600721ae4782f721a50a3bfc70dfd37dbff38fb2a9",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "2. Dependency Shape"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-10 (lines 69–70) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-12 (lines 92–93), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_ac73c97d4a2319ae048eea00c9a9e609",
+      "sourceUnitDigest": "f62c0a87fd50d6f2733f35b8cd4b968e212cf2b6d14b39019338a2c84bec1031",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "3-immediate-architecture-order",
+      "targetUnitDigest": "f62c0a87fd50d6f2733f35b8cd4b968e212cf2b6d14b39019338a2c84bec1031",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/roadmap.md#3-immediate-architecture-order (lines 72–72) into docs/platform/system-architecture/architecture/roadmap.md#3-immediate-architecture-order (lines 95–95), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_cc572123ed1081d875f26b61c676387e",
+      "sourceUnitDigest": "7da227c3ae94158f96b8534a5b96b0baa0284643a10fca6b96659ffe8445f07b",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetUnitDigest": "7da227c3ae94158f96b8534a5b96b0baa0284643a10fca6b96659ffe8445f07b",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "3. Immediate Architecture Order"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-11 (lines 74–74) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-13 (lines 97–97), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_3d45038b2ddd69df29d7f95db8bf4e44",
+      "sourceUnitDigest": "bfc783fc18dc591871513f0c90a4a4e4e57e0a0b14a2bc1bb37ca10a3dcb3f5a",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-14",
+      "targetUnitDigest": "bfc783fc18dc591871513f0c90a4a4e4e57e0a0b14a2bc1bb37ca10a3dcb3f5a",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "3. Immediate Architecture Order"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-12 (lines 76–111) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-14 (lines 99–134), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_3fc93f4bc8d3e1377e238bb3fce4c1ae",
+      "sourceUnitDigest": "98573d405e4683ddc76206491fba6947a94d3c0c56af2072da5186530db688d9",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "4-high-level-delivery-plan",
+      "targetUnitDigest": "98573d405e4683ddc76206491fba6947a94d3c0c56af2072da5186530db688d9",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/roadmap.md#4-high-level-delivery-plan (lines 113–113) into docs/platform/system-architecture/architecture/roadmap.md#4-high-level-delivery-plan (lines 136–136), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_51cebdaf0cd75aa2a5a399db813a3999",
+      "sourceUnitDigest": "6b0067c00eb1c706f1db622c576ec64b3675388cee4af6473d7852215ac95234",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetUnitDigest": "6b0067c00eb1c706f1db622c576ec64b3675388cee4af6473d7852215ac95234",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "4. High-Level Delivery Plan"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-13 (lines 115–116) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-15 (lines 138–139), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_af6891bce988e05f7f5867fec6a4129a",
+      "sourceUnitDigest": "566e12d4aac06acebfc3beb452dfd928cb4cf4c732f5e5f13afeef8bbf273988",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetUnitDigest": "566e12d4aac06acebfc3beb452dfd928cb4cf4c732f5e5f13afeef8bbf273988",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "4. High-Level Delivery Plan"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-14 (lines 118–132) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-16 (lines 141–155), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_e4a841d0dc2eba677d43ff398a709d29",
+      "sourceUnitDigest": "d9cdd9afbe7f398fe09357623dd37ca0962c30323d8f63e85cb3b65b9e839bf1",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetUnitDigest": "d9cdd9afbe7f398fe09357623dd37ca0962c30323d8f63e85cb3b65b9e839bf1",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "4. High-Level Delivery Plan"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-15 (lines 134–138) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-17 (lines 157–161), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_091201b70577dcdf974a366e0773d6cc",
+      "sourceUnitDigest": "8f8560266b68900e1237d301d0dc1d5a896cc18a6b444da469a88889638c5ce3",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetUnitDigest": "8f8560266b68900e1237d301d0dc1d5a896cc18a6b444da469a88889638c5ce3",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "4. High-Level Delivery Plan"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-16 (lines 140–143) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-18 (lines 163–166), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_4f3ba6dd4a8c55b28a49d7a519de2b3d",
+      "sourceUnitDigest": "7c44910a446a2785492fd97584a7cc6aa3c4c8fc4d078b2ed07773dbf50a584c",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "5-planning-rules-for-fast-delivery",
+      "targetUnitDigest": "7c44910a446a2785492fd97584a7cc6aa3c4c8fc4d078b2ed07773dbf50a584c",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/roadmap.md#5-planning-rules-for-fast-delivery (lines 145–145) into docs/platform/system-architecture/architecture/roadmap.md#5-planning-rules-for-fast-delivery (lines 168–168), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_8e347b55343e6d863f13a143536bf3a7",
+      "sourceUnitDigest": "72777a36579653ebf130ca67083e2e114e6d1cc4d454a782bec8dfe8fca679d9",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetUnitDigest": "72777a36579653ebf130ca67083e2e114e6d1cc4d454a782bec8dfe8fca679d9",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "5. Planning Rules For Fast Delivery"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-17 (lines 147–168) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-19 (lines 170–191), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_a2c8ae1e05ff55cd12f45bf510adb0f0",
+      "sourceUnitDigest": "34b0f2b4efc09830589d6b52b1bb3d28c7c0a49828423bc2c75a43ccdd99cd25",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "6-parallel-work-lanes",
+      "targetUnitDigest": "34b0f2b4efc09830589d6b52b1bb3d28c7c0a49828423bc2c75a43ccdd99cd25",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/roadmap.md#6-parallel-work-lanes (lines 170–170) into docs/platform/system-architecture/architecture/roadmap.md#6-parallel-work-lanes (lines 193–193), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_8fcad0e9c173f20d24fb08517ef8be28",
+      "sourceUnitDigest": "469d265f7499652ddd6f7c3b449b59c20dd51b9ba8a622232e759f04c1432752",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetUnitDigest": "469d265f7499652ddd6f7c3b449b59c20dd51b9ba8a622232e759f04c1432752",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "6. Parallel Work Lanes"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-18 (lines 172–173) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-20 (lines 195–196), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_105d9ce8a71a304dce1c6919c8cc4c34",
+      "sourceUnitDigest": "deb65a68c4c03a670d327f9ed3cbe34b489ad51938cbac50dafe5eef3ad7cfa9",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetUnitDigest": "deb65a68c4c03a670d327f9ed3cbe34b489ad51938cbac50dafe5eef3ad7cfa9",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "6. Parallel Work Lanes"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-19 (lines 175–187) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-21 (lines 198–210), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_415205ea7d0a7ea12d3f8388d3958825",
+      "sourceUnitDigest": "9321484a06622ba9230e25043852aef96091dbca37b7ff1467eb1fd2ca5c369a",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "7-do-not-collapse-these-boundaries",
+      "targetUnitDigest": "9321484a06622ba9230e25043852aef96091dbca37b7ff1467eb1fd2ca5c369a",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/roadmap.md#7-do-not-collapse-these-boundaries (lines 189–189) into docs/platform/system-architecture/architecture/roadmap.md#7-do-not-collapse-these-boundaries (lines 212–212), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_53d0c6c318eaaca97e659055b6c120fa",
+      "sourceUnitDigest": "6afc9fffd3243d9d894c856c072376063f8285bbd81666fd63ad9fdf56d72ce1",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "6afc9fffd3243d9d894c856c072376063f8285bbd81666fd63ad9fdf56d72ce1",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "7. Do Not Collapse These Boundaries"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-20 (lines 191–191) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-22 (lines 214–214), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_3704550ca5298f89dba23e546f456e37",
+      "sourceUnitDigest": "47cdf022c9528c502230b67934a1b2ae6a1c987f0926d45a65ffe1b0d51f5232",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "47cdf022c9528c502230b67934a1b2ae6a1c987f0926d45a65ffe1b0d51f5232",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "7. Do Not Collapse These Boundaries"
+      ],
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-21 (lines 193–203) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-23 (lines 216–226), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_710cfe3b3f349d0eb85cd9f85980b25d",
+      "sourceUnitDigest": "24393ad467308fdcbb24b2db72b26dc8034f2070a306cc9ce1d3872e8427b03d",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "8-packaging-and-distribution-sub-roadmap",
+      "targetUnitDigest": "24393ad467308fdcbb24b2db72b26dc8034f2070a306cc9ce1d3872e8427b03d",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete heading at docs/architect/roadmap.md#8-packaging-and-distribution-sub-roadmap (lines 205–205) into docs/platform/system-architecture/architecture/roadmap.md#8-packaging-and-distribution-sub-roadmap (lines 228–228), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_b1d4dd5d584f6021d2cfcf5c969e1dab",
+      "sourceUnitDigest": "9446812fdaa26253548e37263f9a7a242f489fc9db0109351c69d2245dd71144",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "9446812fdaa26253548e37263f9a7a242f489fc9db0109351c69d2245dd71144",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "8. Packaging And Distribution Sub-Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-22 (lines 207–210) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-24 (lines 230–233), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_9f2a60e61c1ffc92aec216e2a711204c",
+      "sourceUnitDigest": "4dc084fbb4e17e76fc44418a5c9a8043f816ec214e3040d2db791c0ee1ff52b1",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "4dc084fbb4e17e76fc44418a5c9a8043f816ec214e3040d2db791c0ee1ff52b1",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "8. Packaging And Distribution Sub-Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-23 (lines 212–248) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-25 (lines 235–271), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_5da90c457140655340546484d478dd4e",
+      "sourceUnitDigest": "1b56f25a66f36c02facfd652d76fba986f50290fc84223b86ca03df729f8293d",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "9-spec-update-rule",
+      "targetUnitDigest": "1b56f25a66f36c02facfd652d76fba986f50290fc84223b86ca03df729f8293d",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/roadmap.md#9-spec-update-rule (lines 250–250) into docs/platform/system-architecture/architecture/roadmap.md#9-spec-update-rule (lines 273–273), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_b26f5bb1a6707753a11e095029be5b84",
+      "sourceUnitDigest": "88015746993e09e29c55ca989dbd7df13b1b1268766ee5f5484e995b24bf9ade",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetUnitDigest": "88015746993e09e29c55ca989dbd7df13b1b1268766ee5f5484e995b24bf9ade",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "9. Spec Update Rule"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-24 (lines 252–252) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-26 (lines 275–275), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_5583e5fb6f926677b26343d340174308",
+      "sourceUnitDigest": "8609e90d1bf1262f7a8e2255acd4c0001a349b75e2c665ad87d927c0e418a89a",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-27",
+      "targetUnitDigest": "8609e90d1bf1262f7a8e2255acd4c0001a349b75e2c665ad87d927c0e418a89a",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "9. Spec Update Rule"
+      ],
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-25 (lines 254–257) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-27 (lines 277–280), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_e56e94ff728fa8025c139f39228b20ff",
+      "sourceUnitDigest": "ae6ca13f1241311ca408bc68e8333a55f4976241cbae8e53d99b816894a90afd",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "10-roadmap-status",
+      "targetUnitDigest": "ae6ca13f1241311ca408bc68e8333a55f4976241cbae8e53d99b816894a90afd",
+      "targetAncestry": [
+        "Architect Roadmap"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/roadmap.md#10-roadmap-status (lines 259–259) into docs/platform/system-architecture/architecture/roadmap.md#10-roadmap-status (lines 282–282), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    },
+    {
+      "claimId": "claim_1e4477a65ecb1075b1d724d7e38d4293",
+      "sourceUnitDigest": "2b4e99a43773981f2ada8bdd238be0f89d3ad08dbc67dd923e57565748e71ba1",
+      "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+      "targetAnchor": "unheaded-block-28",
+      "targetUnitDigest": "2b4e99a43773981f2ada8bdd238be0f89d3ad08dbc67dd923e57565748e71ba1",
+      "targetAncestry": [
+        "Architect Roadmap",
+        "10. Roadmap Status"
+      ],
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-26 (lines 261–269) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-28 (lines 284–292), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+    }
+  ]
+}
