@@ -440,6 +440,9 @@ async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }
     throw new StoreError('validation', 'fgos run "<prompt>" needs a non-empty prompt');
   }
   const writes = parseListFlag(flags.writes);
+  if (flags.writes !== undefined && writes.length === 0) {
+    throw new StoreError('validation', 'fgos run "<prompt>" --writes needs at least one path; omit it for a read-only unit');
+  }
   if (writes.length > 0 && !isLinkedWorktree()) {
     throw new StoreError('validation', 'fgos run "<prompt>" --writes needs a linked worktree: create one with `git worktree add <path>` and pass --worktree <path> (or run from inside it)');
   }
@@ -2735,6 +2738,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       if ([unitPath, resumeUnitRunId, prompt].filter((v) => v !== undefined).length > 1) {
         throw new StoreError('validation', 'fgos run takes either a "<prompt>", --unit or --resume, not more than one');
+      }
+      if (positional.length > 1) {
+        throw new StoreError('validation', `fgos run takes one prompt; quote the prompt ("${positional.join(' ')}")`);
+      }
+      // The flags that build a unit from a prompt mean nothing to a --unit file or a resume; refused, never dropped.
+      const promptOnlyFlag = prompt === undefined && ['provider', 'persona', 'writes', 'capability', 'rigor'].find((f) => flags[f] !== undefined);
+      if (promptOnlyFlag) {
+        throw new StoreError('validation', `--${promptOnlyFlag} only applies to fgos run "<prompt>"`);
       }
       const pattern = flags.pattern;
       const overrideStr = flags.override;

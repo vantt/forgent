@@ -286,3 +286,11 @@ test('fgos run "<prompt>" --writes with a --worktree that is the main checkout i
   assert.match(out, /--writes needs a linked worktree/);
   assert.deepEqual(unitRunsOf(tmp), []);
 });
+
+test('fgos run refuses one-liner flags without a prompt, an unquoted multi-word prompt, and an empty --writes', () => {
+  const tmp = setupTestRepo();
+  assert.match(failCli(['--unit', 'x.yaml', '--provider', 'test-node', '--dir', tmp], tmp), /--provider only applies to fgos run "<prompt>"/);
+  assert.match(failCli(['fix', 'the', 'typo', '--capability', 'docs:write', '--dir', tmp], tmp), /quote the prompt/);
+  assert.match(failCli(['Write notes', '--capability', 'docs:write', '--writes', '--dir', tmp], tmp), /--writes needs at least one path/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
