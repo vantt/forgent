@@ -79,13 +79,13 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "Source heading at line 833 is carried as the frozen target heading \"Add Verb\" (anchor add-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
-      "targetUnitDigest": "a91ff340a101cd39a19a7c164207fcaac01be42dca50384221f27fe28c4154b9",
+      "rationale": "Source heading at line 833 is carried as the frozen target heading \"Add Verb\" (anchor add-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries.",
+      "targetUnitDigest": "5a8bd90404bdc7021a6d3ba75882493b6331b3d3640224d7e3e654c07cf523ad",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations"
       ],
-      "authoredBy": "codex-session:21@2026-10-14"
+      "authoredBy": "codex-session:22@2026-10-14"
     },
     {
       "claimId": "claim_320ba6224015cc3877738795b80dabb7",
@@ -95,14 +95,14 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "Body of the add verb section (source lines 835-840) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-65 of spec.md under the add verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
-      "targetUnitDigest": "72721c54253ba541180f7b7114d858ce2af06671f1fa05f45162063962b681b2",
+      "rationale": "Body of the add verb section (source lines 835-840) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-65 of spec.md under the add verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries.",
+      "targetUnitDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Add Verb"
       ],
-      "authoredBy": "codex-session:21@2026-10-14"
+      "authoredBy": "codex-session:22@2026-10-14"
     },
     {
       "claimId": "claim_22efb604ffdcadbc5fd3d9a3df00d539",

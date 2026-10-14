@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "shard": "s5-root-source-native-successors.json",
+  "authorSession": "codex-session:22@2026-10-14",
+  "authorshipRequired": true,
+  "sources": [],
+  "claims": [],
+  "registryGaps": [
+    {
+      "claimId": "claim_cd630652a03e26ef20dc546ae2eed5bb",
+      "sourcePath": "docs/platform/platform-foundations.md",
+      "sourceAnchor": "unheaded-block-1",
+      "sourceUnitDigest": "ad8150aa7423e01dbc47f52f5793a9a1846659c818215d0c3c2fae297c211dd0",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "e768e1726afe9a00c736aedb86cce313a8723f0b9e4e8168808767ea578fb883",
+      "targetAncestry": [
+        "Platform Foundations"
+      ],
+      "authoredBy": "codex-session:22@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "The existing candidate header adds required orientation fields and explicitly remains non-canonical Candidate. Exact old/current same-file header is shown; original summary prose remains untouched. Native predecessor identity retained, successor pending, no approval carry or authority change."
+    },
+    {
+      "claimId": "claim_795266a5e8c31c6935c7f5f7cea4fcb7",
+      "sourcePath": "docs/platform/vision.md",
+      "sourceAnchor": "unheaded-block-1",
+      "sourceUnitDigest": "35c468a4c7b109636d7f8ad9b0b5a9906facab0f962acf110609a034acbe0edc",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "1354381d3c2de9618825b28b0ebbe1507ec4bc2c63983f90f386e72f6d30be4d",
+      "targetAncestry": [
+        "Platform Vision"
+      ],
+      "authoredBy": "codex-session:22@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "The existing candidate header adds required orientation fields and explicitly remains non-canonical Candidate. Exact old/current same-file header is shown; original summary prose remains untouched. Native predecessor identity retained, successor pending, no approval carry or authority change."
+    },
+    {
+      "claimId": "claim_89727d0eb13008ab3f1ed76092044a4f",
+      "sourcePath": "docs/platform/work-state/spec.md",
+      "sourceAnchor": "unheaded-block-65",
+      "sourceUnitDigest": "72721c54253ba541180f7b7114d858ce2af06671f1fa05f45162063962b681b2",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-65",
+      "targetUnitDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
+      "targetAncestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Add Verb"
+      ],
+      "authoredBy": "codex-session:22@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "Authorized U8/RUL60 second-fragment correction under A19 creates a native predecessor gap. Exact old/current same-file units are shown; A22 requires this real successor pending, no truth approval or identity graft."
+    },
+    {
+      "claimId": "claim_8ffb36c0af7a1f88517179b8b1adb0a4",
+      "sourcePath": "docs/platform/work-state/spec.md",
+      "sourceAnchor": "unheaded-block-93",
+      "sourceUnitDigest": "5c61302d66e78a5c872334e3a00927d6a8230642fd670dc0af923cad3e83f3b8",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-93",
+      "targetUnitDigest": "f20c0ca6ad7490fa85635d8100333e97787282b0936df18a2f7f7599d5cd3b63",
+      "targetAncestry": [
+        "Work State Specification",
+        "11. Business Rules"
+      ],
+      "authoredBy": "codex-session:22@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "Authorized U8/RUL60 second-fragment correction under A19 creates a native predecessor gap. Exact old/current same-file units are shown; A22 requires this real successor pending, no truth approval or identity graft."
+    }
+  ]
+}

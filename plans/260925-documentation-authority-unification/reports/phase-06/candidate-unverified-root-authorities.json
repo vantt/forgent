@@ -2,17 +2,24 @@
   "version": 1,
   "batch": "root-authorities",
   "authorization": "A28",
-  "authoredCommit": "55ec1e0c40410b70b1e4024232a233d4e3d96b3d",
+  "authoredCommit": "cd82746a8ba169600d987eeb0f5ca274304712f3",
   "scope": [
-    "docs/specs/work-state.md",
-    "docs/io-contract.md",
+    "docs/architecture-manifest.json",
+    "docs/coexistence.md",
+    "docs/contracts/fgos-gateway-api-v1.yaml",
     "docs/doc-governance.md",
-    "docs/decisions/index.md",
     "docs/doc-registry.json",
+    "docs/io-contract.md",
+    "docs/operator-runbook-herdr-cockpit.md",
+    "docs/platform-foundations.md",
+    "docs/reading-map.md",
+    "docs/README.md",
+    "docs/routing-handoff-contract.md",
+    "docs/specs/reading-map.md",
+    "docs/specs/work-state.md",
     "docs/templates/architecture.md",
     "docs/templates/area-readme.md",
     "docs/templates/contract.md",
-    "docs/user/README.md",
     "docs/templates/decision.md",
     "docs/templates/discussion.md",
     "docs/templates/generated.md",
@@ -21,20 +28,18 @@
     "docs/templates/subcomponent-readme.md",
     "docs/templates/verification.md",
     "docs/templates/vision.md",
-    "docs/coexistence.md",
-    "docs/id-systems-audit.md",
-    "docs/operator-runbook-herdr-cockpit.md",
-    "docs/routing-handoff-contract.md",
-    "docs/distribution-vision.md",
     "docs/transitional-switchboard.md",
-    "docs/README.md",
+    "docs/user/README.md",
+    "docs/distribution-vision.md",
+    "docs/id-systems-audit.md",
+    "docs/work-item-lifecycle-vision.md",
+    "docs/backlog.md",
     "docs/platform/proposals/documentation-system-unification.md",
-    "docs/reading-map.md",
-    "docs/specs/reading-map.md"
+    "docs/decisions/index.md"
   ],
-  "scopeLimit": "Bounded source packs; 95 mapped source rows still undecided, no Step 5 closure.",
+  "scopeLimit": "Final mapped Step 5 source population; AGENTS.md/CLAUDE.md deferred to Step 10. Review and other closure obligations remain open.",
   "meaning": "Native reverse-open list; candidate-unverified, no truth approval.",
-  "count": 792,
+  "count": 830,
   "rows": [
     {
       "claimId": "claim_d32ffe8c2dcf1fffb004c4087509896f",
@@ -11020,12 +11025,544 @@
       "status": "candidate-unverified"
     },
     {
+      "claimId": "claim_cc9b0b6baebe1cb598291fbcd80cf899",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "platform-foundations",
+      "unitDigest": "5c759487c5bbaf994cc259125ee951974a5884b5d2ffb76e0c26f321cd77bb8a",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_1e5b959ec4d25da5a56ea4b6dc313e96",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "e768e1726afe9a00c736aedb86cce313a8723f0b9e4e8168808767ea578fb883",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_203299ed2dc9accaa27c5cee541a6c68",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "1-purpose",
+      "unitDigest": "b1812bd18b7b88b58dd1aef1c97a743e50a59994ed395121e0b5fb46a55f1c79",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_2c16dcf7e25396c56c18e719e440b68d",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "5682857e36dbe2f2257da713fe265fe2386dfdfa21da814d538db5e7cdef15da",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_ab7778cdce4955b28736467a541b04b6",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "e167f297f95fde2d645fc8e9d211b27764b38e9f6ed5461bdbb8185cc3abfbae",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_ab6a09abd0c9962aaa111ac673945505",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "2-authority",
+      "unitDigest": "e7977dd467f0763fc10b18e43770b94df399e8205fa2d73c37631fb61ec33560",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_2a6d0d0bf4e4ab6c47ee38c5e4dbc85f",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "760ce813dee38275b7835a75dd4e115a731f5ce1e61749e6a13974f43f848746",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_09f0919c5e299c8c230e0fee70c02c0f",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "a0a0e5de1d354fb68d004fe2f754d907f01a2bf6eecaab15c3f42eafa65f5200",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_ec2e75abecc7de3c5fcc2b6bda8c23b9",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "3-law-summary",
+      "unitDigest": "8a9987cf7771997d2ead9b240368d21c35726fd55c7533ea6b93cbb3d157c7ab",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_46c53960c0ca396b4728ba271a4486c5",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "264fec538429723ca63f4d609493bde52c077526f20cc4ace32261c0d1ff7e96",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_e7a58711fc263a61319de611617375d5",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "4-design-gate",
+      "unitDigest": "85fcc60218f8b2752e0d5a40393d61e0768f416d388b42dbbf4ec54d0859f676",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_18bc93913b448431a0c855963911fe2b",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "e0c8ac3c9a003bc9c5327c935fb9dce93fb8c05bc50c1a197d32333e8fba140c",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_cdd858ddc77eff892c0d7595a2db233a",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "bdb17898e7cf55880fca4f9b8f0768512d63cc439553812987b32a4ad461774a",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_01bad959c0d979694ccdbd7766f78e7a",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "5-component-boundary-link",
+      "unitDigest": "7ade7273a7e33013be873ae48162d4851c168e14f09b8b08452fc3cf917634ab",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b646f1ec8d56851edc383bc50c70482d",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "f52b702a1f9d964fd1326c1dcf5f3d0d7b64c19f47d04ee8912714f80819312c",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_dce530f30386e919cbaa50513f29fb1d",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "6-related-docs",
+      "unitDigest": "bd310233f65057b6deebb20219de85727322b6915586e7ae2c24d1b2a3f1f6ab",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_e4f03a34cf0718c43c6faa9baac040ab",
+      "path": "docs/platform/platform-foundations.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "b8dfcdaaf4850b881b6b58c8f5d30c3ad90b9bf8f0c40c73416cff26ef0102fc",
+      "fileStatus": {
+        "kind": "platform-foundations",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
       "claimId": "claim_fecee46f6c7c699047ffdb436bfdebe1",
       "path": "docs/platform/runner/contracts/routing-handoff.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "2cf8b2804c543a24a8069e49f7298d2469fabb5efa38f475bfeb6782000fab7f",
       "fileStatus": {
         "kind": "contract",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_da74ffc5a39c41249882475145eb2e63",
+      "path": "docs/platform/vision.md",
+      "anchor": "platform-vision",
+      "unitDigest": "ea178ef136591f0a6a9475913040ed7a553a51f0ee7f9b88b4f1e6fae1f51c10",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_e732b70a915be38bc24582c37b8a11d9",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "1354381d3c2de9618825b28b0ebbe1507ec4bc2c63983f90f386e72f6d30be4d",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_599e3b70255a1adae56db008765f98a1",
+      "path": "docs/platform/vision.md",
+      "anchor": "1-purpose",
+      "unitDigest": "41f9f26895a3fd15c1346b4dea51f499b791b07502e3274e42adfa44ac2b1326",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_c8feb2e73a6808945b3e28ecf6291b66",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "333a4b2486599a56bd1b8f8c779963155d9616ed20374dc34e5f14fac1b61836",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_f653c9c029036673c35aeb5ff8ed2ae9",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "37d3dc5d4da6e21ac01d35aa2db581d5f3a7d58449c1f8a26e2d7fba753aec31",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b6af228ec920c86ed2ca297d1fcd99dc",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "fcc7271ad97b4e8c16e9069eb29c9b20da361343bde1d1532d28c9a95dc0d0fa",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_efcca1f29fbb7c23724705d6a2980697",
+      "path": "docs/platform/vision.md",
+      "anchor": "2-mission",
+      "unitDigest": "44bf1aa91066c666a57b711d204ea7c350bcb97875c049f215650130a831d38b",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_744dfc7dabdb1afc35f335a71c4dfbcc",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "57a466fc5e6510e5f79d43250a9365a26d5a6eb239cf50d7ae8f039c58479f6b",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_3762f9bdc9ec0ade5909594d5df7bdfb",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "d4f74d1a2ba7f80df408ede64e8421ed0a84414c0c5ba2ebc9d9925d992f2b9a",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_6e2947efa7ddeb725aa1d350ddc0cf8a",
+      "path": "docs/platform/vision.md",
+      "anchor": "3-product-priority",
+      "unitDigest": "c39164e45f7ef6e3b519d7fcae12a48540afeb3b071e2676ad6ed1f295037de1",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_494d8e8822be204801bf5ff8eb769ae4",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "cdba578e364cab804a6697f995d211ff840052b1290102be0ffeadd35a5427d7",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_14ea9b6dc062608fa5b63ed0631b96be",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "3053f892e107efcb15cf5c0f575f74d7eb1abd5c99a147b68d5b31bc04931a82",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_0ea347963e49153158871a3235afc483",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "f052f5c431c476ae9020646a613ddd9161c9e97274d52468cbce69b3e4cdbd38",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_204790a9e9721cc754228f6791d4ae15",
+      "path": "docs/platform/vision.md",
+      "anchor": "4-operating-shape",
+      "unitDigest": "5bb304703ee71f6287b3ed62c1698e865404c2fc08ff8650ecb3250172c648f4",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_d46e6059744853141c52690dd123172e",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "7187b249eb9b0eafb62fbaddb443c1f1b0a2fd491722aaaaf2c907101fc4e3b2",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_97612b7e12b29ed8b81108acdf8a9285",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "78570f317b86844d5b6bce311cbe8446773d9690ba0d7b83c43e865375aba46b",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_dcde5099b1a9c73ca23fdd0a3c3184f7",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "f72e0eacbeac76734c5e4959a52864c3e57ce8a82cc1b473003815e5d53ad7b1",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_4b30a105feac3a5125f176b76aafe247",
+      "path": "docs/platform/vision.md",
+      "anchor": "5-design-commitments",
+      "unitDigest": "a64d8219274c479a080a4ab6cd028c02e7ae8de7a509707419313dd52d1ff31a",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_e61a4b569537191f080ca673d3dead6c",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "dbad144992f606d174d337ca04afe24ff5e6d69f2fff57aa4d8d7b028692e6ea",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b7c518d75199b375690ee0f92878a42a",
+      "path": "docs/platform/vision.md",
+      "anchor": "6-related-anchors",
+      "unitDigest": "0f1fb36b7b9c371685c7d818752f200a5314fca16a15a2d833730d518e3dd656",
+      "fileStatus": {
+        "kind": "vision",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_908f25861679e06c2aab8286758c076c",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "47e992413c7b6cbe3b8e2c54b93e7924dc9bb7edd12d047d87c2c368079b4718",
+      "fileStatus": {
+        "kind": "vision",
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,

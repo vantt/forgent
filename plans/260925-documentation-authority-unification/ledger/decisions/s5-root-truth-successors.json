@@ -38,15 +38,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-65",
-      "targetUnitDigest": "72721c54253ba541180f7b7114d858ce2af06671f1fa05f45162063962b681b2",
+      "targetUnitDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Add Verb"
       ],
-      "authoredBy": "codex-session:21@2026-10-14",
+      "authoredBy": "codex-session:22@2026-10-14",
       "reviewStatus": "pending",
-      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block."
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries."
     },
     {
       "claimId": "claim_64efd51dc50d417f21972188bf57afe9",
@@ -104,14 +104,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-93",
-      "targetUnitDigest": "5c61302d66e78a5c872334e3a00927d6a8230642fd670dc0af923cad3e83f3b8",
+      "targetUnitDigest": "f20c0ca6ad7490fa85635d8100333e97787282b0936df18a2f7f7599d5cd3b63",
       "targetAncestry": [
         "Work State Specification",
         "11. Business Rules"
       ],
-      "authoredBy": "codex-session:21@2026-10-14",
+      "authoredBy": "codex-session:22@2026-10-14",
       "reviewStatus": "pending",
-      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block."
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries."
     }
   ]
 }

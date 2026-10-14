@@ -1,0 +1,1626 @@
+{
+  "version": 1,
+  "shard": "s5-root-source-completion.json",
+  "authorSession": "codex-session:22@2026-10-14",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/platform-foundations.md",
+    "docs/work-item-lifecycle-vision.md",
+    "docs/architecture-manifest.json",
+    "docs/contracts/fgos-gateway-api-v1.yaml"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_6174137a754842159b087cb0c603e8e5",
+      "sourceUnitDigest": "41e92c8d1b769ce801adf6bfb5596e8f86dd508c788a2ebd08e5cebd24b3bab6",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack",
+      "targetUnitDigest": "5df48342e3d20011f98051cecac1bd8e9ea955597798ea40216715006696e0a8",
+      "targetAncestry": [
+        "Platform Foundations"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack to docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_c35726c310bf820e3cda599f084761e2",
+      "sourceUnitDigest": "576ef4b9c089c5932e3ceb6fd85f26befd352ffb1a05e9cf768fb54a4bfe88a9",
+      "claimKind": "vision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetUnitDigest": "576ef4b9c089c5932e3ceb6fd85f26befd352ffb1a05e9cf768fb54a4bfe88a9",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-1 to docs/platform/platform-foundations.md#unheaded-block-11. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_ec5d5e0befef92d8598542ed3b0db18f",
+      "sourceUnitDigest": "8fc59c5dbdac8ab4ef8e31cefed6cddbcce54e9c0f32a697f7101bed0056a06f",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-12",
+      "targetUnitDigest": "8fc59c5dbdac8ab4ef8e31cefed6cddbcce54e9c0f32a697f7101bed0056a06f",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-2 to docs/platform/platform-foundations.md#unheaded-block-12. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_df118c590b5e50994ebf902fcee81dd0",
+      "sourceUnitDigest": "04083497fff112b9d6fae286b82e06f3d01cf5979ba1c91b431fd073be2bcea8",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetUnitDigest": "04083497fff112b9d6fae286b82e06f3d01cf5979ba1c91b431fd073be2bcea8",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-3 to docs/platform/platform-foundations.md#unheaded-block-13. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_ccde9f60ec4e4d8e2966bbb92c1dcfc2",
+      "sourceUnitDigest": "46f22a5ebd4f70aa1e3cde636b877d06419098d0ae0df3db3352830f7cea9751",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "l1-hai-vật-lý-của-tri-thức-log-vs-state",
+      "targetUnitDigest": "a91884401af9fbe75d19fac880431be98aa8fc3e683655fcedcfb0ba711e082f",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#l1-hai-vật-lý-của-tri-thức-log-vs-state to docs/platform/platform-foundations.md#l1-hai-vật-lý-của-tri-thức-log-vs-state. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_1a46379988ff3344860104a51037903a",
+      "sourceUnitDigest": "168dd2e09c1b7d5d85e9ab1c366ad3e2765e68bf3d3991db2335d781272862d7",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-14",
+      "targetUnitDigest": "168dd2e09c1b7d5d85e9ab1c366ad3e2765e68bf3d3991db2335d781272862d7",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L1 — Hai vật lý của tri thức: Log vs State"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-4 to docs/platform/platform-foundations.md#unheaded-block-14. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_70d58fc7e508c8468e3bfb284bd8b94b",
+      "sourceUnitDigest": "8964d263ae3ad29e88a1eccd4fb5df020d84e55f2474133eaae113e22f94d25f",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetUnitDigest": "8964d263ae3ad29e88a1eccd4fb5df020d84e55f2474133eaae113e22f94d25f",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L1 — Hai vật lý của tri thức: Log vs State"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-5 to docs/platform/platform-foundations.md#unheaded-block-15. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_02c87de35ef87e8e839d825159269530",
+      "sourceUnitDigest": "92472ade03b38c76133d902390be97f629d706f20831347a1435738d597a7afc",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetUnitDigest": "92472ade03b38c76133d902390be97f629d706f20831347a1435738d597a7afc",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L1 — Hai vật lý của tri thức: Log vs State"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-6 to docs/platform/platform-foundations.md#unheaded-block-16. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_7faa6b0b1f7756a0e575da23321747e0",
+      "sourceUnitDigest": "f074d27202dea0e5b6fcd976c22ccfc3836b61a2aec5ba48ea55695d159f72ae",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetUnitDigest": "f074d27202dea0e5b6fcd976c22ccfc3836b61a2aec5ba48ea55695d159f72ae",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L1 — Hai vật lý của tri thức: Log vs State"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-7 to docs/platform/platform-foundations.md#unheaded-block-17. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_55eb5351a24880ca55e248603c0817b8",
+      "sourceUnitDigest": "f9ee0c36132cc8ca46dcc88c13ac91d4da3cc4a7613492309fe57d3335ff245b",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetUnitDigest": "f9ee0c36132cc8ca46dcc88c13ac91d4da3cc4a7613492309fe57d3335ff245b",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L1 — Hai vật lý của tri thức: Log vs State"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-8 to docs/platform/platform-foundations.md#unheaded-block-18. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_6b9f5de9214186d66d3dc1e74d8d48f3",
+      "sourceUnitDigest": "ac87664311c5b2d18345dc46aa1213825d954686d2e16ca42781d195f70b92d7",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetUnitDigest": "ac87664311c5b2d18345dc46aa1213825d954686d2e16ca42781d195f70b92d7",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L1 — Hai vật lý của tri thức: Log vs State"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-9 to docs/platform/platform-foundations.md#unheaded-block-19. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_c38928f213e73bffe6542050ab2e37fb",
+      "sourceUnitDigest": "ecf7aa9236bae0aca5ada1280d0c28798242ca3e644cd9f7a03629d1f1e2a11f",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "l2-kiến-trúc-memory-hai-tầng",
+      "targetUnitDigest": "102b3fdf09dcc2c19e795ab43974fca95d02a62f8cc7f6f495cb09192a66fc1a",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#l2-kiến-trúc-memory-hai-tầng to docs/platform/platform-foundations.md#l2-kiến-trúc-memory-hai-tầng. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_46875e137b716d373f8e9fcff9ff6400",
+      "sourceUnitDigest": "cb8e14aea4bf8d30ef595a63e5dea5469bfc546948453940d1a152392ec2c353",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetUnitDigest": "cb8e14aea4bf8d30ef595a63e5dea5469bfc546948453940d1a152392ec2c353",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L2 — Kiến trúc memory hai tầng"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-10 to docs/platform/platform-foundations.md#unheaded-block-20. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_ee8253bf093aef17679ee666626915b5",
+      "sourceUnitDigest": "6b9221d7fa3cf226534e6f2d648074316f372917811e47a470f01867cb4cef01",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetUnitDigest": "6b9221d7fa3cf226534e6f2d648074316f372917811e47a470f01867cb4cef01",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L2 — Kiến trúc memory hai tầng"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-11 to docs/platform/platform-foundations.md#unheaded-block-21. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_08f29fe36e9b56e14e2f87eb7e99a6b8",
+      "sourceUnitDigest": "531971f08dd18f63b3add0bb38e9070c4b11d668584f3f7cfb6b08a427c1f675",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "531971f08dd18f63b3add0bb38e9070c4b11d668584f3f7cfb6b08a427c1f675",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L2 — Kiến trúc memory hai tầng"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-12 to docs/platform/platform-foundations.md#unheaded-block-22. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_7719b670af6d4ae9f1c4be3184d279b8",
+      "sourceUnitDigest": "6df091c96a3f7425cdf8c220b37c54e0f2bf0734c2e3729cafe6fa4f5adfc036",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "6df091c96a3f7425cdf8c220b37c54e0f2bf0734c2e3729cafe6fa4f5adfc036",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L2 — Kiến trúc memory hai tầng"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-13 to docs/platform/platform-foundations.md#unheaded-block-23. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_021cbf90d1403deaba20bd2d37cff1e4",
+      "sourceUnitDigest": "30f7e9eeb5a17e2b4fe86fa1961296bb91abecfdda08a500133bc382b333c432",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "30f7e9eeb5a17e2b4fe86fa1961296bb91abecfdda08a500133bc382b333c432",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L2 — Kiến trúc memory hai tầng"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-14 to docs/platform/platform-foundations.md#unheaded-block-24. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_055abe423cee3a57c347c1f06fe8e064",
+      "sourceUnitDigest": "690eb02856c7a16108cb6173bc5beaa6110ab30c1c4c5f439a66c1db93ae3ada",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "690eb02856c7a16108cb6173bc5beaa6110ab30c1c4c5f439a66c1db93ae3ada",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L2 — Kiến trúc memory hai tầng"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-15 to docs/platform/platform-foundations.md#unheaded-block-25. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_a0d0d9a42f1c44c5d2dc8d465b4e9694",
+      "sourceUnitDigest": "84571cc58784b535ba14f87b3b837e47be6ec322c9d3fe0f97c2b1a09227c845",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "l3-luật-store-truth-ở-jsonl-db-là-view",
+      "targetUnitDigest": "c9e252ce8241f878b6404574d2e82893c5375ff3b434617ac6981d9b0d9480ec",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view to docs/platform/platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_513c6011284c4b74249f89883c5c2b36",
+      "sourceUnitDigest": "5839776da66814923a7967180bfeb790e725ea19d401943843658433eac1a4ae",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetUnitDigest": "5839776da66814923a7967180bfeb790e725ea19d401943843658433eac1a4ae",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L3 — Luật store: truth ở JSONL, db là view"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-16 to docs/platform/platform-foundations.md#unheaded-block-26. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_8f4288e512fe195699c27f6bf26fe1fd",
+      "sourceUnitDigest": "11462fd7cf03c90ed5a86a8a544c6ecc76a4bab660cd23c577e6a2637478686b",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-27",
+      "targetUnitDigest": "11462fd7cf03c90ed5a86a8a544c6ecc76a4bab660cd23c577e6a2637478686b",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L3 — Luật store: truth ở JSONL, db là view"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-17 to docs/platform/platform-foundations.md#unheaded-block-27. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_e2e4f1d831adba141aa783f330242afc",
+      "sourceUnitDigest": "9c409ff547b04a39d2aa19b74b80df3071c086a6a669d9fcddb1dbb92d4d2baf",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-28",
+      "targetUnitDigest": "9c409ff547b04a39d2aa19b74b80df3071c086a6a669d9fcddb1dbb92d4d2baf",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L3 — Luật store: truth ở JSONL, db là view"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-18 to docs/platform/platform-foundations.md#unheaded-block-28. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_3c94852092c05486c379c3313eb6e911",
+      "sourceUnitDigest": "9c91e304dff732a99d5fa1141233041c634debc06bef4c2a3c77543c181aa9ba",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-29",
+      "targetUnitDigest": "9c91e304dff732a99d5fa1141233041c634debc06bef4c2a3c77543c181aa9ba",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L3 — Luật store: truth ở JSONL, db là view"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-19 to docs/platform/platform-foundations.md#unheaded-block-29. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_0c213128e2d185432accdc278bdb2a40",
+      "sourceUnitDigest": "90e37ae90166ffdff682883f8366a3fe36be59151d980be89b3a4a55414b257f",
+      "claimKind": "verification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-30",
+      "targetUnitDigest": "90e37ae90166ffdff682883f8366a3fe36be59151d980be89b3a4a55414b257f",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L3 — Luật store: truth ở JSONL, db là view"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-20 to docs/platform/platform-foundations.md#unheaded-block-30. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_7327c094fb15d2cfcaad5a681f690b57",
+      "sourceUnitDigest": "4f7b30b161b87316f0dd1e1de1e8c41b490f20ff52f5185d77550ef26491e655",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "l4-routing-model-theo-audience-của-từng-interface",
+      "targetUnitDigest": "9487ad11b57fe44ce79ecf697c6aa04c6070ce673f399dada389e6d3ea6f5d9e",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#l4-routing-model-theo-audience-của-từng-interface to docs/platform/platform-foundations.md#l4-routing-model-theo-audience-của-từng-interface. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_75504d48b9a81174ef19731cb714ae79",
+      "sourceUnitDigest": "fa0d18bd92ea2f88fec46020b02745a75a410b21eeb7dfcfb43f6851e89a3bea",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-31",
+      "targetUnitDigest": "fa0d18bd92ea2f88fec46020b02745a75a410b21eeb7dfcfb43f6851e89a3bea",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L4 — Routing model theo audience của từng interface"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-21 to docs/platform/platform-foundations.md#unheaded-block-31. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_2dc8d531bc7924c6b481065e674ac0e7",
+      "sourceUnitDigest": "a6165ca54f6e232f91f3f293552afbc9ba99359966f4ec8c76bbf2fe4566e3af",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-32",
+      "targetUnitDigest": "a6165ca54f6e232f91f3f293552afbc9ba99359966f4ec8c76bbf2fe4566e3af",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L4 — Routing model theo audience của từng interface"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-22 to docs/platform/platform-foundations.md#unheaded-block-32. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_065e33d2123d8ccc63a2dac1c579f438",
+      "sourceUnitDigest": "a66a63381d36cbfd9f067080c0df139677a4c83ae2f7132eb47e6d54ff32f768",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-33",
+      "targetUnitDigest": "a66a63381d36cbfd9f067080c0df139677a4c83ae2f7132eb47e6d54ff32f768",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L4 — Routing model theo audience của từng interface"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-23 to docs/platform/platform-foundations.md#unheaded-block-33. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_e8e2588cecca381e006274039c912274",
+      "sourceUnitDigest": "d345460f92c033e34453a60c7f6a6fa6083e75ab3aa24794279e280464ddcef5",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-34",
+      "targetUnitDigest": "d345460f92c033e34453a60c7f6a6fa6083e75ab3aa24794279e280464ddcef5",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L4 — Routing model theo audience của từng interface"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-24 to docs/platform/platform-foundations.md#unheaded-block-34. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_a03c431e66bc6bc291daf27a626e3393",
+      "sourceUnitDigest": "2d3a3d99276a46e6495ac8b7b9f5700982cbfbdbfb607c0be05684c3195a81bc",
+      "claimKind": "vision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-35",
+      "targetUnitDigest": "2d3a3d99276a46e6495ac8b7b9f5700982cbfbdbfb607c0be05684c3195a81bc",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L4 — Routing model theo audience của từng interface"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-25 to docs/platform/platform-foundations.md#unheaded-block-35. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_36e4d6e0f08ff75c793da8266e5e6551",
+      "sourceUnitDigest": "ada3bb8904224d8ebeaba76b87593e3fb9fad4e7ad1981ab77e3dc323a15bfb4",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "l5-definition-of-done-sáu-câu-hỏi",
+      "targetUnitDigest": "95645c6fe8d0405f1b99510819ef57fbe638e49192a0b25137bce960f0cf63fb",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi to docs/platform/platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_7877a2ddfb8ee8075a7148c52ea4fc5c",
+      "sourceUnitDigest": "d4ce58bb34a24c4bae4a9705612947a20539df432b8f187a82966b1cbb730993",
+      "claimKind": "historical-context",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-36",
+      "targetUnitDigest": "d4ce58bb34a24c4bae4a9705612947a20539df432b8f187a82966b1cbb730993",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L5 — Definition of done: sáu câu hỏi"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-26 to docs/platform/platform-foundations.md#unheaded-block-36. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_6aa997ba5db22eca51ee518c96e0a010",
+      "sourceUnitDigest": "194feeb55a2c5852ab1a53afe8389d6eecac3acda61bec4b9a2416a86bd6d9ba",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-37",
+      "targetUnitDigest": "194feeb55a2c5852ab1a53afe8389d6eecac3acda61bec4b9a2416a86bd6d9ba",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L5 — Definition of done: sáu câu hỏi"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-27 to docs/platform/platform-foundations.md#unheaded-block-37. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_dca0a01cf9e35fa1feee1a8e79c20d34",
+      "sourceUnitDigest": "9b1765b033e354a693b87d6bb03284de03e9eec965bb45aa145216bab1eadf76",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-38",
+      "targetUnitDigest": "9b1765b033e354a693b87d6bb03284de03e9eec965bb45aa145216bab1eadf76",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L5 — Definition of done: sáu câu hỏi"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-28 to docs/platform/platform-foundations.md#unheaded-block-38. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_83dd66e0ac1cbaf77d00d206e9860bdc",
+      "sourceUnitDigest": "ac66a5e481b2ccaaae55707f3e75db9db7c9215d05e3c2c776f27b2cdc6722d4",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-39",
+      "targetUnitDigest": "ac66a5e481b2ccaaae55707f3e75db9db7c9215d05e3c2c776f27b2cdc6722d4",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L5 — Definition of done: sáu câu hỏi"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-29 to docs/platform/platform-foundations.md#unheaded-block-39. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_c15ce9e77ba97d8f03467e66b554fa93",
+      "sourceUnitDigest": "e5655fce38683ccafd23b27b30ba6b2b69da7f872b97e046bf8b20b55eff1f3a",
+      "claimKind": "verification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-40",
+      "targetUnitDigest": "e5655fce38683ccafd23b27b30ba6b2b69da7f872b97e046bf8b20b55eff1f3a",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L5 — Definition of done: sáu câu hỏi"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-30 to docs/platform/platform-foundations.md#unheaded-block-40. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_8e7223e3c622244caac49e5517f1d828",
+      "sourceUnitDigest": "726071bff96103755278ccee336ec9f6626f8732903a8eb8793ce123501c2482",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "l6-maturity-ladder-f0f5",
+      "targetUnitDigest": "b7fc052954d0e46c38c18dfd1c81c0ed879138f5bdc57214e67ad60f3cddecd0",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#l6-maturity-ladder-f0f5 to docs/platform/platform-foundations.md#l6-maturity-ladder-f0f5. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_82e4dc848455dbc8e136055038463e18",
+      "sourceUnitDigest": "9fad9909fecad6671be0b443371b8004fc6fcebb41209c6e482ef7c253b24f4d",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-41",
+      "targetUnitDigest": "9fad9909fecad6671be0b443371b8004fc6fcebb41209c6e482ef7c253b24f4d",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L6 — Maturity ladder F0–F5"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-31 to docs/platform/platform-foundations.md#unheaded-block-41. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_c012b4c1f3a5251a77ed2549e568e40a",
+      "sourceUnitDigest": "3581ac1cda8e573a14ba60b273068d1328935dc6d3ef0bb76e5c0dc738e469c4",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-42",
+      "targetUnitDigest": "3581ac1cda8e573a14ba60b273068d1328935dc6d3ef0bb76e5c0dc738e469c4",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L6 — Maturity ladder F0–F5"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-32 to docs/platform/platform-foundations.md#unheaded-block-42. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_5d37caaeb0adfe5d05ca876067677cf7",
+      "sourceUnitDigest": "c108c572f3b1aa29e759e131e839893ba4e3325008a2cf90af928e4998dbafa0",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-43",
+      "targetUnitDigest": "c108c572f3b1aa29e759e131e839893ba4e3325008a2cf90af928e4998dbafa0",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L6 — Maturity ladder F0–F5"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-33 to docs/platform/platform-foundations.md#unheaded-block-43. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_05e04f013ba4170e36549f4481b69bb5",
+      "sourceUnitDigest": "fc29fd5404577c0b040a7e8b7f9e384b1d9f2d945b433af61b23f811e0e41b31",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-44",
+      "targetUnitDigest": "fc29fd5404577c0b040a7e8b7f9e384b1d9f2d945b433af61b23f811e0e41b31",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L6 — Maturity ladder F0–F5"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-34 to docs/platform/platform-foundations.md#unheaded-block-44. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_d6712ea2fa20605c40087b83b24fcd36",
+      "sourceUnitDigest": "c795a7db139ae8c49aef2c6759d7cac69ed6c21812481c25a1d8e5c02135f665",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-45",
+      "targetUnitDigest": "c795a7db139ae8c49aef2c6759d7cac69ed6c21812481c25a1d8e5c02135f665",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L6 — Maturity ladder F0–F5"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-35 to docs/platform/platform-foundations.md#unheaded-block-45. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_735be6c96579d25dc9328ea9070c93b3",
+      "sourceUnitDigest": "ea7673c6384e7e7556415c10dd80522db39ce83b2bf80c8a3a1a7221bb95985e",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "l7-durability-ladder",
+      "targetUnitDigest": "b00bf8a32401dbbd9edd32dd0fa477121115c7e37ed06e9bc6dc10e76ba9e548",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#l7-durability-ladder to docs/platform/platform-foundations.md#l7-durability-ladder. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_404167805085c5145681f309b696b18a",
+      "sourceUnitDigest": "28907df5eed46756c20083b73c8e9394162079d58dd8bf47abbd107e7ea45e0b",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-46",
+      "targetUnitDigest": "28907df5eed46756c20083b73c8e9394162079d58dd8bf47abbd107e7ea45e0b",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L7 — Durability ladder"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-36 to docs/platform/platform-foundations.md#unheaded-block-46. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_81795ee07d8fe55d654210e01a698870",
+      "sourceUnitDigest": "59ad8d3e401e36258a8527c29f47108347fe8192b254faa08ab12c8fc960f212",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-47",
+      "targetUnitDigest": "59ad8d3e401e36258a8527c29f47108347fe8192b254faa08ab12c8fc960f212",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L7 — Durability ladder"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-37 to docs/platform/platform-foundations.md#unheaded-block-47. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_6f86708809b155f9e053a3ffec9ed8dd",
+      "sourceUnitDigest": "314a236e6c4731b0624a98aed7b5cee3d2f7393560bd111a1bea083018816ef4",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-48",
+      "targetUnitDigest": "314a236e6c4731b0624a98aed7b5cee3d2f7393560bd111a1bea083018816ef4",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L7 — Durability ladder"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-38 to docs/platform/platform-foundations.md#unheaded-block-48. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_d199e9ac39d012465fccccde5ee857c9",
+      "sourceUnitDigest": "bc7fee3b89305482daa8230b3e622e12b757ace44e6a8dee938d8d1bcc1a8fce",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-49",
+      "targetUnitDigest": "bc7fee3b89305482daa8230b3e622e12b757ace44e6a8dee938d8d1bcc1a8fce",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L7 — Durability ladder"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-39 to docs/platform/platform-foundations.md#unheaded-block-49. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_7327662d59313d1a000abef634a98c17",
+      "sourceUnitDigest": "17f2d160f7e45011424b5797f5568fa268b8ebd3db65d6c5bf60f2cc6de4d42d",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "l8-doctrine-placement-rule-always-loaded-layer",
+      "targetUnitDigest": "a125f0eb5bb4bb2db411f00b029236074d88ba3aa0d9e299f4d6aff6e4843aa9",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#l8-doctrine-placement-rule-always-loaded-layer to docs/platform/platform-foundations.md#l8-doctrine-placement-rule-always-loaded-layer. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_142412881aab59902a2000fce053ce1b",
+      "sourceUnitDigest": "ea781530a988c571f40a7ce2d00aa12dbb4f57799295621db43d88632f408d11",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-50",
+      "targetUnitDigest": "ea781530a988c571f40a7ce2d00aa12dbb4f57799295621db43d88632f408d11",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L8 — Doctrine placement rule (always-loaded layer)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-40 to docs/platform/platform-foundations.md#unheaded-block-50. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_9824a0a3b61e41069083f5e4d465560a",
+      "sourceUnitDigest": "54f8314c197673de54a0ca1fd5f0d223fa3cc77f99da6927b7e688f2f038abc2",
+      "claimKind": "verification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-51",
+      "targetUnitDigest": "54f8314c197673de54a0ca1fd5f0d223fa3cc77f99da6927b7e688f2f038abc2",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L8 — Doctrine placement rule (always-loaded layer)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-41 to docs/platform/platform-foundations.md#unheaded-block-51. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_660c8d87aea64cd29ea09e2e0fc788f9",
+      "sourceUnitDigest": "7e3bd2974780c7384b0902da7e62f60eb6eeb6bf2d0ca27868de9bd263779a94",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-52",
+      "targetUnitDigest": "7e3bd2974780c7384b0902da7e62f60eb6eeb6bf2d0ca27868de9bd263779a94",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L8 — Doctrine placement rule (always-loaded layer)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-42 to docs/platform/platform-foundations.md#unheaded-block-52. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_206a6fd6785289c868e90a52a9561280",
+      "sourceUnitDigest": "9cc767290d41105b348e3d3823ed6905197a2843a5dee60c551bcf04cfeb7b60",
+      "claimKind": "verification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-53",
+      "targetUnitDigest": "9cc767290d41105b348e3d3823ed6905197a2843a5dee60c551bcf04cfeb7b60",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L8 — Doctrine placement rule (always-loaded layer)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-43 to docs/platform/platform-foundations.md#unheaded-block-53. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_af634c381a24e700ec780665f955dd52",
+      "sourceUnitDigest": "781d9813175b99ce5352929e313c42be637e23162fc9f4af8c83a45963decba2",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-54",
+      "targetUnitDigest": "781d9813175b99ce5352929e313c42be637e23162fc9f4af8c83a45963decba2",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L8 — Doctrine placement rule (always-loaded layer)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-44 to docs/platform/platform-foundations.md#unheaded-block-54. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_e511b27c8566a61124a52af7bf7898cb",
+      "sourceUnitDigest": "7c913f24d2e0494f8cc5694418c6908bf04ad14e6836703f66bd97881818e08f",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "l9-thang-hoàn-tất-của-một-việc-run-merge-durable",
+      "targetUnitDigest": "27ceb54327fef2cd68c7c03c0ac2cd712c1120cc04d8f1d54bc2647d9df1e06a",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#l9-thang-hoàn-tất-của-một-việc-run-merge-durable to docs/platform/platform-foundations.md#l9-thang-hoàn-tất-của-một-việc-run-merge-durable. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_936d30d6aa5cc64b54e8596bca6f4a5e",
+      "sourceUnitDigest": "b026a410818016db4d0a1dcbe070f3ee609a6d7d1ecf88db636781321abcc803",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-55",
+      "targetUnitDigest": "b026a410818016db4d0a1dcbe070f3ee609a6d7d1ecf88db636781321abcc803",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-45 to docs/platform/platform-foundations.md#unheaded-block-55. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_3a1deb538c2644701104575bc652a83c",
+      "sourceUnitDigest": "ffef49a44040bab676b2f35e492f2998bdcc37353bc515f1cb7bfe4cf00d15be",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-56",
+      "targetUnitDigest": "ffef49a44040bab676b2f35e492f2998bdcc37353bc515f1cb7bfe4cf00d15be",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-46 to docs/platform/platform-foundations.md#unheaded-block-56. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_f94aa4526598534cf6d1e7763bddd59f",
+      "sourceUnitDigest": "6939ee9ec648dfc4a6ced3e213bcbe3b1113cec87bf2dab98574392993b82344",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-57",
+      "targetUnitDigest": "6939ee9ec648dfc4a6ced3e213bcbe3b1113cec87bf2dab98574392993b82344",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-47 to docs/platform/platform-foundations.md#unheaded-block-57. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_9facdcd97be2e052a73f6cfbc5fdf481",
+      "sourceUnitDigest": "4ea8c14d897681838896be70cf1e1752b0c32977fef46f6625862e5867759884",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-58",
+      "targetUnitDigest": "4ea8c14d897681838896be70cf1e1752b0c32977fef46f6625862e5867759884",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-48 to docs/platform/platform-foundations.md#unheaded-block-58. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_50eb467189595953d908005e52f374df",
+      "sourceUnitDigest": "2635805de8dc44a68fcc10042a636b1d3eea57b35a04e033f4a6d8cbf71dff13",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-59",
+      "targetUnitDigest": "2635805de8dc44a68fcc10042a636b1d3eea57b35a04e033f4a6d8cbf71dff13",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-49 to docs/platform/platform-foundations.md#unheaded-block-59. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_d1ac3c1ada40b2eb31aff61a11aaf84d",
+      "sourceUnitDigest": "2687947208cf7c2aca86618bbbf86b46103d0eb1b25457ad007c73dad85f7fef",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-60",
+      "targetUnitDigest": "2687947208cf7c2aca86618bbbf86b46103d0eb1b25457ad007c73dad85f7fef",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-50 to docs/platform/platform-foundations.md#unheaded-block-60. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_5cd5728df7506d555fd25a3cf3879dde",
+      "sourceUnitDigest": "2d6d0b1b02975c336f8825b8d9a0463969c9c5aa9b0a1b3a17f6ff7eedc30e34",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa",
+      "targetUnitDigest": "f1fa60caa80a3173c98c3613923ba9a0da0b92b4545090020f5413f0ba2845c3",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa to docs/platform/platform-foundations.md#l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_e9aac1ae38314d17c62385ad187e022f",
+      "sourceUnitDigest": "c6cbbafb3359e8cedccd4445b7752500266268d284506b3b6ea2addc5c934aa3",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-61",
+      "targetUnitDigest": "c6cbbafb3359e8cedccd4445b7752500266268d284506b3b6ea2addc5c934aa3",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-51 to docs/platform/platform-foundations.md#unheaded-block-61. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_e8f3fa9230e29adf02928ae9572b6af1",
+      "sourceUnitDigest": "2359f2c0b35193876c094051a0110eacf387819fa76027a6b6b345384fb2d16e",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-62",
+      "targetUnitDigest": "2359f2c0b35193876c094051a0110eacf387819fa76027a6b6b345384fb2d16e",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-52 to docs/platform/platform-foundations.md#unheaded-block-62. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_701238f18b72b5e60284fb3dae43624f",
+      "sourceUnitDigest": "0efc4e024672c39cc76a909ac1ee27f6c17c0d09540b7a1fc13ec0ddca65ef3b",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-63",
+      "targetUnitDigest": "0efc4e024672c39cc76a909ac1ee27f6c17c0d09540b7a1fc13ec0ddca65ef3b",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-53 to docs/platform/platform-foundations.md#unheaded-block-63. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_17706f2b226337885a2f6c0781fb7423",
+      "sourceUnitDigest": "1cc2518bff1d0743f58c76739fb0df05f0f6a9aef55ef94d7c8b4d1d38276435",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-64",
+      "targetUnitDigest": "1cc2518bff1d0743f58c76739fb0df05f0f6a9aef55ef94d7c8b4d1d38276435",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-54 to docs/platform/platform-foundations.md#unheaded-block-64. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_f311e1efb5e6372a582326ff588f1634",
+      "sourceUnitDigest": "e11dee98df58f0fd18b2ad85bed581d1ee8733b5a61eb57e5f15b77dfc4ff41f",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-65",
+      "targetUnitDigest": "e11dee98df58f0fd18b2ad85bed581d1ee8733b5a61eb57e5f15b77dfc4ff41f",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-55 to docs/platform/platform-foundations.md#unheaded-block-65. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_a9cd7e480450c50f17eccd099748cd66",
+      "sourceUnitDigest": "ae70ba21d67a98558d9ef24d116ed172b3309c6fe2b3624fef5e032895592d48",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "trình-tự-thi-công-phía-trên-các-luật",
+      "targetUnitDigest": "9bdd1413c48a0b13b192d0e8578a9b9560f97a85fff67e75c5e469795a2c58ff",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#trình-tự-thi-công-phía-trên-các-luật to docs/platform/platform-foundations.md#trình-tự-thi-công-phía-trên-các-luật. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_45311733787f5c97253a7f73114d7b45",
+      "sourceUnitDigest": "275b2faa9870643199ae75c7d893f177befae3b6c147c24a3752a06ac5788f4f",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/platform-foundations.md",
+      "targetAnchor": "unheaded-block-66",
+      "targetUnitDigest": "275b2faa9870643199ae75c7d893f177befae3b6c147c24a3752a06ac5788f4f",
+      "targetAncestry": [
+        "Platform Foundations",
+        "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+        "Trình tự thi công phía trên các luật"
+      ],
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-56 to docs/platform/platform-foundations.md#unheaded-block-66. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_51c4db831393875bf5c2b9a65dbfaae7",
+      "sourceUnitDigest": "9bfd545c6185ace29f2f7fa6a14f33845fe5bb7f31925ebb51964d7fa72a08fe",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "chu-trình-work-item-của-fgos-tầm-nhìn-nền-tảng",
+      "targetUnitDigest": "b021e414de7f674190ffbd95cd923ae54caee8368f1af1b649a4926d88de1fec",
+      "targetAncestry": [
+        "Platform Vision"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#chu-trình-work-item-của-fgos-tầm-nhìn-nền-tảng to docs/platform/vision.md#chu-trình-work-item-của-fgos-tầm-nhìn-nền-tảng. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_5bd737a7e4e3049616002f6dedbf2c53",
+      "sourceUnitDigest": "1fcf006616d819b95f3c9bf50eda70bcbe36406bb8d2be60a0749700e5c11ee7",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetUnitDigest": "1fcf006616d819b95f3c9bf50eda70bcbe36406bb8d2be60a0749700e5c11ee7",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-1 to docs/platform/vision.md#unheaded-block-15. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_4fe3f025c9caa788c5f9a46682146793",
+      "sourceUnitDigest": "39a2d681b9faf6d2009912b9d422923de31d8bf62cb70a934d043c8f203bc92b",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetUnitDigest": "39a2d681b9faf6d2009912b9d422923de31d8bf62cb70a934d043c8f203bc92b",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-2 to docs/platform/vision.md#unheaded-block-16. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_234cfd0f97573cb23852f7822b23b65c",
+      "sourceUnitDigest": "e02516ed37296056336868cb69cf96afa00d7fe1aab05bbc83d6060e55175f6c",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetUnitDigest": "e02516ed37296056336868cb69cf96afa00d7fe1aab05bbc83d6060e55175f6c",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-3 to docs/platform/vision.md#unheaded-block-17. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_84e30ba5903bdbc79ecb7e0bcd8c9b4c",
+      "sourceUnitDigest": "c2449f4d9d41f8a1127f59fee96403ac1a7f881450a9faf895036c1a69667f0d",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "1-ý-tưởng-cốt-lõi",
+      "targetUnitDigest": "4c383ce51d57dc8f572aee24fca6b158aca0be9004290921385c8927346c7dc1",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#1-ý-tưởng-cốt-lõi to docs/platform/vision.md#1-ý-tưởng-cốt-lõi. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_bd6f6b8d469bf685b5b34bc81fd4d755",
+      "sourceUnitDigest": "823a41ccd6698d68c84831bad5b682ada83bd6d205016021212b9ca6e75ef2e4",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetUnitDigest": "823a41ccd6698d68c84831bad5b682ada83bd6d205016021212b9ca6e75ef2e4",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "1. Ý tưởng cốt lõi"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-4 to docs/platform/vision.md#unheaded-block-18. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_192c96a8aad6b5bb23383da735805673",
+      "sourceUnitDigest": "0df1c3469f13d847fbc27694e65d4ba521c2a3ed160a24b0028539e2a1f582bb",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetUnitDigest": "0df1c3469f13d847fbc27694e65d4ba521c2a3ed160a24b0028539e2a1f582bb",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "1. Ý tưởng cốt lõi"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-5 to docs/platform/vision.md#unheaded-block-19. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_25856ca74601abef51162fa1336661cd",
+      "sourceUnitDigest": "adf8cd1c4e640fce2d39f13c990455e10e092d79033a5cc18f8d599a369be6e4",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "2-chu-trình-chung-nền-tảng-base-workflow",
+      "targetUnitDigest": "462cec728e4f6e9a36949ac2ca364c7108c9d2e004040aa22fb2e61e21e9dbb2",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#2-chu-trình-chung-nền-tảng-base-workflow to docs/platform/vision.md#2-chu-trình-chung-nền-tảng-base-workflow. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_32dee7826c373d464b4efa13b6b5135b",
+      "sourceUnitDigest": "8ccb6ca76a1fef51686027603807b932c04e6bfc63521b9b503afbb28a7899d2",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetUnitDigest": "8ccb6ca76a1fef51686027603807b932c04e6bfc63521b9b503afbb28a7899d2",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "2. Chu trình chung nền tảng (base workflow)"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-6 to docs/platform/vision.md#unheaded-block-20. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_e3bf13cdd8a7ad2f68c0f917e388297d",
+      "sourceUnitDigest": "148b3d406039a3547d25ff35cff9f22cbcdfffddf9204df0bbead2f63259249e",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetUnitDigest": "148b3d406039a3547d25ff35cff9f22cbcdfffddf9204df0bbead2f63259249e",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "2. Chu trình chung nền tảng (base workflow)"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-7 to docs/platform/vision.md#unheaded-block-21. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_eb680bbc71ad8e238b210449a5d62b5f",
+      "sourceUnitDigest": "b8070b2c948fabc9f8a58187e74452dc6fa7671582674606523540397f93ce63",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "b8070b2c948fabc9f8a58187e74452dc6fa7671582674606523540397f93ce63",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "2. Chu trình chung nền tảng (base workflow)"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-8 to docs/platform/vision.md#unheaded-block-22. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_61b5b211cd33d2be1871ed589eda69af",
+      "sourceUnitDigest": "b7d1403425ea892eddcdb7cd76553057b1d788a55dd46b574a26fa763f78ab2f",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "3-hai-chế-độ-intake",
+      "targetUnitDigest": "6ca51cbbb54d354c99d3d662338e0f772e1290864e60ea675f3c698393ddbf81",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#3-hai-chế-độ-intake to docs/platform/vision.md#3-hai-chế-độ-intake. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_4be980669c1d0b976cc8e1d7e140df22",
+      "sourceUnitDigest": "4b0f3ddb074b9b7c03a796c4b351ad7b7f826403bba10abc7e0fecbe3ecee7f5",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "4b0f3ddb074b9b7c03a796c4b351ad7b7f826403bba10abc7e0fecbe3ecee7f5",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "3. Hai chế độ Intake"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-9 to docs/platform/vision.md#unheaded-block-23. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_8116a777ce8821f8e5e6abd644aa2f56",
+      "sourceUnitDigest": "9ee5e7c70f7770e4c0cf18ee0112012d884f7daf9e408d1d920726c6683bb6a7",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "4-chu-trình-coding-cụ-thể-hoá-base-cho-coding",
+      "targetUnitDigest": "f70ffecf1a9eb9c041562853060ce9963e29dbd6751366f6762e17c18fbeaf76",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#4-chu-trình-coding-cụ-thể-hoá-base-cho-coding to docs/platform/vision.md#4-chu-trình-coding-cụ-thể-hoá-base-cho-coding. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_bd8d838ce4294b49b3a674383718a380",
+      "sourceUnitDigest": "e4b5970e98f2d83a3e9f4cb7496bd0f878cde92a34fb45c51f6253454b3757ea",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "e4b5970e98f2d83a3e9f4cb7496bd0f878cde92a34fb45c51f6253454b3757ea",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "4. Chu trình coding (cụ thể hoá base cho coding)"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-10 to docs/platform/vision.md#unheaded-block-24. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_eb9ecb187e1d4d79d553c157e852e57d",
+      "sourceUnitDigest": "619ebf21fa52684f8f2659a98e89631346c958772d156650a2f4e7f9796e5889",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "5-bản-đồ-người-tham-gia-human-involvement-map",
+      "targetUnitDigest": "ff2ec54e319197c751c83fc0bf4330fefac68dc44c896ee1906705051d5670b4",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#5-bản-đồ-người-tham-gia-human-involvement-map to docs/platform/vision.md#5-bản-đồ-người-tham-gia-human-involvement-map. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_a3179d366545a11e763b6da69d4aa728",
+      "sourceUnitDigest": "0d786b5dc117745c1dcaa3c0936a20e33dac711ecd205f3950975e47fef31b12",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "0d786b5dc117745c1dcaa3c0936a20e33dac711ecd205f3950975e47fef31b12",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "5. Bản đồ người-tham-gia (human-involvement map)"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-11 to docs/platform/vision.md#unheaded-block-25. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_b927ea09f5baef6db3f71fc1fa56c43b",
+      "sourceUnitDigest": "fde1e396073c969ed946ff59c7aaa21b9ab472ab9183c9961055c943686c7def",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "6-ánh-xạ-phase-123-hiện-có-vào-chu-trình",
+      "targetUnitDigest": "60740db37bd20ae8f1514663a2b56de90a881bd4ae7cd9c3cb0a139ea493560f",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#6-ánh-xạ-phase-123-hiện-có-vào-chu-trình to docs/platform/vision.md#6-ánh-xạ-phase-123-hiện-có-vào-chu-trình. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_328f8c31cf431aa1122b411eb2da7bab",
+      "sourceUnitDigest": "672345732b93d34f1504aea4a190f39fff21621357529e7178b85a0650ba7459",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetUnitDigest": "672345732b93d34f1504aea4a190f39fff21621357529e7178b85a0650ba7459",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "6. Ánh xạ Phase 1/2/3 hiện có vào chu trình"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-12 to docs/platform/vision.md#unheaded-block-26. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_01cec51e08c6924e05c263d28d1e303a",
+      "sourceUnitDigest": "40ae23313bf17a2b39a0b3f5cb6e0596acc0869b61c0427b93f5a0ee5c5bb5b1",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "7-câu-hỏi-mở-chưa-quyết-cần-chốt-khi-tới-stage-tương-ứng",
+      "targetUnitDigest": "ade213e6731f71df4adce7304edb1f18610c068dabbc68403871d0515edf74f7",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#7-câu-hỏi-mở-chưa-quyết-cần-chốt-khi-tới-stage-tương-ứng to docs/platform/vision.md#7-câu-hỏi-mở-chưa-quyết-cần-chốt-khi-tới-stage-tương-ứng. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_4d5c67adaadb4552a0879e92e2ca3690",
+      "sourceUnitDigest": "f570e39ac9c0dcc0a393e34d33121a6c2c235c756b1af526037111496d773709",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-27",
+      "targetUnitDigest": "f570e39ac9c0dcc0a393e34d33121a6c2c235c756b1af526037111496d773709",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "7. Câu hỏi mở (chưa quyết — cần chốt khi tới stage tương ứng)"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-13 to docs/platform/vision.md#unheaded-block-27. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_29a458dda2e2bf7624ada68a74d28dbe",
+      "sourceUnitDigest": "307fd73e6f31c1b541110ba85668b8a4c4e63415dd0a237ba3932420a21e3471",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "8-ảnh-hưởng-tới-capture-2-kênh-phase-3-slice-2",
+      "targetUnitDigest": "4eb54c36037c0944addf1c6b6ef995dc0d623be4a2b71fd71b58ca9b8d54ba72",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#8-ảnh-hưởng-tới-capture-2-kênh-phase-3-slice-2 to docs/platform/vision.md#8-ảnh-hưởng-tới-capture-2-kênh-phase-3-slice-2. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_1dd1ac4b9a7204b124b48287966a697f",
+      "sourceUnitDigest": "c1183579f67e4b81a05a89a2c2f0c501291f4b02fe6e6d07acfcd1904a7beabf",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-28",
+      "targetUnitDigest": "c1183579f67e4b81a05a89a2c2f0c501291f4b02fe6e6d07acfcd1904a7beabf",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "8. Ảnh hưởng tới \"capture 2 kênh\" (Phase 3 slice 2)"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-14 to docs/platform/vision.md#unheaded-block-28. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_c0781c4ec30dbafb691a63d86e9e2668",
+      "sourceUnitDigest": "05b9c508d627aca1823c679270b8167e40d2d05ed69900620c8596f48d9dea60",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-29",
+      "targetUnitDigest": "05b9c508d627aca1823c679270b8167e40d2d05ed69900620c8596f48d9dea60",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "8. Ảnh hưởng tới \"capture 2 kênh\" (Phase 3 slice 2)"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-15 to docs/platform/vision.md#unheaded-block-29. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_45db468c617aaa882ba4aca00978f89e",
+      "sourceUnitDigest": "bbb754f410d5c011ee0b8641a6f792a607d8234ac8fe3a5beb96486fa0d5c4ad",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/vision.md",
+      "targetAnchor": "unheaded-block-30",
+      "targetUnitDigest": "bbb754f410d5c011ee0b8641a6f792a607d8234ac8fe3a5beb96486fa0d5c4ad",
+      "targetAncestry": [
+        "Platform Vision",
+        "Chu trình Work-Item của fgOS — tầm nhìn nền tảng",
+        "8. Ảnh hưởng tới \"capture 2 kênh\" (Phase 3 slice 2)"
+      ],
+      "rationale": "Frozen root map assigns docs/work-item-lifecycle-vision.md#unheaded-block-16 to docs/platform/vision.md#unheaded-block-30. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_4b96f4f42ea417623dcc794155fa17ce",
+      "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+      "targetAncestry": [],
+      "rationale": "Frozen root map assigns docs/architecture-manifest.json#file-block to docs/platform/contracts/architecture-manifest.json#file-block. The complete non-Markdown contract payload is copied byte-identically; no runtime consumer or embedded paths are rewritten. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    },
+    {
+      "claimId": "claim_f0f4828229b64bd6cc8959111c824e24",
+      "sourceUnitDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:22@2026-10-14",
+      "targetOwner": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "targetAncestry": [],
+      "rationale": "Frozen root map assigns docs/contracts/fgos-gateway-api-v1.yaml#file-block to docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml#file-block. The complete non-Markdown contract payload is copied byte-identically; no runtime consumer or embedded paths are rewritten. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion."
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/platform-foundations.md",
+      "targets": [
+        "docs/platform/platform-foundations.md"
+      ],
+      "disposition": "supersede",
+      "rationale": "Complete frozen-map source retained in candidate owner; no retirement, implementation or truth certification."
+    },
+    {
+      "path": "docs/work-item-lifecycle-vision.md",
+      "targets": [
+        "docs/platform/vision.md"
+      ],
+      "disposition": "supersede",
+      "rationale": "Complete frozen-map source retained in candidate owner; no retirement, implementation or truth certification."
+    },
+    {
+      "path": "docs/architecture-manifest.json",
+      "targets": [
+        "docs/platform/contracts/architecture-manifest.json"
+      ],
+      "disposition": "supersede",
+      "rationale": "Complete frozen-map source retained in candidate owner; no retirement, implementation or truth certification."
+    },
+    {
+      "path": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "targets": [
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ],
+      "disposition": "supersede",
+      "rationale": "Complete frozen-map source retained in candidate owner; no retirement, implementation or truth certification."
+    }
+  ]
+}
