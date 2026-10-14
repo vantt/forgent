@@ -2,7 +2,7 @@
   "version": 1,
   "batch": "root-authorities",
   "authorization": "A28",
-  "authoredCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
+  "authoredCommit": "f0d4d030b06d36e3e9f55f7a1e3e5df623cc9860",
   "scope": [
     "docs/architecture-manifest.json",
     "docs/coexistence.md",
@@ -175,7 +175,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_0e8ec4eb8b34858d8ad510637f86dcba",
+      "claimId": "claim_39c2dd19b855354d259a9463b0e14b13",
       "path": "docs/platform/documentation/history/templates/README.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "f8529a60605f9359a47859d267c54c7e8645044de2e5ca32e99eeb9078af123a",
@@ -189,14 +189,14 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b433273df822ece051bf33b9a3f1ee52",
+      "claimId": "claim_948e30a8fc20bbc6eafe67fe4d5e446a",
       "path": "docs/platform/documentation/history/templates/README.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "678848107b31d80edd136b22f13172d9108a04acba89fb1bcaae8a5731739655",
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_dae5c70a732ac4bb4c77bec7ad441513",
+      "claimId": "claim_697e72838020f73bf2f260e8c5235abe",
       "path": "docs/platform/documentation/history/templates/README.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "ffa2bb8733befa735bde4fc4bf9e7cd5db1001958a7227851491559ed29675f7",
@@ -5872,16 +5872,16 @@
       "meaning": "Carrier-level caveat; tuple population is still the exact native T6 reverse-open set, not a truth receipt."
     }
   ],
-  "previousCount": 832,
+  "previousCount": 830,
   "nativeRebinding": {
     "authorization": "A28 + A31",
     "fullNativeTupleEquality": true,
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
-    "meaning": "Exact individual native checkConservation reverse-open tuples; full tuple union equals union-scoped E. Candidate-unverified, no truth approval.",
-    "verifiedCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
-    "verification": "reports/phase-06/root-boundary-native-verification.json nativeProofResume",
-    "reviewStatus": "pending independent conservation review of changed tuples only",
+    "meaning": "Actual individual native conservation tuples. Previous identity remains a native gap; no identity graft or disposition.",
+    "verifiedCommit": "f0d4d030b06d36e3e9f55f7a1e3e5df623cc9860",
+    "verification": "reports/phase-06/root-boundary-native-verification.json nativeClosurePin",
+    "reviewStatus": "candidate-unverified; changed native identities carry no approval",
     "supplementalMetadata": "Preserved receipt/reason metadata is historical evidence from the prior list; current decisions/classification refs are read from unchanged shards at the verified commit. It does not grant current truth approval."
   },
   "closureCorrectionRebinding": {

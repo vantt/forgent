@@ -1,3 +1,26 @@
+# Native closure pin — closed — native conservation proof complete
+
+Date: 2026-10-15. Executor: codex-session:36@2026-10-15. Assignment: `unit-run-1792011785631-683fa556/producer/1`.
+Session counter: 36.
+Step: 5. State: **closed — native conservation proof complete**.
+Input content pin: `f0d4d030b06d36e3e9f55f7a1e3e5df623cc9860`. Proof artifact commit: **the runner-produced commit for this assignment**, pending settlement; no commit hash is invented here.
+Last historical native source proof: `04e476784ed528970ae33b13dbd220bff9948a5a`.
+B0: `dbe5c432852837ea01e6025b35868bcb7271495d`. SYNC: `da8285e065835dc3136ca0daabb2cd19e05d10fb`.
+
+Read progress first, confirmed a clean initial tree and ancestry from the historical proof, restored the committed native helpers into scratch, and started the native sync in the background. This assignment authorizes native pin files only: no git write, docs bytes, decision shards, checker, gate, extractor, vocabulary, baseline or workspace .fgos mutation. External claim is the explicit exception. Scratch is confined to /tmp/fgos-work/resume-truth/.
+
+Sync elapsed: **1275.158 seconds**. Minute-30 stop: **False**. Registry: **59,810,349 bytes**, SHA256 `5834e8872b9df68ea9a2966f325d244f93d40247a3ef358ab87513891073045a`, compact one-line, below the 90,000,000-byte stop line. Both-prior D fatal findings: **0**. Scoped E open data: **claims-partial-carry=1, identical-units-multiple-owners=3, candidate-blocks-unreferenced=830**. Strict E remains a separate cutover bar; allowed-open equality does not certify strict green. Candidate full tuple checks: **root=830 (True), agent=568 (True), packaging=694 (True)**.
+
+Native known-ID conservation and live claim-ID/path/anchor/full-digest equality pass before and after persistence. Scoped E equals exactly the accepted Packaging A34 partial, the same three identical-unit exception memberships and the deduplicated Root/Packaging candidate-unverified list (830 tuples); all three individual lists also equal actual native conservation output. No scoped not-reviewed, unknown-blocking, application or T9 defect remains. Packaging and AGENTS residual SHA256/source/target bindings recompute.
+
+The native carry keeps three edited heading identities, allocates four body identities and preserves all four predecessors as explicit native gaps; zero newly retired units. Three templates body entries are rebound to their actual native identities in the candidate-unverified list without carrying approvals; all actual changed text was independently accepted at the prior closure review. Complete native old/new units and list deltas are recorded in nativeClosurePin. New native gaps remain explicit later global/cutover obligations outside this source scope; no gap disposition, successor judgment or truth approval is invented.
+
+**Step 5 is closed on its accepted batch-closure criteria.** The runner commit containing this proof is the closure proof artifact; the content pin above is the committed input. No Step 6 candidate authoring, promotion, main merge or push is performed. Preserve the exact first Step 6 actions below: read map/review brief, authorized Plan B sync/blob comparisons and re-pin before affected sources, author against component-boundary/architecture-map, record boundary impact, then scoped E, second checkpoint refresh, effort and genuine reviewer-held checkpoint sensitivity proof. The initial native pin is complete; it does not replace that end-of-Step-6 checkpoint. Existing Coordination Rings holds, all A34 residuals, candidate-unverified/truth/promotion/navigation/consumer/alias/native-gap debts and owner effort checkpoint remain.
+
+Tests: 39/39 unchanged review/apply tests pass with env -u CLAUDE_CODE_SESSION_ID; zero failed/cancelled/skipped/todo. Ratchet clean; placement 529/528/one recorded exception; candidate-status zero findings. B/C/I and ancestry pass. Eight A historical allowlist observations are preserved, not waived. No full-suite or full current-truth claim. No component-boundary change. No new owner question. Full commands, helper sources, native consequences, D/E, list/exception/residual checks and logs: [root-boundary-native-verification.json](root-boundary-native-verification.json), `nativeClosurePin`. Preview unavailable within this write scope.
+
+---
+
 # Accepted closure verdicts — native conservation proof blocked
 
 Date: 2026-10-15

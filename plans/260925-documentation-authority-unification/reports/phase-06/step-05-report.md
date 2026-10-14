@@ -1,10 +1,34 @@
 # Root authorities, laws and work-state batch report
 
-Date: 2026-10-15. Executor: codex-session:35@2026-10-15. Step: 5. State: **open — independent corrections accepted; closure blocked on native pin/conservation proof**. Conservation/source reviews and Lead's closure passes are complete; all four reopened bindings now have independent ordinary approval. Strict E remains red; promotion and cutover are unapproved.
+Date: 2026-10-15. Executor: codex-session:36@2026-10-15. Step: 5. State: **closed — native conservation proof complete**. Conservation/source reviews and Lead's closure passes are complete; all four reopened bindings now have independent ordinary approval. Strict E remains red; promotion and cutover are unapproved.
 
-The independent [closure-fixes review](review-261015-0340-root-closure-fixes.md), including Notes, is committed at `6dadbb3685126542e6a2cecd64bcbae035b4fb58` and accepts all four rows (4 ok / 0 rework). This turn applies them through the unchanged ordinary `applyReviewVerdicts` API, with every note verbatim and every row pinned to that full report commit. No further bounded review or truth draw is required. Current D/E and native freshness are reported below without treating the earlier equality proof as current.
+The independent [closure-fixes review](review-261015-0340-root-closure-fixes.md), including Notes, is committed at `6dadbb3685126542e6a2cecd64bcbae035b4fb58` and accepts all four rows (4 ok / 0 rework). The preceding closure-acceptance turn applied them through the unchanged ordinary `applyReviewVerdicts` API, with every note verbatim and every row pinned to that full report commit. No further bounded review or truth draw is required. Current D/E and native freshness are reported below without treating the earlier equality proof as current.
 
-## Closure evidence
+## Current native closure result
+
+
+Date: 2026-10-15. Executor: codex-session:36@2026-10-15. Assignment: `unit-run-1792011785631-683fa556/producer/1`.
+Step: 5. State: **closed — native conservation proof complete**.
+Input content pin: `f0d4d030b06d36e3e9f55f7a1e3e5df623cc9860`. Proof artifact commit: **the runner-produced commit for this assignment**, pending settlement; no commit hash is invented here.
+Last historical native source proof: `04e476784ed528970ae33b13dbd220bff9948a5a`.
+B0: `dbe5c432852837ea01e6025b35868bcb7271495d`. SYNC: `da8285e065835dc3136ca0daabb2cd19e05d10fb`.
+
+Read progress first, confirmed a clean initial tree and ancestry from the historical proof, restored the committed native helpers into scratch, and started the native sync in the background. This assignment authorizes native pin files only: no git write, docs bytes, decision shards, checker, gate, extractor, vocabulary, baseline or workspace .fgos mutation. External claim is the explicit exception. Scratch is confined to /tmp/fgos-work/resume-truth/.
+
+Sync elapsed: **1275.158 seconds**. Minute-30 stop: **False**. Registry: **59,810,349 bytes**, SHA256 `5834e8872b9df68ea9a2966f325d244f93d40247a3ef358ab87513891073045a`, compact one-line, below the 90,000,000-byte stop line. Both-prior D fatal findings: **0**. Scoped E open data: **claims-partial-carry=1, identical-units-multiple-owners=3, candidate-blocks-unreferenced=830**. Strict E remains a separate cutover bar; allowed-open equality does not certify strict green. Candidate full tuple checks: **root=830 (True), agent=568 (True), packaging=694 (True)**.
+
+Native known-ID conservation and live claim-ID/path/anchor/full-digest equality pass before and after persistence. Scoped E equals exactly the accepted Packaging A34 partial, the same three identical-unit exception memberships and the deduplicated Root/Packaging candidate-unverified list (830 tuples); all three individual lists also equal actual native conservation output. No scoped not-reviewed, unknown-blocking, application or T9 defect remains. Packaging and AGENTS residual SHA256/source/target bindings recompute.
+
+The native carry keeps three edited heading identities, allocates four body identities and preserves all four predecessors as explicit native gaps; zero newly retired units. Three templates body entries are rebound to their actual native identities in the candidate-unverified list without carrying approvals; all actual changed text was independently accepted at the prior closure review. Complete native old/new units and list deltas are recorded in nativeClosurePin. New native gaps remain explicit later global/cutover obligations outside this source scope; no gap disposition, successor judgment or truth approval is invented.
+
+**Step 5 is closed on its accepted batch-closure criteria.** The runner commit containing this proof is the closure proof artifact; the content pin above is the committed input. No Step 6 candidate authoring, promotion, main merge or push is performed. Preserve the exact first Step 6 actions below: read map/review brief, authorized Plan B sync/blob comparisons and re-pin before affected sources, author against component-boundary/architecture-map, record boundary impact, then scoped E, second checkpoint refresh, effort and genuine reviewer-held checkpoint sensitivity proof. The initial native pin is complete; it does not replace that end-of-Step-6 checkpoint. Existing Coordination Rings holds, all A34 residuals, candidate-unverified/truth/promotion/navigation/consumer/alias/native-gap debts and owner effort checkpoint remain.
+
+Tests: 39/39 unchanged review/apply tests pass with env -u CLAUDE_CODE_SESSION_ID; zero failed/cancelled/skipped/todo. Ratchet clean; placement 529/528/one recorded exception; candidate-status zero findings. B/C/I and ancestry pass. Eight A historical allowlist observations are preserved, not waived. No full-suite or full current-truth claim. No component-boundary change. No new owner question. Full commands, helper sources, native consequences, D/E, list/exception/residual checks and logs: [root-boundary-native-verification.json](root-boundary-native-verification.json), `nativeClosurePin`. Preview unavailable within this write scope.
+
+
+The following sections through the historical D/E rerun preserve the preceding turn’s evidence. Their “this turn”, open-state and deferred-native statements are historical and superseded by the current result above. Outstanding cutover obligations and the exact Step 6 sequence remain active.
+
+## Historical closure evidence
 
 Input/Lead closure evidence commit: `a3a4251f07d619adbb0184f29ec6e2254a008862` (`a3a4251f0`). It contains [red-team-5.md](red-team-5.md), [sampled-blocks-5.md](sampled-blocks-5.md), the [fresh-reader key](fresh-reader-key-261015-root-authorities.md) and [scoring report](fresh-reader-261015-root-authorities.md). Last full native source proof: `04e476784ed528970ae33b13dbd220bff9948a5a`; accepted ordinary review pin: `6fbb5aed0493b2afb99552ef5bd5cefac897e551`. Exact 44 accepted verdicts and subsequent D/E are recorded in [verification-261015-0236-bounded-corrections.md.json](verification-261015-0236-bounded-corrections.md.json). Thirty were ordinary source/gap decisions; fourteen were separately labelled accounting acceptances, not claim approvals. Notes were applied verbatim through the existing applier.
 
@@ -148,7 +172,7 @@ Relevant unchanged review/apply tests: `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tm
 
 Open risks are the disclosed shared Lead session, permissive reader scoring/isolation, known-stale candidate text, pending local/native rebinding and later retirement that could drop navigation or residual clauses. Independent re-review is complete; the current persisted-registry D/E result and any remaining closure blocker are recorded in the verification section below. Markdown preview is unavailable within this write scope: no MDView MCP tool is exposed and its CLI would write an out-of-scope local database.
 
-## Persisted-registry D/E rerun and closure result
+## Historical persisted-registry D/E rerun (superseded by current native closure result)
 
 D and scoped E were rerun through the unchanged `checkInventory` API, using the persisted working registry and both prior registries together; no carry-forward, registry persistence or full native sync was run. Current-HEAD `generateInventory` refuses the unchanged registry because its pin `7e9fd4bd5d9eff9ef748190256cbe182c5ace00c` precedes the two edited candidate files. A read-only inventory was therefore generated at that actual persisted pin (4,404 items / 87,368 claims), with freshness explicitly checked against HEAD; the old pin was not represented as current.
 
@@ -163,6 +187,8 @@ Candidate ID/path/anchor membership equals the deduplicated Root/Packaging lists
 Complete unchanged gate results, scopes, exact stale tuple deltas, exception memberships, residual bindings, report-ancestry checks, tests and reproduction helpers: [verification-261015-0347-root-closure-acceptance.md](verification-261015-0347-root-closure-acceptance.md).
 
 ## Exact first actions for Step 6
+
+Native-pin status: item 2 was completed by this boundary-only assignment at the current input pin. Its preservation/review rules continue to apply if the source tree changes; the remaining Step 6 sequence and final checkpoint are unchanged. The earlier unperformed-sync/open-state narrative above is historical and superseded by the current native closure result.
 
 Step 6 is **Whole-system architecture**, a checkpoint step with a genuine **reviewer-held sensitivity pack**; A36's ordinary sampled-deep review does not replace checkpoint proof. The author must not create, select or answer the real mutations or invent pack/seed score headers. The separate reviewer follows `review-brief.md`, creates and answers the seeded pack first, keeps its key private until the verdict commit, then commits `review-6-checkpoint[-<shard>].md`; checkpoint application requires the real pack/key/verdict bindings, never the ordinary channel used for this closure review.
 
