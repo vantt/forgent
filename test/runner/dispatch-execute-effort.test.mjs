@@ -14,6 +14,13 @@ import { executeExecutorCli, runDispatchCli } from '../../src/runner/dispatch/cl
 import { renderReasoningEffortArgs, checkLaunchedModel, collectModelWarnings } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
+import { bind } from '../../src/runner/execution/bind.mjs';
+import { runUnit } from '../../src/runner/execution/run.mjs';
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
+
+// posture filtering consults the machine backend registry; keep it file-local
+seedFileLocalBwrapRegistry();
 import { assertReasoningEffort, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 
 test('renderReasoningEffortArgs puts codex effort in a config override after the exec subcommand', () => {
@@ -223,6 +230,107 @@ console.log('All good');
   assert.equal(result.status, 'done', JSON.stringify(result));
   const argv = spawnedArgv(root);
   assert.deepEqual(argv.slice(0, 5), ['exec', '-c', 'model_reasoning_effort=high', '--model', 'asked-model']);
-  assert.equal(result.reasoningEffort.native, 'high');
-  assert.deepEqual(result.modelWarnings.map((w) => w.code), ['model-reported-different']);
+  // The receipt records what the launch did as provenance of the policy it ran under.
+  assert.equal(result.policy.provenance.reasoningEffort.value, 'high');
+  assert.equal(result.policy.provenance.reasoningEffort.rendered.native, 'high');
+  assert.deepEqual(result.policy.provenance.modelDrift.value.map((w) => w.code), ['model-reported-different']);
+  assert.equal(result.reasoningEffort, undefined);
+  assert.equal(result.modelWarnings, undefined);
+});
+
+const bindConfig = () => ({
+  modelPolicies: { openai: { standard: 'gpt-std' }, claude: { standard: 'sonnet' } },
+  rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard' } },
+  executors: {
+    codex: { kind: 'agent', providerModel: 'openai', allowCrossProvider: true, invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'codex', args: ['exec', '{prompt}'] }] },
+    claude: { kind: 'agent', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'claude-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'claude', args: ['-p', '{prompt}'] }] },
+  },
+});
+const unitAsk = (overrides) => ({ unit: { id: 'u1', capability: 'docs:write', writes: ['README.md'] }, role: 'producer', overrides });
+
+test('bind() takes a reasoningEffort override and records where it came from', () => {
+  const bound = bind(unitAsk([{ reasoningEffort: 'high', origin: 'human-cli' }]), { runnerConfig: bindConfig(), session: {} });
+  assert.equal(bound.executor, 'codex');
+  assert.equal(bound.reasoningEffort, 'high');
+  assert.deepEqual(bound.provenance.reasoningEffort, { value: 'high', source: 'override:human-cli' });
+  const plain = bind(unitAsk([]), { runnerConfig: bindConfig(), session: {} });
+  assert.equal(plain.reasoningEffort, null);
+  assert.deepEqual(plain.provenance.reasoningEffort, { value: null, source: 'none' });
+});
+
+test('bind() refuses an effort outside the vocabulary or outside what the bound executor declares', () => {
+  const bad = bind(unitAsk([{ reasoningEffort: 'turbo', origin: 'human-cli' }]), { runnerConfig: bindConfig(), session: {} });
+  assert.equal(bad.refused.reason, 'reasoning-effort');
+  assert.match(bad.refused.detail, /invalid reasoningEffort "turbo"/);
+  const locked = bind(unitAsk([{ executor: 'claude', reasoningEffort: 'max', origin: 'human-cli' }]), { runnerConfig: bindConfig(), session: {} });
+  assert.match(locked.refused.detail, /executor "claude" supports reasoningEffort \[low, medium, high\], not "max"/);
+});
+
+test('fgos run with an effort override renders it into the CLI the bound executor spawns', async () => {
+  const repoRoot = makeFixtureDir('fgos-run-effort-');
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'README.md'), '# t\n');
+  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/\n');
+  execFileSync('git', ['add', '.'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'initial'], { cwd: repoRoot });
+  const binDir = makeFixtureDir('fgos-run-effort-bin-');
+  const cli = path.join(binDir, 'codex');
+  // Prints its argv; the run keeps the worker's stdout in the run directory.
+  fs.writeFileSync(cli, `#!${process.execPath}\nprocess.stdout.write('ARGV' + JSON.stringify(process.argv.slice(2)) + '\\n');\n`);
+  fs.chmodSync(cli, 0o755);
+  const runner = {
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    modelPolicies: { openai: { standard: 'gpt-std' } },
+    executors: { codex: { kind: 'agent', providerModel: 'openai', allowCrossProvider: true, invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: cli, args: ['exec', '--model', '{model}', '{prompt}'] }] } },
+    capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard' } },
+  };
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
+  const worktreeDir = makeFixtureDir('fgos-run-effort-wt-');
+  fs.rmSync(worktreeDir, { recursive: true, force: true });
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', worktreeDir], { cwd: repoRoot });
+
+  const res = await runUnit({
+    unitData: { id: 'u-effort', objective: 'Touch the readme', capability: 'docs:write', writes: ['README.md'] },
+    repoRoot,
+    cwd: worktreeDir,
+    pattern: 'solo',
+    overrides: [{ reasoningEffort: 'low', origin: 'human-cli' }],
+  });
+  const record = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit.json'), 'utf8'));
+  const attempt = Object.values(record.bindings)[0][0];
+  assert.equal(attempt.binding.reasoningEffort, 'low');
+  const stdoutLogs = execFileSync('find', [path.join(repoRoot, '.fgos', 'assignments', res.unitRunId), '-name', 'stdout.log'], { encoding: 'utf8' }).trim().split('\n');
+  const argvLine = fs.readFileSync(stdoutLogs[0], 'utf8').split('\n').find((line) => line.startsWith('ARGV'));
+  assert.ok(argvLine, `no ARGV line in ${stdoutLogs[0]}`);
+  assert.deepEqual(JSON.parse(argvLine.slice(4)).slice(0, 5), ['exec', '-c', 'model_reasoning_effort=low', '--model', 'gpt-std']);
+});
+
+test('fgos run --effort reaches bind() as an override, and a level the executor does not declare is a policy refusal', () => {
+  const repo = makeFixtureDir('fgos-cli-effort-');
+  for (const args of [['init', '-q', '-b', 'main'], ['config', 'user.email', 't@e.com'], ['config', 'user.name', 'T']]) execFileSync('git', args, { cwd: repo });
+  fs.writeFileSync(path.join(repo, 'README.md'), '# t\n');
+  fs.writeFileSync(path.join(repo, '.gitignore'), '.fgos/\n');
+  execFileSync('git', ['add', '.'], { cwd: repo });
+  execFileSync('git', ['commit', '-q', '-m', 'initial'], { cwd: repo });
+  const runner = {
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    executors: { claude: { kind: 'agent', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'claude', args: ['-p', '{prompt}'] }] } },
+    capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
+  };
+  fs.mkdirSync(path.join(repo, '.fgos'));
+  fs.writeFileSync(path.join(repo, '.fgos', 'config.json'), JSON.stringify({ runner }));
+  const wt = makeFixtureDir('fgos-cli-effort-wt-');
+  fs.rmSync(wt, { recursive: true, force: true });
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: repo });
+  const unitFile = path.join(wt, 'unit.json');
+  fs.writeFileSync(unitFile, JSON.stringify({ id: 'u', objective: 'x', capability: 'docs:write', writes: ['README.md'] }));
+  const out = execFileSync(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repo, '--effort', 'max', '--json'], { cwd: wt, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  const { data } = JSON.parse(out);
+  assert.equal(data.outcome, 'policy-refusal');
+  assert.deepEqual(data.results[0].refused, { reason: 'reasoning-effort', detail: 'executor "claude" supports reasoningEffort [low, medium, high], not "max"' });
 });

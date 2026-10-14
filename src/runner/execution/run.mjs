@@ -383,6 +383,8 @@ export async function runUnit(options = {}) {
         preferInvocation: bound.invocation,
         tier: bound.tier,
         model: bound.model,
+        // A level bind() accepted from an override; the launch renders it into the CLI's flag.
+        ...(bound.reasoningEffort ? { reasoningEffort: bound.reasoningEffort } : {}),
       },
       isReadOnlyMode: readOnly,
       session,

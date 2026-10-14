@@ -361,8 +361,6 @@ export function normalizeRunResult({
   confinement = null,
   role = null,
   executorRedirected,
-  reasoningEffort,
-  modelWarnings,
   policy: dispatchPolicy,
   settledAt,
   durationMs = null,
@@ -583,10 +581,6 @@ export function normalizeRunResult({
       role: role ?? null,
     }),
     ...(executorRedirected !== undefined ? { executorRedirected } : {}),
-    // What the launch rendered for `--effort`, and where the model the CLI ran
-    // disagrees with the one asked for (provider-adapter.mjs's model check).
-    ...(reasoningEffort ? { reasoningEffort } : {}),
-    ...(Array.isArray(modelWarnings) && modelWarnings.length > 0 ? { modelWarnings } : {}),
     ...(dispatchPolicy !== undefined ? { policy: dispatchPolicy } : {}),
     ...(dispatchPolicy?.persona
       ? {

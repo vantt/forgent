@@ -490,6 +490,24 @@ export function commitRunSettlement({
 /**
  * Unified settlement pipeline for successful or evaluated Run outcomes.
  */
+/**
+ * The policy a receipt records, plus what the launch itself did with it: the effort level as
+ * the provider CLI's own flag (`provenance.reasoningEffort.rendered`) and every place the model
+ * that ran differs from the one bound (`provenance.modelDrift`, provider-adapter.mjs's model
+ * check). Unchanged when neither applies.
+ */
+function withLaunchProvenance(policy, { reasoningEffort, modelWarnings = [] } = {}) {
+  if (!reasoningEffort && modelWarnings.length === 0) return policy;
+  const provenance = { ...(policy.provenance ?? {}) };
+  if (reasoningEffort) {
+    provenance.reasoningEffort = { ...(provenance.reasoningEffort ?? {}), rendered: reasoningEffort };
+  }
+  if (modelWarnings.length > 0) {
+    provenance.modelDrift = { value: modelWarnings, source: 'launch-and-provider-output' };
+  }
+  return { ...policy, provenance };
+}
+
 export async function settleRunOutcome({
   runDir,
   runMeta,
@@ -744,9 +762,7 @@ export async function settleRunOutcome({
     confinement: ranConfinementBackend(runDir, launchCommandId, attestation),
     warnings: attributionPolicy.warnings,
     role: assignment?.role ?? null,
-    ...(effectivePolicy ? { policy: effectivePolicy, executorRedirected } : {}),
-    ...(reasoningEffort ? { reasoningEffort } : {}),
-    ...(modelWarnings.length > 0 ? { modelWarnings } : {}),
+    ...(effectivePolicy ? { policy: withLaunchProvenance(effectivePolicy, { reasoningEffort, modelWarnings }), executorRedirected } : {}),
     settledAt,
     durationMs: typeof durationMs === 'number' ? durationMs : null,
     ...(planContentHash ? { planContentHash } : {}),

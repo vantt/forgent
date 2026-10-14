@@ -6,7 +6,7 @@ import { deriveProviderFamily, resolveTierModel } from '../dispatch/resolve.mjs'
 import { checkProviderDisallowed } from '../dispatch/provider-adapter.mjs';
 import { canApplyPosture, resolvePostureInvocation } from '../dispatch/confinement/policies.mjs';
 import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
-import { MODEL_POLICY_TIERS } from '../dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, assertReasoningEffort } from '../dispatch/config.mjs';
 import { resolveStrongerTier, TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
@@ -409,6 +409,25 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     personaSource = `capability:${capKey}`;
   }
 
+  // 7b. Reasoning effort: only an override asks for one (`fgos run --effort`, or a
+  // `reasoningEffort` key in `--override`). It is checked here against the same rule the launch
+  // applies (canonical levels, then the executor's declared `supports.reasoningEffort`), so a
+  // level the chosen executor refuses is a refused binding, not a failed run; the transport
+  // renders it into the provider CLI's own flag. Without one the executor's own default stands.
+  let reasoningEffort = null;
+  let reasoningEffortSource = 'none';
+  if (matchingOverride && matchingOverride.reasoningEffort !== undefined) {
+    try {
+      reasoningEffort = assertReasoningEffort(matchingOverride.reasoningEffort, {
+        supported: executorEntry?.supports?.reasoningEffort,
+        executorId,
+      });
+    } catch (err) {
+      return { refused: { reason: 'reasoning-effort', detail: err.message } };
+    }
+    reasoningEffortSource = `override:${matchingOverride.origin ?? 'unknown'}`;
+  }
+
   // 8. Provenance
   const provenance = {
     executor: { value: executorId, source: candidateSource },
@@ -417,6 +436,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     tier: { value: finalTier, source: tierSource },
     model: { value: model, source: modelSource },
     persona: { value: persona, source: personaSource },
+    reasoningEffort: { value: reasoningEffort, source: reasoningEffortSource },
     mechanism: { value: mechanism, source: mechanismSource },
     posture: { value: posture, source: isReadOnlyPosture ? 'read-only-ask-or-writes-empty' : 'producer-writes-declared' },
   };
@@ -447,6 +467,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     tier: finalTier,
     model,
     persona: persona ?? null,
+    reasoningEffort,
     mechanism,
     posture,
     provenance,

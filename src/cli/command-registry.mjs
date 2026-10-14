@@ -857,6 +857,7 @@ export const COMMAND_REGISTRY = [
         prompt: { type: 'string', description: '"execute" only: prompt text for the executor.' },
         model: { type: 'string', description: '"execute"/"log" only: model override.' },
         tier: { type: 'string', description: '"execute"/"log" only: tier override.' },
+        effort: { type: 'string', description: '"execute" only: reasoning effort (low, medium, high, max) rendered into the provider CLI\'s own flag.' },
         carries: { type: 'string', description: '"execute" only: data classification carried (e.g. repo-content, user-text).' },
         'has-live-task-access': { type: 'boolean', description: '"decide"/"execute" only: caller has live task/subagent access.' },
         'needs-soul': { type: 'boolean', description: '"decide" only: task requires an agent soul.' },
@@ -906,7 +907,7 @@ export const COMMAND_REGISTRY = [
   },
   {
     name: 'run',
-    invoke: 'fgos run [--unit <file|->] [--pattern <name|preset>] [--override <json>] [--resume <unitRunId>] [--dir <mainRoot>] [--json]',
+    invoke: 'fgos run [--unit <file|->] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--resume <unitRunId>] [--dir <mainRoot>] [--json]',
     description: 'Single execution door for Unit runs: headless execution of Units through collaboration patterns (solo, reviewed, panel). Also supports "record" for inline producer turns.',
     parameters: {
       type: 'object',
@@ -914,6 +915,7 @@ export const COMMAND_REGISTRY = [
         unit: { type: 'string', description: 'Path to unit YAML/JSON file or "-" for stdin.' },
         pattern: { type: 'string', description: 'Pattern name or preset (solo, reviewed, panel, code-change).' },
         override: { type: 'string', description: 'JSON-encoded array or object of overrides.' },
+        effort: { type: 'string', description: 'Reasoning effort for this run (low, medium, high, max), rendered into the provider CLI\'s own flag; a level the bound executor does not declare refuses the binding.' },
         resume: { type: 'string', description: 'Unit run ID to resume.' },
         dir: { type: 'string', description: 'Main repository root directory. Storage follows it; workers start in the current directory, so run from inside that project or pass --worktree (a different project than the current directory is warned about as dir-differs-from-cwd).' },
         worktree: { type: 'string', description: 'Target worktree directory.' },

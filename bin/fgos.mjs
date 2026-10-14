@@ -2699,6 +2699,15 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           throw new StoreError('validation', `invalid JSON for --override: ${e.message}`);
         }
       }
+      // `--effort <level>` is a reasoningEffort override for bind(): added to every override that
+      // does not name one, or as the only override. bind() checks it against the chosen executor.
+      if (flags.effort !== undefined) {
+        const effort = requireField(flags.effort, '--effort requires a level (low, medium, high, max)');
+        if (overrides.length === 0) overrides.push({ origin: 'human-cli' });
+        for (const ov of overrides) {
+          if (ov.reasoningEffort === undefined) ov.reasoningEffort = effort;
+        }
+      }
       const repoRoot = flags.dir;
       const worktree = flags.worktree;
       const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
