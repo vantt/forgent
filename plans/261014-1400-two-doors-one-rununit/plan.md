@@ -129,6 +129,11 @@ Người giữ các file dùng chung theo từng bước được ghi ở [proto
   - Item riêng: `fgos doctor` nên báo executor có provider không khai account; `policy-refusal` trả exit 0; log `dispatch capability=(none declared)` in sai capability của Unit; subject commit có thể là summary bị cắt kèm "...".
 - Ngoài phạm vi, từ lane gitparse: tên file không phải UTF-8 vẫn mất byte; cổng merge coi main đang merge dở là sạch khi có `ownFileSet`; env `GIT_*` rò vào `git()` của `merge.mjs`; `ls-files` của distill đọc theo dòng.
 
+- Từ lane cut (06):
+  - Có một event `executor.dispatch` giả (`id:"a"`) trong `.fgos/events/3546717-20261014T123543656Z.jsonl` của main checkout. Lead giữ nguyên: log chỉ ghi thêm (L3), và guard chống cắt log đã ghi nhận file này.
+  - R4b (guard A4 chưa thấy `import()` động / `createRequire`, ví dụ `dispatch/assignment.mjs:99` nạp harness của domain) chuyển sang phase 11.
+  - `node src/runner/dispatch.mjs decide --work` vẫn có thể ghi config mặc định trước khi từ chối. Mức Low, có từ trước.
+
 ## Disposition review
 
 V = [validate-plan-against-code.md](reports/validate-plan-against-code.md), R = [red-team-plan.md](reports/red-team-plan.md).
