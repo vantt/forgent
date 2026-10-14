@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos doctor`'s `workflow-capabilities-configured` also warns when `code:implement`, the capability the runner loop's coding executing step asks for, has no `prefer` pool.
 - `fgos run --effort low|medium|high|max` (or `"reasoningEffort"` in `--override`) sets how hard the worker reasons for one run, without editing the provider's own config. claude and agy get `--effort`, pi and omp `--thinking`, Codex `-c model_reasoning_effort=` (`max` becomes `xhigh`). A level outside that list, or one the bound executor's `supports.reasoningEffort` does not declare, is refused before the worker starts (`fgos run` reports a `policy-refusal` with reason `reasoning-effort`). Until now a derived effort was recorded in the policy but never reached the CLI; that is unchanged when no effort is given.
 - A run's result records where the model that ran differs from the one bound, under `policy.provenance.modelDrift`: replaced by policy before launch (`model-overridden`), not passed on the command line (`model-not-passed`), refused or unknown to the provider CLI (`model-unsupported`), or reported differently by the CLI (`model-reported-different`).
 - `fgos run "<prompt>"` runs a one-line task as a Unit. The flags are `--provider` (soft preference), `--persona`, `--writes` (needs a linked worktree), `--capability` (default `execute`), `--rigor`, `--effort` and `--override`. Without `--writes` the Unit is read-only. A wrong provider, a wrong persona, or writes from the main checkout fail before anything runs.
@@ -24,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The runner loop (`fgos-runner`) and the fan-out batch run each worker as one Unit run, through the same boundary as `fgos run`: the worker runs confined and never commits, and the runner commits what it left. The item's log names the Unit run (`unitRunId`) and where its output is captured instead of teeing the worker's output live, and the `executor.dispatch` event carries `unitRunId`. Commit subjects become `chore(work-<id>-<step>): <the worker's claim summary>`.
+- A runner loop step asks for its capability as `<domain>:<verb>` (for example `coding:discover`), the name its Workflow uses; a config that only declares the bare verb still serves it.
+- An item no executor can run (its capability has no usable pool) parks as `no-executor`, with the pool to configure in the message, instead of stopping the runner. Every candidate at its provider limit parks the item as `provider-limit`. A worker round that fails after writing files is `worker-failed`: retried, and its uncommitted files are never verified as if they were on the branch.
+- A runner loop round that stopped over its own half-done writes, or whose runner commit failed, keeps its worktree; the item's next attempt resumes the same Unit run there, committing again without running the agent a second time.
 - `fgos run` (and a Workflow unit) commits only files inside the Unit's `writes`. Files outside it are left in place and reported in `commit.outOfScope`; files you were already editing inside the scope are left as they are (`preExistingInScope`).
 - The runner refuses to start a writing Unit while the index already holds staged changes (`foreign-staged-index`); unstage or commit them and run again.
 - Runner commits use a conventional subject: the first line of the worker's `summary`, or `chore(<unitId>): …` when that is not conventional.
@@ -41,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- `fgos-runner --config <path>`: the runner and its workers always use the repo's own `.fgos/config.json`.
 - `fgos dispatch execute` is gone, together with its `--contract` and `--assignment` forms and the `node src/runner/dispatch.mjs execute` alias. Run one task with `fgos run "<prompt>" --provider <executor>` (`--provider` takes an agent executor; a `kind: "tool"` executor is called directly) (add `--writes <paths> --worktree <linked-worktree>` for work that changes files; the runner commits them), or a Unit file with `fgos run --unit <file>`; planned work goes through `fgos workflow start`. Calling the old door returns an error naming the replacement, and the dispatch-decide hook's BLOCKED message names the same `fgos run` form.
 - `fgos dispatch log` is gone: every `fgos run` already records its Unit, binding, results and commit under `.fgos/assignments/<unitRunId>/`.
 - `dispatch fanout-batch` is gone. Fanout runs from `node src/runner/fanout-batch.mjs "<ids>" [--has-live-task-access]`, with the same output keys (`fired`, `mechanismChanged`, `unavailable`, `deferred`, and `slotsFull: true` when no slot is free).
