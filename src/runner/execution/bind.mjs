@@ -147,19 +147,29 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
   // Level 2 & 1: Capability prefer candidates (project / global)
   const { entry: capConfig, key: capKey } = lookupCapabilityConfig(runnerConfig, unit?.capability);
 
+  // Each candidate carries its own `source`; the binding records the source of the one chosen.
   let candidatePool = [];
-  let candidateSource = 'prefer';
 
   if (matchingOverride && matchingOverride.executor) {
     candidatePool = [{
       executor: matchingOverride.executor,
       invocation: matchingOverride.invocation ?? null,
       override: matchingOverride,
+      source: 'override',
     }];
-    candidateSource = 'override';
-  } else if (capConfig?.prefer) {
-    candidatePool = normalizeCandidates(capConfig.prefer);
-    candidateSource = `capability:${capKey}`;
+  } else {
+    // The unit's own `prefer` is soft: its candidates go ahead of the capability's pool, a
+    // capability candidate it already names is not listed twice, and every filter below applies
+    // to both alike. A unit without one binds exactly as before.
+    const seen = new Set();
+    const keyOf = (cand) => `${cand.executor}\u0000${cand.invocation ?? ''}`;
+    const unitCandidates = normalizeCandidates(unit?.prefer)
+      .filter((cand) => !seen.has(keyOf(cand)) && seen.add(keyOf(cand)))
+      .map((cand) => ({ ...cand, source: 'unit-prefer' }));
+    const capabilityCandidates = (capConfig?.prefer ? normalizeCandidates(capConfig.prefer) : [])
+      .filter((cand) => !seen.has(keyOf(cand)))
+      .map((cand) => ({ ...cand, source: `capability:${capKey}` }));
+    candidatePool = [...unitCandidates, ...capabilityCandidates];
   }
 
   // Soft spread: `preferIndependentOf` is [{ role, executor }] of the seats already bound (empty
@@ -191,6 +201,13 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
       const executorId = cand.executor;
       const executorEntry = executors[executorId];
       const providerFamily = getProviderFamily(runnerConfig, executorId);
+
+      // Filter: a unit may name an executor this config does not register; it is skipped, not thrown.
+      if (cand.source === 'unit-prefer' && !executorEntry) {
+        refusalReason = 'unknown-executor';
+        refusalDetail = `Unit prefers executor "${executorId}", which is not registered`;
+        continue;
+      }
 
       // Filter: Governance
       const disallowedProviders = runnerConfig.governance?.disallowedProviders ?? runnerConfig.runner?.governance?.disallowedProviders;
@@ -276,8 +293,8 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
         executor: session.provider ?? 'lead',
         invocation: null,
         isInlineFallback: true,
+        source: 'session-lead-inline',
       };
-      candidateSource = 'session-lead-inline';
     } else {
       if (isHeadless) {
         return {
@@ -389,6 +406,16 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
   // 7. Persona
   let persona = null;
   let personaSource = 'none';
+  const unitPersona = typeof unit?.persona === 'string' && unit.persona ? unit.persona : null;
+
+  if (lockedPersona && unitPersona && unitPersona !== lockedPersona) {
+    return {
+      refused: {
+        reason: 'locked-persona',
+        detail: `Unit persona "${unitPersona}" conflicts with locked persona "${lockedPersona}"`,
+      },
+    };
+  }
 
   if (matchingOverride && matchingOverride.persona) {
     if (lockedPersona && matchingOverride.persona !== lockedPersona) {
@@ -401,6 +428,9 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     }
     persona = matchingOverride.persona;
     personaSource = `override:${matchingOverride.origin ?? 'unknown'}`;
+  } else if (unitPersona) {
+    persona = unitPersona;
+    personaSource = 'unit';
   } else if (lockedPersona) {
     persona = lockedPersona;
     personaSource = 'locked-persona';
@@ -430,8 +460,8 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
 
   // 8. Provenance
   const provenance = {
-    executor: { value: executorId, source: candidateSource },
-    invocation: { value: invocation, source: invocation ? candidateSource : 'none' },
+    executor: { value: executorId, source: chosenCandidate.source },
+    invocation: { value: invocation, source: invocation ? chosenCandidate.source : 'none' },
     transport: { value: transport, source: transportSource },
     tier: { value: finalTier, source: tierSource },
     model: { value: model, source: modelSource },
