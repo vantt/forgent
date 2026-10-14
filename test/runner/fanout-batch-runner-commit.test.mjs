@@ -89,7 +89,8 @@ test('fanout batch: a worker that only edits files is committed by its Unit run,
   assert.equal(fired.commit.status, 'committed');
   assert.equal(fired.errorClass, undefined);
   assert.equal(listWork(fgosDir).work.cand1.status, 'awaiting-approval');
-  assert.equal(branchSubjects(repoRoot), 'chore(work-cand1-executing): producer changes');
+  // No claim summary: the subject is the goal line of the Unit objective (the item's title line).
+  assert.equal(branchSubjects(repoRoot), 'chore(work-cand1-executing): Produce the file (kind: task)');
   assert.equal(execFileSync('git', ['rev-parse', 'fgw/cand1'], { cwd: repoRoot, encoding: 'utf8' }).trim(), fired.commit.sha, 'return judged the Unit run commit');
 });
 

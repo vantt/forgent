@@ -954,7 +954,7 @@ test('e2e runner commit: a worker that only edits files gets its work committed 
   assert.match(workerLog, /commit runner/);
 });
 
-test('e2e runner commit: with no result claim the commit subject is the Unit run\'s generic one, under the Unit id', () => {
+test('e2e runner commit: with no result claim the commit subject is the goal line of the Unit objective, under the Unit id', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
 
@@ -964,7 +964,7 @@ test('e2e runner commit: with no result claim the commit subject is the Unit run
 
   const result = runner(repoRoot, ['--once']);
   assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
-  assert.match(branchLog(repoRoot, 'fgw/item-fallback'), /chore\(work-item-fallback-executing\): producer changes/);
+  assert.match(branchLog(repoRoot, 'fgw/item-fallback'), /chore\(work-item-fallback-executing\): Produce the file\b/);
 });
 
 test('e2e runner commit: a worker cannot commit itself (its git dir is read-only) -- the round fails, nothing is committed, and its uncommitted file is never verified (worker-failed)', () => {
