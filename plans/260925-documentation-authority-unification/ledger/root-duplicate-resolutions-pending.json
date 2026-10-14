@@ -2,7 +2,7 @@
   "version": 1,
   "authorSession": "codex-session:23@2026-10-14",
   "inputCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3",
-  "reviewStatus": "pending",
+  "reviewStatus": "reviewed",
   "groups": [
     {
       "blobSha": "11684583c2ac84357168e237f3ac045201377712",
@@ -11,7 +11,7 @@
         "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
       ],
       "authoredBy": "codex-session:23@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "resolution": "One mapped platform owner; preserve the legacy source until atomic cutover.",
       "rule": "Whole-file byte equality establishes one payload; the frozen root map and accepted source decision establish its sole platform owner. Consumer rewrite and historical lookup use that owner; no second authority is inferred from a retained source copy.",
       "owner": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
@@ -21,7 +21,17 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-source-completion-02.md",
       "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3",
       "rationale": "Existing independent review accepted exact group membership and payload carriage. This pending resolution projection records the sole owner and a cutover done condition; no source deletion or authority switch occurs.",
-      "doneCondition": "Independent acceptance of this projection, all inbound mutable consumers rewritten or explicitly queued, immutable references covered by reviewed aliases, and atomic cutover retirement of the legacy source."
+      "doneCondition": "Independent acceptance of this projection, all inbound mutable consumers rewritten or explicitly queued, immutable references covered by reviewed aliases, and atomic cutover retirement of the legacy source.",
+      "accountingAcceptance": {
+        "id": "duplicate-group-1",
+        "verdict": "ok",
+        "note": "deep: docs/contracts/fgos-gateway-api-v1.yaml and docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml are the same git blob 11684583c (sha256 9f200578...), no third path in the tree has that blob; one owner is the herdr-web-dashboard path matching the reviewed move claim_f0f4828229b64bd6cc8959111c824e24; rule, rationale and cutover done condition read in full and say source is preserved until atomic cutover",
+        "sourceDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+        "targetDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+        "reviewer": "reviewer:claude-session:a4954387@2026-10-14",
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
+        "reportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
+      }
     },
     {
       "blobSha": "e923fa822dadf885952546d50b29fa88f352147e",
@@ -30,7 +40,7 @@
         "docs/platform/contracts/architecture-manifest.json"
       ],
       "authoredBy": "codex-session:23@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "resolution": "One mapped platform owner; preserve the legacy source until atomic cutover.",
       "rule": "Whole-file byte equality establishes one payload; the frozen root map and accepted source decision establish its sole platform owner. Consumer rewrite and historical lookup use that owner; no second authority is inferred from a retained source copy.",
       "owner": "docs/platform/contracts/architecture-manifest.json",
@@ -40,13 +50,33 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-source-completion-02.md",
       "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3",
       "rationale": "Existing independent review accepted exact group membership and payload carriage. This pending resolution projection records the sole owner and a cutover done condition; no source deletion or authority switch occurs.",
-      "doneCondition": "Independent acceptance of this projection, all inbound mutable consumers rewritten or explicitly queued, immutable references covered by reviewed aliases, and atomic cutover retirement of the legacy source."
+      "doneCondition": "Independent acceptance of this projection, all inbound mutable consumers rewritten or explicitly queued, immutable references covered by reviewed aliases, and atomic cutover retirement of the legacy source.",
+      "accountingAcceptance": {
+        "id": "duplicate-group-2",
+        "verdict": "ok",
+        "note": "deep: docs/architecture-manifest.json and docs/platform/contracts/architecture-manifest.json are the same blob e923fa822 (sha256 c1c23046...), exactly two members in the tree; sole owner docs/platform/contracts/architecture-manifest.json matches reviewed move claim_4b96f4f42ea417623dcc794155fa17ce; done condition complete",
+        "sourceDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+        "targetDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+        "reviewer": "reviewer:claude-session:a4954387@2026-10-14",
+        "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
+        "reportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
+      }
     }
   ],
   "identicalUnitResolution": {
-    "reviewStatus": "pending",
+    "reviewStatus": "reviewed",
     "rationale": "The final scoped strict E reports no Root identical-units-multiple-owners group. Preserve all earlier area exceptions unchanged, introduce no root exception and choose no competing owner. Follow-up at the new content commit must reconfirm native scoped membership before requesting acceptance.",
     "expectedRootGroups": 0,
-    "reviewPackOwed": true
+    "reviewPackOwed": false,
+    "accountingAcceptance": {
+      "id": "identical-unit-zero-groups",
+      "verdict": "ok",
+      "note": "deep: my independent grouping of source unit digests to target owners over the 468 owner-bearing rows of the twelve s5-root shards finds 0 digests with more than one owner, equal to the author scopedE value; the five backlog rows have no owner so cannot create a group; earlier area exceptions are untouched (no exception file changed)",
+      "sourceDigest": null,
+      "targetDigest": null,
+      "reviewer": "reviewer:claude-session:a4954387@2026-10-14",
+      "reportPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
+      "reportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
+    }
   }
 }

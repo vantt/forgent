@@ -17,9 +17,15 @@
       "sourceAnchor": "file-block",
       "sourceUnitDigest": "5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664",
       "disposition": "retain-as-evidence",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:23@2026-10-14",
-      "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/architecture-manifest.json at e63a17b8ec87ec6b29671d00a0111dc84b3eb848 (blob c530841eb23f1ac0b2acd46a32cf9ff9da4ba9a3, full unit SHA256 5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/contracts/architecture-manifest.json, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed."
+      "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/architecture-manifest.json at e63a17b8ec87ec6b29671d00a0111dc84b3eb848 (blob c530841eb23f1ac0b2acd46a32cf9ff9da4ba9a3, full unit SHA256 5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/contracts/architecture-manifest.json, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed.",
+      "reviewNote": "deep: blob c530841eb at e63a17b8e hashes to the stated sha256 by sha256sum; the diff to the current manifest is only 14 added file-map entries and no removal, so the retain wording (no claim every old field survives) is honest; current owner is byte-equal and named as informational successor only; file class is a live contract so retain-as-evidence of a git-history version is a stretch of the history-evidence class but the author discloses it",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
     },
     {
       "claimId": "claim_b6f28092c03285c2745234912da0f2ab",
@@ -27,9 +33,15 @@
       "sourceAnchor": "file-block",
       "sourceUnitDigest": "6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e",
       "disposition": "retain-as-evidence",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:23@2026-10-14",
-      "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/architecture-manifest.json at e2fc7754259747ea70b23f1bab72ba5671b2cf87 (blob f8daa37e065f3b1178a1929a874ed5d2f83c5c82, full unit SHA256 6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/contracts/architecture-manifest.json, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed."
+      "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/architecture-manifest.json at e2fc7754259747ea70b23f1bab72ba5671b2cf87 (blob f8daa37e065f3b1178a1929a874ed5d2f83c5c82, full unit SHA256 6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/contracts/architecture-manifest.json, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed.",
+      "reviewNote": "deep: blob f8daa37e0 at e2fc77542 hashes to the stated sha256; unlike the first version this one holds entries since removed upstream (placement-policy, operation-choice, coordination/* and others), so retaining the whole old text as evidence is the right call and no deletion-as-obsolete is claimed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
     },
     {
       "claimId": "claim_0956ea2eadf0a32787b7fd0e51d693a6",
@@ -38,8 +50,8 @@
       "sourceUnitDigest": "8af4c326a8034fa8b4584cb6795459a32d8e9c0afbc616540092a7d8400382c1",
       "disposition": "regenerate-from-source",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:23@2026-10-14",
-      "rationale": "This identity is a historical version of the generated active PBI block, not an unaccounted maintained platform claim. The source header explicitly labels the backlog GENERATED FILE and names bee backlog render from event-sourced PBI records. Preserve the exact old projection in its immutable source blob and the supplied full-text evidence; the five current backlog units remain pending regenerate-from-source decisions outside platform authority under the frozen product-backlog exception. No historical status is asserted current, no PBI is deleted or archived here, and regeneration or source-store availability is not claimed."
+      "authoredBy": "codex-session:25@2026-10-14",
+      "rationale": "This identity is a historical version of the generated active PBI block, not an unaccounted maintained platform claim. The source header explicitly labels the backlog GENERATED FILE and names bee backlog render from event-sourced PBI records. Preserve the exact old projection in its immutable source blob and the supplied full-text evidence; the five current backlog units remain pending regenerate-from-source decisions outside platform authority under the frozen product-backlog exception. No historical status is asserted current, no PBI is deleted or archived here, and regeneration or source-store availability is not claimed. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes."
     },
     {
       "claimId": "claim_53b01784413095d74305b7367e9054fb",
@@ -47,9 +59,15 @@
       "sourceAnchor": "file-block",
       "sourceUnitDigest": "9d2bbd0b5bf3c812c67c3ac860daf4a91f6505e7ccf8a1a8e2a5ce36d25213d3",
       "disposition": "retain-as-evidence",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:23@2026-10-14",
-      "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/contracts/fgos-gateway-api-v1.yaml at 07bd0c594eff78b7214cfa5f43e9cc859e13ceb8 (blob 8818e5724b9cd12daceaed17ffc2b3e873e1330e, full unit SHA256 9d2bbd0b5bf3c812c67c3ac860daf4a91f6505e7ccf8a1a8e2a5ce36d25213d3). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed."
+      "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/contracts/fgos-gateway-api-v1.yaml at 07bd0c594eff78b7214cfa5f43e9cc859e13ceb8 (blob 8818e5724b9cd12daceaed17ffc2b3e873e1330e, full unit SHA256 9d2bbd0b5bf3c812c67c3ac860daf4a91f6505e7ccf8a1a8e2a5ce36d25213d3). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed.",
+      "reviewNote": "deep: blob 8818e5724 at 07bd0c594 hashes to the stated sha256 and equals the frozen-map pin; the only difference to the current yaml is one added `approve` property line, current bytes are carried byte-identically at the herdr-web-dashboard owner (same blob 11684583c), rationale matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
     },
     {
       "claimId": "claim_b92ac199356ff830e5554647ab143a90",
@@ -57,16 +75,22 @@
       "sourceAnchor": "unheaded-block-14",
       "sourceUnitDigest": "e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:23@2026-10-14",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-23",
+      "rationale": "The historical four-stream introduction is replaced by the already-reviewed current five-stream introduction in the mapped CLI I/O contract. All four original exception categories remain in the adjoining complete successor list; merged upstream explicitly adds the agent hook transport as the fifth category. This is historical-count supersession with full old/current text and immutable source provenance, not deletion inferred from absence or truth correction. The native predecessor identity stays intact, and independent acceptance of this gap disposition is still required.",
+      "reviewNote": "deep: old block 14 (05d6fc7ca, lines 83-84) reads \"Bốn luồng ...\" and the target unheaded-block-23 (lines 178-179, anchor ok) reads \"Năm luồng ...\" with the rest of the two lines identical; old to current docs/io-contract.md diff is exactly Bốn to Năm plus a fifth list item, so supersede with a count change is truthful",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
       "targetAncestry": [
         "CLI I/O Contract",
         "5. Reasoned Envelope Exceptions"
       ],
-      "rationale": "The historical four-stream introduction is replaced by the already-reviewed current five-stream introduction in the mapped CLI I/O contract. All four original exception categories remain in the adjoining complete successor list; merged upstream explicitly adds the agent hook transport as the fifth category. This is historical-count supersession with full old/current text and immutable source provenance, not deletion inferred from absence or truth correction. The native predecessor identity stays intact, and independent acceptance of this gap disposition is still required."
+      "reviewReportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
     },
     {
       "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
@@ -74,16 +98,22 @@
       "sourceAnchor": "unheaded-block-15",
       "sourceUnitDigest": "74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:23@2026-10-14",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-24",
+      "rationale": "The complete historical four-item exception list remains word-for-word at the beginning of the already-reviewed current five-item list. The merged upstream addition is the agent-hook exception only; the four original rationales, progress trace and stop lifecycle clause are conserved. The historical native predecessor is superseded by this exact mapped current unit, with real digest/ancestry and no identity graft, approval carry or truth certification.",
+      "reviewNote": "deep: old block 15 (lines 86-95) is a character-exact prefix of target unheaded-block-24 (lines 181-194, anchor ok); the target adds only item 5 (agent hook door, hook-transport protocol) and the old four categories, progress-trace and watch-mode clause are all intact, so the author claim of four categories plus a fifth holds; whole old unit carried so supersede (not partial-carry) is right",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a",
       "targetAncestry": [
         "CLI I/O Contract",
         "5. Reasoned Envelope Exceptions"
       ],
-      "rationale": "The complete historical four-item exception list remains word-for-word at the beginning of the already-reviewed current five-item list. The merged upstream addition is the agent-hook exception only; the four original rationales, progress trace and stop lifecycle clause are conserved. The historical native predecessor is superseded by this exact mapped current unit, with real digest/ancestry and no identity graft, approval carry or truth certification."
+      "reviewReportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
     }
   ]
 }

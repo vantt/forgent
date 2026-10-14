@@ -15,8 +15,8 @@
       "targetOwner": null,
       "targetAnchor": null,
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:23@2026-10-14",
-      "rationale": "The complete product-backlog unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+      "authoredBy": "codex-session:25@2026-10-14",
+      "rationale": "The complete product-backlog unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes."
     },
     {
       "claimId": "claim_c295c4c899afa37544bda841421c92e4",
@@ -26,8 +26,8 @@
       "targetOwner": null,
       "targetAnchor": null,
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:23@2026-10-14",
-      "rationale": "The complete unheaded-block-1 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+      "authoredBy": "codex-session:25@2026-10-14",
+      "rationale": "The complete unheaded-block-1 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes."
     },
     {
       "claimId": "claim_d7660c15ae6c2d2e7d610c1aa571101c",
@@ -37,8 +37,8 @@
       "targetOwner": null,
       "targetAnchor": null,
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:23@2026-10-14",
-      "rationale": "The complete unheaded-block-2 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+      "authoredBy": "codex-session:25@2026-10-14",
+      "rationale": "The complete unheaded-block-2 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes."
     },
     {
       "claimId": "claim_743cde02b9562c5f8e4724512ee6fc8f",
@@ -48,8 +48,8 @@
       "targetOwner": null,
       "targetAnchor": null,
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:23@2026-10-14",
-      "rationale": "The complete done-declined unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+      "authoredBy": "codex-session:25@2026-10-14",
+      "rationale": "The complete done-declined unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes."
     },
     {
       "claimId": "claim_56db2b3b7a6258289e1ab13f5c69d47f",
@@ -59,8 +59,8 @@
       "targetOwner": null,
       "targetAnchor": null,
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:23@2026-10-14",
-      "rationale": "The complete unheaded-block-3 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+      "authoredBy": "codex-session:25@2026-10-14",
+      "rationale": "The complete unheaded-block-3 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes."
     }
   ]
 }

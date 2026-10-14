@@ -1,0 +1,54 @@
+{
+  "$schema": "https://forgent.dev/schemas/sharded-json-artifact.v1.json",
+  "schemaVersion": 1,
+  "artifactKind": "phase-02-doc-inventory",
+  "encoding": "utf8",
+  "reassembly": "ordered-concat-then-json-parse",
+  "canonicalJson": "pretty-2-space-with-final-newline",
+  "totalBytes": 155741438,
+  "sha256": "4ea41f7d19e40c3757722708c6222c924407d7f720fe65f4e8a8f7705b8eefcb",
+  "partCount": 8,
+  "maxPartBytes": 20971520,
+  "parts": [
+    {
+      "path": "preview-261014-2205-root-alias-consumer-followup.parts/part-0001.jsonl",
+      "bytes": 20971484,
+      "sha256": "fd093fff3f75c59e1caf5615af6e672baa014854d00790ed76b4cd4372d973ce"
+    },
+    {
+      "path": "preview-261014-2205-root-alias-consumer-followup.parts/part-0002.jsonl",
+      "bytes": 20971456,
+      "sha256": "50adf5756e9ce85f19f3ec4a10ff974a946327177ec0fc84e49cdf35afb920af"
+    },
+    {
+      "path": "preview-261014-2205-root-alias-consumer-followup.parts/part-0003.jsonl",
+      "bytes": 20971516,
+      "sha256": "c5262ccc85be4dee0528b1796093ff7ae909f620a4ed5badff3a3e1248e36c49"
+    },
+    {
+      "path": "preview-261014-2205-root-alias-consumer-followup.parts/part-0004.jsonl",
+      "bytes": 20971504,
+      "sha256": "75282e66f4b2037f3b2991fab4d33b061af86808bbbe28468352b744113f4ed9"
+    },
+    {
+      "path": "preview-261014-2205-root-alias-consumer-followup.parts/part-0005.jsonl",
+      "bytes": 20971498,
+      "sha256": "12705d3afe2a6c53e3942c33db6cfaacada1fc416d4a27b236a2956d0c6bf561"
+    },
+    {
+      "path": "preview-261014-2205-root-alias-consumer-followup.parts/part-0006.jsonl",
+      "bytes": 20971488,
+      "sha256": "190ab754908a9750d31a50439a7719a386ae27bfa89332fabcf4bc1cd91a6853"
+    },
+    {
+      "path": "preview-261014-2205-root-alias-consumer-followup.parts/part-0007.jsonl",
+      "bytes": 20971437,
+      "sha256": "9800cac85d8d292256d8ea11ecbca21ea6a3cb987b23551da34aa8a34fd8b0ba"
+    },
+    {
+      "path": "preview-261014-2205-root-alias-consumer-followup.parts/part-0008.jsonl",
+      "bytes": 8941055,
+      "sha256": "1ff3989900d4a475880cf6771858bbe9cf13b12d56cad8837af407a78d61d346"
+    }
+  ]
+}

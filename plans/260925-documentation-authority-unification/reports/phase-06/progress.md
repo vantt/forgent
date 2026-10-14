@@ -1,3 +1,68 @@
+# Latest resume state — Closure reviews applied; alias routing and cutover wording corrected
+
+Date: 2026-10-14
+Executor: codex-session:25@2026-10-14
+Session counter: 25
+Assignment: unit-run-1791988555363-1a19d672/producer/1
+Step: 5
+State: rework / file-only handoff awaiting runner-produced commit
+Input HEAD and Lead report pin: b20dc73158d6c0a636522555da23de8428e1fc59
+Last green D/native/preservation proof inventory: b20dc73158d6c0a636522555da23de8428e1fc59, with working-tree decisions overlaid
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Current-turn content commit: none; the runner commits this assignment's files.
+
+Resume read progress first, verified the expected worktree/branch, clean starting tree and ancestry from a125b4ec0. Shared rules, Checks, Step 5, A28–A36 and every Notes section of the six committed Lead reports were read. No git write, .fgos workspace write, secret read, promotion, push, main merge or Step 6 work. No new pack/request pretends to pin this turn's uncommitted content.
+
+## Applied reviews and bounded rework
+
+Evidence: [accounting-261014-2205-root-alias-review-followup.json](accounting-261014-2205-root-alias-review-followup.json); proof, native API calls and complete helper sources: [verification-261014-2205-root-alias-review-followup.json](verification-261014-2205-root-alias-review-followup.json); complete refreshed edge/action preview: [preview-261014-2205-root-alias-consumer-followup.json](preview-261014-2205-root-alias-consumer-followup.json).
+
+All 365 ok verdicts at b20dc7315 are retained verbatim: 11 ordinary source/gap decisions applied through the existing applyReviewVerdicts, plus 354 separate accounting receipts (344 alias ok, seven retained-path ok, two duplicate-group ok and one zero-group ok). Three alias rework notes are also preserved. Accounting does not fabricate a source decision or activate an alias. Each report's full Notes section and immutable SHA256 is in the accounting evidence. Duplicate/zero-group acceptances stay in their existing projection, without authority activation.
+
+Four alias proposals are pending for a bounded re-review: 0263 and 0300 now land on history/templates/spec.md and vision.md themselves; 0265 and 0302 land on their same anchors in those own-file carriers. Same-heading full digests were verified. The resolver accepts this contextual routing without a decision-owner constraint, so no fallback or decision-owner change was needed. Bindings preserve the conservation owner separately from navigationOwner/navigationAnchor and preserve source-decision report pins. Unchanged aliases retain independent acceptance: 343 reviewed, 4 pending.
+
+Nine existing decisions are reopened with no approval carry: historical backlog claim_0956ea2eadf0a32787b7fd0e51d693a6, all five generated backlog rows, the 0315/0316 source decisions and the 0318 source decision. Backlog wording explicitly records missing repository input .bee/backlog.jsonl, missing bee tool, manual additions at b6763388b, and mandatory retention of docs/backlog.md at its path until a real source exists; cutover must neither delete nor regenerate it first. 0315/0316 counts/listings now say one/six actual link respellings. 0318 now distinguishes an identical heading title from unequal full-section digests caused by the candidate header; its original independent note stays immutable in prior reports/evidence.
+
+Five retained-path rationales are pending after wording fixes: 01, 02, 04, 05 and 06. The unrelated copied backlog sentence is removed; 05 carries the explicit source/retention safeguard; 06 correctly identifies the retained in-platform proposal. Retained 03 and 07 keep their acceptances. No source text, target text, disposition or conservation owner changed.
+
+## Cutover obligations and consumer lineage
+
+The existing alias-input artifact now carries an explicit cutover obligation list, with done conditions and owners:
+
+- Step 10 / cutover must merge retained docs/specs/reading-map.md navigation into docs/reading-map.md, validate destinations, independently review it and rewrite mutable consumers before retiring the former map. Platform alias schema cannot target the non-platform singleton.
+- Aliases 0117–0150 must be repinned to full 64-hex native digests at cutover, with actual anchor/owner checks; the accepted pilot prefixes remain unchanged here.
+- All 16 exact stale law references are recorded with source file/line, exact diacritic-stripped fragment, corresponding 0049–0056 alias, actual target owner/anchor, prospective alias and resolver failure. Existing validation reports from-anchor-missing for those non-existent source fragments. No resolver/checker change is allowed here; obtain authorized resolver handling or rewrite the live instruction references at cutover. These owed references must not silently inherit a bare-path landing.
+
+The refreshed native preview uses the existing native sharded JSON artifact format (manifest plus eight bounded parts; exact original-byte reassembly verified). Read it with scripts/doc-inventory-artifact.mjs loadShardedJsonArtifact. It contains 129,409 unique input-HEAD edges, with complete additions/removals against the prior 26,290-edge preview; earlier tuples remain intact in the earlier artifact. 28 history-template Related/Provenance citations and README former-source index cells are now keep-bytes, with literal source lines recorded. Generated/derived .fgos consumers still owe their owning regeneration/contract review; documentation aliases do not certify executable/data compatibility. The old previews are preserved as pinned lineage evidence; the existing inputs now point to the refreshed preview. Current-turn artifacts are excluded from the committed inventory and owe accounting after the runner commit.
+
+## Proof and limits
+
+- Both-prior D through native checkInventory: zero fatal; full parsed outputs equal.
+- Both-prior full-map scoped E: expected red only for eight pending current source decisions and 830 candidate-unverified units; full parsed outputs equal. The ninth edited judgment is a historical registry-gap disposition, separately pending; native omission from the open-gap category is not review approval. No Root hold/unknown/multiple-owner group. All 830 full candidate tuples equal the unchanged committed list.
+- All 94,865 known IDs/full tuples retained; active inventory/registry tuples equal; zero identity graft, new gap or retired-unit change. Root source population: 1,072 decided / 1,064 reviewed / eight pending; five historical closure gaps reviewed / one reopened backlog gap pending.
+- Persisted working registry copied directly and generated natively at b20dc7315, never reconstructed from a seed. Byte-equal output, so the registry was not rewritten. Compact one-line size 59,723,017 bytes; SHA256 7b7e8645cf9609688ae83d43ac821d5f0c093755845bcf712102d3c210b04ec0; below the 90 MB stop line. Its metadata remains cd82746a8 because registry content did not change.
+- Preservation A/B/C/F/G/H/I passes, same seven exact prior A exemptions, no new violations; extractor/frozen files/witnesses/payloads/authority statuses/reader links unchanged. Ratchet 995/25/1; placement 529/528/one existing exception; H zero findings. All truth draws/reports/populations, owner answers/queue and candidate lists are byte-unchanged.
+- Tests: env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs — 39/39 pass, zero fail/cancel/skip/todo.
+
+Explained execution obstacles: CLI refresh generates the native inventory but its existing pretty-JSON serializer raises Invalid string length after the large committed review packs. Direct native generateInventory/checkInventory API calls retain all inventory fields and run the unchanged proof in memory; this is not a filtered inventory or a weakened gate. A preview helper initially read consumerEdges from item objects instead of the native top-level array; the corrected follow-up regenerated natively and verified the complete population. Neither obstacle required a checker change. No unexplained failing proof remains. No full-suite, installed-release, gateway, truth or batch-closure certification is claimed.
+
+## Exact next turn and parked owner decision
+
+After the runner commits these files:
+
+1. Read this progress and verify that commit/ancestry/scope. Use the runner-produced commit as the new content pin. Refresh directly from persisted working-identity-registry.json; use the unchanged native APIs in memory if the existing serializer still exceeds V8 string length. Account this turn's artifact edge additions/removals and repeat both-prior D/E, all-known/native tuple equality, candidate-list equality and preservation. Persist compact registry only if changed, below 90 MB.
+2. Repack a bounded independent re-review from that committed content: exactly aliases 0263, 0265, 0300 and 0302; retained-path 01, 02, 04, 05 and 06; the nine changed decision IDs enumerated in accounting-261014-2205-root-alias-review-followup.json. Show full old/new proposal/decision wording, original verdict receipts, real source/target text, exact full digests and the separated navigation/conservation owners. Include the provenance action changes and exact owed-fragment/cutover obligation accounting; do not resubmit unchanged accepted rows or fabricate fresh source approval. Follow A36 and ordinary digest format. No pack can pin this turn before its runner commit exists.
+3. Apply the resulting committed verdicts with notes verbatim, then rerun the same native proofs. Preserve 0117–0150 repin and navigation/fragment cutover obligations; do not activate aliases or rewrite consumers here.
+4. Await the owner's committed scope for review-5-root-truth-final.md (eight false units of 30, 26.7%, 13 false sentences). Its draw/report/population are untouched; A35 does not authorize corrections to this later failed sample. This parks eventual Step 5 truth closure, not this completed assignment.
+5. Remaining Step 5 work is still owed: independent 50-block invented-claim sample and hostile pass; committed fresh-reader key, two independent readers/three scenarios; owner-approved A31 batch-boundary sync/accounting; final batch report with holds/exceptions/A34 residuals, cutover consumers and owner effort checkpoint. No Step 6 until authorized.
+
+Technical blockers: none within this assignment. Independent bounded re-review and the parked truth-owner decision remain outstanding. MDView MCP is unavailable; the prior CLI attempt is recorded as readonly SQLite, and no out-of-scope preview database repair was attempted. Markdown remains directly readable.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Root closure and alias previews packaged for independent review
 
 Date: 2026-10-14

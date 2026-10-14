@@ -2625,9 +2625,9 @@
     {
       "aliasId": "root-authorities-draft-0263",
       "fromPath": "docs/templates/spec.md",
-      "toOwner": "docs/platform/documentation/history/templates/README.md",
+      "toOwner": "docs/platform/documentation/history/templates/spec.md",
       "toAnchor": null,
-      "kind": "merged",
+      "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
       "immutableRefs": [],
       "recordedAt": "2026-10-14"
@@ -2645,7 +2645,7 @@
     {
       "aliasId": "root-authorities-draft-0265",
       "fromPath": "docs/templates/spec.md#1-current-summary",
-      "toOwner": "docs/platform/documentation/history/templates/discussion.md",
+      "toOwner": "docs/platform/documentation/history/templates/spec.md",
       "toAnchor": "1-current-summary",
       "kind": "split",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-mapped-root-conservation-01.md",
@@ -2995,9 +2995,9 @@
     {
       "aliasId": "root-authorities-draft-0300",
       "fromPath": "docs/templates/vision.md",
-      "toOwner": "docs/platform/documentation/history/templates/README.md",
+      "toOwner": "docs/platform/documentation/history/templates/vision.md",
       "toAnchor": null,
-      "kind": "merged",
+      "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
       "immutableRefs": [],
       "recordedAt": "2026-10-14"
@@ -3015,7 +3015,7 @@
     {
       "aliasId": "root-authorities-draft-0302",
       "fromPath": "docs/templates/vision.md#1-purpose",
-      "toOwner": "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
+      "toOwner": "docs/platform/documentation/history/templates/vision.md",
       "toAnchor": "1-purpose",
       "kind": "split",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-mapped-root-conservation-02.md",

@@ -4170,17 +4170,12 @@
       "targetAnchor": "cài-đặt-setup-doctor-của-fgos-tầm-nhìn-nền-tảng",
       "claimKind": "historical-context",
       "disposition": "archive-with-reason",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:20@2026-10-14",
-      "rationale": "Frozen root map assigns docs/distribution-vision.md#cài-đặt-setup-doctor-của-fgos-tầm-nhìn-nền-tảng to docs/platform/packaging-distribution/history/distribution-vision.md#cài-đặt-setup-doctor-của-fgos-tầm-nhìn-nền-tảng. Retain the complete source unit as non-canonical history; the source remains active/retained until cutover. Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change.",
-      "reviewNote": "Heading \"# Cài đặt / Setup / Doctor của fgOS — tầm nhìn n\" (source 1-1, target 1-1) identical in level, title and full section payload, digests equal; body blocks carried by their own rows; Candidate header insertion only shifts lines.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-mapped-root-conservation-03.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:25@2026-10-14",
+      "rationale": "Frozen root map assigns docs/distribution-vision.md#cài-đặt-setup-doctor-của-fgos-tầm-nhìn-nền-tảng to docs/platform/packaging-distribution/history/distribution-vision.md#cài-đặt-setup-doctor-của-fgos-tầm-nhìn-nền-tảng. Retain the complete source unit as non-canonical history; the source remains active/retained until cutover. Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. The heading title is identical; the full section digests differ because the candidate header was inserted. Body blocks retain their own conservation bindings. Equality of full section digests is not claimed.",
       "targetUnitDigest": "06fb53a3c6d19df7acef7ce97786b4304fb88eb4797869e216cf75ba31f52d80",
       "targetAncestry": [],
-      "reviewReportCommit": "729bea7588017b285553332d838543bedecd2605"
+      "reviewNote": "Author correction of the stale equal-digests note: source and target full section digests differ due to the inserted candidate header; heading title and separately bound body conservation are unchanged. Independent re-review owed."
     },
     {
       "claimId": "claim_8e5a87cedeff99cfae48de4e8d8b166a",
@@ -4832,19 +4827,13 @@
       "targetAnchor": "4-resolution-algorithm-for-readers-and-writers",
       "claimKind": "navigation",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:20@2026-10-14",
-      "rationale": "Frozen root map assigns docs/transitional-switchboard.md#4-resolution-algorithm-for-readers-and-writers to docs/platform/documentation/switchboard.md#4-resolution-algorithm-for-readers-and-writers. Carry the complete unit into its candidate switchboard doc owner. This unit includes 2 documented link spelling adjustment(s): [docs/platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) becomes [docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md) (Relative spelling changes only; original repository destination conserved.); [docs/platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) becomes [docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change.",
-      "reviewNote": "Section 4 resolution-algorithm heading (src 90, tgt 89): payload differs only by the one link [migration-authoring-rules](platform/migration-authoring-rules.md) -> (../migration-authoring-rules.md), both resolve to docs/platform/migration-authoring-rules.md (my path-normalising diff gives equal text). Rationale says 2 adjustments but the unit has 1; tool-generated listing repeats it, a count nit not a conservation defect.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-mapped-root-conservation-04.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:25@2026-10-14",
+      "rationale": "Frozen root map assigns docs/transitional-switchboard.md#4-resolution-algorithm-for-readers-and-writers to docs/platform/documentation/switchboard.md#4-resolution-algorithm-for-readers-and-writers. Carry the complete unit into its candidate switchboard doc owner. This unit includes 1 documented link spelling adjustment(s): [docs/platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) becomes [docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change.",
       "targetUnitDigest": "223371878b16c2d9f46034406f6367f06e028bf62ab898f631e939c96fa3b0cb",
       "targetAncestry": [
         "Transitional Documentation Authority Switchboard"
-      ],
-      "reviewReportCommit": "729bea7588017b285553332d838543bedecd2605"
+      ]
     },
     {
       "claimId": "claim_be508003873ccd504ecddda670e9bb48",
@@ -4875,19 +4864,13 @@
       "targetAnchor": "5-related-files",
       "claimKind": "navigation",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:20@2026-10-14",
-      "rationale": "Frozen root map assigns docs/transitional-switchboard.md#5-related-files to docs/platform/documentation/switchboard.md#5-related-files. Carry the complete unit into its candidate switchboard doc owner. This unit includes 7 documented link spelling adjustment(s): [docs/platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) becomes [docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md) (Relative spelling changes only; original repository destination conserved.); [docs/reading-map.md](reading-map.md) becomes [docs/reading-map.md](../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [docs/platform/README.md](platform/README.md) becomes [docs/platform/README.md](../README.md) (Relative spelling changes only; original repository destination conserved.); [docs/doc-governance.md](doc-governance.md) becomes [docs/doc-governance.md](../../doc-governance.md) (Relative spelling changes only; original repository destination conserved.); [docs/platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) becomes [docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md) (Relative spelling changes only; original repository destination conserved.); [plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) becomes [plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../../../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) (Relative spelling changes only; original repository destination conserved.); [plans/260925-documentation-authority-unification/plan.md](../plans/260925-documentation-authority-unification/plan.md) becomes [plans/260925-documentation-authority-unification/plan.md](../../../plans/260925-documentation-authority-unification/plan.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change.",
-      "reviewNote": "Section 5 related-files heading (src 110, tgt 109): six table links respelled (reading-map, platform/README, doc-governance, migration-authoring-rules, two plans/ paths); all six resolve to the same repo files, rest byte-equal; hand-recomputed digests match (seeded sample). Rationale says 7 adjustments, unit has 6 (the extra is the block 6 link), count nit.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-mapped-root-conservation-04.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:25@2026-10-14",
+      "rationale": "Frozen root map assigns docs/transitional-switchboard.md#5-related-files to docs/platform/documentation/switchboard.md#5-related-files. Carry the complete unit into its candidate switchboard doc owner. This unit includes 6 documented link spelling adjustment(s): [docs/reading-map.md](reading-map.md) becomes [docs/reading-map.md](../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [docs/platform/README.md](platform/README.md) becomes [docs/platform/README.md](../README.md) (Relative spelling changes only; original repository destination conserved.); [docs/doc-governance.md](doc-governance.md) becomes [docs/doc-governance.md](../../doc-governance.md) (Relative spelling changes only; original repository destination conserved.); [docs/platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) becomes [docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md) (Relative spelling changes only; original repository destination conserved.); [plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) becomes [plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../../../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) (Relative spelling changes only; original repository destination conserved.); [plans/260925-documentation-authority-unification/plan.md](../plans/260925-documentation-authority-unification/plan.md) becomes [plans/260925-documentation-authority-unification/plan.md](../../../plans/260925-documentation-authority-unification/plan.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change.",
       "targetUnitDigest": "2d0fdc58ccca8953ac6055bbba12e78356832d27d4750032b8b336c46ab5566d",
       "targetAncestry": [
         "Transitional Documentation Authority Switchboard"
-      ],
-      "reviewReportCommit": "729bea7588017b285553332d838543bedecd2605"
+      ]
     },
     {
       "claimId": "claim_e5cc66ff5930f04b7ebd9a8acbc52942",
