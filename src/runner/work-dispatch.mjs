@@ -6,13 +6,16 @@
 // executor, capability hints, agent type and prompt from the item's Workflow
 // step, then calls dispatch's generic building blocks.
 
+import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { resolveTaskSpecPath } from './paths.mjs';
+import { resolveTaskSpecPath, resolveContentRoot } from './paths.mjs';
 import { loadAgentDefs, readTaskSpecHeader } from './agent-roster.mjs';
 import { selectTemplate, hashTemplate } from './prompt-templates.mjs';
 import { RunnerConfigError } from './dispatch/config.mjs';
-import { resolveStrongerRigor } from './rigor.mjs';
+import { resolveStrongerRigor, RIGOR_VALUES } from './rigor.mjs';
+import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
+import { deriveOperationCapability } from './operation-capability.mjs';
 import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily } from './dispatch/resolve.mjs';
 import { resolveExecutorCommand, DispatchError } from './dispatch/transport.mjs';
 import { executeThroughConfinement, buildConfinementAttestation } from './dispatch/confinement/authority.mjs';
@@ -24,7 +27,7 @@ import {
   strayWriteWarning,
 } from './dispatch/cli.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHints, buildPrompt } from './work-compat.mjs';
-import { getDomain, resolveDomainName, effectiveStep, bundleForStep } from '../state/domain-registry.mjs';
+import { getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';
 import { listWork } from '../state/store.mjs';
 
 /**
@@ -315,5 +318,155 @@ export function workDispatchContext({ work, stage, cwd, executorId } = {}) {
     work,
     capabilityHints: workCapabilityHints({ work, stage, executorId }),
     agentType: work ? resolveAgentTypeForWork(work, cwd, stage) : null,
+  };
+}
+
+/**
+ * The Unit rigor a Work item demands, before the lower layer applies its own floors
+ * (capability rigor, Unit tier override, `maxTier`). Same order as the assignment policy:
+ * the operation's own rigor comes first, the item's `rigor` then only raises it, and
+ * `risk: heavy` reads as `high` only when the item declares no `rigor`. `undefined` when
+ * nothing explicit applies, so the lower layer's default stands.
+ */
+export function workRigorFor(work, opPolicy) {
+  const checked = (value, label) => {
+    if (!RIGOR_VALUES.includes(value)) {
+      throw new RunnerConfigError(`invalid ${label} rigor "${value}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
+    }
+    return value;
+  };
+  let rigor = opPolicy?.rigor !== undefined ? checked(opPolicy.rigor, 'operation') : undefined;
+  const raise = (next) => { rigor = rigor === undefined ? next : resolveStrongerRigor(rigor, next); };
+  if (work?.rigor !== undefined) raise(checked(work.rigor, 'work'));
+  else if (work?.risk === 'heavy') raise('high');
+  return rigor;
+}
+
+// Same section buildPrompt renders into the worker prompt, for an operation Unit whose
+// prompt the dispatch side renders from the operation's contract template.
+function feedbackLines(feedback) {
+  const answer = typeof feedback?.answer === 'string' && feedback.answer.trim() ? feedback.answer : null;
+  const reason = typeof feedback?.reason === 'string' && feedback.reason.trim() ? feedback.reason : null;
+  const lines = [];
+  if (answer) lines.push(`Human answer (binding decision):\n${answer}`);
+  if (reason) lines.push(`Latest human rejection/park reason (fix THIS before anything else):\n${reason}`);
+  return lines.length ? `\n\n# Human feedback\n${lines.join('\n\n')}` : '';
+}
+
+function isSafeRepoRelative(ref) {
+  return typeof ref === 'string' && ref.trim() !== '' && !ref.startsWith('/')
+    && !ref.includes('\\') && !ref.includes('\0') && !ref.split('/').includes('..');
+}
+
+/**
+ * The single place a Work item becomes Unit data for `runUnit`.
+ *
+ * Without `operation` this is a step Unit (the runner loop's worker): its objective is the
+ * worker prompt and it is mutating. With `operation` it is an operation Unit (a driver
+ * step such as `validate-plan`): its objective names the operation, whose prompt the
+ * dispatch side renders from the contract template; `declared` carries the operation
+ * semantics and `pinInputs` the absolute files whose bytes the verdict is bound to.
+ *
+ * `inputs` stay repo-relative; the worker reads them relative to `worktree`. A read-only
+ * operation Unit defaults to running where the item's locked plan lives
+ * (`resolveContentRoot`). A mutating Unit needs the caller's worktree.
+ *
+ * Transport and session stay the caller's choice; nothing here decides them.
+ *
+ * @param {object} item  Work item
+ * @param {{ cfg?: object, stateRoot?: string, stage?: string, operation?: string,
+ *   feedback?: {answer?: string, reason?: string}, expectedFiles?: string[], worktree?: string }} [opts]
+ * @returns {{ unitData: object, declared?: object, pinInputs?: string[], worktree: string, warnings: string[] }}
+ */
+export function workUnitFor(item, opts = {}) {
+  const { cfg = {}, stateRoot, operation, feedback, expectedFiles } = opts;
+  const warnings = [];
+  const domain = resolveDomainName(item?.domain);
+  const domainObj = getDomain(item?.domain, { onUnrecognized: () => {} });
+  const stage = opts.stage ?? effectiveStep(item ?? {}, domainObj);
+
+  let matchedOp;
+  let operations;
+  let mutating = true;
+  if (operation !== undefined) {
+    operations = operationsForStep(domainObj, stage, item?.kind);
+    matchedOp = operations.find((op) => op.id === operation);
+    if (!matchedOp) {
+      throw new RunnerConfigError(`operation "${operation}" is not declared at step "${stage}" for work "${item?.id}".`);
+    }
+    mutating = stampDeclaredAssignment({ role: matchedOp.role, operation }).mutation === 'mutating';
+  }
+
+  const executorId = executorIdForWork(item, stage);
+  const resolved = executorId ? resolveExecutorAndOverrides(cfg, executorId) : { configured: false };
+  const stepCapability = resolveCapabilityIdentityDetails({
+    cfg, work: item, stage, executorId, resolvedExecutor: resolved.executor,
+  }).capability;
+  let capability = stepCapability;
+  if (matchedOp) {
+    const resultKind = stampDeclaredAssignment({ role: matchedOp.role, operation }).resultKind;
+    capability = deriveOperationCapability(
+      { ...matchedOp, result: matchedOp.result ?? { kind: resultKind } },
+      { domain },
+      cfg,
+    ).name ?? stepCapability;
+  }
+
+  const inputs = [];
+  const addInput = (ref) => {
+    if (!isSafeRepoRelative(ref)) {
+      warnings.push(`work-ref-skipped: ${JSON.stringify(ref)} is not a repo-relative path`);
+      return;
+    }
+    if (!inputs.includes(ref)) inputs.push(ref);
+  };
+  const docsRef = typeof item?.docsRef === 'string' && item.docsRef.trim() ? item.docsRef : null;
+  if (docsRef) {
+    addInput(docsRef);
+    addInput(path.posix.join(docsRef, 'plan.md'));
+    addInput(path.posix.join(docsRef, 'CONTEXT.md'));
+  }
+  for (const ref of Array.isArray(item?.refs) ? item.refs : []) addInput(ref);
+
+  let worktree = opts.worktree;
+  let pinInputs;
+  if (matchedOp) {
+    if (!stateRoot) throw new RunnerConfigError('workUnitFor: an operation Unit needs stateRoot.');
+    const contentRoot = docsRef ? resolveContentRoot(stateRoot, item.id, docsRef) : stateRoot;
+    const planPath = docsRef ? path.join(contentRoot, docsRef, 'plan.md') : null;
+    pinInputs = planPath && fs.existsSync(planPath) ? [planPath] : [];
+    if (!mutating) worktree ??= contentRoot;
+  }
+  if (!worktree) {
+    throw new RunnerConfigError(`workUnitFor: a mutating Unit for work "${item?.id}" needs the caller's worktree.`);
+  }
+
+  const writes = !mutating ? [] : (Array.isArray(expectedFiles) && expectedFiles.length ? [...expectedFiles] : ['**']);
+  const rigor = workRigorFor(item, matchedOp?.policy);
+  const preferId = resolved.configured && cfg.executors?.[resolved.executorId] ? resolved.executorId : null;
+  const idTail = String(operation ?? stage);
+  const unitId = `work-${item?.id}-${idTail}`.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/-+/g, '-').replace(/-$/, '');
+
+  const unitData = {
+    id: unitId,
+    objective: matchedOp
+      ? `Execute ${stage}.${operation} operation${feedbackLines(feedback)}`
+      : buildPrompt(item, feedback, opts.stage),
+    capability,
+    writes,
+    inputs,
+    pattern: 'solo',
+    ...(rigor !== undefined ? { rigor } : {}),
+    ...(preferId ? { prefer: [preferId] } : {}),
+  };
+
+  const workflow = item?.workflow
+    ?? (item?.kind !== undefined ? domainObj?.workflowFor?.[item.kind] : undefined)
+    ?? domainObj?.defaultWorkflow;
+  return {
+    unitData,
+    ...(matchedOp ? { declared: { workId: item.id, domain, workflow, stage, operation, operations }, pinInputs } : {}),
+    worktree,
+    warnings,
   };
 }
