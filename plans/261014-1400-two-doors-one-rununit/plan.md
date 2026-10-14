@@ -13,7 +13,11 @@ created: 2026-10-14
 
 ## Trạng thái
 
-pending (2026-10-14, bản sửa 2 sau validate + red-team). Chỉ là tài liệu plan, chưa có code. Lead: phiên điều phối; owner: anh vantt.
+M1 đóng 2026-10-14 19:30. M2 đang chạy. Lead: phiên điều phối; owner: anh vantt.
+
+- M1 = đợt A-E, cộng hai lane ngoài phase (gitparse, các fix khoá resume / pin persona / invocation `prefer` của Lead).
+- Cổng G-M1: [gate-m1-261014-1857](reports/gate-m1-261014-1857.md); ca 2 và ca 8 đổi kỳ vọng (mục để ngỏ). Ma trận provider 6/6 sau khi Lead thêm provider `deepseek` vào `~/.fgos/config.json` (owner cho phép; backup `config.json.bak-20261014-deepseek`).
+- Mốc E: activate `sha256:0f0d988e…` từ main `b78c0019c`, `previousArtifactDigest` `sha256:bbea6dba…`. Qua `fgos` trần: doctor có `active-release-matches-checkout` và `runner-generated-paths` đạt (10 check đỏ có từ trước, không do release); one-liner đọc `unit-run-1791980280110-d94db2c6` pass; preset `group-cognition --seats` `wf-run-1791980326757-126e4fc8` pass.
 
 ## Nguồn và quyết định đã chốt
 
