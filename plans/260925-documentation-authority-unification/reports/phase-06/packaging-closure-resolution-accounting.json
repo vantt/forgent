@@ -1,0 +1,552 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:12@2026-10-14",
+  "beforeCommit": "492877ab9",
+  "contentCommit": "cfd4cffc17caae2e4b28417487f967f35ebae845",
+  "knownBefore": 94333,
+  "knownAfter": 94338,
+  "noKnownIdLost": true,
+  "changedStableTuples": [
+    {
+      "claimId": "claim_2ae4c5c63621e9fe8e2c14021ee4a5f7",
+      "before": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+        "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee"
+      ],
+      "after": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+        "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07"
+      ]
+    },
+    {
+      "claimId": "claim_a0f184bc39b573f0b4bf0ba469d68d2a",
+      "before": [
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "installed-default-and-npm-compatibility",
+        "a77dc7f6b7b1dd819a751579a1de6e718e80e669ef146fdcd10d0f66e6c821e4"
+      ],
+      "after": [
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "installed-default-and-npm-compatibility",
+        "6c803388a11379425a5ae5f98e4415b833183eee7167ae61592ede96818922c7"
+      ]
+    },
+    {
+      "claimId": "claim_e6538fb192303f7d4fdf1e00c0d3aa18",
+      "before": [
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "proposed-disposition",
+        "b1ec345e0756e842dfa086f9c4ef0110dca6a04da2c95d9139cb11186688c3a2"
+      ],
+      "after": [
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "proposed-disposition",
+        "0c4a1e10db283e13eb9bebdeb53fe11b94ffb80f609ae4f21cdb08021ec64e4f"
+      ]
+    },
+    {
+      "claimId": "claim_76e368f9914b86f0de7fcef41386b8d7",
+      "before": [
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "unheaded-block-4",
+        "a513eb7c42ddbdd4384e1aa33225568a3f0591a9dc433b435bc578a6acc9d972"
+      ],
+      "after": [
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "unheaded-block-5",
+        "a513eb7c42ddbdd4384e1aa33225568a3f0591a9dc433b435bc578a6acc9d972"
+      ]
+    }
+  ],
+  "newNativeIds": [
+    {
+      "claimId": "claim_fc0f66b40d62145f2477fd6ee8583083",
+      "tuple": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "unheaded-block-24",
+        "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17"
+      ],
+      "shown": {
+        "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "unheaded-block-24",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Architecture: Release Boundaries",
+          "Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea"
+        ],
+        "unitDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17",
+        "shownText": "**Checked status:** Superseded by decision (owner F6 resolution, 2026-10-14): the installed-default npm `bin.fgos` removal trigger has the 2026-09-15 coordinator 30-day window as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; compatibility-window row above, originally line 35). The Rust host is the installed default from preview; the deprecated Node fallback is supported for 30 calendar days after preview publication, earliest removal 2026-10-18. Removing or redirecting `bin.fgos` after the window remains owed to Packaging-distribution (release-owner decision). The original clause below is retained verbatim as dated design. The runner mapping and source-entry ownership header stay; nothing is removed now.",
+        "shownTextDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17"
+      }
+    },
+    {
+      "claimId": "claim_0f7171f953dad3169ab775d68929c99f",
+      "tuple": [
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "unheaded-block-1",
+        "31f20682351c4c470babfddbbf18a71a32190c071d4f6ae659725b6cfcf84dd0"
+      ],
+      "shown": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility"
+        ],
+        "unitDigest": "31f20682351c4c470babfddbbf18a71a32190c071d4f6ae659725b6cfcf84dd0",
+        "shownText": "```txt\nDocument type: Decision\nAudience: Release owner, maintainer and independent reviewer\nPurpose: Record the owner-decided successor to the installed-default npm entry trigger and the owed removal obligation\nDesign status: Candidate\nImplementation: Owner-decided successor; end-of-window removal or redirect remains owed\nProvenance: dropped-010; original legacy-cli-transition.md obligation and current ownership boundary\nWriter type: Human + agent coauthor\nCanonical: No\nCanonical for: Candidate record of the owner F6 resolution and remaining Packaging-distribution obligation\nUse this when: Reading the successor window and the owed end-of-window removal or redirect\nDo not use this for: Claiming removal is implemented, extending release support, or an authority cutover\nLast reviewed: Owner resolution 2026-10-14; conservation representation pending independent review\nRelated:\n- docs/platform/packaging-distribution/spec.md\nSupersedes: The automatic installed-default npm bin.fgos removal trigger, by the owner F6 resolution\nSuperseded by: None recorded\n```",
+        "shownTextDigest": "31f20682351c4c470babfddbbf18a71a32190c071d4f6ae659725b6cfcf84dd0"
+      }
+    },
+    {
+      "claimId": "claim_83454fd935b1f1f26a4b130576cc2471",
+      "tuple": [
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "unheaded-block-3",
+        "4d3bba9687d0eddb7182380f864742235de0aecae298039ad72043d97098fa14"
+      ],
+      "shown": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility",
+          "Proposed Disposition"
+        ],
+        "unitDigest": "4d3bba9687d0eddb7182380f864742235de0aecae298039ad72043d97098fa14",
+        "shownText": "Added in candidate — owner F6 resolution (2026-10-14): **superseded by decision**. The automatic installed-default removal or redirection trigger for npm `bin.fgos` has the 2026-09-15 coordinator decision as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; `docs/platform/host-invocation-routing/architecture/release-boundaries.md:35`). The Rust host is the installed default from the preview; the Node fallback is deprecated and supported for 30 calendar days after preview publication, earliest removal 2026-10-18.",
+        "shownTextDigest": "4d3bba9687d0eddb7182380f864742235de0aecae298039ad72043d97098fa14"
+      }
+    },
+    {
+      "claimId": "claim_b17ddf847a3ee8b85d9e962e0350a26d",
+      "tuple": [
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "unheaded-block-4",
+        "83cd96cfb781feb154abc4afd7b34b45cab68e62e77788622955e964629399aa"
+      ],
+      "shown": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-4",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility",
+          "Proposed Disposition"
+        ],
+        "unitDigest": "83cd96cfb781feb154abc4afd7b34b45cab68e62e77788622955e964629399aa",
+        "shownText": "Removing or redirecting `bin.fgos` after the window remains an **owed obligation owned by Packaging-distribution (release-owner decision)**. Nothing is removed now. The runner mapping and source-entry ownership header stay; this resolution does not extend the support promise.",
+        "shownTextDigest": "83cd96cfb781feb154abc4afd7b34b45cab68e62e77788622955e964629399aa"
+      }
+    },
+    {
+      "claimId": "claim_7a7a5547e9add84006789d592a9528b3",
+      "tuple": [
+        "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "unheaded-block-6",
+        "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b"
+      ],
+      "shown": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-6",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility",
+          "Proposed Disposition"
+        ],
+        "unitDigest": "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b",
+        "shownText": "The rationale is **superseded by decision**: the same-day ownership header and the dated coordinator window show intentional coexistence. The coordinator window supersedes the automatic installed-default trigger; absence of a removal commit is not the retirement rationale. The original obligation remains preserved verbatim above and at the resolved retention anchor in `docs/platform/host-invocation-routing/architecture/release-boundaries.md`. The end-of-window removal or redirect remains owed to Packaging-distribution.",
+        "shownTextDigest": "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b"
+      }
+    }
+  ],
+  "changedNativeUnits": [
+    {
+      "beforeClaimId": "claim_a0f184bc39b573f0b4bf0ba469d68d2a",
+      "afterClaimId": "claim_a0f184bc39b573f0b4bf0ba469d68d2a",
+      "before": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "installed-default-and-npm-compatibility",
+        "unitKind": "heading",
+        "ancestry": [],
+        "unitDigest": "a77dc7f6b7b1dd819a751579a1de6e718e80e669ef146fdcd10d0f66e6c821e4",
+        "shownText": "# Installed Default And npm Compatibility\n\n```txt\nDocument type: Decision\nAudience: Release owner, maintainer and independent reviewer\nPurpose: Propose the disposition of the retained installed-default npm entry obligation\nDesign status: Candidate\nImplementation: Proposed retirement of a dated trigger clause; no retirement is approved here\nProvenance: dropped-010; original legacy-cli-transition.md obligation and current ownership boundary\nWriter type: Human + agent coauthor\nCanonical: No\nCanonical for: The pending decision proposal only\nUse this when: Reviewing the original installed-default trigger against the retained npm compatibility channel\nDo not use this for: Removing npm entries, changing release support, or treating the proposal as accepted\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/packaging-distribution/spec.md\nSupersedes: None until independent verdict\nSuperseded by: None recorded\n```",
+        "shownTextDigest": "1ac83e4cef56391fcf15d97cc5ce09eb1f8f2b7b565bf7c31d234e691cd0e79e"
+      },
+      "after": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "installed-default-and-npm-compatibility",
+        "unitKind": "heading",
+        "ancestry": [],
+        "unitDigest": "6c803388a11379425a5ae5f98e4415b833183eee7167ae61592ede96818922c7",
+        "shownText": "# Installed Default And npm Compatibility\n\n```txt\nDocument type: Decision\nAudience: Release owner, maintainer and independent reviewer\nPurpose: Record the owner-decided successor to the installed-default npm entry trigger and the owed removal obligation\nDesign status: Candidate\nImplementation: Owner-decided successor; end-of-window removal or redirect remains owed\nProvenance: dropped-010; original legacy-cli-transition.md obligation and current ownership boundary\nWriter type: Human + agent coauthor\nCanonical: No\nCanonical for: Candidate record of the owner F6 resolution and remaining Packaging-distribution obligation\nUse this when: Reading the successor window and the owed end-of-window removal or redirect\nDo not use this for: Claiming removal is implemented, extending release support, or an authority cutover\nLast reviewed: Owner resolution 2026-10-14; conservation representation pending independent review\nRelated:\n- docs/platform/packaging-distribution/spec.md\nSupersedes: The automatic installed-default npm bin.fgos removal trigger, by the owner F6 resolution\nSuperseded by: None recorded\n```",
+        "shownTextDigest": "20fb5222a1a92b2a6a978a73b5bc85f982e38ffdb474bfb52d3ea182989d679a"
+      }
+    },
+    {
+      "beforeClaimId": "claim_743f0b70132cc6fda8271214be7c061a",
+      "afterClaimId": "claim_0f7171f953dad3169ab775d68929c99f",
+      "before": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility"
+        ],
+        "unitDigest": "ffc24cb21beb67e859d84f86ef48e47a78b8c3e678c78823abd7be210cbd1a2c",
+        "shownText": "```txt\nDocument type: Decision\nAudience: Release owner, maintainer and independent reviewer\nPurpose: Propose the disposition of the retained installed-default npm entry obligation\nDesign status: Candidate\nImplementation: Proposed retirement of a dated trigger clause; no retirement is approved here\nProvenance: dropped-010; original legacy-cli-transition.md obligation and current ownership boundary\nWriter type: Human + agent coauthor\nCanonical: No\nCanonical for: The pending decision proposal only\nUse this when: Reviewing the original installed-default trigger against the retained npm compatibility channel\nDo not use this for: Removing npm entries, changing release support, or treating the proposal as accepted\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/packaging-distribution/spec.md\nSupersedes: None until independent verdict\nSuperseded by: None recorded\n```",
+        "shownTextDigest": "ffc24cb21beb67e859d84f86ef48e47a78b8c3e678c78823abd7be210cbd1a2c"
+      },
+      "after": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility"
+        ],
+        "unitDigest": "31f20682351c4c470babfddbbf18a71a32190c071d4f6ae659725b6cfcf84dd0",
+        "shownText": "```txt\nDocument type: Decision\nAudience: Release owner, maintainer and independent reviewer\nPurpose: Record the owner-decided successor to the installed-default npm entry trigger and the owed removal obligation\nDesign status: Candidate\nImplementation: Owner-decided successor; end-of-window removal or redirect remains owed\nProvenance: dropped-010; original legacy-cli-transition.md obligation and current ownership boundary\nWriter type: Human + agent coauthor\nCanonical: No\nCanonical for: Candidate record of the owner F6 resolution and remaining Packaging-distribution obligation\nUse this when: Reading the successor window and the owed end-of-window removal or redirect\nDo not use this for: Claiming removal is implemented, extending release support, or an authority cutover\nLast reviewed: Owner resolution 2026-10-14; conservation representation pending independent review\nRelated:\n- docs/platform/packaging-distribution/spec.md\nSupersedes: The automatic installed-default npm bin.fgos removal trigger, by the owner F6 resolution\nSuperseded by: None recorded\n```",
+        "shownTextDigest": "31f20682351c4c470babfddbbf18a71a32190c071d4f6ae659725b6cfcf84dd0"
+      }
+    },
+    {
+      "beforeClaimId": "claim_e6538fb192303f7d4fdf1e00c0d3aa18",
+      "afterClaimId": "claim_e6538fb192303f7d4fdf1e00c0d3aa18",
+      "before": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "proposed-disposition",
+        "unitKind": "heading",
+        "ancestry": [
+          "Installed Default And npm Compatibility"
+        ],
+        "unitDigest": "b1ec345e0756e842dfa086f9c4ef0110dca6a04da2c95d9139cb11186688c3a2",
+        "shownText": "## Proposed Disposition\n\nAdded in candidate — propose retirement of the automatic installed-default removal or redirection trigger. Keep the npm compatibility mapping, runner mapping and source-entry ownership header under their existing support and release policy. This does not decide when the npm fallback channel ends, extend its support promise, or remove a payload.\n\nThe current `package.json:9-12` maps both npm entries to the Node payload. `bin/fgos.mjs:4-10` expressly retains global npm and direct Node compatibility channels while requiring Rust host payload resolution through manifest fields. The source obligation was introduced by `4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f`; the implementation header added by `c831811faaa0be93f505456aae6a134865ccbc9b` explicitly retained npm compatibility and did not remove that mapping. The candidate spec distinguishes the native public/default posture from the deprecated npm channel.\n\nThe current code proves coexistence, not intentional retirement of the original obligation. No commit explicitly retiring the trigger was found by the recorded symbol/history search. Independent review must decide whether this proposal becomes a retirement verdict or whether a restoration remains owed. Until that verdict, dropped-010 stays deferred to Packaging-distribution and its FLAGGED-obsolete literal retention is unchanged.",
+        "shownTextDigest": "fd9c92a3a1bd2b50533a4763eaa00363205e5a7619b208637ec875fb33ad972d"
+      },
+      "after": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "proposed-disposition",
+        "unitKind": "heading",
+        "ancestry": [
+          "Installed Default And npm Compatibility"
+        ],
+        "unitDigest": "0c4a1e10db283e13eb9bebdeb53fe11b94ffb80f609ae4f21cdb08021ec64e4f",
+        "shownText": "## Proposed Disposition\n\nAdded in candidate — owner F6 resolution (2026-10-14): **superseded by decision**. The automatic installed-default removal or redirection trigger for npm `bin.fgos` has the 2026-09-15 coordinator decision as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; `docs/platform/host-invocation-routing/architecture/release-boundaries.md:35`). The Rust host is the installed default from the preview; the Node fallback is deprecated and supported for 30 calendar days after preview publication, earliest removal 2026-10-18.\n\nRemoving or redirecting `bin.fgos` after the window remains an **owed obligation owned by Packaging-distribution (release-owner decision)**. Nothing is removed now. The runner mapping and source-entry ownership header stay; this resolution does not extend the support promise.\n\nThe current `package.json:9-12` maps both npm entries to the Node payload. `bin/fgos.mjs:4-10` expressly retains global npm and direct Node compatibility channels while requiring Rust host payload resolution through manifest fields. The source obligation was introduced by `4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f`; the implementation header added by `c831811faaa0be93f505456aae6a134865ccbc9b` explicitly retained npm compatibility and did not remove that mapping. The candidate spec distinguishes the native public/default posture from the deprecated npm channel.\n\nThe rationale is **superseded by decision**: the same-day ownership header and the dated coordinator window show intentional coexistence. The coordinator window supersedes the automatic installed-default trigger; absence of a removal commit is not the retirement rationale. The original obligation remains preserved verbatim above and at the resolved retention anchor in `docs/platform/host-invocation-routing/architecture/release-boundaries.md`. The end-of-window removal or redirect remains owed to Packaging-distribution.",
+        "shownTextDigest": "fb4815b1548bde1adba608f338c0690b18b5e9bc55a3084217993cbc9b2eb250"
+      }
+    },
+    {
+      "beforeClaimId": "claim_34de7c299044ca3ebf49837a0ef7f3bb",
+      "afterClaimId": "claim_83454fd935b1f1f26a4b130576cc2471",
+      "before": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility",
+          "Proposed Disposition"
+        ],
+        "unitDigest": "8c825fbfc4345283bc92771c4af94d6a38ff5e2b75e2b7097d29267f7d882769",
+        "shownText": "Added in candidate — propose retirement of the automatic installed-default removal or redirection trigger. Keep the npm compatibility mapping, runner mapping and source-entry ownership header under their existing support and release policy. This does not decide when the npm fallback channel ends, extend its support promise, or remove a payload.",
+        "shownTextDigest": "8c825fbfc4345283bc92771c4af94d6a38ff5e2b75e2b7097d29267f7d882769"
+      },
+      "after": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility",
+          "Proposed Disposition"
+        ],
+        "unitDigest": "4d3bba9687d0eddb7182380f864742235de0aecae298039ad72043d97098fa14",
+        "shownText": "Added in candidate — owner F6 resolution (2026-10-14): **superseded by decision**. The automatic installed-default removal or redirection trigger for npm `bin.fgos` has the 2026-09-15 coordinator decision as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; `docs/platform/host-invocation-routing/architecture/release-boundaries.md:35`). The Rust host is the installed default from the preview; the Node fallback is deprecated and supported for 30 calendar days after preview publication, earliest removal 2026-10-18.",
+        "shownTextDigest": "4d3bba9687d0eddb7182380f864742235de0aecae298039ad72043d97098fa14"
+      }
+    },
+    {
+      "beforeClaimId": "claim_76e368f9914b86f0de7fcef41386b8d7",
+      "afterClaimId": "claim_76e368f9914b86f0de7fcef41386b8d7",
+      "before": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-4",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility",
+          "Proposed Disposition"
+        ],
+        "unitDigest": "a513eb7c42ddbdd4384e1aa33225568a3f0591a9dc433b435bc578a6acc9d972",
+        "shownText": "The current `package.json:9-12` maps both npm entries to the Node payload. `bin/fgos.mjs:4-10` expressly retains global npm and direct Node compatibility channels while requiring Rust host payload resolution through manifest fields. The source obligation was introduced by `4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f`; the implementation header added by `c831811faaa0be93f505456aae6a134865ccbc9b` explicitly retained npm compatibility and did not remove that mapping. The candidate spec distinguishes the native public/default posture from the deprecated npm channel.",
+        "shownTextDigest": "a513eb7c42ddbdd4384e1aa33225568a3f0591a9dc433b435bc578a6acc9d972"
+      },
+      "after": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility",
+          "Proposed Disposition"
+        ],
+        "unitDigest": "a513eb7c42ddbdd4384e1aa33225568a3f0591a9dc433b435bc578a6acc9d972",
+        "shownText": "The current `package.json:9-12` maps both npm entries to the Node payload. `bin/fgos.mjs:4-10` expressly retains global npm and direct Node compatibility channels while requiring Rust host payload resolution through manifest fields. The source obligation was introduced by `4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f`; the implementation header added by `c831811faaa0be93f505456aae6a134865ccbc9b` explicitly retained npm compatibility and did not remove that mapping. The candidate spec distinguishes the native public/default posture from the deprecated npm channel.",
+        "shownTextDigest": "a513eb7c42ddbdd4384e1aa33225568a3f0591a9dc433b435bc578a6acc9d972"
+      }
+    },
+    {
+      "beforeClaimId": "claim_d301f741817cf5afb1da6637ea19c3c7",
+      "afterClaimId": "claim_7a7a5547e9add84006789d592a9528b3",
+      "before": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility",
+          "Proposed Disposition"
+        ],
+        "unitDigest": "6587193ed55d77e09a42126a76fde7bb74560bb4d554440f4b09983a4fc8fc00",
+        "shownText": "The current code proves coexistence, not intentional retirement of the original obligation. No commit explicitly retiring the trigger was found by the recorded symbol/history search. Independent review must decide whether this proposal becomes a retirement verdict or whether a restoration remains owed. Until that verdict, dropped-010 stays deferred to Packaging-distribution and its FLAGGED-obsolete literal retention is unchanged.",
+        "shownTextDigest": "6587193ed55d77e09a42126a76fde7bb74560bb4d554440f4b09983a4fc8fc00"
+      },
+      "after": {
+        "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+        "anchor": "unheaded-block-6",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Installed Default And npm Compatibility",
+          "Proposed Disposition"
+        ],
+        "unitDigest": "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b",
+        "shownText": "The rationale is **superseded by decision**: the same-day ownership header and the dated coordinator window show intentional coexistence. The coordinator window supersedes the automatic installed-default trigger; absence of a removal commit is not the retirement rationale. The original obligation remains preserved verbatim above and at the resolved retention anchor in `docs/platform/host-invocation-routing/architecture/release-boundaries.md`. The end-of-window removal or redirect remains owed to Packaging-distribution.",
+        "shownTextDigest": "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b"
+      }
+    },
+    {
+      "beforeClaimId": "claim_2ae4c5c63621e9fe8e2c14021ee4a5f7",
+      "afterClaimId": "claim_2ae4c5c63621e9fe8e2c14021ee4a5f7",
+      "before": {
+        "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+        "unitKind": "heading",
+        "ancestry": [
+          "Architecture: Release Boundaries"
+        ],
+        "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee",
+        "shownText": "## Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea\n\nAdded in candidate: verbatim restoration of `docs/architect/host-invocation-routing/legacy-cli-transition.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`; preservation is not a fresh implementation claim.\n\n**Checked status:** FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed.\n\n**Code evidence:** `package.json:9-12`; `bin/fgos.mjs:1-10`.\n\n````md\n`package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` stays until the runner migrates. A header in `bin/fgos.mjs` and the root `AGENTS.md` state the ownership rule for editors already at that path.\n````",
+        "shownTextDigest": "dc30e096fad099c495846dc6cb686974a13ca165f5c18bbea7fa12097e1e99e7"
+      },
+      "after": {
+        "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+        "unitKind": "heading",
+        "ancestry": [
+          "Architecture: Release Boundaries"
+        ],
+        "unitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07",
+        "shownText": "## Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea\n\nAdded in candidate: verbatim restoration of `docs/architect/host-invocation-routing/legacy-cli-transition.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`; preservation is not a fresh implementation claim.\n\n**Checked status:** Superseded by decision (owner F6 resolution, 2026-10-14): the installed-default npm `bin.fgos` removal trigger has the 2026-09-15 coordinator 30-day window as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; compatibility-window row above, originally line 35). The Rust host is the installed default from preview; the deprecated Node fallback is supported for 30 calendar days after preview publication, earliest removal 2026-10-18. Removing or redirecting `bin.fgos` after the window remains owed to Packaging-distribution (release-owner decision). The original clause below is retained verbatim as dated design. The runner mapping and source-entry ownership header stay; nothing is removed now.\n\n**Code evidence:** `package.json:9-12`; `bin/fgos.mjs:1-10`.\n\n````md\n`package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` stays until the runner migrates. A header in `bin/fgos.mjs` and the root `AGENTS.md` state the ownership rule for editors already at that path.\n````",
+        "shownTextDigest": "5164dfe6fa9e549755e91abe839c8d2813fff0fe80628ca1c3bb8ef9ec31381a"
+      }
+    },
+    {
+      "beforeClaimId": "claim_9f0812f083e5ff3bac32d3e50e024b88",
+      "afterClaimId": "claim_fc0f66b40d62145f2477fd6ee8583083",
+      "before": {
+        "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "unheaded-block-24",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Architecture: Release Boundaries",
+          "Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea"
+        ],
+        "unitDigest": "d348c7aff00a8cbe0fd6cbff45013ccc9cff3699df7a7ab14b985bbb73ba5ccf",
+        "shownText": "**Checked status:** FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed.",
+        "shownTextDigest": "d348c7aff00a8cbe0fd6cbff45013ccc9cff3699df7a7ab14b985bbb73ba5ccf"
+      },
+      "after": {
+        "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "unheaded-block-24",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Architecture: Release Boundaries",
+          "Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea"
+        ],
+        "unitDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17",
+        "shownText": "**Checked status:** Superseded by decision (owner F6 resolution, 2026-10-14): the installed-default npm `bin.fgos` removal trigger has the 2026-09-15 coordinator 30-day window as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; compatibility-window row above, originally line 35). The Rust host is the installed default from preview; the deprecated Node fallback is supported for 30 calendar days after preview publication, earliest removal 2026-10-18. Removing or redirecting `bin.fgos` after the window remains owed to Packaging-distribution (release-owner decision). The original clause below is retained verbatim as dated design. The runner mapping and source-entry ownership header stay; nothing is removed now.",
+        "shownTextDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17"
+      }
+    }
+  ],
+  "gapDecisions": [
+    {
+      "claimId": "claim_9f0812f083e5ff3bac32d3e50e024b88",
+      "sourcePath": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "sourceUnitDigest": "d348c7aff00a8cbe0fd6cbff45013ccc9cff3699df7a7ab14b985bbb73ba5ccf",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+    },
+    {
+      "claimId": "claim_743f0b70132cc6fda8271214be7c061a",
+      "sourcePath": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "sourceUnitDigest": "ffc24cb21beb67e859d84f86ef48e47a78b8c3e678c78823abd7be210cbd1a2c",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "31f20682351c4c470babfddbbf18a71a32190c071d4f6ae659725b6cfcf84dd0",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+    },
+    {
+      "claimId": "claim_34de7c299044ca3ebf49837a0ef7f3bb",
+      "sourcePath": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "sourceUnitDigest": "8c825fbfc4345283bc92771c4af94d6a38ff5e2b75e2b7097d29267f7d882769",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "4d3bba9687d0eddb7182380f864742235de0aecae298039ad72043d97098fa14",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+    },
+    {
+      "claimId": "claim_d301f741817cf5afb1da6637ea19c3c7",
+      "sourcePath": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "sourceUnitDigest": "6587193ed55d77e09a42126a76fde7bb74560bb4d554440f4b09983a4fc8fc00",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+    }
+  ],
+  "stableHeadingBindings": [
+    {
+      "claimId": "claim_2ae4c5c63621e9fe8e2c14021ee4a5f7",
+      "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+      "beforeUnitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee",
+      "afterUnitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "rationale": "Stable heading identity retained by native extractor; section text changes only for the owner F6 resolution. Full before/current section and digests shown; independent conservation review required."
+    },
+    {
+      "claimId": "claim_a0f184bc39b573f0b4bf0ba469d68d2a",
+      "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "anchor": "installed-default-and-npm-compatibility",
+      "beforeUnitDigest": "a77dc7f6b7b1dd819a751579a1de6e718e80e669ef146fdcd10d0f66e6c821e4",
+      "afterUnitDigest": "6c803388a11379425a5ae5f98e4415b833183eee7167ae61592ede96818922c7",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "rationale": "Stable heading identity retained by native extractor; section text changes only for the owner F6 resolution. Full before/current section and digests shown; independent conservation review required."
+    },
+    {
+      "claimId": "claim_e6538fb192303f7d4fdf1e00c0d3aa18",
+      "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "anchor": "proposed-disposition",
+      "beforeUnitDigest": "b1ec345e0756e842dfa086f9c4ef0110dca6a04da2c95d9139cb11186688c3a2",
+      "afterUnitDigest": "0c4a1e10db283e13eb9bebdeb53fe11b94ffb80f609ae4f21cdb08021ec64e4f",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "rationale": "Stable heading identity retained by native extractor; section text changes only for the owner F6 resolution. Full before/current section and digests shown; independent conservation review required."
+    }
+  ],
+  "changedReviewBindings": [
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_6a37273a0a45d24c53e344928c3edf22",
+      "before": {
+        "claimId": "claim_6a37273a0a45d24c53e344928c3edf22",
+        "sourceUnitDigest": "6f959e9066321a5afcbb3c6ae57d46b03fa8da3ae18f7ce0b5454eff36ba701e",
+        "claimKind": "architecture",
+        "kind": "architecture",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "targetAnchor": "unheaded-block-24",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "rationale": "Supersede the whole dated installed-default npm-bin removal promise with the checked current compatibility boundary: both npm entries remain, fgos-runner stays mapped, and the entry ownership header stays present. package.json:9-12 and bin/fgos.mjs:1-10 are the evidence. The obsolete promise is separately preserved verbatim, not deleted or presented as current, and routed to the owner queue. No locked ownership rule is changed.",
+        "reviewNote": "Replacing Checked status matches package.json:9-12 (both bin.fgos and bin.fgos-runner present) and the bin/fgos.mjs header (compatibility channels remain); the old clause is kept verbatim in the adjacent restored block. The root AGENTS.md sentence is not restated in the status text but survives in the verbatim block.",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
+        "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
+        "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
+        "targetUnitDigest": "d348c7aff00a8cbe0fd6cbff45013ccc9cff3699df7a7ab14b985bbb73ba5ccf",
+        "reviewReportCommit": "13322f8a6712df4bb3dd69e7df208e237f32c216"
+      },
+      "currentTarget": {
+        "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "unheaded-block-24",
+        "unitKind": "unheaded-block",
+        "ancestry": [
+          "Architecture: Release Boundaries",
+          "Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea"
+        ],
+        "unitDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17",
+        "shownText": "**Checked status:** Superseded by decision (owner F6 resolution, 2026-10-14): the installed-default npm `bin.fgos` removal trigger has the 2026-09-15 coordinator 30-day window as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; compatibility-window row above, originally line 35). The Rust host is the installed default from preview; the deprecated Node fallback is supported for 30 calendar days after preview publication, earliest removal 2026-10-18. Removing or redirecting `bin.fgos` after the window remains owed to Packaging-distribution (release-owner decision). The original clause below is retained verbatim as dated design. The runner mapping and source-entry ownership header stay; nothing is removed now.",
+        "shownTextDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17"
+      },
+      "after": {
+        "claimId": "claim_6a37273a0a45d24c53e344928c3edf22",
+        "sourceUnitDigest": "6f959e9066321a5afcbb3c6ae57d46b03fa8da3ae18f7ce0b5454eff36ba701e",
+        "claimKind": "architecture",
+        "kind": "architecture",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "targetAnchor": "unheaded-block-24",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:12@2026-10-14",
+        "rationale": "Supersede the whole dated installed-default npm-bin removal trigger by the owner-decided 2026-09-15 coordinator 30-day window, earliest removal 2026-10-18. The Checked status names that successor and keeps removing or redirecting bin.fgos after the window owed to Packaging-distribution (release-owner decision). The original source clause is separately retained verbatim in the adjacent fenced block; runner mapping and source-entry ownership header stay. No removal or support extension is implemented by this documentation change.",
+        "reviewNote": "Stored digest has no target match; independent re-review required."
+      },
+      "rebindCommand": [
+        "node",
+        "scripts/propose-doc-decisions.mjs",
+        "--rebind",
+        "/tmp/fgos-work/packaging-close/rebind-source.json",
+        "--inventory",
+        "/tmp/fgos-work/packaging-close/inventory.json",
+        "--repo-root",
+        "."
+      ],
+      "rebindStdout": "{\n  \"shard\": {\n    \"version\": 1,\n    \"shard\": \"s3-host-invocation-checkpoint\",\n    \"authorSession\": \"codex-session:1@2026-10-11\",\n    \"sources\": [\n      \"docs/architect/host-invocation-routing/documentation-standardization-plan.md\",\n      \"docs/architect/host-invocation-routing/external-provider-protocol.md\",\n      \"docs/architect/host-invocation-routing/host-invocation-provider-routing.md\",\n      \"docs/architect/host-invocation-routing/legacy-cli-transition.md\",\n      \"docs/architect/host-invocation-routing/node-to-rust-component-migration.md\",\n      \"docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md\"\n    ],\n    \"files\": [\n      {\n        \"path\": \"docs/architect/host-invocation-routing/documentation-standardization-plan.md\",\n        \"kind\": \"history\",\n        \"disposition\": \"move\",\n        \"reviewStatus\": \"pending\",\n        \"authoredBy\": \"codex-session:1@2026-10-11\",\n        \"rationale\": \"Owner A8: retired area policy and migration plan, retained verbatim as non-authority history. Original source remains unchanged; candidate snapshot is non-authority.\",\n        \"targets\": [\n          \"docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md\"\n        ]\n      },\n      {\n        \"path\": \"docs/architect/host-invocation-routing/external-provider-protocol.md\",\n        \"kind\": \"architecture\",\n        \"disposition\": \"split\",\n        \"reviewStatus\": \"pending\",\n        \"authoredBy\": \"codex-session:1@2026-10-11\",\n        \"rationale\": \"Full six-source conservation: direct units map to the frozen primary owner or the sixteen explicit restoration groups. No source byte or authority route is retired in this candidate batch.\",\n        \"targets\": [\n          \"docs/platform/host-invocation-routing/architecture/external-provider-protocol.md\",\n          \"docs/platform/host-invocation-routing/architecture/release-boundaries.md\",\n          \"docs/platform/host-invocation-routing/contracts/component-protocol.md\",\n          \"docs/platform/host-invocation-routing/verification/compatibility-harness.md\"\n        ]\n      },\n      {\n        \"path\": \"docs/architect/host-invocation-routing/host-invocation-provider-routing.md\",\n        \"kind\": \"spec\",\n        \"disposition\": \"split\",\n        \"reviewStatus\": \"pending\",\n        \"authoredBy\": \"codex-session:1@2026-10-11\",\n        \"rationale\": \"Full six-source conservation: direct units map to the frozen primary owner or the sixteen explicit restoration groups. No source byte or authority route is retired in this candidate batch.\",\n        \"targets\": [\n          \"docs/platform/host-invocation-routing/spec.md\",\n          \"docs/platform/host-invocation-routing/contracts/component-protocol.md\",\n          \"docs/platform/host-invocation-routing/architecture/release-boundaries.md\"\n        ]\n      },\n      {\n        \"path\": \"docs/architect/host-invocation-routing/legacy-cli-transition.md\",\n        \"kind\": \"architecture\",\n        \"disposition\": \"split\",\n        \"reviewStatus\": \"pending\",\n        \"authoredBy\": \"codex-session:1@2026-10-11\",\n        \"rationale\": \"Full six-source conservation: direct units map to the frozen primary owner or the sixteen explicit restoration groups. No source byte or authority route is retired in this candidate batch.\",\n        \"targets\": [\n          \"docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md\",\n          \"docs/platform/host-invocation-routing/contracts/component-protocol.md\",\n          \"docs/platform/host-invocation-routing/architecture/release-boundaries.md\"\n        ]\n      },\n      {\n        \"path\": \"docs/architect/host-invocation-routing/node-to-rust-component-migration.md\",\n        \"kind\": \"architecture\",\n        \"disposition\": \"split\",\n        \"reviewStatus\": \"pending\",\n        \"authoredBy\": \"codex-session:1@2026-10-11\",\n        \"rationale\": \"Full six-source conservation: direct units map to the frozen primary owner or the sixteen explicit restoration groups. No source byte or authority route is retired in this candidate batch.\",\n        \"targets\": [\n          \"docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md\",\n          \"docs/platform/host-invocation-routing/architecture/release-boundaries.md\",\n          \"docs/platform/host-invocation-routing/contracts/component-protocol.md\"\n        ]\n      },\n      {\n        \"path\": \"docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md\",\n        \"kind\": \"roadmap\",\n        \"disposition\": \"split\",\n        \"reviewStatus\": \"pending\",\n        \"authoredBy\": \"codex-session:1@2026-10-11\",\n        \"rationale\": \"Full six-source conservation: direct units map to the frozen primary owner or the sixteen explicit restoration groups. No source byte or authority route is retired in this candidate batch.\",\n        \"targets\": [\n          \"docs/platform/host-invocation-routing/roadmap.md\",\n          \"docs/platform/host-invocation-routing/contracts/component-protocol.md\",\n          \"docs/platform/host-invocation-routing/verification/compatibility-harness.md\"\n        ]\n      }\n    ],\n    \"claims\": [\n      {\n        \"claimId\": \"claim_6a37273a0a45d24c53e344928c3edf22\",\n        \"sourceUnitDigest\": \"6f959e9066321a5afcbb3c6ae57d46b03fa8da3ae18f7ce0b5454eff36ba701e\",\n        \"claimKind\": \"architecture\",\n        \"kind\": \"architecture\",\n        \"disposition\": \"supersede\",\n        \"targetOwner\": \"docs/platform/host-invocation-routing/architecture/release-boundaries.md\",\n        \"targetAnchor\": \"unheaded-block-24\",\n        \"reviewStatus\": \"pending\",\n        \"authoredBy\": \"codex-session:1@2026-10-11\",\n        \"rationale\": \"Supersede the whole dated installed-default npm-bin removal promise with the checked current compatibility boundary: both npm entries remain, fgos-runner stays mapped, and the entry ownership header stays present. package.json:9-12 and bin/fgos.mjs:1-10 are the evidence. The obsolete promise is separately preserved verbatim, not deleted or presented as current, and routed to the owner queue. No locked ownership rule is changed.\",\n        \"reviewNote\": \"Stored digest has no target match; independent re-review required.\",\n        \"reviewReport\": \"plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md\",\n        \"reviewPackCommit\": \"76353c58eb885becc550d734fde5d7c2709cce33\",\n        \"reviewPackId\": \"31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6\",\n        \"seedScoreId\": \"8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba\",\n        \"targetUnitDigest\": \"d348c7aff00a8cbe0fd6cbff45013ccc9cff3699df7a7ab14b985bbb73ba5ccf\",\n        \"reviewReportCommit\": \"13322f8a6712df4bb3dd69e7df208e237f32c216\"\n      }\n    ],\n    \"reviewReport\": \"plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md\"\n  },\n  \"rebound\": [],\n  \"pending\": [\n    \"claim_6a37273a0a45d24c53e344928c3edf22\"\n  ]\n}\n"
+    }
+  ],
+  "hostResidualDrift": [
+    {
+      "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+      "before": {
+        "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+        "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee",
+        "shownText": "## Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea\n\nAdded in candidate: verbatim restoration of `docs/architect/host-invocation-routing/legacy-cli-transition.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`; preservation is not a fresh implementation claim.\n\n**Checked status:** FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed.\n\n**Code evidence:** `package.json:9-12`; `bin/fgos.mjs:1-10`.\n\n````md\n`package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` stays until the runner migrates. A header in `bin/fgos.mjs` and the root `AGENTS.md` state the ownership rule for editors already at that path.\n````",
+        "shownDigest": "dc30e096fad099c495846dc6cb686974a13ca165f5c18bbea7fa12097e1e99e7"
+      },
+      "after": {
+        "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+        "unitKind": "heading",
+        "ancestry": [
+          "Architecture: Release Boundaries"
+        ],
+        "unitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07",
+        "shownText": "## Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea\n\nAdded in candidate: verbatim restoration of `docs/architect/host-invocation-routing/legacy-cli-transition.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`; preservation is not a fresh implementation claim.\n\n**Checked status:** Superseded by decision (owner F6 resolution, 2026-10-14): the installed-default npm `bin.fgos` removal trigger has the 2026-09-15 coordinator 30-day window as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; compatibility-window row above, originally line 35). The Rust host is the installed default from preview; the deprecated Node fallback is supported for 30 calendar days after preview publication, earliest removal 2026-10-18. Removing or redirecting `bin.fgos` after the window remains owed to Packaging-distribution (release-owner decision). The original clause below is retained verbatim as dated design. The runner mapping and source-entry ownership header stay; nothing is removed now.\n\n**Code evidence:** `package.json:9-12`; `bin/fgos.mjs:1-10`.\n\n````md\n`package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` stays until the runner migrates. A header in `bin/fgos.mjs` and the root `AGENTS.md` state the ownership rule for editors already at that path.\n````",
+        "shownTextDigest": "5164dfe6fa9e549755e91abe839c8d2813fff0fe80628ca1c3bb8ef9ec31381a"
+      }
+    }
+  ],
+  "registryBytes": 59452674,
+  "registrySha256": "27956ce386fc016b459455b34b055a46105c340855b36bf4de49c745f242f99a",
+  "persistedInputSha256": "ff3b8e1ced4306cdb94dfcc943de16f2312c0d36b31889b8347aa96ce8bfa4e3",
+  "identityGraft": false
+}

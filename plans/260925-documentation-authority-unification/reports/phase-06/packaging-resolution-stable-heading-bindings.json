@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "rows": [
+    {
+      "claimId": "claim_2ae4c5c63621e9fe8e2c14021ee4a5f7",
+      "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+      "beforeUnitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee",
+      "afterUnitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "rationale": "Stable heading identity retained by native extractor; section text changes only for the owner F6 resolution. Full before/current section and digests shown; independent conservation review required."
+    },
+    {
+      "claimId": "claim_a0f184bc39b573f0b4bf0ba469d68d2a",
+      "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "anchor": "installed-default-and-npm-compatibility",
+      "beforeUnitDigest": "a77dc7f6b7b1dd819a751579a1de6e718e80e669ef146fdcd10d0f66e6c821e4",
+      "afterUnitDigest": "6c803388a11379425a5ae5f98e4415b833183eee7167ae61592ede96818922c7",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "rationale": "Stable heading identity retained by native extractor; section text changes only for the owner F6 resolution. Full before/current section and digests shown; independent conservation review required."
+    },
+    {
+      "claimId": "claim_e6538fb192303f7d4fdf1e00c0d3aa18",
+      "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "anchor": "proposed-disposition",
+      "beforeUnitDigest": "b1ec345e0756e842dfa086f9c4ef0110dca6a04da2c95d9139cb11186688c3a2",
+      "afterUnitDigest": "0c4a1e10db283e13eb9bebdeb53fe11b94ffb80f609ae4f21cdb08021ec64e4f",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "rationale": "Stable heading identity retained by native extractor; section text changes only for the owner F6 resolution. Full before/current section and digests shown; independent conservation review required."
+    }
+  ]
+}

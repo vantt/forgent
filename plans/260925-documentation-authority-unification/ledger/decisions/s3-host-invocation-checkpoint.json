@@ -4502,18 +4502,10 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
       "targetAnchor": "unheaded-block-24",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Supersede the whole dated installed-default npm-bin removal promise with the checked current compatibility boundary: both npm entries remain, fgos-runner stays mapped, and the entry ownership header stays present. package.json:9-12 and bin/fgos.mjs:1-10 are the evidence. The obsolete promise is separately preserved verbatim, not deleted or presented as current, and routed to the owner queue. No locked ownership rule is changed.",
-      "reviewNote": "Replacing Checked status matches package.json:9-12 (both bin.fgos and bin.fgos-runner present) and the bin/fgos.mjs header (compatibility channels remain); the old clause is kept verbatim in the adjacent restored block. The root AGENTS.md sentence is not restated in the status text but survives in the verbatim block.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
-      "reviewPackCommit": "76353c58eb885becc550d734fde5d7c2709cce33",
-      "reviewPackId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
-      "seedScoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba",
-      "targetUnitDigest": "d348c7aff00a8cbe0fd6cbff45013ccc9cff3699df7a7ab14b985bbb73ba5ccf",
-      "reviewReportCommit": "13322f8a6712df4bb3dd69e7df208e237f32c216"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "rationale": "Supersede the whole dated installed-default npm-bin removal trigger by the owner-decided 2026-09-15 coordinator 30-day window, earliest removal 2026-10-18. The Checked status names that successor and keeps removing or redirecting bin.fgos after the window owed to Packaging-distribution (release-owner decision). The original source clause is separately retained verbatim in the adjacent fenced block; runner mapping and source-entry ownership header stay. No removal or support extension is implemented by this documentation change.",
+      "reviewNote": "Stored digest has no target match; independent re-review required."
     },
     {
       "claimId": "claim_0b85ea8ddcbd3d505edf8b110e3a42ad",

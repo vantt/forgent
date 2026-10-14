@@ -521,7 +521,7 @@
         "retainedVerbatim": {
           "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
           "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
-          "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee"
+          "unitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07"
         },
         "decision": "superseded by decision",
         "owner": "Packaging-distribution (release-owner decision)",
@@ -548,7 +548,8 @@
           "text": "F6 resolution (owner-decided 2026-10-14, option A of the Step 4 decision, following `review-4-packaging-truth-f6.md` part 2): dropped-010 is superseded by decision, not retired by absence.\n1. The installed-default removal trigger for npm `bin.fgos` is superseded by the 2026-09-15 coordinator decision (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`, with the `architecture/release-boundaries.md:35` row): the Rust host is the installed default from the preview, and the Node fallback is deprecated and supported for 30 calendar days, earliest removal 2026-10-18. The disposition cites that decision as its successor.\n2. Removing or redirecting `bin.fgos` after the window stays an owed obligation, owned by Packaging-distribution (release-owner decision). The disposition text says so; nothing is removed now.\n3. The rationale says \"superseded by decision\" and drops the \"no intentional retirement is inferred from absence\" wording. The FLAGGED-obsolete verbatim retention may now be resolved consistently with this verdict. The runner mapping and source-entry ownership header stay.",
           "shownTextDigest": "f2a190c215efd2f962ba97b71118536ba72fdf316fc27cea30584299c7ab7487"
         },
-        "reviewNote": "Owner decision accepted; newly authored representation and its conservation bindings await independent Lead review."
+        "reviewNote": "Owner decision accepted; newly authored representation and its conservation bindings await independent Lead review.",
+        "unitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07"
       }
     },
     {

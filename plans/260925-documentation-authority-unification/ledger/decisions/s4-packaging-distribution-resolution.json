@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "shard": "s4-packaging-distribution-resolution.json",
+  "authorSession": "codex-session:12@2026-10-14",
+  "authorshipRequired": true,
+  "sources": [],
+  "claims": [],
+  "registryGaps": [
+    {
+      "claimId": "claim_9f0812f083e5ff3bac32d3e50e024b88",
+      "sourcePath": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "sourceUnitDigest": "d348c7aff00a8cbe0fd6cbff45013ccc9cff3699df7a7ab14b985bbb73ba5ccf",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+    },
+    {
+      "claimId": "claim_743f0b70132cc6fda8271214be7c061a",
+      "sourcePath": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "sourceUnitDigest": "ffc24cb21beb67e859d84f86ef48e47a78b8c3e678c78823abd7be210cbd1a2c",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "31f20682351c4c470babfddbbf18a71a32190c071d4f6ae659725b6cfcf84dd0",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+    },
+    {
+      "claimId": "claim_34de7c299044ca3ebf49837a0ef7f3bb",
+      "sourcePath": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "sourceUnitDigest": "8c825fbfc4345283bc92771c4af94d6a38ff5e2b75e2b7097d29267f7d882769",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "4d3bba9687d0eddb7182380f864742235de0aecae298039ad72043d97098fa14",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+    },
+    {
+      "claimId": "claim_d301f741817cf5afb1da6637ea19c3c7",
+      "sourcePath": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "sourceUnitDigest": "6587193ed55d77e09a42126a76fde7bb74560bb4d554440f4b09983a4fc8fc00",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b",
+      "authoredBy": "codex-session:12@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+    }
+  ]
+}
