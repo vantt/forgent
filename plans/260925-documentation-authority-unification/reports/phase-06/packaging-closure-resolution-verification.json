@@ -1,0 +1,1076 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:12@2026-10-14",
+  "state": "ready-for-review",
+  "batchClosed": false,
+  "scope": "Packaging-distribution F6 resolution and its bounded conservation consequences; source approvals and A34 residual binding",
+  "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-1400-packaging-closure-resolution.md",
+  "requestSha256": "5b55f429328c5ee77d9c26b6a5d75e4f2626b9dd89fb73bc091582af578ab847",
+  "proofCommit": "865ffac93c767b862ad9745fef5372dffd9a8158",
+  "contentCommit": "cfd4cffc17caae2e4b28417487f967f35ebae845",
+  "ownerAnswersCommit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
+  "application": {
+    "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-rationale-followup.md",
+    "reportCommit": "ea04ae8585560bfb1c62c477fdeefb3019021723",
+    "reportSha256": "11c2c915ac3d1574741ca852f04930cf8fa36aa73a68d56785c0f4d96ffc5bf0",
+    "verdicts": [
+      {
+        "item": "claim_e4bf9b812f0b787bcf56246677865361",
+        "verdict": "ok",
+        "note": "Rationale now names both labelled notes with correct placement and dates; target diff is heading depth plus those two notes only; only rationale changed vs d57231686.",
+        "sourceDigest": "57af5b1c65fd1dda38b5e2fa7e5231049f66141d34f71578f2509b78a4994305",
+        "targetDigest": "32761eb7cc5ab63a191f4a707e6e56cf65a32c3dd5d605aa5558346377edfb40"
+      },
+      {
+        "item": "claim_3673677485dd4449067c9e5074623e1a",
+        "verdict": "ok",
+        "note": "Rationale truthfully says the Retained dated design note is prepended to block 25 and says source design versus static preflight; source sentence kept verbatim; only rationale changed.",
+        "sourceDigest": "a1e7ae9c98f45bb7c6b136fec8f222dffea7be454b7288a802983db5a7e43599",
+        "targetDigest": "273e89aa19e81dcc743483fe3e51606dcf949278cadecb37a885aa39014cec2b"
+      },
+      {
+        "item": "claim_107a23bb29dcf6db15e2471d7e77590b",
+        "verdict": "ok",
+        "note": "Rationale truthfully says the Status note is appended after the permission and must-not text (same paragraph, inline) and that the must-not obligation is retained; source sentences verbatim; only rationale changed.",
+        "sourceDigest": "ccb205fdc5120e6287ab2067b178cb8c998e156c606d0282c8d7e02821feece0",
+        "targetDigest": "6fbabae72e49d14c8ea861f42ffc8ee4180d3b83c968871b6ea38ace19b92d9a"
+      }
+    ],
+    "command": [
+      "node",
+      "scripts/propose-doc-decisions.mjs",
+      "--apply-review",
+      "/tmp/fgos-work/packaging-close/apply-source.json",
+      "--inventory",
+      "/tmp/fgos-work/packaging-rationale/inventory.json",
+      "--repo-root",
+      ".",
+      "--verdicts",
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-rationale-followup.md",
+      "--reviewer",
+      "reviewer:claude-session:a4954387@2026-10-14"
+    ],
+    "exit": 0,
+    "stdout": "{\n  \"version\": 1,\n  \"shard\": \"s4-packaging-distribution-architecture.json\",\n  \"authorSession\": \"codex-session:8@2026-10-13\",\n  \"authorshipRequired\": true,\n  \"sources\": [\n    \"docs/architect/packaging-distribution/future-constraints.md\",\n    \"docs/architect/packaging-distribution/history/distribution-baseline.md\",\n    \"docs/architect/packaging-distribution/migration-map.md\",\n    \"docs/architect/packaging-distribution/README.md\",\n    \"docs/architect/packaging-distribution/rewrite-plan.md\",\n    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\",\n    \"docs/architect/packaging-distribution/scope-map.md\",\n    \"docs/architect/packaging-distribution/workspace-runtime-model.md\"\n  ],\n  \"claims\": [\n    {\n      \"claimId\": \"claim_e4bf9b812f0b787bcf56246677865361\",\n      \"sourceUnitDigest\": \"57af5b1c65fd1dda38b5e2fa7e5231049f66141d34f71578f2509b78a4994305\",\n      \"targetOwner\": \"docs/platform/packaging-distribution/contracts/activation-binding.md\",\n      \"targetAnchor\": \"6-workspaceactivationbinding\",\n      \"claimKind\": \"architecture\",\n      \"disposition\": \"move\",\n      \"reviewStatus\": \"reviewed\",\n      \"authoredBy\": \"codex-session:10@2026-10-14\",\n      \"rationale\": \"The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#6-workspaceactivationbinding, under \\\"6. WorkspaceActivationBinding\\\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#6-workspaceactivationbinding. Heading depth changes; the target also adds the labelled Retained dated design — status note (2026-10-14) before the bootstrap-context permission and the labelled Status note (2026-10-14) after the candidate permission paragraph; the direct section payload follows the original source order. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.\",\n      \"reviewNote\": \"Rationale now names both labelled notes with correct placement and dates; target diff is heading depth plus those two notes only; only rationale changed vs d57231686.\",\n      \"reviewedBy\": \"reviewer:claude-session:a4954387@2026-10-14\",\n      \"reviewedAt\": \"2026-10-14\",\n      \"reviewReport\": \"plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-rationale-followup.md\",\n      \"reviewMode\": \"ordinary\",\n      \"targetUnitDigest\": \"32761eb7cc5ab63a191f4a707e6e56cf65a32c3dd5d605aa5558346377edfb40\",\n      \"targetAncestry\": [\n        \"Contract: Activation Binding\",\n        \"Retained Runtime Identity And Activation Source Detail\"\n      ],\n      \"reviewReportCommit\": \"6412eff7988b8510be8ac3cc36dec325eaa94946\"\n    },\n    {\n      \"claimId\": \"claim_3673677485dd4449067c9e5074623e1a\",\n      \"sourceUnitDigest\": \"a1e7ae9c98f45bb7c6b136fec8f222dffea7be454b7288a802983db5a7e43599\",\n      \"targetOwner\": \"docs/platform/packaging-distribution/contracts/activation-binding.md\",\n      \"targetAnchor\": \"unheaded-block-25\",\n      \"claimKind\": \"architecture\",\n      \"disposition\": \"move\",\n      \"reviewStatus\": \"reviewed\",\n      \"authoredBy\": \"codex-session:10@2026-10-14\",\n      \"rationale\": \"The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-63, under \\\"6. WorkspaceActivationBinding\\\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-25. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The target prepends the labelled Retained dated design — status note (2026-10-14), identifying the bootstrap-context permission as source design and static preflight as current behavior. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.\",\n      \"reviewNote\": \"Rationale truthfully says the Retained dated design note is prepended to block 25 and says source design versus static preflight; source sentence kept verbatim; only rationale changed.\",\n      \"reviewedBy\": \"reviewer:claude-session:a4954387@2026-10-14\",\n      \"reviewedAt\": \"2026-10-14\",\n      \"reviewReport\": \"plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-rationale-followup.md\",\n      \"reviewMode\": \"ordinary\",\n      \"targetUnitDigest\": \"273e89aa19e81dcc743483fe3e51606dcf949278cadecb37a885aa39014cec2b\",\n      \"targetAncestry\": [\n        \"Contract: Activation Binding\",\n        \"Retained Runtime Identity And Activation Source Detail\",\n        \"6. WorkspaceActivationBinding\"\n      ],\n      \"reviewReportCommit\": \"6412eff7988b8510be8ac3cc36dec325eaa94946\"\n    },\n    {\n      \"claimId\": \"claim_107a23bb29dcf6db15e2471d7e77590b\",\n      \"sourceUnitDigest\": \"ccb205fdc5120e6287ab2067b178cb8c998e156c606d0282c8d7e02821feece0\",\n      \"targetOwner\": \"docs/platform/packaging-distribution/contracts/activation-binding.md\",\n      \"targetAnchor\": \"unheaded-block-27\",\n      \"claimKind\": \"architecture\",\n      \"disposition\": \"move\",\n      \"reviewStatus\": \"reviewed\",\n      \"authoredBy\": \"codex-session:10@2026-10-14\",\n      \"rationale\": \"The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-65, under \\\"6. WorkspaceActivationBinding\\\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-27. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The target appends the labelled Status note (2026-10-14), identifying the candidate permission as retained dated design, static preflight and the unimplemented environment-variable bootstrap context, while retaining the must-not obligation. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.\",\n      \"reviewNote\": \"Rationale truthfully says the Status note is appended after the permission and must-not text (same paragraph, inline) and that the must-not obligation is retained; source sentences verbatim; only rationale changed.\",\n      \"reviewedBy\": \"reviewer:claude-session:a4954387@2026-10-14\",\n      \"reviewedAt\": \"2026-10-14\",\n      \"reviewReport\": \"plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-rationale-followup.md\",\n      \"reviewMode\": \"ordinary\",\n      \"targetUnitDigest\": \"6fbabae72e49d14c8ea861f42ffc8ee4180d3b83c968871b6ea38ace19b92d9a\",\n      \"targetAncestry\": [\n        \"Contract: Activation Binding\",\n        \"Retained Runtime Identity And Activation Source Detail\",\n        \"6. WorkspaceActivationBinding\"\n      ],\n      \"reviewReportCommit\": \"6412eff7988b8510be8ac3cc36dec325eaa94946\"\n    }\n  ],\n  \"files\": [\n    {\n      \"path\": \"docs/architect/packaging-distribution/future-constraints.md\",\n      \"disposition\": \"move\",\n      \"targets\": [\n        \"docs/platform/packaging-distribution/architecture/future-constraints.md\"\n      ],\n      \"rationale\": \"Complete native source-unit carriage to the listed area owner(s), with dated source planning kept separate from runtime contracts. Legacy bytes stay intact until cutover; no archive or deletion is performed.\"\n    },\n    {\n      \"path\": \"docs/architect/packaging-distribution/history/distribution-baseline.md\",\n      \"disposition\": \"move\",\n      \"targets\": [\n        \"docs/platform/packaging-distribution/history/distribution-baseline.md\"\n      ],\n      \"rationale\": \"Complete native source-unit carriage to the listed area owner(s), with dated source planning kept separate from runtime contracts. Legacy bytes stay intact until cutover; no archive or deletion is performed.\"\n    },\n    {\n      \"path\": \"docs/architect/packaging-distribution/migration-map.md\",\n      \"disposition\": \"move\",\n      \"targets\": [\n        \"docs/platform/packaging-distribution/history/documentation-migration/migration-map.md\"\n      ],\n      \"rationale\": \"Complete native source-unit carriage to the listed area owner(s), with dated source planning kept separate from runtime contracts. Legacy bytes stay intact until cutover; no archive or deletion is performed.\"\n    },\n    {\n      \"path\": \"docs/architect/packaging-distribution/README.md\",\n      \"disposition\": \"move\",\n      \"targets\": [\n        \"docs/platform/packaging-distribution/README.md\"\n      ],\n      \"rationale\": \"Complete native source-unit carriage to the listed area owner(s), with dated source planning kept separate from runtime contracts. Legacy bytes stay intact until cutover; no archive or deletion is performed.\"\n    },\n    {\n      \"path\": \"docs/architect/packaging-distribution/rewrite-plan.md\",\n      \"disposition\": \"move\",\n      \"targets\": [\n        \"docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md\"\n      ],\n      \"rationale\": \"Complete native source-unit carriage to the listed area owner(s), with dated source planning kept separate from runtime contracts. Legacy bytes stay intact until cutover; no archive or deletion is performed.\"\n    },\n    {\n      \"path\": \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\",\n      \"disposition\": \"split\",\n      \"targets\": [\n        \"docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md\",\n        \"docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md\",\n        \"docs/platform/packaging-distribution/contracts/activation-binding.md\",\n        \"docs/platform/packaging-distribution/contracts/distribution-pin.md\",\n        \"docs/platform/packaging-distribution/contracts/projection-ledger.md\",\n        \"docs/platform/packaging-distribution/contracts/release-manifest.md\",\n        \"docs/platform/packaging-distribution/contracts/repository-runtime-layout.md\"\n      ],\n      \"rationale\": \"Complete native source-unit carriage to the named area owners; the required seven dev/source units have an explicit stub and Plan C owner. Legacy bytes stay intact until cutover; no archive or deletion is performed.\"\n    },\n    {\n      \"path\": \"docs/architect/packaging-distribution/scope-map.md\",\n      \"disposition\": \"move\",\n      \"targets\": [\n        \"docs/platform/packaging-distribution/spec.md\"\n      ],\n      \"rationale\": \"Complete native source-unit carriage to the listed area owner(s), with dated source planning kept separate from runtime contracts. Legacy bytes stay intact until cutover; no archive or deletion is performed.\"\n    },\n    {\n      \"path\": \"docs/architect/packaging-distribution/workspace-runtime-model.md\",\n      \"disposition\": \"move\",\n      \"targets\": [\n        \"docs/platform/packaging-distribution/spec.md\"\n      ],\n      \"rationale\": \"Complete native source-unit carriage to the listed area owner(s), with dated source planning kept separate from runtime contracts. Legacy bytes stay intact until cutover; no archive or deletion is performed.\"\n    }\n  ],\n  \"reviewReport\": \"plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-rationale-followup.md\"\n}\n",
+    "stderr": "",
+    "otherRowsEqual": true
+  },
+  "nativeEquality": {
+    "version": 1,
+    "proofCommit": "865ffac93c767b862ad9745fef5372dffd9a8158",
+    "DZeroFatalBothPriors": true,
+    "strictEExpectedRed": true,
+    "strictEOpen": {
+      "claims-partial-carry": 1,
+      "identical-units-multiple-owners": 2,
+      "dropped-claims-unreviewed": 1,
+      "candidate-blocks-unreferenced": 693
+    },
+    "A34PackagingPartialCarries": 1,
+    "sourceRows": 407,
+    "sourceReviewed": 407,
+    "sourcePending": 0,
+    "priorSuccessorsReviewed": 31,
+    "newConservationRowsPending": 4,
+    "stableHeadingsPending": 3,
+    "affectedHostSourceBindingsPending": 1,
+    "hostResidualRenewalsPending": 1,
+    "allOldKnownIdsRetained": true,
+    "oldKnownIds": 94333,
+    "currentKnownIds": 94338,
+    "newNativeIds": 5,
+    "changedNativeUnits": 8,
+    "stableHeadingDigestChanges": 3,
+    "exactDigestAnchorRebinds": 1,
+    "immediatePriorFullNativeTupleEqualityWithShownDeltas": true,
+    "priorPersistedFullNativeTupleEqualityWithReviewedAndShownDeltas": true,
+    "activeRegistryInventoryFullTupleEquality": true,
+    "allReviewedSourceNotesVerbatim": true,
+    "candidateLists": [
+      {
+        "area": "agent-coordination",
+        "count": 488,
+        "fullTupleEqualityBothPriors": true
+      },
+      {
+        "area": "host-invocation-routing",
+        "count": 588,
+        "fullTupleEqualityBothPriors": true
+      },
+      {
+        "area": "packaging-distribution",
+        "count": 693,
+        "fullTupleEqualityBothPriors": true
+      }
+    ],
+    "holdsAndExceptionMembershipUnchanged": true,
+    "unaffectedHostResiduals": 11,
+    "identityGraft": false,
+    "batchClosureClaimed": false,
+    "registryBytes": 59453707,
+    "registrySha256": "7733334b6a3d9b24821b0a493d41ef8e40c9388b76f40cade30b8abdc9178b47"
+  },
+  "preservation": {
+    "commit": "865ffac93c767b862ad9745fef5372dffd9a8158",
+    "extractorUnchanged": true,
+    "agentTreeUnchanged": true,
+    "hostChangeExactlyOneOwnerResolutionStatusLine": true,
+    "historyWitnesses": 74,
+    "payloads": 867,
+    "frozenFiles": 5,
+    "ownAllowlistViolations": [],
+    "exactExemptions": 8,
+    "authorityStatusesUnchanged": true,
+    "readerLinksUnchanged": true,
+    "checks": [
+      {
+        "command": [
+          "node",
+          "scripts/check-legacy-docs-ratchet.mjs"
+        ],
+        "exit": 0,
+        "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "node",
+          "scripts/check-doc-constitution.mjs",
+          "--no-ledger",
+          "--check-placement"
+        ],
+        "exit": 0,
+        "stdout": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 509 files, 508 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "node",
+          "scripts/check-doc-candidate-status.mjs",
+          "--json"
+        ],
+        "exit": 0,
+        "stdout": "{\n  \"counts\": {\n    \"files\": 509,\n    \"byStatus\": {\n      \"promoted\": 3,\n      \"candidate\": 115,\n      \"legacy-current\": 0,\n      \"non-authority\": 1,\n      \"unrouted\": 390\n    },\n    \"exemptUnrouted\": 302,\n    \"checked\": 118,\n    \"findings\": 0,\n    \"byType\": {}\n  },\n  \"findings\": []\n}\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "gates": [
+    {
+      "label": "D-first",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/packaging-close/inventory.json",
+        "--identity-registry",
+        "/tmp/fgos-work/packaging-close/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "outputPath": "/tmp/fgos-work/packaging-close/D-first.json",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1163,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22573,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22805,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22573,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 2,
+          "examples": [
+            "dropped-001",
+            "dropped-010"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2049,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ],
+      "outputSha256": "492e46334d5d42b17846a7054848e42cfea910c594c5a82db8c8bc7affe765e3"
+    },
+    {
+      "label": "D-second",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/packaging-close/inventory.json",
+        "--identity-registry",
+        "/tmp/fgos-work/packaging-close/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "outputPath": "/tmp/fgos-work/packaging-close/D-second.json",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1163,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22573,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22805,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22573,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 2,
+          "examples": [
+            "dropped-001",
+            "dropped-010"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2049,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ],
+      "outputSha256": "492e46334d5d42b17846a7054848e42cfea910c594c5a82db8c8bc7affe765e3"
+    },
+    {
+      "label": "E-first",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/packaging-close/inventory.json",
+        "--identity-registry",
+        "/tmp/fgos-work/packaging-close/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architect/packaging-distribution/future-constraints.md",
+        "--scope",
+        "docs/architect/packaging-distribution/history/distribution-baseline.md",
+        "--scope",
+        "docs/architect/packaging-distribution/migration-map.md",
+        "--scope",
+        "docs/architect/packaging-distribution/README.md",
+        "--scope",
+        "docs/architect/packaging-distribution/rewrite-plan.md",
+        "--scope",
+        "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "--scope",
+        "docs/architect/packaging-distribution/scope-map.md",
+        "--scope",
+        "docs/architect/packaging-distribution/workspace-runtime-model.md",
+        "--scope",
+        "docs/specs/distribution.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "outputPath": "/tmp/fgos-work/packaging-close/E-first.json",
+      "fatalFindings": [
+        {
+          "type": "claims-partial-carry",
+          "message": "1 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/packaging-distribution/runtime-identity-and-activation.md#historical-decisions-promoted-or-tracked)"
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "2 identical source units whose rows name different target owners (e.g. 6d8e01ea29ff: docs/platform/packaging-distribution/history/documentation-migration/migration-map.md, docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md, 0a60f4e2b631: docs/platform/packaging-distribution/README.md, docs/platform/packaging-distribution/spec.md)"
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "1 dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt) (e.g. dropped-001)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "693 candidate conservation units not named by a source decision (e.g. docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#fgctl-and-local-fgos, docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#unheaded-block-1, docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#1-purpose, docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#unheaded-block-2, docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#2-principle)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 1,
+          "examples": [
+            "docs/architect/packaging-distribution/runtime-identity-and-activation.md#historical-decisions-promoted-or-tracked"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 2,
+          "examples": [
+            "6d8e01ea29ff: docs/platform/packaging-distribution/history/documentation-migration/migration-map.md, docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+            "0a60f4e2b631: docs/platform/packaging-distribution/README.md, docs/platform/packaging-distribution/spec.md"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 1,
+          "examples": [
+            "dropped-001"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 693,
+          "examples": [
+            "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#fgctl-and-local-fgos",
+            "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#unheaded-block-1",
+            "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#1-purpose",
+            "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#unheaded-block-2",
+            "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#2-principle"
+          ]
+        }
+      ],
+      "outputSha256": "0d6419f96f38f8ec0871cb594fee36c6129557e566444d07124ade3dfedc3d28"
+    },
+    {
+      "label": "E-second",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/packaging-close/inventory.json",
+        "--identity-registry",
+        "/tmp/fgos-work/packaging-close/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architect/packaging-distribution/future-constraints.md",
+        "--scope",
+        "docs/architect/packaging-distribution/history/distribution-baseline.md",
+        "--scope",
+        "docs/architect/packaging-distribution/migration-map.md",
+        "--scope",
+        "docs/architect/packaging-distribution/README.md",
+        "--scope",
+        "docs/architect/packaging-distribution/rewrite-plan.md",
+        "--scope",
+        "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "--scope",
+        "docs/architect/packaging-distribution/scope-map.md",
+        "--scope",
+        "docs/architect/packaging-distribution/workspace-runtime-model.md",
+        "--scope",
+        "docs/specs/distribution.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "outputPath": "/tmp/fgos-work/packaging-close/E-second.json",
+      "fatalFindings": [
+        {
+          "type": "claims-partial-carry",
+          "message": "1 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/packaging-distribution/runtime-identity-and-activation.md#historical-decisions-promoted-or-tracked)"
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "2 identical source units whose rows name different target owners (e.g. 6d8e01ea29ff: docs/platform/packaging-distribution/history/documentation-migration/migration-map.md, docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md, 0a60f4e2b631: docs/platform/packaging-distribution/README.md, docs/platform/packaging-distribution/spec.md)"
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "1 dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt) (e.g. dropped-001)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "693 candidate conservation units not named by a source decision (e.g. docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#fgctl-and-local-fgos, docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#unheaded-block-1, docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#1-purpose, docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#unheaded-block-2, docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#2-principle)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 1,
+          "examples": [
+            "docs/architect/packaging-distribution/runtime-identity-and-activation.md#historical-decisions-promoted-or-tracked"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 2,
+          "examples": [
+            "6d8e01ea29ff: docs/platform/packaging-distribution/history/documentation-migration/migration-map.md, docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+            "0a60f4e2b631: docs/platform/packaging-distribution/README.md, docs/platform/packaging-distribution/spec.md"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 1,
+          "examples": [
+            "dropped-001"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 693,
+          "examples": [
+            "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#fgctl-and-local-fgos",
+            "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#unheaded-block-1",
+            "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#1-purpose",
+            "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#unheaded-block-2",
+            "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md#2-principle"
+          ]
+        }
+      ],
+      "outputSha256": "0d6419f96f38f8ec0871cb594fee36c6129557e566444d07124ade3dfedc3d28"
+    }
+  ],
+  "candidateDelta": [
+    {
+      "area": "packaging-distribution",
+      "beforeCount": 692,
+      "currentCount": 693,
+      "removed": [
+        {
+          "claimId": "claim_743f0b70132cc6fda8271214be7c061a",
+          "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "ffc24cb21beb67e859d84f86ef48e47a78b8c3e678c78823abd7be210cbd1a2c",
+          "fileStatus": {
+            "kind": "decision",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Candidate",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        {
+          "claimId": "claim_34de7c299044ca3ebf49837a0ef7f3bb",
+          "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+          "anchor": "unheaded-block-3",
+          "unitDigest": "8c825fbfc4345283bc92771c4af94d6a38ff5e2b75e2b7097d29267f7d882769",
+          "fileStatus": {
+            "kind": "decision",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Candidate",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        {
+          "claimId": "claim_d301f741817cf5afb1da6637ea19c3c7",
+          "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+          "anchor": "unheaded-block-5",
+          "unitDigest": "6587193ed55d77e09a42126a76fde7bb74560bb4d554440f4b09983a4fc8fc00",
+          "fileStatus": {
+            "kind": "decision",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Candidate",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        }
+      ],
+      "added": [
+        {
+          "claimId": "claim_0f7171f953dad3169ab775d68929c99f",
+          "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "31f20682351c4c470babfddbbf18a71a32190c071d4f6ae659725b6cfcf84dd0",
+          "fileStatus": {
+            "kind": "decision",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Candidate",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        {
+          "claimId": "claim_83454fd935b1f1f26a4b130576cc2471",
+          "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+          "anchor": "unheaded-block-3",
+          "unitDigest": "4d3bba9687d0eddb7182380f864742235de0aecae298039ad72043d97098fa14",
+          "fileStatus": {
+            "kind": "decision",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Candidate",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        {
+          "claimId": "claim_b17ddf847a3ee8b85d9e962e0350a26d",
+          "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+          "anchor": "unheaded-block-4",
+          "unitDigest": "83cd96cfb781feb154abc4afd7b34b45cab68e62e77788622955e964629399aa",
+          "fileStatus": {
+            "kind": "decision",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Candidate",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        {
+          "claimId": "claim_7a7a5547e9add84006789d592a9528b3",
+          "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+          "anchor": "unheaded-block-6",
+          "unitDigest": "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b",
+          "fileStatus": {
+            "kind": "decision",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Candidate",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        }
+      ],
+      "changed": [
+        {
+          "before": {
+            "claimId": "claim_a0f184bc39b573f0b4bf0ba469d68d2a",
+            "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+            "anchor": "installed-default-and-npm-compatibility",
+            "unitDigest": "a77dc7f6b7b1dd819a751579a1de6e718e80e669ef146fdcd10d0f66e6c821e4",
+            "fileStatus": {
+              "kind": "decision",
+              "kindCanonical": true,
+              "authorityStatus": "candidate",
+              "designStatus": "Candidate",
+              "canonical": false,
+              "eligibility": "non-promoted Candidate/Draft"
+            },
+            "status": "candidate-unverified"
+          },
+          "after": {
+            "claimId": "claim_a0f184bc39b573f0b4bf0ba469d68d2a",
+            "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+            "anchor": "installed-default-and-npm-compatibility",
+            "unitDigest": "6c803388a11379425a5ae5f98e4415b833183eee7167ae61592ede96818922c7",
+            "fileStatus": {
+              "kind": "decision",
+              "kindCanonical": true,
+              "authorityStatus": "candidate",
+              "designStatus": "Candidate",
+              "canonical": false,
+              "eligibility": "non-promoted Candidate/Draft"
+            },
+            "status": "candidate-unverified"
+          }
+        },
+        {
+          "before": {
+            "claimId": "claim_e6538fb192303f7d4fdf1e00c0d3aa18",
+            "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+            "anchor": "proposed-disposition",
+            "unitDigest": "b1ec345e0756e842dfa086f9c4ef0110dca6a04da2c95d9139cb11186688c3a2",
+            "fileStatus": {
+              "kind": "decision",
+              "kindCanonical": true,
+              "authorityStatus": "candidate",
+              "designStatus": "Candidate",
+              "canonical": false,
+              "eligibility": "non-promoted Candidate/Draft"
+            },
+            "status": "candidate-unverified"
+          },
+          "after": {
+            "claimId": "claim_e6538fb192303f7d4fdf1e00c0d3aa18",
+            "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+            "anchor": "proposed-disposition",
+            "unitDigest": "0c4a1e10db283e13eb9bebdeb53fe11b94ffb80f609ae4f21cdb08021ec64e4f",
+            "fileStatus": {
+              "kind": "decision",
+              "kindCanonical": true,
+              "authorityStatus": "candidate",
+              "designStatus": "Candidate",
+              "canonical": false,
+              "eligibility": "non-promoted Candidate/Draft"
+            },
+            "status": "candidate-unverified"
+          }
+        },
+        {
+          "before": {
+            "claimId": "claim_76e368f9914b86f0de7fcef41386b8d7",
+            "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+            "anchor": "unheaded-block-4",
+            "unitDigest": "a513eb7c42ddbdd4384e1aa33225568a3f0591a9dc433b435bc578a6acc9d972",
+            "fileStatus": {
+              "kind": "decision",
+              "kindCanonical": true,
+              "authorityStatus": "candidate",
+              "designStatus": "Candidate",
+              "canonical": false,
+              "eligibility": "non-promoted Candidate/Draft"
+            },
+            "status": "candidate-unverified"
+          },
+          "after": {
+            "claimId": "claim_76e368f9914b86f0de7fcef41386b8d7",
+            "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+            "anchor": "unheaded-block-5",
+            "unitDigest": "a513eb7c42ddbdd4384e1aa33225568a3f0591a9dc433b435bc578a6acc9d972",
+            "fileStatus": {
+              "kind": "decision",
+              "kindCanonical": true,
+              "authorityStatus": "candidate",
+              "designStatus": "Candidate",
+              "canonical": false,
+              "eligibility": "non-promoted Candidate/Draft"
+            },
+            "status": "candidate-unverified"
+          }
+        }
+      ]
+    },
+    {
+      "area": "host-invocation-routing",
+      "beforeCount": 588,
+      "currentCount": 588,
+      "removed": [],
+      "added": [],
+      "changed": [
+        {
+          "before": {
+            "claimId": "claim_2ae4c5c63621e9fe8e2c14021ee4a5f7",
+            "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+            "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+            "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee",
+            "fileStatus": {
+              "kind": "architecture",
+              "kindCanonical": true,
+              "authorityStatus": "candidate",
+              "designStatus": "Draft",
+              "canonical": false,
+              "eligibility": "non-promoted Candidate/Draft"
+            },
+            "status": "candidate-unverified"
+          },
+          "after": {
+            "claimId": "claim_2ae4c5c63621e9fe8e2c14021ee4a5f7",
+            "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+            "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+            "unitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07",
+            "fileStatus": {
+              "kind": "architecture",
+              "kindCanonical": true,
+              "authorityStatus": "candidate",
+              "designStatus": "Draft",
+              "canonical": false,
+              "eligibility": "non-promoted Candidate/Draft"
+            },
+            "status": "candidate-unverified"
+          }
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "--test",
+      "test/scripts/doc-review-format.test.mjs",
+      "test/scripts/doc-decision-review.test.mjs"
+    ],
+    "exit": 0,
+    "tests": 29,
+    "pass": 29,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "output": "✔ review pack contains full source and target units and reverse unmatched candidate blocks (2.989065ms)\n✔ seeded review uses six real text mutations and scores missed defects and false flags (11.305938ms)\n✔ review application binds current digest and keeps rework and hold pending without inventing approval (4.912805ms)\n✔ valid source digest prefixes survive pack and review application with full seen-text bindings (2.16021ms)\n✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (0.662138ms)\n✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (2.188315ms)\n✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (0.986105ms)\n✔ the same reviewer session on another date is still the author session (0.218301ms)\n✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.304344ms)\n✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (1.612204ms)\n✔ review application requires a passing sensitivity result for the exact shown pack (1.771035ms)\n✔ approval cannot attach to target text or heading ancestry changed after the pack (1.955467ms)\n✔ approved rows retain the seen unit binding and their own report across review rounds (1.656859ms)\n✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (1.566549ms)\n✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (112.56176ms)\n✔ the public seeded Markdown can be scored without exposing the seed or private selection key (229.370331ms)\n✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (263.071768ms)\n✔ a new shard cannot claim legacy compatibility by deleting author fields (81.204528ms)\n✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (187.26711ms)\n▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session\n  ✔ target-digest (80.082065ms)\n  ✔ source-digest (81.176761ms)\n  ✔ authoredBy (92.188289ms)\n  ✔ authorSession (89.844466ms)\n  ✔ same-session (86.878269ms)\n✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (431.127321ms)\n▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof\n  ✔ checkpoint 3 (182.731823ms)\n  ✔ checkpoint 6 (174.339316ms)\n  ✔ checkpoint 10 (185.306607ms)\n✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (542.929901ms)\nℹ tests 29\nℹ suites 0\nℹ pass 29\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1925.866144\n"
+  },
+  "resume": {
+    "nativeEquality": {
+      "version": 1,
+      "proofCommit": "478c54d67c4721d495687a88408780f82235f793",
+      "DZeroFatalBothPriors": true,
+      "sourceNativeSetEquality": true,
+      "sourceRows": 407,
+      "sourceReviewed": 404,
+      "sourcePending": 3,
+      "appliedSourceOk": 12,
+      "acceptedVerdicts": 26,
+      "rationaleReworks": 3,
+      "changedTruthBindings": 0,
+      "successorsReviewed": 31,
+      "stableHeadingsReviewed": 21,
+      "notesVerbatim": true,
+      "unchangedApprovalsByteEqualCommittedObjects": true,
+      "allOldKnownIdsRetained": true,
+      "oldKnownIds": 94328,
+      "currentKnownIds": 94333,
+      "newNativeIds": 5,
+      "stableTupleChanges": 4,
+      "changedNativeUnits": 9,
+      "priorPersistedKnownIds": 93839,
+      "persistedUnchangedTuples": 93815,
+      "priorShownHeadingChanges": 21,
+      "newShownHeadingChanges": 4,
+      "persistedTruthHeadingChanges": 3,
+      "immediatePriorFullKnownTupleEquality": true,
+      "activeRegistryInventoryFullTupleEquality": true,
+      "identityGraft": false,
+      "candidateRows": 692,
+      "candidateTupleChanges": 6,
+      "candidateTupleEqualityBothPriors": true,
+      "identicalUnitGroups": 2,
+      "identicalUnitMembershipEqual": true,
+      "closedAreaCandidateEquality": [
+        {
+          "area": "agent-coordination",
+          "rows": 488,
+          "fullTupleEquality": true
+        },
+        {
+          "area": "host-invocation-routing",
+          "rows": 588,
+          "fullTupleEquality": true
+        }
+      ],
+      "F6RegisterAndRetentionUnchanged": true,
+      "strictEOpen": {
+        "claims-partial-carry": 1,
+        "claims-not-reviewed": 3,
+        "identical-units-multiple-owners": 2,
+        "dropped-claims-unreviewed": 1,
+        "candidate-blocks-unreferenced": 692
+      },
+      "strictEExpectedRed": true,
+      "batchClosureClaimed": false,
+      "registryBytes": 59450050,
+      "registrySha256": "ff3b8e1ced4306cdb94dfcc943de16f2312c0d36b31889b8347aa96ce8bfa4e3",
+      "persistedRegistrySha256": "d54faf6eec8e785b33fe5902022f446d0fe25989d90e5316707c1da50e849cd9"
+    },
+    "preservation": {
+      "commit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
+      "extractorUnchanged": true,
+      "priorClosedAreaTreesUnchanged": true,
+      "historyWitnesses": 74,
+      "payloads": 867,
+      "frozenFiles": 5,
+      "ownAllowlistViolations": [],
+      "exactExemptions": 8,
+      "authorityStatusesUnchanged": true,
+      "readerLinksUnchanged": true,
+      "checks": [
+        {
+          "command": [
+            "node",
+            "scripts/check-legacy-docs-ratchet.mjs"
+          ],
+          "exit": 0,
+          "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "node",
+            "scripts/check-doc-constitution.mjs",
+            "--no-ledger",
+            "--check-placement"
+          ],
+          "exit": 0,
+          "stdout": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 509 files, 508 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "node",
+            "scripts/check-doc-candidate-status.mjs",
+            "--json"
+          ],
+          "exit": 0,
+          "stdout": "{\n  \"counts\": {\n    \"files\": 509,\n    \"byStatus\": {\n      \"promoted\": 3,\n      \"candidate\": 115,\n      \"legacy-current\": 0,\n      \"non-authority\": 1,\n      \"unrouted\": 390\n    },\n    \"exemptUnrouted\": 302,\n    \"checked\": 118,\n    \"findings\": 0,\n    \"byType\": {}\n  },\n  \"findings\": []\n}\n",
+          "stderr": ""
+        }
+      ]
+    },
+    "bothPriorInitialDZeroFatal": true,
+    "initialScopedEExpectedOpen": {
+      "claims-partial-carry": 1,
+      "claims-not-reviewed": 3,
+      "identical-units-multiple-owners": 2,
+      "dropped-claims-unreviewed": 1,
+      "candidate-blocks-unreferenced": 692
+    }
+  },
+  "refreshCommands": [
+    {
+      "command": [
+        "node",
+        "scripts/generate-doc-inventory.mjs",
+        "--refresh",
+        "--commit",
+        "865ffac93c767b862ad9745fef5372dffd9a8158",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--json-out",
+        "/tmp/fgos-work/packaging-close/inventory.json",
+        "--md-out",
+        "/tmp/fgos-work/packaging-close/inventory.md"
+      ],
+      "output": "generate-doc-inventory: identity registry (commit cfd4cffc17caae2e4b28417487f967f35ebae845) is bound to 865ffac93c767b862ad9745fef5372dffd9a8158; no carry-forward needed\ngenerate-doc-inventory: wrote ../../../../tmp/fgos-work/packaging-close/inventory.json and ../../../../tmp/fgos-work/packaging-close/inventory.md\n"
+    }
+  ],
+  "persistedRegistry": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "bytes": 59453707,
+    "sha256": "7733334b6a3d9b24821b0a493d41ef8e40c9388b76f40cade30b8abdc9178b47",
+    "stopLineBytes": 90000000,
+    "seedReconstruction": false,
+    "identityGraft": false,
+    "formatChanged": false
+  },
+  "retiredCorrection": "Fresh D rejected the retired proposal paragraph under registryGaps; the existing checker accepts only identityGaps there. Its pending successor disposition is now stored on the native retired registry row, preserving all identity fields. No gate or identity-format change.",
+  "historicalTruthSample": {
+    "falseUnits": 3,
+    "sampleUnits": 30,
+    "checkedAssertions": 65,
+    "trueAssertions": 62,
+    "falseAssertions": 3,
+    "threeStatusFixesIndependentlyOk": true,
+    "exact629UnitPopulationDigestUnverified": true,
+    "freshDrawClaimed": false
+  },
+  "effort": {
+    "packagingExecutorSessions": 5,
+    "oneInterrupted": true,
+    "sourceRows": 407,
+    "rowsPerExecutorSession": 81.4,
+    "sourceOkVerdictsAppliedThisSession": 3
+  },
+  "technicalBlockers": [],
+  "independentReviewRequired": [
+    "F6 newly authored representation",
+    "three native gap successors and one retired successor",
+    "three stable heading digest changes",
+    "one affected Host source binding",
+    "one digest-bound Host residual renewal",
+    "candidate list native tuple deltas and equality",
+    "dropped-001 register binding"
+  ],
+  "helperSources": {
+    "apply.py": "import json,pathlib,subprocess,re,hashlib,copy\np=pathlib.Path('plans/260925-documentation-authority-unification');r=p/'reports/phase-06';s=pathlib.Path('/tmp/fgos-work/packaging-close');report=r/'review-4-packaging-rationale-followup.md';pin='ea04ae858';sha=lambda b:hashlib.sha256(b).hexdigest()\npin=subprocess.check_output(['git','rev-parse',pin],text=True).strip();assert subprocess.check_output(['git','show',pin+':'+str(report)])==report.read_bytes()\nverdicts=[]\nfor l in report.read_text().splitlines():\n if l.startswith('| claim_'):\n  c=[v.strip() for v in l.split('|')[1:-1]];verdicts.append(dict(zip(['item','verdict','note','sourceDigest','targetDigest'],c)))\nassert len(verdicts)==3 and all(v['verdict']=='ok' for v in verdicts)\nf=p/'ledger/decisions/s4-packaging-distribution-architecture.json';d=json.loads(f.read_text());before=copy.deepcopy(d);ids={v['item'] for v in verdicts};tmp=s/'apply-source.json';tmp.write_text(json.dumps({**d,'claims':[x for x in d['claims'] if x['claimId'] in ids]},ensure_ascii=False,indent=2)+'\\n')\ncmd=['node','scripts/propose-doc-decisions.mjs','--apply-review',str(tmp),'--inventory','/tmp/fgos-work/packaging-rationale/inventory.json','--repo-root','.', '--verdicts',str(report),'--reviewer','reviewer:claude-session:a4954387@2026-10-14'];z=subprocess.run(cmd,capture_output=True,text=True);assert z.returncode==0,(z.stdout,z.stderr)\nrows={x['claimId']:x for x in json.loads(tmp.read_text())['claims']}\nfor v in verdicts:\n x=rows[v['item']];assert x['reviewNote']==v['note'] and x['reviewMode']=='ordinary';assert subprocess.check_output(['git','show',x['reviewReportCommit']+':'+str(report)])==report.read_bytes();x['reviewReportCommit']=pin\nd['claims']=[rows.get(x['claimId'],x) for x in d['claims']];f.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\n(s/'application.json').write_text(json.dumps({'report':str(report),'reportCommit':pin,'reportSha256':sha(report.read_bytes()),'verdicts':verdicts,'command':cmd,'exit':z.returncode,'stdout':z.stdout,'stderr':z.stderr,'otherRowsEqual':all(x==y for x,y in zip(before['claims'],d['claims']) if x['claimId'] not in ids)},ensure_ascii=False,indent=2)+'\\n')\nprint('Applied 3 ordinary verdicts verbatim, report pinned:',pin)\n",
+    "resolve.py": "import json,pathlib,hashlib,subprocess,copy\np=pathlib.Path('plans/260925-documentation-authority-unification');r=p/'reports/phase-06';s=pathlib.Path('/tmp/fgos-work/packaging-close');sha=lambda b:hashlib.sha256(b).hexdigest();pin='5563bcb70d1c9f0706925271e8209e7eb49fd28b'\nowner=(r/'owner-answers.md').read_text();resolution=owner[owner.index('F6 resolution ('):].strip();assert subprocess.check_output(['git','show',pin+':'+str(r/'owner-answers.md')]).decode()==owner\nf=pathlib.Path('docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md');before=f.read_text();s.joinpath('decision-before.md').write_text(before)\nnew=before.replace('Purpose: Propose the disposition of the retained installed-default npm entry obligation','Purpose: Record the owner-decided successor to the installed-default npm entry trigger and the owed removal obligation').replace('Implementation: Proposed retirement of a dated trigger clause; no retirement is approved here','Implementation: Owner-decided successor; end-of-window removal or redirect remains owed').replace('Canonical for: The pending decision proposal only','Canonical for: Candidate record of the owner F6 resolution and remaining Packaging-distribution obligation').replace('Use this when: Reviewing the original installed-default trigger against the retained npm compatibility channel','Use this when: Reading the successor window and the owed end-of-window removal or redirect').replace('Do not use this for: Removing npm entries, changing release support, or treating the proposal as accepted','Do not use this for: Claiming removal is implemented, extending release support, or an authority cutover').replace('Last reviewed: Pending independent review','Last reviewed: Owner resolution 2026-10-14; conservation representation pending independent review').replace('Supersedes: None until independent verdict','Supersedes: The automatic installed-default npm bin.fgos removal trigger, by the owner F6 resolution')\nstart=new.index('Added in candidate — propose retirement');end=new.index('\\n\\nThe current `package.json',start)\nnew=new[:start]+'''Added in candidate — owner F6 resolution (2026-10-14): **superseded by decision**. The automatic installed-default removal or redirection trigger for npm `bin.fgos` has the 2026-09-15 coordinator decision as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; `docs/platform/host-invocation-routing/architecture/release-boundaries.md:35`). The Rust host is the installed default from the preview; the Node fallback is deprecated and supported for 30 calendar days after preview publication, earliest removal 2026-10-18.\n\nRemoving or redirecting `bin.fgos` after the window remains an **owed obligation owned by Packaging-distribution (release-owner decision)**. Nothing is removed now. The runner mapping and source-entry ownership header stay; this resolution does not extend the support promise.'''+new[end:]\nstart=new.index('The current code proves coexistence')\nnew=new[:start]+'''The rationale is **superseded by decision**: the same-day ownership header and the dated coordinator window show intentional coexistence. The coordinator window supersedes the automatic installed-default trigger; absence of a removal commit is not the retirement rationale. The original obligation remains preserved verbatim above and at the resolved retention anchor in `docs/platform/host-invocation-routing/architecture/release-boundaries.md`. The end-of-window removal or redirect remains owed to Packaging-distribution.\n'''\nf.write_text(new)\nhost=pathlib.Path('docs/platform/host-invocation-routing/architecture/release-boundaries.md');old=host.read_text();s.joinpath('retention-before.md').write_text(old);line=next(x for x in old.splitlines() if x.startswith('**Checked status:** FLAGGED obsolete installed-default'))\nstatus='Superseded by decision (owner F6 resolution, 2026-10-14): the installed-default npm `bin.fgos` removal trigger has the 2026-09-15 coordinator 30-day window as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; compatibility-window row above, originally line 35). The Rust host is the installed default from preview; the deprecated Node fallback is supported for 30 calendar days after preview publication, earliest removal 2026-10-18. Removing or redirecting `bin.fgos` after the window remains owed to Packaging-distribution (release-owner decision). The original clause below is retained verbatim as dated design. The runner mapping and source-entry ownership header stay; nothing is removed now.'\nhost.write_text(old.replace(line,'**Checked status:** '+status))\nreg=p/'dropped-claims-register.json';d=json.loads(reg.read_text());entry=next(e for e in d['entries'] if e['id']=='dropped-010');s.joinpath('register-before.json').write_text(json.dumps(entry['reviewedDisposition'],ensure_ascii=False,indent=2)+'\\n');rd=entry['reviewedDisposition'];keep={k:rd[k] for k in ['anchor','sourceCommit','codeEvidence','stubOwner','stubAnchor','retainedVerbatim']};entry['reviewedDisposition']={**keep,'decision':'superseded by decision','owner':'Packaging-distribution (release-owner decision)','authoredBy':'codex-session:12@2026-10-14','reviewStatus':'pending','successor':{'decision':'2026-09-15 coordinator 30-day window','owner':'docs/platform/packaging-distribution/code-panel-rollout-plan.md','anchor':'2-coordinator-setup','line':72,'companionOwner':str(host),'companionAnchor':'2-open-release-decisions','companionLine':35,'earliestRemoval':'2026-10-18'},'owedObligation':'Removing or redirecting bin.fgos after the window remains owed to Packaging-distribution (release-owner decision). Nothing is removed now.','rationale':'Superseded by decision: the same-day ownership header and the dated coordinator window show intentional coexistence; the coordinator 30-day window is the successor to the automatic installed-default trigger.','statusNote':status,'flaggedObsolete':False,'retentionStatus':'superseded-by-decision; original clause retained verbatim as dated design','ownerResolution':{'report':str(r/'owner-answers.md'),'commit':pin,'text':resolution,'shownTextDigest':sha(resolution.encode())},'reviewNote':'Owner decision accepted; newly authored representation and its conservation bindings await independent Lead review.'};reg.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\nproposal=r/'dropped-010-packaging-proposal.json';d=json.loads(proposal.read_text());row=d['rows'][0];s.joinpath('proposal-before.json').write_text(json.dumps(row,ensure_ascii=False,indent=2)+'\\n');row.update(proposedVerdict='superseded by decision',rationale=entry['reviewedDisposition']['rationale'],authoredBy='codex-session:12@2026-10-14',reviewStatus='pending',successor=entry['reviewedDisposition']['successor'],owedObligation=entry['reviewedDisposition']['owedObligation'],ownerResolution=entry['reviewedDisposition']['ownerResolution'],limits='Owner resolution decided; newly authored conservation representation pending independent review. No removal, support extension or authority cutover.');proposal.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\nlog=r/'post-review-edits.md';log.write_text(log.read_text()+f'\\n## Packaging owner-resolution representation (2026-10-14)\\n\\nOwner resolution at `{pin}` supersedes the installed-default npm trigger by the dated coordinator window and leaves the end-of-window obligation owed to Packaging-distribution. Update the candidate decision and the release-boundaries retention status; preserve the literal original clause. All affected native units, stable headings, reviewed bindings and reverse tuples are shown in the bounded closure-resolution request and return for independent conservation review. No implementation change or promotion.\\n')\nprint('Resolved F6 prose and FLAGGED status; representation pending Lead review.')\n",
+    "residual.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';import * as g from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',sha=x=>createHash('sha256').update(x).digest('hex'),read=x=>JSON.parse(fs.readFileSync(x)),inventory=g.loadInventory('/tmp/fgos-work/packaging-rationale/inventory.json',{}),units=g.buildConservationUnitLookup(process.cwd(),inventory.commit),sh=read(p+'ledger/decisions/s4-packaging-distribution-architecture.json'),rows=sh.claims.filter(x=>x.disposition==='partial-carry');assert.equal(rows.length,1);const shown=(path,u)=>({path,anchor:u.anchor,unitDigest:u.textDigest,shownText:u.sectionText||u.text,shownTextDigest:sha(u.sectionText||u.text)}),out=[];\nfor(const d of rows){assert.equal(d.reviewStatus,'reviewed');const src=inventory.claimLedger.find(x=>x.claimId===d.claimId);const u=units(src.sourcePath).find(x=>x.anchor===src.sourceAnchor),target=units(d.targetOwner).find(x=>x.anchor===d.targetAnchor);assert.equal(u.textDigest,d.sourceUnitDigest);assert.equal(target.textDigest,d.targetUnitDigest);const remainder=units(src.sourcePath).find(x=>x.unitKind!=='heading'&&x.text.includes('Source checkouts support explicit `dev:<rev>`'));assert(remainder&&u.sectionText.includes(remainder.text));out.push({claimId:d.claimId,disposition:d.disposition,reviewNote:d.reviewNote,reviewedBy:d.reviewedBy,reviewReport:d.reviewReport,reviewReportCommit:d.reviewReportCommit,remainderDescription:d.remainder,source:shown(src.sourcePath,u),primaryTarget:shown(d.targetOwner,target),untransferredRemainder:shown(src.sourcePath,remainder),cutoverObligation:true,restorationOwner:'Plan C (draft, unscheduled); Packaging-distribution tracks the cutover obligation'});}\nconst residual=r+'packaging-partial-carry-residual.json';fs.writeFileSync(residual,JSON.stringify({version:1,rule:'A34',ownerAnswerCommit:'5563bcb70d1c9f0706925271e8209e7eb49fd28b',sourceCommit:inventory.commit,rows:out},null,2)+'\\n');fs.writeFileSync(r+'packaging-partial-carry-acceptance.json',JSON.stringify({version:1,rule:'A34',residualFile:residual,residualSha256:sha(fs.readFileSync(residual)),rows:out.map(x=>({claimId:x.claimId,sourceUnitDigest:x.source.unitDigest,targetUnitDigest:x.primaryTarget.unitDigest,residualSha256:sha(fs.readFileSync(residual)),reviewReport:x.reviewReport,reviewReportCommit:x.reviewReportCommit,cutoverObligation:true})),strictE:'red; partial-carry disposition unchanged; acceptance revoked on any digest drift'},null,2)+'\\n');console.log('A34: one independently ok partial carry, full verbatim table residual, digest-bound.');\n",
+    "rebind.py": "import json,pathlib,subprocess,copy\ns=pathlib.Path('/tmp/fgos-work/packaging-close');rows=json.load(open(s/'changed-review-bindings.json'));assert len(rows)==1;x=rows[0];f=pathlib.Path(x['path']);d=json.loads(f.read_text());before=copy.deepcopy(d);t=s/'rebind-source.json';t.write_text(json.dumps({**d,'claims':[x['before']]},ensure_ascii=False,indent=2)+'\\n');cmd=['node','scripts/propose-doc-decisions.mjs','--rebind',str(t),'--inventory',str(s/'inventory.json'),'--repo-root','.'];z=subprocess.run(cmd,capture_output=True,text=True);assert z.returncode==0,(z.stdout,z.stderr);row=json.loads(t.read_text())['claims'][0];assert row['reviewStatus']=='pending'\nfor k in ['reviewedBy','reviewedAt','reviewReport','reviewReportCommit','reviewMode','reviewPackCommit','reviewPackId','seedScoreId','targetUnitDigest','targetAncestry']:row.pop(k,None)\nrow['authoredBy']='codex-session:12@2026-10-14';row['rationale']='Supersede the whole dated installed-default npm-bin removal trigger by the owner-decided 2026-09-15 coordinator 30-day window, earliest removal 2026-10-18. The Checked status names that successor and keeps removing or redirecting bin.fgos after the window owed to Packaging-distribution (release-owner decision). The original source clause is separately retained verbatim in the adjacent fenced block; runner mapping and source-entry ownership header stay. No removal or support extension is implemented by this documentation change.'\nd['claims']=[row if a['claimId']==row['claimId'] else a for a in d['claims']];assert all(a==b for a,b in zip(before['claims'],d['claims']) if a['claimId']!=row['claimId']);f.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n');x['after']=row;x['rebindCommand']=cmd;x['rebindStdout']=z.stdout;(s/'source-consequence.json').write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\\n');print('One Host source binding reopened; all other Host rows unchanged.')\n",
+    "gates.py": "import json,pathlib,subprocess,concurrent.futures,sys\ns=pathlib.Path('/tmp/fgos-work/packaging-close');p='plans/260925-documentation-authority-unification';scopes=json.load(open(p+'/reports/phase-06/packaging-distribution-placement.json'))['sources'];results=[]\ndef one(label,prior,strict):\n cmd=['node','scripts/check-doc-inventory-gates.mjs','--inventory',str(s/'inventory.json'),'--identity-registry',str(s/'registry.json'),'--decisions',p+'/pilot/decisions','--decisions',p+'/ledger/decisions','--previous-registry',p+'/'+prior,'--json']\n if strict:\n  cmd+=['--strict']\n  for x in scopes:cmd+=['--scope',x['path']]\n x=subprocess.run(cmd,capture_output=True,text=True);out=s/(label+'.json');out.write_text(x.stdout);d=json.loads(x.stdout);r={'label':label,'command':cmd,'exit':x.returncode,'stderr':x.stderr,'outputPath':str(out),'fatalFindings':d['fatalFindings'],'conservationOpen':d['conservationOpen'],'outputSha256':__import__('hashlib').sha256(out.read_bytes()).hexdigest()};print(label,x.returncode,'fatal',len(d['fatalFindings']),'open',[(z['type'],z['count']) for z in d['conservationOpen']],flush=True);return r\nfor strict in [False,True]:\n with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:\n  futs=[pool.submit(one,('E' if strict else 'D')+'-'+label,prior,strict) for label,prior in [('first','reports/identity-registry.json'),('second','reports/phase-02-identity-registry.json')]]\n  for f in futs:results.append(f.result())\n (s/'gate-results.json').write_text(json.dumps(results,indent=2)+'\\n')\n if not strict and any(x['exit'] or x['fatalFindings'] for x in results):sys.exit(1)\n",
+    "sync-candidates.py": "import json,pathlib,hashlib,copy\np=pathlib.Path('plans/260925-documentation-authority-unification');r=p/'reports/phase-06';s=pathlib.Path('/tmp/fgos-work/packaging-close');sha=lambda b:hashlib.sha256(b).hexdigest();D=json.load(open(s/'D-first.json'));changes=[]\nfor area in ['packaging-distribution','host-invocation-routing']:\n f=r/('candidate-unverified-'+area+'.json');d=json.loads(f.read_text());before=copy.deepcopy(d);rows=[x for x in D['explicitOpenFindings']['unreferencedCandidateRows'] if x['path'].startswith('docs/platform/'+area+'/')];old={x['claimId']:x for x in d['rows']};enriched=[]\n for x in rows:\n  template=old.get(x['claimId']) or next(z for z in d['rows'] if z['path']==x['path']);enriched.append({**template,**x})\n rows=enriched;cur={x['claimId']:x for x in rows};changes.append({'area':area,'beforeCount':len(old),'currentCount':len(cur),'removed':[x for i,x in old.items() if i not in cur],'added':[x for i,x in cur.items() if i not in old],'changed':[{'before':x,'after':cur[i]} for i,x in old.items() if i in cur and (x['path'],x['anchor'],x['unitDigest'])!=(cur[i]['path'],cur[i]['anchor'],cur[i]['unitDigest'])]});d['rows']=rows;d['count']=len(rows);d['authoredCommit']=D.get('commit',json.load(open(s/'registry.json'))['commit']);d['resolutionRebinding']={'ownerResolutionCommit':'5563bcb70d1c9f0706925271e8209e7eb49fd28b','reviewStatus':'pending independent conservation review','meaning':'Exact fresh reverse-open tuples only; no code-truth approval. Changes are shown in the bounded F6 resolution request.'};f.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\n(s/'candidate-delta.json').write_text(json.dumps(changes,ensure_ascii=False,indent=2)+'\\n');print([(x['area'],x['beforeCount'],x['currentCount'],len(x['removed']),len(x['added']),len(x['changed'])) for x in changes])\n",
+    "equality.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';import {execFileSync} from 'node:child_process';import * as g from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s='/tmp/fgos-work/packaging-close/',read=f=>JSON.parse(fs.readFileSync(f)),sha=x=>createHash('sha256').update(x).digest('hex'),inv=g.loadInventory(s+'inventory.json',{}),reg=read(s+'registry.json'),before=read(s+'registry-before.json'),hist=read(s+'persisted-before.json'),a=read(r+'packaging-closure-resolution-accounting.json'),known=x=>new Map(['units','retiredUnits','identityGaps'].flatMap(k=>x[k]).map(u=>[u.claimId,[u.sourcePath,u.sourceAnchor,u.sourceUnitDigest]])),N=known(reg),B=known(before),H=known(hist),tuple=u=>[u.claimId,u.sourcePath,u.sourceAnchor,u.sourceUnitDigest].join('\\0'),ct=u=>[u.claimId,u.path,u.anchor,u.unitDigest].join('\\0'),units=g.buildConservationUnitLookup(process.cwd(),inv.commit);\nassert.deepEqual(inv.claimLedger.map(tuple).sort(),reg.units.map(tuple).sort());const expected=new Map(B);for(const x of a.changedStableTuples){assert.deepEqual(expected.get(x.claimId),x.before);expected.set(x.claimId,x.after);}assert.deepEqual([...expected].sort(),[...N].filter(([id])=>B.has(id)).sort());assert.deepEqual([...N].filter(([id])=>!B.has(id)).map(([id,tuple])=>({claimId:id,tuple})).sort((x,y)=>x.claimId.localeCompare(y.claimId)),a.newNativeIds.map(({claimId,tuple})=>({claimId,tuple})).sort((x,y)=>x.claimId.localeCompare(y.claimId)));\nconst histExpected=new Map(H);for(const x of read(r+'packaging-stable-heading-bindings.json').rows){assert.deepEqual(histExpected.get(x.claimId),[x.path,x.anchor,x.beforeUnitDigest]);histExpected.set(x.claimId,[x.path,x.anchor,x.afterUnitDigest]);}for(const x of [...read(r+'packaging-followup-accounting.json').nativeIdentity.changedStableTuples,...a.changedStableTuples])if(histExpected.has(x.claimId)){assert.deepEqual(histExpected.get(x.claimId),x.before);histExpected.set(x.claimId,x.after);}assert.deepEqual([...histExpected].sort(),[...N].filter(([id])=>H.has(id)).sort());\nconst shards=g.loadDecisionShards(p+'ledger/decisions'),srcSh=shards.filter(x=>/^s4-packaging-distribution-(architecture|distribution)\\.json$/.test(x.shard)),rows=srcSh.flatMap(x=>x.claims),scopes=srcSh.flatMap(x=>x.sources),sources=inv.claimLedger.filter(x=>scopes.includes(x.sourcePath));assert.equal(rows.length,407);assert.deepEqual(rows.map(x=>x.claimId).sort(),sources.map(x=>x.claimId).sort());for(const d of rows){assert.equal(d.reviewStatus,'reviewed');assert.notEqual(d.authoredBy,d.reviewedBy);assert.equal(d.sourceUnitDigest,sources.find(x=>x.claimId===d.claimId).sourceUnitDigest);assert.equal(d.targetUnitDigest,units(d.targetOwner).find(x=>x.anchor===d.targetAnchor).textDigest);const text=execFileSync('git',['show',d.reviewReportCommit+':'+d.reviewReport],{encoding:'utf8'});const line=text.split('\\n').find(x=>x.startsWith('| '+d.claimId+' |'));assert(line);const c=line.split('|').slice(1,-1).map(x=>x.trim());assert.equal(c[1],'ok');assert.equal(c[2],d.reviewNote);}\nconst app=read(s+'application.json');for(const v of app.verdicts){const d=rows.find(x=>x.claimId===v.item);assert.equal(d.reviewReportCommit,app.reportCommit);assert.equal(d.reviewNote,v.note);assert.equal(d.reviewMode,'ordinary');}assert.equal(rows.filter(x=>x.disposition==='partial-carry').length,1);const residual=read(r+'packaging-partial-carry-residual.json'),accept=read(r+'packaging-partial-carry-acceptance.json');assert.equal(accept.residualSha256,sha(fs.readFileSync(accept.residualFile)));for(const d of residual.rows){assert.equal(rows.find(x=>x.claimId===d.claimId).sourceUnitDigest,d.source.unitDigest);assert.equal(rows.find(x=>x.claimId===d.claimId).targetUnitDigest,d.primaryTarget.unitDigest);for(const x of [d.source,d.primaryTarget,d.untransferredRemainder]){assert.equal(x.unitDigest,units(x.path).find(u=>u.anchor===x.anchor).textDigest);assert.equal(x.shownTextDigest,sha(x.shownText));}}\nconst priorGaps=shards.find(x=>x.shard==='s4-packaging-distribution-successors.json').registryGaps;assert.equal(priorGaps.length,31);for(const d of priorGaps){assert.equal(d.reviewStatus,'reviewed');assert.equal(d.targetUnitDigest,units(d.targetOwner).find(x=>x.anchor===d.targetAnchor).textDigest);}const newGaps=shards.find(x=>x.shard==='s4-packaging-distribution-resolution.json').registryGaps;assert.equal(newGaps.length,3);const retired=reg.retiredUnits.find(x=>x.claimId===a.retiredDisposition.claimId);assert.deepEqual(retired,a.retiredDisposition);assert.equal(retired.reviewStatus,\"pending\");assert.equal(retired.targetUnitDigest,units(retired.targetOwner).find(u=>u.anchor===retired.targetAnchor).textDigest);for(const d of newGaps){assert.equal(d.reviewStatus,'pending');assert.equal(d.sourceUnitDigest,N.get(d.claimId)[2]);assert.equal(d.targetUnitDigest,units(d.targetOwner).find(x=>x.anchor===d.targetAnchor).textDigest);assert.equal(d.reviewedBy,undefined);}\nconst host=shards.find(x=>x.shard==='s3-host-invocation-checkpoint');assert.equal(host.claims.filter(x=>x.reviewStatus!=='reviewed').length,1);const changed=read(s+'source-consequence.json');assert.deepEqual(host.claims.find(x=>x.claimId===changed.claimId),changed.after);const oldHost=JSON.parse(execFileSync('git',['show','492877ab9:'+p+'ledger/decisions/s3-host-invocation-checkpoint.json'],{encoding:'utf8'}));for(const d of host.claims)if(d.claimId!==changed.claimId)assert.deepEqual(d,oldHost.claims.find(x=>x.claimId===d.claimId));\nconst D1=read(s+'D-first.json'),D2=read(s+'D-second.json'),E1=read(s+'E-first.json'),E2=read(s+'E-second.json');assert.deepEqual(D1.fatalFindings,[]);assert.deepEqual(D2.fatalFindings,[]);assert.deepEqual(E1.conservationOpen,E2.conservationOpen);const lists=[];for(const area of ['agent-coordination','host-invocation-routing','packaging-distribution']){const list=read(r+'candidate-unverified-'+area+'.json'),actual=D1.explicitOpenFindings.unreferencedCandidateRows.filter(x=>x.path.startsWith('docs/platform/'+area+'/'));assert.deepEqual(list.rows.map(ct).sort(),actual.map(ct).sort());assert.deepEqual(list.rows.map(ct).sort(),D2.explicitOpenFindings.unreferencedCandidateRows.filter(x=>x.path.startsWith('docs/platform/'+area+'/')).map(ct).sort());for(const x of list.rows){const u=reg.units.find(u=>u.claimId===x.claimId);assert(u);assert.deepEqual([u.sourcePath,u.sourceAnchor,u.sourceUnitDigest],[x.path,x.anchor,x.unitDigest]);if(typeof x.fileStatus==='string'){assert(['Candidate','Draft','history'].includes(x.fileStatus));}else{assert(['Candidate','Draft'].includes(x.fileStatus.designStatus)||x.fileStatus.kind==='history');assert.equal(x.fileStatus.canonical,false);}}lists.push({area,count:list.rows.length,fullTupleEqualityBothPriors:true});}\nconst packaging=read(r+'candidate-unverified-packaging-distribution.json');assert.deepEqual(packaging.rows.map(ct).sort(),E1.explicitOpenFindings.unreferencedCandidateRows.map(ct).sort());const open=Object.fromEntries(E1.conservationOpen.map(x=>[x.type,x.count]));assert.deepEqual(open,{'claims-partial-carry':1,'identical-units-multiple-owners':2,'dropped-claims-unreviewed':1,'candidate-blocks-unreferenced':packaging.rows.length});assert.deepEqual(new Set(E1.fatalFindings.map(x=>x.type)),new Set(Object.keys(open)));\nconst renew=read(r+'packaging-f6-host-partial-carry-residual.json'),binding=read(r+'packaging-f6-host-partial-carry-binding.json');assert.equal(binding.residualSha256,sha(fs.readFileSync(binding.residualFile)));for(const d of renew.rows)for(const t of [d.source,d.target,...d.restored]){assert.equal(t.unitDigest,units(t.path).find(u=>u.anchor===t.anchor).textDigest);for(const k of ['shownDigest','shownTextDigest'])if(t[k])assert.equal(t[k],sha(t.shownText));}let unaffected=0;for(const d of read(r+'host-invocation-partial-carry-residual.json').rows)if(d.claimId!==binding.claimId){for(const t of [d.source,d.target,...d.restored])assert.equal(t.unitDigest,units(t.path).find(u=>u.anchor===t.anchor).textDigest);unaffected++;}assert.equal(unaffected,11);\nconst blobEqual=path=>assert.equal(sha(fs.readFileSync(path)),sha(execFileSync('git',['show','492877ab9:'+path])));for(const path of [r+'candidate-unverified-agent-coordination.json',r+'holds.md',r+'identical-unit-exceptions.md',r+'identical-unit-exceptions-packaging-distribution.json',r+'host-invocation-partial-carry-residual.json'])blobEqual(path);\nconst outcome={version:1,proofCommit:inv.commit,DZeroFatalBothPriors:true,strictEExpectedRed:true,strictEOpen:open,A34PackagingPartialCarries:1,sourceRows:407,sourceReviewed:407,sourcePending:0,priorSuccessorsReviewed:31,newConservationRowsPending:4,stableHeadingsPending:3,affectedHostSourceBindingsPending:1,hostResidualRenewalsPending:1,allOldKnownIdsRetained:true,oldKnownIds:B.size,currentKnownIds:N.size,newNativeIds:5,changedNativeUnits:8,stableHeadingDigestChanges:3,exactDigestAnchorRebinds:1,immediatePriorFullNativeTupleEqualityWithShownDeltas:true,priorPersistedFullNativeTupleEqualityWithReviewedAndShownDeltas:true,activeRegistryInventoryFullTupleEquality:true,allReviewedSourceNotesVerbatim:true,candidateLists:lists,holdsAndExceptionMembershipUnchanged:true,unaffectedHostResiduals:11,identityGraft:false,batchClosureClaimed:false,registryBytes:fs.statSync(s+'registry.json').size,registrySha256:sha(fs.readFileSync(s+'registry.json'))};assert(outcome.registryBytes<=90000000);fs.writeFileSync(s+'native-equality.json',JSON.stringify(outcome,null,2)+'\\n');console.log(JSON.stringify(outcome));\n",
+    "request.py": "import json,pathlib,hashlib,subprocess,re\np=pathlib.Path('plans/260925-documentation-authority-unification');r=p/'reports/phase-06';s=pathlib.Path('/tmp/fgos-work/packaging-close');sha=lambda b:hashlib.sha256(b).hexdigest();canon=lambda x:sha(json.dumps(x,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode());a=json.load(open(r/'packaging-closure-resolution-accounting.json'));n=json.load(open(s/'native-equality.json'));deltas=json.load(open(s/'candidate-delta.json'));rd=json.load(open(p/'dropped-claims-register.json'));proposal=json.load(open(r/'dropped-010-packaging-proposal.json'))['rows'][0];application=json.load(open(s/'application.json'));name=json.loads((s/'convention-name.json').read_text()[(s/'convention-name.json').read_text().index('{'):])['data']['name'];request=r/name\nlines=['# Packaging-distribution bounded closure-resolution request','','Author session: codex-session:12@2026-10-14','Review mode requested: ordinary','State: ready-for-review; STOP for independent Lead',f\"Content commit: `{a['contentCommit']}`\",f\"Fresh proof commit: `{n['proofCommit']}`\",'Owner decision: `owner-answers.md` at `5563bcb70d1c9f0706925271e8209e7eb49fd28b`; A34 and F6 resolution.',f\"Applied rationale report: `{application['report']}` at `{application['reportCommit']}`; all three ok notes verbatim, ordinary, no new review requested for them.\",'','Review only the F6 representation and its exact native consequences below, the dropped-001 register binding required for closure, and the revised reverse-open tuple equality. The owner already chose the successor, the window and the owed obligation. No new product choice or code-truth review is requested. This request contains all shown text and SHA256 bindings; source and primary-target digests are unchanged for both residual dispositions.','','## Exact review inventory','','- One Host source consequence: claim_6a37273a0a45d24c53e344928c3edf22, reopened after its Checked status target changed. Ordinary source/target-digest verdict requested; all other Host rows are equal to their previous committed objects.','- Three native gap successors in `ledger/decisions/s4-packaging-distribution-resolution.json` plus one retired disposition on the native registry row, all pending.','- Three stable heading digest changes in `packaging-resolution-stable-heading-bindings.json`, pending; one exact-digest anchor shift is also shown, with no identity graft.','- Eight changed native units and five new native IDs, full before/current text and digests shown. These overlap the source/gap/heading items; do not count them as additional source claims.','- dropped-010 register and decision/proposal representation: superseded by decision, dated coordinator successor, Packaging-distribution end-of-window obligation; FLAGGED status resolved and literal original clause retained.','- dropped-001 register: existing seven independently ok stub deferrals, still one pending register disposition; review only the existing register binding, not the accepted seven source rows.','- A34: one Packaging partial carry with committed verbatim compound-table residual; one Host residual reference renewed because the F6 restored-section digest changed. The other 11 Host residuals and the immutable earlier residual file remain unchanged.','- Packaging and Host candidate-unverified lists: fresh native reverse-open equality and eligibility only; no truth approval.','','## Proof and boundaries','',f\"D against both prior registries: exit 0, zero fatal. Scoped strict E against both: expected exit 1, exactly `{json.dumps(n['strictEOpen'])}`. This is a reviewed source population with open residual/register/candidate obligations, not strict closure.\",f\"Full native identity accounting: {n['oldKnownIds']:,} immediate-prior known IDs retained, {n['currentKnownIds']:,} current known IDs, five native additions, three stable heading digest changes and one exact-digest anchor shift. Full active inventory/registry tuple equality and both historical/immediate-prior known-set comparisons pass with exactly the shown deltas. No missing ID or graft. Registry {n['registryBytes']:,} bytes; SHA256 `{n['registrySha256']}`; persisted working registry, below 90 MB.\",'',f\"407 Packaging source rows: 407 reviewed, zero pending (classes: Mirror 0, Unit-exact 0, Weak-exact 293, Judgment 114; dispositions 399 move, seven defer-with-owner, one partial-carry). Prior 31 successors and 21 heading bindings remain reviewed. F6 leaves four native successors, three heading judgments and one Host source binding pending; no approval inferred from the owner decision for newly authored conservation text.\",'','Resume A-H and final preservation checks pass: extractor, authority statuses, reader links, 74 witnesses, 867 payloads and five frozen files unchanged; Agent tree unchanged; the Host document diff is exactly the one resolved Checked status line. Holds and identical-unit memberships unchanged. Review/apply tests with `env -u CLAUDE_CODE_SESSION_ID`: 29/29 pass, zero fail/cancel/skip/todo. No full-suite, installed-release or gateway claim.','', 'Historical truth sample stays 3/30 false (65 assertions: 62 true, three false), exactly 10%, below the more-than-10% stop trigger. The three sentence-local status corrections already have independent ok verdicts. Lead could reproduce the selected 30 but not the exact 629-unit population digest; that limitation remains. This request makes no fresh truth-sample claim.','','Effort: fifth documented Packaging executor session (one interrupted plus four resumes); original authoring 407 rows / five executor sessions = 81.4 rows/session, retrospective denominator only, not an uninterrupted throughput measure. This session applies three accepted rationale rows and authors the bounded F6 consequences. No Step 5, promotion, push, rebase, main merge or main-checkout write.','','## Owner resolution verbatim','','~~~~~~~~text',proposal['ownerResolution']['text'],'~~~~~~~~',f\"Shown-text SHA256: `{proposal['ownerResolution']['shownTextDigest']}`\",'']\ndef jblock(title,obj):\n lines.extend([title,'',f\"Sorted compact JSON SHA256: `{canon(obj)}`\",'','~~~~~~~~json',json.dumps(obj,ensure_ascii=False,indent=2),'~~~~~~~~',''])\ndef unit(title,u):\n assert sha(u['shownText'].encode())==u['shownTextDigest'];lines.extend([title,f\"`{u['path']}#{u['anchor']}`\",f\"Unit digest: `{u['unitDigest']}`; full shown-text SHA256: `{u['shownTextDigest']}`\",'','~~~~~~~~markdown',u['shownText'],'~~~~~~~~',''])\nfor i,x in enumerate(a['changedNativeUnits'],1):\n lines.extend([f\"## Changed native unit {i}\",f\"Before ID `{x['beforeClaimId']}`; current ID `{x['afterClaimId']}`\",'']);unit('Complete before',x['before']);unit('Complete current',x['after'])\nfor i,x in enumerate(a['newNativeIds'],1):\n lines.extend([f\"## New native ID {i}: {x['claimId']}\",'']);unit('Complete current',x['shown'])\nfor x in a['gapDecisions']:jblock('## Native successor '+x['claimId'],x)\njblock('## Pending native retired successor',a['retiredDisposition'])\nfor x in a['stableHeadingBindings']:jblock('## Stable heading '+x['claimId'],x)\njblock('## Full native tuple deltas',a['changedStableTuples'])\nx=json.load(open(s/'source-consequence.json'));jblock('## Reopened Host source binding — before',x['before']);jblock('## Reopened Host source binding — pending current',x['after']);unit('Complete source',{'path':proposal['sourcePath'],'anchor':proposal['sourceAnchor'],'unitDigest':proposal['sourceUnitDigest'],'shownText':proposal['sourceShownText'],'shownTextDigest':proposal['sourceShownTextDigest']});unit('Complete current target',x['currentTarget'])\nfor entry in rd['entries']:\n if entry['id'] in ['dropped-001','dropped-010']:\n  jblock('## Current register '+entry['id'],entry)\n  if entry['id']=='dropped-010':jblock('Previous reviewedDisposition',json.load(open(s/'register-before.json')))\njblock('## Current F6 proposal/decision binding',proposal)\nfor filename,title in [('packaging-partial-carry-residual.json','Packaging verbatim residual'),('packaging-partial-carry-acceptance.json','Packaging A34 digest binding'),('packaging-f6-host-partial-carry-residual.json','Host renewed residual'),('packaging-f6-host-partial-carry-binding.json','Host renewed digest binding')]:\n f=r/filename;lines.extend([f\"## {title}\",f\"Committed file `{f}`; file SHA256 `{sha(f.read_bytes())}`\",'']);jblock('Complete file data',json.load(open(f)))\njblock('## Candidate-unverified tuple changes',deltas)\nfor area in ['packaging-distribution','host-invocation-routing','agent-coordination']:\n f=r/('candidate-unverified-'+area+'.json');d=json.load(open(f));lines.extend([f\"Full {area} list: `{f}`; {len(d['rows'])} rows; file SHA256 `{sha(f.read_bytes())}`.\",''])\nlines+=['## Lead handback','','Commit ordinary independent ok/rework verdicts for the one source claim, four native successor claim IDs, three stable heading claim IDs, dropped-001 and dropped-010 register dispositions, Host renewed residual representation, and the revised candidate tuple equality/eligibility. Echo full source/current digests; every shown item needs its own note. No gate/checker, vocabulary, extractor or baseline changes. The existing seven dropped-001 source ok verdicts already name the stub and Plan C; their notes are in `review-4-packaging-source-architecture-03.md` and `review-4-packaging-source-architecture-04.md`.','', 'After that independent commit, the next Doer applies only verbatim verdicts and report pins, reruns both-prior D/E and full native equality, persists the registry and writes the batch report if closure comparison is exact. No batch closure is claimed now.','', 'STOP. Independent Lead review is the sole remaining blocker in this turn.']\nrequest.write_text('\\n'.join(lines)+'\\n');assert request.stat().st_size<250000;(s/'request-path.txt').write_text(str(request));print(str(request),request.stat().st_size)\n",
+    "renew-residual.py": "import json,pathlib,copy,hashlib\np=pathlib.Path('plans/260925-documentation-authority-unification');r=p/'reports/phase-06';sha=lambda b:hashlib.sha256(b).hexdigest();a=json.load(open(r/'packaging-closure-resolution-accounting.json'));drift=a['hostResidualDrift'];assert len(drift)==1;x=drift[0];old=json.load(open(r/'host-invocation-partial-carry-residual.json'));row=copy.deepcopy(next(z for z in old['rows'] if z['claimId']==x['claimId']));target=next(z for z in row['restored'] if z['path']==x['path'] and z['anchor']==x['anchor']);target.update(x['after']);target['shownDigest']=x['after']['shownTextDigest'];f=r/'packaging-f6-host-partial-carry-residual.json';f.write_text(json.dumps({'version':1,'rule':'A34','ownerAnswerCommit':'5563bcb70d1c9f0706925271e8209e7eb49fd28b','previousResidualFile':str(r/'host-invocation-partial-carry-residual.json'),'previousResidualSha256':sha((r/'host-invocation-partial-carry-residual.json').read_bytes()),'reason':'F6 changes only the labelled Checked status in one restored section; original source remainder and primary target remain byte-identical. Prior restored-section digest acceptance no longer applies. This renewed conservation representation joins the bounded independent F6 request.','reviewStatus':'pending','rows':[row]},ensure_ascii=False,indent=2)+'\\n');d=json.load(open(p/'ledger/decisions/s3-host-invocation-checkpoint.json'));decision=next(z for z in d['claims'] if z['claimId']==row['claimId']);assert decision['disposition']=='partial-carry' and decision['reviewStatus']=='reviewed';assert decision['sourceUnitDigest']==row['source']['unitDigest'] and decision['targetUnitDigest']==row['target']['unitDigest'];f2=r/'packaging-f6-host-partial-carry-binding.json';f2.write_text(json.dumps({'version':1,'rule':'A34','claimId':row['claimId'],'sourceUnitDigest':row['source']['unitDigest'],'primaryTargetUnitDigest':row['target']['unitDigest'],'residualFile':str(f),'residualSha256':sha(f.read_bytes()),'dispositionReview':{k:decision[k] for k in ['reviewedBy','reviewNote','reviewReport','reviewReportCommit']},'cutoverObligation':True,'representationReview':'pending independent conservation review; original disposition stays reviewed; no strict or batch closure'},ensure_ascii=False,indent=2)+'\\n');print('One Host residual renewed, original immutable residual retained; source/primary digests equal.')\n"
+  },
+  "limits": [
+    "No strict closure, promotion, Step 5, push, main merge or main-checkout write",
+    "No gate, checker, vocabulary, extractor or baseline edit",
+    "No full-suite, installed-release or gateway claim"
+  ]
+}

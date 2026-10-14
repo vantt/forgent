@@ -2,9 +2,9 @@
   "version": 1,
   "batch": "packaging-distribution",
   "authorization": "A28",
-  "authoredCommit": "fa7f63868c7b046aa6133749c942aa5f4ae87ad9",
+  "authoredCommit": "cfd4cffc17caae2e4b28417487f967f35ebae845",
   "meaning": "Exact native reverse-open units; candidate-unverified, never a truth approval or cutover waiver.",
-  "count": 692,
+  "count": 693,
   "rows": [
     {
       "claimId": "claim_c83db9e7c725ee8a14dc1143efd84270",
@@ -6340,7 +6340,7 @@
       "claimId": "claim_a0f184bc39b573f0b4bf0ba469d68d2a",
       "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
       "anchor": "installed-default-and-npm-compatibility",
-      "unitDigest": "a77dc7f6b7b1dd819a751579a1de6e718e80e669ef146fdcd10d0f66e6c821e4",
+      "unitDigest": "6c803388a11379425a5ae5f98e4415b833183eee7167ae61592ede96818922c7",
       "fileStatus": {
         "kind": "decision",
         "kindCanonical": true,
@@ -6352,10 +6352,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_743f0b70132cc6fda8271214be7c061a",
+      "claimId": "claim_0f7171f953dad3169ab775d68929c99f",
       "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
       "anchor": "unheaded-block-1",
-      "unitDigest": "ffc24cb21beb67e859d84f86ef48e47a78b8c3e678c78823abd7be210cbd1a2c",
+      "unitDigest": "31f20682351c4c470babfddbbf18a71a32190c071d4f6ae659725b6cfcf84dd0",
       "fileStatus": {
         "kind": "decision",
         "kindCanonical": true,
@@ -6400,7 +6400,7 @@
       "claimId": "claim_e6538fb192303f7d4fdf1e00c0d3aa18",
       "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
       "anchor": "proposed-disposition",
-      "unitDigest": "b1ec345e0756e842dfa086f9c4ef0110dca6a04da2c95d9139cb11186688c3a2",
+      "unitDigest": "0c4a1e10db283e13eb9bebdeb53fe11b94ffb80f609ae4f21cdb08021ec64e4f",
       "fileStatus": {
         "kind": "decision",
         "kindCanonical": true,
@@ -6412,10 +6412,25 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_34de7c299044ca3ebf49837a0ef7f3bb",
+      "claimId": "claim_83454fd935b1f1f26a4b130576cc2471",
       "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
       "anchor": "unheaded-block-3",
-      "unitDigest": "8c825fbfc4345283bc92771c4af94d6a38ff5e2b75e2b7097d29267f7d882769",
+      "unitDigest": "4d3bba9687d0eddb7182380f864742235de0aecae298039ad72043d97098fa14",
+      "fileStatus": {
+        "kind": "decision",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b17ddf847a3ee8b85d9e962e0350a26d",
+      "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "83cd96cfb781feb154abc4afd7b34b45cab68e62e77788622955e964629399aa",
       "fileStatus": {
         "kind": "decision",
         "kindCanonical": true,
@@ -6429,7 +6444,7 @@
     {
       "claimId": "claim_76e368f9914b86f0de7fcef41386b8d7",
       "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
-      "anchor": "unheaded-block-4",
+      "anchor": "unheaded-block-5",
       "unitDigest": "a513eb7c42ddbdd4384e1aa33225568a3f0591a9dc433b435bc578a6acc9d972",
       "fileStatus": {
         "kind": "decision",
@@ -6442,10 +6457,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d301f741817cf5afb1da6637ea19c3c7",
+      "claimId": "claim_7a7a5547e9add84006789d592a9528b3",
       "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
-      "anchor": "unheaded-block-5",
-      "unitDigest": "6587193ed55d77e09a42126a76fde7bb74560bb4d554440f4b09983a4fc8fc00",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b",
       "fileStatus": {
         "kind": "decision",
         "kindCanonical": true,
@@ -10587,5 +10602,10 @@
     "priorReviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-candidate-unverified.md",
     "priorReviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
     "unchangedTupleCount": 686
+  },
+  "resolutionRebinding": {
+    "ownerResolutionCommit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
+    "reviewStatus": "pending independent conservation review",
+    "meaning": "Exact fresh reverse-open tuples only; no code-truth approval. Changes are shown in the bounded F6 resolution request."
   }
 }

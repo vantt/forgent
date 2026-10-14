@@ -1,3 +1,49 @@
+# Latest resume state — Packaging closure-resolution ready for review
+
+Date: 2026-10-14
+Executor: codex-session:12@2026-10-14
+Session counter: 12
+Documented Packaging executor sessions: 5 (one interrupted plus four resumes)
+Step: 4 / Packaging-distribution
+State: ready-for-review; STOP for independent Lead
+Resume HEAD / owner answers: 5563bcb70d1c9f0706925271e8209e7eb49fd28b
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 77830ba77eb05991d95b005919776ee6254e833b
+Last green D/native proof source: 865ffac93c767b862ad9745fef5372dffd9a8158
+Request: review-request-261014-1400-packaging-closure-resolution.md
+Verification: packaging-closure-resolution-verification.json
+Accounting: packaging-closure-resolution-accounting.json
+Technical blockers: none. Sole stop reason: independent Lead review of the newly authored F6 representation and its conservation consequences.
+
+Applied three ok rationale verdicts verbatim, ordinary, pinned to review-4-packaging-rationale-followup.md at ea04ae8585560bfb1c62c477fdeefb3019021723. All 407 Packaging source rows are reviewed: classes Mirror 0 / Unit-exact 0 / Weak-exact 293 / Judgment 114; dispositions 399 move / seven defer-with-owner / one partial-carry. Prior 31 successors and 21 stable heading bindings remain reviewed. A34 Packaging residual is committed verbatim, bound by source/primary-target unit digests and file SHA256; strict E stays red and restoration stays an owed cutover obligation.
+
+F6 is owner-decided, superseded by decision: successor is the 2026-09-15 coordinator 30-day window, earliest removal 2026-10-18. Removal or redirect after the window remains owed to Packaging-distribution (release-owner decision). FLAGGED status is resolved consistently; the literal original clause, runner mapping and entry ownership header remain. Newly authored conservation text is pending independent review, not an owner-approved wording inference.
+
+Consequences: three pending native gap successors and one pending retired successor, three stable heading digest judgments, one exact-digest anchor shift, eight changed native units and five native new IDs; one Host source binding reopened because its Checked status changed. Every other Host source object is equal to the preceding committed object. One Host residual restored-section digest drift invalidates that earlier acceptance; a single-row A34 residual renewal is committed and shown for review. Its source/primary-target digests and disposition stay equal and independently ok; 11 other Host residuals and the immutable earlier residual file are preserved. The dropped-001 register remains pending and is included only for its existing stub binding; seven source deferrals stay ok.
+
+Fresh D against both prior registries: exit 0, zero fatal. Scoped strict E against both: expected exit 1, exact open data {"claims-partial-carry": 1, "identical-units-multiple-owners": 2, "dropped-claims-unreviewed": 1, "candidate-blocks-unreferenced": 693}; no batch closure. Full native equality: all 94,333 immediate-prior IDs retained, 94,338 current; active inventory/registry tuples equal, historical and immediate-prior known tuple sets equal with exactly reviewed/shown deltas, no graft. Lists: [{"area": "agent-coordination", "count": 488, "fullTupleEqualityBothPriors": true}, {"area": "host-invocation-routing", "count": 588, "fullTupleEqualityBothPriors": true}, {"area": "packaging-distribution", "count": 693, "fullTupleEqualityBothPriors": true}]. Holds and identical-unit memberships unchanged. Entire source/target/digest consequences are in the single bounded request.
+
+Persisted working registry: 59453707 bytes, SHA256 7733334b6a3d9b24821b0a493d41ef8e40c9388b76f40cade30b8abdc9178b47; below 90 MB. Restored the prior approved native scratch byte-for-byte into the persisted working registry before carrying it natively through this turn's content; no seed reconstruction or ID transplant. The final refresh uses that persisted registry and the current source tree. Retired-unit disposition uses the existing registry representation: fresh D had rejected a retired row inside registryGaps; it was moved to the native retired row as pending without changing any identity tuple or checker.
+
+Resume A-H and final preservation checks pass: extractor, authority statuses, reader links, 74 witnesses/867 payloads/five frozen files unchanged; Agent tree unchanged; Host document change exactly one owner-resolution Checked status line. Review/apply tests with env -u CLAUDE_CODE_SESSION_ID: 29/29 pass, zero fail/cancel/skip/todo. GitNexus detects documentation/data-only scope, low risk, zero affected execution processes. No production symbol edits. Historical truth sample remains 3/30 false (10%, 65 assertions: 62 true/three false); three status-note corrections are independently ok, exact 629-unit population digest remains unverified; no new truth draw claimed.
+
+Effort: five documented Packaging executor sessions, 407 source rows / five sessions = 81.4 rows/session (retrospective denominator, not uninterrupted throughput). This session applies three prior ok rows and authors only the bounded F6 consequences.
+
+This turn commits before the final request/verification/progress commit:
+
+```text
+865ffac93c767b862ad9745fef5372dffd9a8158 docs(packaging): bind retired proposal to its native successor
+3e186eb8e71a5a7fe283240e40010db82d8e446f docs(packaging): persist native conservation consequences for review
+cfd4cffc17caae2e4b28417487f967f35ebae845 docs(packaging): record npm compatibility successor and owed removal
+492877ab92be6a7b7d3f5191725d5d2f8ed19ea6 docs(packaging): record digest-bound residual obligation
+8a4377b1255f7ec7836d9f17c341c10ab52858c8 docs(packaging): bind accepted reviews and partial carry evidence
+6412eff7988b8510be8ac3cc36dec325eaa94946 docs(unification): record packaging closure resume
+```
+
+STOP. Next action: Lead reviews only the bounded request, commits ordinary notes and full digest verdicts; next Doer applies them verbatim, reruns both-prior D/scoped E and full native equality, persists the registry and writes step-04-report.md only if the closure comparison is exact. Owner decision is settled; do not ask it again. No Step 5, promotion, push, rebase, main merge/write, gate/checker/vocabulary/extractor/baseline edit. Earlier progress follows intact.
+
+---
+
 # Latest resume state — Packaging closure resolution in progress
 
 Date: 2026-10-14

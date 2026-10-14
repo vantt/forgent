@@ -2,7 +2,7 @@
   "version": 1,
   "batch": "Host Invocation Routing",
   "authorization": "A28",
-  "authoredCommit": "08a97d289170aec6541e250d69bb207ac7d29506",
+  "authoredCommit": "cfd4cffc17caae2e4b28417487f967f35ebae845",
   "meaning": "Conservation is separate from candidate truth; no per-unit reverse receipts or current-truth approvals.",
   "count": 588,
   "rows": [
@@ -1810,7 +1810,7 @@
       "claimId": "claim_2ae4c5c63621e9fe8e2c14021ee4a5f7",
       "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
       "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
-      "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee",
+      "unitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07",
       "fileStatus": {
         "kind": "architecture",
         "kindCanonical": true,
@@ -8827,5 +8827,10 @@
       "status": "candidate-unverified"
     }
   ],
-  "previousCount": 572
+  "previousCount": 572,
+  "resolutionRebinding": {
+    "ownerResolutionCommit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
+    "reviewStatus": "pending independent conservation review",
+    "meaning": "Exact fresh reverse-open tuples only; no code-truth approval. Changes are shown in the bounded F6 resolution request."
+  }
 }

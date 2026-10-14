@@ -5,7 +5,7 @@
   "sourceUnitDigest": "e9f472117d68d8c826f9f9b15946883a24addeedf3c298765032fc081f37cb2d",
   "primaryTargetUnitDigest": "bcaecc76a91e2cd04d8a432c31285c9d795a274e2ae8dcba92ccfd94780daddf",
   "residualFile": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-f6-host-partial-carry-residual.json",
-  "residualSha256": "f666a999c2aced08f6de2891673e0745a1985f0f5e97f4f634adcaf8b3d315f8",
+  "residualSha256": "61c3263ca987046effa1f7615eaaa3bc9599f0acaca8785c86139a1518e13342",
   "dispositionReview": {
     "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
     "reviewNote": "Partial carry correct: bin.fgos removal paragraph (block 14) verbatim at release-boundaries restoration with its obsolete-clause flag. Added resolver note is accurate: legacy_exec.rs resolve_payload_path spans lines 69-154, uses env or exe-relative release root, verifies manifest and confined entry; spec.md row stays accepted-not-implemented.",

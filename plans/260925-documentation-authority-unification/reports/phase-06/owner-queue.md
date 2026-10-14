@@ -1,3 +1,11 @@
+# Current Packaging decision status — 2026-10-14
+
+F6 is answered by the owner resolution committed at `5563bcb70d1c9f0706925271e8209e7eb49fd28b`: dropped-010 is superseded by decision, with the 2026-09-15 coordinator 30-day window as successor and removal or redirect after the window still owed to Packaging-distribution (release-owner decision). The FLAGGED status is resolved; the original clause remains verbatim as dated design. No owner direction question remains for this batch.
+
+A34 accepts independently ok partial carries with committed verbatim residuals and source/primary-target/file digest bindings. The Packaging partial carry is bound to `packaging-partial-carry-residual.json`; it remains a cutover obligation. One Host residual reference is renewed solely because the F6 restored-section status digest changed; its disposition, source and primary target remain independently ok and unchanged. That renewed representation and the bounded F6/native consequences await Lead conservation review in `review-request-261014-1400-packaging-closure-resolution.md`, together with the existing dropped-001 register binding. No new owner question, closure, promotion or cutover is inferred. Earlier entries below are historical checkpoints.
+
+---
+
 # Owner queue
 
 | Id | Question | Options and recommendation | Blocks | Date asked | Answer |
