@@ -79,8 +79,9 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "agy-cli-mucdong"
-          }
+            "invocation": "agy-cli-bwrap-mucdong"
+          },
+          "claude"
         ],
         "serves": {
           "outputKind": "change",
