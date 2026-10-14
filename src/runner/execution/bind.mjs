@@ -322,13 +322,16 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
 
   // 4. Transport (G7): herdr when this session runs inside one and the executor has a
   // herdr-spawn invocation that can carry the posture; the invocation that runs is then
-  // that herdr one. An invocation a human pinned by override stays as pinned.
+  // that herdr one. An invocation a human pinned by override, or one a unit named in its own
+  // `prefer`, stays as named.
   let invocation = chosenCandidate.invocation;
   let transport = 'cli';
   let transportSource = 'default-cli';
   const herdrInvocation = findHerdrInvocation(executorEntry);
-  if (chosenCandidate.override?.invocation) {
-    transportSource = 'override-pinned-invocation';
+  const namedInvocation = chosenCandidate.override?.invocation
+    || (chosenCandidate.source === 'unit-prefer' && chosenCandidate.invocation);
+  if (namedInvocation) {
+    transportSource = chosenCandidate.override?.invocation ? 'override-pinned-invocation' : 'unit-prefer-pinned-invocation';
     const pinned = executorEntry?.invocations?.find((inv) => inv?.id === invocation);
     if (pinned?.adapter === 'herdr-spawn') transport = 'herdr';
   } else if (herdrInvocation && session.herdrPresent === true && !chosenCandidate.isInlineFallback) {

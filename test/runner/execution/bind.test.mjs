@@ -788,3 +788,17 @@ test('bind prefer: a bare unit executor id covers every capability entry of that
   }
   assert.deepEqual(walked, ['codex', 'claude', 'gemini-cli']);
 });
+
+test('bind: an invocation a unit names in its prefer stays bound inside herdr, while a bare executor id still takes the herdr transport', () => {
+  const herdr = { headless: true, herdrPresent: true };
+  const pinned = bind(preferAsk({ capability: 'docs:write', prefer: [{ executor: 'duo', invocation: 'duo-confined' }] }), { runnerConfig: twoInvocationConfig(), session: herdr });
+  assert.equal(pinned.invocation, 'duo-confined');
+  assert.equal(pinned.transport, 'cli');
+  assert.deepEqual(pinned.provenance.invocation, { value: 'duo-confined', source: 'unit-prefer' });
+
+  // A bare executor id leaves the transport to bind(): the herdr invocation is not something the unit named.
+  const bare = bind(preferAsk({ capability: 'docs:write', prefer: ['duo'] }), { runnerConfig: twoInvocationConfig(), session: herdr });
+  assert.equal(bare.invocation, 'duo-herdr');
+  assert.equal(bare.transport, 'herdr');
+  assert.equal(bare.provenance.executor.source, 'unit-prefer');
+});
