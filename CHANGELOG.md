@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `fgos run --effort low|medium|high|max` (or `"reasoningEffort"` in `--override`) sets how hard the worker reasons for one run, without editing the provider's own config; `fgos dispatch execute --effort` does the same on the compatibility door. claude and agy get `--effort`, pi and omp `--thinking`, Codex `-c model_reasoning_effort=` (`max` becomes `xhigh`). A level outside that list, or one the bound executor's `supports.reasoningEffort` does not declare, is refused before the worker starts (`fgos run` reports a `policy-refusal` with reason `reasoning-effort`). Until now a derived effort was recorded in the policy but never reached the CLI; that is unchanged when no effort is given.
+- `fgos run --effort low|medium|high|max` (or `"reasoningEffort"` in `--override`) sets how hard the worker reasons for one run, without editing the provider's own config. claude and agy get `--effort`, pi and omp `--thinking`, Codex `-c model_reasoning_effort=` (`max` becomes `xhigh`). A level outside that list, or one the bound executor's `supports.reasoningEffort` does not declare, is refused before the worker starts (`fgos run` reports a `policy-refusal` with reason `reasoning-effort`). Until now a derived effort was recorded in the policy but never reached the CLI; that is unchanged when no effort is given.
 - A run's result records where the model that ran differs from the one bound, under `policy.provenance.modelDrift`: replaced by policy before launch (`model-overridden`), not passed on the command line (`model-not-passed`), refused or unknown to the provider CLI (`model-unsupported`), or reported differently by the CLI (`model-reported-different`). `fgos dispatch execute` returns the same list as `modelWarnings`.
 - `fgos run "<prompt>"` runs a one-line task as a Unit. The flags are `--provider` (soft preference), `--persona`, `--writes` (needs a linked worktree), `--capability` (default `execute`), `--rigor`, `--effort` and `--override`. Without `--writes` the Unit is read-only. A wrong provider, a wrong persona, or writes from the main checkout fail before anything runs.
 - `fgos workflow start --units <file>` (a YAML/JSON list of Units) runs the list as a one-off Workflow, one step per Unit. A Unit may carry `prefer` (soft preference) and `persona`; `--units` does not combine with `--seats`.
@@ -32,6 +32,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A writing workflow unit that depends on another writing unit now starts from that unit's branch instead of HEAD; `workflow status` lists `writeBranches`.
 - A writing unit that changed files outside its `writes` ends as `findings`; an integrate step that meets such a unit fails and merges nothing (it used to skip it silently).
 - A writing unit that cannot get a worktree of its own now fails instead of running in the shared checkout.
+
+### Removed
+
+- `fgos dispatch execute` is gone, together with its `--contract` and `--assignment` forms and the `node src/runner/dispatch.mjs execute` alias. Run one task with `fgos run "<prompt>" --provider <executor>` (add `--writes <paths> --worktree <linked-worktree>` for work that changes files; the runner commits them), or a Unit file with `fgos run --unit <file>`; planned work goes through `fgos workflow start`. Calling the old door returns an error naming the replacement.
+- `fgos dispatch log` is gone: every `fgos run` already records its Unit, binding, results and commit under `.fgos/assignments/<unitRunId>/`.
+- `dispatch fanout-batch` is gone. Fanout runs from `node src/runner/fanout-batch.mjs "<ids>" [--has-live-task-access]`, with the same output keys (`fired`, `mechanismChanged`, `unavailable`, `deferred`, and `slotsFull: true` when no slot is free).
+- `decide --work` runs only as `fgos dispatch decide --work <id>`; `node src/runner/dispatch.mjs decide --work` is refused with a pointer to it.
+- `AGENTS.md` and every skill render no longer teach the removed doors. Other projects keep their old rendered skills until they activate a release that carries this change and run `fgos setup`.
 
 ### Fixed
 
