@@ -1,0 +1,1017 @@
+{
+  "version": 1,
+  "shard": "s5-root-boundary-sync.json",
+  "authorSession": "codex-session:27@2026-10-14",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/architect/agent-coordination/README.md",
+    "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+    "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+    "docs/architecture-manifest.json",
+    "docs/io-contract.md",
+    "docs/specs/distribution.md",
+    "docs/specs/reading-map.md",
+    "docs/specs/work-state.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_0c7119af692eb2f3eb43cf2e9f4fdbbd",
+      "sourceUnitDigest": "5c63838fa96be6393d80db751be1ce6ac02ad072b59af2fc9f6a3455f7072467",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/README.md",
+      "targetAnchor": "upstream-source-unheaded-block-4-2026-10-14",
+      "claimKind": "navigation",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetKind": "history-evidence",
+      "targetUnitDigest": "d3f4bd4035f70868a76bd1be7fd94c2d060ad4cf848f849d8d7c09cd8e53a8c5",
+      "targetAncestry": [
+        "Retired engine snapshot: README.md"
+      ]
+    },
+    {
+      "claimId": "claim_142558254b0fa5e0b0fe78096f4caa9c",
+      "sourceUnitDigest": "80d7423f033f8c78a1beda1acbbfaa96ea3e7e4d0a8072384736ee8e971c15fb",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "component-internal-ownership",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewStatus": "pending",
+      "targetUnitDigest": "c0bb4ead0f6620892a21de57af6673d4d2e2c67ae656917f1ee7f9a24363a67a",
+      "targetAncestry": [
+        "Dispatch Control Plane"
+      ]
+    },
+    {
+      "claimId": "claim_d11900e7305d31956a2f066f6e29db57",
+      "sourceUnitDigest": "d4680aff85d3fde491d53de514c220042fc6560c46a22fdee6b32144b1989770",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+      "targetAnchor": "upstream-source-unheaded-block-37-2026-10-14",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewStatus": "pending",
+      "targetUnitDigest": "920cfaa5ed282548566e7c4ae5ba14679c1a65211d8fd42e7773752846d5c72f",
+      "targetAncestry": [
+        "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
+      ]
+    },
+    {
+      "claimId": "claim_e0e3f54e0ac694fa7a5542eac3f7a721",
+      "sourceUnitDigest": "9e278ef19449f7e162de03087375cac4b0fb44212c0a637ff0ffa3938f394edf",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "routing-identities",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewStatus": "pending",
+      "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
+      "targetAncestry": [
+        "Dispatch Control Plane"
+      ]
+    },
+    {
+      "claimId": "claim_44e6d52dac61b16b646f7fadc1a8afe7",
+      "sourceUnitDigest": "03cbed1e341cc3d3cc31fd8290c0f02d74ba52916e2ff036ca7503b0121653ce",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "targetAnchor": "upstream-source-unheaded-block-11-2026-10-14",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewStatus": "pending",
+      "targetUnitDigest": "f8ef3610193e0fdade4078f09bc4a7103184b7f66f9203a98b780859063a2f86",
+      "targetAncestry": [
+        "Historical File: still-consumed cognitive prompt; mixed manual runtime instructions superseded by registered skill"
+      ]
+    },
+    {
+      "claimId": "claim_0416642260519cf992931a4968e80c03",
+      "sourceUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+      "targetAncestry": []
+    },
+    {
+      "claimId": "claim_e5e2846158bbd249d1ebbd70161f02a0",
+      "sourceUnitDigest": "06606edc018d149151d695b556303fa30fc664064737645cc57d1dce43711b67",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "targetUnitDigest": "8a4450efa42cf8d7d02b90b65a9e093fbbfd3178788f682caa9a3a7cba5b73b7",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ]
+    },
+    {
+      "claimId": "claim_cbc7ad17e0764ac8d1d4d386e3b62e74",
+      "sourceUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-31",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Manifest Shape"
+      ]
+    },
+    {
+      "claimId": "claim_b8fa7fa2cd614433de754bbb92302140",
+      "sourceUnitDigest": "d08ac6f65427df6334f383a722e80ed4640fc93af7693c530ce2265d7262fcb7",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-33",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Entry Fields And Effect Axes"
+      ]
+    },
+    {
+      "claimId": "claim_f7459f118bd93b8769e6c90ace8c68fe",
+      "sourceUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-91",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetUnitDigest": "cdc65be47d5ab1b4f61dfdef36be58ea1c499cff90dd56e3b3bcb5431aa561f4",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Business Rules"
+      ]
+    },
+    {
+      "claimId": "claim_f703aeda7755ab376e6e3eee88eb82c2",
+      "sourceUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-92",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetUnitDigest": "b1e15730d97d645508d833b30133c31d6ac119466d80377b70c7815d0b8e08b3",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Lịch sử quyết định"
+      ]
+    },
+    {
+      "claimId": "claim_53838c4268148341ce0069394572d0eb",
+      "sourceUnitDigest": "b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-93",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetUnitDigest": "adbe84814a993cfb5f57b2646665d448fe34ee2d2583e6b2f930855f035722e8",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Edge Cases Settled"
+      ]
+    },
+    {
+      "claimId": "claim_daaf3726036adad15b2529ad43f71d44",
+      "sourceUnitDigest": "b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-85",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Data Dictionary"
+      ]
+    },
+    {
+      "claimId": "claim_d956ba3fb9a8cce9589194e5f59d021f",
+      "sourceUnitDigest": "3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry."
+    },
+    {
+      "claimId": "claim_d76334798a7de5ca967d48855418497f",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "8bbf5f90fa21dfbe14c7ca22e285fa97b8ffc915f8482b1f15c93a1002a28242",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "9-per-verb-help",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetUnitDigest": "4caa102d6379d79bdbc1549552a850498dff81a7ea57a43e020f9f3c3be9a67e",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ]
+    },
+    {
+      "claimId": "claim_9be8a10fa3ce503d2ebc2ffe6ffc76ad",
+      "sourceUnitDigest": "8bd86cc5389383bcf8adb8357508e963db32cba252431e2b4680f6dfe109f635",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-93",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "targetUnitDigest": "d8bf5e1f48a181d1cc996d8e39c12e715dbf18e894203ed47c457a4a3a4b8835",
+      "targetAncestry": [
+        "Work State Specification",
+        "11. Business Rules"
+      ]
+    },
+    {
+      "claimId": "claim_9c7dc2d7af79db454e4d63ffffe3d6f6",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-29",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Manifest Shape"
+      ]
+    },
+    {
+      "claimId": "claim_045b588f4d839f90c40b48fbc0fc3f4d",
+      "sourceUnitDigest": "a5128895b71f07c2e1baa3ecb90cd302f016fdb4191518ef02835a768c8dc156",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-67",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "targetUnitDigest": "dbfcaa1881570e24492daa35eb776b4fbea75fab92318188517e6b81ee2bdbd2",
+      "targetAncestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Submit Verb"
+      ]
+    },
+    {
+      "claimId": "claim_e8c37a28267ca355475a2286b90ba453",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "7cb2dbfd3b698c923c15d17222daf08e96f5fcbf54aa79afd3e1248fdd8d9b2e",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-37",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "targetUnitDigest": "7cb2dbfd3b698c923c15d17222daf08e96f5fcbf54aa79afd3e1248fdd8d9b2e",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "9. Per-Verb Help"
+      ]
+    },
+    {
+      "claimId": "claim_b69096018a7da1d3dc629b5d37f6fdac",
+      "sourceUnitDigest": "9b711cb5a088ede56ad00207289f1fed2ccc05887597169bbc41eb2e55429db3",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-72",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "targetUnitDigest": "c36313e9a59bc69c1f04a65dc22c55bd72e374e693fd9f4351a3534d1ccf1493",
+      "targetAncestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Edit Verb"
+      ]
+    }
+  ],
+  "registryGaps": [
+    {
+      "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-22",
+      "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+      "disposition": "supersede",
+      "targetOwner": "AGENTS.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+      "targetAncestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-23",
+      "sourceUnitDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+      "disposition": "supersede",
+      "targetOwner": "AGENTS.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
+      "targetAncestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-25",
+      "sourceUnitDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+      "disposition": "supersede",
+      "targetOwner": "AGENTS.md",
+      "targetAnchor": "unheaded-block-27",
+      "targetUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+      "targetAncestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_1a97144c81c563726dfeb3413c4eaddc",
+      "sourcePath": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "sourceAnchor": "unheaded-block-82",
+      "sourceUnitDigest": "ca569099e6633f5b7727f9eda769609f710be5f1867f9a9358f4effb1caf6b12",
+      "disposition": "supersede",
+      "targetOwner": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "targetAnchor": "unheaded-block-82",
+      "targetUnitDigest": "c200204a074853d064951111f53eae21171ee1037c5989affe83e6852678a370",
+      "targetAncestry": [
+        "fgOS Component Boundary Advisory",
+        "12. Dispatch As A Replaceable System"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_755cc3f7baeabc42702373bb6d09154c",
+      "sourcePath": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "sourceAnchor": "unheaded-block-18",
+      "sourceUnitDigest": "abb98866cc08d2f0cf2991cd0559e537f0bb93fa7e75848a31deeef8ed1a3f0f",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetUnitDigest": "b2a4faec46b201424ddcb35d23ac473adf5af2e1d458ebb6d465a71f712789ff",
+      "targetAncestry": [
+        "Compare discussion setups with metrics eval",
+        "2. Blind the judge; distinguish data blindness from isolation"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_f162d77427a68d4fd4ba8a43c39ba746",
+      "sourcePath": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "sourceAnchor": "unheaded-block-20",
+      "sourceUnitDigest": "2e989ebe228c502c9329ad38adec2a72e6bf1f32815aa4750b592aa084f1a144",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "targetAnchor": "unheaded-block-20",
+      "targetUnitDigest": "0e2eeef061c7503ce2fe8137971b43a39091d7dcac1b54e6f88a9ec2b9cb60a2",
+      "targetAncestry": [
+        "Compare discussion setups with metrics eval",
+        "2. Blind the judge; distinguish data blindness from isolation"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_e8446ab5cec97974f2099db88f606c3f",
+      "sourcePath": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "sourceAnchor": "unheaded-block-25",
+      "sourceUnitDigest": "78326661cd2a64e716752d276fcc489fe412efbe97d209e499a5d261f7b1f82c",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "62428c714fde779b055513565a62eabcdc8b2a12cd6861954c2b52da73ffc8fd",
+      "targetAncestry": [
+        "Compare discussion setups with metrics eval",
+        "2. Blind the judge; distinguish data blindness from isolation"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_6b514c8b4b2a093c292c034910f88967",
+      "sourcePath": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "sourceAnchor": "unheaded-block-26",
+      "sourceUnitDigest": "ac34de0a51785bcb3f46dddc25d78d55828a83236c7a2ba26b7a2bd3920bf470",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetUnitDigest": "5e0c0d92c5ae966c7f3e80f6911198849ccc9502290145fed047a77977526668",
+      "targetAncestry": [
+        "Compare discussion setups with metrics eval",
+        "2. Blind the judge; distinguish data blindness from isolation"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_4aaead9c70d5ee34ecd075e726a5ada3",
+      "sourcePath": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md",
+      "sourceAnchor": "unheaded-block-6",
+      "sourceUnitDigest": "c07063f9d7638e663318f08c0ea3eeec5168eee9da5ce75dcfd024572f1187ef",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "b801d755c6885db5c81cff045af8605df9fcfefcdf700a1f6124ebe90ebfa68c",
+      "targetAncestry": [
+        "Example family: heterogeneous roster, and the homogeneous fallback",
+        "Heterogeneous — independently routed shaper/alternative/critic/synthesizer/red-team"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_ba149847526096094f03951b68e8de88",
+      "sourcePath": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "sourceAnchor": "unheaded-block-10",
+      "sourceUnitDigest": "51e6bc7013c2e274058993b2b045adc005a4c2ec7fff34fd8ad7ddc8ed516bb2",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetUnitDigest": "d45184644477e2106cf09a899c7e060e3c23448866e772b8fd92b8665e00a4a5",
+      "targetAncestry": [
+        "Handle a worktree-guard refusal of the dispatch Step B command",
+        "The mitigation"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_e5e168e23061583ac8d6e17486ddaef7",
+      "sourcePath": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "sourceAnchor": "unheaded-block-11",
+      "sourceUnitDigest": "a8c31d4f8c286282a786feb1120813e1401cb662be4c1a1ccc6efe514bfbed9c",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "targetAnchor": "unheaded-block-12",
+      "targetUnitDigest": "3b2d6d5612f62fbe66c0c05f4c5e0b616920aac58d2fa7bea993daa34c0ce694",
+      "targetAncestry": [
+        "Handle a worktree-guard refusal of the dispatch Step B command",
+        "The mitigation"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_942340421f82e17fab0ef9d210141a65",
+      "sourcePath": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "954b6960dc825b2961844bc4ea65a48493f85e1fc02a0d2cea07639308cb77a7",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "cc298b8de2142aefebfd38e7d1218563084f0460dea4c3f8b53c7d95f5236587",
+      "targetAncestry": [
+        "Handle a worktree-guard refusal of the dispatch Step B command",
+        "When this applies"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_b6ff5b306a6ee73547e62548362341b9",
+      "sourcePath": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceUnitDigest": "1e6e23c078b8b355bdf533786cf201018deb677947d1d2dc23cfa758d0561936",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "4eb36b8aa4bc7b5c58a4fb81fbdbb2de7fee7a66ffb3b2f6369900c5897bd798",
+      "targetAncestry": [
+        "Handle a worktree-guard refusal of the dispatch Step B command",
+        "When this applies"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_4b1910a70def813eb4f7f5aed13f3d0c",
+      "sourcePath": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "sourceAnchor": "unheaded-block-8",
+      "sourceUnitDigest": "aef0e6c455da83e39ae42c41dade98ad7cbd98487e68c62f8fddcf40bd12435d",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "e4d863acf24b5b0fe3a040291ff6bb0cfcdce4d4f26c87cfc488461d0bfaabcc",
+      "targetAncestry": [
+        "Handle a worktree-guard refusal of the dispatch Step B command",
+        "The mitigation"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_25e7de5470ee9fda566c3de5be00f57b",
+      "sourcePath": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceUnitDigest": "83e8ba228115631e1cf4604605390b6154b0f8b50a8f44924191c3b893916c54",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
+      "targetAnchor": "unheaded-block-10",
+      "targetUnitDigest": "5c5a0d9c9f1fa5cd247fe1e8acd8d5aa16f79180053db5af374b18b185fe481c",
+      "targetAncestry": [
+        "Handle a worktree-guard refusal of the dispatch Step B command",
+        "The mitigation"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_5ad7915f076019507cae1a93c14ad2d7",
+      "sourcePath": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "sourceAnchor": "unheaded-block-27",
+      "sourceUnitDigest": "4e2d5012783b54e530525974791c5fee2f7a078ee4a84c4a20cdbeb4da8a5108",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "targetAnchor": "unheaded-block-27",
+      "targetUnitDigest": "e21779e108d69203bc26537f09f82d14f57f45bc2cf5232134320c9dfe08d105",
+      "targetAncestry": [
+        "How to install fgOS in a project and use fgos doctor",
+        "2. Order of operations for a new project"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_0b03338bd7576f97d0cd046630a49fee",
+      "sourcePath": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "sourceAnchor": "unheaded-block-28",
+      "sourceUnitDigest": "0e208583b6697a5d9d214ac163155519c9546ff4f5c532095aa5a5cf9afef4e0",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "targetAnchor": "unheaded-block-28",
+      "targetUnitDigest": "ab07915018064a880c69774d42994e1da515f12837c2276b64f98be6c00c9f88",
+      "targetAncestry": [
+        "How to install fgOS in a project and use fgos doctor",
+        "2. Order of operations for a new project"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_d85a5331d5712b2f5c2ecd9cab60e487",
+      "sourcePath": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "sourceAnchor": "unheaded-block-29",
+      "sourceUnitDigest": "12d9fffb49ffa95c2b9387a90947d874c39868bf5cf11fec20992ec249bacd17",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "targetAnchor": "unheaded-block-29",
+      "targetUnitDigest": "8b845575534e8e9dfe409dc59e73bb7168d3579f320d6b6cd34d709fda7cfdb5",
+      "targetAncestry": [
+        "How to install fgOS in a project and use fgos doctor",
+        "2. Order of operations for a new project",
+        "2.1. What each command does"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+      "sourcePath": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "sourceAnchor": "unheaded-block-37",
+      "sourceUnitDigest": "e7eb39699c8b988fcf1907e294d4d34ded00f4a8b3194bd0f3388260bceb749b",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "targetAnchor": "unheaded-block-37",
+      "targetUnitDigest": "f68e806e498e7dfdaf578fd7a5e2bd066c34115737ec13a5faec13540f39170e",
+      "targetAncestry": [
+        "How to install fgOS in a project and use fgos doctor",
+        "4. Every doctor check",
+        "4.2. Project config (written by setup or `--fix`)"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_4b0be5d6b3c4382616bd5748e7bd6c94",
+      "sourcePath": "docs/how-to/write-wrapper-script-for-worktree-guard-refusal.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceUnitDigest": "65bbf66c5fbe7f8b99700d0aa6097603f23c9c66b9e23b6865368e3526bc1265",
+      "disposition": "supersede",
+      "targetOwner": "docs/how-to/write-wrapper-script-for-worktree-guard-refusal.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "3f67c68602b612b7b71b3a4f9e51029ff998d01d07a1a46af50fffcf4b1afe53",
+      "targetAncestry": [
+        "Use `scripts/write-wrapper-script.mjs` instead of hand-authoring a wrapper file",
+        "When to use it"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_19b74556b576db8c4a0acfdd6e5fe1fe",
+      "sourcePath": "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceUnitDigest": "9464c9243268314681492c02aef9a5158d8aea6f78427685fce8b3c4fcbffb73",
+      "disposition": "supersede",
+      "targetOwner": "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "09d4c13d8beacf9a66aaeb522177ea8f91999302941260da55147e7e012e4e08",
+      "targetAncestry": [
+        "How to reuse the shared executor-dispatch-fallback fragment in a new skill",
+        "Steps"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_c3f7f02e554068e22d81262ad18df6df",
+      "sourcePath": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "sourceAnchor": "unheaded-block-8",
+      "sourceUnitDigest": "7b45e559fde5cb417bc51e9649afac0e4e089545f3d0b9a1b84c8ccb39389061",
+      "disposition": "supersede",
+      "targetOwner": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetUnitDigest": "ff4c2df95c47422b2bd00390b05c64edaa1906ca0531f97b97bc5219794a66e3",
+      "targetAncestry": [
+        "How to wire a skill through the dispatch decision",
+        "Branching"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_5f8671a3f3421989a05e27f088a086ef",
+      "sourcePath": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceUnitDigest": "6150adf1385e16ebc1b6987abfb131aca170e46cdbf685149fa6a27657d47190",
+      "disposition": "supersede",
+      "targetOwner": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "8c02ef1948d72d0146635298850bac68cb00c6a0e133f66c5917eedbe8330a9e",
+      "targetAncestry": [
+        "How to wire a skill through the dispatch decision",
+        "Branching"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_d8d20682950e9f29f5fbce07c6a850c3",
+      "sourcePath": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceUnitDigest": "af7b6dd9e1c789a740e8b7085110ea842d6e482267cfaaf578a4b72343721df3",
+      "disposition": "supersede",
+      "targetOwner": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "7dee0bdfbd830d666ddf27b962f997632bdab15056fda6b5e958c48c3ab2f211",
+      "targetAncestry": [
+        "How to wire an existing skill's inline-reasoning step through an agent-executor executor",
+        "Steps"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_7ae2ffc8a883b917293312f8b63805eb",
+      "sourcePath": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceAnchor": "unheaded-block-11",
+      "sourceUnitDigest": "8a476b7de9622de9b60ad5e7b786fdcafe5b788eddbb10b05f818db765b5fd33",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetUnitDigest": "54a906894d376247d082bf9a679ebc746eba36386228da9014bc0d329beb7bbb",
+      "targetAncestry": [
+        "Dispatch Control Plane",
+        "Routing Identities"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_75041e871c0b191949808b55f541184d",
+      "sourcePath": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceAnchor": "unheaded-block-31",
+      "sourceUnitDigest": "d319970d29c29c5c781fc873bff405b6868816863f23906712c367d109b2fff8",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "unheaded-block-31",
+      "targetUnitDigest": "e6a51d5c197169a5427b3a20aab9b9c9ad0e458bc7ef25ccf8a34ae1b2713ed5",
+      "targetAncestry": [
+        "Dispatch Control Plane",
+        "Component-Internal Ownership"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_b9b42545b42b04889685191ada1a3892",
+      "sourcePath": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceAnchor": "unheaded-block-37",
+      "sourceUnitDigest": "685a1962cfdf2a77e004ce63487f93f36b00b332083debf26cda969e833559fd",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "unheaded-block-37",
+      "targetUnitDigest": "26f57ec1a1282005fa3076c63998c3fb78981b3ff51b90ebcbb2d0eca20f42a1",
+      "targetAncestry": [
+        "Dispatch Control Plane",
+        "Source Inventory"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_2f7cbb5fabfc5e77f7014c54f020c524",
+      "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+      "sourceAnchor": "file-block",
+      "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+      "targetAncestry": [],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_c201fb480171293641c2fb049fd33936",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "sourceAnchor": "unheaded-block-6",
+      "sourceUnitDigest": "6454baa8036f396a464892f0ee01b801236b89cfa5091363bea4d4c4cd881b81",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "8d8476fca1d3b135c3ef5f862b59b6e9f7decd3a3ab855089eeb119c9163fa99",
+      "targetAncestry": [
+        "Contract: Distribution Pin",
+        "3. Field Specifications & Optionality"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_199501685fd82d464892f7a06aad9516",
+      "sourcePath": "docs/platform/packaging-distribution/spec.md",
+      "sourceAnchor": "unheaded-block-13",
+      "sourceUnitDigest": "fa1e3475328263494367fdcaa17903829498d7bc435e1dacb33ad8b9ac4b28fc",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetUnitDigest": "d78cfec31f57634f9a0546edea529181e549e9abe991cb86d8523f5b015e2a4d",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "3.1.1 Windows Native Channel"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_73221307a66a364372a7f8206227e62f",
+      "sourcePath": "docs/platform/packaging-distribution/spec.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceUnitDigest": "c14f83e85b43064dd321bf0926e6b98f781c23df08cf772ef8959a30837a2e18",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "2. Entry Points"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_05845829294e08426b2f9395aab26d05",
+      "sourcePath": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceUnitDigest": "cb0caffcb9a4ef54e92d58e2667b1b56728c347c771ad0122ddec7336ef00717",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "ec9cbdb02d32abafa961280883c27c21451cd219d326901d115428856b42a39b",
+      "targetAncestry": [
+        "Verification: Install And Release Proof",
+        "2. Proof Surfaces"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_8e98d801bec98373306633c016311e24",
+      "sourcePath": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceUnitDigest": "e047506458192942e1af0334697f9d4ea5db02a4dc5f34992a3817f6432151aa",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "6542d0d7e4c8eaaa77c4d1c39bbc7a332624be7ffea00a6ca0b5b5d567775d9e",
+      "targetAncestry": [
+        "Verification: Install And Release Proof",
+        "3. Suggested Verification Commands"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_4217ac86de0ba075ca046202b2ce4284",
+      "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "sourceAnchor": "unheaded-block-24",
+      "sourceUnitDigest": "4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "5. Reasoned Envelope Exceptions"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_0bf4d10d1c0f4cda16abe6091d639b64",
+      "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "sourceAnchor": "unheaded-block-29",
+      "sourceUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-29",
+      "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Manifest Shape"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_bc055098a9e2bedf2ed30ab0dfcacf79",
+      "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "sourceAnchor": "unheaded-block-30",
+      "sourceUnitDigest": "83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-31",
+      "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Manifest Shape"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_3d2d87a2a9582e2faebabc79470d8ee8",
+      "sourcePath": "docs/platform/work-state/spec.md",
+      "sourceAnchor": "unheaded-block-93",
+      "sourceUnitDigest": "f20c0ca6ad7490fa85635d8100333e97787282b0936df18a2f7f7599d5cd3b63",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-93",
+      "targetUnitDigest": "d8bf5e1f48a181d1cc996d8e39c12e715dbf18e894203ed47c457a4a3a4b8835",
+      "targetAncestry": [
+        "Work State Specification",
+        "11. Business Rules"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_975c8349e0d069aabf88161d933f2228",
+      "sourcePath": "docs/reference/dispatch-module-boundaries.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceUnitDigest": "8da7e14a80bb5d560d4f6b4ed3a1b4daed64a609bae48059c6c7ec25c3846c18",
+      "disposition": "supersede",
+      "targetOwner": "docs/reference/dispatch-module-boundaries.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "f181007d6c80684c15dc6211eb00115a238cdab88f22bec5eb2d50453454701c",
+      "targetAncestry": [
+        "`src/runner/dispatch` module boundaries"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-100",
+      "sourceUnitDigest": "a9da2cf6e58fce799612fa0621321bd73b52671c571c30d19146f0e982f19d72",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-102",
+      "targetUnitDigest": "3f6a59c3d3764c1b978073ad68eb16ce1b0382d6bf362815f45ad79dd1625224",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Pointers (implementation)"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    },
+    {
+      "claimId": "claim_c2cb6de3e8b1288ed15fcd60f3154bbb",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceUnitDigest": "daf2341d585c13bd3e7f44184eb0b61402e41abf7ac9ae8a987b200a83f51c9e",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "f14dad0a401a272c3f3606f6c1e458003aacc9b553636202bf42ec9fad29a3f0",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Data Dictionary"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+    }
+  ]
+}

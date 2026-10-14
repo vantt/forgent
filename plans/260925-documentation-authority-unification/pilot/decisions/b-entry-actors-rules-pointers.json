@@ -146,46 +146,18 @@
     },
     {
       "claimId": "claim_477a30f4902261e390c34ab888145dcd",
-      "sourceUnitDigest": "da8ed377d2e30211",
+      "sourceUnitDigest": "3b7e07bac28aabd7039e7fa38d69641da21110c34157b6f189c996cead03357b",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "11-business-rules",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "rationale": "Source heading \"Business Rules\" is represented by frozen heading \"11. Business Rules\"; only the numbering prefix differs. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries.",
-      "authoredBy": "codex-session:22@2026-10-14",
-      "reviewNote": "deep: heading Business Rules to 11. Business Rules, H2 both, only the numbering prefix differs, anchor 11-business-rules exists, digest moved to e8875bfd with the RUL60 fix and matches HEAD.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-rework2.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "e8875bfd3ae0aff0ed573fd69a62868e8d8ad38af409b4c01b0d1533a2908f1b",
+      "reviewStatus": "pending",
+      "rationale": "Source heading \"Business Rules\" is represented by frozen heading \"11. Business Rules\"; only the numbering prefix differs. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "targetUnitDigest": "765b8e058e0fff60e1af8dea50abdb3838bbcd5ae59f225920829e959a5de0df",
       "targetAncestry": [
         "Work State Specification"
-      ],
-      "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3"
-    },
-    {
-      "claimId": "claim_9bb5739f68a7b4bafcd959ef59104e6a",
-      "sourceUnitDigest": "19f7dcac1af1f366",
-      "targetOwner": "docs/platform/work-state/spec.md",
-      "targetAnchor": "unheaded-block-93",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "rationale": "The RUL1..RULn single unit is identical in the candidate (diff clean); kind stays specification, not normative-law, since the vocabulary reserves normative-law for platform laws L1-L8 (map section 7). Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries.",
-      "authoredBy": "codex-session:22@2026-10-14",
-      "reviewNote": "deep: source 1160-1213 against target 1032-1085 differs in exactly the 13 lines reviewed last round, and of those only line 1080 (RUL60) changed this round; rebound target digest f20c0ca6 equals the file at HEAD; rationale lead says identical in the candidate yet discloses the correction in the same text.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-rework2.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "f20c0ca6ad7490fa85635d8100333e97787282b0936df18a2f7f7599d5cd3b63",
-      "targetAncestry": [
-        "Work State Specification",
-        "11. Business Rules"
-      ],
-      "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3"
+      ]
     },
     {
       "claimId": "claim_904f21e704c3d43d63ae2a762bf9791c",

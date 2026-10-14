@@ -356,21 +356,15 @@
       "sourceUnitDigest": "a72d8937e06c1393d29237a78645c521fdf0e95a0e4ab77c5d459969af038254",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
-      "targetAnchor": "unheaded-block-79",
+      "targetAnchor": "unheaded-block-81",
       "targetUnitDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
-      "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry.",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
-      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
-      "reviewMode": "ordinary",
-      "reviewNote": "ok. runner.md line 1052 (RUL-era note on execute --for): main inserts '(không kèm executor)' and replaces 'thẳng,' with a clause that RUL76 reopens `execute <id> --for <capability>`. Pure insertion plus clause extension; three-way equals HEAD. Request display trims the two leading spaces of the line, the digest is unaffected."
+      ]
     },
     {
       "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",

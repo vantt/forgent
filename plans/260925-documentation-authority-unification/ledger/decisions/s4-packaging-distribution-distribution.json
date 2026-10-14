@@ -145,50 +145,20 @@
     },
     {
       "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
-      "sourceUnitDigest": "7843e5b171ea17f9bece9456184250e5ef748cb46c1a87d79917c145dbcba539",
+      "sourceUnitDigest": "bdcb9646e89b32f767b4d238f8b4e55aab7d9ea8f3541fc4ce22f7f2a99ac581",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:15@2026-10-14",
-      "rationale": "The complete heading from docs/specs/distribution.md#data-dictionary, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#data-dictionary. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Heading Data Dictionary moved, depth 2 to 4 only; section payload and following-block digests equal on both sides; the new source digest differs from the old only through main's row 7 and 7b edits; anchor ok; rationale accurate, though it does not say the digest drift came from main",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-source.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The complete heading from docs/specs/distribution.md#data-dictionary, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#data-dictionary. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "targetUnitDigest": "daf68f421dfeceaf353dae3acd35391978f7dd56e9f10b1a0d6d4d0a13d7380b",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ],
-      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
-    },
-    {
-      "claimId": "claim_a26a90f97c6a399a30ce1df9207743b0",
-      "sourceUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
-      "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-85",
-      "claimKind": "specification",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:15@2026-10-14",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-5, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-85. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream source successor: complete current table imported verbatim into the existing candidate owner; independent conservation review pending. No implementation truth approval.",
-      "reviewNote": "Complete table verbatim at packaging#unheaded-block-85: digest 648a2fee equals the main legacy unit, so main's row 7 and 7b additions are carried word for word and nothing is lost; the stale boilerplate phrase about relative-link changes is inert since the unit has none, so no objection; no truth approval implied",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-source.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
-      "targetAncestry": [
-        "Spec: Packaging-Distribution",
-        "Retained Distribution Source Detail",
-        "Spec: Distribution",
-        "Data Dictionary"
-      ],
-      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+      ]
     },
     {
       "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",
@@ -495,26 +465,20 @@
     },
     {
       "claimId": "claim_7b2641076e23f0d2528c250d4e59cba2",
-      "sourceUnitDigest": "e623134d9a2a490ca8b99279780247475bdcdcfe13f11cbf369c154add3c3290",
+      "sourceUnitDigest": "080ff9c9873117a53258fd7291d73a77ebc4cc146768fc36121512c870af297b",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "business-rules",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#business-rules, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#business-rules. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 223-223 to target spec.md line 607; anchor business-rules exists; recomputed digest matches",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The complete heading from docs/specs/distribution.md#business-rules, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#business-rules. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "targetUnitDigest": "675341c756080b8acf77769cafe1a61d87e3a70ef5546c9e3cf7884cb853fce3",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_8930ab9733374cfbb11470da79f610cf",
@@ -565,122 +529,38 @@
       "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
-      "claimId": "claim_bdeaa6f1cce78532047ba6bf959cc43a",
-      "sourceUnitDigest": "cdc65be47d5ab1b4f61dfdef36be58ea1c499cff90dd56e3b3bcb5431aa561f4",
-      "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-91",
-      "claimKind": "specification",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-14, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-91. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Block byte-identical (9315 chars), digests equal, source lines 297-320 to target spec.md line 681; anchor unheaded-block-91 exists; recomputed digest matches",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "cdc65be47d5ab1b4f61dfdef36be58ea1c499cff90dd56e3b3bcb5431aa561f4",
-      "targetAncestry": [
-        "Spec: Packaging-Distribution",
-        "Retained Distribution Source Detail",
-        "Spec: Distribution",
-        "Business Rules"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
-    },
-    {
       "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
-      "sourceUnitDigest": "409f6139b9fe07c812843cb45d4f1fda7eafd39bcc0bf09edf48baa1a376dd55",
+      "sourceUnitDigest": "7d3b22dcbeba036ee788b91dd1409d06f722321a5b10851c97cd677654203743",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "lịch-sử-quyết-định",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#lịch-sử-quyết-định, under \"Lịch sử quyết định\", is retained at docs/platform/packaging-distribution/spec.md#lịch-sử-quyết-định. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Decision-history section carried verbatim (2026-10-12 and 2026-10-13 owner decisions); kind is specification although text is decision history, which is the file-level default and not blocking; Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 322-322 to target spec.md line 706; recomputed digest matches",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The complete heading from docs/specs/distribution.md#lịch-sử-quyết-định, under \"Lịch sử quyết định\", is retained at docs/platform/packaging-distribution/spec.md#lịch-sử-quyết-định. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "targetUnitDigest": "ac304b14f8b735b34c045e37fb6f686838cdfa55774338919cdf258cc85a3850",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
-    },
-    {
-      "claimId": "claim_45e83e644c43384e188c16e20172a52c",
-      "sourceUnitDigest": "b1e15730d97d645508d833b30133c31d6ac119466d80377b70c7815d0b8e08b3",
-      "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-92",
-      "claimKind": "specification",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-15, under \"Lịch sử quyết định\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-92. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Verbatim payload of the decision-history section incl. both dated entries; claim kind specification is arguable (decision) but not blocking and nothing in the text changed; Block byte-identical (2243 chars), digests equal, source lines 324-325 to target spec.md line 708; recomputed digest matches",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "b1e15730d97d645508d833b30133c31d6ac119466d80377b70c7815d0b8e08b3",
-      "targetAncestry": [
-        "Spec: Packaging-Distribution",
-        "Retained Distribution Source Detail",
-        "Spec: Distribution",
-        "Lịch sử quyết định"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_797fb0be5db3c260c97745cd0894bec8",
-      "sourceUnitDigest": "e68ffed7e8c4e5523fe33183c439acd593fb7441ac8cc17af557e45e749e796c",
+      "sourceUnitDigest": "1222a356730459a58d03ca68ada07f9dbd0d21cc6d6dcfba18067b6fddf7902d",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "edge-cases-settled",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#edge-cases-settled, under \"Edge Cases Settled\", is retained at docs/platform/packaging-distribution/spec.md#edge-cases-settled. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 327-327 to target spec.md line 711; anchor edge-cases-settled exists; recomputed digest matches",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The complete heading from docs/specs/distribution.md#edge-cases-settled, under \"Edge Cases Settled\", is retained at docs/platform/packaging-distribution/spec.md#edge-cases-settled. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "targetUnitDigest": "27d796445bca33db32cf7b287a079e920f33f612ace58427a56f40ea607b3f66",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
-    },
-    {
-      "claimId": "claim_8d6b06dae659395981e196d4f7d33c15",
-      "sourceUnitDigest": "adbe84814a993cfb5f57b2646665d448fe34ee2d2583e6b2f930855f035722e8",
-      "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-93",
-      "claimKind": "specification",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-16, under \"Edge Cases Settled\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-93. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Block byte-identical (2207 chars), digests equal, source lines 329-361 to target spec.md line 713; anchor unheaded-block-93 exists; recomputed digest matches",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "adbe84814a993cfb5f57b2646665d448fe34ee2d2583e6b2f930855f035722e8",
-      "targetAncestry": [
-        "Spec: Packaging-Distribution",
-        "Retained Distribution Source Detail",
-        "Spec: Distribution",
-        "Edge Cases Settled"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_18420261f445f01acf39c262a9ce170c",
@@ -857,6 +737,88 @@
         "docs/platform/packaging-distribution/spec.md"
       ],
       "rationale": "Complete native source-unit carriage to the listed area owner(s), with dated source planning kept separate from runtime contracts. Legacy bytes stay intact until cutover; no archive or deletion is performed."
+    }
+  ],
+  "registryGaps": [
+    {
+      "claimId": "claim_a26a90f97c6a399a30ce1df9207743b0",
+      "sourceUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-85",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-5, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-85. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream source successor: complete current table imported verbatim into the existing candidate owner; independent conservation review pending. No implementation truth approval. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-5"
+    },
+    {
+      "claimId": "claim_bdeaa6f1cce78532047ba6bf959cc43a",
+      "sourceUnitDigest": "cdc65be47d5ab1b4f61dfdef36be58ea1c499cff90dd56e3b3bcb5431aa561f4",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-91",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-14, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-91. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetUnitDigest": "cdc65be47d5ab1b4f61dfdef36be58ea1c499cff90dd56e3b3bcb5431aa561f4",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Business Rules"
+      ],
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-14"
+    },
+    {
+      "claimId": "claim_45e83e644c43384e188c16e20172a52c",
+      "sourceUnitDigest": "b1e15730d97d645508d833b30133c31d6ac119466d80377b70c7815d0b8e08b3",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-92",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-15, under \"Lịch sử quyết định\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-92. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetUnitDigest": "b1e15730d97d645508d833b30133c31d6ac119466d80377b70c7815d0b8e08b3",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Lịch sử quyết định"
+      ],
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-15"
+    },
+    {
+      "claimId": "claim_8d6b06dae659395981e196d4f7d33c15",
+      "sourceUnitDigest": "adbe84814a993cfb5f57b2646665d448fe34ee2d2583e6b2f930855f035722e8",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-93",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-16, under \"Edge Cases Settled\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-93. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetUnitDigest": "adbe84814a993cfb5f57b2646665d448fe34ee2d2583e6b2f930855f035722e8",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Edge Cases Settled"
+      ],
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-16"
     }
   ]
 }

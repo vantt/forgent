@@ -1723,71 +1723,36 @@
     },
     {
       "claimId": "claim_9c6c68acbcd413ec5d826804b07650c0",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "sourceUnitDigest": "9dcfe09c6bf68c7b",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "421b1ec4798a320fbf10add3258f3791961735bdc499d66771ba6e3c4b8dff02",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "manifest-shape",
       "claimKind": "contract",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Source H3 manifest becomes \"Manifest Shape\" in the contract document; title changed.",
-      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L647-647 (heading \"Sổ verb máy-đọc (manifest) — `--help --json`\") -> contracts/cli-io-contract.md#manifest-shape L244-244; targetOwner/targetAnchor contracts/cli-io-contract.md#manifest-shape. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "f7201259d68259d70be0b14e5989837d13de80f1a0f46817c02bca93603a9250",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Source H3 manifest becomes \"Manifest Shape\" in the contract document; title changed. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetUnitDigest": "1f684d2bdd33bd8b03a384f0657e10df3dc2861a4c839d7be8fb74e5bfb29db4",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
-    },
-    {
-      "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "sourceUnitDigest": "a2e6a5ffa58ec1f1",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-29",
-      "claimKind": "contract",
-      "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Manifest fields (schema_version 2.0, commands) are stated in both sources; candidate carries both texts, the work-state one adds the positional-parameter rule.",
-      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L649-663 (unheaded-block-66) -> contracts/cli-io-contract.md#unheaded-block-29 L246-260; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-29. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
-      "targetAncestry": [
-        "CLI I/O Contract",
-        "7. Machine-Readable Verb Registry",
-        "Manifest Shape"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+      ]
     },
     {
       "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "sourceUnitDigest": "c219ee825c3475e6",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "c219ee825c3475e61bb642fd89e50efedc586df24b0252a6d99e58df63f419d8",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-31",
+      "targetAnchor": "unheaded-block-32",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "rationale": "Code is truth for both effect axes and the whole source field definition. Owner A15 resolves SC-1: the stale exclusive only-review-and-approve assertion is superseded by the current registry contract and a run example, not coordination. Actual --help --json exposes 15 externalEffect verbs including run and no coordination verb. The candidate preserves the source field definitions and corrects its obsolete enumeration; independent review of this changed binding is pending.",
-      "reviewNote": "work-state.md block 67 to cli-io-contract block 31: diff shows only the clause \"hôm nay chỉ review và approve mang externalEffect: true, đúng chế độ --github của chúng\" replaced by the COMMAND_REGISTRY, 15 verbs, no coordination statement with review/approve/run examples; all 15 and the missing coordination verb confirmed in code; review rationale and STR38 clause intact; rationale truthful. Low observation: the per-verb \"exactly their --github mode\" qualifier for approve is dropped with the stale exclusivity (registry comment lines 18-20 still say so), a true fact now silent for approve. Accepted as part of the owner-approved supersede of that sentence.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-sc1.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Code is truth for both effect axes and the whole source field definition. Owner A15 resolves SC-1: the stale exclusive only-review-and-approve assertion is superseded by the current registry contract and a run example, not coordination. Actual --help --json exposes 15 externalEffect verbs including run and no coordination verb. The candidate preserves the source field definitions and corrects its obsolete enumeration; independent review of this changed binding is pending. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "563247893e1b8fd795c43d611fd1d5ed28d150b5"
+      ]
     },
     {
       "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
@@ -1813,90 +1778,35 @@
     },
     {
       "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "sourceUnitDigest": "3964ac136b9bb85d",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-34",
+      "targetAnchor": "unheaded-block-35",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8.",
-      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L704-711 (unheaded-block-69) -> contracts/cli-io-contract.md#unheaded-block-34 L298-305; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-34. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
       "targetAncestry": [
         "CLI I/O Contract",
         "8. Multi-Value Flag Convention"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
-    },
-    {
-      "claimId": "claim_522c26efde7ef029b3ce6e25829a8915",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "sourceUnitDigest": "aadcac783bf59267",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "9-per-verb-help",
-      "claimKind": "contract",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Source H3 per-verb help becomes the numbered H2 \"9. Per-Verb Help\" in the contract document; level and title changed.",
-      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L713-713 (heading \"Trợ giúp theo từng verb — `fgos <verb> --help`\") -> contracts/cli-io-contract.md#9-per-verb-help L313-313; targetOwner/targetAnchor contracts/cli-io-contract.md#9-per-verb-help. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "c57c03b28277a6a6bb5608ca73c026fab2a79333bccf9bc89a53208ea9d16dcb",
-      "targetAncestry": [
-        "CLI I/O Contract"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
-    },
-    {
-      "claimId": "claim_f1eca3e6fcc3886007fa5de37d686e54",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "sourceUnitDigest": "49da8c71336ea054",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-36",
-      "claimKind": "contract",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Per-verb --help intro is carried verbatim into the contract document; only in work-state.md.",
-      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L715-718 (unheaded-block-70) -> contracts/cli-io-contract.md#unheaded-block-36 L315-318; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-36. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "49da8c71336ea054dce887759a9eea0ef5f841792858d401b66341c4d0d8734d",
-      "targetAncestry": [
-        "CLI I/O Contract",
-        "9. Per-Verb Help"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+      ]
     },
     {
       "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "sourceUnitDigest": "a1c9e2ebc2ba7e6a",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-37",
+      "targetAnchor": "unheaded-block-39",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee.",
-      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L720-731 (unheaded-block-71) -> contracts/cli-io-contract.md#unheaded-block-37 L320-331; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-37. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
       "targetAncestry": [
         "CLI I/O Contract",
         "9. Per-Verb Help"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+      ]
     },
     {
       "claimId": "claim_a374334e7c5dc565cac42c0fa641f78f",
@@ -2012,5 +1922,26 @@
       "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+  "registryGaps": [
+    {
+      "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "a2e6a5ffa58ec1f1",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-29",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Manifest fields (schema_version 2.0, commands) are stated in both sources; candidate carries both texts, the work-state one adds the positional-parameter rule. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Manifest Shape"
+      ],
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-66"
+    }
+  ]
 }

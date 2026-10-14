@@ -546,7 +546,9 @@
           ],
           "fragment": "## Ranh giới — điều gì KHÔNG thuộc hợp đồng này\n\nSTR46 hợp nhất chiều vào/ra hôm nay đang có, KHÔNG mở rộng nó thành chủ\nđộng (push). Ba việc sau đã locked ngoài biên khi mở exploring, mỗi việc có\nnhà riêng:\n\n- **Chiều-ra khởi-xướng (\"cần bạn\")** — một kênh attention/push có\n  delivery-semantics riêng (at-least-once, dedup, routing, ack,\n  escalation) — thuộc STR48, sống ở consumer/daemon, KHÔNG phải core fgOS.\n- **Increment terminal/pane + chat item-scoped** — thuộc STR83/STR38.\n- **Tầng phân quyền** (\"ai được gọi verb nào\", caller chưa xác danh có bị\n  chặn hay không) — thuộc STR38.\n\nĐây là lý do CoS gốc của STR46 (bản khai lúc mở backlog) bị thu hẹp có chủ\ný: chỉ vế \"có một spec hợp đồng in/out tự-mô-tả\" là việc của STR46; hai vế\ncòn lại (chiều-ra khởi-xướng, increment terminal/pane) thuộc PBI khác.\n\nCũng nằm ngoài: daemon (chưa xây), tách core verb-logic thành lib độc lập\nCLI (prerequisite của kiến trúc daemon tương lai, refactor thuần không đổi\nhành vi), và khối `fgos-discovered` (giao thức worker→runner, không phải\ncửa ra tới người).\n\n## Tham chiếu\n\n`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (kiến trúc cửa) ·\n`docs/decisions/0011-version-tuong-minh-cho-moi-contract.md` (version) ·\n`docs/specs/work-state.md` §envelope, §Sổ verb máy-đọc, §Danh tính người\nghi (chi tiết trường/hành vi) · `docs/specs/runner.md` RUL61 (envelope\nstdout runner) · `docs/architecture-map.md` CTR001/CTR003/CTR004 (sổ đăng\nký contract) · `docs/history/str46-io-contract/` (CONTEXT.md 37 quyết định\nkhoá, plan.md bốn lát).\n"
         }
-      ]
+      ],
+      "currentLineAfterSync": 406,
+      "currentContentCommit": "6c6a65e8543fa72012bd55f8999f13f9ed6193c4"
     }
   ],
   "A35Item2": {
@@ -3649,5 +3651,323 @@
   },
   "contentCommit": "58705f6d6461770629128075d4c4dfe8de79dafa",
   "nativeSuccessorAccounting": "root-truth-successor-accounting.json",
-  "nativeProof": "verification-261014-2300-root-truth-corrections.json"
+  "nativeProof": "verification-261014-2300-root-truth-corrections.json",
+  "currentReviewEvidenceAfterSync": {
+    "commit": "6c6a65e8543fa72012bd55f8999f13f9ed6193c4",
+    "rows": [
+      {
+        "correctionIndex": 0,
+        "sampledClaimId": "claim_02a2110f086ac00ef2d59c9d4d9afeb1",
+        "path": "docs/platform/work-state/spec.md",
+        "currentCodeCitations": [
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 569,
+            "endLine": 581,
+            "text": "569:     if (flags.tier !== undefined) {\n570:       throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');\n571:     }\n572:     const size = optionalField(flags.size, \"discover --size requires a value ('light'/'standard'/'heavy'); omit --size entirely to leave the item's size unchanged.\");\n573:     const rigor = optionalField(flags.rigor, \"discover --rigor requires a value ('low'/'standard'/'high'/'critical'); omit --rigor entirely to leave the item's rigor unchanged.\");\n574:     const kind = optionalField(flags.kind, \"discover --kind requires a value from the domain's own kind vocabulary; omit --kind entirely to leave the item's kind unchanged.\");\n575:     const risk = optionalField(flags.risk, \"discover --risk requires a value ('light'/'standard'/'heavy'); omit --risk entirely to leave the item's risk unchanged.\");\n576:     if (size !== undefined) verdict.size = size;\n577:     if (rigor !== undefined) verdict.rigor = rigor;\n578:     if (kind !== undefined) verdict.kind = kind;\n579:     if (risk !== undefined) verdict.risk = risk;\n580:     return verdict;\n581:   }",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "124911524c999774dd229799866e39c524ae54afcf9087a6e3f0e561f0ff9003",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          }
+        ]
+      },
+      {
+        "correctionIndex": 1,
+        "sampledClaimId": "claim_02a2110f086ac00ef2d59c9d4d9afeb1",
+        "path": "docs/platform/work-state/spec.md",
+        "currentCodeCitations": [
+          {
+            "path": "src/intake/discovery.mjs",
+            "startLine": 202,
+            "endLine": 211,
+            "text": "202: // function so it is unit-testable without mocking a whole dispatch pipeline.\n203: export function classificationPatchFromVerdict(outcome, callerVerdict) {\n204:   if (outcome !== 'clear' || !callerVerdict?.clear) return {};\n205:   const patch = {};\n206:   if (callerVerdict.size !== undefined) patch.size = callerVerdict.size;\n207:   else if (callerVerdict.tier !== undefined) patch.size = callerVerdict.tier;\n208:   if (callerVerdict.rigor !== undefined) patch.rigor = callerVerdict.rigor;\n209:   if (callerVerdict.kind !== undefined) patch.kind = callerVerdict.kind;\n210:   if (callerVerdict.risk !== undefined) patch.risk = callerVerdict.risk;\n211:   return patch;",
+            "blob": "a83fad5a3b64d03dea6f13e3eca629949cbc315f",
+            "excerptSHA256": "16bac3c6a90bd131dcadff8b89133a8afa7186f5e4d1baad934499f94e1b47d9",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 569,
+            "endLine": 581,
+            "text": "569:     if (flags.tier !== undefined) {\n570:       throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');\n571:     }\n572:     const size = optionalField(flags.size, \"discover --size requires a value ('light'/'standard'/'heavy'); omit --size entirely to leave the item's size unchanged.\");\n573:     const rigor = optionalField(flags.rigor, \"discover --rigor requires a value ('low'/'standard'/'high'/'critical'); omit --rigor entirely to leave the item's rigor unchanged.\");\n574:     const kind = optionalField(flags.kind, \"discover --kind requires a value from the domain's own kind vocabulary; omit --kind entirely to leave the item's kind unchanged.\");\n575:     const risk = optionalField(flags.risk, \"discover --risk requires a value ('light'/'standard'/'heavy'); omit --risk entirely to leave the item's risk unchanged.\");\n576:     if (size !== undefined) verdict.size = size;\n577:     if (rigor !== undefined) verdict.rigor = rigor;\n578:     if (kind !== undefined) verdict.kind = kind;\n579:     if (risk !== undefined) verdict.risk = risk;\n580:     return verdict;\n581:   }",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "124911524c999774dd229799866e39c524ae54afcf9087a6e3f0e561f0ff9003",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          }
+        ]
+      },
+      {
+        "correctionIndex": 2,
+        "sampledClaimId": "claim_1f9fb4feceda8f5bf6a18b151ce0a397",
+        "path": "docs/platform/work-state/spec.md",
+        "currentCodeCitations": [
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 3013,
+            "endLine": 3041,
+            "text": "3013:       const explicitId = optionalField(positional[0] ?? flags.id, 'take --id requires a non-empty id value (omit --id entirely to take the frontier head)');\n3014:       const role = optionalField(flags.role, 'take --role requires \"human\" or \"session\" (omit --role entirely to default to human)') ?? 'human';\n3015:       if (role !== 'human' && role !== 'session') {\n3016:         throw new StoreError('validation', `take --role must be \"human\" or \"session\" (got \"${role}\").`);\n3017:       }\n3018: \n3019:       let id = explicitId;\n3020:       if (!id) {\n3021:         const [head] = readyWork(dir);\n3022:         if (!head) {\n3023:           throw new StoreError('validation', 'take: the frontier is empty — no item ready to take.');\n3024:         }\n3025:         id = head.id;\n3026:       } else {\n3027:         // Explicit `--id` (choke-point-take-vs-pick-claim-eligibility): only\n3028:         // deps-done + no-open-descendant gate this branch, not stage — a\n3029:         // clarify/decompose item is claimable here exactly like `pick`\n3030:         // already allows (status and stage are independent axes, fsm.mjs).\n3031:         // The no-`--id` branch above still only ever opens `readyWork`'s own\n3032:         // frontier head, so D1 (take mirrors the runner's own auto-dispatch\n3033:         // set) stays true for that path, unchanged.\n3034:         const item = listWork(dir).work[id];\n3035:         if (!item) {\n3036:           throw new StoreError('validation', `take: work \"${id}\" not found.`);\n3037:         }\n3038:         if (item.status === 'todo' && !isDepsAndLineageReady(dir, id)) {\n3039:           throw new StoreError(\n3040:             'validation',\n3041:             `take: \"${id}\" is todo but has an unmet dependency or an open decomposed child — take only opens work the runner could actually dispatch (D1).`,",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "d8b9e12e1d9a3ec84818f662ba715db6e3535c010c73e45089817a1b72b29ebf",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 3112,
+            "endLine": 3158,
+            "text": "3112:     case 'pick': {\n3113:       const explicitId = optionalField(positional[0] ?? flags.id, 'pick --id requires a non-empty id value (omit --id entirely to pick the frontier head)');\n3114:       const claimTrigger = optionalField(flags.via, 'pick --via requires a non-empty value (omit --via entirely to skip stamping claimTrigger)');\n3115: \n3116:       let id = explicitId;\n3117:       if (!id) {\n3118:         const [head] = readyWork(dir);\n3119:         if (!head) {\n3120:           throw new StoreError('validation', 'pick: the frontier is empty — no item ready to pick.');\n3121:         }\n3122:         id = head.id;\n3123:       } else if (!listWork(dir).work[id]) {\n3124:         throw new StoreError('validation', `pick: work \"${id}\" not found.`);\n3125:       }\n3126: \n3127:       // Delegate to claim-port.mjs — single choke-point for all claim flows\n3128:       // (tsk-53f D1). Handles: main-checkout-lock, moveWork, addOutcome,\n3129:       // worktree creation with correct baseRef for leaf items. Branch-reuse\n3130:       // generalized to \"does fgw/<id> already exist\" alone (claim-lock §3c)\n3131:       // — claimWork computes branchAlreadyExists unconditionally (not gated\n3132:       // on status === 'blocked'), so a `todo` item whose branch already\n3133:       // stands (released back to `todo` at the clarify/decompose ->\n3134:       // executing boundary, claim-lock §3b) reattaches to that same branch\n3135:       // tip via createWorktree's reuse path instead of forking a new one.\n3136:       const { noWait, waitMs } = parseWaitFlags(flags, 'pick');\n3137:       // repoRoot from --dir, never raw process.cwd() (tsk-k8u D1/D2): a\n3138:       // claim-release + re-pick run from inside the very worktree being\n3139:       // torn down (e.g. the claim-lock §3b reattach above) must never\n3140:       // target git operations at that doomed cwd — deriving repoRoot from\n3141:       // --dir keeps them at the stable main checkout instead. Same\n3142:       // no-op-when---dir-is-omitted behavior as take's own fix above.\n3143:       const repoRoot = path.dirname(dir);\n3144:       // worktreeDir under repoRoot's .claude/worktrees/ (tsk-424 D1/D2,\n3145:       // tsk-k8u D2: derived from the same fixed repoRoot, not\n3146:       // process.cwd(), for the same reason): the harness's own\n3147:       // EnterWorktree tool only allows a second-or-later in-session switch\n3148:       // when the target sits there, e.g. a root item decomposing into a\n3149:       // child mid-session. os.tmpdir()/fgos-worktrees (createWorktree's own\n3150:       // default) fails that check past the first switch — pick is the only\n3151:       // caller that needs the harness-chainable location; runner/\n3152:       // merge-ephemeral callers are untouched.\n3153:       const doPick = () => claimWork(dir, {\n3154:         id,\n3155:         actor: 'session',\n3156:         isolate: true,\n3157:         claimTrigger,\n3158:         repoRoot,",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "b4d78f916c19bcb72d4cfece9b184edd7d4359c11025ea4dcaf94294d189435e",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "src/runner/claim-port.mjs",
+            "startLine": 188,
+            "endLine": 196,
+            "text": "188:     if (isolate && isLeaf) {\n189:       const unmergedDeps = (item.deps ?? []).filter((dep) => !isResolvedStatus(view.work[dep]));\n190:       if (unmergedDeps.length > 0) {\n191:         throw new ClaimError(\n192:           'deps-not-merged',\n193:           `claimWork: leaf \"${id}\" has dep(s) not yet status:done — ${unmergedDeps.join(', ')} — forking from \"${rootBranch}\" now risks missing their content; approve/merge them into \"${rootBranch}\" first.`,\n194:         );\n195:       }\n196:     }",
+            "blob": "ed742a7d151ff914e80f0ce5b640391e3d391388",
+            "excerptSHA256": "590fd04a7f4ab015e3162eb74b7b8f32b465a71852cf00d342bcc535f83ae60a",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "src/runner/claim-port.mjs",
+            "startLine": 241,
+            "endLine": 243,
+            "text": "241:     const isBranchTake = item.status === 'blocked' && branchAlreadyExists;\n242:     const expectedStatus = isBranchTake ? 'blocked' : 'todo';\n243:     const useBranchSource = isolate || isBranchTake;",
+            "blob": "ed742a7d151ff914e80f0ce5b640391e3d391388",
+            "excerptSHA256": "4d87095c04e2377a8e00673fca53800a4a48b038aebe4d25f3699483105fb174",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "src/runner/claim-port.mjs",
+            "startLine": 299,
+            "endLine": 309,
+            "text": "299:     const runtimeClaim = withEventsLock(path.join(dir, 'events.jsonl'), () => {\n300:       const freshDurableView = foldEvents(readRawEvents(dir));\n301:       const freshStatus = freshDurableView.work[id]?.status;\n302:       if (freshStatus !== expectedStatus) {\n303:         throw new ClaimError(\n304:           'conflict',\n305:           `claimWork: expected \"${id}\" durable status \"${expectedStatus}\" but found \"${freshStatus}\" (durable state changed since read)`,\n306:         );\n307:       }\n308:       const freshRevision = getItemDurableRevision(freshDurableView, id);\n309: ",
+            "blob": "ed742a7d151ff914e80f0ce5b640391e3d391388",
+            "excerptSHA256": "c6d179d3966061f9a357e79bf88bc0457f88db87c573cbd87f039bdc7ecd19d5",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          }
+        ]
+      },
+      {
+        "correctionIndex": 3,
+        "sampledClaimId": "claim_3c9b65402d8ece4ef57ad337ba5d9d72",
+        "path": "docs/platform/work-state/spec.md",
+        "currentCodeCitations": [
+          {
+            "path": "domains/coding/workflows/feature.yaml",
+            "startLine": 154,
+            "endLine": 162,
+            "text": "154: transitions:\n155:   - { from: discovery, to: exploring }\n156:   - { from: discovery, to: planning }\n157:   - { from: exploring, to: planning }\n158:   - { from: planning, to: executing }\n159: \n160: # Step names older records carry.\n161: aliases:\n162:   decompose: planning",
+            "blob": "73be44ee13235ee800d60010ab8f9b1261d2b22a",
+            "excerptSHA256": "84735617d95c5ad77b89c8c3ee56525727a88f8adba3173f7ea28d72823b6808",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "src/state/domain-registry.mjs",
+            "startLine": 229,
+            "endLine": 233,
+            "text": "229:   const wf = resolveWorkflow(domain, item.kind);\n230:   if (item.workflowStep !== undefined) return resolveStepAlias(wf, item.workflowStep);\n231:   return workflowStepForPhase(wf, 'execute');\n232: }\n233: ",
+            "blob": "79871e4e1c675b5a371707d719dbc2318f71f112",
+            "excerptSHA256": "eda049d170170c38f818d5fb953c3a67d72e73d6d936de62381afeb2798d7c89",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          }
+        ]
+      },
+      {
+        "correctionIndex": 4,
+        "sampledClaimId": "claim_eb0bf7783bb1b1027c012f050c782203",
+        "path": "docs/platform/work-state/spec.md",
+        "currentCodeCitations": [
+          {
+            "path": "src/intake/classify.mjs",
+            "startLine": 68,
+            "endLine": 76,
+            "text": "68: /**\n69:  * Classify a free-text submission into {size, kind, risk} (Phase 3). Purely\n70:  * mechanical keyword counting, no LLM call, and never throws — an\n71:  * unrecognized or empty/non-string input falls back to size: 'standard',\n72:  * kind: 'task', with risk mirroring the size signal. Does NOT guess rigor.\n73:  *\n74:  * D12 (tsk-2yo): this result is only ever a TEMP placeholder at item\n75:  * creation time now -- the real judgment happens once, later, at stage\n76:  * `discovery`, on real research evidence (`fgos-coding-discovering`).",
+            "blob": "35a3d03da7317a42574aa7bda3818adfb5a19c63",
+            "excerptSHA256": "83598b170c4f6e1c3410a4958683a38219ad7170aed498cf8ecad7e9ab0fba3d",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 858,
+            "endLine": 870,
+            "text": "858: function submitWork(dir, text, opts = {}) {\n859:   const title = deriveTitle(text);\n860:   const classified = classify(text);\n861:   // Per str51-llm-assist-classify D2/D5: --tier/--kind/--risk are\n862:   // independently overridable per-field; an omitted flag falls through to\n863:   // classify(text)'s own mechanical default for exactly that field, so a\n864:   // flagless call stays byte-identical to the pre-feature behavior.\n865:   const size = opts.size ?? classified.size;\n866:   const kind = opts.kind ?? classified.kind;\n867:   const risk = opts.risk ?? classified.risk;\n868:   const id = generateId(title, Object.keys(listWork(dir).work));\n869:   const work = {\n870:     id,",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "31a448dedbb53b0c3f204023609ff463682db2f714d98efeb9df3a7316692894",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          }
+        ]
+      },
+      {
+        "correctionIndex": 5,
+        "sampledClaimId": "claim_eb0bf7783bb1b1027c012f050c782203",
+        "path": "docs/platform/work-state/spec.md",
+        "currentCodeCitations": [
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 1380,
+            "endLine": 1393,
+            "text": "1380:       const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;\n1381:       // tsk-59x D1: a leaf gets this shorter/zero TTL instead of ttlDays --\n1382:       // resolved per-item inside assessCleanupReadiness (resolveTtlDaysForItem).\n1383:       const leafTtlDays = sharedConfig?.cleanup?.leafTtlDays ?? DEFAULT_CLEANUP_LEAF_TTL_DAYS;\n1384: \n1385:       const assessment = assessCleanupReadiness({\n1386:         view,\n1387:         rawEvents,\n1388:         id,\n1389:         repoRoot,\n1390:         worktreeBacked: domain.worktreeBacked ?? false,\n1391:         ttlDays,\n1392:         leafTtlDays,\n1393:       });",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "17da1226750366bad72439357e1cb06c942eede727b3f082d6e3f7512f398426",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "src/setup/registrations.mjs",
+            "startLine": 2739,
+            "endLine": 2753,
+            "text": "2739: export const DEFAULT_CLEANUP_TTL_DAYS = 7;\n2740: \n2741: // tsk-59x D1: supersedes D7's global-only premise for the leaf/root axis\n2742: // specifically, now that the demonstrated need D7 flagged as missing\n2743: // exists (25% of open list is children, 0/99 cleanup-pool items ever\n2744: // elapse the 7-day TTL). A leaf's own content already lives on its\n2745: // still-alive root branch the moment it merges, so reclaiming its\n2746: // worktree/branch immediately loses nothing. Root items are unaffected —\n2747: // they keep DEFAULT_CLEANUP_TTL_DAYS above.\n2748: export const DEFAULT_CLEANUP_LEAF_TTL_DAYS = 0;\n2749: \n2750: registerConfigDefault({\n2751:   id: 'cleanup',\n2752:   key: 'cleanup',\n2753:   shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },",
+            "blob": "c5756b174773914fda5402ee961d01de9f07a080",
+            "excerptSHA256": "d6c7b3a24eb09ca5cfea24efcfcb19a567679eae5cbbc053de31135d3336df30",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "src/state/cleanup-harness.mjs",
+            "startLine": 65,
+            "endLine": 76,
+            "text": "65:  * tsk-59x D1: which TTL applies to `id` — the leaf value when `id` has a\n66:  * real parent (`resolveRoot(view, id) !== id`, same leaf test\n67:  * `checkMergeStillResolves` above already uses), the root value otherwise.\n68:  * `leafTtlDays` omitted entirely falls back to `ttlDays` for every item,\n69:  * root or leaf — keeps every existing caller that doesn't pass it\n70:  * byte-identical to pre-tsk-59x behavior.\n71:  */\n72: export function resolveTtlDaysForItem(view, id, { ttlDays, leafTtlDays } = {}) {\n73:   if (leafTtlDays === undefined) return ttlDays;\n74:   const isLeaf = resolveRoot(view, id) !== id;\n75:   return isLeaf ? leafTtlDays : ttlDays;\n76: }",
+            "blob": "8079a0d1e985cf07f745600c3ab4fd4cc0e3454b",
+            "excerptSHA256": "15a2f2e73b5fc406ecc37ca6428a6bbee81fca0741f7891d0e807dacd528708a",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          }
+        ]
+      },
+      {
+        "correctionIndex": 6,
+        "sampledClaimId": "claim_eb0bf7783bb1b1027c012f050c782203",
+        "path": "docs/platform/work-state/spec.md",
+        "currentCodeCitations": [
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 1395,
+            "endLine": 1404,
+            "text": "1395:       if (assessment.failed.length > 0) {\n1396:         const reason = [...assessment.notReadyYet, ...assessment.failed].join('; ');\n1397:         const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'cleanup', reason, role: 'system' });\n1398:         releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);\n1399:         return { id, to: 'blocked', reason, seq: event.seq };\n1400:       }\n1401: \n1402:       if (assessment.notReadyYet.length > 0) {\n1403:         return { id, to: 'cleanup', noop: true, reasons: assessment.notReadyYet };\n1404:       }",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "74f3705c295f83e281bd33f749cdc5d01566b46e805e344b00995340fe4e66a8",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          }
+        ]
+      },
+      {
+        "correctionIndex": 7,
+        "sampledClaimId": "claim_2d8114529b804f49494e6d42548e1372",
+        "path": "docs/platform/platform-foundations.md",
+        "currentCodeCitations": [
+          {
+            "path": "docs/decisions/index.md",
+            "startLine": 1,
+            "endLine": 12,
+            "text": "1: ---\n2: type: explanation\n3: title: Decisions index\n4: generated: true\n5: ---\n6: \n7: # Decisions index\n8: \n9: <!-- generated by `fgos decision-index` from state.decisions -- never hand-edit; a manual edit is overwritten on the next regenerate. -->\n10: \n11: | Scope | Decision | Rationale | Recorded |\n12: |---|---|---|---|",
+            "blob": "98ec28db4e5b5534c705813a76edbd676c29723f",
+            "excerptSHA256": "41f9c186d3ccfeced5b22e448929e97d516fafd5d226ce8523651bff40061d73",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "docs/specs/platform-foundations.md",
+            "startLine": 1,
+            "endLine": 16,
+            "text": "1: ---\n2: area: platform-foundations\n3: updated: 2026-07-14\n4: sources: [phase-0-compound-learning-stack]\n5: decisions: [ca7de3cf, ae461c8b, ed953e09, 14ebeea9]\n6: coverage: full\n7: ---\n8: \n9: # Spec: Platform Foundations (luật nền)\n10: \n11: Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên mọi code của compound stack (state/FSM → routing → compound-learning). Người dùng: product owner (khóa và supersede luật) và mọi agent/reviewer thiết kế hay thẩm định artifact của forgent. Văn bản gốc đầy đủ (phát biểu, nguồn bằng chứng, hệ quả, ngưỡng xem lại): xem Pointers.\n12: \n13: ## Entry Points & Triggers\n14: \n15: - Trước khi thiết kế bất kỳ artifact bền, store, hay interface mới → đọc luật nền; thiết kế phải khai các phân loại bắt buộc (RUL1 (Log hay State ngay lúc thiết kế), RUL8 (mọi artifact khai mức bền tường minh), RUL4 (mỗi interface chọn theo audience)).\n16: - Mở đầu mọi review thiết kế tầng state → câu hỏi \"log hay state?\" (RUL1 (Log hay State ngay lúc thiết kế)).",
+            "blob": "1c58a7c8c07a566f2c9240efa2e9615411a4585f",
+            "excerptSHA256": "d830f1aa7189cf2ec063f76fa1573d8462d807636d10976ad4dced12ac23615c",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "docs/specs/platform-foundations.md",
+            "startLine": 97,
+            "endLine": 99,
+            "text": "97: ## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)\n98: \n99: Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.",
+            "blob": "1c58a7c8c07a566f2c9240efa2e9615411a4585f",
+            "excerptSHA256": "b1c96a6b7e91c0b817366eff6749df6f0fbffa6b9e669f3a13b57fd96eb51b36",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 1996,
+            "endLine": 2007,
+            "text": "1996:     // state.decisions' scope-carrying records -- generated, never\n1997:     // hand-edited (bee's own standing exemption for this exact path,\n1998:     // mirrors `fgos docs-index`'s own generate+drift shape for\n1999:     // docs/enduser-docs-index.json). `--check` never writes: it reports\n2000:     // whether the on-disk file matches what a fresh regenerate would\n2001:     // produce, refusing (validation) when it does not -- the drift-mode\n2002:     // half of the verify draft this task's own DISCUSSION.md names.\n2003:     case 'decision-index': {\n2004:       const repoRoot = path.dirname(dir);\n2005:       if (flags.check) {\n2006:         const { indexPath, changed } = computeDecisionIndex(repoRoot, dir);\n2007:         if (changed) {",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "84a5ae7d18bcbeac481a65d2a8bb7f2665072f520975f59232daac951f86f388",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          }
+        ]
+      },
+      {
+        "correctionIndex": 8,
+        "sampledClaimId": "claim_7c4295aa058b6a7fa5c6b945a0441a35",
+        "path": "docs/platform/work-state/spec.md",
+        "currentCodeCitations": [
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 1137,
+            "endLine": 1159,
+            "text": "1137:     // whether the submitter stayed to collaborate (`sync`, default) or left\n1138:     // (`async`/`--unattended`); P14 only writes the field, nothing branches\n1139:     // on it here.\n1140:     case 'submit': {\n1141:       const text = requireField(positional[0], 'submit requires a free-text description: fgos submit \"<description>\" [--async|--unattended]');\n1142:       if (flags.tier !== undefined) {\n1143:         throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');\n1144:       }\n1145:       const opts = {\n1146:         async: Boolean(flags.async || flags.unattended),\n1147:         backlog: Boolean(flags.backlog),\n1148:         domain: optionalField(flags.domain, 'submit --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),\n1149:         discoveredFrom: optionalField(flags['discovered-from'], 'submit --discovered-from requires a non-empty id; omit it to leave unset.'),\n1150:         deps: parseListFlag(flags.deps),\n1151:         acceptance: parseAcceptanceFlag(flags.acceptance, 'submit --acceptance requires a JSON-encoded array of {text, evidence} clauses.'),\n1152:         size: optionalField(flags.size, 'submit --size requires a size value (e.g. light/standard/heavy); omit --size entirely to use classify()\\'s derived value.'),\n1153:         rigor: optionalField(flags.rigor, 'submit --rigor requires a rigor value (e.g. low/standard/high/critical); omit --rigor entirely to leave unset.'),\n1154:         kind: optionalField(flags.kind, 'submit --kind requires a kind value; omit --kind entirely to use classify()\\'s derived value.'),\n1155:         risk: optionalField(flags.risk, 'submit --risk requires a risk value; omit --risk entirely to use classify()\\'s derived value.'),\n1156:         // tsk-5gu: same optionalField shape as --tier/--kind/--risk above --\n1157:         // a submitter who already knows the real verify command (stated in\n1158:         // free text) previously had no way to attach it at submit time,\n1159:         // unlike `add` (which requires --verify outright). Omitted leaves",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "58d7554e6286e14f57f430cb77e6e2d4372e066e1e78a4a110828b057a5e0aa5",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          }
+        ]
+      },
+      {
+        "correctionIndex": 9,
+        "sampledClaimId": "claim_7c4295aa058b6a7fa5c6b945a0441a35",
+        "path": "docs/platform/work-state/spec.md",
+        "currentCodeCitations": [
+          {
+            "path": "src/intake/classify.mjs",
+            "startLine": 68,
+            "endLine": 76,
+            "text": "68: /**\n69:  * Classify a free-text submission into {size, kind, risk} (Phase 3). Purely\n70:  * mechanical keyword counting, no LLM call, and never throws — an\n71:  * unrecognized or empty/non-string input falls back to size: 'standard',\n72:  * kind: 'task', with risk mirroring the size signal. Does NOT guess rigor.\n73:  *\n74:  * D12 (tsk-2yo): this result is only ever a TEMP placeholder at item\n75:  * creation time now -- the real judgment happens once, later, at stage\n76:  * `discovery`, on real research evidence (`fgos-coding-discovering`).",
+            "blob": "35a3d03da7317a42574aa7bda3818adfb5a19c63",
+            "excerptSHA256": "83598b170c4f6e1c3410a4958683a38219ad7170aed498cf8ecad7e9ab0fba3d",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 858,
+            "endLine": 897,
+            "text": "858: function submitWork(dir, text, opts = {}) {\n859:   const title = deriveTitle(text);\n860:   const classified = classify(text);\n861:   // Per str51-llm-assist-classify D2/D5: --tier/--kind/--risk are\n862:   // independently overridable per-field; an omitted flag falls through to\n863:   // classify(text)'s own mechanical default for exactly that field, so a\n864:   // flagless call stays byte-identical to the pre-feature behavior.\n865:   const size = opts.size ?? classified.size;\n866:   const kind = opts.kind ?? classified.kind;\n867:   const risk = opts.risk ?? classified.risk;\n868:   const id = generateId(title, Object.keys(listWork(dir).work));\n869:   const work = {\n870:     id,\n871:     title,\n872:     // Per P30 (discovery-context): the full submitted text, kept\n873:     // alongside the derived/truncated `title` so context-discovery can\n874:     // read the real ask instead of just the classified summary.\n875:     description: text,\n876:     kind,\n877:     // Per work-item-backlog-status D2: the default stays 'todo' for both\n878:     // `submit` and `add` -- `opts.backlog` is the opt-in escape hatch that\n879:     // marks an item as a not-yet-committed idea from the moment of\n880:     // creation, instead of requiring submit-then-move. Same independent\n881:     // optional-flag shape as `opts.async` below; an omitted --backlog flag\n882:     // leaves this byte-identical to the prior hardcoded 'todo'. `add`\n883:     // deliberately gains no such flag (D2, explicit human answer) -- it is\n884:     // for already-planned work.\n885:     status: opts.backlog ? 'backlog' : 'todo',\n886:     // Per D4 (str83-fgos-slash-commands): --deps threaded from opts the\n887:     // same way --domain/--discovered-from already are, immediately below.\n888:     // opts.deps defaults to [] (parseListFlag's own undefined-input\n889:     // shape), so an omitted --deps flag stays byte-identical to the prior\n890:     // hardcoded deps: [].\n891:     deps: opts.deps ?? [],\n892:     risk,\n893:     // Per tsk-5fs D1: refs now threads from opts the same way deps does,\n894:     // immediately above (opts.refs defaults to [] via parseListFlag's own\n895:     // undefined-input shape, so an omitted --refs flag stays byte-identical\n896:     // to the prior hardcoded refs: []).\n897:     refs: opts.refs ?? [],",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "f4eede66f4d5c402e69d908c092bd1e81d00a556603cc605bd52ab03bc48240d",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 1137,
+            "endLine": 1159,
+            "text": "1137:     // whether the submitter stayed to collaborate (`sync`, default) or left\n1138:     // (`async`/`--unattended`); P14 only writes the field, nothing branches\n1139:     // on it here.\n1140:     case 'submit': {\n1141:       const text = requireField(positional[0], 'submit requires a free-text description: fgos submit \"<description>\" [--async|--unattended]');\n1142:       if (flags.tier !== undefined) {\n1143:         throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');\n1144:       }\n1145:       const opts = {\n1146:         async: Boolean(flags.async || flags.unattended),\n1147:         backlog: Boolean(flags.backlog),\n1148:         domain: optionalField(flags.domain, 'submit --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),\n1149:         discoveredFrom: optionalField(flags['discovered-from'], 'submit --discovered-from requires a non-empty id; omit it to leave unset.'),\n1150:         deps: parseListFlag(flags.deps),\n1151:         acceptance: parseAcceptanceFlag(flags.acceptance, 'submit --acceptance requires a JSON-encoded array of {text, evidence} clauses.'),\n1152:         size: optionalField(flags.size, 'submit --size requires a size value (e.g. light/standard/heavy); omit --size entirely to use classify()\\'s derived value.'),\n1153:         rigor: optionalField(flags.rigor, 'submit --rigor requires a rigor value (e.g. low/standard/high/critical); omit --rigor entirely to leave unset.'),\n1154:         kind: optionalField(flags.kind, 'submit --kind requires a kind value; omit --kind entirely to use classify()\\'s derived value.'),\n1155:         risk: optionalField(flags.risk, 'submit --risk requires a risk value; omit --risk entirely to use classify()\\'s derived value.'),\n1156:         // tsk-5gu: same optionalField shape as --tier/--kind/--risk above --\n1157:         // a submitter who already knows the real verify command (stated in\n1158:         // free text) previously had no way to attach it at submit time,\n1159:         // unlike `add` (which requires --verify outright). Omitted leaves",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "58d7554e6286e14f57f430cb77e6e2d4372e066e1e78a4a110828b057a5e0aa5",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          }
+        ]
+      },
+      {
+        "correctionIndex": 10,
+        "sampledClaimId": "claim_acab595482e4f9f7ae05e21a1a28f11b",
+        "path": "docs/platform/work-state/spec.md",
+        "currentCodeCitations": [
+          {
+            "path": "bin/fgos.mjs",
+            "startLine": 4979,
+            "endLine": 4985,
+            "text": "4979:     if (verb === 'init' && !isMainWorktree(process.cwd())) {\n4980:       throw new StoreError(\n4981:         'validation',\n4982:         `\"fgos init\" refused inside a linked worktree (\"${process.cwd()}\") -- worktrees never carry .fgos/ by design (ADR0020); run \"fgos init\" from the main checkout instead.`,\n4983:       );\n4984:     }\n4985:     // tsk-56t D2: these read verbs are `requiresExistingStore: false` by",
+            "blob": "4fb24082f26e736501cf970c03b009487765e676",
+            "excerptSHA256": "28dd2486feb11fd908f059b5d91ec84aefdb974fb0bfbc77c229d64f9ee85c18",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          },
+          {
+            "path": "src/install/coexist.mjs",
+            "startLine": 65,
+            "endLine": 75,
+            "text": "65:  * de-duplicated-by-name array (a directory marker and an AGENTS.md block for\n66:  * the same harness collapse into one entry with both markers listed).\n67:  */\n68: export function detectHarnesses(rootDir) {\n69:   const byName = new Map();\n70:   for (const hit of detectDirMarkers(rootDir)) {\n71:     byName.set(hit.name, { name: hit.name, markers: [...hit.markers] });\n72:   }\n73: \n74:   const { hit: agentsHit, readError } = detectAgentsMdMarker(rootDir);\n75:   if (agentsHit) {",
+            "blob": "cca8ab8b0203ead31360d073d5b1779f36d403a8",
+            "excerptSHA256": "95d0e3f7ff257f967e16738725a209d34c0d4a47441a88fd2f9b133b9c43570c",
+            "meaning": "Exact cited bytes unchanged, actual current line range machine-recomputed; no approval carry."
+          }
+        ]
+      }
+    ],
+    "unmatchedCitations": [],
+    "noApprovalCarry": true
+  }
 }

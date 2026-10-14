@@ -1684,27 +1684,6 @@
       "reviewReportCommit": "5d470d7e4718585733b141fe28c0356697b3edd0"
     },
     {
-      "claimId": "claim_f4a5ce7ed6d48bdbbe996501f088c288",
-      "sourceUnitDigest": "9bc0af4821db07883f3ceb4bb753479a8d6571d4a4017f3fecfb0ae1d19b00e9",
-      "claimKind": "decision",
-      "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "reviewed",
-      "reviewNote": "unheaded-block unheaded-block-11 (lines 76-760) of A:playbooks/prompts/architecture-advisory-coordinator.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. File check: main subject confirmed as the retired engine by the file-level review",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2whole-s2-agent-coordination-exact-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "f961caf92280854444e1b95118a9f279f20116913c16634978122a8256524070",
-      "targetAncestry": [
-        "Historical File: still-consumed cognitive prompt; mixed manual runtime instructions superseded by registered skill"
-      ],
-      "reviewReportCommit": "5d470d7e4718585733b141fe28c0356697b3edd0"
-    },
-    {
       "claimId": "claim_1d44fe22e7c96961387a73dfe7e53fde",
       "sourceUnitDigest": "e35e35f7980575ad2409889f3ec5a6776b3d86990703333ef7c83c85cf896a74",
       "claimKind": "architecture",
@@ -6682,5 +6661,24 @@
       ]
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-03.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-03.md",
+  "registryGaps": [
+    {
+      "claimId": "claim_f4a5ce7ed6d48bdbbe996501f088c288",
+      "sourceUnitDigest": "9bc0af4821db07883f3ceb4bb753479a8d6571d4a4017f3fecfb0ae1d19b00e9",
+      "claimKind": "decision",
+      "disposition": "move",
+      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewStatus": "pending",
+      "targetUnitDigest": "f961caf92280854444e1b95118a9f279f20116913c16634978122a8256524070",
+      "targetAncestry": [
+        "Historical File: still-consumed cognitive prompt; mixed manual runtime instructions superseded by registered skill"
+      ],
+      "sourcePath": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "sourceAnchor": "unheaded-block-11"
+    }
+  ]
 }

@@ -98,15 +98,14 @@
     },
     {
       "claimId": "claim_ebe7d2366429303cb74938b60f5cf2fb",
-      "sourceUnitDigest": "ba8ccc03e5d12eaaf004b55882c332fe6ba0c2d0987ed1103738672a5bf52e39",
+      "sourceUnitDigest": "b557458c4cb01956a5b5647b8b1b0291422d6a1d549dcb18f973a37a50cc63ff",
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "routing-identities",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:5@2026-10-13",
-      "rationale": "The committed reviewer rejected this specific binding: LEG:architecture/dispatch-control-plane.md#routing-identities -> architecture/dispatch-control-plane.md#routing-identities (supersede): Routing Identities target keeps the for[] binding path (lines 81-83) that contradicts resolve.mjs:255-266 where an executor for never binds a purpose; only prefer binds. The corrected current successor at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities now states the code-checked boundary in Routing Identities; evidence: src/runner/dispatch/resolve.mjs:25-66; src/runner/dispatch/resolve.mjs:255-309. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review. A31 boundary merge: current target imports main capability tool-executor restriction; the shown full source and target bind this conservation review only.",
-      "reviewNote": "Rebound heading row. The source heading digest changed because main edited the fence inside the section; the recomputed digest equals ba8ccc03... and the full shown source and target sections equal the files at HEAD. Target now carries main's tool-executor wording from the merge. The rationale is true for the merge; the carried reviewNote (\"prefer-only binding; for[] defect fixed\") describes the pre-merge target and is superseded by this verdict. Anchor resolves.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The committed reviewer rejected this specific binding: LEG:architecture/dispatch-control-plane.md#routing-identities -> architecture/dispatch-control-plane.md#routing-identities (supersede): Routing Identities target keeps the for[] binding path (lines 81-83) that contradicts resolve.mjs:255-266 where an executor for never binds a purpose; only prefer binds. The corrected current successor at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities now states the code-checked boundary in Routing Identities; evidence: src/runner/dispatch/resolve.mjs:25-66; src/runner/dispatch/resolve.mjs:255-309. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review. A31 boundary merge: current target imports main capability tool-executor restriction; the shown full source and target bind this conservation review only. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
         "targetAnchor": "routing-identities",
@@ -114,17 +113,11 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
-      "shownTargetDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
       "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-source.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "7829c9c2262ec408f1212c5408dbd496856b97f8a64fa7ab1953f18ac8f60a6b",
+      "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ],
-      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a"
+      ]
     },
     {
       "claimId": "claim_0fc7c6e612423aa78420e2b5ad63f1bf",
@@ -193,25 +186,18 @@
     },
     {
       "claimId": "claim_7c56791bc2955ef63687b7134d2cd053",
-      "sourceUnitDigest": "e1304a6a126e9f403638d42ccb4476b132e6aa74cdf84bbca3bf92cfb26e1678",
+      "sourceUnitDigest": "442ff7c188a360afc14578b58195eda6b3e61058605eaca339aae4b7adbc7f8a",
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "component-internal-ownership",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
-      "reviewNote": "supersede correct, whole unit changed (items 1,2,4,7, two forbidden-dependency bullets). Verified: resolve.mjs:269-310 resolveExecutorAndOverrides binds executor-id/default/capability.prefer only, aliases and `for[]` are in resolveCapabilityDetailsFromHints (:25-66); `mergePolicyStack` absent from src; bind() called in execution/run.mjs:407, assignment-runner.mjs:501 recomputes and refuses on mismatch; test/runner/dispatch-reconciliation-import-graph.test.mjs:434-443 are the retired-module and work-compat/work-dispatch import rules over 13 core files; cohort-planner.mjs removed (2180b4e72). Dropped details (13-module count, plan.mjs/cli.mjs consumers, work-compat function list) are test-enforced or historical, not live claims.",
-      "shownTargetDigest": "0c74651edd5b7e919916e16bb79bbe5536883eb24333911502d943c37f14d833",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
-      "reviewedAt": "2026-10-11",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "2733a56fe75fb75ffd77892a1cbc0937340927f3c7727df7cc59446f24be91ce",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetUnitDigest": "c0bb4ead0f6620892a21de57af6673d4d2e2c67ae656917f1ee7f9a24363a67a",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ],
-      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
+      ]
     },
     {
       "claimId": "claim_8ed451a179a884fe1b475149f75e2b26",
@@ -2031,27 +2017,6 @@
       "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
     },
     {
-      "claimId": "claim_ab182560a5142f22e010e35a97b115dc",
-      "sourceUnitDigest": "212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec",
-      "claimKind": "architecture",
-      "disposition": "supersede",
-      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The current successor at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-11 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. A31 boundary merge: current target imports main capability tool-executor restriction; the shown full source and target bind this conservation review only.",
-      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
-      "targetAnchor": "routing-identities",
-      "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "reviewed",
-      "reviewNote": "Rebound purpose-paragraph row (architect unheaded-block-9). The unit is unchanged by main and the shown text equals lines 66-78. It is carried into the same Routing Identities target, whose shown text equals the file. The rationale's A31 sentence is accurate. The carried reviewNote still holds, since it concerns the purpose paragraph and not the fence.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-source.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "7829c9c2262ec408f1212c5408dbd496856b97f8a64fa7ab1953f18ac8f60a6b",
-      "targetAncestry": [
-        "Dispatch Control Plane"
-      ],
-      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a"
-    },
-    {
       "claimId": "claim_ad2493c325d75127139698ed4a34592b",
       "sourceUnitDigest": "7e87c99c9a073e73b1281b51433e46d2a791c3cb617df86a55498fa14b2d5ac3",
       "claimKind": "contract",
@@ -2298,12 +2263,11 @@
       "sourceUnitDigest": "95a2b7c5b5d00e917f2c042d1d49d3829b707933cfea28a3d65f1887744d1c08",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "component-internal-ownership",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "supersede correct (not move): item 1 now \"(design)\"; item 2 narrowed to resolveExecutorAndOverrides (resolve.mjs:269-310) with aliases/for[] in resolveCapabilityDetailsFromHints (resolve.mjs:25-66, verified); item 4 drops mergePolicyStack (no such symbol in src); item 7 drops \"sole execution chooser\" for bind() + assignment-runner revalidation (assignment-runner.mjs:501). \"No Work graph traversal\" of the normalizer has no verbatim carrier but is covered by the no-Work-lookup bullet (target :295, test import-graph:434-443). Target heading digest recomputed; shown digest 0c74651e recomputed from whole section. Rationale is boilerplate and does not name the changed words (non-blocking).",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewStatus": "pending",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
         "targetAnchor": "component-internal-ownership",
@@ -2311,39 +2275,11 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
-      "shownTargetDigest": "0c74651edd5b7e919916e16bb79bbe5536883eb24333911502d943c37f14d833",
       "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
-      "reviewedAt": "2026-10-11",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "2733a56fe75fb75ffd77892a1cbc0937340927f3c7727df7cc59446f24be91ce",
+      "targetUnitDigest": "c0bb4ead0f6620892a21de57af6673d4d2e2c67ae656917f1ee7f9a24363a67a",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ],
-      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
-    },
-    {
-      "claimId": "claim_194da7d0a9b40e6ba93d40df2b58eaec",
-      "sourceUnitDigest": "e9b40512995229674223f2e51e2cf80e9bc9f95814714f443178d73d8bcece52",
-      "claimKind": "contract",
-      "disposition": "supersede",
-      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
-      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
-      "targetAnchor": "component-internal-ownership",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "supersede correct: lookup bullet rewritten (13-module count and work-compat/infra detail replaced by caller-derived-hints text; work-compat.mjs, operation-choice.mjs, loop.mjs, fanout-batch.mjs, dispatch-log.mjs exist; test Rule 1/2 at import-graph:430-443); last bullet: cohort-planner.mjs no longer exists (deleted in 2180b4e72) so \"one confirmed exception\" is correctly retired. Same whole-section target and shown digest as d277029b; no double-ownership problem.",
-      "shownTargetDigest": "0c74651edd5b7e919916e16bb79bbe5536883eb24333911502d943c37f14d833",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
-      "reviewedAt": "2026-10-11",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "2733a56fe75fb75ffd77892a1cbc0937340927f3c7727df7cc59446f24be91ce",
-      "targetAncestry": [
-        "Dispatch Control Plane"
-      ],
-      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
+      ]
     },
     {
       "claimId": "claim_3eb1d76cbee05b14310c7bf9188db06d",
@@ -9304,12 +9240,11 @@
       "sourceUnitDigest": "1d6df4038cd801c79a791a0ccca5621ce632a7f8b33a07983cc7d4220e79b05c",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "rationale": "A31 current source unit added by the upstream tool-executor restriction; the current target Routing Identities section carries the complete changed code fence. Main diff is the source/successor evidence; no truth re-review.",
+      "rationale": "A31 current source unit added by the upstream tool-executor restriction; the current target Routing Identities section carries the complete changed code fence. Main diff is the source/successor evidence; no truth re-review. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "routing-identities",
-      "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "reviewed",
-      "reviewNote": "Native new source unit: the architect code fence (unheaded-block-8, lines 58-64) with main's \"(kind \"tool\" executors only)\" line. The shown text equals the file, and its digest equals the identical fence in the target (platform unheaded-block-10), so the target carries the whole changed fence. The old fence identity is not duplicated in this table, and the successor binding matches main's diff. The carried reviewNote (\"target ... names for[] as non-binding\") is false against the current fence and must not be copied; use this note.",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewStatus": "pending",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
         "targetAnchor": "routing-identities",
@@ -9317,17 +9252,11 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
-      "shownTargetDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
       "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-source.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "7829c9c2262ec408f1212c5408dbd496856b97f8a64fa7ab1953f18ac8f60a6b",
+      "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ],
-      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a"
+      ]
     }
   ],
   "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
@@ -9353,6 +9282,40 @@
       "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
       "reviewMode": "ordinary",
       "reviewNote": "ok. Old docs/architect dispatch-control-plane unheaded-block-8 (lines 58-64 at 63af2a5f9) gains only ` (kind \"tool\" executors only)` on the runner.executors.<id>.for[] line; three-way merge of pre-merge, merge-base and main equals HEAD byte for byte, so main's diff alone explains it. All other lines preserved; nothing lost."
+    },
+    {
+      "claimId": "claim_ab182560a5142f22e010e35a97b115dc",
+      "sourceUnitDigest": "212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The current successor at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-11 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. A31 boundary merge: current target imports main capability tool-executor restriction; the shown full source and target bind this conservation review only. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "routing-identities",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewStatus": "pending",
+      "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
+      "targetAncestry": [
+        "Dispatch Control Plane"
+      ],
+      "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceAnchor": "unheaded-block-9"
+    },
+    {
+      "claimId": "claim_194da7d0a9b40e6ba93d40df2b58eaec",
+      "sourceUnitDigest": "e9b40512995229674223f2e51e2cf80e9bc9f95814714f443178d73d8bcece52",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "component-internal-ownership",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewStatus": "pending",
+      "targetUnitDigest": "c0bb4ead0f6620892a21de57af6673d4d2e2c67ae656917f1ee7f9a24363a67a",
+      "targetAncestry": [
+        "Dispatch Control Plane"
+      ],
+      "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceAnchor": "unheaded-block-31"
     }
   ]
 }

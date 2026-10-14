@@ -729,24 +729,18 @@
     },
     {
       "claimId": "claim_f42fcb530d066e79cb2632b13a7faa0e",
-      "sourceUnitDigest": "67eefa93fbbe47ff04c2877be4bbc124b78683ded5447a8eac2ec1f21ba312de",
+      "sourceUnitDigest": "a46e3bc30063ae6d6c5c404c8e443e34adc32f3823c2d10810543f5a241073e9",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
-      "targetAnchor": "literal-snapshot",
+      "targetAnchor": "upstream-source-source-inventory-2026-10-14",
       "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/dispatch-control-plane.md#source-inventory is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/dispatch-control-plane.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:architecture/dispatch-control-plane.md#source-inventory -> PLAT:history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot: Header block, PolicyPatch FlowDefinition-link intro and session-engine status, and the Source Inventory table (re-authored in current L335-343) are carried verbatim in history and have a corrected current counterpart or are retired-engine/metadata.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/dispatch-control-plane.md#source-inventory is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/dispatch-control-plane.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetUnitDigest": "dc8434225f7e28e2fdc197f3f20f18586d2cb5b689504e1df6f992ad122c5e6b",
       "targetAncestry": [
         "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_35964c798e2d6ae0072c66bff3143ec7",

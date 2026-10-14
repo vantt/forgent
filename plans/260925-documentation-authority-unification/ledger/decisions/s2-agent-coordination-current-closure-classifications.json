@@ -75,13 +75,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "reviewed",
-      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Metadata block and link only; no code assertions. Link target history/retired-engine/files/contracts/assignment-run-runresult.md exists with a Literal Snapshot heading; Related files exist; provenance commit 7880fbc74b07 exists and holds the path.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
-      "reviewedAt": "2026-10-11",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
-      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
-      "reviewMode": "ordinary"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_8ed59b72fce0ae8cbe96ceb925f68cdc",

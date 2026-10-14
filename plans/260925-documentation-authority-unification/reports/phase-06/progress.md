@@ -1,3 +1,72 @@
+# Boundary proof complete — bounded review packaging next
+
+Step: 5
+State: ready-for-review
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Native content/receipt pin: 6c6a65e8543fa72012bd55f8999f13f9ed6193c4
+
+Both-prior native D passes with zero fatal. Full union-scoped E retains only explicitly pending decisions/candidate units and previously held/exception/partial-carry categories. Both priors were supplied together through the unchanged native API, not a filtered or substituted inventory. Native individual batch reverse lists equal their committed full tuples and their union equals full scoped E. All prior IDs retained; every changed tuple and new ID enumerated; inventory/current-registry tuples equal. Persisted registry is compact one-line, below 90 MB; exact bytes/hash in verification. The code re-pin scope is 18 unchanged excerpts and 82 changed-code references; no approval carry. All 14 truth units follow correct identities and all 26 citations use current file/line.
+
+Next: commit this complete merge accounting, then package one bounded set covering A37 truth (100%), its source/gap rebounds, the previous four aliases/nine decisions/five retained-path rationales, and A31 conflict/conservation/receipt accounting only. Every pack has at most 80 entries, complete shown text, full digests and A36 differing-digest lists. Update remaining Step 5 closure obligations and stop. No promotion, push or Step 6.
+
+---
+
+# Final native merge proof rerun
+
+Step: 5
+State: authoring
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Content/receipt pin: 6c6a65e8543fa72012bd55f8999f13f9ed6193c4
+Last green checkpoint: c18020da3
+
+The first complete D after identity recovery surfaced two explained helper bookkeeping errors. Restoring seven exact old IDs required keeping their original legacy shard rows entirely unchanged; all original source IDs/full digest prefixes and current target digests were machine-proved before restoring both sealed legacy decision shards. No acceptance is carried to changed text. Three genuinely new current units had lost their owner when the predecessor was recorded retired; their real prior source-to-owner mapping and exact upstream line map restore the whole-unit candidate targets. Current proposed counts: 47 existing source/target rebindings, 20 new current source rows, 40 additional gap rows, nine existing gap targets, 54 native gaps total, 15 retired dispositions, 15 exact ancestry identity proofs, 18 code re-pins and 82 changed-code reference withdrawals. All remain pending except byte-unchanged legacy decisions. Native complete generation/D/E are being rerun. No checker, extractor, gate, vocabulary or baseline change.
+
+Next: persist only a natively proven registry, compare exact candidate lists and commit accounting; package the bounded review set and stop.
+
+---
+
+# Exact ancestry identity recovery — native proof rerun
+
+Step: 5
+State: authoring
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Content/receipt pin: 6c6a65e8543fa72012bd55f8999f13f9ed6193c4
+Last green checkpoint: c18020da3
+
+A first full native generation surfaced 15 ambiguous same-text current units (seven work-state, eight runner), all the immutable decision-change sentence. No checker was changed. Further immutable-source comparison proved exactly one old/current pair for EVERY unit by full text digest AND complete heading ancestry. Under A22 mechanical rebinding, those exact old opaque IDs are restored; the 15 newly minted unpersisted scratch IDs are discarded, and no known ID is lost. Complete witnesses and row transformations are in root-boundary-sync-accounting.json. This genuinely resolves the ambiguity rather than assigning an old ID by position. Source/gap proposals are corrected accordingly, with no approval carry. Native generation and both-prior D/E are being rerun.
+
+Next: persist only the registry whose unchanged native checks pass; compare exact candidate lists, commit complete accounting, generate the bounded review set and stop. No owner decision or checker change is presently required.
+
+---
+
+# Native merge proof in progress
+
+Step: 5
+State: authoring
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Content/receipt pin: 6c6a65e8543fa72012bd55f8999f13f9ed6193c4
+Last green checkpoint: c18020da3
+
+All 14 corrected truth units follow their actual native identities after main import. All 26 original cited code excerpts are unchanged and re-pinned to actual current file/line ranges in the A37 evidence; no new truth sweep. Native merge accounting additionally rebinds nine pre-existing gap targets whose actual anchors shifted. Source and target bindings use native identity or exact upstream diff line mapping, never positional-anchor guessing. The complete native inventory is being generated without omitted fields. D and scoped E will receive both previous registries together through the existing previousRegistries array; individual batch lists will also be derived by the native checkConservation function from the same full overlaid inventory. No gate/checker/extractor code change.
+
+Next: finish native proofs, compare/persist all candidate tuple lists and compact registry, commit the merge accounting, package truth/pending/A31 reviews and stop.
+
+---
+
+# Boundary conservation checkpoint
+
+Step: 5
+State: authoring
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Content/receipt pin: 6c6a65e8543fa72012bd55f8999f13f9ed6193c4
+Last green checkpoint: c18020da3
+
+Native carry produced 139 new IDs, 69 gaps, 15 retired units and 68 edited stable units; all known IDs retained. Conservation consequences are pending: 54 existing source/target rebindings, 27 new current source decisions, 48 additional native-gap decisions (69 gaps total including source rebindings), and 15 retired dispositions. Removed native units retain their exact prior text as immutable git evidence; informational successors and main diff are shown separately, never assumed whole-unit carries. Three changed current classification references are reopened; 18 machine re-pins and 82 changed-code references are pending, no approval carry. All source/target bytes and the new receipt artifact have a real committed pin.
+
+Next: rerun native complete inventory and unchanged D with both priors, scoped E and full known/native tuple equality, update exact candidate lists and persist compact registry. Then package the single bounded review set and stop. No promotion, push or Step 6.
+
+---
+
 # Boundary source and receipt checkpoint
 
 Step: 5

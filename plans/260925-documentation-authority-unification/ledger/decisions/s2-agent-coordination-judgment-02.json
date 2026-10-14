@@ -1237,24 +1237,18 @@
     },
     {
       "claimId": "claim_16c34b67099ca4c97df600750a78d72c",
-      "sourceUnitDigest": "c3f90492039139c8c549aa80bd4916c2ccf283507e6bed60ae3865ed03482c4c",
+      "sourceUnitDigest": "67cda0610d046b2b6d2d74eae7274d2991e6ba24814cbf9d5da2da86de34538e",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
-      "targetAnchor": "literal-snapshot",
+      "targetAnchor": "upstream-source-the-advisory-coordinator-prompt-2026-10-14",
       "claimKind": "procedure",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "rationale": "The prior target unit is no longer a current authority assertion after the whole-file reframe. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: Preserve the section identity and its source context docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md#the-advisory-coordinator-prompt at docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md#the-advisory-coordinator-prompt. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: The Advisory Coordinator Prompt.",
-      "reviewNote": "heading the-advisory-coordinator-prompt (lines 74-74) of A:playbooks/prompts/architecture-advisory-coordinator.md: prior promote was reviewed ok by claude-session:4df9e88c@2026-10-08 with a byte-identical candidate unit; the unit text is found verbatim in the snapshot body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind procedure unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. File check: main subject confirmed as the retired engine by the file-level review",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2whole-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "f961caf92280854444e1b95118a9f279f20116913c16634978122a8256524070",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The prior target unit is no longer a current authority assertion after the whole-file reframe. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: Preserve the section identity and its source context docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md#the-advisory-coordinator-prompt at docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md#the-advisory-coordinator-prompt. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: The Advisory Coordinator Prompt. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetUnitDigest": "ca2862314512fc9d3dae27e5bd48617f9f3c7163a51a4fd7fcf1462ed7fef79e",
       "targetAncestry": [
         "Historical File: still-consumed cognitive prompt; mixed manual runtime instructions superseded by registered skill"
-      ],
-      "reviewReportCommit": "5d470d7e4718585733b141fe28c0356697b3edd0"
+      ]
     },
     {
       "claimId": "claim_a5ab6e75f077dc7fb31372cd0ffded5b",
@@ -6379,25 +6373,19 @@
     },
     {
       "claimId": "claim_d7b301f8fb707e0d981814d24bb15baf",
-      "sourceUnitDigest": "cf7c1cc1403beef5ea2e3cded6d5e65473661550a1b985676abfa839e2aa7f1c",
+      "sourceUnitDigest": "f120b3ce8b8266ec0184676ecf4414c2305ac448c45aec25e2a049b0181655b4",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/legacy/README.md",
-      "targetAnchor": "literal-snapshot",
+      "targetAnchor": "upstream-source-agent-coordination-documentation-2026-10-14",
       "claimKind": "navigation",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "rationale": "The coordination engine was retired in 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md records that in its historical CoordinationSession section. This move binds the actual shown legacy source docs/architect/agent-coordination/README.md#agent-coordination-documentation to its own complete original-source history carrier, not to a normalized/interleaved candidate copy. The full source bytes, including the migration-status notice where present, original heading levels and relative link text, are contained without normalization or interleaving. The f719eeff9 candidate snapshots remain unchanged. This is history, not current runtime authority; independent whole-area acceptance is pending.",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "The coordination engine was retired in 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md records that in its historical CoordinationSession section. This move binds the actual shown legacy source docs/architect/agent-coordination/README.md#agent-coordination-documentation to its own complete original-source history carrier, not to a normalized/interleaved candidate copy. The full source bytes, including the migration-status notice where present, original heading levels and relative link text, are contained without normalization or interleaving. The f719eeff9 candidate snapshots remain unchanged. This is history, not current runtime authority; independent whole-area acceptance is pending. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "targetKind": "history-evidence",
-      "reviewNote": "heading agent-coordination-documentation (lines 1-1) of A:README.md: row binds the complete own-source legacy snapshot; source text found byte-for-byte in the snapshot body (including the migration-status blockquote and every status line), so the earlier \"interleaved candidate\" objection no longer applies. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind navigation unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. File check: main subject confirmed as the retired engine by the file-level review",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2whole-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "7bc6408cefac2408da797d15ad0ad568c5939a412882fa1e1f321a3304d43e91",
+      "targetUnitDigest": "f85193ae731099c5fa39f10af95b5fc2979c7be0cb9ff10f49fcd38938d700fc",
       "targetAncestry": [
         "Historical File: Original legacy input README.md"
-      ],
-      "reviewReportCommit": "5d470d7e4718585733b141fe28c0356697b3edd0"
+      ]
     },
     {
       "claimId": "claim_866f1a0e0c7cd00800b6adace9496b3b",

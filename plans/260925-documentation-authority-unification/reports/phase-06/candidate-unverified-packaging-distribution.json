@@ -2,9 +2,9 @@
   "version": 1,
   "batch": "packaging-distribution",
   "authorization": "A28",
-  "authoredCommit": "cfd4cffc17caae2e4b28417487f967f35ebae845",
+  "authoredCommit": "6c6a65e8543fa72012bd55f8999f13f9ed6193c4",
   "meaning": "Exact native reverse-open units; candidate-unverified, never a truth approval or cutover waiver.",
-  "count": 693,
+  "count": 694,
   "rows": [
     {
       "claimId": "claim_c83db9e7c725ee8a14dc1143efd84270",
@@ -2965,7 +2965,7 @@
       "claimId": "claim_2a90a475edf85a7f0d72e0cd27db0960",
       "path": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
       "anchor": "3-field-specifications-optionality",
-      "unitDigest": "36aa8051389af71b4a4b24d6b6ec086d123ff131ad855bcd6f5cd7d5e1fef567",
+      "unitDigest": "a4fb5baa2336f43f330c75a06bf419184011ea9590f5269a8922a0903cb86f00",
       "fileStatus": {
         "kind": "contract",
         "kindCanonical": true,
@@ -2977,18 +2977,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_c201fb480171293641c2fb049fd33936",
+      "claimId": "claim_35bc7551041993fc82a1a82165c93981",
       "path": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
       "anchor": "unheaded-block-6",
-      "unitDigest": "6454baa8036f396a464892f0ee01b801236b89cfa5091363bea4d4c4cd881b81",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
+      "unitDigest": "8d8476fca1d3b135c3ef5f862b59b6e9f7decd3a3ab855089eeb119c9163fa99",
       "status": "candidate-unverified"
     },
     {
@@ -7057,6 +7049,13 @@
       "status": "candidate-unverified"
     },
     {
+      "claimId": "claim_449808134e8709820fb1ee1ebe1a081d",
+      "path": "docs/platform/packaging-distribution/history/distribution-vision.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "1ec8da9c8382fb4b1d2f14f1bea1312773fc3ccdae3e95b7af308d827c13f66c",
+      "status": "candidate-unverified"
+    },
+    {
       "claimId": "claim_20dc7bdefef3c07ea27da294a4883e71",
       "path": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
       "anchor": "migration-map",
@@ -8050,7 +8049,7 @@
       "claimId": "claim_3eb374c62ff548c9bf2d60298a30b045",
       "path": "docs/platform/packaging-distribution/spec.md",
       "anchor": "2-entry-points",
-      "unitDigest": "b7dd46711cadc218656708f71fce7a7bf60679319b0619998780d320995cb93c",
+      "unitDigest": "b957a77f0e576cd94b809c6f976e1b8b24e9b50a53d1fb521faea2b2dc819b6a",
       "fileStatus": {
         "kind": "spec",
         "kindCanonical": true,
@@ -8062,18 +8061,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_73221307a66a364372a7f8206227e62f",
+      "claimId": "claim_35a7173387677bab288d2dcc6afcf245",
       "path": "docs/platform/packaging-distribution/spec.md",
       "anchor": "unheaded-block-4",
-      "unitDigest": "c14f83e85b43064dd321bf0926e6b98f781c23df08cf772ef8959a30837a2e18",
-      "fileStatus": {
-        "kind": "spec",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
+      "unitDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
       "status": "candidate-unverified"
     },
     {
@@ -8185,7 +8176,7 @@
       "claimId": "claim_c8324b39de5b60d77f57fe165214ebb9",
       "path": "docs/platform/packaging-distribution/spec.md",
       "anchor": "311-windows-native-channel",
-      "unitDigest": "f5e73aa73558c8d8475061642e66f5cf13363806adc83329583f59da8551a04f",
+      "unitDigest": "623044e8ae6fd4d5a8c31df7089717d45d4b8a6dd7fed69567b95f461bfbdc00",
       "fileStatus": {
         "kind": "spec",
         "kindCanonical": true,
@@ -8242,18 +8233,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_199501685fd82d464892f7a06aad9516",
+      "claimId": "claim_6bcb905f2c79999e4608d6644419f7f8",
       "path": "docs/platform/packaging-distribution/spec.md",
       "anchor": "unheaded-block-13",
-      "unitDigest": "fa1e3475328263494367fdcaa17903829498d7bc435e1dacb33ad8b9ac4b28fc",
-      "fileStatus": {
-        "kind": "spec",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
+      "unitDigest": "d78cfec31f57634f9a0546edea529181e549e9abe991cb86d8523f5b015e2a4d",
       "status": "candidate-unverified"
     },
     {
@@ -9295,7 +9278,7 @@
       "claimId": "claim_cc691c67cb574a032d13c0ead02324d7",
       "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
       "anchor": "2-proof-surfaces",
-      "unitDigest": "69e7af233b462338b90897b36371e8155fcc6910718e32ddd26d54e700fc1f91",
+      "unitDigest": "cd8d5925aa5090f84a98b99edee7fce9d0888e350bd9a4c0470e4964e1dc8a2c",
       "fileStatus": {
         "kind": "verification",
         "kindCanonical": true,
@@ -9307,25 +9290,17 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_05845829294e08426b2f9395aab26d05",
+      "claimId": "claim_596f0e8bd25f8a00d62ad9b577cb5e3b",
       "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
       "anchor": "unheaded-block-3",
-      "unitDigest": "cb0caffcb9a4ef54e92d58e2667b1b56728c347c771ad0122ddec7336ef00717",
-      "fileStatus": {
-        "kind": "verification",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
+      "unitDigest": "ec9cbdb02d32abafa961280883c27c21451cd219d326901d115428856b42a39b",
       "status": "candidate-unverified"
     },
     {
       "claimId": "claim_82d9eb761fd3a3a44c1982ea2e55f2ba",
       "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
       "anchor": "3-suggested-verification-commands",
-      "unitDigest": "333a814cc91185b2987665adcf3fda44c54d40cabcd44cc11cf01ad95bb969cd",
+      "unitDigest": "f665cdabede649517e2b08bd61a59f1629b5fab1aba228bbe5259705ea73ae7e",
       "fileStatus": {
         "kind": "verification",
         "kindCanonical": true,
@@ -9352,18 +9327,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_8e98d801bec98373306633c016311e24",
+      "claimId": "claim_1f34eb17ef2e131df1d42fefae980e20",
       "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
       "anchor": "unheaded-block-5",
-      "unitDigest": "e047506458192942e1af0334697f9d4ea5db02a4dc5f34992a3817f6432151aa",
-      "fileStatus": {
-        "kind": "verification",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
+      "unitDigest": "6542d0d7e4c8eaaa77c4d1c39bbc7a332624be7ffea00a6ca0b5b5d567775d9e",
       "status": "candidate-unverified"
     },
     {
@@ -10403,205 +10370,11 @@
     }
   ],
   "nativeRebinding": {
-    "reason": "Only the three authorized sampled truth fixes; six reverse tuple changes, no truth approval.",
-    "contentCommit": "fa7f63868c7b046aa6133749c942aa5f4ae87ad9",
-    "changedTuples": [
-      {
-        "before": {
-          "claimId": "claim_8346d3fc0bd4551aae82a045dc081a3f",
-          "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
-          "anchor": "3-implemented-model",
-          "unitDigest": "60647e3fe7bc9ecdea9d6a06c0d7758979a28930daf0b1b32ba9186736406e58",
-          "fileStatus": {
-            "kind": "contract",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        },
-        "after": {
-          "claimId": "claim_8346d3fc0bd4551aae82a045dc081a3f",
-          "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
-          "anchor": "3-implemented-model",
-          "unitDigest": "df6fa52885ed92efcfee0882fbddb65b54e5d5ee372ae9dfc65047ccb663e1e8",
-          "fileStatus": {
-            "kind": "contract",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        }
-      },
-      {
-        "before": {
-          "claimId": "claim_8db02d2c23a009bfaab4b9e9bdba4622",
-          "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
-          "anchor": "unheaded-block-11",
-          "unitDigest": "6243e500e00b9ac6c14a9430c85ac0c5ffb12ae145edddb5a17b8096ed84de5b",
-          "fileStatus": {
-            "kind": "contract",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        },
-        "after": {
-          "claimId": "claim_a58bad2441b40698889c8e0187d2605e",
-          "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
-          "anchor": "unheaded-block-11",
-          "unitDigest": "1c0ced47def581b2c6236f710da48b9b52fa6b13795bf4d037c1b528d19dc987",
-          "fileStatus": {
-            "kind": "contract",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        }
-      },
-      {
-        "before": {
-          "claimId": "claim_095d9f70331b803e8fdfa59bbda82d0c",
-          "path": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
-          "anchor": "3-alignment-table",
-          "unitDigest": "34771c42ba42aea9b74bf36110de97211b1fc60a9c6d45652134b01bb8abaf7e",
-          "fileStatus": {
-            "kind": "verification",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        },
-        "after": {
-          "claimId": "claim_095d9f70331b803e8fdfa59bbda82d0c",
-          "path": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
-          "anchor": "3-alignment-table",
-          "unitDigest": "c5ef945c749e02cd0479a2540196f51ffadf62f984dbfb5f5ba933509a9d96a4",
-          "fileStatus": {
-            "kind": "verification",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        }
-      },
-      {
-        "before": {
-          "claimId": "claim_23aa9eddbe0a401a9d68aa29470f2618",
-          "path": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
-          "anchor": "unheaded-block-5",
-          "unitDigest": "75a79276b3c2305221a561a733259f29f4c76ea5bacdc6754b26547e37722c7d",
-          "fileStatus": {
-            "kind": "verification",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        },
-        "after": {
-          "claimId": "claim_6ea4185ed63550ef849daaedb8a999d1",
-          "path": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
-          "anchor": "unheaded-block-5",
-          "unitDigest": "337119230317d450243e7262b70478e740f5e71270e3c8d8ba5ef003cf7b967b",
-          "fileStatus": {
-            "kind": "verification",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        }
-      },
-      {
-        "before": {
-          "claimId": "claim_51b8e85b394738184789d7d5e5082c9d",
-          "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
-          "anchor": "6-settled-node-fallback-policy",
-          "unitDigest": "e6d01264c4854a3eea5840c631cb7a62ebec91b3e42648654bc74238ec36bb7e",
-          "fileStatus": {
-            "kind": "verification",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        },
-        "after": {
-          "claimId": "claim_51b8e85b394738184789d7d5e5082c9d",
-          "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
-          "anchor": "6-settled-node-fallback-policy",
-          "unitDigest": "e004f1bd1e6f3be3f9e5c5e290a5f2934b0d222a315409018d1776a12d807554",
-          "fileStatus": {
-            "kind": "verification",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        }
-      },
-      {
-        "before": {
-          "claimId": "claim_5f74e7c956ad4a546af303d9f15fb8e2",
-          "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
-          "anchor": "unheaded-block-17",
-          "unitDigest": "6a838503d80c838c649167ceff151326e6f7a7a7c6e4f3b6f63d7157d5d337ed",
-          "fileStatus": {
-            "kind": "verification",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        },
-        "after": {
-          "claimId": "claim_b1c72fca65660f4b58be153780bc5435",
-          "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
-          "anchor": "unheaded-block-17",
-          "unitDigest": "0a6462a61aad15b54f05f1516733d66bbaa77dfe4800eb05db5f58f6561ff268",
-          "fileStatus": {
-            "kind": "verification",
-            "kindCanonical": true,
-            "authorityStatus": "candidate",
-            "designStatus": "Draft",
-            "canonical": false,
-            "eligibility": "non-promoted Candidate/Draft"
-          },
-          "status": "candidate-unverified"
-        }
-      }
-    ],
-    "priorReviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-candidate-unverified.md",
-    "priorReviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-    "unchangedTupleCount": 686
+    "authorization": "A28 + A31",
+    "fullNativeTupleEquality": true,
+    "knownIDsPreserved": true,
+    "noApprovalCarry": true,
+    "meaning": "Exact individual native checkConservation reverse-open tuples, independently equal to the corresponding part of the full union-scoped E."
   },
   "resolutionRebinding": {
     "ownerResolutionCommit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
@@ -10616,5 +10389,6 @@
     "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
     "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
     "reviewMode": "ordinary"
-  }
+  },
+  "previousCount": 693
 }

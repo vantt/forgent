@@ -284,12 +284,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "architecture/evidence-and-results.md#evidence-and-result-architecture: receipt evidence-and-result-architecture (1-1): shown text is true now, header and snapshot link resolve (list-doc-anchors --check ok) and the Related paths exist",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_7363a4d96e53877c2cfd8c765312b850",
@@ -1356,12 +1352,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "architecture/work-integration.md#work-integration-boundaries: Title and metadata (lines 1-1) label the document Architecture/Candidate with section-specific implementation, an honest bound; no runtime claim.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_0b063b698aafe4c5268ee3a0369548d5",
@@ -1536,12 +1528,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "contracts/assignment-run-runresult.md#assignment-run-and-runresult-contract: unit assignment-run-and-runresult-contract (lines 1-1) in section assignment-run-and-runresult-contract: text is true now or honestly labeled; check: header block and snapshot link resolve (list-doc-anchors ok for the literal-snapshot anchor); scope statement is bounded and matches code that exists in assignment-runner.mjs and run-result.mjs",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_8ed59b72fce0ae8cbe96ceb925f68cdc",
@@ -1824,12 +1812,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "decisions/ADR-001-work-lifecycle-authority.md#adr-001-work-owns-delivery-lifecycle: ADR-001 title: matches the surviving Work-lifecycle invariant stated at assignment-runner.mjs:10.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_880c84de9a17e58cc3db9aeea4cf6226",
@@ -4695,12 +4679,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#agent-coordination-spec: Unit agent-coordination-spec (lines 1-1) sits in section agent-coordination-spec: Metadata block and retirement commit 2180b4e72 (commit message: L4 coordination engine retired) verified; Related files all exist.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_0a11e2c1dc82c85460f549610a4aa16c",
@@ -4719,12 +4699,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#current-summary: Unit current-summary (lines 26-26) sits in section current-summary: Pattern selection and Workflow-to-Unit call confirmed: src/runner/execution/patterns/index.mjs:34-46 runPattern, src/workflow/runner.mjs:420 runUnit; all four owner files in lines 35-38 exist.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_fdf2e002148201fb7d6f22cc161d2678",
@@ -4767,12 +4743,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#scope: Unit scope (lines 40-40) sits in section scope: Pointer-only section; links to runner spec and retired-engine snapshot resolve and anchor literal-snapshot passes.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_120de07c46a0dba530e234e5298bf13b",
@@ -4791,36 +4763,24 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#non-scope: Unit non-scope (lines 44-44) sits in section non-scope: Exclusions hold: provider account inventory is global-only (provider-capacity.mjs:62), host routing and packaging owners exist at the linked READMEs.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_74b00b519bc6b0b62131eef05e5e7061",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#unheaded-block-7: Unit unheaded-block-7 (lines 46-54) sits in section non-scope: Exclusions hold: provider account inventory is global-only (provider-capacity.mjs:62), host routing and packaging owners exist at the linked READMEs.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_bc2a036bfb370b61dfc459ae5a77cd8c",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#actors-and-surfaces: Unit actors-and-surfaces (lines 56-56) sits in section actors-and-surfaces: Owner table rows exist (run.mjs, patterns/index.mjs, workflow/runner.mjs, assignment.mjs, plan.mjs, assignment-runner.mjs, run-result.mjs); `fgos coordination` is an unknown verb so the retired CLI row is accurate.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_56423b38ed0daba89e6b0bc554e5c1b1",
@@ -4839,12 +4799,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#core-entities: Unit core-entities (lines 65-65) sits in section core-entities: Unit (src/runner/execution/unit.mjs) and CollaborationPattern files exist; DispatchPlan is compiled in plan.mjs (return object at 444-461); the not-exclusive-list caveat is accurate.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_da7b0b147e0fe8cc04ab53733d585e0a",
@@ -4863,12 +4819,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#operations-and-flows: Unit operations-and-flows (lines 69-69) sits in section operations-and-flows: Points to the Workflow runner and patterns as current sequencing owners; former flow table is correctly labelled history.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_66ae1090fca905403485108ef8ce6ae3",
@@ -4887,12 +4839,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#contracts-owned: Unit contracts-owned (lines 73-73) sits in section contracts-owned: Ownership table links all exist (assignment-run-runresult.md, dispatch-control-plane.md, runtime-recovery-design.md, run-handle.md) and the history snapshot anchor passes.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_c54c1ec976d0072516c3e001b42c7282",
@@ -4923,12 +4871,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#contracts-consumed: Unit contracts-consumed (lines 83-83) sits in section contracts-consumed: All four consumed owners exist (docs/specs/confinement-authority.md, host-invocation-routing and packaging-distribution READMEs); the hedge about Node dispatch paths is honest.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_a6165b935b5cfc5e33dc2895d178dfe3",
@@ -4947,12 +4891,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#implementation-status: Unit implementation-status (lines 92-92) sits in section implementation-status: Dormant session-ownership check claim verified: findCoordinationSessionOwningAssignment (runtime-inspection.mjs:131) used by recover.mjs:292 and reconciliation-planner.mjs:274; engine removal commit confirmed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_b4a145035c6a7f6db4cc95b9fcd651c7",
@@ -4983,12 +4923,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#known-gaps: Unit known-gaps (lines 98-98) sits in section known-gaps: Pointer to retained history and runner spec only; no status claim of its own.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_8fa11c037a72cdae3f84b0c8c2271a2b",
@@ -5007,12 +4943,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "spec.md#related-files: Unit related-files (lines 102-102) sits in section related-files: Every row link resolves (scripted check), including history/retired-engine/verification/implementation-alignment.md#literal-snapshot.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_1ed756b5b623fb0239857929d2c5c770",
@@ -5031,12 +4963,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "verification/README.md#agent-coordination-verification: Unit agent-coordination-verification (lines 1-1) in verification index section agent-coordination-verification: checked against the repo, no false current-state claim; Header and snapshot link are honest.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_17bcf3da1e41112b719199da8b00453e",
@@ -5055,12 +4983,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "verification/README.md#evidence-sets: Unit evidence-sets (lines 25-25) in verification index section evidence-sets: checked against the repo, no false current-state claim; All 17 collection rows match the 17 actual directories under verification/ (ls).",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
     },
     {
       "claimId": "claim_cd978575021e1363e680ac1d3ff30502",

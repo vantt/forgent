@@ -2109,25 +2109,6 @@
       "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3"
     },
     {
-      "claimId": "claim_4b96f4f42ea417623dcc794155fa17ce",
-      "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
-      "claimKind": "contract",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:22@2026-10-14",
-      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
-      "targetAnchor": "file-block",
-      "rationale": "Frozen root map assigns docs/architecture-manifest.json#file-block to docs/platform/contracts/architecture-manifest.json#file-block. The complete non-Markdown contract payload is copied byte-identically; no runtime consumer or embedded paths are rewritten. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion.",
-      "reviewNote": "mechanical: whole-file move, source docs/architecture-manifest.json and docs/platform/contracts/architecture-manifest.json are the same git blob e923fa822 and the same sha256 (c1c23046...), equal to the unit digest in both columns; source file at HEAD equals the content commit; claim kind contract and move are right; anchor tool is Markdown-only so file-block was proven by the gate lookup, not list-doc-anchors. Observation: the frozen-map pin 626eeadd is older than HEAD (merged upstream edit); the carried bytes are the current ones.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-source-completion-02.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
-      "targetAncestry": [],
-      "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3"
-    },
-    {
       "claimId": "claim_f0f4828229b64bd6cc8959111c824e24",
       "sourceUnitDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
       "claimKind": "contract",
@@ -2179,6 +2160,23 @@
       ],
       "disposition": "supersede",
       "rationale": "Complete frozen-map source retained in candidate owner; no retirement, implementation or truth certification."
+    }
+  ],
+  "registryGaps": [
+    {
+      "claimId": "claim_4b96f4f42ea417623dcc794155fa17ce",
+      "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "rationale": "Frozen root map assigns docs/architecture-manifest.json#file-block to docs/platform/contracts/architecture-manifest.json#file-block. The complete non-Markdown contract payload is copied byte-identically; no runtime consumer or embedded paths are rewritten. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "targetUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+      "targetAncestry": [],
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceAnchor": "file-block"
     }
   ]
 }

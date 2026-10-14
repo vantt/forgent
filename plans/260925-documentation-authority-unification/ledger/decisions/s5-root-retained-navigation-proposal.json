@@ -3326,18 +3326,12 @@
     },
     {
       "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
-      "sourceUnitDigest": "e8958f94f79cb31f51d08b6d774fa7b6e3ba2d70c5d4b4fe508b2d562fef9fcb",
+      "sourceUnitDigest": "22c6580953028171ac1febd1a750c1930c6374a479ea17af5aa6f541df122f18",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/specs/reading-map.md#reading-map-sản-phẩm is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
-      "reviewNote": "mechanical: full digest recomputed by script, anchor specs/reading-map.md#reading-map-sản-phẩm exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/specs/reading-map.md#reading-map-sản-phẩm is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification."
     },
     {
       "claimId": "claim_587566a4401b92c909e862d72aad4af0",
@@ -3348,21 +3342,6 @@
       "authoredBy": "codex-session:21@2026-10-14",
       "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/specs/reading-map.md#unheaded-block-1 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
       "reviewNote": "mechanical: full digest recomputed by script, anchor specs/reading-map.md#unheaded-block-1 exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
-    },
-    {
-      "claimId": "claim_bdfe277773eef55558042590ce9590af",
-      "sourceUnitDigest": "f3bcb9045712152762754f78ad2524c9e8bfe13c6d2818f145d021bfb3ded9c4",
-      "claimKind": "navigation",
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/specs/reading-map.md#unheaded-block-2 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
-      "reviewNote": "mechanical: full digest recomputed by script, anchor specs/reading-map.md#unheaded-block-2 exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-14",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
@@ -3388,6 +3367,19 @@
       "disposition": "reclassify-out-of-platform-scope",
       "rationale": "Approved repository-wide reading-map singleton outside platform; both sources remain unchanged pending later navigation merge/consumer rewrite.",
       "targets": []
+    }
+  ],
+  "registryGaps": [
+    {
+      "claimId": "claim_bdfe277773eef55558042590ce9590af",
+      "sourceUnitDigest": "f3bcb9045712152762754f78ad2524c9e8bfe13c6d2818f145d021bfb3ded9c4",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/specs/reading-map.md#unheaded-block-2 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "sourcePath": "docs/specs/reading-map.md",
+      "sourceAnchor": "unheaded-block-2"
     }
   ]
 }
