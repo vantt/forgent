@@ -1,8 +1,8 @@
 # Lane B — `--effort` và cảnh báo model
 
 - Worktree: `/home/vantt/projects/forgentX-worktrees/dispatch-effort-model`
-- Nhánh: `feat/dispatch-effort-model`, rebase lên main `b0d9fa192` (2026-10-14 12:26, không xung đột)
-- Commit code: `3b3486234` (trước rebase `09b1608e6`) feat(dispatch): set reasoning effort per dispatch and warn when the model that ran differs
+- Nhánh: `feat/dispatch-effort-model`, rebase lên main `f69a446f0` (kết luận hội đồng một-cửa; 2026-10-14, không xung đột)
+- Commit code: `9f34239e2` (effort ở tầng transport chung + kiểm model), `ef6fcb797` (theo hội đồng: `--effort` là override của `bind()`, model drift thành provenance của RunResult) feat(dispatch): set reasoning effort per dispatch and warn when the model that ran differs
 - Chưa merge, chưa push.
 - Ràng buộc Lead (10:45): logic đặt ở tầng chung (`provider-adapter.mjs`, `resolveExecutorCommand`/`resolve.mjs`), cửa chỉ parse cờ — đã làm theo (xem "Thiết kế").
 
@@ -13,6 +13,17 @@
 - `config.mjs`: `supports.reasoningEffort` được kiểm shape lúc load (claude khai `[low, medium, high]`), không ai dùng lúc dispatch.
 - Pane "Lead handoff 261013" chỉnh effort bằng cách sửa `~/.codex-fgovn/config.toml` (`model_reasoning_effort`, mtime 2026-10-13 18:09) — không có commit repo. `git log -G'effort' --since=2026-10-10` chỉ ra các commit không liên quan (council postures, credential).
 - Dùng lại: từ vựng `REASONING_EFFORT_VALUES`, `supports.reasoningEffort`, đường `cliOverride.reasoningEffort` của assignment-policy. Thiếu: render vào argv, cờ CLI, kiểm theo `supports`, mọi thứ về model thật.
+
+## Cập nhật sau hội đồng một-cửa
+
+Theo `reports/council-261014-1231-dispatch-one-door-conclusion.md` và mục cập nhật của brief lane B:
+
+- **`--effort` là override của `bind()`** (cửa chuẩn `fgos run`): `bin/fgos.mjs` parse `--effort` một lần thành `{reasoningEffort, origin:'human-cli'}` gộp vào `overrides` (hoặc khoá `reasoningEffort` trong `--override`). `bind()` kiểm bằng `assertReasoningEffort` với `supports.reasoningEffort` của executor được bind → mức không hợp lệ thành binding bị từ chối `reasoning-effort` (`policy-refusal`, chưa spawn); hợp lệ thì ghi `binding.reasoningEffort` + `provenance.reasoningEffort {value, source: override:<origin>}`. `dispatchBound` chuyển vào `cliOverride.reasoningEffort` → policy (`explicitReasoningEffort`) → `resolveExecutorCommand` render. Kiểm lại binding của `assignment-runner` dựng lại từ `unitRecord.overrides` nên khớp.
+- **Model drift là provenance trong RunResult v3**: `settlement.mjs withLaunchProvenance` ghi `policy.provenance.modelDrift = {value: [...], source: 'launch-and-provider-output'}` và `policy.provenance.reasoningEffort.rendered`. Gỡ hai field top-level khỏi `run-result.mjs`.
+- Cửa compat `dispatch execute --effort` giữ nguyên, đi qua cùng hàm kiểm và cùng render ở transport; kết quả thô vẫn có `reasoningEffort`/`modelWarnings` vì kết quả thô không có `policy`. Hội đồng hạ cửa thô xuống compat, không xoá; nếu Lead muốn bỏ `--effort` khỏi cửa thô thì chỉ cần xoá phần parse.
+- Test thêm: `bind()` nhận/ghi provenance/từ chối; `runUnit` đầu-cuối với CLI giả tên `codex` trong bwrap → argv thật có `-c model_reasoning_effort=low`; cửa CLI thật `fgos run --effort max` trên executor khai `[low, medium, high]` → `policy-refusal` lý do `reasoning-effort`.
+- Impact (GitNexus, chạy trước commit `ef6fcb797`): `bind` HIGH (6 caller trực tiếp, gồm check doctor trong `registrations.mjs`, `executeAssignment`, `runRole`); `settleRunOutcome` CRITICAL (9 luồng). Thay đổi chỉ thêm khoá: binding có `reasoningEffort` (null khi không có override), provenance thêm khoá chỉ khi có dữ liệu.
+- Phần "chờ owner" của hội đồng (bước 4–6, af132275b) không đụng.
 
 ## Đề xuất 4 — `--effort <level>`
 
@@ -29,7 +40,7 @@
 - Render một chỗ: `transport.mjs resolveExecutorCommand` (mọi cửa đều qua: plain, assignment supervisor, assignment/herdr qua `executeExecutorCli`, `spawnWorker`) gọi `provider-adapter.mjs renderReasoningEffortArgs` trên **template** trước khi thay `{prompt}/{model}` → herdr dựng lại argv từ `argsTemplate` cũng mang effort. Key theo tên lệnh spawn (pi chạy cả openai lẫn deepseek): claude/agy `--effort`, pi/omp `--thinking` (thay giá trị template ghi cứng, ghi `replaced`), codex `-c model_reasoning_effort=` sau `exec` (`max`→`xhigh`). Lệnh không có điều khiển effort → `RunnerConfigError` trước spawn.
 - `resolve.mjs`: kết quả `resolveExecutorConfig` mang `supports` của entry.
 - Assignment: `explicitReasoningEffort(policy)` chỉ render khi nguồn là `cliOverride`/`opPolicy`; mức suy từ rigor **không** render (giữ hành vi cũ, xem "Còn để ngỏ").
-- Kết quả: `reasoningEffort: {requested, command, flag, native, replaced?}` trên kết quả execute và `assignment-run-result`.
+- Kết quả: `reasoningEffort: {requested, command, flag, native, replaced?}` trên kết quả execute thô; receipt Assignment ghi ở `policy.provenance.reasoningEffort.rendered`.
 
 ### Test
 
@@ -48,7 +59,7 @@
 Toàn bộ ở `provider-adapter.mjs`, dùng chung:
 - `checkLaunchedModel({requested, launched, args})` — gọi trong `resolveExecutorCommand`, trả `modelCheck` (trước spawn): `model-overridden`, `model-not-passed` (chỉ khi người gọi hỏi model).
 - `collectModelWarnings(modelCheck, {stdout, stderr})` — sau run: `model-unsupported` (câu từ chối thật của agy/pi/codex), `model-reported-different` (header `model:` của codex, chỉ đọc stderr để không bắt nhầm chữ của worker).
-- Gắn vào kết quả: `executeExecutorCli` (plain + nhánh herdr/legacy của assignment) và `assignment-runner` trước `settleRunOutcome` (nhánh supervisor) → `normalizeRunResultV3` thêm `modelWarnings` (chỉ khi khác rỗng). `requestedModel` = `cliOverride.model` được truyền xuống cả hai nhánh.
+- Gắn vào kết quả: `executeExecutorCli` (plain + nhánh herdr/legacy của assignment) và `assignment-runner` trước `settleRunOutcome` (nhánh supervisor). Sau hội đồng: receipt Assignment ghi ở `policy.provenance.modelDrift`, không còn field top-level. `requestedModel` = `cliOverride.model` được truyền xuống cả hai nhánh.
 
 ### Test
 
@@ -56,6 +67,7 @@ Unit cho `checkLaunchedModel`/`collectModelWarnings` dùng chính chuỗi lỗi 
 
 ## Kiểm tra
 
+- **Sau hội đồng, trên `ef6fcb797` (rebase lên `f69a446f0`)**: `npm test` toàn bộ tests 7383, pass 7308, fail 0, skipped 10, todo 65 (rc=0). Test lane 20/20.
 - Sau rebase lên `b0d9fa192`: `npm test` toàn bộ tests 7379, pass 7304, fail 0, skipped 10, todo 65 (rc=0). Test lane + bộ dispatch lân cận + test Việc 1/3 mới vào main: 668/668.
 - Test lane mới: 16/16 xanh. Bộ lân cận (`provider-adapter`, `dispatch-policy-baseline-snapshot`, `dispatch`, `assignment-dispatch`, `dispatch-execute-for-capability`): 586/586 xanh.
 - `npm test` toàn bộ trước rebase (worktree, `env -u CLAUDE_CODE_SESSION_ID`, trên `09b1608e6`): tests 7371, pass 7296, fail 1, skipped 9, todo 65. Lỗi duy nhất: `test/rust-host/fgctl-init.test.mjs` bị watchdog 600s/file giết — vấn đề đã biết, có follow-up trên main (`44287a09c`: file chạy riêng mất ~635s vì mỗi test build Rust), không đụng dispatch. Lần chạy riêng file này trên nhánh: tests 33, pass 32, fail 0, skipped 1 (vượt 600s khi chạy chung, khớp follow-up).
@@ -69,7 +81,7 @@ Unit cho `checkLaunchedModel`/`collectModelWarnings` dùng chính chuỗi lỗi 
 2. Effort suy từ rigor có nên render vào lệnh chạy không? Bật sẽ đổi chi phí/thời gian của mọi run Codex cùng lúc (21/32 lệch). Em giữ hành vi cũ; đây là quyết định riêng.
 3. `max`→`xhigh` cho codex: UNPROVEN với API thật (chưa gọi có trả phí); codex CLI không kiểm giá trị.
 4. `model-reported-different` mới đọc được header codex; pi/omp JSON có trường model nhưng định dạng sự kiện chưa kiểm — UNPROVEN, chưa làm.
-5. `spawnWorker` (work loop) nhận `modelCheck` nhưng chưa gắn `modelWarnings` vào kết quả của nó, và không có cờ `--effort` ở cửa đó. Tuỳ kết luận hội đồng "nhiều cửa dispatch".
+5. `spawnWorker` (work loop) nhận `modelCheck` nhưng chưa ghi drift vào kết quả của nó; hội đồng coi Assignment là cửa chuẩn nên em không mở rộng cửa này.
 6. Cửa plain `execute` không kiểm cờ trùng (`--model` cũng vậy từ trước); em không mở rộng.
 7. Nhánh in-process (agentType) bỏ qua `--effort` (không spawn CLI).
-8. Có thể phải chỉnh theo kết luận hội đồng về các cửa dispatch.
+8. Đã chỉnh theo kết luận hội đồng (mục "Cập nhật sau hội đồng một-cửa").
