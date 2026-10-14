@@ -166,6 +166,7 @@ test('j2. subject: without a summary the first line of the objective names the c
   const cases = [
     [{ objective: 'Write the docs for the lane\nmore detail' }, 'chore(u1): Write the docs for the lane'],
     [{ objective: '# Task: refresh the guide' }, 'chore(u1): Task: refresh the guide'],
+    [{ objective: '# Goal\nShip the lane report\n\n# Rules\n...' }, 'chore(u1): Ship the lane report'],
     [{ objective: 'docs(rununit): add the lane notes' }, 'docs(rununit): add the lane notes'],
     [{ summary: 'Added the file', objective: 'Write the docs' }, 'chore(u1): Added the file'],
     [{ objective: '' }, 'chore(u1): producer changes'],

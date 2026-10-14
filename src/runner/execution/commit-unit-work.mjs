@@ -141,9 +141,13 @@ export function foreignIndexDetail(paths) {
   return `the index has staged changes this run did not make: ${paths.join(', ')}; unstage or commit them, then run again`;
 }
 
-/** First non-empty line of `text`, without a leading markdown heading mark or any ellipsis. */
+/**
+ * The line that names `text`: its first line that is not a markdown heading (a prompt opens with
+ * `# Goal` before the goal itself), else the first heading's text; without any ellipsis.
+ */
 function headline(text) {
-  const line = String(text ?? '').split(/\r?\n/).map((l) => l.trim().replace(/^#+\s*/, '')).find(Boolean) ?? '';
+  const lines = String(text ?? '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const line = lines.find((l) => !l.startsWith('#')) ?? (lines[0] ?? '').replace(/^#+\s*/, '');
   return line.replace(/\s*(?:\.{3,}|\u2026)\s*/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
