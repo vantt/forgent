@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:20@2026-10-14",
+  "priorEvidenceCommit": "a5b13d6dfdad6400b8230f22a6e0f19060df5e41",
+  "priorList": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-packaging-distribution.json",
+  "priorListSHA256": "f935b5162126eeee2a9394e741ac12410905140d4a1932b281b5e97b24c64c24",
+  "priorIndependentReview": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-candidate-unverified.md",
+  "reusedCount": 693,
+  "fullRowsIncludingStatusesEqual": true,
+  "nativeNamespaceReason": "Expanded docs/distribution-vision.md source scope selects its packaging-distribution namespace; native T6 therefore also includes the 693 already accepted Packaging reverse tuples.",
+  "meaning": "Scope accounting only; no new review decision, text change, truth sample or approval. Original list remains byte-identical. Root includes these exact full records alongside 70 prior root records and 29 genuinely new units."
+}

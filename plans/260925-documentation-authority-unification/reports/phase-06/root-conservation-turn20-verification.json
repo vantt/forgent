@@ -1,0 +1,2627 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:20@2026-10-14",
+  "state": "ready-for-review",
+  "contentCommit": "23062c2ce9caaf6711a906673e2dc14c3f345ec3",
+  "B0": "dbe5c432852837ea01e6025b35868bcb7271495d",
+  "SYNC": "48e3a992be1cd74a0960df953af16b5dae4275e4",
+  "reviewApplication": {
+    "rows": 2,
+    "notesVerbatim": true,
+    "reportCommit": "a5b13d6dfdad6400b8230f22a6e0f19060df5e41",
+    "originalProvenance": "18962827a371c629b91475e6b2540a998fa30e9a"
+  },
+  "newSourceRows": 240,
+  "sourceClasses": {
+    "Judgment": 53,
+    "Weak-exact": 83,
+    "Unit-exact": 104
+  },
+  "sourceRowsRemaining": 319,
+  "sourceRowsPending": 245,
+  "nativeEquality": {
+    "inventoryCommit": "23062c2ce9caaf6711a906673e2dc14c3f345ec3",
+    "knownBefore": 94494,
+    "knownCurrent": 94761,
+    "allKnownIdsAndFullTuplesRetained": true,
+    "activeFullTupleEquality": true,
+    "newGaps": 0,
+    "newRetired": 0,
+    "candidateList": 792,
+    "candidateDelta": 722,
+    "oldTuplesUnchanged": 70,
+    "remaining": 319,
+    "pending": 245,
+    "sourceStatuses": {
+      "blocking": 319,
+      "pending": 245,
+      "reviewed": 508
+    },
+    "registryBytes": 59682291,
+    "registrySha256": "661ebcb2490195b9d5fc0d6a45bc90e4670f408ca13a2251f9d2210dcc91ec16",
+    "compactOneLine": true,
+    "nativeByteEqual": true,
+    "immutableFiles": [
+      "root-authorities-truth-sample.json",
+      "root-authorities-truth-population.json",
+      "review-5-root-authorities-truth.md",
+      "candidate-unverified-agent-coordination.json",
+      "candidate-unverified-host-invocation-routing.json",
+      "candidate-unverified-packaging-distribution.json",
+      "holds.md",
+      "identical-unit-exceptions.md",
+      "identical-unit-exceptions.json",
+      "identical-unit-exceptions-packaging-distribution.json",
+      "host-invocation-partial-carry-residual.json",
+      "packaging-partial-carry-residual.json",
+      "packaging-partial-carry-acceptance.json",
+      "packaging-f6-host-partial-carry-residual.json",
+      "packaging-f6-host-partial-carry-binding.json"
+    ]
+  },
+  "candidateListFullTupleEqualityBothPriors": true,
+  "priorThreeListsUnchanged": true,
+  "newRootUnitsInPriorAreaScopesDisclosed": true,
+  "strictEOpen": [
+    {
+      "type": "claims-not-reviewed",
+      "message": "claim rows whose reviewStatus is not reviewed",
+      "count": 240,
+      "examples": [
+        "docs/coexistence.md#unheaded-block-1",
+        "docs/coexistence.md#coexistence",
+        "docs/coexistence.md#unheaded-block-2",
+        "docs/coexistence.md#lãnh-địa-territory",
+        "docs/coexistence.md#unheaded-block-3"
+      ]
+    },
+    {
+      "type": "registry-gaps-without-disposition",
+      "message": "registry identity-gap rows with no vocabulary disposition",
+      "count": 3,
+      "examples": [
+        "docs/io-contract.md#unheaded-block-14",
+        "docs/io-contract.md#unheaded-block-15",
+        "docs/transitional-switchboard.md#unheaded-block-4"
+      ]
+    },
+    {
+      "type": "candidate-blocks-unreferenced",
+      "message": "candidate conservation units not named by a source decision",
+      "count": 792,
+      "examples": [
+        "docs/platform/coexistence/spec.md#unheaded-block-1",
+        "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+        "docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1",
+        "docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate",
+        "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "label": "D-first",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5-turn20/post-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1162,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22608,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 23079,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22608,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 454,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2092,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "D-second",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5-turn20/post-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1162,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22608,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 23079,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22608,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 454,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2092,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "E-first",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5-turn20/post-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/specs/work-state.md",
+        "--scope",
+        "docs/io-contract.md",
+        "--scope",
+        "docs/doc-governance.md",
+        "--scope",
+        "docs/decisions/index.md",
+        "--scope",
+        "docs/doc-registry.json",
+        "--scope",
+        "docs/templates/architecture.md",
+        "--scope",
+        "docs/templates/area-readme.md",
+        "--scope",
+        "docs/templates/contract.md",
+        "--scope",
+        "docs/user/README.md",
+        "--scope",
+        "docs/templates/decision.md",
+        "--scope",
+        "docs/templates/discussion.md",
+        "--scope",
+        "docs/templates/generated.md",
+        "--scope",
+        "docs/templates/intent-preservation-ledger.md",
+        "--scope",
+        "docs/templates/spec.md",
+        "--scope",
+        "docs/templates/subcomponent-readme.md",
+        "--scope",
+        "docs/templates/verification.md",
+        "--scope",
+        "docs/templates/vision.md",
+        "--scope",
+        "docs/coexistence.md",
+        "--scope",
+        "docs/id-systems-audit.md",
+        "--scope",
+        "docs/operator-runbook-herdr-cockpit.md",
+        "--scope",
+        "docs/routing-handoff-contract.md",
+        "--scope",
+        "docs/distribution-vision.md",
+        "--scope",
+        "docs/transitional-switchboard.md",
+        "--scope",
+        "docs/README.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "fatalFindings": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "240 claim rows whose reviewStatus is not reviewed (e.g. docs/coexistence.md#unheaded-block-1, docs/coexistence.md#coexistence, docs/coexistence.md#unheaded-block-2, docs/coexistence.md#lãnh-địa-territory, docs/coexistence.md#unheaded-block-3)"
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "3 registry identity-gap rows with no vocabulary disposition (e.g. docs/io-contract.md#unheaded-block-14, docs/io-contract.md#unheaded-block-15, docs/transitional-switchboard.md#unheaded-block-4)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "792 candidate conservation units not named by a source decision (e.g. docs/platform/coexistence/spec.md#unheaded-block-1, docs/platform/coexistence/spec.md#source-metadata-added-in-candidate, docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1, docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate, docs/platform/documentation/history/templates/architecture.md#unheaded-block-1)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 240,
+          "examples": [
+            "docs/coexistence.md#unheaded-block-1",
+            "docs/coexistence.md#coexistence",
+            "docs/coexistence.md#unheaded-block-2",
+            "docs/coexistence.md#lãnh-địa-territory",
+            "docs/coexistence.md#unheaded-block-3"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 3,
+          "examples": [
+            "docs/io-contract.md#unheaded-block-14",
+            "docs/io-contract.md#unheaded-block-15",
+            "docs/transitional-switchboard.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 792,
+          "examples": [
+            "docs/platform/coexistence/spec.md#unheaded-block-1",
+            "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1",
+            "docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "E-second",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5-turn20/post-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/specs/work-state.md",
+        "--scope",
+        "docs/io-contract.md",
+        "--scope",
+        "docs/doc-governance.md",
+        "--scope",
+        "docs/decisions/index.md",
+        "--scope",
+        "docs/doc-registry.json",
+        "--scope",
+        "docs/templates/architecture.md",
+        "--scope",
+        "docs/templates/area-readme.md",
+        "--scope",
+        "docs/templates/contract.md",
+        "--scope",
+        "docs/user/README.md",
+        "--scope",
+        "docs/templates/decision.md",
+        "--scope",
+        "docs/templates/discussion.md",
+        "--scope",
+        "docs/templates/generated.md",
+        "--scope",
+        "docs/templates/intent-preservation-ledger.md",
+        "--scope",
+        "docs/templates/spec.md",
+        "--scope",
+        "docs/templates/subcomponent-readme.md",
+        "--scope",
+        "docs/templates/verification.md",
+        "--scope",
+        "docs/templates/vision.md",
+        "--scope",
+        "docs/coexistence.md",
+        "--scope",
+        "docs/id-systems-audit.md",
+        "--scope",
+        "docs/operator-runbook-herdr-cockpit.md",
+        "--scope",
+        "docs/routing-handoff-contract.md",
+        "--scope",
+        "docs/distribution-vision.md",
+        "--scope",
+        "docs/transitional-switchboard.md",
+        "--scope",
+        "docs/README.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "fatalFindings": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "240 claim rows whose reviewStatus is not reviewed (e.g. docs/coexistence.md#unheaded-block-1, docs/coexistence.md#coexistence, docs/coexistence.md#unheaded-block-2, docs/coexistence.md#lãnh-địa-territory, docs/coexistence.md#unheaded-block-3)"
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "3 registry identity-gap rows with no vocabulary disposition (e.g. docs/io-contract.md#unheaded-block-14, docs/io-contract.md#unheaded-block-15, docs/transitional-switchboard.md#unheaded-block-4)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "792 candidate conservation units not named by a source decision (e.g. docs/platform/coexistence/spec.md#unheaded-block-1, docs/platform/coexistence/spec.md#source-metadata-added-in-candidate, docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1, docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate, docs/platform/documentation/history/templates/architecture.md#unheaded-block-1)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 240,
+          "examples": [
+            "docs/coexistence.md#unheaded-block-1",
+            "docs/coexistence.md#coexistence",
+            "docs/coexistence.md#unheaded-block-2",
+            "docs/coexistence.md#lãnh-địa-territory",
+            "docs/coexistence.md#unheaded-block-3"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 3,
+          "examples": [
+            "docs/io-contract.md#unheaded-block-14",
+            "docs/io-contract.md#unheaded-block-15",
+            "docs/transitional-switchboard.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 792,
+          "examples": [
+            "docs/platform/coexistence/spec.md#unheaded-block-1",
+            "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1",
+            "docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1"
+          ]
+        }
+      ]
+    }
+  ],
+  "directUnitPreservation": {
+    "version": 1,
+    "contentCommit": "23062c2ce9caaf6711a906673e2dc14c3f345ec3",
+    "authorSession": "codex-session:20@2026-10-14",
+    "method": "For each of 240 shown native direct units, reverse only the 25 recorded destination-preserving link spellings and ignore fence delimiters/whitespace; entire original direct-unit text is contained in its bound target. Full section context and all wrappers are independently shown in packs, not truth-certified.",
+    "rows": [
+      {
+        "claimId": "claim_8415b80600de8f4556f623a2b5d12e1c",
+        "sourceUnitDigest": "19d76b37d318c814790e8274888332820810e3aa03025ef424fe1b72baec31e8",
+        "targetUnitDigest": "7a712e922ad0f4d2b69f95bedf024adc683d67f1c31c2f696030f2438585e947",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_019a134f507964b4acdafb405af987d2",
+        "sourceUnitDigest": "6502d7ee8e1a967486edd08641e4dd4a7407e84d5c4417261c8340948483d497",
+        "targetUnitDigest": "b4c77f3a054ff5df8a38c2c84a2cbdb0ece20a95af047bf13840fa10c8713b48",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_fc3ba35a4a6054296a2921a7f4a0bace",
+        "sourceUnitDigest": "4bcc75985a8ab70b12905950ceb37bec01ad710f4f63931ac969264a2682d90c",
+        "targetUnitDigest": "4bcc75985a8ab70b12905950ceb37bec01ad710f4f63931ac969264a2682d90c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_bfe9c921a410b984d10d4fd7bcfb234f",
+        "sourceUnitDigest": "d1278c55e0404423c5a769b659196a944d15afbdc217e05b96450872cd68241a",
+        "targetUnitDigest": "d1278c55e0404423c5a769b659196a944d15afbdc217e05b96450872cd68241a",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_ddbbf7252439bd23e90c23d5ba8ca781",
+        "sourceUnitDigest": "224a207f2767fc69a1f994883581119c23200b8002b9937bf4d51126c6adbded",
+        "targetUnitDigest": "224a207f2767fc69a1f994883581119c23200b8002b9937bf4d51126c6adbded",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_3d68a7e334b18b309ff952c640c4349f",
+        "sourceUnitDigest": "078672381c26a7aebf1f2b30713a5b18f9050a0f2a2e69c7a78121b824c0aab3",
+        "targetUnitDigest": "078672381c26a7aebf1f2b30713a5b18f9050a0f2a2e69c7a78121b824c0aab3",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_c6ca90af0d4db3715873c6aceb571374",
+        "sourceUnitDigest": "56d308dbd6af1a404f751fb4e292695e4030c4175fcbddc10eb95241e6dcc730",
+        "targetUnitDigest": "56d308dbd6af1a404f751fb4e292695e4030c4175fcbddc10eb95241e6dcc730",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_b91d99e692bb9ff6f1de339422bcd603",
+        "sourceUnitDigest": "9886b88919d8dc243c562f7d16a6d15a77753060617c26b381f38d5a594d7850",
+        "targetUnitDigest": "9886b88919d8dc243c562f7d16a6d15a77753060617c26b381f38d5a594d7850",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_8abc1e813dec242523acd9a595bb1d4e",
+        "sourceUnitDigest": "cda7f1d0b3d66b6ee8fdd063cda59c0cec521a86206277e7e611809e67bde953",
+        "targetUnitDigest": "cda7f1d0b3d66b6ee8fdd063cda59c0cec521a86206277e7e611809e67bde953",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_199692388ab7ee1591a2d462a0cc375e",
+        "sourceUnitDigest": "706b66b70ffa54f7b9480765c23b46be3fef32a1467beb9eb98154f632826eec",
+        "targetUnitDigest": "706b66b70ffa54f7b9480765c23b46be3fef32a1467beb9eb98154f632826eec",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_8dbc1cd297e15539638fe43e604104f9",
+        "sourceUnitDigest": "216cc7dc854a37778589f80c460bf926ed5e454ce60c190520730792834ccef9",
+        "targetUnitDigest": "216cc7dc854a37778589f80c460bf926ed5e454ce60c190520730792834ccef9",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_385a0a5f560ac4b87378c9384a6d62b5",
+        "sourceUnitDigest": "c1598f2d662f661485030f75a4c96593b3b91071e1308883f0f09e35c48bbbe9",
+        "targetUnitDigest": "f1d8224d8ba8f05f5096ade69950bd66de485e4a47f9039154a8ee4ae25451d2",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_027a40ad9ed4dadf08ebcc73586dd9a1",
+        "sourceUnitDigest": "761063de33d3f2bd45daba62389b4775f542d1ab20470952661ff3eb601a7508",
+        "targetUnitDigest": "4f930677458e87cb27b1ca982e4d3cef5d0eaa0887d66d2a6a31dedbebe83cf6",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_bb13ae8ff2a978863f7ff6ff20a455df",
+        "sourceUnitDigest": "f49ac334cf5ce88bf10d8379381de7cdcc65b5caf28a554f271d7e467187506c",
+        "targetUnitDigest": "ec5215c654e3c0954f4641817f07d062b9e0e3d8345b13511aae3427c3fa6721",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_a991a3191ee2d7590c0862621dc2a06a",
+        "sourceUnitDigest": "d78ecd737996ef4d7e5c9955614c89921c8d4859a2e274eb8f245922eb51142c",
+        "targetUnitDigest": "9537ada509227ee895828f5ba76dfd0f2bd977103bdf0108c911ec2dea2be849",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_630c884a95a84ad5eea22c035638f83e",
+        "sourceUnitDigest": "b4f4ae113f2bb06b797cf4343fc31eace2b66fcd98070172f36877405f9df170",
+        "targetUnitDigest": "b4f4ae113f2bb06b797cf4343fc31eace2b66fcd98070172f36877405f9df170",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_85175d44794e2f1f4f394de5965af0ed",
+        "sourceUnitDigest": "a553730a0bbe2d9d861bc2bb3872c1fdf604f42625c81641f59b04474d0cf42a",
+        "targetUnitDigest": "a553730a0bbe2d9d861bc2bb3872c1fdf604f42625c81641f59b04474d0cf42a",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_318885bccab24d0a820cb9a26bf29abc",
+        "sourceUnitDigest": "82e4eb17d63584cbd0b366d628d8a2663745c3c526d024ff2b8431e50b1acb6b",
+        "targetUnitDigest": "82e4eb17d63584cbd0b366d628d8a2663745c3c526d024ff2b8431e50b1acb6b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_994b96c67626ed2da842e4c33830142d",
+        "sourceUnitDigest": "25eb7d3e256a414e92c052bdfe9ff1ec1959136b23ec4de49262c6d5c8c1ce47",
+        "targetUnitDigest": "25eb7d3e256a414e92c052bdfe9ff1ec1959136b23ec4de49262c6d5c8c1ce47",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_b99c04f17e9d133dc4f985a1a0195403",
+        "sourceUnitDigest": "31c11e0a3eb3238bd88abe10156e0a31cdf837a099db6ebb870a378d94f62895",
+        "targetUnitDigest": "31c11e0a3eb3238bd88abe10156e0a31cdf837a099db6ebb870a378d94f62895",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_677ef19a8f81f975807f8a2b5f623440",
+        "sourceUnitDigest": "28cbe54f9a8f518729ee3a1d4fc8c95597cf4fe5b1d0313a1a603abbaefb2dc7",
+        "targetUnitDigest": "28cbe54f9a8f518729ee3a1d4fc8c95597cf4fe5b1d0313a1a603abbaefb2dc7",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_e7a5211570ef3acf24be2c8aed25f7d9",
+        "sourceUnitDigest": "d3622b3da6693857b5e215e4dc645da900389c086f3716775c9788425552178b",
+        "targetUnitDigest": "d3622b3da6693857b5e215e4dc645da900389c086f3716775c9788425552178b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_90dbf8d83bda70886dd8bbc7f3831f83",
+        "sourceUnitDigest": "5906ad720cdf87a4671a56d051f87545515dbb288c591f7aaa6179d558842dcd",
+        "targetUnitDigest": "5906ad720cdf87a4671a56d051f87545515dbb288c591f7aaa6179d558842dcd",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_9e6028aac3d1cbc4cd5c7a7ac317656a",
+        "sourceUnitDigest": "218ed4ed15f6d60cf95f35f5a4bfa8afa0d76147e8f2549bc107e93e79040550",
+        "targetUnitDigest": "218ed4ed15f6d60cf95f35f5a4bfa8afa0d76147e8f2549bc107e93e79040550",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_bc11a187e9d7ff386dff0698302dc2a9",
+        "sourceUnitDigest": "5629c3b3a4cb1084c150bb743ffbab9fb74816c5b57ea487e5cac9626036ec97",
+        "targetUnitDigest": "2cda2b7ab786500eeb53c06cfbeb9b3807ff6e723cc52afc8feebcb10e85b52b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_7108513a06fdb92644760d384e2663d6",
+        "sourceUnitDigest": "35eb59a8aee21d02dbf965b2c1bfec4fbd7cec70c3d0a067ca15c9c175d7707e",
+        "targetUnitDigest": "20adbd2c6c9d69f8cd705e4f0eb689c5c35aa1bfcc829183c220d7aa064ff8bd",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_c92cfffdd611655e62f4be3ba2859acc",
+        "sourceUnitDigest": "0c40d64333e03ec6ced72d94e48d36f5f50adb9890abc0733f0f6141a85985f0",
+        "targetUnitDigest": "0c40d64333e03ec6ced72d94e48d36f5f50adb9890abc0733f0f6141a85985f0",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_088e8648addb44a4b6aa9ea49dfe06f6",
+        "sourceUnitDigest": "1194385db07cbdee1b48cf878f6c8f3c99500a6e6e9daf34db0f6d7335d46816",
+        "targetUnitDigest": "13b6b33a09155510d36a5895422c414206222237ebe6105922582aaddb701f1d",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_8730f45cf1ac41bbbd9f92fd5e018acb",
+        "sourceUnitDigest": "3e7be11de725163967b27583210e2ba555ee03694403e2adda93428b466b648c",
+        "targetUnitDigest": "67efa7d7b2b83c64d8e6f6bab07b476a0d5cf580e2711ad8f9a549382169a029",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_92eba2424b594a6bddea4f6ee0e2d82c",
+        "sourceUnitDigest": "e008f4420e278caad8afa31028a0c49c1ae2422e2bb99bbdfab4c0bd433d94ab",
+        "targetUnitDigest": "e008f4420e278caad8afa31028a0c49c1ae2422e2bb99bbdfab4c0bd433d94ab",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_a156d400f7ce7c598811129557094c5e",
+        "sourceUnitDigest": "8c876bf5039e49bf89ec738a6fd8e9fb4d6b90ba8601c03fb50c83c29d9b92fc",
+        "targetUnitDigest": "8c876bf5039e49bf89ec738a6fd8e9fb4d6b90ba8601c03fb50c83c29d9b92fc",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_3f9117a3c7a534f1b2c418868118619c",
+        "sourceUnitDigest": "d781a719179cb91f80889601f2a248abfa5a4ff930e44bd1bddbf2d5f31b1b19",
+        "targetUnitDigest": "d781a719179cb91f80889601f2a248abfa5a4ff930e44bd1bddbf2d5f31b1b19",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_9009e4a5ad257dfb138745b4dc8ae0e0",
+        "sourceUnitDigest": "1d9f2f9e9aeb89d4dc3ed0e3198c76dea47e7b12645ecf691d207a4f2acc7491",
+        "targetUnitDigest": "1d9f2f9e9aeb89d4dc3ed0e3198c76dea47e7b12645ecf691d207a4f2acc7491",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_4590768b333671cf98f6f39c1a3d5aeb",
+        "sourceUnitDigest": "1dc5f5c96ce288a8b53ad12084218252f01d4e91b556f495ff70a7e39ada88ff",
+        "targetUnitDigest": "1dc5f5c96ce288a8b53ad12084218252f01d4e91b556f495ff70a7e39ada88ff",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_58c6eef162879926a789acc22f1a339f",
+        "sourceUnitDigest": "fdd596cae7e331b12de6ce2f44d3a35794f96c16cdb82a96f4c3e12e723a3515",
+        "targetUnitDigest": "fdd596cae7e331b12de6ce2f44d3a35794f96c16cdb82a96f4c3e12e723a3515",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_48e0f411f0c1c9eb5caa5b51a6a4bdec",
+        "sourceUnitDigest": "1ec856e51adfd7afd16e1276f98f86346095f5c6f85985d21aa00d520a087680",
+        "targetUnitDigest": "1ec856e51adfd7afd16e1276f98f86346095f5c6f85985d21aa00d520a087680",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_22bb5339f29356ff5f865bec08343d63",
+        "sourceUnitDigest": "8fc064b9ff9996fc5fefcdcdc3586a9668625806a5f2e242fd98a2f01cfba1bc",
+        "targetUnitDigest": "8fc064b9ff9996fc5fefcdcdc3586a9668625806a5f2e242fd98a2f01cfba1bc",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_2459fb56922616d86e3780da3cf4dd19",
+        "sourceUnitDigest": "284ebc2fd3544061f8c3a25217a69ba7386305466ba010a3badb48f8be27bee1",
+        "targetUnitDigest": "23c70f4ba4670ccfb52b3a60b84ec064fbd2dff6aa7ceb2140f01f6396eb379a",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_d660efa6e2427772ae44971c30e68a4b",
+        "sourceUnitDigest": "c76ccfd8fd32f42418fc5b9e9f7f69333c4d3c2af3023da9e3624abd6de61e9d",
+        "targetUnitDigest": "006fe41a2ca6f5f4542ce6405cde297810d9d44cd354bfacdc86fa527f7d87fa",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_ae24b8746d2322b51336a3964ffd6670",
+        "sourceUnitDigest": "97a026961d6ec441cabdc39a35d8cf913bb6a21da3717df6a20017ae5f34fdef",
+        "targetUnitDigest": "07f6b58d8d8a0f36c9bffc505d126926a1dcc347c2e8dbb0b53481cd2d3c44d1",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_a45257049fe00947d73007e74910b25d",
+        "sourceUnitDigest": "b12843d3353fb5116ebfea73d40c8a46d55481f09ca87e08adb0c39b6e15b034",
+        "targetUnitDigest": "8947bb1d4e377fbf27c877cee74d0b26b66b7bea8f7756742aadeedd4366f7ee",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_e8ad412db9d0a5f0df0fc2fef6b7ad0b",
+        "sourceUnitDigest": "b4f4ae113f2bb06b797cf4343fc31eace2b66fcd98070172f36877405f9df170",
+        "targetUnitDigest": "b4f4ae113f2bb06b797cf4343fc31eace2b66fcd98070172f36877405f9df170",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_6b69104f02ec6acc77ff79b6bfdb3f25",
+        "sourceUnitDigest": "43a28a72bbe42824092ee996a42568f03088e4083b49705cca8ef601992e46f1",
+        "targetUnitDigest": "43a28a72bbe42824092ee996a42568f03088e4083b49705cca8ef601992e46f1",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_85864e088f7eb72366a2044548466c80",
+        "sourceUnitDigest": "6577d48407f347445e200ebb59673b01e566050e776d1e9e4742c16bff06b752",
+        "targetUnitDigest": "6577d48407f347445e200ebb59673b01e566050e776d1e9e4742c16bff06b752",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_7372546a17410211cf3b35ccbf2b7128",
+        "sourceUnitDigest": "7f1b91e6873f41aebab881cbc14a33f1acccdd975425dd4e3fe9c46875740d00",
+        "targetUnitDigest": "7f1b91e6873f41aebab881cbc14a33f1acccdd975425dd4e3fe9c46875740d00",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_339d29403333adfe79f03f041551387a",
+        "sourceUnitDigest": "32f3490c63a31c25751e857be987576c42363bd61e65922fad4943aa0277738c",
+        "targetUnitDigest": "32f3490c63a31c25751e857be987576c42363bd61e65922fad4943aa0277738c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_70028f5aa4c6ad5558adc036ee45d9a0",
+        "sourceUnitDigest": "9de713b7aefba8ff9c96f4a1ae455e4ed52168c3d0941b4adf7aa1ef2a9c7fa2",
+        "targetUnitDigest": "9de713b7aefba8ff9c96f4a1ae455e4ed52168c3d0941b4adf7aa1ef2a9c7fa2",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_de75118d33ad4375275fb4c8756e8090",
+        "sourceUnitDigest": "149229705b7b31edf864d727c61cd87f3188caf0f7594950d292c447bfe017cc",
+        "targetUnitDigest": "149229705b7b31edf864d727c61cd87f3188caf0f7594950d292c447bfe017cc",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_7986021956540a45414a393ca74043f6",
+        "sourceUnitDigest": "ec5e1994db51e1b2b68867891ee2e2aa032d1a1d24ff7dab1967e01d8d41298a",
+        "targetUnitDigest": "ec5e1994db51e1b2b68867891ee2e2aa032d1a1d24ff7dab1967e01d8d41298a",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_b7b51142eaf0ed740e342d67c09d2b4e",
+        "sourceUnitDigest": "4e4ae74745d753cb21c6359d30de9d46a1743456e833bf69532fcab840f6bd1c",
+        "targetUnitDigest": "4e4ae74745d753cb21c6359d30de9d46a1743456e833bf69532fcab840f6bd1c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_ef20b9eef53017a3399efa9ce1e24dc3",
+        "sourceUnitDigest": "0b5d9f3b00854f6c3fe460be1d9eeb7a7fb9c1b274f0c75487158fdd5d668850",
+        "targetUnitDigest": "0b5d9f3b00854f6c3fe460be1d9eeb7a7fb9c1b274f0c75487158fdd5d668850",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_5d2966325bfa91d2aece7d2af6aac890",
+        "sourceUnitDigest": "aa139e7f29d4cc10aa6f2552a16142d2f46c1ba5a066b6a806283a33ab260646",
+        "targetUnitDigest": "aa139e7f29d4cc10aa6f2552a16142d2f46c1ba5a066b6a806283a33ab260646",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_02e6e6be57caed3e7e38d7d74289abe4",
+        "sourceUnitDigest": "280469ab6a1d0054b93fc94a938e649ab2193e360c25733c0d8ed916e06d65e3",
+        "targetUnitDigest": "280469ab6a1d0054b93fc94a938e649ab2193e360c25733c0d8ed916e06d65e3",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_650112b876998d4cb3aabc8821bd3b3d",
+        "sourceUnitDigest": "5f9560316d69a080e5e8df860868ec23968d665633a3886dd18aa956db3c2c81",
+        "targetUnitDigest": "5f9560316d69a080e5e8df860868ec23968d665633a3886dd18aa956db3c2c81",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_6a6e84ef10e1642a3f82dc4d60846fbf",
+        "sourceUnitDigest": "e9fc751b1b7b41defbccc4ceafd53f00bf788928135f1212677bfc5fbf805618",
+        "targetUnitDigest": "e9fc751b1b7b41defbccc4ceafd53f00bf788928135f1212677bfc5fbf805618",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_b902d33f6951d2bd4a86d0d166465c5a",
+        "sourceUnitDigest": "0665ddd86e8f74ea7642815fcb3e86b3070d01ca8cc4590ddb4d83d874f9bcc1",
+        "targetUnitDigest": "0665ddd86e8f74ea7642815fcb3e86b3070d01ca8cc4590ddb4d83d874f9bcc1",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_2664791a3d04752b151ecf669a79f9e6",
+        "sourceUnitDigest": "6272fadd8b7c0b0f9c25de4c23bc9e359f4c07f799b46b286805bda02f6b32c6",
+        "targetUnitDigest": "6272fadd8b7c0b0f9c25de4c23bc9e359f4c07f799b46b286805bda02f6b32c6",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_d1cc054c7b4e3e345619fd3da1af5adc",
+        "sourceUnitDigest": "8b13592b1a1fabb0dfeb669e3f06bb805358e7c10f750a73a8b02fc433dff4fa",
+        "targetUnitDigest": "74b2a72fe67db248940a1cdc955fcf8c273ab4bae71d834fb103d97bb81dd9ee",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_d6482c62c40b1d86ce2953a4fd074c0e",
+        "sourceUnitDigest": "c51828ec79bcb07e97fa714d944361dd73f6d28b1832d6b748cb4ecda1adbc40",
+        "targetUnitDigest": "094f99814a34c9e13a8f1f9397d84e0ca6bddf0258f2fcc535fa1938519e068d",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_92432fc7ae23620e94e6f8e1aaefe0ea",
+        "sourceUnitDigest": "f702a38e05dadab4af95cf96fe663c8fe2038e80921f7f7c4f2921399f0ae45f",
+        "targetUnitDigest": "f702a38e05dadab4af95cf96fe663c8fe2038e80921f7f7c4f2921399f0ae45f",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_82590e6d9aa64b3691203911b37fabda",
+        "sourceUnitDigest": "e1570959d76c07840b8f0f8075a3cd22459164e9078c0cef2dc84ba2a14ab2c4",
+        "targetUnitDigest": "0013c714868989a666cdfe718f5adac8af28be54ab1ac7906472e91007e02e57",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_05dbddd0e1a360b6246e8e752ef7fdff",
+        "sourceUnitDigest": "724d955e087decd02f52b0a781724fb329e24ad748a149d0ff28b0425ddaa4f9",
+        "targetUnitDigest": "0f16bf8815f64473ff7698eed8591bf9f2cfbb99beb78611dc3303dd7d4acaa3",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_9c3ace99f40733edadc187b9a6962f30",
+        "sourceUnitDigest": "5528493601e5ef29fcc93b69d997c0aec3ecf563797816e77d79bcb6996f1bda",
+        "targetUnitDigest": "639a9769444a78bb1558a6978a1af72b670e08dc11add854992078b09bb0ed4c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_d4c900f7715e01d6d486ad14c3023666",
+        "sourceUnitDigest": "52afa7d87c50531f57c4b99d57eaca863eba028340d1fa3b65792cc514b65863",
+        "targetUnitDigest": "26378adcbb3d3de832d73f7ff892c5cb23fd72afe557430aee815e2d374d30af",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_3dc403ae9d9394d0ea1f7efc49635c1f",
+        "sourceUnitDigest": "d37ddeb04789fb376c86bf83679c431a68529cbdcdfbb50707de8ee85b04589a",
+        "targetUnitDigest": "d37ddeb04789fb376c86bf83679c431a68529cbdcdfbb50707de8ee85b04589a",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_596dd9589431832a27a84373fd43dc64",
+        "sourceUnitDigest": "a59e045381d64188a92b76b7033c3fd7682f63b04014215c88faad1b8510f810",
+        "targetUnitDigest": "a59e045381d64188a92b76b7033c3fd7682f63b04014215c88faad1b8510f810",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_9fc806d7ab3f5ed7166aa1e3682e3663",
+        "sourceUnitDigest": "51ffd86b7f7ed955a30fa155272b8fb80837472a912212e65432bdf142135d82",
+        "targetUnitDigest": "51ffd86b7f7ed955a30fa155272b8fb80837472a912212e65432bdf142135d82",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_be73d40c738edf6c1e59c5cc6b85fbec",
+        "sourceUnitDigest": "37490c3b6051031027921b98ba5b3c550bd01ca69f4923398da74d62fab6d726",
+        "targetUnitDigest": "c9064480df1c899a489140e2fff74ae69e6b506f49096038cdb41fe78100e35b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_454f6d8335dabe97efe18b811eefefaf",
+        "sourceUnitDigest": "5e6f431308636052ea3e0656a2f6523510c766773e1baff8b3226d998f57edba",
+        "targetUnitDigest": "aca1411a687dbe2288f5a2e87cd48e6bbe9c2000204511fdc72fa1e735c543cc",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_73b857e82f88cc9d3459132758321b3f",
+        "sourceUnitDigest": "bce4dd9c55fac78c7d4e53932b8cd9b06e879db600ddf9993a0aa674f89221db",
+        "targetUnitDigest": "bce4dd9c55fac78c7d4e53932b8cd9b06e879db600ddf9993a0aa674f89221db",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_2c5f66a73fc6c1061c9aa1eacb76123f",
+        "sourceUnitDigest": "5de58631ce25a536aeda47373b179bbf1bc9e606d896ad1f6127be5a3b0c1052",
+        "targetUnitDigest": "5de58631ce25a536aeda47373b179bbf1bc9e606d896ad1f6127be5a3b0c1052",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_29e4db4d1e0e9f74098c0eea7d793c99",
+        "sourceUnitDigest": "e7fbdb1a30ba4a93c65250ec8732bee9f5607c0acaa0af1964921eb27968244b",
+        "targetUnitDigest": "e7fbdb1a30ba4a93c65250ec8732bee9f5607c0acaa0af1964921eb27968244b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_3c87db9e8900c099ee0ff1cebdbf7e92",
+        "sourceUnitDigest": "d01e25650e85c43a9b483b88255b1eb1a90756c8dc15c59ca4dac278d97c9776",
+        "targetUnitDigest": "d01e25650e85c43a9b483b88255b1eb1a90756c8dc15c59ca4dac278d97c9776",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_587505d1f5fbce977f568326d91ad285",
+        "sourceUnitDigest": "0a5afc3d354657bce6080de5b41485d5a1b825a0518b7bae3fc8af3a0a876dc1",
+        "targetUnitDigest": "0a5afc3d354657bce6080de5b41485d5a1b825a0518b7bae3fc8af3a0a876dc1",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_fd0d10e6518d65c8c1bcf6bdd4c693df",
+        "sourceUnitDigest": "20ff133eca295e522261975ffc038b0dc9d64362c532064698eab5f5352ac46c",
+        "targetUnitDigest": "20ff133eca295e522261975ffc038b0dc9d64362c532064698eab5f5352ac46c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_800c0b9450fc2922055b79f3015e8bf7",
+        "sourceUnitDigest": "5eb523e2cfc17382df001e949ce60be4819fb32a6900ae64925a48f9dadc5a0c",
+        "targetUnitDigest": "a7ec1de8ccb66220a96833693968fa59f0bab816d2fbdd02e520c1c580e4a0e2",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_67666efaf53224a9348dd7f3060cc811",
+        "sourceUnitDigest": "c2156d0d8e5129281c6fab03e4d1d3719c6dc3e681b8b32c1088c6f6702bba8e",
+        "targetUnitDigest": "fb41f3d41130dff474a7e5540ea8d9eb0a3b6d52b3192b501c0f583510b53332",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_54d5f40b91d8dbc73afa7847d4536896",
+        "sourceUnitDigest": "5af2a3805aa1d35845c117f741365c9aeb934a4516d0d8f589bddec729f811f9",
+        "targetUnitDigest": "385c5edaea93e98c4375b90347e2e49c8155c602bb9bc8634ba096fff729819d",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_b85d4207748c7a0fcce2ebb21c97688c",
+        "sourceUnitDigest": "9c4500563419c3f1b34747ec715fb74809c2e4e0f504b194b2f02a9258e07a45",
+        "targetUnitDigest": "d0de707b81243c02f7efde79893ff7b385f1406429119a6b9b6974d58f801097",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_eda962e66800996ed767b10cac5d30c8",
+        "sourceUnitDigest": "5bb0afe7f8ac3fd2ce28cd6d13f870749ab7390b82ed210c0ed150f745b868f9",
+        "targetUnitDigest": "5bb0afe7f8ac3fd2ce28cd6d13f870749ab7390b82ed210c0ed150f745b868f9",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_f2ab840fe3dbd3965b83c34b3abd3f2c",
+        "sourceUnitDigest": "812a31e2133e9a10ebd275c43d64b3a0e65e1c70c6b761bb5ac01dcdb4b2ada8",
+        "targetUnitDigest": "812a31e2133e9a10ebd275c43d64b3a0e65e1c70c6b761bb5ac01dcdb4b2ada8",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_bb5a3eacd48f9a3f24329ca07d8b7b85",
+        "sourceUnitDigest": "4c00a249e92384adbd64972b717c2cd011998ebb031a8e94b830427505863a8a",
+        "targetUnitDigest": "4c00a249e92384adbd64972b717c2cd011998ebb031a8e94b830427505863a8a",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_ce08bbb844ab2fa273386174c79adf84",
+        "sourceUnitDigest": "be27453be2283b45de057d6aac5581df74fb6d8d63c033fa52bb78f9e28b0322",
+        "targetUnitDigest": "be27453be2283b45de057d6aac5581df74fb6d8d63c033fa52bb78f9e28b0322",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_7325a8a88cc51c84dec9366965dac02e",
+        "sourceUnitDigest": "9ce20c443197a4488d966dc178ac327583748ff2916ad5744c71e4442ac09716",
+        "targetUnitDigest": "9ce20c443197a4488d966dc178ac327583748ff2916ad5744c71e4442ac09716",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_e15c3758602d9e89cb76bb9788146522",
+        "sourceUnitDigest": "d56ba799cef5d65bb1a61e8a7a631010354e87bc776ceea658ae6e2b38e6888c",
+        "targetUnitDigest": "d56ba799cef5d65bb1a61e8a7a631010354e87bc776ceea658ae6e2b38e6888c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_e31df097ecd5ad85e6bda9ea267988c1",
+        "sourceUnitDigest": "06d2e52826012cdf7e5a36ebe7e8e86e8123d4da34b186d696599faecced7e31",
+        "targetUnitDigest": "1dbac81d11473808583dd64e804c1978fbcd9606a1affb4c1a8c6d907cd9c2b8",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_60fb20199e23f76f2d75a69ab7b6df63",
+        "sourceUnitDigest": "5d8f7cd0fabc70ce7e9ab5be6bef99966fbcf74c227d6719c84628d6649b72fc",
+        "targetUnitDigest": "67a656ed1bb123b204b3fe96ab8ce974a4ef28f17d4368a56e7833563a17d6b0",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_07a6749be69305a6aa18ce2425f4582b",
+        "sourceUnitDigest": "69e48da70a1b128a6679cf4ae5efab1cd20be1137184b3c4271f5575c0718bed",
+        "targetUnitDigest": "28d464a3a28a6ae9aa62c5f496b3fd52c3719d042dae0ca24ddc1d4b6d860c84",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_97c68529a35e8087f8d2dee188ae0dd2",
+        "sourceUnitDigest": "241b0de7825b48aea9e32c9dd526094312f29ea501922d5237236bc16cc38f00",
+        "targetUnitDigest": "e0a02e834096f03b0ad821633ec08765b8cd829984ad096ffc215a797cf2e0a7",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_fd36aa6d5ecde01def3d53c0007670ca",
+        "sourceUnitDigest": "e008f4420e278caad8afa31028a0c49c1ae2422e2bb99bbdfab4c0bd433d94ab",
+        "targetUnitDigest": "e008f4420e278caad8afa31028a0c49c1ae2422e2bb99bbdfab4c0bd433d94ab",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_47b0f20bb3b210336db5f9c4042ee52e",
+        "sourceUnitDigest": "6e102f95ce7de1743a17764020133983d1a561443c06691ccdc3d73d26197612",
+        "targetUnitDigest": "6e102f95ce7de1743a17764020133983d1a561443c06691ccdc3d73d26197612",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_6645662f1fbda88084ca672b0febb705",
+        "sourceUnitDigest": "2c83269a2e2c01a226c15e65f49ba57e8f24b6a76b5372173ad963803513dbc8",
+        "targetUnitDigest": "2c83269a2e2c01a226c15e65f49ba57e8f24b6a76b5372173ad963803513dbc8",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_f3842d1ec913d8cc36f2ea86353a3225",
+        "sourceUnitDigest": "437e33962f5ef84a127b1a8cf4a180dba02bee479d4ca938dd676826743e1262",
+        "targetUnitDigest": "437e33962f5ef84a127b1a8cf4a180dba02bee479d4ca938dd676826743e1262",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_20bc110149a3bd2a2e649115d1658eb1",
+        "sourceUnitDigest": "80b3bfe3f3e7602da62fa064d789383164e7eac1c3a0b60ada49e5c13f5e22f7",
+        "targetUnitDigest": "80b3bfe3f3e7602da62fa064d789383164e7eac1c3a0b60ada49e5c13f5e22f7",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_d519a77e315a8b80326ff96c6e9b69a0",
+        "sourceUnitDigest": "69b4d984ee2dc40c8cc198c5563bbcee4079f80ddffe63a0f43696c2ec87713e",
+        "targetUnitDigest": "69b4d984ee2dc40c8cc198c5563bbcee4079f80ddffe63a0f43696c2ec87713e",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_f30f14a4fee5cb27d7e215d30751d1ea",
+        "sourceUnitDigest": "e46dcc90755604b137a0c662f380dc3aeaf25aca0cce01f19bc76fc9af118477",
+        "targetUnitDigest": "e46dcc90755604b137a0c662f380dc3aeaf25aca0cce01f19bc76fc9af118477",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_a3a1c2a0aa732e9c30068537f058f374",
+        "sourceUnitDigest": "660413549cc4189a96e8b239ca4cf4d5cacc5304723a1e9d0d70279fc61930b1",
+        "targetUnitDigest": "660413549cc4189a96e8b239ca4cf4d5cacc5304723a1e9d0d70279fc61930b1",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_b69d6f3847b770edb3ba5d699591d0b5",
+        "sourceUnitDigest": "33a9bd2028091a8bfdadf440282c2bf9ead0b84641cef616ac6772996f3fdaa7",
+        "targetUnitDigest": "33a9bd2028091a8bfdadf440282c2bf9ead0b84641cef616ac6772996f3fdaa7",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_bceeb9c028624cb642deccaba86b2688",
+        "sourceUnitDigest": "65dcff8529e056d4cce8604571b0a088bb7b4d44bc388d9a04f0d7201a06c40c",
+        "targetUnitDigest": "2eed557c82fd634ab26e6fb2c448d67aeded765f3f60b4bc754ef85a6465109f",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_8d6c0a21110220c459497ae1f42f44c4",
+        "sourceUnitDigest": "23734513736d05daa91e5540d7e80790c2b17e6a54d7b8015045440fcc984f79",
+        "targetUnitDigest": "3c4663acfb61a305663cfc21826b4847729335cce6494a1788014a7bfae8092d",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_536fd6bd518a3ae183ba0b6a171894e0",
+        "sourceUnitDigest": "71fa1fe3696a2c79fe3bb5fba0ff855ffff38701d8802e94e1cd67366bbdb753",
+        "targetUnitDigest": "20da3515e5e82adbcfc65f330ec56bedb48564a19734e2c8a9506a22b5bbad4b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_0c761cc239c69f9ee0d1af9afded91d6",
+        "sourceUnitDigest": "b0191587880d503aa14c1fba92c5924d80d8a54068005a45da443ca135c2d144",
+        "targetUnitDigest": "b413d37c560d4b74feacaf1f5213efbe13c93e4d385ecbb3465a2f84d2c4fb3c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_70c98282d70c3019c5b0f518c5b41ca6",
+        "sourceUnitDigest": "7e62385ddc90d8d132134a247995fd6979516a226b5d8581507b4b4b23775ef5",
+        "targetUnitDigest": "7e62385ddc90d8d132134a247995fd6979516a226b5d8581507b4b4b23775ef5",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_1741941775d663e7bd58923814485a29",
+        "sourceUnitDigest": "1c83beca1cdbf50a13d29e16115296541d14ba9dc90c939f579b7e4233a4b1dc",
+        "targetUnitDigest": "1c83beca1cdbf50a13d29e16115296541d14ba9dc90c939f579b7e4233a4b1dc",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_6bb699f0b9c22cbffa3de482d8434b6a",
+        "sourceUnitDigest": "54bd827efe52f713ee77267e027dd72235d5a6360dd2c2278ca21eb40d933521",
+        "targetUnitDigest": "54bd827efe52f713ee77267e027dd72235d5a6360dd2c2278ca21eb40d933521",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_4a216ec0b6a1a7bd8d104ef38a8dff45",
+        "sourceUnitDigest": "3eff74f1ff0c6baf75fe6cd4cd141617f14528cb728a17773c7a57843a641323",
+        "targetUnitDigest": "3eff74f1ff0c6baf75fe6cd4cd141617f14528cb728a17773c7a57843a641323",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_9d6db4efcb1f3a21e8e19d67a624a53b",
+        "sourceUnitDigest": "3a51a9f8c9df009dfd174e9660ec9c5f32c34b5817a7c22045bd4d9d57dccf3c",
+        "targetUnitDigest": "3a51a9f8c9df009dfd174e9660ec9c5f32c34b5817a7c22045bd4d9d57dccf3c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_9b21955627ce92a9373241a5ff3862f1",
+        "sourceUnitDigest": "e3320381434b8c090ebb654ce15209469300643cda58396dd0b44ee535db6b8a",
+        "targetUnitDigest": "e3320381434b8c090ebb654ce15209469300643cda58396dd0b44ee535db6b8a",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_77d2d3c11cc80b314525858b457a5609",
+        "sourceUnitDigest": "23de78bfd6233e6be40e9b4a85b90b2355ef4d270ef61850a2932846f9d12aa4",
+        "targetUnitDigest": "23de78bfd6233e6be40e9b4a85b90b2355ef4d270ef61850a2932846f9d12aa4",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_584075b067cebc0c0971bfc8cfa4a5a2",
+        "sourceUnitDigest": "acb5fb274961e046674c51da1c970c33265b5deff0195ab067a18969c0b905b6",
+        "targetUnitDigest": "acb5fb274961e046674c51da1c970c33265b5deff0195ab067a18969c0b905b6",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_400b187e204d43d47bf0ef99b0a0c9e2",
+        "sourceUnitDigest": "2620e281e1857265ac8d29ec6f70e429d4fa14fc9552f8673ee0a08839af451b",
+        "targetUnitDigest": "2620e281e1857265ac8d29ec6f70e429d4fa14fc9552f8673ee0a08839af451b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_776ecb30a65d1b3f58ded88bcea06a39",
+        "sourceUnitDigest": "e1f5e530fb904a48871439190074cd505353e0ce68393e231c7daccc025ed1e9",
+        "targetUnitDigest": "e1f5e530fb904a48871439190074cd505353e0ce68393e231c7daccc025ed1e9",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_0b6be5a559b8c342e9f32c990ee60887",
+        "sourceUnitDigest": "787c56fbaae6d796210e94fc81178a80ebb7a12f0e6d582399504adaa83c669e",
+        "targetUnitDigest": "787c56fbaae6d796210e94fc81178a80ebb7a12f0e6d582399504adaa83c669e",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_758e22a9189f1a0963d4fbd4d6d6962a",
+        "sourceUnitDigest": "dc6ca9e9b25c3b5742da559f7f532ddd616ebd835ec0049e0e490f66c989a868",
+        "targetUnitDigest": "dc6ca9e9b25c3b5742da559f7f532ddd616ebd835ec0049e0e490f66c989a868",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_691ffd30205cf61f2e6e319a603c033b",
+        "sourceUnitDigest": "3d25f914a61385efbe7bfb0515d8b6067929d046ce13e49fc952558c9cee09e4",
+        "targetUnitDigest": "3d25f914a61385efbe7bfb0515d8b6067929d046ce13e49fc952558c9cee09e4",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_9edf8b90118646c6b94691ebc60e04da",
+        "sourceUnitDigest": "a27ccac8fc16e298014be7b1eae6e57f2c76cc3f8e69cd0b282b7383e636608a",
+        "targetUnitDigest": "a27ccac8fc16e298014be7b1eae6e57f2c76cc3f8e69cd0b282b7383e636608a",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_a6e6648cd73c21fdebf2595693c144c0",
+        "sourceUnitDigest": "bb3ecfdb26db74e2c1994e836bfa3948342cbe40c06066f4a34a4f9f8609ff79",
+        "targetUnitDigest": "bb3ecfdb26db74e2c1994e836bfa3948342cbe40c06066f4a34a4f9f8609ff79",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_b9b328c05b626eb18f1dbb5396513f17",
+        "sourceUnitDigest": "c251c70cd142a978cc0298ae1697eddb857d8634f5aef616f7d21e51e889843d",
+        "targetUnitDigest": "c251c70cd142a978cc0298ae1697eddb857d8634f5aef616f7d21e51e889843d",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_b1d8fe26af0ff9fa6a578035f5c6945b",
+        "sourceUnitDigest": "a68c17326b60d7ad5acda9b48dc02434242230abac3b718ec828003693eedccc",
+        "targetUnitDigest": "a68c17326b60d7ad5acda9b48dc02434242230abac3b718ec828003693eedccc",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_1fb392829af79ab4e310fc57e7a18417",
+        "sourceUnitDigest": "83bb4a6e15e98dfa5915fc97930900e83c87b6bf1e1fc6550c4823b760c03644",
+        "targetUnitDigest": "83bb4a6e15e98dfa5915fc97930900e83c87b6bf1e1fc6550c4823b760c03644",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_0d6b548f25c43726e16dfaa3db3b50c6",
+        "sourceUnitDigest": "108ef42eb0f9b4c14b52945810ca180e81f45f1de7c5bd7175a2856f3733c95f",
+        "targetUnitDigest": "108ef42eb0f9b4c14b52945810ca180e81f45f1de7c5bd7175a2856f3733c95f",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_176133a9c908301954329ee1c9c63dfe",
+        "sourceUnitDigest": "711282804d4c2908e7dbb68401a2665068b10040172acbff0fc76c86c23ae15e",
+        "targetUnitDigest": "711282804d4c2908e7dbb68401a2665068b10040172acbff0fc76c86c23ae15e",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_9b91936a3ad03f80101c4cbb5718f2bb",
+        "sourceUnitDigest": "979a7e6604657c12b8bb38e12a421854e0173f21b7c0dbca549b336f4c7a94d2",
+        "targetUnitDigest": "979a7e6604657c12b8bb38e12a421854e0173f21b7c0dbca549b336f4c7a94d2",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_5d857143e69127b974573a563f2b4f0d",
+        "sourceUnitDigest": "19c8da607e29227f761c037089424c6bb4b03e7fe8595b6f570365f2d7eec2ed",
+        "targetUnitDigest": "19c8da607e29227f761c037089424c6bb4b03e7fe8595b6f570365f2d7eec2ed",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_03442ce35ad000f53a7b3c8ada7f3917",
+        "sourceUnitDigest": "092c4defefefd6fe98bd926a924d821599937c976c30136cd332d1daaa01f81c",
+        "targetUnitDigest": "092c4defefefd6fe98bd926a924d821599937c976c30136cd332d1daaa01f81c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_31da3484337f9291d10f1d7bfdbf98a1",
+        "sourceUnitDigest": "101ca24a4babcc80626fd5bdcd92a4abbe46c15d9183819af86f2faab75c5d8e",
+        "targetUnitDigest": "93d5681e33b3f1468d40e466af8f7ca9bd1d2775388690e9449d82a07905c41e",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_2aea5b3660d8588c5287636f01a78ce2",
+        "sourceUnitDigest": "83db723622b27a7d83b0435ac1f692eabcb247aca79936bbc93d2602d2d6d1c7",
+        "targetUnitDigest": "6db014d964b2427f4309a52e657875aeb760d740d7f7fc29344683c2f49fea18",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_35e86f81ee143f2e20aba15cfdb37b68",
+        "sourceUnitDigest": "11d382080aeaa76409bab5d5b51b697d49fe84f497cecaa4073697e71272a2ac",
+        "targetUnitDigest": "11d382080aeaa76409bab5d5b51b697d49fe84f497cecaa4073697e71272a2ac",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_9e2d3f49be7a349869017a93b73120cc",
+        "sourceUnitDigest": "3f34f9d14c4ecaa8482d9a90059902cebddfd83e5e82126037d43c4928e6468d",
+        "targetUnitDigest": "3f34f9d14c4ecaa8482d9a90059902cebddfd83e5e82126037d43c4928e6468d",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_151f5734d44df79cf8987d09dd4d598c",
+        "sourceUnitDigest": "cb76d2bce7480169b75239a45cbe0be326a4d1b45f9900246ffedea3d98adab8",
+        "targetUnitDigest": "cb76d2bce7480169b75239a45cbe0be326a4d1b45f9900246ffedea3d98adab8",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_bec16cd0f24310a6419caff7453a715f",
+        "sourceUnitDigest": "faf7b44d78496b6ce6893b1f1bea7d0902f77ca8dc6446e53d276ce2f5be7ec4",
+        "targetUnitDigest": "faf7b44d78496b6ce6893b1f1bea7d0902f77ca8dc6446e53d276ce2f5be7ec4",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_25d99c6c797c21efdd1d11ed7d70a87f",
+        "sourceUnitDigest": "3d3adc6c49927c4627f46dfc82178f2e337641b60932f73dd6847b5c7cdefc0c",
+        "targetUnitDigest": "3d3adc6c49927c4627f46dfc82178f2e337641b60932f73dd6847b5c7cdefc0c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_ee0bc5ddb9626281662430a0492cdccd",
+        "sourceUnitDigest": "ac18ddb7f9acf66f4c5fe7f01ecf7319fb4942a29bb33201b6dbdc6a57aeca34",
+        "targetUnitDigest": "ac18ddb7f9acf66f4c5fe7f01ecf7319fb4942a29bb33201b6dbdc6a57aeca34",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_df26acdf7c7c6ad3a25c44486535c4b3",
+        "sourceUnitDigest": "6c6c50ac084317fde0e6286127fe1f8a62026a5c527ce8a0e954d28f7c05847b",
+        "targetUnitDigest": "6c6c50ac084317fde0e6286127fe1f8a62026a5c527ce8a0e954d28f7c05847b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_3661df6c69488b1ea9c596a2ffc65ff4",
+        "sourceUnitDigest": "84a87e70aac52e1b7cdf1d96a657c8d8482659e0e38af5ada4c3a63982e1f157",
+        "targetUnitDigest": "84a87e70aac52e1b7cdf1d96a657c8d8482659e0e38af5ada4c3a63982e1f157",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_f3413d5462ad3f26c73d617c67279ced",
+        "sourceUnitDigest": "3533f4a5a93811ebcf336c70764e89e32af1c93e33ae7047181ec1e7eea293a7",
+        "targetUnitDigest": "3533f4a5a93811ebcf336c70764e89e32af1c93e33ae7047181ec1e7eea293a7",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_f97af9d102a31ea32cd616380ccb8b0d",
+        "sourceUnitDigest": "471561edd7b46502006089e7284cd2e6316eac6e8ad3ac580e7aac41e148133b",
+        "targetUnitDigest": "471561edd7b46502006089e7284cd2e6316eac6e8ad3ac580e7aac41e148133b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_a59646397da7bacc57e6a456c0a64783",
+        "sourceUnitDigest": "1dc9a951665ce941df8fc06467a68f68b4b5ddd0c8226bc9c138a50ffa650923",
+        "targetUnitDigest": "1dc9a951665ce941df8fc06467a68f68b4b5ddd0c8226bc9c138a50ffa650923",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_805724bfd8e552f9eeb65c177bc897f4",
+        "sourceUnitDigest": "a5623141e91cfce796888fcbf3e931047e6b43ef4781dc34c225cd9c90112eba",
+        "targetUnitDigest": "a5623141e91cfce796888fcbf3e931047e6b43ef4781dc34c225cd9c90112eba",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_1d678e157bb78c2ff62818a7cd0b623e",
+        "sourceUnitDigest": "a08f7eeafb7f4e98ceac64c002dacc9d98d286a588b965d6c0a538194ee329ca",
+        "targetUnitDigest": "a08f7eeafb7f4e98ceac64c002dacc9d98d286a588b965d6c0a538194ee329ca",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_23ea5352c89949156b0a32f14acc991e",
+        "sourceUnitDigest": "0101ef0c9974779507c59756ae156b2ce4c50c706b86833c7412ad7df7cfe943",
+        "targetUnitDigest": "0101ef0c9974779507c59756ae156b2ce4c50c706b86833c7412ad7df7cfe943",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_20acd513f5587ec61c00cdcf8a695f1a",
+        "sourceUnitDigest": "d271a946720978b50c6594ff2c1dedb5e30fdc4a5ee77e73f3a768b398302ef5",
+        "targetUnitDigest": "d271a946720978b50c6594ff2c1dedb5e30fdc4a5ee77e73f3a768b398302ef5",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_fb286f73967fbbefdf6e2d4cf60a94d0",
+        "sourceUnitDigest": "f1c8d3fde8d06d74b4a14e540d0be408fc436707291a11f3509dfbc5f63afb6e",
+        "targetUnitDigest": "f1c8d3fde8d06d74b4a14e540d0be408fc436707291a11f3509dfbc5f63afb6e",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_caaf56bdd60adf0ad5a7de5a96b2e03a",
+        "sourceUnitDigest": "c0c8f8a6074736ef365c333fb50c5e3279aa11e1ee69dd3a1ee8b83fa0a20033",
+        "targetUnitDigest": "c0c8f8a6074736ef365c333fb50c5e3279aa11e1ee69dd3a1ee8b83fa0a20033",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_8b30e37f66da1f54b9ccb52543c06b3f",
+        "sourceUnitDigest": "ce70d64fd0d54c56afb54ef3515012729072d003f3b36873c814c88039be4184",
+        "targetUnitDigest": "ce70d64fd0d54c56afb54ef3515012729072d003f3b36873c814c88039be4184",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_4716bbd563e26aa2c4098334ca3f1aa3",
+        "sourceUnitDigest": "7bad8fabbdcd3d3967ac4f33869fd016c888307edd833ab1e87e44a5488848a7",
+        "targetUnitDigest": "7bad8fabbdcd3d3967ac4f33869fd016c888307edd833ab1e87e44a5488848a7",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_6504152de7baf074041aa49bc24e24a2",
+        "sourceUnitDigest": "fc8ef072789f63b2019979939dd6775cec84a36e89db37f29b28726565f557ed",
+        "targetUnitDigest": "fc8ef072789f63b2019979939dd6775cec84a36e89db37f29b28726565f557ed",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_d110505d877522e33bfd11a81effc141",
+        "sourceUnitDigest": "3b7c5596e7cb831ddd5f4cbba55ae2ed2ec0de0a1a73fbd35aeb9a9583d7c703",
+        "targetUnitDigest": "3b7c5596e7cb831ddd5f4cbba55ae2ed2ec0de0a1a73fbd35aeb9a9583d7c703",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_e14bf4b7896771128b4d6e9454173b61",
+        "sourceUnitDigest": "503e53116fb3aad46b4e37e4526ee8343b636b56b208dd38495d22dad2fe155a",
+        "targetUnitDigest": "503e53116fb3aad46b4e37e4526ee8343b636b56b208dd38495d22dad2fe155a",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_f4f418da7bf17ec37d90217f1108968a",
+        "sourceUnitDigest": "c426e2dfcf97737aafb9268a0ba7bfee8ce972184c7f8a4b76556af05495735f",
+        "targetUnitDigest": "c426e2dfcf97737aafb9268a0ba7bfee8ce972184c7f8a4b76556af05495735f",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_df830959e53835a05abb22145b44f6e8",
+        "sourceUnitDigest": "ecf22253813b9fca0966571a9ce1b72a15e49e2acfd26bed53e4af6786069d9c",
+        "targetUnitDigest": "ecf22253813b9fca0966571a9ce1b72a15e49e2acfd26bed53e4af6786069d9c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_bbbc3c5de574380b7ad921d59d5e6188",
+        "sourceUnitDigest": "c2450adadf0a168a04ddb63e83662dcc0f282febee65d5e138751115e4c8dbec",
+        "targetUnitDigest": "c2450adadf0a168a04ddb63e83662dcc0f282febee65d5e138751115e4c8dbec",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_e75b86087f09f65a60aa725afb863cd8",
+        "sourceUnitDigest": "7b93bfa4feafbd3f8c428a890272bc613d95c22a249239d7caf416375be5ea53",
+        "targetUnitDigest": "7b93bfa4feafbd3f8c428a890272bc613d95c22a249239d7caf416375be5ea53",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_5d82d105535c6822672b28b4c4f0c03d",
+        "sourceUnitDigest": "8eaef6f5a2ec819dad8de87b8bb9e15c0d105b3d993869bd088fe312b64c437e",
+        "targetUnitDigest": "8eaef6f5a2ec819dad8de87b8bb9e15c0d105b3d993869bd088fe312b64c437e",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_65828cbb70c075711ad1183135f0ff4e",
+        "sourceUnitDigest": "76e725ec64de6f99f56b2a73c3369abc49f8e927259d32853c9fbefb4fe765c2",
+        "targetUnitDigest": "76e725ec64de6f99f56b2a73c3369abc49f8e927259d32853c9fbefb4fe765c2",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_dbcf57bec8a0f461b157c6e417432cf6",
+        "sourceUnitDigest": "ed6bf9610ce7b6e78f84c9a9cf07aea85cf7926c4bef22f533b32db9e8915941",
+        "targetUnitDigest": "ed6bf9610ce7b6e78f84c9a9cf07aea85cf7926c4bef22f533b32db9e8915941",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_dab02d6084f479c503efe1d42a96633b",
+        "sourceUnitDigest": "620cc5608fb805e0e143e04503789e745079a925c02cd308abe8f3d5cd0f061b",
+        "targetUnitDigest": "620cc5608fb805e0e143e04503789e745079a925c02cd308abe8f3d5cd0f061b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_f7d1f5daf50bff9eba5dce70ba5aab85",
+        "sourceUnitDigest": "2c8da1aaf11c47583d7e43abde118b2616ad08ed947ada803e7717c3f55964c3",
+        "targetUnitDigest": "bd53ab9a9c785423e4a7ad85ef6ccb26b610d762fab9f1ea57b1d031a24b130b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_00fa6ccb974073d6a5956901e3d216dc",
+        "sourceUnitDigest": "681998fc48ddf2b1a16693b13fde4ce04a93ce726baf676187bb398173d13df2",
+        "targetUnitDigest": "681998fc48ddf2b1a16693b13fde4ce04a93ce726baf676187bb398173d13df2",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_55c5c9fdaac3fc58dda9cc17283fb8d4",
+        "sourceUnitDigest": "e8d6cfa1e6531fac7f3d14d6ada936f3597416aae5c79206f2b70201d77f1bdb",
+        "targetUnitDigest": "e8d6cfa1e6531fac7f3d14d6ada936f3597416aae5c79206f2b70201d77f1bdb",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_440909deb4228817b86622f673407cf9",
+        "sourceUnitDigest": "d9a42f9c58f800959f042152ba90bf1f2e195c69657e417b42bb2d898ba85b9f",
+        "targetUnitDigest": "d9a42f9c58f800959f042152ba90bf1f2e195c69657e417b42bb2d898ba85b9f",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_7957745de489ce6d48776fb191815be8",
+        "sourceUnitDigest": "cdc96e0555cb882e3bf09d2d4fc8dfd800fc9bcf47b0566cb7385f3285d4c251",
+        "targetUnitDigest": "cdc96e0555cb882e3bf09d2d4fc8dfd800fc9bcf47b0566cb7385f3285d4c251",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_155f6f1ec7f15d9bd6100c6aff273702",
+        "sourceUnitDigest": "39ab65fc3b43b4d0d896c06367658a6b4a69aa5def2ab3b4e5af507c86dc401d",
+        "targetUnitDigest": "39ab65fc3b43b4d0d896c06367658a6b4a69aa5def2ab3b4e5af507c86dc401d",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_da379046cd1987e5ad3ed424b689c02d",
+        "sourceUnitDigest": "720a4ed3da3b0783cd767ef51cb08d571558c636621171f7067a32d7a6df2a83",
+        "targetUnitDigest": "720a4ed3da3b0783cd767ef51cb08d571558c636621171f7067a32d7a6df2a83",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_c590512e8ee217d5ce7571cbe87da090",
+        "sourceUnitDigest": "2de21bfa3d698bce1908e962df4fb41e2208a9dacedb5bb4d01cc46da7d8bf49",
+        "targetUnitDigest": "2de21bfa3d698bce1908e962df4fb41e2208a9dacedb5bb4d01cc46da7d8bf49",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_1725d5c991e7005bc00678d450ff0279",
+        "sourceUnitDigest": "268389d63078c9f133aa5d6324c1e870294e3bca01a4c4cb94b1af8dd5179d31",
+        "targetUnitDigest": "268389d63078c9f133aa5d6324c1e870294e3bca01a4c4cb94b1af8dd5179d31",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_956c55c5936be71234148ac1d428f578",
+        "sourceUnitDigest": "e0cca48c30c767de1a557525fce7013c8e1f8665bf8a74e68543beb746afae6c",
+        "targetUnitDigest": "e0cca48c30c767de1a557525fce7013c8e1f8665bf8a74e68543beb746afae6c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_ae1084adac7d308021b26d13b942e951",
+        "sourceUnitDigest": "eb07b198b4c01cc50071d1edbd914f51f2304f73d0216560e0da2be1f60fd17f",
+        "targetUnitDigest": "eb07b198b4c01cc50071d1edbd914f51f2304f73d0216560e0da2be1f60fd17f",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_dc15f07c550bf404319d871605060410",
+        "sourceUnitDigest": "a22779729ca512e472fb7ab524ba43386c82914904b72dab32b2607010a0de76",
+        "targetUnitDigest": "a22779729ca512e472fb7ab524ba43386c82914904b72dab32b2607010a0de76",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_78bc2da3fd83ef7878d0a7049c1ea120",
+        "sourceUnitDigest": "df588dc685d48066e0e45d4d7fd6cb05715c66f7763f4be462364d416ffebed2",
+        "targetUnitDigest": "df588dc685d48066e0e45d4d7fd6cb05715c66f7763f4be462364d416ffebed2",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_012a0e00142cc7d17fdaeb65af97ea39",
+        "sourceUnitDigest": "252e9a74d8d47746c674fdd11cc3073b977cadc33abbf028d7128b55a1e29e86",
+        "targetUnitDigest": "252e9a74d8d47746c674fdd11cc3073b977cadc33abbf028d7128b55a1e29e86",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_ec7b9a652a6e915d3543e2b4d89571c8",
+        "sourceUnitDigest": "1f668227d2c0fee889ceca2b962ca77213072b9d9dbcb6ad35e9217289186da0",
+        "targetUnitDigest": "1f668227d2c0fee889ceca2b962ca77213072b9d9dbcb6ad35e9217289186da0",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_0d1b7c0c9b9ab622449a0600b45a0eb7",
+        "sourceUnitDigest": "aaca4fa176c972e45193fcaf5d099da837444d6dd5f57bdbedf5df42c6480d52",
+        "targetUnitDigest": "aaca4fa176c972e45193fcaf5d099da837444d6dd5f57bdbedf5df42c6480d52",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_f871a08707dbed487f7fa553c89717d6",
+        "sourceUnitDigest": "280d43e801ced7aeb5104959f8452af1aae5f2ca90c5b37c698edbcfcecbee8e",
+        "targetUnitDigest": "280d43e801ced7aeb5104959f8452af1aae5f2ca90c5b37c698edbcfcecbee8e",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_fdc876d40609ff4ba08a598298b20d08",
+        "sourceUnitDigest": "fe7b96412a8bbe310e18527da7e60892ffa4f0cd47a9fdf14d4b520b4d6f96a2",
+        "targetUnitDigest": "fe7b96412a8bbe310e18527da7e60892ffa4f0cd47a9fdf14d4b520b4d6f96a2",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_569ce419bdaa3e1d7fad4f2da1e652b2",
+        "sourceUnitDigest": "8f61f45a3a22860498899b29f2bf0eeb07569c9a31ad502bf91292748ba8411a",
+        "targetUnitDigest": "8a4633a098112bd85e3e30b3926de510983a1a6b5470193e311d1b0dea3b4348",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_54a6e4fa2bb7d2bd540ad9b2a63268d9",
+        "sourceUnitDigest": "509c09f8d9c5d789b48446cbc179231de7fa268133ade3900676a574f08732b9",
+        "targetUnitDigest": "509c09f8d9c5d789b48446cbc179231de7fa268133ade3900676a574f08732b9",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_194eabab7aeaa3830c79a7a855148034",
+        "sourceUnitDigest": "01d501eb1f1ae75195d040a9c33e8682c418f2c05d344067525f67dd74521e67",
+        "targetUnitDigest": "01d501eb1f1ae75195d040a9c33e8682c418f2c05d344067525f67dd74521e67",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_a2a657b63256927bfdad8cc99cd978f8",
+        "sourceUnitDigest": "8b5e7c62b0389dfd419b8d3e3e2c0e14badeaeb32f1af3abaa200bfc5019b1a4",
+        "targetUnitDigest": "8b5e7c62b0389dfd419b8d3e3e2c0e14badeaeb32f1af3abaa200bfc5019b1a4",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_70e8e2edaa40f70f6739adb0f53818b4",
+        "sourceUnitDigest": "3bad6f8df905ee9bbfa79324205fbc11cd21b56a1c356970c1edffc66da6e9e9",
+        "targetUnitDigest": "3bad6f8df905ee9bbfa79324205fbc11cd21b56a1c356970c1edffc66da6e9e9",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_565cb70d72f4b1a506c52e85bbb082b6",
+        "sourceUnitDigest": "6aee4cda6fa5543ab0d85ea338daa2d784e1f0d1736606c4531bbc1425a8ece1",
+        "targetUnitDigest": "6aee4cda6fa5543ab0d85ea338daa2d784e1f0d1736606c4531bbc1425a8ece1",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_91bdab441dd65393e6ec33bb51149b69",
+        "sourceUnitDigest": "c2073ac3afb840a1f4cb863f52b45bf5cd07e78d59648c98514d7ce35f0d3851",
+        "targetUnitDigest": "c2073ac3afb840a1f4cb863f52b45bf5cd07e78d59648c98514d7ce35f0d3851",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_1a0339906977f5573af4545866d9e43b",
+        "sourceUnitDigest": "55329ade338d4cc7a7821d3882f0a03a86507a60c965554267a1c548a7fa5aa6",
+        "targetUnitDigest": "55329ade338d4cc7a7821d3882f0a03a86507a60c965554267a1c548a7fa5aa6",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_36c6bf192f3f9afb7278a1dc35dcf5cc",
+        "sourceUnitDigest": "236a8445d1599c3c1542451ef41fe6c5e9a6a46f0d2d1f97671462b9b6e9aff6",
+        "targetUnitDigest": "236a8445d1599c3c1542451ef41fe6c5e9a6a46f0d2d1f97671462b9b6e9aff6",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_0a7c89cc79895b86926401a5c52139c9",
+        "sourceUnitDigest": "3e9d4aa6375656eb6da53d2a48f93c789d3f65e2ba76b742fe84a39aff8dde6d",
+        "targetUnitDigest": "3e9d4aa6375656eb6da53d2a48f93c789d3f65e2ba76b742fe84a39aff8dde6d",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_84b4604ace0a2db58f24992d07da524a",
+        "sourceUnitDigest": "fda20ea3a88124927805fa832f84a08e91ca15e620654154c14427693839ec3b",
+        "targetUnitDigest": "fda20ea3a88124927805fa832f84a08e91ca15e620654154c14427693839ec3b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_8edd5a70b6ce8533b6f038a70c67982f",
+        "sourceUnitDigest": "b3cb0726462123aa6e4ef13561a6ad5ec6a0cf099f8d3cfd13007eb2a886a508",
+        "targetUnitDigest": "b3cb0726462123aa6e4ef13561a6ad5ec6a0cf099f8d3cfd13007eb2a886a508",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_4c452af9d4fd2cbf5cf1d850746f0cb8",
+        "sourceUnitDigest": "d40d1f008afc0371c6d83fe1704cd8d0e2f73f6c960d5f961abe8fac6aa1192f",
+        "targetUnitDigest": "d40d1f008afc0371c6d83fe1704cd8d0e2f73f6c960d5f961abe8fac6aa1192f",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_f6f74edf2440be85e67f10b0b94c3e6c",
+        "sourceUnitDigest": "77aa919785f50fd937355d98bc8012d9e5315375a1608f94ac9a315c6aecd871",
+        "targetUnitDigest": "77aa919785f50fd937355d98bc8012d9e5315375a1608f94ac9a315c6aecd871",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_46b432ac7a980081ce5ab550f9255fc3",
+        "sourceUnitDigest": "4be0ec5bb2c597e320711f0bc22ad295d520b86c3fea127231150e767f8903cb",
+        "targetUnitDigest": "4be0ec5bb2c597e320711f0bc22ad295d520b86c3fea127231150e767f8903cb",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_6ff6228ef9dad03e67f850b50ce066c4",
+        "sourceUnitDigest": "ef3f75a61f26da65653effa99f98b85a4a62e97464397094f73bd956124d892c",
+        "targetUnitDigest": "ef3f75a61f26da65653effa99f98b85a4a62e97464397094f73bd956124d892c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_e97ca9a63845ad04a307585c3d1ab9b0",
+        "sourceUnitDigest": "219e04ff1e7f76c513c2326948e78ac7da7e7393b66fac04d3df089886479771",
+        "targetUnitDigest": "219e04ff1e7f76c513c2326948e78ac7da7e7393b66fac04d3df089886479771",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_f8f15f9da87f6e77341cace39cdffd01",
+        "sourceUnitDigest": "e6b3b341d3f8554716e1c13ad7c0278c8a34b5aed0d849640494c8f84d57e946",
+        "targetUnitDigest": "e6b3b341d3f8554716e1c13ad7c0278c8a34b5aed0d849640494c8f84d57e946",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_e07c67fc7548e82a45695e821af2558f",
+        "sourceUnitDigest": "7aca3755b9d4f4f1826236f51b161291ff58d7dca9d6e1dc2bf1f26a10bcc792",
+        "targetUnitDigest": "7aca3755b9d4f4f1826236f51b161291ff58d7dca9d6e1dc2bf1f26a10bcc792",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_60329d1f27688d4a78c094951d5ac119",
+        "sourceUnitDigest": "7925a22c5b9ca7992f7053732f7597773fa8efdfdb2d9a443a1ee090f772c7d0",
+        "targetUnitDigest": "06fb53a3c6d19df7acef7ce97786b4304fb88eb4797869e216cf75ba31f52d80",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_8e5a87cedeff99cfae48de4e8d8b166a",
+        "sourceUnitDigest": "21b1a5518c252574eef4a55ae3c2b68e285f3a608dc36edce540d01169291822",
+        "targetUnitDigest": "21b1a5518c252574eef4a55ae3c2b68e285f3a608dc36edce540d01169291822",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_ca1d4e99958089ae33b304dbfa42e7ed",
+        "sourceUnitDigest": "e512a70add10d9c1732227124aa07cb5a15f48def15914877e8e033a857da9f0",
+        "targetUnitDigest": "e512a70add10d9c1732227124aa07cb5a15f48def15914877e8e033a857da9f0",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_853f34cbff0d9d2b87f8b02ee06f4f39",
+        "sourceUnitDigest": "53eb117e67467159cfc251090d76b74ba765b1c838f8358732ef534aba995f2b",
+        "targetUnitDigest": "53eb117e67467159cfc251090d76b74ba765b1c838f8358732ef534aba995f2b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_4777347f1ce26d83ee5b5e73dc304ae0",
+        "sourceUnitDigest": "0428e939eea773538c0a486dfc6c8ebedbe0e50602adef9b92cf61b1b36524ce",
+        "targetUnitDigest": "0428e939eea773538c0a486dfc6c8ebedbe0e50602adef9b92cf61b1b36524ce",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_bc505ae7ed821eea7f8bd10ca4305d9e",
+        "sourceUnitDigest": "ea373321d21ced4ebd772cf7935e59faa1f24fb4b28136b4a27e29ebe2a1bf24",
+        "targetUnitDigest": "ea373321d21ced4ebd772cf7935e59faa1f24fb4b28136b4a27e29ebe2a1bf24",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_c859a74c1479db17ac092f3256da0ff9",
+        "sourceUnitDigest": "5e88aa9af5b576fbcce76c81cc4f64e5e5fcd5383fb9ed7019eb2ee5fdc254cb",
+        "targetUnitDigest": "5e88aa9af5b576fbcce76c81cc4f64e5e5fcd5383fb9ed7019eb2ee5fdc254cb",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_76ba549bdef724715f89182e5c6a857d",
+        "sourceUnitDigest": "6a8d7e629b0c2c751e982db8a8790f1a19a0ab377523ea5c903e72608c9895ac",
+        "targetUnitDigest": "6a8d7e629b0c2c751e982db8a8790f1a19a0ab377523ea5c903e72608c9895ac",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_efbc056ae6dd5e3cc8e5b2fc74999f39",
+        "sourceUnitDigest": "9dc7b4527c081f3c7f3ab0fce956e5b12456b8611380cb613451bfbbeee290de",
+        "targetUnitDigest": "9dc7b4527c081f3c7f3ab0fce956e5b12456b8611380cb613451bfbbeee290de",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_3c6f625013597dea9c2f79660f49da77",
+        "sourceUnitDigest": "b61c78b133e8ae6f417d572a809493861d033ea6f3ae32ed57493f22399b9a19",
+        "targetUnitDigest": "b61c78b133e8ae6f417d572a809493861d033ea6f3ae32ed57493f22399b9a19",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_4b4b3a7d29cd5ee1f3b3019c319793bc",
+        "sourceUnitDigest": "2a8e7c9323e9f3967ecd4fa06142b149683b7ea4bd0a716c511183dd3cab1dac",
+        "targetUnitDigest": "2a8e7c9323e9f3967ecd4fa06142b149683b7ea4bd0a716c511183dd3cab1dac",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_c5435236564c1a23dbf76d4fb953ddd7",
+        "sourceUnitDigest": "b10963559358c78dc7fb88af435e2e96823f064be55198d38d8bc09c44dd06b0",
+        "targetUnitDigest": "b10963559358c78dc7fb88af435e2e96823f064be55198d38d8bc09c44dd06b0",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_8763421acf8a60dd2abf323eec3aeb2e",
+        "sourceUnitDigest": "2bab6478ebbb8ac5605c616efaf111842490f5b357c135ecac9096ed2bf4ee2f",
+        "targetUnitDigest": "2bab6478ebbb8ac5605c616efaf111842490f5b357c135ecac9096ed2bf4ee2f",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_2cc8c6f382b404821527c58a0be5ec74",
+        "sourceUnitDigest": "7bbdea5c4cc5be5b68656424b1b84dfd092468d1c65b93735ddddc87d21bb8b9",
+        "targetUnitDigest": "7bbdea5c4cc5be5b68656424b1b84dfd092468d1c65b93735ddddc87d21bb8b9",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_6c925af4c4212fdfb244d75ff22a167f",
+        "sourceUnitDigest": "ad0b767809b6c2916e26d504553e801ae5c5b0fa110e5a3069f9447954ad35ac",
+        "targetUnitDigest": "ad0b767809b6c2916e26d504553e801ae5c5b0fa110e5a3069f9447954ad35ac",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_1792344865944c5f3ef43462565860fb",
+        "sourceUnitDigest": "a89a041102d37451d97eb3eff440384ff5bc01e2c830034fe160f826448439f0",
+        "targetUnitDigest": "a89a041102d37451d97eb3eff440384ff5bc01e2c830034fe160f826448439f0",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_4c2d6358d60ec83cdf29b227ae46d2de",
+        "sourceUnitDigest": "c1fba8ff9c97848a9b61c3e7291a66cd5d462e25bbab70d4e3fe9e699a063967",
+        "targetUnitDigest": "c1fba8ff9c97848a9b61c3e7291a66cd5d462e25bbab70d4e3fe9e699a063967",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_901dcfdf5b862a22425519660d46cc56",
+        "sourceUnitDigest": "cfe5217af8882eb3afb1a6a66f48426eca756183f4336a7525dd6088f5771399",
+        "targetUnitDigest": "cfe5217af8882eb3afb1a6a66f48426eca756183f4336a7525dd6088f5771399",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_a895e8e55881dfb157069587c5958b52",
+        "sourceUnitDigest": "4bfacfa44ba0d601ef9a958d7b087dd56ea180b1e134051dba310a57025c31bc",
+        "targetUnitDigest": "4bfacfa44ba0d601ef9a958d7b087dd56ea180b1e134051dba310a57025c31bc",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_0090dd4f812e9b7062ee66812d590b68",
+        "sourceUnitDigest": "5ef1b77dfe9688b83a1b6debdfbd326120c172b454366287d8f58d2ac6bc7835",
+        "targetUnitDigest": "5ef1b77dfe9688b83a1b6debdfbd326120c172b454366287d8f58d2ac6bc7835",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_a3b4633cea50df0a3571f34125ec8dde",
+        "sourceUnitDigest": "21c6abb7dbb9f52e7c5c3dda69d83a7536292e814bc3db0b091740be7ce8af14",
+        "targetUnitDigest": "21c6abb7dbb9f52e7c5c3dda69d83a7536292e814bc3db0b091740be7ce8af14",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_ce139617087179974c213753d4bbf900",
+        "sourceUnitDigest": "ee940e817df4ea6b36a8aef83e9aa2fe2f7aebfcc86c32f1137dd673acaa2acf",
+        "targetUnitDigest": "ee940e817df4ea6b36a8aef83e9aa2fe2f7aebfcc86c32f1137dd673acaa2acf",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_1119b2dd97f69a6989007656f3024c0e",
+        "sourceUnitDigest": "05ceed4ea474ac2fd15e0186a6f6faa0d394870ce824c7f8a84b88974375d321",
+        "targetUnitDigest": "2790415a3398e7cee880cffffbc071ce70b7586af14923879403a93316c5252b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_e51c85537b1a96fe91d616bdb4a0285f",
+        "sourceUnitDigest": "e2a02e8c8c3ff5d5c3158d08d6bf3c32aef0f5b60664e06c16851f36a9de1be5",
+        "targetUnitDigest": "16ee370d4b3f4d43bf9336e6632212edc5a20859ba926b9cc222743471172d4b",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_c7a1a6324416e9f92aee7d4113413152",
+        "sourceUnitDigest": "dfd0315d706d69359ec37166314c3fe2f4934d1e0186c8bdf0c3780bed399869",
+        "targetUnitDigest": "dfd0315d706d69359ec37166314c3fe2f4934d1e0186c8bdf0c3780bed399869",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_0a99bbe4a6d154a27752c977b871c9a9",
+        "sourceUnitDigest": "9b45938c7be10262305a1cddadb915350f982fe0181808b954dcab61f89ea5ff",
+        "targetUnitDigest": "9b45938c7be10262305a1cddadb915350f982fe0181808b954dcab61f89ea5ff",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_d7cc44a6d5d4a89e0f1e9d812214c4ec",
+        "sourceUnitDigest": "483ff23c2fb5ee1ed30ace1aa06ce631274817a62e150b44774309a9d100e2bc",
+        "targetUnitDigest": "483ff23c2fb5ee1ed30ace1aa06ce631274817a62e150b44774309a9d100e2bc",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_6eff81834e4488efa255c48232451d1a",
+        "sourceUnitDigest": "347f3774889e02abd3a83cf5abb83bcf97fbaf18127a06528eda7612cb39012c",
+        "targetUnitDigest": "347f3774889e02abd3a83cf5abb83bcf97fbaf18127a06528eda7612cb39012c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_3a0662d27a8829517966d15cf279af44",
+        "sourceUnitDigest": "130d01325ca439a9c92832cb477fc845a32ef7d393c7b2d584dcf348ff298902",
+        "targetUnitDigest": "130d01325ca439a9c92832cb477fc845a32ef7d393c7b2d584dcf348ff298902",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_a98d1362da7174ce651499049f44f2de",
+        "sourceUnitDigest": "e46992c6037eb6bec6de18d8f0b47cade6fea0eb2360b799c64662f01933aac0",
+        "targetUnitDigest": "e46992c6037eb6bec6de18d8f0b47cade6fea0eb2360b799c64662f01933aac0",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_0e8c52a99156067ebad1bda2c5d63532",
+        "sourceUnitDigest": "478b035a4311b7f2a578cbd08ac4be552e1eebae3a016bec1791a3c396059cf7",
+        "targetUnitDigest": "478b035a4311b7f2a578cbd08ac4be552e1eebae3a016bec1791a3c396059cf7",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_337ac8c09351c841eae612279299eb52",
+        "sourceUnitDigest": "5fed1d998b596d176f367ea242a30876d9b3eb2008943763347d72e1b5daf9eb",
+        "targetUnitDigest": "223371878b16c2d9f46034406f6367f06e028bf62ab898f631e939c96fa3b0cb",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_be508003873ccd504ecddda670e9bb48",
+        "sourceUnitDigest": "93785930383e67688410031e9924bb29498dd336426af5896684c4bcde5aa471",
+        "targetUnitDigest": "6c8ffa6b696bd0d9cd1f281a052d676ddb98751b0c16bf663c16ae53c67003b7",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_1be7573f879e8eda05723b6d40b3b84e",
+        "sourceUnitDigest": "12b28da343768f1576f3797fb78cc9f5e32b1875275d52d38a1b56ffd6a5d467",
+        "targetUnitDigest": "2d0fdc58ccca8953ac6055bbba12e78356832d27d4750032b8b336c46ab5566d",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_e5cc66ff5930f04b7ebd9a8acbc52942",
+        "sourceUnitDigest": "b6e2d59f4375e48f5ac79aa9807e336f672b11db5beb8b6b786512b62a782ef3",
+        "targetUnitDigest": "510e84f66628bea9a409aa79883aaa8f3c91fb99b30fd5131a1a92cca7e723fc",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_e46b8d68dd2b4c67ab8bae1fbcd74535",
+        "sourceUnitDigest": "133fa7ff547ac84fe6e1fc020fb9b7e6ff816fff5d61ea6bbc9dfdb1d77c66fa",
+        "targetUnitDigest": "b1ef870db2c5e8500f276c9e88979bfb0bad5b24a348824963509a85abe0d60c",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_98950a7eadfd0cd8b10ccf48aef0b941",
+        "sourceUnitDigest": "be66849035ddaa4900b9dbd20a1dfc005e2c032161d23e07ec182d35092f3a4c",
+        "targetUnitDigest": "36805c2eb082439d9f0d7b539dfa4bd37a9756e84a3c033b6b62bd2a898e1d85",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_465246778307f8f5ae53d1ed798114be",
+        "sourceUnitDigest": "74905aad03f2d4da0c0835483e4c8fd51193bbb34ae9acfc4cc9684ce2e04403",
+        "targetUnitDigest": "74905aad03f2d4da0c0835483e4c8fd51193bbb34ae9acfc4cc9684ce2e04403",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+        "sourceUnitDigest": "2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1",
+        "targetUnitDigest": "6a377f59e563080a1cd2129a5f3e3f5de20aee33b8731630b3b6844633df52bb",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_53d2f5742d24e980328f8cee963fb73b",
+        "sourceUnitDigest": "dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579",
+        "targetUnitDigest": "d6a38a7d39b908a31d499a0a332bac7373c5b6113358b7620b70ec1fc1d02f35",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_b1fdaf774b2e70f9dac1e7fe43e17bac",
+        "sourceUnitDigest": "44a296d1f7eff6a8d5e0561904fb335e0980d4647ec12a5ed49f3ed1aee20c34",
+        "targetUnitDigest": "86c86b37d1180a5caf1f628302143a2325199f18339a19106446529ea30ce5c4",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_ccabe79ccb3dde9101d1016c760a269c",
+        "sourceUnitDigest": "146ba296ed2bc77f3dd37ea6365aaa633c90cd9e9de15a10c77dff07d1b0eb2f",
+        "targetUnitDigest": "c81e53c7c41201d4badcfb982d2c1013939e9348b29f89fbd7208e442041839a",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_9697c9db7102570665830e80b38a5175",
+        "sourceUnitDigest": "23ad5cd5f1f0955b874d05381ac46ce4bf659e27db06930c55653b96b2abebe4",
+        "targetUnitDigest": "23ad5cd5f1f0955b874d05381ac46ce4bf659e27db06930c55653b96b2abebe4",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_999f082834f3ce465c173b61a5a0dcc3",
+        "sourceUnitDigest": "86a39793e8e5d6c3c7d89b6a7db02f7130f2f25ca816fc65b791ce32980f1e59",
+        "targetUnitDigest": "86a39793e8e5d6c3c7d89b6a7db02f7130f2f25ca816fc65b791ce32980f1e59",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+        "sourceUnitDigest": "93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d",
+        "targetUnitDigest": "c5d91d675ae60377c81843add7a80b59ad92e35d95bcaab43fa013376fdfe29e",
+        "sourceTextConserved": true
+      },
+      {
+        "claimId": "claim_0f63a4c33bd9ab4d707e6ea459868a91",
+        "sourceUnitDigest": "30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef",
+        "targetUnitDigest": "b2a132aacd33976f63ffb60602febcd806ef74b77e0ee5746b04275f374b992c",
+        "sourceTextConserved": true
+      }
+    ]
+  },
+  "applicationNativeEquality": {
+    "inventoryCommit": "ad2ca83e245bbd76c0d275cc30366457b26c8df3",
+    "knownBefore": 94494,
+    "knownCurrent": 94494,
+    "allKnownIdsRetained": true,
+    "allKnownFullTuplesUnchanged": true,
+    "activeFullTupleEquality": true,
+    "newGaps": 0,
+    "newRetired": 0,
+    "candidateList": 70,
+    "candidateFullTuplesUnchanged": true,
+    "remaining": 559,
+    "pending": 5,
+    "sourceStatuses": {
+      "blocking": 559,
+      "pending": 5,
+      "reviewed": 508
+    },
+    "registryBytes": 59529541,
+    "registrySha256": "3e0e5b8386cf29a6e546b6bb57d7ea15eb0f21607709180e8d1beb3640496d13",
+    "compactOneLine": true,
+    "nativeByteEqual": true,
+    "truthSampleAndPopulationUnchanged": true,
+    "priorHoldExceptionCandidateResidualFilesUnchanged": true,
+    "allSourceCodeCandidateProtectedTreesUnchanged": true
+  },
+  "resumeGates": [
+    {
+      "label": "D-first",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5-turn20/inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1162,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22581,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22814,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22581,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 454,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2063,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "D-second",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5-turn20/inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1162,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22581,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22812,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22581,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 454,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2063,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "E-first",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5-turn20/inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/specs/work-state.md",
+        "--scope",
+        "docs/io-contract.md",
+        "--scope",
+        "docs/doc-governance.md",
+        "--scope",
+        "docs/decisions/index.md",
+        "--scope",
+        "docs/doc-registry.json",
+        "--scope",
+        "docs/templates/architecture.md",
+        "--scope",
+        "docs/templates/area-readme.md",
+        "--scope",
+        "docs/templates/contract.md",
+        "--scope",
+        "docs/user/README.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "fatalFindings": [
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "2 registry identity-gap rows with no vocabulary disposition (e.g. docs/io-contract.md#unheaded-block-14, docs/io-contract.md#unheaded-block-15)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "70 candidate conservation units not named by a source decision (e.g. docs/platform/documentation/history/templates/architecture.md#unheaded-block-1, docs/platform/documentation/history/templates/architecture.md#source-metadata-added-in-candidate, docs/platform/documentation/history/templates/area-readme.md#unheaded-block-1, docs/platform/documentation/history/templates/area-readme.md#source-metadata-added-in-candidate, docs/platform/documentation/history/templates/contract.md#unheaded-block-1)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 2,
+          "examples": [
+            "docs/io-contract.md#unheaded-block-14",
+            "docs/io-contract.md#unheaded-block-15"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 70,
+          "examples": [
+            "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1",
+            "docs/platform/documentation/history/templates/architecture.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/templates/area-readme.md#unheaded-block-1",
+            "docs/platform/documentation/history/templates/area-readme.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/templates/contract.md#unheaded-block-1"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "E-second",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5-turn20/inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/specs/work-state.md",
+        "--scope",
+        "docs/io-contract.md",
+        "--scope",
+        "docs/doc-governance.md",
+        "--scope",
+        "docs/decisions/index.md",
+        "--scope",
+        "docs/doc-registry.json",
+        "--scope",
+        "docs/templates/architecture.md",
+        "--scope",
+        "docs/templates/area-readme.md",
+        "--scope",
+        "docs/templates/contract.md",
+        "--scope",
+        "docs/user/README.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "fatalFindings": [
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "2 registry identity-gap rows with no vocabulary disposition (e.g. docs/io-contract.md#unheaded-block-14, docs/io-contract.md#unheaded-block-15)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "70 candidate conservation units not named by a source decision (e.g. docs/platform/documentation/history/templates/architecture.md#unheaded-block-1, docs/platform/documentation/history/templates/architecture.md#source-metadata-added-in-candidate, docs/platform/documentation/history/templates/area-readme.md#unheaded-block-1, docs/platform/documentation/history/templates/area-readme.md#source-metadata-added-in-candidate, docs/platform/documentation/history/templates/contract.md#unheaded-block-1)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 2,
+          "examples": [
+            "docs/io-contract.md#unheaded-block-14",
+            "docs/io-contract.md#unheaded-block-15"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 70,
+          "examples": [
+            "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1",
+            "docs/platform/documentation/history/templates/architecture.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/templates/area-readme.md#unheaded-block-1",
+            "docs/platform/documentation/history/templates/area-readme.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/templates/contract.md#unheaded-block-1"
+          ]
+        }
+      ]
+    }
+  ],
+  "preservation": {
+    "extractorUnchanged": true,
+    "fiveFrozenFilesUnchanged": true,
+    "witnessAndPayloadTreesUnchanged": true,
+    "authorityStatusesUnchanged": true,
+    "readerLinksUnchanged": true,
+    "checks": [
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-legacy-docs-ratchet.mjs"
+        ],
+        "exit": 0,
+        "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-doc-constitution.mjs",
+          "--no-ledger",
+          "--check-placement"
+        ],
+        "exit": 0,
+        "stdout": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 529 files, 528 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-doc-candidate-status.mjs",
+          "--json"
+        ],
+        "exit": 0,
+        "stdout": "{\n  \"counts\": {\n    \"files\": 529,\n    \"byStatus\": {\n      \"promoted\": 3,\n      \"candidate\": 135,\n      \"legacy-current\": 0,\n      \"non-authority\": 1,\n      \"unrouted\": 390\n    },\n    \"exemptUnrouted\": 302,\n    \"checked\": 138,\n    \"findings\": 0,\n    \"byType\": {}\n  },\n  \"findings\": []\n}\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "allowlist": {
+    "newViolations": [],
+    "existingExactExemptions": [
+      [
+        "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+        "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+      ],
+      [
+        "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"
+      ]
+    ]
+  },
+  "tests": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs",
+    "passed": 29,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "log": "✔ review pack contains full source and target units and reverse unmatched candidate blocks (2.548441ms)\n✔ seeded review uses six real text mutations and scores missed defects and false flags (10.275696ms)\n✔ review application binds current digest and keeps rework and hold pending without inventing approval (4.255698ms)\n✔ valid source digest prefixes survive pack and review application with full seen-text bindings (2.003808ms)\n✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (0.699147ms)\n✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (2.123023ms)\n✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (1.012148ms)\n✔ the same reviewer session on another date is still the author session (0.218478ms)\n✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.299706ms)\n✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (1.761525ms)\n✔ review application requires a passing sensitivity result for the exact shown pack (1.737212ms)\n✔ approval cannot attach to target text or heading ancestry changed after the pack (1.942405ms)\n✔ approved rows retain the seen unit binding and their own report across review rounds (1.507482ms)\n✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (1.469138ms)\n✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (91.902121ms)\n✔ the public seeded Markdown can be scored without exposing the seed or private selection key (220.612277ms)\n✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (226.057711ms)\n✔ a new shard cannot claim legacy compatibility by deleting author fields (59.707462ms)\n✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (171.67339ms)\n▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session\n  ✔ target-digest (75.698861ms)\n  ✔ source-digest (77.498623ms)\n  ✔ authoredBy (73.909988ms)\n  ✔ authorSession (71.75227ms)\n  ✔ same-session (79.061273ms)\n✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (378.886361ms)\n▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof\n  ✔ checkpoint 3 (158.602464ms)\n  ✔ checkpoint 6 (155.647593ms)\n  ✔ checkpoint 10 (149.734458ms)\n✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (464.456156ms)\nℹ tests 29\nℹ suites 0\nℹ pass 29\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1674.706286\n"
+  },
+  "packs": [
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-1648-mapped-root-conservation-01.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1653-mapped-root-conservation-01.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1653-mapped-root-conservation-01.md.json",
+      "entries": 68,
+      "counts": {
+        "source-decision": 68,
+        "candidate-unverified": 0
+      },
+      "packSha256": "6d31b4ec449d65b0b6e4c15716e06abb71579b7af0c6c2d478b7a694d0d21b73",
+      "requestSha256": "0ec0aee0df69c4edb3fc86c65cd66c3d54ba70ece9e88401db466ea558420d4c"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-1649-mapped-root-conservation-02.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1653-mapped-root-conservation-02.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1653-mapped-root-conservation-02.md.json",
+      "entries": 68,
+      "counts": {
+        "source-decision": 68,
+        "candidate-unverified": 0
+      },
+      "packSha256": "3b589e830e9dc0824f6563712d2a5b34cc8a8c4c44d349172fd82f592aac6cdd",
+      "requestSha256": "38e9cf492b0d5ab927fc813d83c8596e8c4c27dfb7552d9e37efdd2cf1a1e29a"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-1649-mapped-root-conservation-03.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1653-mapped-root-conservation-03.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1653-mapped-root-conservation-03.md.json",
+      "entries": 68,
+      "counts": {
+        "source-decision": 68,
+        "candidate-unverified": 0
+      },
+      "packSha256": "20a148f764a75ea8fc14b366c560d8168a244eb1e01728e4c747539801986d5c",
+      "requestSha256": "08b7a1e9550d716373806d4b84a9cca60ef4170524f907d397f4a1db4e8e9b3d"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-1649-mapped-root-conservation-04.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1653-mapped-root-conservation-04.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1653-mapped-root-conservation-04.md.json",
+      "entries": 65,
+      "counts": {
+        "source-decision": 36,
+        "candidate-unverified": 29
+      },
+      "packSha256": "b71101825a65d206175898f79276f2c67b4da26c4d0c3638e504ef4b1911941b",
+      "requestSha256": "67634b56440e4934e09d2b57b63f5b8a523b4c6ca9b92278cca9415dffca9934"
+    }
+  ],
+  "registryBytes": 59682291,
+  "registrySHA256": "661ebcb2490195b9d5fc0d6a45bc90e4670f408ca13a2251f9d2210dcc91ec16",
+  "postRefreshLog": "generate-doc-inventory: identity registry (commit 23062c2ce9caaf6711a906673e2dc14c3f345ec3) is bound to 0c8bc44c6b67863659231450e01860abde32074f; no carry-forward needed\ngenerate-doc-inventory: wrote ../../../../tmp/fgos-work/root-step5-turn20/post-inventory.json and ../../../../tmp/fgos-work/root-step5-turn20/post-inventory.md\n",
+  "resolvedObstacle": "Data-only invalid behavior claimKind replaced with existing specification before final proof; no vocabulary/checker change. Two byte-identical empty template-heading pairs bound to shared owners under the existing duplicate rule. A duplicate scratch refresh was terminated, its output discarded, and final refresh/gates run serially at the final pin.",
+  "parkedOwnerDecision": "Existing truth report 5/30 false remains with owner, byte-identical sample/population, no new draw or correction.",
+  "technicalBlockers": [],
+  "unexplainedProofFailures": [],
+  "batchClosed": false,
+  "noPromotion": true,
+  "noPush": true,
+  "noMainMerge": true,
+  "noMainWrite": true,
+  "noStep6": true,
+  "noSecretsRead": true,
+  "helperSources": {
+    "apply.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';\nimport {loadProposalContext,parseReviewVerdicts,applyReviewVerdicts} from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/propose-doc-decisions.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',pin=execFileSync('git',['rev-parse','a5b13d6df'],{encoding:'utf8'}).trim(),readReviewer=text=>text.match(/^Reviewer:\\s*(.+)$/m)[1].trim(),read=f=>JSON.parse(fs.readFileSync(f)),ctx=loadProposalContext('/tmp/fgos-work/root-step5-turn20/inventory.json',process.cwd()),reg=read(r+'working-identity-registry.json'),known=new Map(['units','retiredUnits','identityGaps'].flatMap(k=>reg[k]).map(x=>[x.claimId,x])),applied=[];\nfor(const report of ['review-5-root-authorities-rework.md','review-5-root-authorities-templates.md']){\n const reportPath=r+report,text=execFileSync('git',['show',pin+':'+reportPath],{encoding:'utf8'});assert.equal(text,fs.readFileSync(reportPath,'utf8'));const reviewer=readReviewer(text),verdicts=parseReviewVerdicts(text,reviewer).filter(v=>v.verdict==='ok' && ['claim_e2377849e4ba8e3d3beaf70880e4ed23','claim_ee85a9e312493fde5fa5dfcf8b3eb573'].includes(v.claimId)),ids=new Set(verdicts.map(v=>v.claimId));let count=0;\n for(const path of ['ledger/decisions','pilot/decisions'].flatMap(d=>fs.readdirSync(p+d).filter(x=>x.endsWith('.json')).map(f=>p+d+'/'+f))){const j=read(path);let dirty=false;for(const kind of ['claims','registryGaps']){const rows=(j[kind]||[]).filter(x=>ids.has(x.claimId));if(!rows.length)continue;const sources=rows.map(x=>known.get(x.claimId));assert(sources.every(Boolean));const work={...j,claims:rows,registryGaps:[],authorSession:j.authorSession},context={...ctx,inventory:{...ctx.inventory,claimLedger:[...ctx.inventory.claimLedger,...sources.filter(x=>!ctx.inventory.claimLedger.some(y=>y.claimId===x.claimId))]}};\n const result=applyReviewVerdicts(context,work,{verdicts:verdicts.filter(v=>rows.some(x=>x.claimId===v.claimId)),reviewer,reportPath,ordinaryReview:true,reviewedAt:'2026-10-14'});\n for(const row of result.claims){row.reviewReportCommit=pin;assert.equal(row.reviewNote,verdicts.find(v=>v.claimId===row.claimId).note);const i=j[kind].findIndex(x=>x.claimId===row.claimId);applied.push({shardPath:path,entryKind:kind,before:j[kind][i],after:row});j[kind][i]=row;count++;}dirty=true;\n }if(dirty)fs.writeFileSync(path,JSON.stringify(j,null,2)+'\\n');}assert.equal(count,verdicts.length);\n}\nassert.equal(applied.length,2);fs.writeFileSync(r+'root-authorities-review-application-turn20.json',JSON.stringify({version:1,authorSession:'codex-session:20@2026-10-14',reviewMode:'ordinary',reviewReportCommit:pin,rows:applied,notesVerbatim:true},null,2)+'\\n');console.log('Applied exactly 2 ordinary ok notes, pinned to '+pin);\n",
+    "carriers.py": "from pathlib import Path\nimport re,subprocess,json,posixpath\npin=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()\nr=Path('plans/260925-documentation-authority-unification/reports/phase-06')\nnames=['decision','discussion','generated','intent-preservation-ledger','spec','subcomponent-readme','verification','vision']\npairs=[('docs/templates/'+n+'.md','docs/platform/documentation/history/templates/'+n+'.md','History') for n in names]+[\n('docs/coexistence.md','docs/platform/coexistence/spec.md','Spec'),\n('docs/id-systems-audit.md','docs/platform/documentation/history/id-systems-audit.md','History'),\n('docs/operator-runbook-herdr-cockpit.md','docs/platform/herdr-web-dashboard/operations/operator-runbook.md','Guide / Runbook'),\n('docs/routing-handoff-contract.md','docs/platform/runner/contracts/routing-handoff.md','Contract'),\n('docs/distribution-vision.md','docs/platform/packaging-distribution/history/distribution-vision.md','History'),\n('docs/transitional-switchboard.md','docs/platform/documentation/switchboard.md','Switchboard doc'),\n('docs/README.md','docs/platform/documentation/operations/portals/docs-portal.md','Portal')]\nchanges=[]\nfor source,target,kind in pairs:\n assert not Path(target).exists(),target\n text=Path(source).read_text();metadata=[]\n if text.startswith('---\\n'):\n  e=text.index('\\n---',4)+4;metadata.append(text[:e]);text=text[e:].lstrip('\\n')\n m=re.search(r'(?m)^```txt\\nDocument type:.*?^```\\s*\\n',text,re.S)\n if m:metadata.append(m.group(0));text=text[:m.start()]+text[m.end():]\n h=re.search(r'(?m)^# .+\\n',text);assert h,source\n header='\\n```txt\\nDocument type: '+kind+'\\nAudience: Documentation migration reviewer, maintainer, agent\\nPurpose: Preserve the mapped source as candidate material for conservation review\\nDesign status: Candidate\\nImplementation: Historical source retained; current truth not certified\\nProvenance: '+source+' at '+pin+'\\nWriter type: Agent draft writer\\nCanonical: No\\nCanonical for: None; candidate only\\nUse this when: Reviewing conservation of the mapped legacy source\\nDo not use this for: Current canonical authority or proof of implemented behavior\\nLast reviewed: 2026-10-14\\nRelated:\\n- '+source+'\\nSupersedes: None; candidate only\\nSuperseded by: None\\n```\\n'\n # Historical template tables keep every byte inside a verbatim example fence.\n if '/templates/' in source:\n  text=re.sub(r'(?m)(^\\|.*(?:\\n\\|.*)*\\n?)',lambda m:'```markdown\\n'+m.group(0).rstrip('\\n')+'\\n```\\n' if re.search(r'\\[[^\\]]*\\]\\(',m.group(0)) else m.group(0),text)\n else:\n  # Repoint relative destinations without changing their repository meaning.\n  def link(m):\n   label,dest=m.groups()\n   if dest.startswith(('#','http:','https:','mailto:','/')):return m.group(0)\n   path,sep,anchor=dest.partition('#');old=posixpath.normpath(posixpath.join(posixpath.dirname(source),path))\n   if not Path(old).exists():\n    changes.append(dict(source=source,target=target,original=m.group(0),result=label+' (`'+dest+'`)',reason='Source destination absent; preserve spelling as non-live historical/plain-path reference.'))\n    return label+' (`'+dest+'`)'\n   new=posixpath.relpath(old,posixpath.dirname(target))+('#'+anchor if sep else '')\n   if new!=dest:changes.append(dict(source=source,target=target,original=m.group(0),result='['+label+']('+new+')',reason='Relative spelling changes only; original repository destination conserved.'))\n   return '['+label+']('+new+')'\n  # Skip fenced code examples.\n  parts=re.split(r'(^```[^\\n]*\\n.*?^```[^\\n]*\\n?)',text,flags=re.M|re.S)\n  text=''.join(part if part.startswith('```') else re.sub(r'\\[([^\\]\\n]*)\\]\\(([^)\\n]+)\\)',link,part) for part in parts)\n h=re.search(r'(?m)^# .+\\n',text);text=text[:h.end()]+header+text[h.end():]\n if metadata:\n  original='\\n\\n'.join(metadata).rstrip();fence='`'*max(4,1+max([len(x) for x in re.findall('`+',original)]+[0]));text+='\\n\\n## Source Metadata (Added in candidate)\\n\\n'+fence+'text\\n'+original+'\\n'+fence+'\\n'\n Path(target).parent.mkdir(parents=True,exist_ok=True);Path(target).write_text(text)\n(r/'root-mapped-carriers-accounting-turn20.json').write_text(json.dumps(dict(version=1,authorSession='codex-session:20@2026-10-14',sourceCommit=pin,pairs=pairs,linkAdjustments=changes,truthNotCertified=True),indent=2,ensure_ascii=False)+'\\n')\nprint(len(pairs),'carriers; link changes',len(changes))\n",
+    "liveness.py": "import json,pathlib,subprocess\nr=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-06');s=pathlib.Path('/tmp/fgos-work/root-step5-turn20');a=json.loads((r/'root-mapped-carriers-accounting-turn20.json').read_text());inv=json.loads((s/'inventory.json').read_text());ledger=inv.get('claimLedger',[])\n# Native manifest may shard its ledger; load through the existing loader separately when needed.\nrows=[]\nfor source,target,kind in a['pairs']:\n z=subprocess.run(['rg','-n','-F',source,'src','bin','apps','packages','core','domains','docs','README.md','AGENTS.md','CLAUDE.md'],capture_output=True,text=True)\n refs=[]\n for line in z.stdout.splitlines():\n  path,num,text=line.split(':',2)\n  if path==source or path.startswith('docs/platform/'):continue\n  refs.append({'path':path,'line':int(num),'text':text,'liveness':'live implementation/instruction' if not path.startswith(('docs/architect/','docs/history/')) else 'design/history reference; not implementation consumer'})\n rows.append({'source':source,'target':target,'kind':kind,'references':refs,'classification':'history per frozen map; source retained and references unchanged' if kind=='History' else 'current candidate carriage; no truth certification','reason':'Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit.'})\n(r/'liveness-root-mapped-conservation-turn20.json').write_text(json.dumps({'version':1,'authorSession':'codex-session:20@2026-10-14','sourceCommit':a['sourceCommit'],'scanBeforeCommittedCarriage':True,'scan':'rg -n -F each source across src/bin/apps/packages/core/domains/docs and root readers; candidate carriers excluded','files':rows},indent=2,ensure_ascii=False)+'\\n');print('Recorded liveness',len(rows))\n",
+    "author.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import {loadProposalContext,buildReviewPack} from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/propose-doc-decisions.mjs';import {classifyExactCarry} from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s='/tmp/fgos-work/root-step5-turn20/',read=f=>JSON.parse(fs.readFileSync(f)),ctx=loadProposalContext(s+'content-inventory.json',process.cwd()),a=read(r+'root-mapped-carriers-accounting-turn20.json'),author='codex-session:20@2026-10-14',claims=[],account=[];\nconst norm=t=>t.replace(/`{3,}[^\\n]*\\n/g,'').replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g,'$1').replace(/\\s+/g,' ').trim();\nfor(const [source,target,kind]of a.pairs){const su=ctx.unitsOf(source),tu=ctx.unitsOf(target);for(const u of ctx.inventory.claimLedger.filter(x=>x.sourcePath===source)){\n const src=su.find(x=>x.anchor===u.sourceAnchor&&x.textDigest===u.sourceUnitDigest);assert(src,u.claimId);const exact=classifyExactCarry(su,tu,u);let t=exact.targetUnit;\n if(!t){const candidates=tu.filter(x=>x.text===src.text||norm(x.text)===norm(src.text));if(candidates.length===1)t=candidates[0];}\n if(!t&&src.type==='section')t=tu.find(x=>x.anchor===src.anchor);\n if(!t){const contained=tu.filter(x=>x.text.includes(src.text.trim())||norm(x.text).includes(norm(src.text)));if(contained.length===1)t=contained[0];}\n if(!t)t=tu.find(x=>x.anchor===src.anchor);\n if(!t){console.log('UNMATCHED',source,src);throw Error(u.claimId);}\n const history=kind==='History',links=a.linkAdjustments.filter(x=>x.source===source&&(src.sectionText||src.text).includes(x.original)),equal=src.textDigest===t.textDigest;\n const disposition=history?'archive-with-reason':equal?'move':'supersede';\n const rationale='Frozen root map assigns '+source+'#'+src.anchor+' to '+target+'#'+t.anchor+'. '+(history?'Retain the complete source unit as non-canonical history; the source remains active/retained until cutover. ':'Carry the complete unit into its candidate '+kind.toLowerCase()+' owner. ')+(src.anchor==='unheaded-block-1'&&tu.some(x=>x.anchor==='source-metadata-added-in-candidate')?'Original metadata is retained verbatim under Source Metadata (Added in candidate), separate from the candidate authority header. ':'')+(links.length?'This unit includes '+links.length+' documented link spelling adjustment(s): '+links.map(x=>x.original+' becomes '+x.result+' ('+x.reason+')').join('; ')+'. ':'')+(history&&source.includes('/templates/')?'Placeholder link tables are fenced verbatim as examples; every instruction and placeholder is retained. ':'')+(equal?'Native full unit digests are equal. ':'Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. ')+'No source retirement, promotion or component-boundary change.';\n const row={claimId:u.claimId,sourceUnitDigest:u.sourceUnitDigest,targetOwner:target,targetAnchor:t.anchor,targetUnitDigest:t.textDigest,targetAncestry:t.ancestry,claimKind:history?'historical-context':u.claimKind==='unclassified'?(kind==='Contract'?'contract':kind==='Portal'||kind==='Switchboard doc'?'navigation':'specification'):u.claimKind,disposition,reviewStatus:'pending',authoredBy:author,rationale};claims.push(row);account.push({claimId:u.claimId,sourcePath:source,sourceAnchor:src.anchor,sourceUnitDigest:src.textDigest,targetOwner:target,targetAnchor:t.anchor,targetUnitDigest:t.textDigest,class:exact.class,classReason:exact.reason});\n}}\nfor(const [id,ownerId]of [['claim_e8ad412db9d0a5f0df0fc2fef6b7ad0b','claim_630c884a95a84ad5eea22c035638f83e'],['claim_fd36aa6d5ecde01def3d53c0007670ca','claim_92eba2424b594a6bddea4f6ee0e2d82c']]){const row=claims.find(x=>x.claimId===id),owner=claims.find(x=>x.claimId===ownerId);assert.equal(row.sourceUnitDigest,owner.sourceUnitDigest);Object.assign(row,{targetOwner:owner.targetOwner,targetAnchor:owner.targetAnchor,targetUnitDigest:owner.targetUnitDigest,targetAncestry:owner.targetAncestry});row.rationale='The whole empty template heading is byte-identical to '+ownerId+'; one shared history owner '+owner.targetOwner+'#'+owner.targetAnchor+' conserves both units under the identical-unit rule. The full former template remains independently preserved at its mapped history path, including this empty heading. No behavioral assertion, truth certification or source retirement. Both source decisions stay pending.';const a=account.find(x=>x.claimId===id);Object.assign(a,{targetOwner:row.targetOwner,targetAnchor:row.targetAnchor,targetUnitDigest:row.targetUnitDigest,class:'Weak-exact',classReason:'Short identical empty heading; shared owner under duplicate rule, ancestry differs.'});}assert.equal(claims.length,240);const shard='s5-root-mapped-conservation.json',j={version:1,shard,authorSession:author,authorshipRequired:true,sources:a.pairs.map(x=>x[0]),claims,files:a.pairs.map(([path,target,kind])=>({path,targets:[target],disposition:kind==='History'?'archive-with-reason':'supersede',rationale:'Frozen root map whole-source candidate placement; original metadata retained; source and consumers unchanged, no truth certification.'}))};fs.writeFileSync(p+'ledger/decisions/'+shard,JSON.stringify(j,null,2)+'\\n');fs.writeFileSync(r+'root-mapped-conservation-accounting-turn20.json',JSON.stringify({version:1,contentCommit:ctx.inventory.commit,authorSession:author,allPending:true,rows:account,classCounts:account.reduce((o,x)=>(o[x.class]=(o[x.class]||0)+1,o),{})},null,2)+'\\n');const pack=buildReviewPack(ctx,j,{author});fs.writeFileSync(s+'shown.json',JSON.stringify(pack,null,2)+'\\n');console.log({rows:claims.length,classes:account.reduce((o,x)=>(o[x.class]=(o[x.class]||0)+1,o),{})});\n",
+    "native-new.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';import * as g from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs';import {classifyPath} from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-constitution.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s='/tmp/fgos-work/root-step5-turn20/',read=f=>JSON.parse(fs.readFileSync(f)),inv=g.loadInventory(s+'content-inventory.json',{}),reg=read(s+'identity-registry.json'),shards=[...g.loadDecisionShards(p+'pilot/decisions'),...g.loadDecisionShards(p+'ledger/decisions')],units=g.buildConservationUnitLookup(process.cwd(),inv.commit),tuple=x=>[x.claimId,x.sourcePath,x.sourceAnchor,x.sourceUnitDigest].join('\\0'),ct=x=>[x.claimId,x.path,x.anchor,x.unitDigest].join('\\0'),sha=x=>crypto.createHash('sha256').update(x).digest('hex'),old=JSON.parse(execFileSync('git',['show','a5b13d6df:'+r+'working-identity-registry.json'],{encoding:'utf8',maxBuffer:100e6})),known=x=>new Map(['units','identityGaps','retiredUnits'].flatMap(k=>x[k]).map(u=>[u.claimId,tuple(u)])),O=known(old),N=known(reg);\nfor(const [id,t]of O)assert.equal(N.get(id),t);assert.deepEqual(reg.identityGaps,old.identityGaps);assert.deepEqual(reg.retiredUnits,old.retiredUnits);assert.deepEqual(inv.claimLedger.map(tuple).sort(),reg.units.map(tuple).sort());const bytes=fs.readFileSync(s+'identity-registry.json');assert(bytes.length<90000000&&bytes.toString().trim().split('\\n').length===1);fs.writeFileSync(r+'working-identity-registry.json',bytes);\nconst app=g.applyDecisions(inv,shards,{vocabulary:read(p+'claim-and-disposition-vocabulary.json'),registry:reg,repoRoot:process.cwd(),unitsOf:units,targetAnchorsOf:path=>new Set(units(path).map(x=>x.anchor)),targetUnitDigestOf:(path,a)=>units(path).find(x=>x.anchor===a)?.textDigest});assert.deepEqual(app.findings,[]);\nconst prev=JSON.parse(execFileSync('git',['show','a5b13d6df:'+r+'candidate-unverified-root-authorities.json'],{encoding:'utf8',maxBuffer:20e6})),newSources=read(r+'root-mapped-carriers-accounting-turn20.json').pairs.map(x=>x[0]),scope=[...new Set([...prev.scope,...newSources])],reverse=g.unreferencedCandidateRows(app.inventory,shards,{scope,repoRoot:process.cwd()}),constitution=read(p+'minimum-constitution.json');const rows=reverse.map(x=>{const txt=execFileSync('git',['show',inv.commit+':'+x.path],{encoding:'utf8',maxBuffer:20e6}),kind=classifyPath(x.path,constitution,{header:txt}).kind,design=txt.match(/^Design status:\\s*(.+)$/m)?.[1]?.trim(),canonical=/^Canonical:\\s*(?:yes|true)\\s*$/im.test(txt),authority=inv.items.find(u=>u.path===x.path)?.authorityStatus,history=kind==='history'||x.path.includes('/history/');assert(history||(['Candidate','Draft'].includes(design)&&!canonical&&authority!=='promoted'),x.path);return {...x,fileStatus:{kind,authorityStatus:authority,designStatus:design,canonical,eligibility:history?'history':'non-promoted Candidate/Draft'},status:'candidate-unverified'};});const acceptedStatuses=new Map([...prev.rows,...read(r+'candidate-unverified-packaging-distribution.json').rows].map(x=>[ct(x),x]));for(let i=0;i<rows.length;i++){const prior=acceptedStatuses.get(ct(rows[i]));if(prior){for(const key of ['kind','authorityStatus','designStatus','canonical','eligibility'])assert.deepEqual(rows[i].fileStatus[key],prior.fileStatus[key]);rows[i]=prior;}}const oldTuples=new Set(prev.rows.map(ct));for(const t of oldTuples)assert(rows.some(x=>ct(x)===t));const delta=rows.filter(x=>!oldTuples.has(ct(x)));fs.writeFileSync(r+'candidate-unverified-root-authorities.json',JSON.stringify({version:1,batch:'root-authorities',authorization:'A28',authoredCommit:inv.commit,scope,scopeLimit:'Bounded source packs only; not final Step 5 closure.',meaning:'Native reverse-open list; candidate-unverified, no truth approval.',count:rows.length,rows},null,2)+'\\n');fs.writeFileSync(s+'candidate-delta-shown.json',JSON.stringify({previousCommit:'a5b13d6df',unchanged:prev.count,removed:[],rows:delta.map(x=>({...x,unit:units(x.path).find(u=>u.anchor===x.anchor&&u.textDigest===x.unitDigest)}))},null,2)+'\\n');\nconst mapSources=read(r+'root-authorities-remaining-source-rows.json').mapSources,sourceRows=app.inventory.claimLedger.filter(x=>mapSources.includes(x.sourcePath)),remaining=sourceRows.filter(x=>x.disposition==='unknown-blocking'),pending=sourceRows.filter(x=>x.reviewStatus!=='reviewed'&&x.disposition!=='unknown-blocking'),byStatus=sourceRows.reduce((o,x)=>(o[x.reviewStatus]=(o[x.reviewStatus]||0)+1,o),{}),byDisposition=sourceRows.reduce((o,x)=>(o[x.disposition]=(o[x.disposition]||0)+1,o),{});fs.writeFileSync(r+'root-authorities-remaining-source-rows.json',JSON.stringify({version:1,inventoryCommit:inv.commit,mapSources,total:sourceRows.length,byStatus,byDisposition,remainingUndecided:remaining.length,pendingConservationReview:pending.length,rows:remaining.map(x=>({claimId:x.claimId,path:x.sourcePath,anchor:x.sourceAnchor,unitDigest:x.sourceUnitDigest})),AGENTSAndCLAUDE:'Deferred to Step 10, excluded.'},null,2)+'\\n');\nconst immutable=['root-authorities-truth-sample.json','root-authorities-truth-population.json','review-5-root-authorities-truth.md','candidate-unverified-agent-coordination.json','candidate-unverified-host-invocation-routing.json','candidate-unverified-packaging-distribution.json','holds.md','identical-unit-exceptions.md','identical-unit-exceptions.json','identical-unit-exceptions-packaging-distribution.json','host-invocation-partial-carry-residual.json','packaging-partial-carry-residual.json','packaging-partial-carry-acceptance.json','packaging-f6-host-partial-carry-residual.json','packaging-f6-host-partial-carry-binding.json'];for(const f of immutable)assert.equal(fs.readFileSync(r+f,'utf8'),execFileSync('git',['show','a5b13d6df:'+r+f],{encoding:'utf8',maxBuffer:20e6}));const proof={inventoryCommit:inv.commit,knownBefore:O.size,knownCurrent:N.size,allKnownIdsAndFullTuplesRetained:true,activeFullTupleEquality:true,newGaps:0,newRetired:0,candidateList:rows.length,candidateDelta:delta.length,oldTuplesUnchanged:prev.count,remaining:remaining.length,pending:pending.length,sourceStatuses:byStatus,registryBytes:bytes.length,registrySha256:sha(bytes),compactOneLine:true,nativeByteEqual:true,immutableFiles:immutable};fs.writeFileSync(s+'native-new-proof.json',JSON.stringify(proof,null,2)+'\\n');console.log(proof);\n",
+    "gates-new.py": "import json,pathlib,subprocess,sys\ns=pathlib.Path('/tmp/fgos-work/root-step5-turn20');p='plans/260925-documentation-authority-unification';stage=sys.argv[1];inv=sys.argv[2] if len(sys.argv)>2 else str(s/'inventory.json');scopes=['docs/specs/work-state.md','docs/io-contract.md','docs/doc-governance.md','docs/decisions/index.md','docs/doc-registry.json','docs/templates/architecture.md','docs/templates/area-readme.md','docs/templates/contract.md','docs/user/README.md'];scopes+=json.loads(pathlib.Path(p+'/reports/phase-06/root-mapped-carriers-accounting-turn20.json').read_text())['pairs'] and [x[0] for x in json.loads(pathlib.Path(p+'/reports/phase-06/root-mapped-carriers-accounting-turn20.json').read_text())['pairs']];results=[]\nfor strict in [False,True]:\n for label,prior in [('first','reports/identity-registry.json'),('second','reports/phase-02-identity-registry.json')]:\n  label=('E' if strict else 'D')+'-'+label\n  cmd=['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-doc-inventory-gates.mjs','--inventory',inv,'--identity-registry',p+'/reports/phase-06/working-identity-registry.json','--decisions',p+'/pilot/decisions','--decisions',p+'/ledger/decisions','--previous-registry',p+'/'+prior,'--json']\n  if strict:\n   cmd+=['--strict']\n   for scope in scopes:cmd+=['--scope',scope]\n  out=s/(stage+'-'+label+'.json')\n  with out.open('w') as f:z=subprocess.run(cmd,stdout=f,stderr=subprocess.PIPE,text=True)\n  d=json.loads(out.read_text());record={'label':label,'command':cmd,'exit':z.returncode,'stderr':z.stderr,'fatalFindings':d['fatalFindings'],'conservationOpen':d['conservationOpen']};results.append(record);(s/(stage+'-gates.json')).write_text(json.dumps(results,indent=2)+'\\n');print(stage,label,z.returncode,'fatal',len(d['fatalFindings']),[(x['type'],x['count']) for x in d['conservationOpen']],flush=True)\n  if not strict:assert z.returncode==0 and not d['fatalFindings'],d['fatalFindings'][:10]\n",
+    "preserve.py": "import json,pathlib,subprocess,hashlib,re\np=pathlib.Path('plans/260925-documentation-authority-unification');r=p/'reports/phase-06';s=pathlib.Path('/tmp/fgos-work/root-step5-turn20');git=lambda *args:subprocess.check_output(['git',*args],text=True).strip()\nexpected={line.split()[0]:line.split()[1] for line in (r/'extractor-blobs.txt').read_text().splitlines()};assert all(git('rev-parse','HEAD:'+f)==v for f,v in expected.items())\nfor f in ['AGENTS.md','CLAUDE.md','docs/specs/reading-map.md','docs/reading-map.md','docs/platform-foundations.md']:\n assert pathlib.Path(f).read_bytes()==subprocess.check_output(['git','show','5a1b26a02:'+f])\nassert git('ls-tree','-r','HEAD','--','docs/architect/agent-coordination/verification')==git('ls-tree','-r','5a1b26a02','--','docs/architect/agent-coordination/verification')\nassert git('ls-tree','-r','HEAD','--','docs/platform/agent-coordination/verification')==git('ls-tree','-r','5a1b26a02','--','docs/platform/agent-coordination/verification')\na=json.loads(subprocess.check_output(['git','show','48e3a992b:'+str(p/'transitional-switchboard.json')],text=True));b=json.load(open(p/'transitional-switchboard.json'));assert [(u['area'],u['authorityStatus']) for u in a['areas']]==[(u['area'],u['authorityStatus']) for u in b['areas']]\nlinks=set()\nfor f in ['AGENTS.md','CLAUDE.md','README.md','docs/README.md','docs/reading-map.md','docs/specs/reading-map.md']:links.update(re.findall(r'docs/platform/[^ )`|>\"\\n]*',pathlib.Path(f).read_text()))\nassert sorted(links)==sorted((r/'reader-links-baseline.txt').read_text().splitlines())\nresults=[]\nfor cmd in [['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-legacy-docs-ratchet.mjs'],['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-doc-constitution.mjs','--no-ledger','--check-placement'],['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-doc-candidate-status.mjs','--json']]:\n z=subprocess.run(cmd,capture_output=True,text=True);results.append(dict(command=cmd,exit=z.returncode,stdout=z.stdout,stderr=z.stderr));assert z.returncode==0,(cmd,z.stdout,z.stderr)\nassert json.loads(results[-1]['stdout'])['findings']==[]\n(s/'preservation.json').write_text(json.dumps(dict(extractorUnchanged=True,fiveFrozenFilesUnchanged=True,witnessAndPayloadTreesUnchanged=True,authorityStatusesUnchanged=True,readerLinksUnchanged=True,checks=results),indent=2)+'\\n');print('Preservation passes')\n",
+    "allowlist.py": "import subprocess,json,pathlib\nr=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-06');s=pathlib.Path('/tmp/fgos-work/root-step5-turn20');old=json.loads(pathlib.Path('/tmp/fgos-work/root-step5-turn19/allowlist.json').read_text());exceptions={tuple(x) for x in old['existingExactExemptions']};allowed=json.loads((r/'allowed-paths.json').read_text());raw=subprocess.check_output(['git','log','--first-parent','--no-merges','--format=COMMIT %H','--name-only','dbe5c432852837ea01e6025b35868bcb7271495d..HEAD'],text=True);commit=None;violations=[];used=[]\nfor line in raw.splitlines():\n if line.startswith('COMMIT '):commit=line[7:]\n elif line.strip() and not any(line==x or line.startswith(x) for x in allowed):\n  pair=(commit,line)\n  if pair in exceptions:used.append(pair)\n  else:violations.append(pair)\nassert not violations,violations;(s/'allowlist.json').write_text(json.dumps(dict(newViolations=violations,existingExactExemptions=used),indent=2)+'\\n');print('A passes with existing exact exemptions:',len(used))\n",
+    "packs.py": "import json,pathlib,re,hashlib,difflib,math\ns=pathlib.Path('/tmp/fgos-work/root-step5-turn20');r=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-06')\nread=lambda p:json.loads(p.read_text());sha=lambda t:hashlib.sha256(t.encode() if isinstance(t,str) else t).hexdigest()\ndef fence(t,lang='text'):\n n=max(4,1+max([len(x) for x in re.findall('`+',t)]+[0]));return '`'*n+lang+'\\n'+t.rstrip('\\n')+'\\n'+'`'*n+'\\n'\ndef shown(u):return u.get('sectionText') or u['text']\ndef name(p):t=p.read_text();return json.loads(t[t.index('{'):])['data']['name']\nbase=read(s/'shown.json');delta=read(s/'candidate-delta-shown.json');prior=read(r/'candidate-unverified-packaging-distribution.json');ct=lambda x:(x['claimId'],x['path'],x['anchor'],x['unitDigest']);accepted=set(map(ct,prior['rows']));reused=[x for x in delta['rows'] if ct(x) in accepted];delta['rows']=[x for x in delta['rows'] if ct(x) not in accepted];assert len(reused)==693\nentries=[dict(entryKind='source-decision',row=x) for x in base['rows']]+[dict(entryKind='candidate-unverified',row=x) for x in delta['rows']];assert len(entries)<=320\n# Exactly four bounded packs, including every reverse-list addition.\nchunk=math.ceil(len(entries)/4);assert chunk<=80;published=[]\nfor i in range(4):\n group=entries[i*chunk:(i+1)*chunk];num=f'{i+1:02}';request=name(s/('convention-'+num+'.json'));pack=name(s/('convention-pack-'+num+'.json'))\n text='# Mapped root conservation: bounded full-text pack '+num+'\\n\\nAuthor session: codex-session:20@2026-10-14\\nContent commit: '+base['commit']+'\\n\\n'\n for e in group:\n  x=e['row'];text+='## '+e['entryKind']+' '+x['claimId']+'\\n\\n'\n  if e['entryKind']=='source-decision':\n   u=x['source'];t=x['target'];st=shown(u);tt=shown(t);text+='Decision:\\n\\n'+fence(json.dumps(x['decision'],ensure_ascii=False,indent=2),'json')+'\\nSource: `'+u['path']+'#'+u['anchor']+'`\\nSource unit SHA256: `'+u['textDigest']+'`\\nShown source SHA256: `'+sha(st)+'`\\n\\n'+fence(st)+'\\nTarget: `'+t['path']+'#'+t['anchor']+'`\\nTarget unit SHA256: `'+t['textDigest']+'`\\nShown target SHA256: `'+sha(tt)+'`\\n\\n'+fence(tt)+'\\n'+fence(''.join(difflib.unified_diff(st.splitlines(True),tt.splitlines(True),fromfile=u['path'],tofile=t['path'],n=0)),'diff')\n   assert len(u['textDigest'])==len(t['textDigest'])==64\n  else:\n   u=x['unit'];assert u and len(x['unitDigest'])==64;text+=fence(json.dumps({k:v for k,v in x.items() if k!='unit'},ensure_ascii=False,indent=2),'json')+'\\nShown SHA256: `'+sha(shown(u))+'`\\n\\n'+fence(shown(u))\n (r/pack).write_text(text);side=dict(version=1,authorSession='codex-session:20@2026-10-14',contentCommit=base['commit'],packSha256=sha(text),entries=group);(r/(pack+'.json')).write_text(json.dumps(side,ensure_ascii=False,indent=2)+'\\n')\n counts={k:sum(e['entryKind']==k for e in group) for k in ['source-decision','candidate-unverified']}\n requestText='# Independent review request: mapped root conservation '+num+'\\n\\nAuthor session: codex-session:20@2026-10-14\\nContent commit: '+base['commit']+'\\nReview mode: ordinary\\nState: ready-for-review; Step 5 remains open\\n\\nReview exactly '+str(len(group))+' entries: '+str(counts['source-decision'])+' pending source decisions and '+str(counts['candidate-unverified'])+' new candidate-unverified units. Full shown source/target text, full 64-hex native and shown digests, decisions and unified diffs with zero context (full source/target text above supplies all context): ['+pack+']('+pack+'). Pack SHA256: `'+sha(text)+'`; bound sidecar: `'+pack+'.json`. This pack submits only its enumerated entries, not a new truth sample or prior unchanged approvals.\\n\\nAll 240 source rows in the four packs are pending (104 Unit-exact controls, 83 Weak-exact, 53 Judgment), with authoredBy codex-session:20@2026-10-14. No script/self approval. Review every row for whole-unit conservation and target ownership. Source groups: eight remaining templates 100; coexistence 25; id-systems audit 32; operator runbook 18; routing handoff 19; distribution vision 22; switchboard 13; docs portal 11. Frozen root map and Q5/N1 control placement. Templates, audit and distribution vision are history; original authoring headers/frontmatter are retained as Source Metadata (Added in candidate); existing legacy-status blocks remain verbatim in the body. Template placeholder tables are fenced verbatim. Other link spellings retain the original repository destinations; all 25 adjusted links retain their original repository destinations, with accounting and per-row rationale. Source text and consumers are unchanged. No component-boundary change. Liveness: liveness-root-mapped-conservation-turn20.json.\\n\\nThe expanded candidate-unverified-root-authorities.json covers its 24 exact source scopes. Its '+str(delta['unchanged'])+' old tuples are unchanged and '+str(len(delta['rows']))+' new additions are shown across these packs; another 693 list additions exactly reuse the unchanged committed candidate-unverified-packaging-distribution.json full tuples at a5b13d6df. They are scope accounting, not new review or truth rows; root-mapped-candidate-rescope-accounting-turn20.json records full-row/status equality and the original independent report. Verify full identity/path/anchor/digest/status tuple equality against both native strict E outputs and eligibility under A28. No truth approval. Prior Agent/Host/Packaging lists, holds, exceptions and A34 residual bindings remain byte-identical.\\n\\nProof: both-prior D must have zero fatal; scoped strict E stays red for the submitted pending source rows, three existing historical gaps (two IO and one source-switchboard gap newly included by scope; no native gap created; root-mapped-existing-gap-accounting-turn20.json) and the reverse list. Native known-ID/full-tuple conservation and compact persisted registry equality are recorded in root-conservation-turn20-verification.json. Registry remains below 90 MB. The two corrected ordinary verdicts are pinned to a5b13d6df, exact notes with original provenance 18962827a; no source row is re-reviewed for those format corrections.\\n\\nUse the committed ordinary report contract: Reviewer and Author session headers; five columns Claim | Verdict | Note | Source digest | Target digest, full 64-hex native digest cells. Recompute the required independent 10% sample with a recorded seed; no seeded/checkpoint pack is requested. Commit verdicts before application. The existing truth report (5/30 false), sample and population are untouched and remain with the owner. No promotion, push, main merge/write, Step 6 or protected gate/checker/extractor/vocabulary/baseline change.\\n'\n (r/request).write_text(requestText);published.append(dict(request=str(r/request),pack=str(r/pack),sidecar=str(r/(pack+'.json')),entries=len(group),counts=counts,packSha256=sha(text),requestSha256=sha(requestText)))\n(s/'pack-paths.json').write_text(json.dumps(published,indent=2)+'\\n');print([(x['entries'],x['counts']) for x in published])\n",
+    "verify.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';import {loadInventory} from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s='/tmp/fgos-work/root-step5-turn20/',read=f=>JSON.parse(fs.readFileSync(f)),sha=x=>crypto.createHash('sha256').update(x).digest('hex'),ct=x=>[x.claimId,x.path,x.anchor,x.unitDigest].join('\\0'),D=['first','second'].map(x=>read(s+'post-D-'+x+'.json')),E=['first','second'].map(x=>read(s+'post-E-'+x+'.json')),list=read(r+'candidate-unverified-root-authorities.json'),native=read(s+'native-new-proof.json'),paths=read(s+'pack-paths.json');\nassert.deepEqual(D[0],D[1]);assert.deepEqual(E[0],E[1]);for(const d of D)assert.deepEqual(d.fatalFindings,[]);for(const e of E){assert.deepEqual(e.explicitOpenFindings.unreferencedCandidateRows.map(ct).sort(),list.rows.map(ct).sort());assert.deepEqual(Object.fromEntries(e.conservationOpen.map(x=>[x.type,x.count])),{'claims-not-reviewed':240,'registry-gaps-without-disposition':3,'candidate-blocks-unreferenced':list.count});}\nconst priorAccepted=new Set(['agent-coordination','host-invocation-routing','packaging-distribution'].flatMap(area=>read(r+'candidate-unverified-'+area+'.json').rows.map(ct))),original=new Set(read(s+'candidate-delta-shown.json').rows.map(ct).filter(x=>!priorAccepted.has(x)));for(const area of ['agent-coordination','host-invocation-routing','packaging-distribution']){const prior=read(r+'candidate-unverified-'+area+'.json');for(const d of D){const current=d.explicitOpenFindings.unreferencedCandidateRows.filter(x=>x.path.startsWith('docs/platform/'+area+'/'));assert.deepEqual(current.filter(x=>!original.has(ct(x))).map(ct).sort(),prior.rows.map(ct).sort());}}\nconst app=read(r+'root-authorities-review-application-turn20.json');assert.equal(app.rows.length,2);for(const x of app.rows){const row=read(x.shardPath)[x.entryKind].find(u=>u.claimId===x.after.claimId);assert.deepEqual(row,x.after);assert.equal(row.reviewReportCommit,'a5b13d6dfdad6400b8230f22a6e0f19060df5e41');const report=execFileSync('git',['show',row.reviewReportCommit+':'+row.reviewReport],{encoding:'utf8'}),line=report.split('\\n').find(u=>u.startsWith('| '+row.claimId+' |')),cells=line.trim().split(/(?<!\\\\)\\|/).slice(1,-1).map(u=>u.trim().replace(/\\\\\\|/g,'|'));assert.equal(cells.length,5);assert.equal(cells[2],row.reviewNote);assert(/^[a-f0-9]{64}$/.test(cells[3]));}\nlet sourceCount=0,candidateCount=0;for(const x of paths){assert(x.entries<=80);assert.equal(sha(fs.readFileSync(x.pack)),x.packSha256);assert.equal(sha(fs.readFileSync(x.request)),x.requestSha256);const side=read(x.sidecar);assert.equal(side.packSha256,x.packSha256);assert.equal(side.entries.length,x.entries);for(const e of side.entries){if(e.entryKind==='source-decision'){sourceCount++;assert.equal(e.row.decision.reviewStatus,'pending');assert.equal(e.row.source.textDigest.length,64);assert.equal(e.row.target.textDigest.length,64);}else candidateCount++;}}\nassert.equal(sourceCount,240);assert.equal(candidateCount,list.count-70-693);const previousRoot=JSON.parse(execFileSync('git',['show','a5b13d6df:'+r+'candidate-unverified-root-authorities.json'],{encoding:'utf8'}));for(const old of [...previousRoot.rows,...read(r+'candidate-unverified-packaging-distribution.json').rows])assert.deepEqual(list.rows.find(x=>ct(x)===ct(old)),old);const actualInv=loadInventory(s+'post-inventory.json',{}),actualReg=read(r+'working-identity-registry.json'),tuple=x=>[x.claimId,x.sourcePath,x.sourceAnchor,x.sourceUnitDigest].join('\\0');assert.deepEqual(actualInv.claimLedger.map(tuple).sort(),actualReg.units.map(tuple).sort());const bytes=fs.readFileSync(r+'working-identity-registry.json');assert(bytes.equals(fs.readFileSync(s+'identity-registry.json')));assert(bytes.length<90000000&&bytes.toString().trim().split('\\n').length===1);const tests=fs.readFileSync(s+'tests.log','utf8');assert(/pass 29/.test(tests)&&/fail 0/.test(tests));const v={version:1,authorSession:'codex-session:20@2026-10-14',state:'ready-for-review',contentCommit:native.inventoryCommit,proofInventory:JSON.parse(fs.readFileSync(s+'post-inventory.json')).commit,B0:'dbe5c432852837ea01e6025b35868bcb7271495d',SYNC:'48e3a992be1cd74a0960df953af16b5dae4275e4',reviewApplication:{rows:2,notesVerbatim:true,reportCommit:app.reviewReportCommit,originalProvenance:app.originalProvenanceCommit},newSourceRows:240,sourceClasses:read(r+'root-mapped-conservation-accounting-turn20.json').classCounts,sourceRowsRemaining:319,sourceRowsPending:245,nativeEquality:native,candidateListFullTupleEqualityBothPriors:true,priorThreeListsUnchanged:true,newRootUnitsInPriorAreaScopesDisclosed:true,strictEOpen:E[0].conservationOpen,gates:read(s+'post-gates.json'),directUnitPreservation:read(r+'root-mapped-direct-unit-preservation-turn20.json'),applicationNativeEquality:read(s+'native-proof.json'),resumeGates:read(s+'resume-gates.json'),preservation:read(s+'preservation.json'),allowlist:read(s+'allowlist.json'),tests:{command:'env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs',passed:29,failed:0,cancelled:0,skipped:0,todo:0,log:tests},packs:paths,registryBytes:bytes.length,registrySHA256:sha(bytes),postRefreshLog:fs.readFileSync(s+'post-refresh.log','utf8'),resolvedObstacle:'Data-only invalid behavior claimKind replaced with existing specification before final proof; no vocabulary/checker change. Two byte-identical empty template-heading pairs bound to shared owners under the existing duplicate rule. A duplicate scratch refresh was terminated, its output discarded, and final refresh/gates run serially at the final pin.',parkedOwnerDecision:'Existing truth report 5/30 false remains with owner, byte-identical sample/population, no new draw or correction.',technicalBlockers:[],unexplainedProofFailures:[],batchClosed:false,noPromotion:true,noPush:true,noMainMerge:true,noMainWrite:true,noStep6:true,noSecretsRead:true,helperSources:Object.fromEntries(['apply.mjs','carriers.py','liveness.py','author.mjs','native-new.mjs','gates-new.py','preserve.py','allowlist.py','packs.py','verify.mjs'].map(f=>[f,fs.readFileSync(s+f,'utf8')]))};fs.writeFileSync(r+'root-conservation-turn20-verification.json',JSON.stringify(v,null,2)+'\\n');console.log({sourceCount,candidateCount,D:'zero fatal',E:'expected red',registryBytes:bytes.length,remaining:319});\n"
+  }
+}
