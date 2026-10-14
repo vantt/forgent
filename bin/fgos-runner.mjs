@@ -8,7 +8,7 @@
 // falling back to a poll every `--poll-ms`, default 5000) and exiting only
 // on an explicit SIGINT/SIGTERM.
 //
-//   fgos-runner [--once] [--watch] [--poll-ms <ms>] [--dry-run] [--config <path>]
+//   fgos-runner [--once] [--watch] [--poll-ms <ms>] [--dry-run]
 //
 // Exit codes (R4): The canonical exit-code table lives in src/state/store.mjs's
 // EXIT_CODES export (codes 2-5, 7-9; 0=ok, 1=unexpected) plus src/runner/loop.mjs's
@@ -21,12 +21,12 @@
 // a committed path.
 
 import { EXIT_CODES, categoryOf } from '../src/state/store.mjs';
-import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
+import { ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { resolveRepoRoot, runOnce, runWatch } from '../src/runner/loop.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 
 function parseArgs(args) {
-  const flags = { once: false, watch: false, pollMs: undefined, dryRun: false, config: undefined };
+  const flags = { once: false, watch: false, pollMs: undefined, dryRun: false };
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === '--once') {
@@ -45,12 +45,9 @@ function parseArgs(args) {
       i += 1;
     } else if (arg === '--dry-run') {
       flags.dryRun = true;
-    } else if (arg === '--config') {
-      flags.config = args[i + 1];
-      i += 1;
     } else {
       const err = new Error(
-        `unknown flag "${arg}". Usage: fgos-runner [--once] [--watch] [--poll-ms <ms>] [--dry-run] [--config <path>]`,
+        `unknown flag "${arg}". Usage: fgos-runner [--once] [--watch] [--poll-ms <ms>] [--dry-run]`,
       );
       err.category = 'validation';
       throw err;
@@ -96,12 +93,10 @@ async function main() {
   try {
     const flags = parseArgs(process.argv.slice(2));
     const repoRoot = resolveRepoRoot(process.cwd());
-    // An explicit --config path stays a loud, unmodified failure on ENOENT
-    // (loadRunnerConfig); only the default, unflagged path bootstraps a
-    // missing config (D1/D3, ensureRunnerConfigForDir — tsk-5vf D1/D2).
-    const config = flags.config
-      ? loadRunnerConfig(flags.config)
-      : ensureRunnerConfigForDir(repoRoot);
+    // The repo's own `.fgos/config.json` is the one runner config: every
+    // worker runs as a Unit run, which binds from it too. A missing config is
+    // bootstrapped (D1/D3, ensureRunnerConfigForDir — tsk-5vf D1/D2).
+    const config = ensureRunnerConfigForDir(repoRoot);
 
     if (flags.watch) {
       // Persistent mode (D8): the ONLY termination trigger is an explicit
