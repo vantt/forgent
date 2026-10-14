@@ -776,3 +776,15 @@ test('bind persona: a locked persona that disagrees with the unit persona refuse
   const agreed = bind(preferAsk({ persona: 'locked-voice' }, { lockedPersona: 'locked-voice' }), { runnerConfig, session: {} });
   assert.equal(agreed.persona, 'locked-voice');
 });
+
+test('bind prefer: a bare unit executor id covers every capability entry of that executor, so failover never returns to it', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
+  const ask = preferAsk({ prefer: ['codex'], writes: ['src/a.js'] });
+  const walked = [];
+  let bound = bind(ask, ctx);
+  while (!bound.refused) {
+    walked.push(bound.executor);
+    bound = nextCandidate(bound, ask, ctx);
+  }
+  assert.deepEqual(walked, ['codex', 'claude', 'gemini-cli']);
+});

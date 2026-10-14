@@ -160,14 +160,17 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
   } else {
     // The unit's own `prefer` is soft: its candidates go ahead of the capability's pool, a
     // capability candidate it already names is not listed twice, and every filter below applies
-    // to both alike. A unit without one binds exactly as before.
+    // to both alike. A bare executor id names the executor whatever invocation it runs, so it
+    // covers every capability entry of that executor: a failover never walks back onto it.
+    // A unit without one binds exactly as before.
     const seen = new Set();
     const keyOf = (cand) => `${cand.executor}\u0000${cand.invocation ?? ''}`;
     const unitCandidates = normalizeCandidates(unit?.prefer)
       .filter((cand) => !seen.has(keyOf(cand)) && seen.add(keyOf(cand)))
       .map((cand) => ({ ...cand, source: 'unit-prefer' }));
+    const bareExecutors = new Set(unitCandidates.filter((cand) => !cand.invocation).map((cand) => cand.executor));
     const capabilityCandidates = (capConfig?.prefer ? normalizeCandidates(capConfig.prefer) : [])
-      .filter((cand) => !seen.has(keyOf(cand)))
+      .filter((cand) => !seen.has(keyOf(cand)) && !bareExecutors.has(cand.executor))
       .map((cand) => ({ ...cand, source: `capability:${capKey}` }));
     candidatePool = [...unitCandidates, ...capabilityCandidates];
   }
