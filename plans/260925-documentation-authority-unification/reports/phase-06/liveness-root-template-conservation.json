@@ -1,0 +1,574 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:18@2026-10-14",
+  "sections": [
+    {
+      "claimId": "claim_819d8dab402882018e804a2a71dae60a",
+      "path": "docs/templates/architecture.md",
+      "anchor": "section",
+      "unitDigest": "8b357c9e9e9789a236fec29d7661c0b0457d431af78ee5dd07e04684b7a47809",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_ef61d8b48131b82fc49b1f8ea511b5f4",
+      "path": "docs/templates/architecture.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "119728c70b0ab6245aac2bd845b97832ec7bfc37fb72e85940ff0f6b06006941",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_b772f7252cb798e58c22b762f69ec2a6",
+      "path": "docs/templates/architecture.md",
+      "anchor": "1-problem-and-forces",
+      "unitDigest": "6d01cb1e0916f512a2f1875072b76b0c78929132c7c4d95ab4140c332d780bcd",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_ccd34bf56e65689d026d4c1f04e48368",
+      "path": "docs/templates/architecture.md",
+      "anchor": "2-chosen-shape",
+      "unitDigest": "9753cb16cecb3f1d9f1a67c230bbabce5ae0bf2e5a81f4a146506eaae38d6ea6",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_69aa83ccbd39391b1c0b3e0de583ef5e",
+      "path": "docs/templates/architecture.md",
+      "anchor": "3-boundaries-and-responsibilities",
+      "unitDigest": "f321c6fcf79c508a2ca820fafabf0972577a487bf64b0ec257941d6ddce8bb42",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_c58bd1fe8db77a8a72a9cc8d4b6b6c99",
+      "path": "docs/templates/architecture.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "2ce9c7e83030a00d7be3e6ad1f94f05b71ca923876d8c15f5cffdf89bef2aa95",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_4690e1c5f0e671dc7b0aa542edb9261c",
+      "path": "docs/templates/architecture.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "553beda916c35195b2201bd481db35dccdce57161e9f5a3eb4164f5012e3f077",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_e0c528593e9859339fc58cb227794cd2",
+      "path": "docs/templates/architecture.md",
+      "anchor": "4-alternatives-considered",
+      "unitDigest": "44031f5d971a33d4ea2a7be4cdcebd110004ddafc57706b7e5269e1f5421d28e",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_35b9afbf88ed4fbfcb94a7f2f6dbacfa",
+      "path": "docs/templates/architecture.md",
+      "anchor": "5-trade-offs",
+      "unitDigest": "46841ff90862ee7bc2892d5298397e3120d75d06a213bde7c135a1a42493ce5f",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_d5fb924e4631760e1d89400d4839bb92",
+      "path": "docs/templates/architecture.md",
+      "anchor": "6-decision-surface",
+      "unitDigest": "cc513d6fbe454c73bbc0361ffccb54bd7dd069f4e938455eee45f4c2cd8b23a3",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_f8493f2f277d9616569b9db1f439048e",
+      "path": "docs/templates/architecture.md",
+      "anchor": "7-consequences",
+      "unitDigest": "3326183f51f23ef19206b717be46fa923a3b416ce25bdf6813e114ed5b2f7d9d",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_a8f8be0a3b246a7e19c816564b248e53",
+      "path": "docs/templates/architecture.md",
+      "anchor": "8-contracts-affected",
+      "unitDigest": "94cc3825f1d95333a4dfd3b112fb8e451b13223a3c43f4b699b8179876653aa2",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_c147afe1777e89235d7adf0542ac0d6e",
+      "path": "docs/templates/architecture.md",
+      "anchor": "9-implementation-alignment",
+      "unitDigest": "069c8cc507cbb2354e434c049d318152de3b29dd358451765a7788a53d00288f",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_04e18a9b29442519335fd1ed060c6cd0",
+      "path": "docs/templates/architecture.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "427510a97d8b5f2e6e55fea59a9345fd261d8da13c06d4224217a6a9b21478f1",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_c9a9230b1a5be02d061f6663327e7e46",
+      "path": "docs/templates/architecture.md",
+      "anchor": "10-verification-expectations",
+      "unitDigest": "bf7bd6fa98d49facb60d30e16f1a82d1cc4034b9237f8aed7aacc6b5c52900de",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_bdf818f750a64ccae056c9149279d22d",
+      "path": "docs/templates/architecture.md",
+      "anchor": "11-related-files",
+      "unitDigest": "3d2d10016aada1eb217632d776ea2587b6b0c65c6ccf502b41d692df397df9b5",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_fbc916a829ad90b0fe2b8f54ec745aa5",
+      "path": "docs/templates/architecture.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "5b4fa4bbeb2619d28842d732cc1cd4e1fb1bb476ad9243b21485b3d42e118315",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_4281249fd3851022664c50482513754f",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "section",
+      "unitDigest": "cc6da11fd15204fb2fcc9c89d0e47582ebc904665100302e2bb524c04797d963",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_bc4c8e10464b5200023267b95c0a87c9",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "97c772ea8ac477c5a9aa90e9dedfaed6883316a2ac07ca4bc7e39a242d5e60c2",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_fa97f5b14af242c342675ea7ffb8e393",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "1-what-this-area-owns",
+      "unitDigest": "e05c16ca6a677a8dfe28be626f7c15ccb6ff348ff152c3db03fcfdc40f65f71b",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_96bf7233e618d91bf7289cc535125790",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "2-current-shape",
+      "unitDigest": "2fa9c07bd19a25e628590fe57c21a52d6d1f182cb8d95454f1134f68b0b79dc5",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_f7a065b3aad21e3f3d66625c0d4a5955",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "3-read-first",
+      "unitDigest": "d45819dc6043212f5a9d8dce3faf1566dcc7c6b4dc52c378ef96fbfb5a755ca0",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_fca3a109fc33727cd5f2d861f54cabbe",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "f2fdffeeee9470375dd9d514159639e3b30b67e8fef299e62504e7b02596b3f0",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_3f8670e2092fd63b3ed43610654e575c",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "4-decision-surface",
+      "unitDigest": "4643094b50be30dc677c94b9669fcc46e8160272dab5781d636f607d42a31daf",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_a548331c0ac8d27dfce509230ae9e80b",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "c33992a104c2fffa292b3eed0a725e89f0d04336b05077965cc0b37006ddd8c9",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_1ff1c07082b0d61b5b2435820c6fabf6",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "5-canonical-documents",
+      "unitDigest": "a0df3f695d0e401abb801e5c67d3c6d027f01b0efc1aa93cd15f40d0c460dc6b",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_2ba7046e61d14eec1abdbbcf70cf572e",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "53a193af9746b5861d80117df6234778c03729ec788caf49345211f12c6ecffc",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_64a6762fd324ccf10d76f497d83945d9",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "6-subcomponent-map",
+      "unitDigest": "dbe38691d2d4bf3016086974a6268ad1a3a4298c1436b714fe2ae7c32c347bbd",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_7e46d6bcbf6ba3a219b5bb83300cb035",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "3c5dd6e8ad5fd8e9a09e77e4babaca128034a67bb87501f5bc31ee68af97394a",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_390e3d69f979a294f0ce018104552b9d",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "88f8d7fa32b9cb827b933718906dc5c66df99cd086544fe402dfd016450451f5",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_9c73735e4b1169dca3b15d6f369145ca",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "7-key-contracts",
+      "unitDigest": "3f4f8d5c655918107545f3b3fc8cf02ec93fa930878193d6618059299c276d1a",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_a97b4fb0f6b12f30c2e7f5f20c3a7656",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "8-related-areas",
+      "unitDigest": "11472f32c4f43f5be481125a7e0171bd0c26aa77b6829aaae167a1d709039827",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_3d31f4852ae0d831f0487cfbf4ae1d59",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "7aad71bc69fe6f13326b8790793f342525fe0e14b343b0b0b30737decadcceb1",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_39700796390cc329b7cff6b8842e801c",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "9-component-boundary-impact",
+      "unitDigest": "5657415e4b9e7ca6add3600ee59dd056e6ba2c10e69aa12fadf0c8ebd924f4c8",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_a530ce45d966ab75410181e9ec95b971",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "a717d40783a0ff7cb1c1849c5e89810a6f84e2de4cd7bcf5632e01967ce5b2c2",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_a0540a0d9142fde9f32eb1791a9fc803",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "aa9fca84c56f5fe39ea3ad83b2266bbc33411e5f05cd477248fd18cc0a6ee2d4",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_23435ea8986d7fdd988a35f6a261ea7f",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "10-how-to-change-this-area",
+      "unitDigest": "d1e6ffc4e3cd35e9ed7127a68351465b76c3158a2af98f01a84a94f18f2e99dd",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_6c91dfac8904af282d62fdbcb8b2d4f1",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "df833cca57ffb5503e2b01dc5bd080840fff98249907eeec7857292032d886d0",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_94fef218c368c61c0db242f5a250d0c8",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "11-maintenance-notes",
+      "unitDigest": "2e92974f405bf3e17eddf30117c634ae9720751d05e72f97ff5e9832f6fcbb0a",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_a8a8365739a987937252b67793201ffc",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "12-related-files",
+      "unitDigest": "2e291bd076596797124bc6c1f249f644b48fd68679ab7a7b9c22f392312b684d",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_9830613e938f023e2586c2c95b6d92c3",
+      "path": "docs/templates/area-readme.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "4bd5313e8e0b19bc7a2f4981ad2b1399a27a9a7cbad268828adce8b7f45c49d5",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_79a4e1d59b5e5879f3b8b2e0ad74580e",
+      "path": "docs/templates/contract.md",
+      "anchor": "contract",
+      "unitDigest": "8a876dad2c0f44906caad82aa62d6d6f98063a046eb6ee9600863d7f89d1dd41",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_2701b801e34630c55ddc3d0c39849f50",
+      "path": "docs/templates/contract.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "da488073301bb9c825fb91507a27538e9c4fe8826406ea5a2e57bbcc97e3f55b",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_9cd16d7330878d01d4f7fe078071b0f7",
+      "path": "docs/templates/contract.md",
+      "anchor": "1-status-and-authority",
+      "unitDigest": "246c4bb63a386dc6e57c08e5b0511af01158e83cce847e6ffda891926af936ab",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_bbd15a6f8d54093f519896a31c7a55ac",
+      "path": "docs/templates/contract.md",
+      "anchor": "2-parties",
+      "unitDigest": "fb6ad8bd725b5b3689902f3356e1b2e8b9aba23b83fd66108eab4daf3c73fcf4",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_598c15995ca57539d890fc5f381767f8",
+      "path": "docs/templates/contract.md",
+      "anchor": "3-definitions",
+      "unitDigest": "897ecd5f6f50a00d01cb211376f21d07fcd75b2bfe32e4a76f1e33332ac3582d",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_a44e404dea34a137e621f417a195eadb",
+      "path": "docs/templates/contract.md",
+      "anchor": "4-rules",
+      "unitDigest": "85ecf603fec642067fafd7adc1be1e80e52e57e1264a7611073d59716a15db54",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_8e018df65402260b39f9d4800d60d4dc",
+      "path": "docs/templates/contract.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "c56c3a1cd6946eb9f6d9597a300b91b71b9269f94b3497bf2fd21769b50ab20a",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_c001314ad1d60481a35c681ad4d595b9",
+      "path": "docs/templates/contract.md",
+      "anchor": "5-inputs-and-outputs",
+      "unitDigest": "66ff03c44a1aad8d7c16628267c59808d939b9c8e0cb6857d84c45273bc329f3",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_c0cde296c06b591a3c8565cd55e093f3",
+      "path": "docs/templates/contract.md",
+      "anchor": "6-failure-behavior",
+      "unitDigest": "ff99edd78668e59634fe9c3aed36f2020294f53213e5caac3295476b20344952",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_8d8c83a0368979baa4e3dab686fc5e0f",
+      "path": "docs/templates/contract.md",
+      "anchor": "7-compatibility-and-versioning",
+      "unitDigest": "59b03e6569029a6540b0b17a55567b32b20a29531b93ede6953c51f2cf02f516",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_57a28eab863d6d33293dcc46ccee384d",
+      "path": "docs/templates/contract.md",
+      "anchor": "8-examples",
+      "unitDigest": "064e8a06a6fce3777082d82028a9f1c4ba7400139ddbecd6d59cbc4acef84630",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_44b45cfb25f10defcd1938ec46b65b5a",
+      "path": "docs/templates/contract.md",
+      "anchor": "9-implementation-alignment",
+      "unitDigest": "1732cc48caf6587d0752208adbf829cebac8a2077a627e3beec8f6c6d0aeda24",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_b54575fa05d450078bcfc24526942510",
+      "path": "docs/templates/contract.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "51c656be29a07a048fc3e11710655e3ca5fa0e05475edf6d88b5c43dcd215bff",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_56e8da8a92f0eccd43bc55d143cb19e0",
+      "path": "docs/templates/contract.md",
+      "anchor": "10-verification",
+      "unitDigest": "2a38e29a27e9f94b79db89a7d3b8762d638c034773d7790173eac788c79fd537",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_e5744c46be543b46465b2c41170d436e",
+      "path": "docs/templates/contract.md",
+      "anchor": "11-change-procedure",
+      "unitDigest": "6344dc3b005ea1a179633cfa0f170e70f85edc3ebc35e6c51c5d6b41ac8d959a",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_200bb87faabc56d103a72fb480108dd1",
+      "path": "docs/templates/contract.md",
+      "anchor": "12-related-files",
+      "unitDigest": "d7ab4817c74bc60a2d253dc17f86306ddcd80f48febe2a0697c1a590e17a66cb",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_04555e5073e222ceff3ceb264bd90d0c",
+      "path": "docs/templates/contract.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "fb0843352ea12829e155cd45dd6156834ea4123d18e6a859329393ff07a8ee2c",
+      "references": [],
+      "classification": "historical-template",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_637a4e43b0da52e0925c64c0ec9b1647",
+      "path": "docs/user/README.md",
+      "anchor": "user-documentation",
+      "unitDigest": "5d77147e582614f661f2c566ddedcd4b4b362d719ce7241a06341e93f41f0245",
+      "references": [],
+      "classification": "non-platform-exception",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_bf54f09cd76b40dce5bb0c7ca2e38fc7",
+      "path": "docs/user/README.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "a556158440f7895f126babe0dcedd7e43df6b9402aac503d32b57d6a6f0d42e4",
+      "references": [],
+      "classification": "non-platform-exception",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_01a923cb28cac05c7896422d07c3c11f",
+      "path": "docs/user/README.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "5865bfc2f8364f935ef44c56fec270055b30fe47db42a011ca2dae9b91557bfe",
+      "references": [],
+      "classification": "non-platform-exception",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_ecefb56ff29adc37074cec0af7f36312",
+      "path": "docs/user/README.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "782ad0d8d8b9bebd7baabcaecb18ac84d2a9c660dd85b1d8ea5455e87bd5a4f8",
+      "references": [],
+      "classification": "non-platform-exception",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    },
+    {
+      "claimId": "claim_ee85a9e312493fde5fa5dfcf8b3eb573",
+      "path": "docs/user/README.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "6d5ef0e9fd38ab9de5b8bbb92f352e17a9232c8182e4298939aa23ccce892548",
+      "references": [],
+      "classification": "non-platform-exception",
+      "reason": "Frozen map retains templates as historical authoring material, including placeholders; user portal and product backlog remain non-platform, unchanged. No retirement from absent references or truth verdict."
+    }
+  ],
+  "method": "Literal source-path references for every section/unit; placement follows the already frozen Q5 map; no live obligation removed."
+}
