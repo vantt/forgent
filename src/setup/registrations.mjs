@@ -62,6 +62,7 @@ import {
   ensureMachineBackendRegistryDefaults,
   loadMachineBackendRegistry,
   defaultConfinementTempRoots,
+  credentialScanRoots,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
@@ -89,7 +90,7 @@ import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
 import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory, commandCli, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
-import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
+import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -5275,7 +5276,7 @@ registerFix({
 // stayed on disk forever. Wiring it in here (checked/fixed via `doctor
 // --fix`) and at runner start (loop.mjs) is what actually reclaims it.
 
-export { defaultConfinementTempRoots };
+export { defaultConfinementTempRoots, credentialScanRoots };
 
 /** Temp roots we own whose mode is not owner-only: a private home under one
  * holds a copy of an account login, so a group- or world-readable root is a
@@ -5432,7 +5433,7 @@ function summarizeByAccount(items, label) {
 
 export function checkCredentialCopiesRetained({
   runtimeDir = defaultProviderCapacityRuntimeDir(),
-  roots = defaultConfinementTempRoots(),
+  roots = credentialScanRoots(),
   now = Date.now(),
   minAgeMs = RETAINED_COPY_REPORT_AFTER_MS,
   inventory,
@@ -5455,7 +5456,7 @@ export function checkCredentialCopiesRetained({
     ...overLimit.map((a) => `${a.provider}/${a.accountId}${a.store ? ` (store ${a.store})` : ''}: ${a.count} pending login copies waiting, over the limit of ${MAX_PENDING_COPIES} (the limit drops only copies identical to another, never one that may be the only valid login; a dispatch for that account re-checks them, and if the source stays unreadable recover the logins by hand)`),
     ...strandedByStore(stranded),
     ...summarizeByAccount(copies.filter((c) => c.kind !== 'torn' && c.kind !== 'staging' && !c.stranded), 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)'),
-    ...summarizeByAccount(copies.filter((c) => c.kind === 'staging'), 'interrupted staging(s) of a login copy (a crash cut the copy short; "fgos doctor --fix" removes one that is empty or identical to a copy already kept, any other stays for hand recovery)'),
+    ...summarizeByAccount(copies.filter((c) => c.kind === 'staging' && !c.stranded), 'interrupted staging(s) of a login copy (a crash cut the copy short; "fgos doctor --fix" removes one that is empty, identical to a copy already kept, or shown by the source login of the account to be no newer, any other stays for hand recovery)'),
     ...summarizeByAccount(copies.filter((c) => c.kind === 'torn'), 'half-written login copy(ies) kept for hand recovery (never applied or dropped automatically)'),
     ...held.map((home) => `${home.provider}/${home.accountId}: private home held after repeated staging failures, ${formatAge(home.ageMs)} old, at ${home.dir} ("fgos doctor --fix" re-checks it and removes it once its login is shown to be applied or obsolete; otherwise recover the login from it by hand)`),
     ...summarizeByAccount(retrying, 'private home(s) kept after a staging failure, retried by the reaper'),
@@ -5475,9 +5476,24 @@ function strandedByStore(copies) {
   return [...groups].map(([dir, g]) => `${g.provider}/${g.accountId}: ${g.count} login copy(ies) that no dispatch applies, oldest ${formatAge(g.oldestMs)}, at ${dir} (the account's login store layout in the provider inventory no longer reads this directory; recover the login from them by hand, they are never applied or dropped automatically)`);
 }
 
-export function fixCredentialCopiesRetained({ roots = defaultConfinementTempRoots(), ...options } = {}) {
+// What an interrupted staging is judged against: the source login of the store it sits in, `'stranded'` when the
+// account's layout in the inventory no longer reads that store, `null` when it cannot be judged.
+function stagingStoreResolver(inventory, runtimeDir) {
+  if (inventory === undefined) return undefined;
+  return ({ provider, accountId, store }) => {
+    const account = inventory?.[provider]?.accounts?.[accountId];
+    if (!account) return 'stranded';
+    const source = store ? account.credentialSources?.[store] : (account.credentialSources ? undefined : account.credentialSource);
+    if (!source) return 'stranded';
+    const marker = credentialWriteBackMarker({ provider, accountId, credentialSource: source, runtimeDir });
+    return marker ? { layoutName: marker.layout, sourceHome: marker.home } : null;
+  };
+}
+
+export function fixCredentialCopiesRetained({ roots = credentialScanRoots(), inventory, ...options } = {}) {
   const total = { settled: 0, held: 0 };
-  const stagings = sweepInterruptedStagings({ runtimeDir: options.runtimeDir ?? defaultProviderCapacityRuntimeDir() });
+  const runtimeDir = options.runtimeDir ?? defaultProviderCapacityRuntimeDir();
+  const stagings = sweepInterruptedStagings({ runtimeDir, resolveStore: stagingStoreResolver(inventory, runtimeDir) });
   for (const root of roots) {
     const { settled, held } = settleHeldCredentialHomes({ tempRoots: [root], ...options });
     total.settled += settled;
@@ -5504,7 +5520,11 @@ registerCheck({
 
 registerFix({
   id: 'credential-copies-retained',
-  fix: () => fixCredentialCopiesRetained(),
+  fix: (cwd) => {
+    let inventory;
+    try { inventory = providerAccountInventory(loadRunnerConfigFromDir(cwd)); } catch { inventory = undefined; }
+    return fixCredentialCopiesRetained({ inventory });
+  },
 });
 
 export function checkConfinementBwrapPlatform() {

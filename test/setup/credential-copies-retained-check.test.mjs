@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 
 import { checkCredentialCopiesRetained, fixCredentialCopiesRetained, checkConfinementOrphanedResourcesReaped } from '../../src/setup/registrations.mjs';
 import { extendOwnershipMarker, writeOwnershipMarker, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
@@ -229,19 +228,32 @@ test('without a readable inventory the layout is not judged and the copies keep 
   } finally { w.cleanup(); }
 });
 
+// A process id above the kernel's limit: signalling it always says "no such process".
+function deadPid() {
+  let max = 4194304;
+  try { max = Number(fs.readFileSync('/proc/sys/kernel/pid_max', 'utf8')); } catch { /* the usual limit */ }
+  return max + 1;
+}
+
+function addStaging(dir, name, content) {
+  const target = path.join(dir, 'pending', name);
+  fs.mkdirSync(target, { recursive: true });
+  if (content !== undefined) fs.writeFileSync(path.join(target, 'auth.json'), content);
+  const longAgo = (Date.now() - 3 * HOUR) / 1000;
+  for (const entry of fs.readdirSync(target)) fs.utimesSync(path.join(target, entry), longAgo, longAgo);
+  fs.utimesSync(target, longAgo, longAgo);
+  return target;
+}
+
 test('an interrupted staging is reported with its own wording, and the fix removes only one that is provably not needed', () => {
   const w = workspace();
   try {
-    const pendingDir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'pending');
-    const dead = spawnSync(process.execPath, ['-e', '0']).pid;
-    const put = (name, content) => {
-      const dir = path.join(pendingDir, name);
-      fs.mkdirSync(dir, { recursive: true });
-      if (content !== undefined) fs.writeFileSync(path.join(dir, 'auth.json'), content);
-    };
-    put('000000000001000-aaaa', FAKE_TOKEN);
-    put(`.tmp-${dead}-same`, FAKE_TOKEN);
-    put(`.tmp-${dead}-only`, 'ONLY-COPY-BYTES');
+    const accountDir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct');
+    addPendingIn(w, 'xai', 'acct', '.', Date.now() - 3 * HOUR);
+    const pendingName = fs.readdirSync(path.join(accountDir, 'pending'))[0];
+    fs.writeFileSync(path.join(accountDir, 'pending', pendingName, 'auth.json'), FAKE_TOKEN);
+    const same = addStaging(accountDir, `.tmp-${deadPid()}-same`, FAKE_TOKEN);
+    const only = addStaging(accountDir, `.tmp-${deadPid()}-only`, 'ONLY-COPY-BYTES');
     const before = run(w);
     assert.match(before.message, /xai\/acct: 2 interrupted staging\(s\)/);
     assert.equal(before.message.includes(FAKE_TOKEN), false);
@@ -249,7 +261,41 @@ test('an interrupted staging is reported with its own wording, and the fix remov
     const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], runtimeDir: w.runtimeDir });
     assert.equal(fixed.changed, true);
     assert.match(fixed.message, /interrupted staging\(s\): 1 removed, 1 kept/);
+    assert.equal(fs.existsSync(same), false);
+    assert.equal(fs.existsSync(only), true);
     assert.match(run(w).message, /xai\/acct: 1 interrupted staging\(s\)/);
+  } finally { w.cleanup(); }
+});
+
+test('a staging in a store the account layout no longer reads is reported once, in the hand-recovery row, and the fix leaves it', () => {
+  const w = workspace();
+  try {
+    const accountDir = path.join(w.runtimeDir, 'account-locks', 'openai', 'acct');
+    const staging = addStaging(accountDir, `.tmp-${deadPid()}-stranded`);
+    const inventory = { openai: { accounts: { acct: perCliAccount } } };
+    const result = runWith(w, inventory);
+    assert.equal(result.passed, false);
+    assert.match(result.message, /openai\/acct: 1 login copy\(ies\) that no dispatch applies/);
+    assert.equal(result.message.includes('interrupted staging'), false, 'not a second row for the same directory');
+    assert.equal(result.message.split(';').filter((row) => row.includes('openai/acct')).length, 1);
+    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], runtimeDir: w.runtimeDir, inventory });
+    assert.equal(fixed.changed, false);
+    assert.equal(fs.existsSync(staging), true);
+  } finally { w.cleanup(); }
+});
+
+test('the fix reads each store through the inventory: a staging the source login proves no newer is removed, one whose store has no source stays', () => {
+  const w = workspace();
+  try {
+    const source = path.join(w.tmp, 'source-home');
+    fs.mkdirSync(source, { recursive: true });
+    const doc = (expires, refresh) => JSON.stringify({ 'x-ai': { type: 'oauth', access: 'FAKE-ACCESS', refresh, expires } });
+    fs.writeFileSync(path.join(source, 'auth.json'), doc(Date.now() + 6 * HOUR, 'FAKE-REFRESH-A'));
+    const accountDir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct');
+    const older = addStaging(accountDir, `.tmp-${deadPid()}-older`, doc(Date.now() + HOUR, 'FAKE-REFRESH-A'));
+    const inventory = { xai: { accounts: { acct: { credentialSource: { kind: 'home-files', home: source, files: ['auth.json'] } } } } };
+    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], runtimeDir: w.runtimeDir, inventory });
+    assert.equal(fs.existsSync(older), false, fixed.message);
   } finally { w.cleanup(); }
 });
 

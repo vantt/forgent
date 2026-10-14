@@ -341,20 +341,38 @@ export function ensureMachineBackendRegistryDefaults(registryPath = resolveMachi
 }
 
 /**
- * Every root private homes can live under: the default temp root plus each registered backend's own
- * `tempRoot` and `privateHomeRoot`. An unreadable or malformed registry is reported by its own doctor check; the default root
- * alone is used meanwhile.
+ * Every temp root private homes can live under: the default one plus each registered backend's own
+ * `tempRoot`. An unreadable or malformed registry is reported by its own doctor check; the default root
+ * alone is used meanwhile. This list also drives the orphan reaper and the root-mode tightening, so it
+ * names only roots fgOS owns.
  */
 export function defaultConfinementTempRoots() {
   const roots = new Set([resolveConfinementTempRoot()]);
   try {
     const registry = loadMachineBackendRegistry();
     for (const instance of Object.values(registry?.confinementBackends || {})) {
-      // A registered instance is its own config (spec §6.2): `tempRoot` and `privateHomeRoot` sit on it.
-      // A private home is allocated under `privateHomeRoot` when the backend sets one (resources.mjs).
-      if (instance?.tempRoot) roots.add(instance.tempRoot);
-      if (instance?.privateHomeRoot) roots.add(instance.privateHomeRoot);
+      if (instance?.config?.tempRoot) roots.add(instance.config.tempRoot);
     }
   } catch { /* the default root only */ }
+  return [...roots];
+}
+
+/**
+ * Every root a private home with a retained login can live under, for the read-only scan of kept homes: the
+ * roots above plus each registered backend's `tempRoot` and `privateHomeRoot` (a registered instance is its
+ * own config, spec §6.2; resources.mjs allocates a home under `privateHomeRoot` first). Absolute and without
+ * duplicates, so `/x` and `/x/` are one root. Nothing deletes or re-modes these roots: they are scanned for
+ * kept logins only.
+ */
+export function credentialScanRoots() {
+  const roots = new Set(defaultConfinementTempRoots().map((root) => path.resolve(root)));
+  try {
+    const registry = loadMachineBackendRegistry();
+    for (const instance of Object.values(registry?.confinementBackends || {})) {
+      for (const root of [instance?.tempRoot, instance?.privateHomeRoot]) {
+        if (typeof root === 'string' && root.trim()) roots.add(path.resolve(root));
+      }
+    }
+  } catch { /* the default roots only */ }
   return [...roots];
 }

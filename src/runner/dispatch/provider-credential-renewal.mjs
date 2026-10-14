@@ -55,7 +55,6 @@ const LOCK_MARGIN_MS = 30 * 1000;
 const COOLDOWN_FILE = 'cooldown.json';
 const PENDING_DIR = 'pending';
 const SCRATCH_PREFIX = 'scratch-';
-const STAGING_PREFIX = '.tmp-';
 export const MAX_PENDING_COPIES = 5;
 const TORN_DIR = 'torn';
 
@@ -680,53 +679,97 @@ export function inspectPendingCopiesOverLimit({ runtimeDir }) {
 // Interrupted stagings: `pending/.tmp-<pid>-<id>` is a copy being staged. A crash before the rename leaves it
 // behind, possibly part of a login, and the leftover listing skips hidden names, so nothing applies it. It is
 // reported, and removed only when it is provably not needed.
+//
+// The writer stages without the account lock, so the process id in the name is not proof that the writer is
+// gone (another host sharing the runtime directory, another pid namespace). Two guards stand in for it: a
+// staging is touched only when it has not changed for STAGING_MIN_AGE_MS, and the sweep first claims it by
+// renaming it to a name of its own. A writer that is still running then fails its own rename and keeps its
+// private home; a sweep that loses the race leaves the staging alone.
 // ---------------------------------------------------------------------------------------------------
+
+const SWEEP_PREFIX = '.sweep-';
+const STAGING_NAME = /^\.(?:tmp|sweep)-(\d+)-/;
+/** A staging is a few file copies and syncs; one that has not changed for this long is not being written. */
+export const STAGING_MIN_AGE_MS = 10 * 60 * 1000;
 
 function listInterruptedStagings(storeDir) {
   const pendingDir = path.join(storeDir, PENDING_DIR);
   try {
-    return fs.readdirSync(pendingDir).filter((n) => n.startsWith(STAGING_PREFIX)).sort().map((n) => path.join(pendingDir, n));
+    return fs.readdirSync(pendingDir).filter((n) => STAGING_NAME.test(n)).sort().map((n) => path.join(pendingDir, n));
   } catch { return []; }
 }
 
 // A staging whose writer is still running is being written, not left behind. The pid is in the name; one that
 // cannot be read or looked up counts as alive, so an unclear case is kept.
 function stagingWriterAlive(dir) {
-  const pid = Number(/^\.tmp-(\d+)-/.exec(path.basename(dir))?.[1]);
+  const pid = Number(STAGING_NAME.exec(path.basename(dir))?.[1]);
   if (!Number.isInteger(pid) || pid <= 0) return true;
   try { process.kill(pid, 0); return true; } catch (err) { return err?.code !== 'ESRCH'; }
 }
 
-// Every file under `dir` as `[relative name, bytes]`, sorted; null when anything cannot be read.
-function treeBytes(dir, base = dir) {
-  const out = [];
+// Whether a staging is old enough to be left behind: its own change time and that of what it holds.
+function stagingAgeMs(dir, now) {
   try {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        const inner = treeBytes(full, base);
-        if (inner === null) return null;
-        out.push(...inner);
-      } else if (entry.isFile()) out.push([path.relative(base, full), fs.readFileSync(full)]);
-      else return null;
-    }
-  } catch { return null; }
-  return out;
+    const entries = fs.readdirSync(dir).map((n) => fs.lstatSync(path.join(dir, n)).mtimeMs);
+    return now - Math.max(fs.lstatSync(dir).mtimeMs, ...entries);
+  } catch { return -Infinity; }
 }
 
-function treesIdentical(a, b) {
-  const x = treeBytes(a);
-  const y = treeBytes(b);
-  if (x === null || y === null || x.length !== y.length) return false;
-  return x.every(([name, bytes], i) => name === y[i][0] && bytes.equals(y[i][1]));
+// Digest of every file under `dir` (names and bytes), or null when anything cannot be read or is not a plain
+// file. The shared-memory index (`-shm`) is left out: SQLite creates it inside any copy it opens and it
+// carries no data. In memory only.
+function treeDigest(dir) {
+  const hash = crypto.createHash('sha256');
+  const walk = (current) => {
+    for (const entry of fs.readdirSync(current, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      const full = path.join(current, entry.name);
+      if (entry.isDirectory()) { if (!walk(full)) return false; continue; }
+      if (!entry.isFile()) return false;
+      if (entry.name.endsWith('-shm')) continue;
+      hash.update(path.relative(dir, full)).update('\u0000').update(fs.readFileSync(full)).update('\u0001');
+    }
+    return true;
+  };
+  try { return walk(dir) ? hash.digest('hex') : null; } catch { return null; }
+}
+
+// `{layoutName, sourceHome}` is what a store's source login is judged by. `resolveStore({provider, accountId,
+// store})` returns it, `null` when the store cannot be judged, or `'stranded'` when the account's layout no
+// longer reads that store (nothing there is touched). Without a resolver nothing is judged by the source.
+function sweepOneStaging({ staging, kept, judge, tryLock, runtimeDir, provider, accountId, now, loadSqlite }) {
+  const original = staging;
+  const claimed = path.join(path.dirname(staging), `${SWEEP_PREFIX}${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
+  try { fs.renameSync(staging, claimed); } catch { return 'kept'; }
+  const restore = () => { try { fs.renameSync(claimed, original); } catch { /* stays under the sweep's own name, still reported */ } return 'kept'; };
+  let removable = false;
+  try {
+    if (fs.lstatSync(claimed).isDirectory() && fs.readdirSync(claimed).length === 0) removable = true;
+    if (!removable) {
+      const digest = treeDigest(claimed);
+      if (digest !== null && kept().has(digest)) removable = true;
+    }
+    if (!removable && judge) {
+      // The source's verdict is read under the account lock, like every other judgement of a copy against it.
+      const lock = tryLock({ runtimeDir, provider, accountId });
+      if (lock) {
+        try { removable = judgeCopy({ layout: LAYOUTS[judge.layoutName], provider, sourceHome: judge.sourceHome, copyHome: claimed, now, loadSqlite }) === 'not-newer'; }
+        catch { removable = false; } finally { try { lock.release(); } catch { /* nothing held */ } }
+      }
+    }
+  } catch { removable = false; }
+  if (!removable) return restore();
+  try { fs.rmSync(claimed, { recursive: true, force: true }); return 'removed'; } catch { return restore(); }
 }
 
 /**
- * Remove the interrupted stagings that are provably not needed: the writer is gone and the staging is either
- * empty or byte for byte the same as a copy the account already keeps in `pending/` (or `torn/`) of the same
- * store. Anything else stays and keeps being reported. Read-write on `pending/` only; counts, no names.
+ * Remove the interrupted stagings that are provably not needed. A staging is considered only when its writer
+ * is gone and it has not changed for STAGING_MIN_AGE_MS; it is claimed by rename first. It goes when it is
+ * empty, or has the same files as a copy the store already keeps in `pending/` or `torn/` (the shared-memory
+ * index aside), or, under the account lock, the account's source login proves it is not newer or it is
+ * malformed. Anything else stays for hand recovery. A store the account's layout no longer reads is never
+ * touched. Counts only; no names, no values.
  */
-export function sweepInterruptedStagings({ runtimeDir } = {}) {
+export function sweepInterruptedStagings({ runtimeDir, resolveStore, now = Date.now(), minAgeMs = STAGING_MIN_AGE_MS, tryLock = tryAcquireAccountLock, loadSqlite = defaultLoadSqlite } = {}) {
   const result = { removed: 0, kept: 0 };
   const root = path.join(runtimeDir, 'account-locks');
   const subdirs = (dir) => {
@@ -735,18 +778,27 @@ export function sweepInterruptedStagings({ runtimeDir } = {}) {
   for (const provider of subdirs(root)) {
     for (const accountId of subdirs(path.join(root, provider))) {
       const accountDir = path.join(root, provider, accountId);
-      const storeDirs = [accountDir, ...subdirs(path.join(accountDir, 'stores')).map((cli) => path.join(accountDir, 'stores', cli))];
-      for (const storeDir of storeDirs) {
-        const kept = [];
-        try { for (const n of fs.readdirSync(path.join(storeDir, PENDING_DIR))) if (!n.startsWith('.')) kept.push(path.join(storeDir, PENDING_DIR, n)); } catch { /* none */ }
-        try { for (const n of fs.readdirSync(path.join(storeDir, TORN_DIR))) if (!n.startsWith('.')) kept.push(path.join(storeDir, TORN_DIR, n)); } catch { /* none */ }
-        for (const staging of listInterruptedStagings(storeDir)) {
-          if (stagingWriterAlive(staging)) continue;
-          let names;
-          try { names = fs.readdirSync(staging); } catch { result.kept += 1; continue; }
-          const unneeded = names.length === 0 || kept.some((copy) => treesIdentical(staging, copy));
-          if (!unneeded) { result.kept += 1; continue; }
-          try { fs.rmSync(staging, { recursive: true, force: true }); result.removed += 1; } catch { result.kept += 1; }
+      const stores = [{ store: null, dir: accountDir }, ...subdirs(path.join(accountDir, 'stores')).map((cli) => ({ store: cli, dir: path.join(accountDir, 'stores', cli) }))];
+      for (const { store, dir: storeDir } of stores) {
+        const stagings = listInterruptedStagings(storeDir);
+        if (stagings.length === 0) continue;
+        const resolved = resolveStore ? resolveStore({ provider, accountId, store }) : null;
+        if (resolved === 'stranded') continue;
+        let keptDigests = null;
+        const kept = () => {
+          if (keptDigests !== null) return keptDigests;
+          keptDigests = new Set();
+          for (const sub of [PENDING_DIR, TORN_DIR]) {
+            let names = [];
+            try { names = fs.readdirSync(path.join(storeDir, sub)).filter((n) => !n.startsWith('.')); } catch { /* none */ }
+            for (const n of names) { const d = treeDigest(path.join(storeDir, sub, n)); if (d !== null) keptDigests.add(d); }
+          }
+          return keptDigests;
+        };
+        for (const staging of stagings) {
+          if (stagingWriterAlive(staging) || stagingAgeMs(staging, now) < minAgeMs) continue;
+          const outcome = sweepOneStaging({ staging, kept, judge: resolved, tryLock, runtimeDir, provider, accountId, now, loadSqlite });
+          if (outcome === 'removed') result.removed += 1; else result.kept += 1;
         }
       }
     }
@@ -781,7 +833,7 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
       const tornIn = (dir) => { try { return fs.readdirSync(path.join(dir, TORN_DIR)).filter((n) => !n.startsWith('.')).map((n) => path.join(dir, TORN_DIR, n)); } catch { return []; } };
       for (const storeDir of storeDirs) {
         const stranded = readStoreDirs !== null && !readStoreDirs.has(storeDir);
-        const interrupted = listInterruptedStagings(storeDir).filter((d) => !stagingWriterAlive(d));
+        const interrupted = listInterruptedStagings(storeDir).filter((d) => !stagingWriterAlive(d) && stagingAgeMs(d, now) >= STAGING_MIN_AGE_MS);
         for (const dir of [...listLeftovers(storeDir), ...tornIn(storeDir), ...interrupted]) {
           const name = path.basename(dir);
           const staged = /^(\d{15})-/.exec(name);
@@ -790,7 +842,7 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
           else { try { at = fs.statSync(dir).mtimeMs; } catch { continue; } }
           const ageMs = now - at;
           const torn = path.basename(path.dirname(dir)) === TORN_DIR;
-          const staging = name.startsWith(STAGING_PREFIX);
+          const staging = STAGING_NAME.test(name);
           if (ageMs >= minAgeMs || torn || staging) found.push({ provider, accountId, kind: torn ? 'torn' : staging ? 'staging' : staged ? 'pending' : 'scratch', ageMs, storeDir, stranded });
         }
       }

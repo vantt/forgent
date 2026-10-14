@@ -20,6 +20,7 @@ import {
   inspectRetainedCredentialCopies,
   inspectPendingCopiesOverLimit,
   sweepInterruptedStagings,
+  STAGING_MIN_AGE_MS,
 } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
 import {
   providerAccountDir,
@@ -1955,35 +1956,48 @@ test('staging a renewed omp login does not copy the shared-memory index, so an u
   } finally { w.cleanup(); }
 });
 
+// A process id no process can hold: above the kernel's limit, so signalling it always says "no such process".
 function deadPid() {
-  const child = spawnSync(process.execPath, ['-e', '0']);
-  return child.pid;
+  let max = 4194304;
+  try { max = Number(fs.readFileSync('/proc/sys/kernel/pid_max', 'utf8')); } catch { /* the usual limit */ }
+  for (let pid = max + 1; pid < max + 50; pid += 1) {
+    try { process.kill(pid, 0); } catch (err) { if (err?.code === 'ESRCH') return pid; }
+  }
+  throw new Error('no unused process id found');
 }
+
+const LONG_AGO_S = (Date.now() - 3 * STAGING_MIN_AGE_MS) / 1000;
+const age = (dir) => {
+  for (const name of fs.readdirSync(dir)) fs.utimesSync(path.join(dir, name), LONG_AGO_S, LONG_AGO_S);
+  fs.utimesSync(dir, LONG_AGO_S, LONG_AGO_S);
+};
 
 function interruptedStagingWorkspace() {
-  const runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-interrupted-staging-'));
-  const pendingDir = path.join(runtimeDir, 'account-locks', 'xai', 'acct', 'pending');
+  const w = workspace();
+  const pendingDir = path.join(w.accountDir, 'pending');
   fs.mkdirSync(pendingDir, { recursive: true });
-  const put = (name, files) => {
-    const dir = path.join(pendingDir, name);
-    fs.mkdirSync(dir, { recursive: true });
-    for (const [file, bytes] of Object.entries(files)) fs.writeFileSync(path.join(dir, file), bytes);
-    return dir;
+  const put = (name, files, { old = true, dir = pendingDir } = {}) => {
+    const target = path.join(dir, name);
+    fs.mkdirSync(target, { recursive: true });
+    for (const [file, bytes] of Object.entries(files)) fs.writeFileSync(path.join(target, file), bytes);
+    if (old) age(target);
+    return target;
   };
-  return { runtimeDir, pendingDir, put, cleanup: () => fs.rmSync(runtimeDir, { recursive: true, force: true }) };
+  return { ...w, pendingDir, put };
 }
 
-test('an interrupted staging left by a dead writer is reported at any age, and one whose writer still runs is not', () => {
+test('an interrupted staging is reported once its writer is gone and it has sat for a while, and not before', () => {
   const w = interruptedStagingWorkspace();
   try {
     w.put(`.tmp-${deadPid()}-aaaa`, { 'auth.json': 'PART' });
+    w.put(`.tmp-${deadPid()}-young`, { 'auth.json': 'PART' }, { old: false });
     w.put(`.tmp-${process.pid}-bbbb`, { 'auth.json': 'LIVE' });
-    const found = inspectRetainedCredentialCopies({ runtimeDir: w.runtimeDir, now: Date.now(), minAgeMs: 24 * 60 * 60 * 1000 });
+    const found = inspectRetainedCredentialCopies({ runtimeDir: w.runtimeDir, now: Date.now() });
     assert.deepEqual(found.map((c) => [c.provider, c.accountId, c.kind]), [['xai', 'acct', 'staging']]);
   } finally { w.cleanup(); }
 });
 
-test('the sweep removes an interrupted staging only when it is empty or identical to a copy already kept', () => {
+test('the sweep removes an interrupted staging only when it is empty or identical to a kept copy, and never one that is young or has a live writer', () => {
   const w = interruptedStagingWorkspace();
   try {
     const dead = deadPid();
@@ -1991,13 +2005,107 @@ test('the sweep removes an interrupted staging only when it is empty or identica
     const empty = w.put(`.tmp-${dead}-empty`, {});
     const same = w.put(`.tmp-${dead}-same`, { 'auth.json': 'KEPT' });
     const different = w.put(`.tmp-${dead}-diff`, { 'auth.json': 'ONLY-COPY' });
+    const young = w.put(`.tmp-${dead}-young`, { 'auth.json': 'KEPT' }, { old: false });
     const live = w.put(`.tmp-${process.pid}-live`, { 'auth.json': 'KEPT' });
-    const result = sweepInterruptedStagings({ runtimeDir: w.runtimeDir });
-    assert.deepEqual(result, { removed: 2, kept: 1 });
+    assert.deepEqual(sweepInterruptedStagings({ runtimeDir: w.runtimeDir }), { removed: 2, kept: 1 });
     assert.equal(fs.existsSync(empty), false);
     assert.equal(fs.existsSync(same), false);
-    assert.equal(fs.existsSync(different), true, 'a staging that may hold the only copy stays');
+    assert.equal(fs.existsSync(different), true, 'a staging that may hold the only copy stays under its own name');
+    assert.equal(fs.readFileSync(path.join(different, 'auth.json'), 'utf8'), 'ONLY-COPY');
+    assert.equal(fs.existsSync(young), true, 'a staging that changed a moment ago is not touched');
     assert.equal(fs.existsSync(live), true, 'a staging whose writer runs is not touched');
     assert.equal(fs.existsSync(path.join(w.pendingDir, '000000000001000-aaaa')), true, 'the kept copy stays');
+  } finally { w.cleanup(); }
+});
+
+test('the sweep claims a staging by renaming it before it judges it, so a writer that is still running loses its rename instead of its login', () => {
+  const w = interruptedStagingWorkspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + 6 * HOUR));
+    const original = w.put(`.tmp-${deadPid()}-claimed`, { 'auth.json': JSON.stringify(piDoc(Date.now() + 12 * HOUR, { refresh: 'FAKE-NEWER-REFRESH' })) });
+    let seenDuringJudgement;
+    const result = sweepInterruptedStagings({
+      runtimeDir: w.runtimeDir,
+      resolveStore: () => ({ layoutName: 'pi-auth-json', sourceHome: w.home }),
+      tryLock: () => { seenDuringJudgement = fs.existsSync(original); return { release() {} }; },
+    });
+    assert.equal(seenDuringJudgement, false, 'the staging is under the sweep\'s own name while it is judged');
+    assert.deepEqual(result, { removed: 0, kept: 1 }, 'a newer login stays');
+    assert.equal(fs.existsSync(original), true, 'and goes back under its own name');
+  } finally { w.cleanup(); }
+});
+
+test('the sweep removes a staging the source login proves is not newer, or that is malformed, and keeps one that is newer or cannot be judged', () => {
+  const w = interruptedStagingWorkspace();
+  try {
+    const source = piDoc(Date.now() + 6 * HOUR);
+    writePi(w.home, source);
+    const dead = deadPid();
+    const same = w.put(`.tmp-${dead}-same`, { 'auth.json': JSON.stringify(source), extra: '1' });
+    const older = w.put(`.tmp-${dead}-older`, { 'auth.json': JSON.stringify(piDoc(Date.now() + 1 * HOUR)) });
+    const malformed = w.put(`.tmp-${dead}-malformed`, { 'auth.json': '{not json' });
+    const newer = w.put(`.tmp-${dead}-newer`, { 'auth.json': JSON.stringify(piDoc(Date.now() + 12 * HOUR, { refresh: 'FAKE-NEWER-REFRESH' })) });
+    const result = sweepInterruptedStagings({ runtimeDir: w.runtimeDir, resolveStore: () => ({ layoutName: 'pi-auth-json', sourceHome: w.home }), tryLock: () => ({ release() {} }) });
+    assert.deepEqual(result, { removed: 3, kept: 1 });
+    for (const dir of [same, older, malformed]) assert.equal(fs.existsSync(dir), false);
+    assert.equal(fs.existsSync(newer), true);
+    // The same sweep without a resolver judges nothing by the source.
+    const w2 = interruptedStagingWorkspace();
+    try {
+      const only = w2.put(`.tmp-${deadPid()}-older`, { 'auth.json': JSON.stringify(piDoc(Date.now() + 1 * HOUR)) });
+      assert.deepEqual(sweepInterruptedStagings({ runtimeDir: w2.runtimeDir }), { removed: 0, kept: 1 });
+      assert.equal(fs.existsSync(only), true);
+    } finally { w2.cleanup(); }
+  } finally { w.cleanup(); }
+});
+
+test('a busy account lock leaves a staging that only the source could clear', () => {
+  const w = interruptedStagingWorkspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + 6 * HOUR));
+    const older = w.put(`.tmp-${deadPid()}-older`, { 'auth.json': JSON.stringify(piDoc(Date.now() + 1 * HOUR)) });
+    const result = sweepInterruptedStagings({ runtimeDir: w.runtimeDir, resolveStore: () => ({ layoutName: 'pi-auth-json', sourceHome: w.home }), tryLock: () => null });
+    assert.deepEqual(result, { removed: 0, kept: 1 });
+    assert.equal(fs.existsSync(older), true);
+  } finally { w.cleanup(); }
+});
+
+test('the sweep compares an omp staging to a kept copy without the shared-memory index, and also to a half-written copy under torn/', () => {
+  const w = interruptedStagingWorkspace();
+  try {
+    const dead = deadPid();
+    w.put('000000000001000-aaaa', { 'agent.db': 'SAME-DB', 'agent.db-shm': 'INDEX-MADE-BY-A-READ' });
+    const sameAsKept = w.put(`.tmp-${dead}-omp`, { 'agent.db': 'SAME-DB' });
+    const tornDir = path.join(w.accountDir, 'torn');
+    w.put('scratch-torn', { 'auth.json': 'HALF-WRITTEN' }, { dir: tornDir });
+    const sameAsTorn = w.put(`.tmp-${dead}-torn`, { 'auth.json': 'HALF-WRITTEN' });
+    assert.deepEqual(sweepInterruptedStagings({ runtimeDir: w.runtimeDir }), { removed: 2, kept: 0 });
+    assert.equal(fs.existsSync(sameAsKept), false);
+    assert.equal(fs.existsSync(sameAsTorn), false);
+    assert.equal(fs.existsSync(path.join(tornDir, 'scratch-torn')), true, 'the torn copy itself is never touched');
+  } finally { w.cleanup(); }
+});
+
+test('a store the account layout no longer reads is never swept, and a symlink is never followed', () => {
+  const w = interruptedStagingWorkspace();
+  try {
+    const dead = deadPid();
+    const empty = w.put(`.tmp-${dead}-empty`, {});
+    assert.deepEqual(sweepInterruptedStagings({ runtimeDir: w.runtimeDir, resolveStore: () => 'stranded' }), { removed: 0, kept: 0 });
+    assert.equal(fs.existsSync(empty), true, 'stranded stores are left to hand recovery');
+
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-sweep-outside-'));
+    try {
+      fs.writeFileSync(path.join(outside, 'auth.json'), 'MUST-SURVIVE');
+      fs.rmSync(empty, { recursive: true });
+      const link = path.join(w.pendingDir, `.tmp-${dead}-link`);
+      fs.symlinkSync(outside, link);
+      const linked = w.put(`.tmp-${dead}-childlink`, {});
+      fs.symlinkSync(path.join(outside, 'auth.json'), path.join(linked, 'auth.json'));
+      age(linked);
+      sweepInterruptedStagings({ runtimeDir: w.runtimeDir, minAgeMs: -Infinity });
+      assert.equal(fs.readFileSync(path.join(outside, 'auth.json'), 'utf8'), 'MUST-SURVIVE', 'the target of a link is never deleted');
+      assert.equal(fs.existsSync(linked), true, 'a staging holding a link is not a plain copy and stays');
+    } finally { fs.rmSync(outside, { recursive: true, force: true }); }
   } finally { w.cleanup(); }
 });
