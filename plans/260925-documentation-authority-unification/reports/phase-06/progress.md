@@ -1,3 +1,47 @@
+# Native sync and bounded review handoff — ready for review, closure open
+
+Date: 2026-10-15. Executor: codex-session:38@2026-10-15. Session counter: 38. Assignment: unit-run-1792014456508-358dc876/producer/1.
+Step: 6. State: **ready-for-review; closure open**. Content/native pin: `a8a10abc1a24218518a14764f68c8d86f4810f91`. SYNC: `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`. B0: `dbe5c432852837ea01e6025b35868bcb7271495d`. Step 5 closure proof: `a216ddfc0`. Batch content commit: `a8a10abc1a24218518a14764f68c8d86f4810f91`; request/proof commit is this runner settlement, no hash invented. Last D-green source remains `f0d4d030b06d36e3e9f55f7a1e3e5df623cc9860`; current D is red, no historical flag carried.
+
+Progress read first; native sync started early in background, own log polled. Elapsed 1117.021s. Registry 60,284,258 bytes, compact one-line below 90 MB, persisted at the actual content pin. Both-prior D: two fatal; scoped E red (claims-not-reviewed=826, identical-units-multiple-owners=2, registry-gaps-without-disposition=1, candidate-blocks-unreferenced=79). Native known/live full tuple equality and all four list equalities pass before/after persistence; lists root=831, agent=572, packaging=694, whole=79. Full receipts/code spans recompute, four pending artifact metadata refs bind to the committed receipt at a8a10abc1a24218518a14764f68c8d86f4810f91; no source/gap decision content or approval changes.
+
+D remains red for exactly two explicit blockers: old manifest claim `claim_0416642260519cf992931a4968e80c03` is now a native gap but still resides in `claims`; and upstream runner ratchet digest accounting is stale. No gate/checker/decision-content workaround was made. Lead/next authorized writer must move the old binding to registryGaps, add current source `claim_cdb2776a59ac6a8bbc129754ffc7380f` and the actual target-gap binding, and account the runner exception in its authorized scope, then rerun D/E/native proofs. Whole-system scoped E also retains the pre-existing system-overview source gap claim_0cc5fd490ce0087ed51f38bca9d8c96e and two multiple-owner groups; the separate one-entry native-gap request shows historical/current text and ownership context without inventing a disposition or exception.
+
+Pending requests: 16 source packs / 826 entries / 123 A36 differing pairs / no absent target; historical native-gap request / one entry; A31 separate request / nine entries; candidate-unverified reverse population 79 in 1 bounded packs. All pinned to a8a10abc1a24218518a14764f68c8d86f4810f91, max 80 entries, complete shown text and full 64-hex digests. Per-pack A36 reviewer sample minimum totals 162; author selected none. Request paths and counts:
+
+| Request | Entries |
+|---|---:|
+| [review-request-261015-0450-whole-system-01.md](review-request-261015-0450-whole-system-01.md) | 80 |
+| [review-request-261015-0450-whole-system-02.md](review-request-261015-0450-whole-system-02.md) | 65 |
+| [review-request-261015-0450-whole-system-03.md](review-request-261015-0450-whole-system-03.md) | 80 |
+| [review-request-261015-0450-whole-system-04.md](review-request-261015-0450-whole-system-04.md) | 80 |
+| [review-request-261015-0450-whole-system-05.md](review-request-261015-0450-whole-system-05.md) | 6 |
+| [review-request-261015-0450-whole-system-06.md](review-request-261015-0450-whole-system-06.md) | 52 |
+| [review-request-261015-0450-whole-system-07.md](review-request-261015-0450-whole-system-07.md) | 51 |
+| [review-request-261015-0450-whole-system-08.md](review-request-261015-0450-whole-system-08.md) | 11 |
+| [review-request-261015-0450-whole-system-09.md](review-request-261015-0450-whole-system-09.md) | 37 |
+| [review-request-261015-0450-whole-system-10.md](review-request-261015-0450-whole-system-10.md) | 31 |
+| [review-request-261015-0450-whole-system-11.md](review-request-261015-0450-whole-system-11.md) | 55 |
+| [review-request-261015-0450-whole-system-12.md](review-request-261015-0450-whole-system-12.md) | 48 |
+| [review-request-261015-0450-whole-system-13.md](review-request-261015-0450-whole-system-13.md) | 61 |
+| [review-request-261015-0450-whole-system-14.md](review-request-261015-0450-whole-system-14.md) | 80 |
+| [review-request-261015-0450-whole-system-15.md](review-request-261015-0450-whole-system-15.md) | 39 |
+| [review-request-261015-0450-whole-system-16.md](review-request-261015-0450-whole-system-16.md) | 50 |
+| [review-request-261015-0508-whole-system-native-gap.md](review-request-261015-0508-whole-system-native-gap.md) | 1 |
+| [review-request-261015-0451-whole-system-merge.md](review-request-261015-0451-whole-system-merge.md) | 9 |
+| [review-request-261015-0507-whole-system-candidates-01.md](review-request-261015-0507-whole-system-candidates-01.md) | 79 |
+
+Next: Lead independently reviews these bounded requests; an authorized writer reconciles the actual manifest source/gap bindings and upstream runner exception, then reruns both-prior D/E and full native/list equality. Step 6 closure still owes the reviewer-selected 30-unit truth sample, red-team, 50-block stratified sample, committed fresh-reader key and two readers, checkpoint review with **reviewer-held sensitivity pack**, consumer/alias preview and final batch/effort report. Author made no sensitivity pack/key. No Step 7, new Plan B re-pin, promotion, git write, docs/decision-content/protected-tool/baseline edit, workspace .fgos mutation or secret read. Preserve all earlier Rings holds, A34 residuals and truth/navigation/alias/consumer/native-gap/cutover debts and owner effort checkpoint.
+
+Evidence and request index: [verification-261015-0501-whole-system-native-review.md](verification-261015-0501-whole-system-native-review.md); [full native proof](whole-system-native-verification.json). Tests 39/39, candidate findings zero; placement 536/535/one existing exception; A/B/C/I preserved; ratchet blocker disclosed, no full-suite or current-truth certification. Markdown preview unavailable within this scope.
+
+---
+
+# Native sync and bounded review preparation — running
+
+Date: 2026-10-15. Executor: codex-session:38@2026-10-15. Assignment: unit-run-1792014456508-358dc876/producer/1.
+Content pin: a8a10abc1. Step 6 remains open. Resume journal read first; native carry from persisted registry is starting in background, separate scratch log. No git write, docs/decision/protected-tool/baseline edit or workspace .fgos mutation. Scratch: /tmp/fgos-work/resume-truth/. Required external claim is the explicit exception.
+
 # Whole-system architecture — candidates authored, native pin next
 
 Date: 2026-10-15. Executor: codex-session:37@2026-10-15. Session counter: 37. Assignment: `unit-run-1792013490296-c08d7894/producer/1`.

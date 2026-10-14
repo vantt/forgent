@@ -1,0 +1,401 @@
+{
+  "version": 1,
+  "commit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+  "shard": "s6-whole-system-component-component-boundary-advisory.json",
+  "authorSession": "codex-session:37@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_4eca744c23d1052489bfce3c6d545ab5",
+      "sourceUnitDigest": "cb8a65913d31cbbba3ca80990c295a191d337f7ed9323f84b3eb40725f67f9be",
+      "targetUnitDigest": "cb8a65913d31cbbba3ca80990c295a191d337f7ed9323f84b3eb40725f67f9be",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_4eca744c23d1052489bfce3c6d545ab5",
+        "sourceUnitDigest": "cb8a65913d31cbbba3ca80990c295a191d337f7ed9323f84b3eb40725f67f9be",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-154",
+        "targetUnitDigest": "cb8a65913d31cbbba3ca80990c295a191d337f7ed9323f84b3eb40725f67f9be",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "20. Architectural Pressure Points"
+        ],
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-140 (lines 1006–1007) into docs/platform/component-boundary.md#unheaded-block-154 (lines 1103–1104), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-140",
+        "githubAnchor": "unheaded-block-140",
+        "stableAnchor": "unheaded-block-140",
+        "title": "Unheaded block 140",
+        "startLine": 1006,
+        "endLine": 1007,
+        "textDigest": "cb8a65913d31cbbba3ca80990c295a191d337f7ed9323f84b3eb40725f67f9be",
+        "sample": "These are the areas most likely to become tangled if boundaries are not named\nearly:",
+        "identityFingerprint": "6acfa4777e46193c08a5183339adbf0164d9d36a47d385d7fbaa740d91d5a8e9",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "20. Architectural Pressure Points"
+        ],
+        "text": "These are the areas most likely to become tangled if boundaries are not named\nearly:"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-154",
+        "githubAnchor": "unheaded-block-154",
+        "stableAnchor": "unheaded-block-154",
+        "title": "Unheaded block 154",
+        "startLine": 1103,
+        "endLine": 1104,
+        "textDigest": "cb8a65913d31cbbba3ca80990c295a191d337f7ed9323f84b3eb40725f67f9be",
+        "sample": "These are the areas most likely to become tangled if boundaries are not named\nearly:",
+        "identityFingerprint": "6acfa4777e46193c08a5183339adbf0164d9d36a47d385d7fbaa740d91d5a8e9",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "20. Architectural Pressure Points"
+        ],
+        "text": "These are the areas most likely to become tangled if boundaries are not named\nearly:"
+      }
+    },
+    {
+      "claimId": "claim_7eb9780265a604bc3285eefd6046a236",
+      "sourceUnitDigest": "472f88c8598588587368902ac9d3e029db6b242855fb7c195b332168280acf47",
+      "targetUnitDigest": "472f88c8598588587368902ac9d3e029db6b242855fb7c195b332168280acf47",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_7eb9780265a604bc3285eefd6046a236",
+        "sourceUnitDigest": "472f88c8598588587368902ac9d3e029db6b242855fb7c195b332168280acf47",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-155",
+        "targetUnitDigest": "472f88c8598588587368902ac9d3e029db6b242855fb7c195b332168280acf47",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "20. Architectural Pressure Points"
+        ],
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-141 (lines 1009–1029) into docs/platform/component-boundary.md#unheaded-block-155 (lines 1106–1126), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-141",
+        "githubAnchor": "unheaded-block-141",
+        "stableAnchor": "unheaded-block-141",
+        "title": "Unheaded block 141",
+        "startLine": 1009,
+        "endLine": 1029,
+        "textDigest": "472f88c8598588587368902ac9d3e029db6b242855fb7c195b332168280acf47",
+        "sample": "1. Dispatch plus RunResult normalization: dispatch should govern execution;\n   evidence evaluation should govern confidence.\n2. Assignment/Run/RunResult chain ownership: one flow s",
+        "identityFingerprint": "7ad58e38e11d8b307b50973aff40c921ebe00f2c210bf02bee75b415cd5302f2",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "20. Architectural Pressure Points"
+        ],
+        "text": "1. Dispatch plus RunResult normalization: dispatch should govern execution;\n   evidence evaluation should govern confidence.\n2. Assignment/Run/RunResult chain ownership: one flow should not imply one\n   module owns semantic intent, execution attempt, and confidence truth.\n3. Protocol graph plus runtime task state: FlowDefinition defines legal shape;\n   CoordinationSession/AdhocTask records runtime progress.\n4. FlowDefinition policy fields plus dispatch policy resolution: protocol\n   definitions declare hints and constraints; Dispatch computes effective\n   executor/provider/model/mechanism under governance.\n5. Coordinator planning plus domain harness: coordinator proposes; harness\n   enriches or rejects; neither dispatches.\n6. Work-attached session plus Work lifecycle: session may inform the driver;\n   only Work verbs mutate domain-agnostic Work lifecycle, while coding merge,\n   worktree, and technical approval behavior stays in the coding domain\n   extension.\n7. Herdr visibility plus runtime truth: Herdr shows processes; Run/RunResult\n   settle truth.\n8. Cohort diversity plus dispatch: session/coordinator allocates sibling-aware\n   policy inputs; dispatch remains one-Assignment-at-a-time.\n9. Agent-led planning plus free-form prose: inline contracts are mandatory;\n   absence of a declared protocol must not mean unbounded execution."
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-155",
+        "githubAnchor": "unheaded-block-155",
+        "stableAnchor": "unheaded-block-155",
+        "title": "Unheaded block 155",
+        "startLine": 1106,
+        "endLine": 1126,
+        "textDigest": "472f88c8598588587368902ac9d3e029db6b242855fb7c195b332168280acf47",
+        "sample": "1. Dispatch plus RunResult normalization: dispatch should govern execution;\n   evidence evaluation should govern confidence.\n2. Assignment/Run/RunResult chain ownership: one flow s",
+        "identityFingerprint": "7ad58e38e11d8b307b50973aff40c921ebe00f2c210bf02bee75b415cd5302f2",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "20. Architectural Pressure Points"
+        ],
+        "text": "1. Dispatch plus RunResult normalization: dispatch should govern execution;\n   evidence evaluation should govern confidence.\n2. Assignment/Run/RunResult chain ownership: one flow should not imply one\n   module owns semantic intent, execution attempt, and confidence truth.\n3. Protocol graph plus runtime task state: FlowDefinition defines legal shape;\n   CoordinationSession/AdhocTask records runtime progress.\n4. FlowDefinition policy fields plus dispatch policy resolution: protocol\n   definitions declare hints and constraints; Dispatch computes effective\n   executor/provider/model/mechanism under governance.\n5. Coordinator planning plus domain harness: coordinator proposes; harness\n   enriches or rejects; neither dispatches.\n6. Work-attached session plus Work lifecycle: session may inform the driver;\n   only Work verbs mutate domain-agnostic Work lifecycle, while coding merge,\n   worktree, and technical approval behavior stays in the coding domain\n   extension.\n7. Herdr visibility plus runtime truth: Herdr shows processes; Run/RunResult\n   settle truth.\n8. Cohort diversity plus dispatch: session/coordinator allocates sibling-aware\n   policy inputs; dispatch remains one-Assignment-at-a-time.\n9. Agent-led planning plus free-form prose: inline contracts are mandatory;\n   absence of a declared protocol must not mean unbounded execution."
+      }
+    },
+    {
+      "claimId": "claim_27d3a09ef0b56afd3492c7213235e8ca",
+      "sourceUnitDigest": "9379011241408aa9c0707db68d1045cebc7039c465669be302f39370c1847402",
+      "targetUnitDigest": "52d7d5d860e2ecb33e7b15f4b2dc90d9c490d57bc3f0802807d2fae0dba22e4b",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_27d3a09ef0b56afd3492c7213235e8ca",
+        "sourceUnitDigest": "9379011241408aa9c0707db68d1045cebc7039c465669be302f39370c1847402",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "21-suggested-next-discussion-artifact",
+        "targetUnitDigest": "52d7d5d860e2ecb33e7b15f4b2dc90d9c490d57bc3f0802807d2fae0dba22e4b",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory"
+        ],
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/component-boundary/component-boundary-advisory.md#21-suggested-next-discussion-artifact (lines 1031–1031) into docs/platform/component-boundary.md#21-suggested-next-discussion-artifact (lines 1128–1128), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "21. Suggested Next Discussion Artifact",
+        "anchor": "21-suggested-next-discussion-artifact",
+        "githubAnchor": "21-suggested-next-discussion-artifact",
+        "stableAnchor": "h-1e24bd7d835e",
+        "startLine": 1031,
+        "endLine": 1031,
+        "textDigest": "9379011241408aa9c0707db68d1045cebc7039c465669be302f39370c1847402",
+        "sample": "21. Suggested Next Discussion Artifact",
+        "sectionPayloadDigest": "b22dbb8ddd9a83dabd4afeeda11b7bd24792c9ea7308ffb9337e1ed14e6d5660",
+        "followingBlockDigest": "43ab4628e076c75678fca1154aca0c8bafd0f4da49c74ef742f0860a99b072b3",
+        "identityFingerprint": "3dbc04ef8121ea12b6b07f0afa86d832026635e9ab0b100bdac14fcd1bfd229e",
+        "ancestry": [
+          "fgOS Component Boundary Advisory"
+        ],
+        "text": "## 21. Suggested Next Discussion Artifact",
+        "sectionText": "## 21. Suggested Next Discussion Artifact\n\nIf this advisory is accepted as useful, the next useful document is a canonical\nor near-canonical \"Component, Bounded-Context, And Authority Map\" for fgOS as a\nwhole. It should record:\n\n- each high-level component's packaging responsibility;\n- each bounded context's model and vocabulary;\n- each authority boundary's source of truth and writer;\n- state it owns;\n- ports it exposes;\n- adapters it permits;\n- forbidden dependencies;\n- whether it belongs to foundation, domain, integration, visibility, or plugin\n  layer;\n- which seams are active boundaries and which are preserved extension points.\n\nThat document should not be a roadmap. It should be an ownership map that lets\nimplementation slices stay small without losing the architecture, while\nalso preventing a convenient module boundary from silently becoming authority\nover state it does not own."
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "unitKind": "heading",
+        "level": 4,
+        "title": "21. Suggested Next Discussion Artifact",
+        "anchor": "21-suggested-next-discussion-artifact",
+        "githubAnchor": "21-suggested-next-discussion-artifact",
+        "stableAnchor": "h-a9571feffed2",
+        "startLine": 1128,
+        "endLine": 1128,
+        "textDigest": "52d7d5d860e2ecb33e7b15f4b2dc90d9c490d57bc3f0802807d2fae0dba22e4b",
+        "sample": "21. Suggested Next Discussion Artifact",
+        "sectionPayloadDigest": "b22dbb8ddd9a83dabd4afeeda11b7bd24792c9ea7308ffb9337e1ed14e6d5660",
+        "followingBlockDigest": "43ab4628e076c75678fca1154aca0c8bafd0f4da49c74ef742f0860a99b072b3",
+        "identityFingerprint": "6438e9729a3add2229724bb5b3b4f7925f34c105756e7185f5681b7795fe8e8e",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory"
+        ],
+        "text": "#### 21. Suggested Next Discussion Artifact",
+        "sectionText": "#### 21. Suggested Next Discussion Artifact\n\nIf this advisory is accepted as useful, the next useful document is a canonical\nor near-canonical \"Component, Bounded-Context, And Authority Map\" for fgOS as a\nwhole. It should record:\n\n- each high-level component's packaging responsibility;\n- each bounded context's model and vocabulary;\n- each authority boundary's source of truth and writer;\n- state it owns;\n- ports it exposes;\n- adapters it permits;\n- forbidden dependencies;\n- whether it belongs to foundation, domain, integration, visibility, or plugin\n  layer;\n- which seams are active boundaries and which are preserved extension points.\n\nThat document should not be a roadmap. It should be an ownership map that lets\nimplementation slices stay small without losing the architecture, while\nalso preventing a convenient module boundary from silently becoming authority\nover state it does not own."
+      }
+    },
+    {
+      "claimId": "claim_057cf501335065a4f54a49eeb0eb0d59",
+      "sourceUnitDigest": "43ab4628e076c75678fca1154aca0c8bafd0f4da49c74ef742f0860a99b072b3",
+      "targetUnitDigest": "43ab4628e076c75678fca1154aca0c8bafd0f4da49c74ef742f0860a99b072b3",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_057cf501335065a4f54a49eeb0eb0d59",
+        "sourceUnitDigest": "43ab4628e076c75678fca1154aca0c8bafd0f4da49c74ef742f0860a99b072b3",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-156",
+        "targetUnitDigest": "43ab4628e076c75678fca1154aca0c8bafd0f4da49c74ef742f0860a99b072b3",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "21. Suggested Next Discussion Artifact"
+        ],
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-142 (lines 1033–1035) into docs/platform/component-boundary.md#unheaded-block-156 (lines 1130–1132), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-142",
+        "githubAnchor": "unheaded-block-142",
+        "stableAnchor": "unheaded-block-142",
+        "title": "Unheaded block 142",
+        "startLine": 1033,
+        "endLine": 1035,
+        "textDigest": "43ab4628e076c75678fca1154aca0c8bafd0f4da49c74ef742f0860a99b072b3",
+        "sample": "If this advisory is accepted as useful, the next useful document is a canonical\nor near-canonical \"Component, Bounded-Context, And Authority Map\" for fgOS as a\nwhole. It should rec",
+        "identityFingerprint": "42ac8e9ad5c1e4cfe15385978f2c1e09959720830bb78fed1066720c463a766e",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "21. Suggested Next Discussion Artifact"
+        ],
+        "text": "If this advisory is accepted as useful, the next useful document is a canonical\nor near-canonical \"Component, Bounded-Context, And Authority Map\" for fgOS as a\nwhole. It should record:"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-156",
+        "githubAnchor": "unheaded-block-156",
+        "stableAnchor": "unheaded-block-156",
+        "title": "Unheaded block 156",
+        "startLine": 1130,
+        "endLine": 1132,
+        "textDigest": "43ab4628e076c75678fca1154aca0c8bafd0f4da49c74ef742f0860a99b072b3",
+        "sample": "If this advisory is accepted as useful, the next useful document is a canonical\nor near-canonical \"Component, Bounded-Context, And Authority Map\" for fgOS as a\nwhole. It should rec",
+        "identityFingerprint": "42ac8e9ad5c1e4cfe15385978f2c1e09959720830bb78fed1066720c463a766e",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "21. Suggested Next Discussion Artifact"
+        ],
+        "text": "If this advisory is accepted as useful, the next useful document is a canonical\nor near-canonical \"Component, Bounded-Context, And Authority Map\" for fgOS as a\nwhole. It should record:"
+      }
+    },
+    {
+      "claimId": "claim_5ca2b6ffe0827597b89098f4c32ce644",
+      "sourceUnitDigest": "14f6554299fda71e196ef3589ccc01223d9eb29d2565c387461fb1a9f6a7b59e",
+      "targetUnitDigest": "14f6554299fda71e196ef3589ccc01223d9eb29d2565c387461fb1a9f6a7b59e",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_5ca2b6ffe0827597b89098f4c32ce644",
+        "sourceUnitDigest": "14f6554299fda71e196ef3589ccc01223d9eb29d2565c387461fb1a9f6a7b59e",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-157",
+        "targetUnitDigest": "14f6554299fda71e196ef3589ccc01223d9eb29d2565c387461fb1a9f6a7b59e",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "21. Suggested Next Discussion Artifact"
+        ],
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-143 (lines 1037–1046) into docs/platform/component-boundary.md#unheaded-block-157 (lines 1134–1143), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-143",
+        "githubAnchor": "unheaded-block-143",
+        "stableAnchor": "unheaded-block-143",
+        "title": "Unheaded block 143",
+        "startLine": 1037,
+        "endLine": 1046,
+        "textDigest": "14f6554299fda71e196ef3589ccc01223d9eb29d2565c387461fb1a9f6a7b59e",
+        "sample": "- each high-level component's packaging responsibility;\n- each bounded context's model and vocabulary;\n- each authority boundary's source of truth and writer;\n- state it owns;\n- po",
+        "identityFingerprint": "fa3cf3f7fefdb6db2f1164a374b0e6f43c10d78362fc5fc2f0f90c53f3221736",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "21. Suggested Next Discussion Artifact"
+        ],
+        "text": "- each high-level component's packaging responsibility;\n- each bounded context's model and vocabulary;\n- each authority boundary's source of truth and writer;\n- state it owns;\n- ports it exposes;\n- adapters it permits;\n- forbidden dependencies;\n- whether it belongs to foundation, domain, integration, visibility, or plugin\n  layer;\n- which seams are active boundaries and which are preserved extension points."
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-157",
+        "githubAnchor": "unheaded-block-157",
+        "stableAnchor": "unheaded-block-157",
+        "title": "Unheaded block 157",
+        "startLine": 1134,
+        "endLine": 1143,
+        "textDigest": "14f6554299fda71e196ef3589ccc01223d9eb29d2565c387461fb1a9f6a7b59e",
+        "sample": "- each high-level component's packaging responsibility;\n- each bounded context's model and vocabulary;\n- each authority boundary's source of truth and writer;\n- state it owns;\n- po",
+        "identityFingerprint": "fa3cf3f7fefdb6db2f1164a374b0e6f43c10d78362fc5fc2f0f90c53f3221736",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "21. Suggested Next Discussion Artifact"
+        ],
+        "text": "- each high-level component's packaging responsibility;\n- each bounded context's model and vocabulary;\n- each authority boundary's source of truth and writer;\n- state it owns;\n- ports it exposes;\n- adapters it permits;\n- forbidden dependencies;\n- whether it belongs to foundation, domain, integration, visibility, or plugin\n  layer;\n- which seams are active boundaries and which are preserved extension points."
+      }
+    },
+    {
+      "claimId": "claim_2edc9ac16c08e3b8d4693f71bfd5369f",
+      "sourceUnitDigest": "bc33b17dfd01c19eb8fb523aff986bf0738d4aeba3484fac4522f1fd77809368",
+      "targetUnitDigest": "bc33b17dfd01c19eb8fb523aff986bf0738d4aeba3484fac4522f1fd77809368",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_2edc9ac16c08e3b8d4693f71bfd5369f",
+        "sourceUnitDigest": "bc33b17dfd01c19eb8fb523aff986bf0738d4aeba3484fac4522f1fd77809368",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-158",
+        "targetUnitDigest": "bc33b17dfd01c19eb8fb523aff986bf0738d4aeba3484fac4522f1fd77809368",
+        "targetAncestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "21. Suggested Next Discussion Artifact"
+        ],
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-144 (lines 1048–1051) into docs/platform/component-boundary.md#unheaded-block-158 (lines 1145–1148), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-144",
+        "githubAnchor": "unheaded-block-144",
+        "stableAnchor": "unheaded-block-144",
+        "title": "Unheaded block 144",
+        "startLine": 1048,
+        "endLine": 1051,
+        "textDigest": "bc33b17dfd01c19eb8fb523aff986bf0738d4aeba3484fac4522f1fd77809368",
+        "sample": "That document should not be a roadmap. It should be an ownership map that lets\nimplementation slices stay small without losing the architecture, while\nalso preventing a convenient ",
+        "identityFingerprint": "40a9c870bccfb7f114181ad28c675b05bcb18b68332c344df9738139a7a07e16",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "21. Suggested Next Discussion Artifact"
+        ],
+        "text": "That document should not be a roadmap. It should be an ownership map that lets\nimplementation slices stay small without losing the architecture, while\nalso preventing a convenient module boundary from silently becoming authority\nover state it does not own."
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-158",
+        "githubAnchor": "unheaded-block-158",
+        "stableAnchor": "unheaded-block-158",
+        "title": "Unheaded block 158",
+        "startLine": 1145,
+        "endLine": 1148,
+        "textDigest": "bc33b17dfd01c19eb8fb523aff986bf0738d4aeba3484fac4522f1fd77809368",
+        "sample": "That document should not be a roadmap. It should be an ownership map that lets\nimplementation slices stay small without losing the architecture, while\nalso preventing a convenient ",
+        "identityFingerprint": "40a9c870bccfb7f114181ad28c675b05bcb18b68332c344df9738139a7a07e16",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "21. Suggested Next Discussion Artifact"
+        ],
+        "text": "That document should not be a roadmap. It should be an ownership map that lets\nimplementation slices stay small without losing the architecture, while\nalso preventing a convenient module boundary from silently becoming authority\nover state it does not own."
+      }
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "a36PopulationByClass": {
+    "Unit-exact": [],
+    "Weak-exact": [
+      "claim_4eca744c23d1052489bfce3c6d545ab5",
+      "claim_7eb9780265a604bc3285eefd6046a236",
+      "claim_057cf501335065a4f54a49eeb0eb0d59",
+      "claim_5ca2b6ffe0827597b89098f4c32ce644",
+      "claim_2edc9ac16c08e3b8d4693f71bfd5369f"
+    ],
+    "Judgment": [
+      "claim_27d3a09ef0b56afd3492c7213235e8ca"
+    ]
+  }
+}

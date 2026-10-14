@@ -1,0 +1,585 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:38@2026-10-15",
+  "scope": [
+    "docs/architect/architecture-intent.md",
+    "docs/architect/component-boundary/component-boundary-advisory.md",
+    "docs/architect/component-boundary/README.md",
+    "docs/architect/component-boundary/repo-layout-vision.md",
+    "docs/architect/README.md",
+    "docs/architect/roadmap.md",
+    "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+    "docs/architect/workspace-topology-audit.md",
+    "docs/architect/workspace-topology-roadmap.md",
+    "docs/architect/workspace-topology.md",
+    "docs/architecture-map.md",
+    "docs/specs/system-overview.md"
+  ],
+  "rows": [
+    {
+      "claimId": "claim_fa634b3e30b51cd9a715a68c66a6c6cd",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "architecture-map",
+      "unitDigest": "bcd8d331cdf19bae5bd9e2c905ae105b6602bc14fcbcc49936d94a465648acf0",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_7b42d1f1ec85abb92f9124fa12ff86e0",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "23c5433eab71eb0bf72530aa096a6fb852745b86503954b0b364a77b3e18670b",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_0cac3815f330102dda880aa4a9cee9a9",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "1-purpose",
+      "unitDigest": "be40287dd052e2a58a481eca5a9c26803a99c71e079cbe5d1f48ebbf08d8f313",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_26777b895aa016631ca689bd4f87afc7",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "68716afb3dda001cd96ab7a995e126ac526255487b5047319b29fecd24fe8775",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_5d0c6632450568243317dd086a5853bf",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "afc142aea3205ebe232bc65cfcad405006ce0c5dbbcf129c23ac7d3daae41deb",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_9b2a0e0128ac38f2400fdd8239a9a75d",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "2-reading-model",
+      "unitDigest": "e12c2ee084ca79541f3df7e3e9e91cf6bc0689c249f3dbba9d59c95351d70377",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_99b07c1da9ac5d14a39dfde1c2750131",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "241aac718cd28f3b4e86328c1b53e14ab43ab2457b01d7fae55786c3b706288f",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_5663da2b2b3c94add15ab1ba5b75917d",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "5b19cb31509d7bb8693310e3a6b1994f68301f63b2d339ea39dbfe7635a8d72f",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_ee2fe1fcb299bfa19c57700b45be1766",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "a03df4ba273840097cc9d52875113f631a2a913028f8eec37b3d7778c95e2923",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_4bbe5a740067198320d036fdd8743e7c",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "e3d1ba266d00910dcfc85ee6662a3354211640e1f315223f84db62981f8d73ba",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_08b63da9e9f152cd8f66e576898d1d37",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "3-current-shape",
+      "unitDigest": "0943acc71e69148395194b8e69ab99d9f4d519c633e407b3745574241dbf8ad2",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_1704754baa11baa361c23479e876c7b9",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "d357c0787f40103f6284132aa5e82344685766c2cac1c2a9fd2634ea9b6f0def",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_eb7750bfa1cf3ed6959126bb83345f40",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "86c7ae350779393f0a5557b684231621791068d099cfe10c17bd6a4493e85872",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_412840f35b9e3f874c394dd8b85cf297",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "3f49089a112019f9506460f7fcd819e3ce194cc76ed02c88efa0e41e28e50853",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_e6c17a2321df4b31d36ae8f830f011d9",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "4-change-rule",
+      "unitDigest": "572faca05bb217c28e934745c6bc1540a7571bdcdeb3389e1e34f7b43b376aac",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_8490c1969dc4668c7875c3360295da0b",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "78466155eac7663bb68e6a1e1837c864a54f828f562596d07991a13197fd3a60",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_d63ead69be42bc59fd0ba597b9c56f73",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "42579709d7a4138710205008d889fd495f9fcd931526a5ca4db5e5e5d2594ba0",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_87bee0710bd078c1fbd49e651c3e3280",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "5-legacy-source",
+      "unitDigest": "419f628006c4594febd9b033d546a640bceb9ea3f2b64424457928d06fbcc151",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_9733e00101a0e8571c2b13b1b7659902",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "2bf6a602063a801647d08720214fd9ab86045a5e8fa89dfbb0cc81a8befed87c",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_bdeec56f775d4bbd0bab5b121cb21184",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "added-in-candidate-architecture-map-source-carriage",
+      "unitDigest": "753970a184e63b9cb95829096fbffaaba089f4b519f5b13f6ef7ea188c07f977",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_7807bb743d35f824e666aea198deb475",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "ff0cebcb42c0dda1443764763345db7ce15cced9342aab59a7a5e1a129177e36",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b3accab399a342e74cfc9f0a80322ab0",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "component-boundary",
+      "unitDigest": "6bc383951cb3164cfe0d7eda0a0fda55cbab77c5de19185f0f9e72c3dcba8081",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_84a933eabe0c7693f8286447605b07dc",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "4440935e581cf4814a9fd23e8fd1c81f854cbd7b40144e05bad405a94bd979ec",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_d75dabab4a879f6c66f46958eaf99ef5",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "1-purpose",
+      "unitDigest": "488337d8f1b00cc529dab2f10ee67e4e0ee1ac6775d1f63985676f08048245b0",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_1f96489735bc11e76a941f7c0bba2bad",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "00dd08421918b12e434bb0709bce8fa430b156f3940834dcb773529bed602a8f",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_6b0bb16dca9de7dfe5721722a0a798a3",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "86fae76e86657b80527ef9314b287130c2af7f5a29391b155b5934082a1d1498",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_8f18b63b71b7d9431414d08beedc3921",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "2-current-source-during-migration",
+      "unitDigest": "5341c959c3d2fdd7e6713f825e09d581449633c8f54de7a70ca0421f34cdfd85",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_88b807df35d765018f92641351a46283",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "5a4f9608c6c88b211b79a9e695b3242279891daf915424ff0dfc42f1ff7ccded",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_aacc38bae14d6ddc021cc4278795f5af",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "ef970220b2a0deaa9fe9d0aabe96a61d29451f0955f547b511aaa46b7f5df403",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_98c0bcbf807cefc91820028ca5a3ea76",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "146d21b69eac577a72cd212c76f8a62a0538f00e5c1a882abd5654b2351fda42",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_2c77e24af387b57a9c1c75101fac6e73",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "3-update-rule",
+      "unitDigest": "1ca2e20b0caaa2013cfa2c065d5fa85202034197e86aac5ac162a44c2c61451d",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_87aa008d95f5575a18f9c8a84d86f74d",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "931c4d6895bd0c9820534e6587755c4ff1370b0737dc6cd169f806faf5643af0",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_f1d9a8653090838260a111f47381ee1a",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "a9dc381fff40284c0c3b7e441652537e68064a92adad8e838afe267b4ad7a6bc",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_4c287afb27181ca336afd0459b6df321",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "0de4043eee48d40910da8a29038a48444c7348e7b16df286dbd5726fa7e3d6e6",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_60b200d89cba5da6157ee4c3b7311a2e",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "4-current-high-level-components",
+      "unitDigest": "074412d0f27fb46eef0f2f874fa82854cfe3d19f27ec43eb1bceb4234a3c7108",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_4b3482e666dba2d9678b4f8bf0fefcea",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "36c91b4a266f2cce40ec42a6cbd62b58b528279168a1f18813f26320a368c040",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_281124881201e09f11dbb099caeee81c",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "6bea55eabbf3ca711b55d4bee07df1e778082b2c93056e32cd2385c41465f4df",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_04ad87d13e4de217b79136140dab35f4",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "5-how-to-change",
+      "unitDigest": "b4423d9bf996a66389e78604c6db56148f7538f902148aa7d25570efb7952fd3",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_494478c0f174c1316cb79499ecd22da7",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "345cb600b2af33bffdee76c814f7c800ca86d7f801ea60f040e38c6e9a251405",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_5d3c632ef3e6b7631307307d54682e71",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "6-related-files",
+      "unitDigest": "1313f97e7dee44b4db59dac70ff9b0a41c4bc904dde3ca26cac5926a20f19c3a",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_088901bb1c7d69b87da383ddce95fe18",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "dd9bdd0cd63e539a2ae55a9d73c2ba85351ad2befc50c30551992df9f7efd894",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_568f01ef849f421829301c6915bb229a",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "added-in-candidate-component-boundary-advisory-source-carriage",
+      "unitDigest": "f1c3eb7baa65505f9f680c1a52a1ee64950b98f9b8af505785789ed587b2e985",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_07791d764c90e9fb064d1f2d24405532",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "5c900dfeaf4d283852e8c26b515a900fa5260d59ba760a3d6bc82174f54c2699",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_a1b1028d7f59d5c4abc36be529d775ce",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "added-in-candidate-readme-source-carriage",
+      "unitDigest": "fe10be3720c20ffc8fa0f52158bcf0bf08bfbeb870c8080a4e82ad3903e79419",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_9f9d5f8014b5411013ef1423cdddc32f",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-159",
+      "unitDigest": "c6fa906e1372bdc87bca865c0a89d94a184e689c9880bf94c6dce80ff25cd0a6",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_779a50ced8b8ee88dfc0a5c0d13ea897",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "added-in-candidate-repo-layout-vision-source-carriage",
+      "unitDigest": "8a51c360ba667e340a596d974c46ad4e74450a36b375c5a34460fdbc87da9058",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_2ca8344b20f24a67a8414f3d6ac78158",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-200",
+      "unitDigest": "8d6eec3640a155c73aafb3fdb2868e4e9747da8885c6c2b4b8a779146f44569a",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_33cab447f5d37437033c2024d39072cc",
+      "path": "docs/platform/README.md",
+      "anchor": "platform-documentation",
+      "unitDigest": "8fc9c0389780b881695ab47666312083822592c77e4e6e7edc4ab35da7c1299e",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b45c04655f2d6427c8dcb5ee6579e3dd",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "de17bdcf6470426386de3e75549ce8239a1e535e747842facdc53dd258fb1479",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_026114d1153a519da8c725be403babc1",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "efc34ef6f5aa655035efac51a724089ce84dd17cd231f6dacdef63f5d1356c05",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b4cf0df2f8bcb0d3daa27b5fc3bfdadb",
+      "path": "docs/platform/README.md",
+      "anchor": "1-platform-wide-anchors",
+      "unitDigest": "a50bb1654cb8fda3fd30a1d4de47465b15870f24a5a7034d6c003f6ee386612c",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_0ce4eb1bfa6b34e3831ae06a72ae3542",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "b91459b47f7a7aec45a0e03afc29342b26e9cdba66f334988a648ac9acf6e4bd",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_8f3435494fd3ab6edecb312621fd044d",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_1898cdafa7835d675526173d39eb5cd2",
+      "path": "docs/platform/README.md",
+      "anchor": "2-area-registry",
+      "unitDigest": "c1c8d66852c686b940eb0ceab00d7f6abde4f143be360919f223176afeae88d1",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_cb178b2f0832cfa84b1cbd611e0f7e3a",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "ca9b55008482c55a9c860c3c957855a19075bdd07ef9e882435be2c6d2413069",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_ec78621ff44b9fe7fa47ce85bd84bfa6",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "f2d3701022f39f5669ec2aa50aa078458032d0aad4398630e3aaf3dcc5b353ca",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_e6c39f56c4d05238618e1a7fb7004af1",
+      "path": "docs/platform/README.md",
+      "anchor": "3-decision-surface",
+      "unitDigest": "5b577ba76c013ac3079053a37da9764292815a862e3d1519d54172d8d9bf7e3c",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_6143f65cb5e3d4d41e7b957306ab6e4e",
+      "path": "docs/platform/README.md",
+      "anchor": "4-how-to-change-platform-docs",
+      "unitDigest": "26ba4bbb4020dfcf0e9c7691d01fae431c0ade4e92ec48d9e28793ac84ccd34b",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_471738010525b3b6490003c96f408273",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "e4046fd7c27a762982d49241b30e3f99899719586530455fb4e9dfc7fbb6734f",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_cf06097fa740bba9d230af78ec04463d",
+      "path": "docs/platform/README.md",
+      "anchor": "5-related-files",
+      "unitDigest": "c216275c70704b3851ca22c07410a6743b69a249a0fda11cf67bc8b848cce2a5",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b9ae3399674ba8e92c79e75b7b35c6c3",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "233073464aa7a066ec6812e54a3bbc87f523a2f83c8b0a1c87d09448296f8c74",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_e88d54e093c0cbc64cf8a291109760aa",
+      "path": "docs/platform/README.md",
+      "anchor": "added-in-candidate-readme-source-carriage",
+      "unitDigest": "7ae95d9a526d22db68c323a88db9e35e1ec667750e5a4616445c67012f0669e8",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_fdf5951f6ac14750049b17bc79477f9c",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "921a04d4bd874a25f9f0f4abb48bb704c8eb0203baacd7b5b20407d268aa1638",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_a5bea09289d356820c12b650f473b9a5",
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "29832c476e0e8af9e461a1d23df4767e64382135d014ec3b3160de320e645d6d",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_ac1a0faff59618ebf38ccf8e6000fd40",
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_6cd449ef115de0465d810e5dfccc2bc7",
+      "path": "docs/platform/system-architecture/architecture/roadmap.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "76468776b88732bb4e083b27d96380bb697fc12ccd88a349be860800200ef2a0",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_d63d7990151f2781a8a4da339c62ac64",
+      "path": "docs/platform/system-architecture/architecture/roadmap.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_3194ec35382127f6edde53d0697a232d",
+      "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "c0c113ba85ee7b2d4de003e40d27463f653fe08013463bb68aa5830df5015113",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_3a39f4a6f5622e7db7a9913956c9aa6e",
+      "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_1200f05152a6a9b464b6c12bc17f21db",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "b851e6ad89a3503be3a6cbdf0b6a4e6b9ef978e2aefa616c3032ddc3235b7599",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b5f698f6088c010eec3a5fa77d0e9e61",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_638ffba5b4214918a4123ad8ac2def28",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "120fffc25f8269b4e34d850a9c84e43796aa1fafc9cd67808c67ecd0579b9042",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_faf6a192a58c297957a66b34b5e395d7",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_ba08d1a48089f77718d81c9b2c825202",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "e44eb7add5cc37f535199ac750be110dd7e016fcab5900b300da62673e7f921f",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_411decb502d39d43876c5d7da7e1cf7f",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_0dc85618100636a09598f0d426315ac8",
+      "path": "docs/platform/system-overview/spec.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "7149b336edba9024596b27d6733db1774fc939667ae9f7962e1e17948534a9b6",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_bb7cef766e9e315e8d571c2439266591",
+      "path": "docs/platform/system-overview/spec.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_ac724d4356d7b0991556746868bdf769",
+      "path": "docs/platform/system-overview/spec.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "c14e6d885d8ddd0d15c5c8e447c051e813669cf0889523b27d14ab00267a9ea8",
+      "status": "candidate-unverified"
+    }
+  ],
+  "count": 79,
+  "previousCount": 0,
+  "authoredCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+  "nativeRebinding": {
+    "fullNativeTupleEquality": true,
+    "knownIDsPreserved": true,
+    "noApprovalCarry": true,
+    "verifiedCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+    "verification": "reports/phase-06/whole-system-native-verification.json",
+    "reviewStatus": "candidate-unverified; no approval or truth certification",
+    "meaning": "Actual native conservation output; all newly allocated identities and predecessor gaps retained without graft or invented disposition."
+  }
+}

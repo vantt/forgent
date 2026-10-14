@@ -1,0 +1,1874 @@
+{
+  "version": 1,
+  "commit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+  "shard": "s6-whole-system-system-vision-trong-mem-ngoai-cung.json",
+  "authorSession": "codex-session:37@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_7af08f7b19633c3efc3c54cb870ad5f5",
+      "sourceUnitDigest": "3c6cade55629a91704628da7ada07f43360fff62bcc6e8d1c23abae9ddce8d81",
+      "targetUnitDigest": "ed8092dd2b9cd330bc467efd0472a61b70765f53bbaeab1087126c74beff1e28",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_7af08f7b19633c3efc3c54cb870ad5f5",
+        "sourceUnitDigest": "3c6cade55629a91704628da7ada07f43360fff62bcc6e8d1c23abae9ddce8d81",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "system-vision-trong-mem-ngoai-cung",
+        "targetUnitDigest": "ed8092dd2b9cd330bc467efd0472a61b70765f53bbaeab1087126c74beff1e28",
+        "targetAncestry": [],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#system-vision-trong-mem-ngoai-cung (lines 1–1) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#system-vision-trong-mem-ngoai-cung (lines 1–1), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "System Vision: Trong Mem Ngoai Cung",
+        "anchor": "system-vision-trong-mem-ngoai-cung",
+        "githubAnchor": "system-vision-trong-mem-ngoai-cung",
+        "stableAnchor": "h-ab626936e74c",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "3c6cade55629a91704628da7ada07f43360fff62bcc6e8d1c23abae9ddce8d81",
+        "sample": "System Vision: Trong Mem Ngoai Cung",
+        "sectionPayloadDigest": "2d38a8b85750e2ad698eb5bada7baa91dea80b0d4f430179ebde5f51b9cb27d6",
+        "followingBlockDigest": "2d38a8b85750e2ad698eb5bada7baa91dea80b0d4f430179ebde5f51b9cb27d6",
+        "identityFingerprint": "5dc61095ac85b2912668b7704cb41868ec284b170af45f305a0ec1174fc8b496",
+        "ancestry": [],
+        "text": "# System Vision: Trong Mem Ngoai Cung",
+        "sectionText": "# System Vision: Trong Mem Ngoai Cung\n\nDocument type: System-wide architecture vision\nDesign status: Guiding vision\nImplementation: Cross-cutting\nLast reviewed: 2026-09-05\nCanonical for: balancing hard runtime contracts with adaptive agent soul/prose/skill across fgOS"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "System Vision: Trong Mem Ngoai Cung",
+        "anchor": "system-vision-trong-mem-ngoai-cung",
+        "githubAnchor": "system-vision-trong-mem-ngoai-cung",
+        "stableAnchor": "h-ab626936e74c",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "ed8092dd2b9cd330bc467efd0472a61b70765f53bbaeab1087126c74beff1e28",
+        "sample": "System Vision: Trong Mem Ngoai Cung",
+        "sectionPayloadDigest": "bc7fd2bfd14a8acc8ac1b376269d2435989d8a96a91f782f625321ccb2dba5cb",
+        "followingBlockDigest": "c0c113ba85ee7b2d4de003e40d27463f653fe08013463bb68aa5830df5015113",
+        "identityFingerprint": "306b00634acd7d63939a1b1d49aef9b2d6f1dfb657d8094d07617964196f4048",
+        "ancestry": [],
+        "text": "# System Vision: Trong Mem Ngoai Cung",
+        "sectionText": "# System Vision: Trong Mem Ngoai Cung\n\n```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete system-vision-trong-mem-ngoai-cung.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/system-vision-trong-mem-ngoai-cung.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 473dd8f1f28f4573194c47ca787973c52cc65756)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/system-vision-trong-mem-ngoai-cung.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/system-vision-trong-mem-ngoai-cung.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```\n\nAdded in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion.\n\n\nDocument type: System-wide architecture vision\nDesign status: Guiding vision\nImplementation: Cross-cutting\nLast reviewed: 2026-09-05\nCanonical for: balancing hard runtime contracts with adaptive agent soul/prose/skill across fgOS"
+      }
+    },
+    {
+      "claimId": "claim_733bbbdcf82cccec0ae64f0d51bbae35",
+      "sourceUnitDigest": "2d38a8b85750e2ad698eb5bada7baa91dea80b0d4f430179ebde5f51b9cb27d6",
+      "targetUnitDigest": "2d38a8b85750e2ad698eb5bada7baa91dea80b0d4f430179ebde5f51b9cb27d6",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_733bbbdcf82cccec0ae64f0d51bbae35",
+        "sourceUnitDigest": "2d38a8b85750e2ad698eb5bada7baa91dea80b0d4f430179ebde5f51b9cb27d6",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-3",
+        "targetUnitDigest": "2d38a8b85750e2ad698eb5bada7baa91dea80b0d4f430179ebde5f51b9cb27d6",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-1 (lines 3–7) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-3 (lines 26–30), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 7,
+        "textDigest": "2d38a8b85750e2ad698eb5bada7baa91dea80b0d4f430179ebde5f51b9cb27d6",
+        "sample": "Document type: System-wide architecture vision\nDesign status: Guiding vision\nImplementation: Cross-cutting\nLast reviewed: 2026-09-05\nCanonical for: balancing hard runtime contracts",
+        "identityFingerprint": "951a5a0a3499d70ba6b923dacf639bfcc709d673e3072ec5b214dbd89a7f8655",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "Document type: System-wide architecture vision\nDesign status: Guiding vision\nImplementation: Cross-cutting\nLast reviewed: 2026-09-05\nCanonical for: balancing hard runtime contracts with adaptive agent soul/prose/skill across fgOS"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 26,
+        "endLine": 30,
+        "textDigest": "2d38a8b85750e2ad698eb5bada7baa91dea80b0d4f430179ebde5f51b9cb27d6",
+        "sample": "Document type: System-wide architecture vision\nDesign status: Guiding vision\nImplementation: Cross-cutting\nLast reviewed: 2026-09-05\nCanonical for: balancing hard runtime contracts",
+        "identityFingerprint": "951a5a0a3499d70ba6b923dacf639bfcc709d673e3072ec5b214dbd89a7f8655",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "Document type: System-wide architecture vision\nDesign status: Guiding vision\nImplementation: Cross-cutting\nLast reviewed: 2026-09-05\nCanonical for: balancing hard runtime contracts with adaptive agent soul/prose/skill across fgOS"
+      }
+    },
+    {
+      "claimId": "claim_64a8c8baf09cc399d820a25f51c530aa",
+      "sourceUnitDigest": "2b97a7318c1621bd5bcc1f1a4cee9c4f76466582a7101067669f6782ecfc78f6",
+      "targetUnitDigest": "2b97a7318c1621bd5bcc1f1a4cee9c4f76466582a7101067669f6782ecfc78f6",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_64a8c8baf09cc399d820a25f51c530aa",
+        "sourceUnitDigest": "2b97a7318c1621bd5bcc1f1a4cee9c4f76466582a7101067669f6782ecfc78f6",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "1-vision",
+        "targetUnitDigest": "2b97a7318c1621bd5bcc1f1a4cee9c4f76466582a7101067669f6782ecfc78f6",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#1-vision (lines 9–9) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#1-vision (lines 32–32), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "1. Vision",
+        "anchor": "1-vision",
+        "githubAnchor": "1-vision",
+        "stableAnchor": "h-2d9d89f440a5",
+        "startLine": 9,
+        "endLine": 9,
+        "textDigest": "2b97a7318c1621bd5bcc1f1a4cee9c4f76466582a7101067669f6782ecfc78f6",
+        "sample": "1. Vision",
+        "sectionPayloadDigest": "2e43f1ffee787e62e06b18843f3b3d8af74db17d2452003ff8af4c0cc5bd5fe0",
+        "followingBlockDigest": "df0a9ebc856762709c383a1a7a6543ab58134e65953ec5d8d8ca58e5c423c055",
+        "identityFingerprint": "f53001a2503caf6d55c76e716c74809b6f068a5f087506bd70d1638645f43510",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 1. Vision",
+        "sectionText": "## 1. Vision\n\nfgOS should be **trong mem, ngoai cung**: a strong body operated by a superior\nintelligence.\n\nThe outside must be hard:\n\n- contracts are explicit;\n- state transitions are lawful;\n- evidence is auditable;\n- capabilities are fenced;\n- roots and writer authority are typed;\n- runtime behavior is reproducibly verifiable.\n\nThe inside must be soft:\n\n- prose can carry judgment;\n- skills can adapt to context;\n- agents can reason, reframe, negotiate, and recover;\n- coordination can use human-shaped operating patterns;\n- domain behavior can stay expressive instead of becoming only schema.\n\nThe target is not softness instead of rigor, or rigor instead of intelligence.\nThe target is a living system that is flexible, graceful, quick, strong, and\nprecise because each side does its own job.\n\n```txt\nOutside hard:\n  contract, state, capability, topology, proof, audit\n\nInside soft:\n  soul, prose, skill, judgment, collaboration, domain intelligence\n```"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "1. Vision",
+        "anchor": "1-vision",
+        "githubAnchor": "1-vision",
+        "stableAnchor": "h-9b63ca9bcf86",
+        "startLine": 32,
+        "endLine": 32,
+        "textDigest": "2b97a7318c1621bd5bcc1f1a4cee9c4f76466582a7101067669f6782ecfc78f6",
+        "sample": "1. Vision",
+        "sectionPayloadDigest": "2e43f1ffee787e62e06b18843f3b3d8af74db17d2452003ff8af4c0cc5bd5fe0",
+        "followingBlockDigest": "df0a9ebc856762709c383a1a7a6543ab58134e65953ec5d8d8ca58e5c423c055",
+        "identityFingerprint": "f53001a2503caf6d55c76e716c74809b6f068a5f087506bd70d1638645f43510",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 1. Vision",
+        "sectionText": "## 1. Vision\n\nfgOS should be **trong mem, ngoai cung**: a strong body operated by a superior\nintelligence.\n\nThe outside must be hard:\n\n- contracts are explicit;\n- state transitions are lawful;\n- evidence is auditable;\n- capabilities are fenced;\n- roots and writer authority are typed;\n- runtime behavior is reproducibly verifiable.\n\nThe inside must be soft:\n\n- prose can carry judgment;\n- skills can adapt to context;\n- agents can reason, reframe, negotiate, and recover;\n- coordination can use human-shaped operating patterns;\n- domain behavior can stay expressive instead of becoming only schema.\n\nThe target is not softness instead of rigor, or rigor instead of intelligence.\nThe target is a living system that is flexible, graceful, quick, strong, and\nprecise because each side does its own job.\n\n```txt\nOutside hard:\n  contract, state, capability, topology, proof, audit\n\nInside soft:\n  soul, prose, skill, judgment, collaboration, domain intelligence\n```"
+      }
+    },
+    {
+      "claimId": "claim_c7c23597f0f59066744415e2b42c32ee",
+      "sourceUnitDigest": "df0a9ebc856762709c383a1a7a6543ab58134e65953ec5d8d8ca58e5c423c055",
+      "targetUnitDigest": "df0a9ebc856762709c383a1a7a6543ab58134e65953ec5d8d8ca58e5c423c055",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_c7c23597f0f59066744415e2b42c32ee",
+        "sourceUnitDigest": "df0a9ebc856762709c383a1a7a6543ab58134e65953ec5d8d8ca58e5c423c055",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "df0a9ebc856762709c383a1a7a6543ab58134e65953ec5d8d8ca58e5c423c055",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-2 (lines 11–12) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-4 (lines 34–35), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 11,
+        "endLine": 12,
+        "textDigest": "df0a9ebc856762709c383a1a7a6543ab58134e65953ec5d8d8ca58e5c423c055",
+        "sample": "fgOS should be **trong mem, ngoai cung**: a strong body operated by a superior\nintelligence.",
+        "identityFingerprint": "4ec00562dfbfc8f45cd7473ab6fda8aefcd378fa85a619b0bab9fe12aac00af7",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "fgOS should be **trong mem, ngoai cung**: a strong body operated by a superior\nintelligence."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 34,
+        "endLine": 35,
+        "textDigest": "df0a9ebc856762709c383a1a7a6543ab58134e65953ec5d8d8ca58e5c423c055",
+        "sample": "fgOS should be **trong mem, ngoai cung**: a strong body operated by a superior\nintelligence.",
+        "identityFingerprint": "4ec00562dfbfc8f45cd7473ab6fda8aefcd378fa85a619b0bab9fe12aac00af7",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "fgOS should be **trong mem, ngoai cung**: a strong body operated by a superior\nintelligence."
+      }
+    },
+    {
+      "claimId": "claim_74f677288b1f88a2bd061f430885442c",
+      "sourceUnitDigest": "08c06530837bcf99e37c66ace553bb05831af473a279e2cd6c5b5c7c818c8c96",
+      "targetUnitDigest": "08c06530837bcf99e37c66ace553bb05831af473a279e2cd6c5b5c7c818c8c96",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_74f677288b1f88a2bd061f430885442c",
+        "sourceUnitDigest": "08c06530837bcf99e37c66ace553bb05831af473a279e2cd6c5b5c7c818c8c96",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "08c06530837bcf99e37c66ace553bb05831af473a279e2cd6c5b5c7c818c8c96",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-3 (lines 14–14) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-5 (lines 37–37), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 14,
+        "endLine": 14,
+        "textDigest": "08c06530837bcf99e37c66ace553bb05831af473a279e2cd6c5b5c7c818c8c96",
+        "sample": "The outside must be hard:",
+        "identityFingerprint": "acc338fec16cadf3b031180af99b620c1af7dedbe309312a53e806b47a2e954e",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "The outside must be hard:"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "08c06530837bcf99e37c66ace553bb05831af473a279e2cd6c5b5c7c818c8c96",
+        "sample": "The outside must be hard:",
+        "identityFingerprint": "acc338fec16cadf3b031180af99b620c1af7dedbe309312a53e806b47a2e954e",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "The outside must be hard:"
+      }
+    },
+    {
+      "claimId": "claim_4908c7e38d4253d644d9510066b39e3e",
+      "sourceUnitDigest": "fb65608afa835d405a300ecefaaf8480c43f37269313e38862d84f63c10d908d",
+      "targetUnitDigest": "fb65608afa835d405a300ecefaaf8480c43f37269313e38862d84f63c10d908d",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_4908c7e38d4253d644d9510066b39e3e",
+        "sourceUnitDigest": "fb65608afa835d405a300ecefaaf8480c43f37269313e38862d84f63c10d908d",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-6",
+        "targetUnitDigest": "fb65608afa835d405a300ecefaaf8480c43f37269313e38862d84f63c10d908d",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-4 (lines 16–21) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-6 (lines 39–44), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 16,
+        "endLine": 21,
+        "textDigest": "fb65608afa835d405a300ecefaaf8480c43f37269313e38862d84f63c10d908d",
+        "sample": "- contracts are explicit;\n- state transitions are lawful;\n- evidence is auditable;\n- capabilities are fenced;\n- roots and writer authority are typed;\n- runtime behavior is reproduc",
+        "identityFingerprint": "8cd3c9034d72d0d7d034b4bf5be0b94b046971f22fa9f35f92856556f7f41df4",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "- contracts are explicit;\n- state transitions are lawful;\n- evidence is auditable;\n- capabilities are fenced;\n- roots and writer authority are typed;\n- runtime behavior is reproducibly verifiable."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 39,
+        "endLine": 44,
+        "textDigest": "fb65608afa835d405a300ecefaaf8480c43f37269313e38862d84f63c10d908d",
+        "sample": "- contracts are explicit;\n- state transitions are lawful;\n- evidence is auditable;\n- capabilities are fenced;\n- roots and writer authority are typed;\n- runtime behavior is reproduc",
+        "identityFingerprint": "8cd3c9034d72d0d7d034b4bf5be0b94b046971f22fa9f35f92856556f7f41df4",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "- contracts are explicit;\n- state transitions are lawful;\n- evidence is auditable;\n- capabilities are fenced;\n- roots and writer authority are typed;\n- runtime behavior is reproducibly verifiable."
+      }
+    },
+    {
+      "claimId": "claim_a8b24a3334af5b6a3479f38a98d7e591",
+      "sourceUnitDigest": "d572c64d9c10974762e52ca0ee4d031be1d60d87a100be8300b050560e27b84e",
+      "targetUnitDigest": "d572c64d9c10974762e52ca0ee4d031be1d60d87a100be8300b050560e27b84e",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_a8b24a3334af5b6a3479f38a98d7e591",
+        "sourceUnitDigest": "d572c64d9c10974762e52ca0ee4d031be1d60d87a100be8300b050560e27b84e",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-7",
+        "targetUnitDigest": "d572c64d9c10974762e52ca0ee4d031be1d60d87a100be8300b050560e27b84e",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-5 (lines 23–23) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-7 (lines 46–46), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "d572c64d9c10974762e52ca0ee4d031be1d60d87a100be8300b050560e27b84e",
+        "sample": "The inside must be soft:",
+        "identityFingerprint": "98e925148d5c398c07e443bcb38a5ae039b738c7af6215770e3c747f9b70be47",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "The inside must be soft:"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 46,
+        "endLine": 46,
+        "textDigest": "d572c64d9c10974762e52ca0ee4d031be1d60d87a100be8300b050560e27b84e",
+        "sample": "The inside must be soft:",
+        "identityFingerprint": "98e925148d5c398c07e443bcb38a5ae039b738c7af6215770e3c747f9b70be47",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "The inside must be soft:"
+      }
+    },
+    {
+      "claimId": "claim_85adced2ecd69234b52d791b5832428a",
+      "sourceUnitDigest": "b46b3d5d129c035af4920c4cd50a01e8ec422a50ef71bdfd7f9c2c7dc55d9577",
+      "targetUnitDigest": "b46b3d5d129c035af4920c4cd50a01e8ec422a50ef71bdfd7f9c2c7dc55d9577",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_85adced2ecd69234b52d791b5832428a",
+        "sourceUnitDigest": "b46b3d5d129c035af4920c4cd50a01e8ec422a50ef71bdfd7f9c2c7dc55d9577",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-8",
+        "targetUnitDigest": "b46b3d5d129c035af4920c4cd50a01e8ec422a50ef71bdfd7f9c2c7dc55d9577",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-6 (lines 25–29) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-8 (lines 48–52), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 25,
+        "endLine": 29,
+        "textDigest": "b46b3d5d129c035af4920c4cd50a01e8ec422a50ef71bdfd7f9c2c7dc55d9577",
+        "sample": "- prose can carry judgment;\n- skills can adapt to context;\n- agents can reason, reframe, negotiate, and recover;\n- coordination can use human-shaped operating patterns;\n- domain be",
+        "identityFingerprint": "f7454070a65df49d1b91bc263d2b128e2d54977518239eb670c3a7a8d5d5ca7e",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "- prose can carry judgment;\n- skills can adapt to context;\n- agents can reason, reframe, negotiate, and recover;\n- coordination can use human-shaped operating patterns;\n- domain behavior can stay expressive instead of becoming only schema."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 48,
+        "endLine": 52,
+        "textDigest": "b46b3d5d129c035af4920c4cd50a01e8ec422a50ef71bdfd7f9c2c7dc55d9577",
+        "sample": "- prose can carry judgment;\n- skills can adapt to context;\n- agents can reason, reframe, negotiate, and recover;\n- coordination can use human-shaped operating patterns;\n- domain be",
+        "identityFingerprint": "f7454070a65df49d1b91bc263d2b128e2d54977518239eb670c3a7a8d5d5ca7e",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "- prose can carry judgment;\n- skills can adapt to context;\n- agents can reason, reframe, negotiate, and recover;\n- coordination can use human-shaped operating patterns;\n- domain behavior can stay expressive instead of becoming only schema."
+      }
+    },
+    {
+      "claimId": "claim_248240ca25f66e964188accd00df526a",
+      "sourceUnitDigest": "6c3bd16867cc227601af8bb4bde1ba0a1ff5ffc21d4a837447614ba84dcb4841",
+      "targetUnitDigest": "6c3bd16867cc227601af8bb4bde1ba0a1ff5ffc21d4a837447614ba84dcb4841",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_248240ca25f66e964188accd00df526a",
+        "sourceUnitDigest": "6c3bd16867cc227601af8bb4bde1ba0a1ff5ffc21d4a837447614ba84dcb4841",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-9",
+        "targetUnitDigest": "6c3bd16867cc227601af8bb4bde1ba0a1ff5ffc21d4a837447614ba84dcb4841",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-7 (lines 31–33) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-9 (lines 54–56), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 31,
+        "endLine": 33,
+        "textDigest": "6c3bd16867cc227601af8bb4bde1ba0a1ff5ffc21d4a837447614ba84dcb4841",
+        "sample": "The target is not softness instead of rigor, or rigor instead of intelligence.\nThe target is a living system that is flexible, graceful, quick, strong, and\nprecise because each sid",
+        "identityFingerprint": "b35a5daead9be505fb591f97c1c2553edcfab6499974ba5c54fdcdb0c9a18019",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "The target is not softness instead of rigor, or rigor instead of intelligence.\nThe target is a living system that is flexible, graceful, quick, strong, and\nprecise because each side does its own job."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 54,
+        "endLine": 56,
+        "textDigest": "6c3bd16867cc227601af8bb4bde1ba0a1ff5ffc21d4a837447614ba84dcb4841",
+        "sample": "The target is not softness instead of rigor, or rigor instead of intelligence.\nThe target is a living system that is flexible, graceful, quick, strong, and\nprecise because each sid",
+        "identityFingerprint": "b35a5daead9be505fb591f97c1c2553edcfab6499974ba5c54fdcdb0c9a18019",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "The target is not softness instead of rigor, or rigor instead of intelligence.\nThe target is a living system that is flexible, graceful, quick, strong, and\nprecise because each side does its own job."
+      }
+    },
+    {
+      "claimId": "claim_4b3408bc120b2ab7f05bdcdca3a78dab",
+      "sourceUnitDigest": "6a940230eb3172ac0cd44665b6d492a11ff8d99fe92c0f3b5c5eff8ae521ae54",
+      "targetUnitDigest": "6a940230eb3172ac0cd44665b6d492a11ff8d99fe92c0f3b5c5eff8ae521ae54",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_4b3408bc120b2ab7f05bdcdca3a78dab",
+        "sourceUnitDigest": "6a940230eb3172ac0cd44665b6d492a11ff8d99fe92c0f3b5c5eff8ae521ae54",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-10",
+        "targetUnitDigest": "6a940230eb3172ac0cd44665b6d492a11ff8d99fe92c0f3b5c5eff8ae521ae54",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-8 (lines 35–41) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-10 (lines 58–64), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 35,
+        "endLine": 41,
+        "textDigest": "6a940230eb3172ac0cd44665b6d492a11ff8d99fe92c0f3b5c5eff8ae521ae54",
+        "sample": "```txt\nOutside hard:\n  contract, state, capability, topology, proof, audit\n\nInside soft:\n  soul, prose, skill, judgment, collaboration, domain intelligence\n```",
+        "identityFingerprint": "48f446ae0291fe8e73960ccee40818e9e63c362a125143e008b9a1945e67cde4",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "```txt\nOutside hard:\n  contract, state, capability, topology, proof, audit\n\nInside soft:\n  soul, prose, skill, judgment, collaboration, domain intelligence\n```"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 58,
+        "endLine": 64,
+        "textDigest": "6a940230eb3172ac0cd44665b6d492a11ff8d99fe92c0f3b5c5eff8ae521ae54",
+        "sample": "```txt\nOutside hard:\n  contract, state, capability, topology, proof, audit\n\nInside soft:\n  soul, prose, skill, judgment, collaboration, domain intelligence\n```",
+        "identityFingerprint": "48f446ae0291fe8e73960ccee40818e9e63c362a125143e008b9a1945e67cde4",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "```txt\nOutside hard:\n  contract, state, capability, topology, proof, audit\n\nInside soft:\n  soul, prose, skill, judgment, collaboration, domain intelligence\n```"
+      }
+    },
+    {
+      "claimId": "claim_7276e16ef23d0ab1850dd9d91d5121ae",
+      "sourceUnitDigest": "cb4b7a3b8e29e4d9f3f0ebaf1119a98d6120fd6afd834d9827d2085a459da741",
+      "targetUnitDigest": "cb4b7a3b8e29e4d9f3f0ebaf1119a98d6120fd6afd834d9827d2085a459da741",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_7276e16ef23d0ab1850dd9d91d5121ae",
+        "sourceUnitDigest": "cb4b7a3b8e29e4d9f3f0ebaf1119a98d6120fd6afd834d9827d2085a459da741",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "2-why-this-exists",
+        "targetUnitDigest": "cb4b7a3b8e29e4d9f3f0ebaf1119a98d6120fd6afd834d9827d2085a459da741",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#2-why-this-exists (lines 43–43) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#2-why-this-exists (lines 66–66), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "2. Why This Exists",
+        "anchor": "2-why-this-exists",
+        "githubAnchor": "2-why-this-exists",
+        "stableAnchor": "h-659eec88ff9c",
+        "startLine": 43,
+        "endLine": 43,
+        "textDigest": "cb4b7a3b8e29e4d9f3f0ebaf1119a98d6120fd6afd834d9827d2085a459da741",
+        "sample": "2. Why This Exists",
+        "sectionPayloadDigest": "813f65feb7afa1d20514b10ec7acb3fb2e415d3e3d65f439a5a176f38fac9abf",
+        "followingBlockDigest": "20121b5ea8cfc91a1d4c5ebcb8cf5598f35e34ca4c6d5ac1701811d632822ad8",
+        "identityFingerprint": "1b541332d073e3d2effdc4ea70ffd732db71e991090cff988249e5ca46178bfd",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 2. Why This Exists",
+        "sectionText": "## 2. Why This Exists\n\nStep 09 exposed the failure mode this vision is meant to prevent.\n\nDuring the group-thinking work, implementation pressure pulled attention toward\nharnesses, schemas, tests, and fixtures. Those were necessary: without them the\nsystem cannot be trusted. But too much attention on harness alone made the\nMaster Coordination shape hard to deploy as a living operating pattern. The\nsystem could become correct but stiff: safe mechanics with too little soul,\nprose, and skill surface for agents to actually coordinate well.\n\nThat is not the intended fgOS shape.\n\nfgOS exists to help developers and business workflows forge agents faster. A\nplatform that only exposes hard machinery makes every new agent app rebuild\nits own operating intelligence in prose outside the system. A platform that\nonly exposes prose and skill without hard contracts becomes fragile and\nunverifiable. The product needs both."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "2. Why This Exists",
+        "anchor": "2-why-this-exists",
+        "githubAnchor": "2-why-this-exists",
+        "stableAnchor": "h-50f78e415e5a",
+        "startLine": 66,
+        "endLine": 66,
+        "textDigest": "cb4b7a3b8e29e4d9f3f0ebaf1119a98d6120fd6afd834d9827d2085a459da741",
+        "sample": "2. Why This Exists",
+        "sectionPayloadDigest": "813f65feb7afa1d20514b10ec7acb3fb2e415d3e3d65f439a5a176f38fac9abf",
+        "followingBlockDigest": "20121b5ea8cfc91a1d4c5ebcb8cf5598f35e34ca4c6d5ac1701811d632822ad8",
+        "identityFingerprint": "1b541332d073e3d2effdc4ea70ffd732db71e991090cff988249e5ca46178bfd",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 2. Why This Exists",
+        "sectionText": "## 2. Why This Exists\n\nStep 09 exposed the failure mode this vision is meant to prevent.\n\nDuring the group-thinking work, implementation pressure pulled attention toward\nharnesses, schemas, tests, and fixtures. Those were necessary: without them the\nsystem cannot be trusted. But too much attention on harness alone made the\nMaster Coordination shape hard to deploy as a living operating pattern. The\nsystem could become correct but stiff: safe mechanics with too little soul,\nprose, and skill surface for agents to actually coordinate well.\n\nThat is not the intended fgOS shape.\n\nfgOS exists to help developers and business workflows forge agents faster. A\nplatform that only exposes hard machinery makes every new agent app rebuild\nits own operating intelligence in prose outside the system. A platform that\nonly exposes prose and skill without hard contracts becomes fragile and\nunverifiable. The product needs both."
+      }
+    },
+    {
+      "claimId": "claim_93023a4db20504781b44efb9be5b3726",
+      "sourceUnitDigest": "20121b5ea8cfc91a1d4c5ebcb8cf5598f35e34ca4c6d5ac1701811d632822ad8",
+      "targetUnitDigest": "20121b5ea8cfc91a1d4c5ebcb8cf5598f35e34ca4c6d5ac1701811d632822ad8",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_93023a4db20504781b44efb9be5b3726",
+        "sourceUnitDigest": "20121b5ea8cfc91a1d4c5ebcb8cf5598f35e34ca4c6d5ac1701811d632822ad8",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-11",
+        "targetUnitDigest": "20121b5ea8cfc91a1d4c5ebcb8cf5598f35e34ca4c6d5ac1701811d632822ad8",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-9 (lines 45–45) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-11 (lines 68–68), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 45,
+        "endLine": 45,
+        "textDigest": "20121b5ea8cfc91a1d4c5ebcb8cf5598f35e34ca4c6d5ac1701811d632822ad8",
+        "sample": "Step 09 exposed the failure mode this vision is meant to prevent.",
+        "identityFingerprint": "9765d65984e161d4372ad47a963b627cdb3a628ed15bf9df066048e6d5bcd008",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "text": "Step 09 exposed the failure mode this vision is meant to prevent."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 68,
+        "endLine": 68,
+        "textDigest": "20121b5ea8cfc91a1d4c5ebcb8cf5598f35e34ca4c6d5ac1701811d632822ad8",
+        "sample": "Step 09 exposed the failure mode this vision is meant to prevent.",
+        "identityFingerprint": "9765d65984e161d4372ad47a963b627cdb3a628ed15bf9df066048e6d5bcd008",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "text": "Step 09 exposed the failure mode this vision is meant to prevent."
+      }
+    },
+    {
+      "claimId": "claim_11d2f816f621c7c9cffad344a3356475",
+      "sourceUnitDigest": "8d0bcb622e3057582d231b81a0380adecdd47c78593bd957b1e525a262907264",
+      "targetUnitDigest": "8d0bcb622e3057582d231b81a0380adecdd47c78593bd957b1e525a262907264",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_11d2f816f621c7c9cffad344a3356475",
+        "sourceUnitDigest": "8d0bcb622e3057582d231b81a0380adecdd47c78593bd957b1e525a262907264",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-12",
+        "targetUnitDigest": "8d0bcb622e3057582d231b81a0380adecdd47c78593bd957b1e525a262907264",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-10 (lines 47–52) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-12 (lines 70–75), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 47,
+        "endLine": 52,
+        "textDigest": "8d0bcb622e3057582d231b81a0380adecdd47c78593bd957b1e525a262907264",
+        "sample": "During the group-thinking work, implementation pressure pulled attention toward\nharnesses, schemas, tests, and fixtures. Those were necessary: without them the\nsystem cannot be tru",
+        "identityFingerprint": "331cc22eccb5c4241c3c9ac29268506bdf58319f443d33b70e3814d0ed7d3f96",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "text": "During the group-thinking work, implementation pressure pulled attention toward\nharnesses, schemas, tests, and fixtures. Those were necessary: without them the\nsystem cannot be trusted. But too much attention on harness alone made the\nMaster Coordination shape hard to deploy as a living operating pattern. The\nsystem could become correct but stiff: safe mechanics with too little soul,\nprose, and skill surface for agents to actually coordinate well."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 70,
+        "endLine": 75,
+        "textDigest": "8d0bcb622e3057582d231b81a0380adecdd47c78593bd957b1e525a262907264",
+        "sample": "During the group-thinking work, implementation pressure pulled attention toward\nharnesses, schemas, tests, and fixtures. Those were necessary: without them the\nsystem cannot be tru",
+        "identityFingerprint": "331cc22eccb5c4241c3c9ac29268506bdf58319f443d33b70e3814d0ed7d3f96",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "text": "During the group-thinking work, implementation pressure pulled attention toward\nharnesses, schemas, tests, and fixtures. Those were necessary: without them the\nsystem cannot be trusted. But too much attention on harness alone made the\nMaster Coordination shape hard to deploy as a living operating pattern. The\nsystem could become correct but stiff: safe mechanics with too little soul,\nprose, and skill surface for agents to actually coordinate well."
+      }
+    },
+    {
+      "claimId": "claim_08fe56b6dc3b93c6a86a2e22d854dd21",
+      "sourceUnitDigest": "15e599a2a3eea6213b50f3592b57fe4e61c5acb2abece954f8ccba3592f3d526",
+      "targetUnitDigest": "15e599a2a3eea6213b50f3592b57fe4e61c5acb2abece954f8ccba3592f3d526",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_08fe56b6dc3b93c6a86a2e22d854dd21",
+        "sourceUnitDigest": "15e599a2a3eea6213b50f3592b57fe4e61c5acb2abece954f8ccba3592f3d526",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-13",
+        "targetUnitDigest": "15e599a2a3eea6213b50f3592b57fe4e61c5acb2abece954f8ccba3592f3d526",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-11 (lines 54–54) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-13 (lines 77–77), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 54,
+        "endLine": 54,
+        "textDigest": "15e599a2a3eea6213b50f3592b57fe4e61c5acb2abece954f8ccba3592f3d526",
+        "sample": "That is not the intended fgOS shape.",
+        "identityFingerprint": "26e641fac0945d6f64c8694db840c856e07db9251ed2f86e9621a332629e05f0",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "text": "That is not the intended fgOS shape."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 77,
+        "endLine": 77,
+        "textDigest": "15e599a2a3eea6213b50f3592b57fe4e61c5acb2abece954f8ccba3592f3d526",
+        "sample": "That is not the intended fgOS shape.",
+        "identityFingerprint": "26e641fac0945d6f64c8694db840c856e07db9251ed2f86e9621a332629e05f0",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "text": "That is not the intended fgOS shape."
+      }
+    },
+    {
+      "claimId": "claim_25de6efa8826e2668318a047142018af",
+      "sourceUnitDigest": "627a8d63f3cfc6aded622ed5a0ee8d94bfd02db2f1bef025a222f7aabe3fbfa5",
+      "targetUnitDigest": "627a8d63f3cfc6aded622ed5a0ee8d94bfd02db2f1bef025a222f7aabe3fbfa5",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_25de6efa8826e2668318a047142018af",
+        "sourceUnitDigest": "627a8d63f3cfc6aded622ed5a0ee8d94bfd02db2f1bef025a222f7aabe3fbfa5",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-14",
+        "targetUnitDigest": "627a8d63f3cfc6aded622ed5a0ee8d94bfd02db2f1bef025a222f7aabe3fbfa5",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-12 (lines 56–60) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-14 (lines 79–83), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 56,
+        "endLine": 60,
+        "textDigest": "627a8d63f3cfc6aded622ed5a0ee8d94bfd02db2f1bef025a222f7aabe3fbfa5",
+        "sample": "fgOS exists to help developers and business workflows forge agents faster. A\nplatform that only exposes hard machinery makes every new agent app rebuild\nits own operating intellige",
+        "identityFingerprint": "9c2ab8b8c9d160b714a750dd5caaeffdc04836ec6d4bce3aac50509dd3a35f48",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "text": "fgOS exists to help developers and business workflows forge agents faster. A\nplatform that only exposes hard machinery makes every new agent app rebuild\nits own operating intelligence in prose outside the system. A platform that\nonly exposes prose and skill without hard contracts becomes fragile and\nunverifiable. The product needs both."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 79,
+        "endLine": 83,
+        "textDigest": "627a8d63f3cfc6aded622ed5a0ee8d94bfd02db2f1bef025a222f7aabe3fbfa5",
+        "sample": "fgOS exists to help developers and business workflows forge agents faster. A\nplatform that only exposes hard machinery makes every new agent app rebuild\nits own operating intellige",
+        "identityFingerprint": "9c2ab8b8c9d160b714a750dd5caaeffdc04836ec6d4bce3aac50509dd3a35f48",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "text": "fgOS exists to help developers and business workflows forge agents faster. A\nplatform that only exposes hard machinery makes every new agent app rebuild\nits own operating intelligence in prose outside the system. A platform that\nonly exposes prose and skill without hard contracts becomes fragile and\nunverifiable. The product needs both."
+      }
+    },
+    {
+      "claimId": "claim_e4e0ea54bef3a6f4df33df1e89117a52",
+      "sourceUnitDigest": "50ece70c24c1b92b362e6c7ff56b912a0c5b78eb36c9100c7ca17485f709840f",
+      "targetUnitDigest": "50ece70c24c1b92b362e6c7ff56b912a0c5b78eb36c9100c7ca17485f709840f",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_e4e0ea54bef3a6f4df33df1e89117a52",
+        "sourceUnitDigest": "50ece70c24c1b92b362e6c7ff56b912a0c5b78eb36c9100c7ca17485f709840f",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "3-design-rule",
+        "targetUnitDigest": "50ece70c24c1b92b362e6c7ff56b912a0c5b78eb36c9100c7ca17485f709840f",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#3-design-rule (lines 62–62) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#3-design-rule (lines 85–85), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "3. Design Rule",
+        "anchor": "3-design-rule",
+        "githubAnchor": "3-design-rule",
+        "stableAnchor": "h-71d7d14c2e2a",
+        "startLine": 62,
+        "endLine": 62,
+        "textDigest": "50ece70c24c1b92b362e6c7ff56b912a0c5b78eb36c9100c7ca17485f709840f",
+        "sample": "3. Design Rule",
+        "sectionPayloadDigest": "1da40ef4abf7358b1427ca427e3fd7e4a789c4b0d9ae91d17aea03edefacde47",
+        "followingBlockDigest": "7c5ed9fada4f9b791729caac8e955dd61dbfe816823a487a11ef2645554773b5",
+        "identityFingerprint": "d695dc37598e0ed6d1b63ecfff1cf3e3a3051119f6ee1f451ff93e60fc6e4ea8",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 3. Design Rule",
+        "sectionText": "## 3. Design Rule\n\nEvery major architecture slice must ask two questions:\n\n```txt\nWhat is the hard outer contract?\nWhat is the soft inner operating intelligence?\n```\n\nThe hard outer contract includes:\n\n- identity and root ownership;\n- state classes and event truth;\n- command boundaries;\n- capability grants and refusals;\n- evidence and proof rules;\n- compatibility, rollback, and repair behavior.\n\nThe soft inner operating intelligence includes:\n\n- skill flow;\n- prose handoff;\n- domain doctrine;\n- role posture;\n- judgment heuristics;\n- collaboration style;\n- recovery playbook;\n- human-facing explanation.\n\nA design that has only the hard side is incomplete. A design that has only the\nsoft side is incomplete."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "3. Design Rule",
+        "anchor": "3-design-rule",
+        "githubAnchor": "3-design-rule",
+        "stableAnchor": "h-04fa403d5dd3",
+        "startLine": 85,
+        "endLine": 85,
+        "textDigest": "50ece70c24c1b92b362e6c7ff56b912a0c5b78eb36c9100c7ca17485f709840f",
+        "sample": "3. Design Rule",
+        "sectionPayloadDigest": "1da40ef4abf7358b1427ca427e3fd7e4a789c4b0d9ae91d17aea03edefacde47",
+        "followingBlockDigest": "7c5ed9fada4f9b791729caac8e955dd61dbfe816823a487a11ef2645554773b5",
+        "identityFingerprint": "d695dc37598e0ed6d1b63ecfff1cf3e3a3051119f6ee1f451ff93e60fc6e4ea8",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 3. Design Rule",
+        "sectionText": "## 3. Design Rule\n\nEvery major architecture slice must ask two questions:\n\n```txt\nWhat is the hard outer contract?\nWhat is the soft inner operating intelligence?\n```\n\nThe hard outer contract includes:\n\n- identity and root ownership;\n- state classes and event truth;\n- command boundaries;\n- capability grants and refusals;\n- evidence and proof rules;\n- compatibility, rollback, and repair behavior.\n\nThe soft inner operating intelligence includes:\n\n- skill flow;\n- prose handoff;\n- domain doctrine;\n- role posture;\n- judgment heuristics;\n- collaboration style;\n- recovery playbook;\n- human-facing explanation.\n\nA design that has only the hard side is incomplete. A design that has only the\nsoft side is incomplete."
+      }
+    },
+    {
+      "claimId": "claim_8131735458780d1b62ca74659cfc799c",
+      "sourceUnitDigest": "7c5ed9fada4f9b791729caac8e955dd61dbfe816823a487a11ef2645554773b5",
+      "targetUnitDigest": "7c5ed9fada4f9b791729caac8e955dd61dbfe816823a487a11ef2645554773b5",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_8131735458780d1b62ca74659cfc799c",
+        "sourceUnitDigest": "7c5ed9fada4f9b791729caac8e955dd61dbfe816823a487a11ef2645554773b5",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-15",
+        "targetUnitDigest": "7c5ed9fada4f9b791729caac8e955dd61dbfe816823a487a11ef2645554773b5",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-13 (lines 64–64) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-15 (lines 87–87), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 64,
+        "endLine": 64,
+        "textDigest": "7c5ed9fada4f9b791729caac8e955dd61dbfe816823a487a11ef2645554773b5",
+        "sample": "Every major architecture slice must ask two questions:",
+        "identityFingerprint": "57f742fe6e4418fa6926850d630fa23845df88bb3fcd1b945dc465f0788a1336",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "Every major architecture slice must ask two questions:"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-15",
+        "githubAnchor": "unheaded-block-15",
+        "stableAnchor": "unheaded-block-15",
+        "title": "Unheaded block 15",
+        "startLine": 87,
+        "endLine": 87,
+        "textDigest": "7c5ed9fada4f9b791729caac8e955dd61dbfe816823a487a11ef2645554773b5",
+        "sample": "Every major architecture slice must ask two questions:",
+        "identityFingerprint": "57f742fe6e4418fa6926850d630fa23845df88bb3fcd1b945dc465f0788a1336",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "Every major architecture slice must ask two questions:"
+      }
+    },
+    {
+      "claimId": "claim_2275036ae98e72ef435eda28e34cf9d2",
+      "sourceUnitDigest": "6f0d45f5c5dbbf7d3e3e74922e12c7f1134180596600911678b7a13e6acb6247",
+      "targetUnitDigest": "6f0d45f5c5dbbf7d3e3e74922e12c7f1134180596600911678b7a13e6acb6247",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_2275036ae98e72ef435eda28e34cf9d2",
+        "sourceUnitDigest": "6f0d45f5c5dbbf7d3e3e74922e12c7f1134180596600911678b7a13e6acb6247",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-16",
+        "targetUnitDigest": "6f0d45f5c5dbbf7d3e3e74922e12c7f1134180596600911678b7a13e6acb6247",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-14 (lines 66–69) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-16 (lines 89–92), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 66,
+        "endLine": 69,
+        "textDigest": "6f0d45f5c5dbbf7d3e3e74922e12c7f1134180596600911678b7a13e6acb6247",
+        "sample": "```txt\nWhat is the hard outer contract?\nWhat is the soft inner operating intelligence?\n```",
+        "identityFingerprint": "fe064a1e8b233f3a82d64ac9834bdbfd46512d0ac62ddade923fc2b76090d57c",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "```txt\nWhat is the hard outer contract?\nWhat is the soft inner operating intelligence?\n```"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-16",
+        "githubAnchor": "unheaded-block-16",
+        "stableAnchor": "unheaded-block-16",
+        "title": "Unheaded block 16",
+        "startLine": 89,
+        "endLine": 92,
+        "textDigest": "6f0d45f5c5dbbf7d3e3e74922e12c7f1134180596600911678b7a13e6acb6247",
+        "sample": "```txt\nWhat is the hard outer contract?\nWhat is the soft inner operating intelligence?\n```",
+        "identityFingerprint": "fe064a1e8b233f3a82d64ac9834bdbfd46512d0ac62ddade923fc2b76090d57c",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "```txt\nWhat is the hard outer contract?\nWhat is the soft inner operating intelligence?\n```"
+      }
+    },
+    {
+      "claimId": "claim_98cab524d25ac00b1a7bcb55efe5911a",
+      "sourceUnitDigest": "cf1e4001906c60969581b98dc6f1032d1f2ed7a381b41f54721c4e18c6027981",
+      "targetUnitDigest": "cf1e4001906c60969581b98dc6f1032d1f2ed7a381b41f54721c4e18c6027981",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_98cab524d25ac00b1a7bcb55efe5911a",
+        "sourceUnitDigest": "cf1e4001906c60969581b98dc6f1032d1f2ed7a381b41f54721c4e18c6027981",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-17",
+        "targetUnitDigest": "cf1e4001906c60969581b98dc6f1032d1f2ed7a381b41f54721c4e18c6027981",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-15 (lines 71–71) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-17 (lines 94–94), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-15",
+        "githubAnchor": "unheaded-block-15",
+        "stableAnchor": "unheaded-block-15",
+        "title": "Unheaded block 15",
+        "startLine": 71,
+        "endLine": 71,
+        "textDigest": "cf1e4001906c60969581b98dc6f1032d1f2ed7a381b41f54721c4e18c6027981",
+        "sample": "The hard outer contract includes:",
+        "identityFingerprint": "ac75b0d0d1f491337a4f288d806d98eddf37f67502cbd8cb2a9adbd089cc5b65",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "The hard outer contract includes:"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-17",
+        "githubAnchor": "unheaded-block-17",
+        "stableAnchor": "unheaded-block-17",
+        "title": "Unheaded block 17",
+        "startLine": 94,
+        "endLine": 94,
+        "textDigest": "cf1e4001906c60969581b98dc6f1032d1f2ed7a381b41f54721c4e18c6027981",
+        "sample": "The hard outer contract includes:",
+        "identityFingerprint": "ac75b0d0d1f491337a4f288d806d98eddf37f67502cbd8cb2a9adbd089cc5b65",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "The hard outer contract includes:"
+      }
+    },
+    {
+      "claimId": "claim_389cbb0ed16d03193f95b1050307bcf6",
+      "sourceUnitDigest": "2ecb29da7677f901380af32f4dca8c03d15d215ee209dc90040b06996e0e0d41",
+      "targetUnitDigest": "2ecb29da7677f901380af32f4dca8c03d15d215ee209dc90040b06996e0e0d41",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_389cbb0ed16d03193f95b1050307bcf6",
+        "sourceUnitDigest": "2ecb29da7677f901380af32f4dca8c03d15d215ee209dc90040b06996e0e0d41",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-18",
+        "targetUnitDigest": "2ecb29da7677f901380af32f4dca8c03d15d215ee209dc90040b06996e0e0d41",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-16 (lines 73–78) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-18 (lines 96–101), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-16",
+        "githubAnchor": "unheaded-block-16",
+        "stableAnchor": "unheaded-block-16",
+        "title": "Unheaded block 16",
+        "startLine": 73,
+        "endLine": 78,
+        "textDigest": "2ecb29da7677f901380af32f4dca8c03d15d215ee209dc90040b06996e0e0d41",
+        "sample": "- identity and root ownership;\n- state classes and event truth;\n- command boundaries;\n- capability grants and refusals;\n- evidence and proof rules;\n- compatibility, rollback, and r",
+        "identityFingerprint": "8a49ae37ee8c59663fa50f5e6982d643d9d022bb55eb386aaa155461cdd74d88",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "- identity and root ownership;\n- state classes and event truth;\n- command boundaries;\n- capability grants and refusals;\n- evidence and proof rules;\n- compatibility, rollback, and repair behavior."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-18",
+        "githubAnchor": "unheaded-block-18",
+        "stableAnchor": "unheaded-block-18",
+        "title": "Unheaded block 18",
+        "startLine": 96,
+        "endLine": 101,
+        "textDigest": "2ecb29da7677f901380af32f4dca8c03d15d215ee209dc90040b06996e0e0d41",
+        "sample": "- identity and root ownership;\n- state classes and event truth;\n- command boundaries;\n- capability grants and refusals;\n- evidence and proof rules;\n- compatibility, rollback, and r",
+        "identityFingerprint": "8a49ae37ee8c59663fa50f5e6982d643d9d022bb55eb386aaa155461cdd74d88",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "- identity and root ownership;\n- state classes and event truth;\n- command boundaries;\n- capability grants and refusals;\n- evidence and proof rules;\n- compatibility, rollback, and repair behavior."
+      }
+    },
+    {
+      "claimId": "claim_7f2039017fff407a6508c008fb041b42",
+      "sourceUnitDigest": "849ba120da172940f121e38eb77aae29220eab3d801e6386280429b752f99cdd",
+      "targetUnitDigest": "849ba120da172940f121e38eb77aae29220eab3d801e6386280429b752f99cdd",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_7f2039017fff407a6508c008fb041b42",
+        "sourceUnitDigest": "849ba120da172940f121e38eb77aae29220eab3d801e6386280429b752f99cdd",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-19",
+        "targetUnitDigest": "849ba120da172940f121e38eb77aae29220eab3d801e6386280429b752f99cdd",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-17 (lines 80–80) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-19 (lines 103–103), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-17",
+        "githubAnchor": "unheaded-block-17",
+        "stableAnchor": "unheaded-block-17",
+        "title": "Unheaded block 17",
+        "startLine": 80,
+        "endLine": 80,
+        "textDigest": "849ba120da172940f121e38eb77aae29220eab3d801e6386280429b752f99cdd",
+        "sample": "The soft inner operating intelligence includes:",
+        "identityFingerprint": "7e6d68c885b25147b37393282680297d0896ec59c4b1dcf2bed1f4d92edd137a",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "The soft inner operating intelligence includes:"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-19",
+        "githubAnchor": "unheaded-block-19",
+        "stableAnchor": "unheaded-block-19",
+        "title": "Unheaded block 19",
+        "startLine": 103,
+        "endLine": 103,
+        "textDigest": "849ba120da172940f121e38eb77aae29220eab3d801e6386280429b752f99cdd",
+        "sample": "The soft inner operating intelligence includes:",
+        "identityFingerprint": "7e6d68c885b25147b37393282680297d0896ec59c4b1dcf2bed1f4d92edd137a",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "The soft inner operating intelligence includes:"
+      }
+    },
+    {
+      "claimId": "claim_9d8a8f3ba46e861451c6a746db376790",
+      "sourceUnitDigest": "e1c93afc8ed61db724f1964d6adfd49dce4718dca284326ec01ec1972d14cda7",
+      "targetUnitDigest": "e1c93afc8ed61db724f1964d6adfd49dce4718dca284326ec01ec1972d14cda7",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_9d8a8f3ba46e861451c6a746db376790",
+        "sourceUnitDigest": "e1c93afc8ed61db724f1964d6adfd49dce4718dca284326ec01ec1972d14cda7",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-20",
+        "targetUnitDigest": "e1c93afc8ed61db724f1964d6adfd49dce4718dca284326ec01ec1972d14cda7",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-18 (lines 82–89) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-20 (lines 105–112), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-18",
+        "githubAnchor": "unheaded-block-18",
+        "stableAnchor": "unheaded-block-18",
+        "title": "Unheaded block 18",
+        "startLine": 82,
+        "endLine": 89,
+        "textDigest": "e1c93afc8ed61db724f1964d6adfd49dce4718dca284326ec01ec1972d14cda7",
+        "sample": "- skill flow;\n- prose handoff;\n- domain doctrine;\n- role posture;\n- judgment heuristics;\n- collaboration style;\n- recovery playbook;\n- human-facing explanation.",
+        "identityFingerprint": "4928cf12e85fc59cd5a93b602225ddd10f421f723343497a5e51ba6398c3b039",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "- skill flow;\n- prose handoff;\n- domain doctrine;\n- role posture;\n- judgment heuristics;\n- collaboration style;\n- recovery playbook;\n- human-facing explanation."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-20",
+        "githubAnchor": "unheaded-block-20",
+        "stableAnchor": "unheaded-block-20",
+        "title": "Unheaded block 20",
+        "startLine": 105,
+        "endLine": 112,
+        "textDigest": "e1c93afc8ed61db724f1964d6adfd49dce4718dca284326ec01ec1972d14cda7",
+        "sample": "- skill flow;\n- prose handoff;\n- domain doctrine;\n- role posture;\n- judgment heuristics;\n- collaboration style;\n- recovery playbook;\n- human-facing explanation.",
+        "identityFingerprint": "4928cf12e85fc59cd5a93b602225ddd10f421f723343497a5e51ba6398c3b039",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "- skill flow;\n- prose handoff;\n- domain doctrine;\n- role posture;\n- judgment heuristics;\n- collaboration style;\n- recovery playbook;\n- human-facing explanation."
+      }
+    },
+    {
+      "claimId": "claim_e646d72e1faf2dc7eb5c65ab6a6d8030",
+      "sourceUnitDigest": "1a2f6b42c2f140f62743961f6c8c9f5e4d19c3689a10d9f25b6b00ee8524dbb3",
+      "targetUnitDigest": "1a2f6b42c2f140f62743961f6c8c9f5e4d19c3689a10d9f25b6b00ee8524dbb3",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_e646d72e1faf2dc7eb5c65ab6a6d8030",
+        "sourceUnitDigest": "1a2f6b42c2f140f62743961f6c8c9f5e4d19c3689a10d9f25b6b00ee8524dbb3",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-21",
+        "targetUnitDigest": "1a2f6b42c2f140f62743961f6c8c9f5e4d19c3689a10d9f25b6b00ee8524dbb3",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-19 (lines 91–92) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-21 (lines 114–115), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-19",
+        "githubAnchor": "unheaded-block-19",
+        "stableAnchor": "unheaded-block-19",
+        "title": "Unheaded block 19",
+        "startLine": 91,
+        "endLine": 92,
+        "textDigest": "1a2f6b42c2f140f62743961f6c8c9f5e4d19c3689a10d9f25b6b00ee8524dbb3",
+        "sample": "A design that has only the hard side is incomplete. A design that has only the\nsoft side is incomplete.",
+        "identityFingerprint": "8384644a0866b53fb7176ef21d980c2df02c0d948f21a8335eaa39846af4c53b",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "A design that has only the hard side is incomplete. A design that has only the\nsoft side is incomplete."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-21",
+        "githubAnchor": "unheaded-block-21",
+        "stableAnchor": "unheaded-block-21",
+        "title": "Unheaded block 21",
+        "startLine": 114,
+        "endLine": 115,
+        "textDigest": "1a2f6b42c2f140f62743961f6c8c9f5e4d19c3689a10d9f25b6b00ee8524dbb3",
+        "sample": "A design that has only the hard side is incomplete. A design that has only the\nsoft side is incomplete.",
+        "identityFingerprint": "8384644a0866b53fb7176ef21d980c2df02c0d948f21a8335eaa39846af4c53b",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "A design that has only the hard side is incomplete. A design that has only the\nsoft side is incomplete."
+      }
+    },
+    {
+      "claimId": "claim_f39b608c75acacbeb51a223279bb0eaf",
+      "sourceUnitDigest": "d22ed3853aa5ec5870f7788b671d6a4dda1c71cfa0a576f1a6aaf46ec75cfd4e",
+      "targetUnitDigest": "d22ed3853aa5ec5870f7788b671d6a4dda1c71cfa0a576f1a6aaf46ec75cfd4e",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_f39b608c75acacbeb51a223279bb0eaf",
+        "sourceUnitDigest": "d22ed3853aa5ec5870f7788b671d6a4dda1c71cfa0a576f1a6aaf46ec75cfd4e",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "4-practical-consequences",
+        "targetUnitDigest": "d22ed3853aa5ec5870f7788b671d6a4dda1c71cfa0a576f1a6aaf46ec75cfd4e",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#4-practical-consequences (lines 94–94) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#4-practical-consequences (lines 117–117), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "4. Practical Consequences",
+        "anchor": "4-practical-consequences",
+        "githubAnchor": "4-practical-consequences",
+        "stableAnchor": "h-7cd25877c548",
+        "startLine": 94,
+        "endLine": 94,
+        "textDigest": "d22ed3853aa5ec5870f7788b671d6a4dda1c71cfa0a576f1a6aaf46ec75cfd4e",
+        "sample": "4. Practical Consequences",
+        "sectionPayloadDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+        "followingBlockDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+        "identityFingerprint": "539aa5b418312a7b221ea57660e19c849fb8a9af0e2fd2a586587e4350a8a142",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 4. Practical Consequences",
+        "sectionText": "## 4. Practical Consequences\n\n1. **Harness is not the product experience.** Harness proves safety and\n   repeatability. It must not replace the skill/prose path that makes agents\n   effective.\n2. **Skill/prose is not an escape hatch from proof.** Soft operating\n   intelligence still enters through declared contracts, capability checks, and\n   evidence rules.\n3. **Runtime kernels stay small and hard.** The kernel should enforce legality,\n   not absorb every domain judgment into schema.\n4. **Domain adapters carry living intelligence.** Coding, marketing, and future\n   business domains should express their own doctrine, prompts, evidence\n   posture, and operating style behind stable ports.\n5. **Projection matters.** Skills, agents, prose, and managed instruction files\n   are not secondary decoration. They are how the inner intelligence becomes\n   usable by real agents.\n6. **A proof slice must prove usability, not only legality.** A slice is weak if\n   it passes tests but cannot be launched, resumed, understood, or operated by a\n   real agent without reconstructing missing prose from chat history."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "4. Practical Consequences",
+        "anchor": "4-practical-consequences",
+        "githubAnchor": "4-practical-consequences",
+        "stableAnchor": "h-3b71ad8e9d44",
+        "startLine": 117,
+        "endLine": 117,
+        "textDigest": "d22ed3853aa5ec5870f7788b671d6a4dda1c71cfa0a576f1a6aaf46ec75cfd4e",
+        "sample": "4. Practical Consequences",
+        "sectionPayloadDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+        "followingBlockDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+        "identityFingerprint": "539aa5b418312a7b221ea57660e19c849fb8a9af0e2fd2a586587e4350a8a142",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 4. Practical Consequences",
+        "sectionText": "## 4. Practical Consequences\n\n1. **Harness is not the product experience.** Harness proves safety and\n   repeatability. It must not replace the skill/prose path that makes agents\n   effective.\n2. **Skill/prose is not an escape hatch from proof.** Soft operating\n   intelligence still enters through declared contracts, capability checks, and\n   evidence rules.\n3. **Runtime kernels stay small and hard.** The kernel should enforce legality,\n   not absorb every domain judgment into schema.\n4. **Domain adapters carry living intelligence.** Coding, marketing, and future\n   business domains should express their own doctrine, prompts, evidence\n   posture, and operating style behind stable ports.\n5. **Projection matters.** Skills, agents, prose, and managed instruction files\n   are not secondary decoration. They are how the inner intelligence becomes\n   usable by real agents.\n6. **A proof slice must prove usability, not only legality.** A slice is weak if\n   it passes tests but cannot be launched, resumed, understood, or operated by a\n   real agent without reconstructing missing prose from chat history."
+      }
+    },
+    {
+      "claimId": "claim_44599eb7c20796c8f57eed75cc90078f",
+      "sourceUnitDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+      "targetUnitDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_44599eb7c20796c8f57eed75cc90078f",
+        "sourceUnitDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-22",
+        "targetUnitDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "4. Practical Consequences"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-20 (lines 96–112) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-22 (lines 119–135), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-20",
+        "githubAnchor": "unheaded-block-20",
+        "stableAnchor": "unheaded-block-20",
+        "title": "Unheaded block 20",
+        "startLine": 96,
+        "endLine": 112,
+        "textDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+        "sample": "1. **Harness is not the product experience.** Harness proves safety and\n   repeatability. It must not replace the skill/prose path that makes agents\n   effective.\n2. **Skill/prose ",
+        "identityFingerprint": "6fd0b3eb8da1026cd69b52bacbbaafb9cc01bf62a05994db6376db9044f8b4ee",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "4. Practical Consequences"
+        ],
+        "text": "1. **Harness is not the product experience.** Harness proves safety and\n   repeatability. It must not replace the skill/prose path that makes agents\n   effective.\n2. **Skill/prose is not an escape hatch from proof.** Soft operating\n   intelligence still enters through declared contracts, capability checks, and\n   evidence rules.\n3. **Runtime kernels stay small and hard.** The kernel should enforce legality,\n   not absorb every domain judgment into schema.\n4. **Domain adapters carry living intelligence.** Coding, marketing, and future\n   business domains should express their own doctrine, prompts, evidence\n   posture, and operating style behind stable ports.\n5. **Projection matters.** Skills, agents, prose, and managed instruction files\n   are not secondary decoration. They are how the inner intelligence becomes\n   usable by real agents.\n6. **A proof slice must prove usability, not only legality.** A slice is weak if\n   it passes tests but cannot be launched, resumed, understood, or operated by a\n   real agent without reconstructing missing prose from chat history."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-22",
+        "githubAnchor": "unheaded-block-22",
+        "stableAnchor": "unheaded-block-22",
+        "title": "Unheaded block 22",
+        "startLine": 119,
+        "endLine": 135,
+        "textDigest": "c54d034308f80ecadf77cab990cd4411ad39464313819807fa0eb186da38e20f",
+        "sample": "1. **Harness is not the product experience.** Harness proves safety and\n   repeatability. It must not replace the skill/prose path that makes agents\n   effective.\n2. **Skill/prose ",
+        "identityFingerprint": "6fd0b3eb8da1026cd69b52bacbbaafb9cc01bf62a05994db6376db9044f8b4ee",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "4. Practical Consequences"
+        ],
+        "text": "1. **Harness is not the product experience.** Harness proves safety and\n   repeatability. It must not replace the skill/prose path that makes agents\n   effective.\n2. **Skill/prose is not an escape hatch from proof.** Soft operating\n   intelligence still enters through declared contracts, capability checks, and\n   evidence rules.\n3. **Runtime kernels stay small and hard.** The kernel should enforce legality,\n   not absorb every domain judgment into schema.\n4. **Domain adapters carry living intelligence.** Coding, marketing, and future\n   business domains should express their own doctrine, prompts, evidence\n   posture, and operating style behind stable ports.\n5. **Projection matters.** Skills, agents, prose, and managed instruction files\n   are not secondary decoration. They are how the inner intelligence becomes\n   usable by real agents.\n6. **A proof slice must prove usability, not only legality.** A slice is weak if\n   it passes tests but cannot be launched, resumed, understood, or operated by a\n   real agent without reconstructing missing prose from chat history."
+      }
+    },
+    {
+      "claimId": "claim_0583c8bb44ff974331b0f6ab9bf1c48c",
+      "sourceUnitDigest": "71aa65673aba4c74dcf3d07f63fd2f24e26532bd0ade6287704941f029fa3474",
+      "targetUnitDigest": "71aa65673aba4c74dcf3d07f63fd2f24e26532bd0ade6287704941f029fa3474",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_0583c8bb44ff974331b0f6ab9bf1c48c",
+        "sourceUnitDigest": "71aa65673aba4c74dcf3d07f63fd2f24e26532bd0ade6287704941f029fa3474",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "5-relation-to-current-streams",
+        "targetUnitDigest": "71aa65673aba4c74dcf3d07f63fd2f24e26532bd0ade6287704941f029fa3474",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#5-relation-to-current-streams (lines 114–114) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#5-relation-to-current-streams (lines 137–137), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "5. Relation To Current Streams",
+        "anchor": "5-relation-to-current-streams",
+        "githubAnchor": "5-relation-to-current-streams",
+        "stableAnchor": "h-1a54916c7e50",
+        "startLine": 114,
+        "endLine": 114,
+        "textDigest": "71aa65673aba4c74dcf3d07f63fd2f24e26532bd0ade6287704941f029fa3474",
+        "sample": "5. Relation To Current Streams",
+        "sectionPayloadDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+        "followingBlockDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+        "identityFingerprint": "0eb28d11485ff3fd09a95f42d1787def2155555b6538a872417ab6c3c16e9170",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 5. Relation To Current Streams",
+        "sectionText": "## 5. Relation To Current Streams\n\n| Stream | Hard Outside | Soft Inside |\n|---|---|---|\n| Workspace Topology | typed roots, identities, capabilities, leases | clear operational guidance for which workspace an agent is in and what it may touch |\n| Packaging/Distribution | release manifests, activation bindings, projection ledgers | projected skills/prose/agents that make the selected runtime usable |\n| Execution Core / Workflow | Unit, CollaborationPattern, Workflow, Assignment, RunResult | discussion workflows, role posture, synthesis style |\n| Coding Domain / Step 10 | Work Driver ports, evidence contracts, workspace/occupancy grants | Coding Domain Adapter behavior, coding doctrine, prompts, skills, review/debug/implementation habits |\n| Host Invocation | stable command/API entry and provider routing | surfaces that preserve context and help humans/agents operate the system |"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "5. Relation To Current Streams",
+        "anchor": "5-relation-to-current-streams",
+        "githubAnchor": "5-relation-to-current-streams",
+        "stableAnchor": "h-07662519e577",
+        "startLine": 137,
+        "endLine": 137,
+        "textDigest": "71aa65673aba4c74dcf3d07f63fd2f24e26532bd0ade6287704941f029fa3474",
+        "sample": "5. Relation To Current Streams",
+        "sectionPayloadDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+        "followingBlockDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+        "identityFingerprint": "0eb28d11485ff3fd09a95f42d1787def2155555b6538a872417ab6c3c16e9170",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 5. Relation To Current Streams",
+        "sectionText": "## 5. Relation To Current Streams\n\n| Stream | Hard Outside | Soft Inside |\n|---|---|---|\n| Workspace Topology | typed roots, identities, capabilities, leases | clear operational guidance for which workspace an agent is in and what it may touch |\n| Packaging/Distribution | release manifests, activation bindings, projection ledgers | projected skills/prose/agents that make the selected runtime usable |\n| Execution Core / Workflow | Unit, CollaborationPattern, Workflow, Assignment, RunResult | discussion workflows, role posture, synthesis style |\n| Coding Domain / Step 10 | Work Driver ports, evidence contracts, workspace/occupancy grants | Coding Domain Adapter behavior, coding doctrine, prompts, skills, review/debug/implementation habits |\n| Host Invocation | stable command/API entry and provider routing | surfaces that preserve context and help humans/agents operate the system |"
+      }
+    },
+    {
+      "claimId": "claim_680989c22bdb9826c28cce48c76e5154",
+      "sourceUnitDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+      "targetUnitDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_680989c22bdb9826c28cce48c76e5154",
+        "sourceUnitDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-23",
+        "targetUnitDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "5. Relation To Current Streams"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-21 (lines 116–122) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-23 (lines 139–145), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-21",
+        "githubAnchor": "unheaded-block-21",
+        "stableAnchor": "unheaded-block-21",
+        "title": "Unheaded block 21",
+        "startLine": 116,
+        "endLine": 122,
+        "textDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+        "sample": "| Stream | Hard Outside | Soft Inside |\n|---|---|---|\n| Workspace Topology | typed roots, identities, capabilities, leases | clear operational guidance for which workspace an agent",
+        "identityFingerprint": "dad59c06df4eec8675d169f4b01a0af8983485fff80f254269e856d4701a45d3",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "5. Relation To Current Streams"
+        ],
+        "text": "| Stream | Hard Outside | Soft Inside |\n|---|---|---|\n| Workspace Topology | typed roots, identities, capabilities, leases | clear operational guidance for which workspace an agent is in and what it may touch |\n| Packaging/Distribution | release manifests, activation bindings, projection ledgers | projected skills/prose/agents that make the selected runtime usable |\n| Execution Core / Workflow | Unit, CollaborationPattern, Workflow, Assignment, RunResult | discussion workflows, role posture, synthesis style |\n| Coding Domain / Step 10 | Work Driver ports, evidence contracts, workspace/occupancy grants | Coding Domain Adapter behavior, coding doctrine, prompts, skills, review/debug/implementation habits |\n| Host Invocation | stable command/API entry and provider routing | surfaces that preserve context and help humans/agents operate the system |"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-23",
+        "githubAnchor": "unheaded-block-23",
+        "stableAnchor": "unheaded-block-23",
+        "title": "Unheaded block 23",
+        "startLine": 139,
+        "endLine": 145,
+        "textDigest": "b0d6a3e0e18fced7a0c70d1babad510b743fdf3bf6a98109ee5d7b4ff9c43d39",
+        "sample": "| Stream | Hard Outside | Soft Inside |\n|---|---|---|\n| Workspace Topology | typed roots, identities, capabilities, leases | clear operational guidance for which workspace an agent",
+        "identityFingerprint": "dad59c06df4eec8675d169f4b01a0af8983485fff80f254269e856d4701a45d3",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "5. Relation To Current Streams"
+        ],
+        "text": "| Stream | Hard Outside | Soft Inside |\n|---|---|---|\n| Workspace Topology | typed roots, identities, capabilities, leases | clear operational guidance for which workspace an agent is in and what it may touch |\n| Packaging/Distribution | release manifests, activation bindings, projection ledgers | projected skills/prose/agents that make the selected runtime usable |\n| Execution Core / Workflow | Unit, CollaborationPattern, Workflow, Assignment, RunResult | discussion workflows, role posture, synthesis style |\n| Coding Domain / Step 10 | Work Driver ports, evidence contracts, workspace/occupancy grants | Coding Domain Adapter behavior, coding doctrine, prompts, skills, review/debug/implementation habits |\n| Host Invocation | stable command/API entry and provider routing | surfaces that preserve context and help humans/agents operate the system |"
+      }
+    },
+    {
+      "claimId": "claim_fdb1974174f4354153d278b30ce7fc3e",
+      "sourceUnitDigest": "1780923c86e3bee776a803dd0fce20831dffce0fa5488395cefd9df2c8bf865f",
+      "targetUnitDigest": "1780923c86e3bee776a803dd0fce20831dffce0fa5488395cefd9df2c8bf865f",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_fdb1974174f4354153d278b30ce7fc3e",
+        "sourceUnitDigest": "1780923c86e3bee776a803dd0fce20831dffce0fa5488395cefd9df2c8bf865f",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "6-review-check",
+        "targetUnitDigest": "1780923c86e3bee776a803dd0fce20831dffce0fa5488395cefd9df2c8bf865f",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/system-vision-trong-mem-ngoai-cung.md#6-review-check (lines 124–124) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#6-review-check (lines 147–147), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "6. Review Check",
+        "anchor": "6-review-check",
+        "githubAnchor": "6-review-check",
+        "stableAnchor": "h-f705606dc48a",
+        "startLine": 124,
+        "endLine": 124,
+        "textDigest": "1780923c86e3bee776a803dd0fce20831dffce0fa5488395cefd9df2c8bf865f",
+        "sample": "6. Review Check",
+        "sectionPayloadDigest": "0a6be58d2861e46759f404c0980f9bab10421e2131b2009b6724c0e5398385a0",
+        "followingBlockDigest": "d30d1d88e0a0f5bdd55976afadd8b1ecedb13cec31644d4eb712b97a62a21b09",
+        "identityFingerprint": "6f81c2dee6534e255fbfdb6d40ab9ba7f6cdce4080a9f05993ee58f93affb934",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 6. Review Check",
+        "sectionText": "## 6. Review Check\n\nBefore closing an architecture plan or implementation slice, reviewers should\nask:\n\n```txt\nDoes the outside stay hard enough to verify?\nDoes the inside stay soft enough to think and adapt?\nDid we preserve the skill/prose/soul surface, or only the harness?\nDid we preserve the harness/contract surface, or only the prose?\n```\n\nIf the answer is no on either side, the slice is not done."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "6. Review Check",
+        "anchor": "6-review-check",
+        "githubAnchor": "6-review-check",
+        "stableAnchor": "h-6049c08007c1",
+        "startLine": 147,
+        "endLine": 147,
+        "textDigest": "1780923c86e3bee776a803dd0fce20831dffce0fa5488395cefd9df2c8bf865f",
+        "sample": "6. Review Check",
+        "sectionPayloadDigest": "0a6be58d2861e46759f404c0980f9bab10421e2131b2009b6724c0e5398385a0",
+        "followingBlockDigest": "d30d1d88e0a0f5bdd55976afadd8b1ecedb13cec31644d4eb712b97a62a21b09",
+        "identityFingerprint": "6f81c2dee6534e255fbfdb6d40ab9ba7f6cdce4080a9f05993ee58f93affb934",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "## 6. Review Check",
+        "sectionText": "## 6. Review Check\n\nBefore closing an architecture plan or implementation slice, reviewers should\nask:\n\n```txt\nDoes the outside stay hard enough to verify?\nDoes the inside stay soft enough to think and adapt?\nDid we preserve the skill/prose/soul surface, or only the harness?\nDid we preserve the harness/contract surface, or only the prose?\n```\n\nIf the answer is no on either side, the slice is not done."
+      }
+    },
+    {
+      "claimId": "claim_005e747bd6d72d5767f4924add1279c0",
+      "sourceUnitDigest": "d30d1d88e0a0f5bdd55976afadd8b1ecedb13cec31644d4eb712b97a62a21b09",
+      "targetUnitDigest": "d30d1d88e0a0f5bdd55976afadd8b1ecedb13cec31644d4eb712b97a62a21b09",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_005e747bd6d72d5767f4924add1279c0",
+        "sourceUnitDigest": "d30d1d88e0a0f5bdd55976afadd8b1ecedb13cec31644d4eb712b97a62a21b09",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-24",
+        "targetUnitDigest": "d30d1d88e0a0f5bdd55976afadd8b1ecedb13cec31644d4eb712b97a62a21b09",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "6. Review Check"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-22 (lines 126–127) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-24 (lines 149–150), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-22",
+        "githubAnchor": "unheaded-block-22",
+        "stableAnchor": "unheaded-block-22",
+        "title": "Unheaded block 22",
+        "startLine": 126,
+        "endLine": 127,
+        "textDigest": "d30d1d88e0a0f5bdd55976afadd8b1ecedb13cec31644d4eb712b97a62a21b09",
+        "sample": "Before closing an architecture plan or implementation slice, reviewers should\nask:",
+        "identityFingerprint": "210be2e11a4eddcdd0ecb0815ba792b676d396c5b55b959984464d04d3c93c59",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "6. Review Check"
+        ],
+        "text": "Before closing an architecture plan or implementation slice, reviewers should\nask:"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-24",
+        "githubAnchor": "unheaded-block-24",
+        "stableAnchor": "unheaded-block-24",
+        "title": "Unheaded block 24",
+        "startLine": 149,
+        "endLine": 150,
+        "textDigest": "d30d1d88e0a0f5bdd55976afadd8b1ecedb13cec31644d4eb712b97a62a21b09",
+        "sample": "Before closing an architecture plan or implementation slice, reviewers should\nask:",
+        "identityFingerprint": "210be2e11a4eddcdd0ecb0815ba792b676d396c5b55b959984464d04d3c93c59",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "6. Review Check"
+        ],
+        "text": "Before closing an architecture plan or implementation slice, reviewers should\nask:"
+      }
+    },
+    {
+      "claimId": "claim_185ab46fc4e465d5bc8d3f4d6c39aa3a",
+      "sourceUnitDigest": "1c0173b5499b6b851a29c1646acd710e7c10a5ffc05c02d2c8ec41bf881f1b7d",
+      "targetUnitDigest": "1c0173b5499b6b851a29c1646acd710e7c10a5ffc05c02d2c8ec41bf881f1b7d",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_185ab46fc4e465d5bc8d3f4d6c39aa3a",
+        "sourceUnitDigest": "1c0173b5499b6b851a29c1646acd710e7c10a5ffc05c02d2c8ec41bf881f1b7d",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-25",
+        "targetUnitDigest": "1c0173b5499b6b851a29c1646acd710e7c10a5ffc05c02d2c8ec41bf881f1b7d",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "6. Review Check"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-23 (lines 129–134) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-25 (lines 152–157), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-23",
+        "githubAnchor": "unheaded-block-23",
+        "stableAnchor": "unheaded-block-23",
+        "title": "Unheaded block 23",
+        "startLine": 129,
+        "endLine": 134,
+        "textDigest": "1c0173b5499b6b851a29c1646acd710e7c10a5ffc05c02d2c8ec41bf881f1b7d",
+        "sample": "```txt\nDoes the outside stay hard enough to verify?\nDoes the inside stay soft enough to think and adapt?\nDid we preserve the skill/prose/soul surface, or only the harness?\nDid we p",
+        "identityFingerprint": "34fe66679ad735d6c1afd42a59ee7237dcb5f0d097c9dcb3b677fea96b7fd32e",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "6. Review Check"
+        ],
+        "text": "```txt\nDoes the outside stay hard enough to verify?\nDoes the inside stay soft enough to think and adapt?\nDid we preserve the skill/prose/soul surface, or only the harness?\nDid we preserve the harness/contract surface, or only the prose?\n```"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-25",
+        "githubAnchor": "unheaded-block-25",
+        "stableAnchor": "unheaded-block-25",
+        "title": "Unheaded block 25",
+        "startLine": 152,
+        "endLine": 157,
+        "textDigest": "1c0173b5499b6b851a29c1646acd710e7c10a5ffc05c02d2c8ec41bf881f1b7d",
+        "sample": "```txt\nDoes the outside stay hard enough to verify?\nDoes the inside stay soft enough to think and adapt?\nDid we preserve the skill/prose/soul surface, or only the harness?\nDid we p",
+        "identityFingerprint": "34fe66679ad735d6c1afd42a59ee7237dcb5f0d097c9dcb3b677fea96b7fd32e",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "6. Review Check"
+        ],
+        "text": "```txt\nDoes the outside stay hard enough to verify?\nDoes the inside stay soft enough to think and adapt?\nDid we preserve the skill/prose/soul surface, or only the harness?\nDid we preserve the harness/contract surface, or only the prose?\n```"
+      }
+    },
+    {
+      "claimId": "claim_aabd6ef5fad2a6259f57c8651dda00b6",
+      "sourceUnitDigest": "c97f69912beb73486665712ba778bae7cf1ceec3915ebc8360150a085844aab9",
+      "targetUnitDigest": "c97f69912beb73486665712ba778bae7cf1ceec3915ebc8360150a085844aab9",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_aabd6ef5fad2a6259f57c8651dda00b6",
+        "sourceUnitDigest": "c97f69912beb73486665712ba778bae7cf1ceec3915ebc8360150a085844aab9",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-26",
+        "targetUnitDigest": "c97f69912beb73486665712ba778bae7cf1ceec3915ebc8360150a085844aab9",
+        "targetAncestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "6. Review Check"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-24 (lines 136–136) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-26 (lines 159–159), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-24",
+        "githubAnchor": "unheaded-block-24",
+        "stableAnchor": "unheaded-block-24",
+        "title": "Unheaded block 24",
+        "startLine": 136,
+        "endLine": 136,
+        "textDigest": "c97f69912beb73486665712ba778bae7cf1ceec3915ebc8360150a085844aab9",
+        "sample": "If the answer is no on either side, the slice is not done.",
+        "identityFingerprint": "72af0d9757fdd02bb70a8ace50775fbaebea3eb16f75cc8ff72ccfbdf24e9ea6",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "6. Review Check"
+        ],
+        "text": "If the answer is no on either side, the slice is not done."
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-26",
+        "githubAnchor": "unheaded-block-26",
+        "stableAnchor": "unheaded-block-26",
+        "title": "Unheaded block 26",
+        "startLine": 159,
+        "endLine": 159,
+        "textDigest": "c97f69912beb73486665712ba778bae7cf1ceec3915ebc8360150a085844aab9",
+        "sample": "If the answer is no on either side, the slice is not done.",
+        "identityFingerprint": "72af0d9757fdd02bb70a8ace50775fbaebea3eb16f75cc8ff72ccfbdf24e9ea6",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "6. Review Check"
+        ],
+        "text": "If the answer is no on either side, the slice is not done."
+      }
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "a36PopulationByClass": {
+    "Unit-exact": [
+      "claim_733bbbdcf82cccec0ae64f0d51bbae35",
+      "claim_c7c23597f0f59066744415e2b42c32ee",
+      "claim_4908c7e38d4253d644d9510066b39e3e",
+      "claim_85adced2ecd69234b52d791b5832428a",
+      "claim_248240ca25f66e964188accd00df526a",
+      "claim_4b3408bc120b2ab7f05bdcdca3a78dab",
+      "claim_93023a4db20504781b44efb9be5b3726",
+      "claim_11d2f816f621c7c9cffad344a3356475",
+      "claim_25de6efa8826e2668318a047142018af",
+      "claim_8131735458780d1b62ca74659cfc799c",
+      "claim_2275036ae98e72ef435eda28e34cf9d2",
+      "claim_389cbb0ed16d03193f95b1050307bcf6",
+      "claim_7f2039017fff407a6508c008fb041b42",
+      "claim_9d8a8f3ba46e861451c6a746db376790",
+      "claim_e646d72e1faf2dc7eb5c65ab6a6d8030",
+      "claim_44599eb7c20796c8f57eed75cc90078f",
+      "claim_680989c22bdb9826c28cce48c76e5154",
+      "claim_005e747bd6d72d5767f4924add1279c0",
+      "claim_185ab46fc4e465d5bc8d3f4d6c39aa3a",
+      "claim_aabd6ef5fad2a6259f57c8651dda00b6"
+    ],
+    "Weak-exact": [
+      "claim_64a8c8baf09cc399d820a25f51c530aa",
+      "claim_74f677288b1f88a2bd061f430885442c",
+      "claim_a8b24a3334af5b6a3479f38a98d7e591",
+      "claim_7276e16ef23d0ab1850dd9d91d5121ae",
+      "claim_08fe56b6dc3b93c6a86a2e22d854dd21",
+      "claim_e4e0ea54bef3a6f4df33df1e89117a52",
+      "claim_98cab524d25ac00b1a7bcb55efe5911a",
+      "claim_f39b608c75acacbeb51a223279bb0eaf",
+      "claim_0583c8bb44ff974331b0f6ab9bf1c48c",
+      "claim_fdb1974174f4354153d278b30ce7fc3e"
+    ],
+    "Judgment": [
+      "claim_7af08f7b19633c3efc3c54cb870ad5f5"
+    ]
+  }
+}

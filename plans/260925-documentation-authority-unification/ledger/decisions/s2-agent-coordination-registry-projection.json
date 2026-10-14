@@ -7523,22 +7523,22 @@
     },
     {
       "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-      "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+      "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending"
     },
     {
       "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-      "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+      "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending"
     },
     {
       "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-      "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+      "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending"
     },
@@ -7552,8 +7552,8 @@
     },
     {
       "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-      "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+      "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending"
     },

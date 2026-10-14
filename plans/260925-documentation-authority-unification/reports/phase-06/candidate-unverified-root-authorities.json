@@ -2,7 +2,7 @@
   "version": 1,
   "batch": "root-authorities",
   "authorization": "A28",
-  "authoredCommit": "f0d4d030b06d36e3e9f55f7a1e3e5df623cc9860",
+  "authoredCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
   "scope": [
     "docs/architecture-manifest.json",
     "docs/coexistence.md",
@@ -39,7 +39,7 @@
   ],
   "scopeLimit": "Final mapped Step 5 source population; AGENTS.md/CLAUDE.md deferred to Step 10. Review and other closure obligations remain open.",
   "meaning": "Native reverse-open list; candidate-unverified, no truth approval.",
-  "count": 830,
+  "count": 831,
   "rows": [
     {
       "claimId": "claim_d32ffe8c2dcf1fffb004c4087509896f",
@@ -53,6 +53,13 @@
       "path": "docs/platform/coexistence/spec.md",
       "anchor": "source-metadata-added-in-candidate",
       "unitDigest": "ac160fbd4198901698d21f6c6c8a20205b332189b0746649f0533b14893f78a3",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_2cae83233f2c9f4038e573bc0f50ae5d",
+      "path": "docs/platform/contracts/architecture-manifest.json",
+      "anchor": "file-block",
+      "unitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
       "status": "candidate-unverified"
     },
     {
@@ -5874,15 +5881,13 @@
   ],
   "previousCount": 830,
   "nativeRebinding": {
-    "authorization": "A28 + A31",
     "fullNativeTupleEquality": true,
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
-    "meaning": "Actual individual native conservation tuples. Previous identity remains a native gap; no identity graft or disposition.",
-    "verifiedCommit": "f0d4d030b06d36e3e9f55f7a1e3e5df623cc9860",
-    "verification": "reports/phase-06/root-boundary-native-verification.json nativeClosurePin",
-    "reviewStatus": "candidate-unverified; changed native identities carry no approval",
-    "supplementalMetadata": "Preserved receipt/reason metadata is historical evidence from the prior list; current decisions/classification refs are read from unchanged shards at the verified commit. It does not grant current truth approval."
+    "verifiedCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+    "verification": "reports/phase-06/whole-system-native-verification.json",
+    "reviewStatus": "candidate-unverified; no approval or truth certification",
+    "meaning": "Actual native conservation output; all newly allocated identities and predecessor gaps retained without graft or invented disposition."
   },
   "closureCorrectionRebinding": {
     "inputCommit": "a3a4251f07d619adbb0184f29ec6e2254a008862",

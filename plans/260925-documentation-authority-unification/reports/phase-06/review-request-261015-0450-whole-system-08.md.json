@@ -1,0 +1,726 @@
+{
+  "version": 1,
+  "commit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+  "shard": "s6-whole-system-architect-portal.json",
+  "authorSession": "codex-session:37@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_feceb74ddacd9505b466b57828944dbe",
+      "sourceUnitDigest": "73554cfb77ca612f3a8ae819d9aa45da04803a612898b2a7b447aa16ee5e6205",
+      "targetUnitDigest": "6728116d72d8078b550b06129599d2d346837494e530c0e658b4272acd3cbff3",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_feceb74ddacd9505b466b57828944dbe",
+        "sourceUnitDigest": "73554cfb77ca612f3a8ae819d9aa45da04803a612898b2a7b447aa16ee5e6205",
+        "targetOwner": "docs/platform/README.md",
+        "targetAnchor": "architect-level-design",
+        "targetUnitDigest": "6728116d72d8078b550b06129599d2d346837494e530c0e658b4272acd3cbff3",
+        "targetAncestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/README.md#architect-level-design (lines 1–1) into docs/platform/README.md#architect-level-design (lines 95–95), the frozen whole-system platform-portal owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/README.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Architect-Level Design",
+        "anchor": "architect-level-design",
+        "githubAnchor": "architect-level-design",
+        "stableAnchor": "h-6ecd21f74365",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "73554cfb77ca612f3a8ae819d9aa45da04803a612898b2a7b447aa16ee5e6205",
+        "sample": "Architect-Level Design",
+        "sectionPayloadDigest": "b46f3d44c71fd4891ff8ecfc810c2d4f3212658645263508cdc189514ceed3cb",
+        "followingBlockDigest": "8db83e4e0a0c4f7f4b3997f5fd63ce1cd27d444871eaf2c50254af5de942ccc0",
+        "identityFingerprint": "3e0666a600e2ca9169464539244ecd847ac2cb31e8db0091a91979d8692310af",
+        "ancestry": [],
+        "text": "# Architect-Level Design",
+        "sectionText": "# Architect-Level Design\n\nDocument type: Index\nDesign status: Discussion\nImplementation: Partial\nLast reviewed: 2026-09-04\n\nThis directory holds architecture-wide intention and redesign documents whose\nscope crosses one component area. Area-specific canonical documents still live\ninside their own subtrees, such as `agent-coordination/` and\n`component-boundary/`."
+      },
+      "target": {
+        "path": "docs/platform/README.md",
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Architect-Level Design",
+        "anchor": "architect-level-design",
+        "githubAnchor": "architect-level-design",
+        "stableAnchor": "h-a455fed29ab4",
+        "startLine": 95,
+        "endLine": 95,
+        "textDigest": "6728116d72d8078b550b06129599d2d346837494e530c0e658b4272acd3cbff3",
+        "sample": "Architect-Level Design",
+        "sectionPayloadDigest": "b46f3d44c71fd4891ff8ecfc810c2d4f3212658645263508cdc189514ceed3cb",
+        "followingBlockDigest": "8db83e4e0a0c4f7f4b3997f5fd63ce1cd27d444871eaf2c50254af5de942ccc0",
+        "identityFingerprint": "b1f0498c6a669ce8a66d6b018c6d45b277c83770ad6faaa77033cf464cb3834a",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage"
+        ],
+        "text": "### Architect-Level Design",
+        "sectionText": "### Architect-Level Design\n\nDocument type: Index\nDesign status: Discussion\nImplementation: Partial\nLast reviewed: 2026-09-04\n\nThis directory holds architecture-wide intention and redesign documents whose\nscope crosses one component area. Area-specific canonical documents still live\ninside their own subtrees, such as `agent-coordination/` and\n`component-boundary/`."
+      }
+    },
+    {
+      "claimId": "claim_2896a30027e0e6b1d5790748308d08e6",
+      "sourceUnitDigest": "8db83e4e0a0c4f7f4b3997f5fd63ce1cd27d444871eaf2c50254af5de942ccc0",
+      "targetUnitDigest": "8db83e4e0a0c4f7f4b3997f5fd63ce1cd27d444871eaf2c50254af5de942ccc0",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_2896a30027e0e6b1d5790748308d08e6",
+        "sourceUnitDigest": "8db83e4e0a0c4f7f4b3997f5fd63ce1cd27d444871eaf2c50254af5de942ccc0",
+        "targetOwner": "docs/platform/README.md",
+        "targetAnchor": "unheaded-block-11",
+        "targetUnitDigest": "8db83e4e0a0c4f7f4b3997f5fd63ce1cd27d444871eaf2c50254af5de942ccc0",
+        "targetAncestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Carry the complete unheaded-block at docs/architect/README.md#unheaded-block-1 (lines 3–6) into docs/platform/README.md#unheaded-block-11 (lines 97–100), the frozen whole-system platform-portal owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 6,
+        "textDigest": "8db83e4e0a0c4f7f4b3997f5fd63ce1cd27d444871eaf2c50254af5de942ccc0",
+        "sample": "Document type: Index\nDesign status: Discussion\nImplementation: Partial\nLast reviewed: 2026-09-04",
+        "identityFingerprint": "289b00b7a357d6382aafb4609a638d9d21abcce8cde317cd249b9fde0c9c2815",
+        "ancestry": [
+          "Architect-Level Design"
+        ],
+        "text": "Document type: Index\nDesign status: Discussion\nImplementation: Partial\nLast reviewed: 2026-09-04"
+      },
+      "target": {
+        "path": "docs/platform/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 97,
+        "endLine": 100,
+        "textDigest": "8db83e4e0a0c4f7f4b3997f5fd63ce1cd27d444871eaf2c50254af5de942ccc0",
+        "sample": "Document type: Index\nDesign status: Discussion\nImplementation: Partial\nLast reviewed: 2026-09-04",
+        "identityFingerprint": "289b00b7a357d6382aafb4609a638d9d21abcce8cde317cd249b9fde0c9c2815",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "text": "Document type: Index\nDesign status: Discussion\nImplementation: Partial\nLast reviewed: 2026-09-04"
+      }
+    },
+    {
+      "claimId": "claim_50a65e67f2ed6c8391a0e104b46640cb",
+      "sourceUnitDigest": "31b31117fa644b51192ab7299a40420fdbf64307c77cf118bfed3f7b98a8d327",
+      "targetUnitDigest": "31b31117fa644b51192ab7299a40420fdbf64307c77cf118bfed3f7b98a8d327",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_50a65e67f2ed6c8391a0e104b46640cb",
+        "sourceUnitDigest": "31b31117fa644b51192ab7299a40420fdbf64307c77cf118bfed3f7b98a8d327",
+        "targetOwner": "docs/platform/README.md",
+        "targetAnchor": "unheaded-block-12",
+        "targetUnitDigest": "31b31117fa644b51192ab7299a40420fdbf64307c77cf118bfed3f7b98a8d327",
+        "targetAncestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Carry the complete unheaded-block at docs/architect/README.md#unheaded-block-2 (lines 8–11) into docs/platform/README.md#unheaded-block-12 (lines 102–105), the frozen whole-system platform-portal owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 8,
+        "endLine": 11,
+        "textDigest": "31b31117fa644b51192ab7299a40420fdbf64307c77cf118bfed3f7b98a8d327",
+        "sample": "This directory holds architecture-wide intention and redesign documents whose\nscope crosses one component area. Area-specific canonical documents still live\ninside their own subtre",
+        "identityFingerprint": "81dc8c019dd3869e155dbdd023e58f06d05fdb5ae8c674637ae95b2b9f890cc6",
+        "ancestry": [
+          "Architect-Level Design"
+        ],
+        "text": "This directory holds architecture-wide intention and redesign documents whose\nscope crosses one component area. Area-specific canonical documents still live\ninside their own subtrees, such as `agent-coordination/` and\n`component-boundary/`."
+      },
+      "target": {
+        "path": "docs/platform/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 102,
+        "endLine": 105,
+        "textDigest": "31b31117fa644b51192ab7299a40420fdbf64307c77cf118bfed3f7b98a8d327",
+        "sample": "This directory holds architecture-wide intention and redesign documents whose\nscope crosses one component area. Area-specific canonical documents still live\ninside their own subtre",
+        "identityFingerprint": "81dc8c019dd3869e155dbdd023e58f06d05fdb5ae8c674637ae95b2b9f890cc6",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "text": "This directory holds architecture-wide intention and redesign documents whose\nscope crosses one component area. Area-specific canonical documents still live\ninside their own subtrees, such as `agent-coordination/` and\n`component-boundary/`."
+      }
+    },
+    {
+      "claimId": "claim_e27539fb720c07fc732d6c0b8ac106c6",
+      "sourceUnitDigest": "4fd24b963667eddd594439646e203a3e685c95bbe43beed2dfb88fbad35162fd",
+      "targetUnitDigest": "0f4433053968e22e3020d90bc74d59c7b07f727d24d1c6cf7fee0cabdad5bb5b",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_e27539fb720c07fc732d6c0b8ac106c6",
+        "sourceUnitDigest": "4fd24b963667eddd594439646e203a3e685c95bbe43beed2dfb88fbad35162fd",
+        "targetOwner": "docs/platform/README.md",
+        "targetAnchor": "cross-area-intentions",
+        "targetUnitDigest": "0f4433053968e22e3020d90bc74d59c7b07f727d24d1c6cf7fee0cabdad5bb5b",
+        "targetAncestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/README.md#cross-area-intentions (lines 13–13) into docs/platform/README.md#cross-area-intentions (lines 107–107), the frozen whole-system platform-portal owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/README.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Cross-Area Intentions",
+        "anchor": "cross-area-intentions",
+        "githubAnchor": "cross-area-intentions",
+        "stableAnchor": "h-cdf3f5f0e88e",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "4fd24b963667eddd594439646e203a3e685c95bbe43beed2dfb88fbad35162fd",
+        "sample": "Cross-Area Intentions",
+        "sectionPayloadDigest": "e10db7d91f47b1d28d58d88cf1496d275c349f6269dd430171b27bf95d3737e9",
+        "followingBlockDigest": "e10db7d91f47b1d28d58d88cf1496d275c349f6269dd430171b27bf95d3737e9",
+        "identityFingerprint": "581ce22033cf9dadc7af66e3ed75c7bdef96c8c4131c025b23b89d604b99943f",
+        "ancestry": [
+          "Architect-Level Design"
+        ],
+        "text": "## Cross-Area Intentions",
+        "sectionText": "## Cross-Area Intentions\n\n- [Architect Roadmap](roadmap.md) keeps the high-level sequencing and delivery\n  plan across active architecture streams: agent coordination, coding domain,\n  component boundary, host invocation, Node-to-Rust migration, and packaging\n  distribution.\n- [Architecture Intent](architecture-intent.md) preserves architecture-wide\n  design intent across deferred capabilities. Its first active thread covers\n  widening fgOS from strict fan-out/fan-in and artifact-mediated coordination\n  toward richer group-thinking/problem-solving capability, while keeping\n  isolation-heavy fixtures intact.\n- [System Vision: Trong Mem Ngoai Cung](system-vision-trong-mem-ngoai-cung.md)\n  records the cross-system direction that fgOS must combine hard outer\n  contracts with soft inner soul/prose/skill, so architecture slices do not\n  become either unverifiable prose or rigid harness without living operating\n  intelligence.\n- [Workspace Topology Architecture](workspace-topology.md) defines\n  repository/workspace/work-state/runtime identities, state classes, root\n  ownership, worktree mode invariants, and mutation topology used by\n  packaging, work-state, coding-domain, coordination, and config/init/doctor.\n  Read this contract before packaging activation, work-state relocation,\n  coding-domain worktree changes, or runtime coordination changes.\n- [Workspace Topology Audit](workspace-topology-audit.md) records current\n  codebase evidence and gaps behind the topology contract.\n- [Workspace Topology Roadmap](workspace-topology-roadmap.md) sequences the\n  decisions and migration slices needed to make the contract enforceable."
+      },
+      "target": {
+        "path": "docs/platform/README.md",
+        "unitKind": "heading",
+        "level": 4,
+        "title": "Cross-Area Intentions",
+        "anchor": "cross-area-intentions",
+        "githubAnchor": "cross-area-intentions",
+        "stableAnchor": "h-96c6652c03ed",
+        "startLine": 107,
+        "endLine": 107,
+        "textDigest": "0f4433053968e22e3020d90bc74d59c7b07f727d24d1c6cf7fee0cabdad5bb5b",
+        "sample": "Cross-Area Intentions",
+        "sectionPayloadDigest": "317afa51c7f2a4104fb813f126eca9a13f6ae6a7274d31c43fb5822f848b50a4",
+        "followingBlockDigest": "317afa51c7f2a4104fb813f126eca9a13f6ae6a7274d31c43fb5822f848b50a4",
+        "identityFingerprint": "077f5bc7c986f287540b2d88a57978f4b91e1ce776dd4a3e08eb14d842c19faf",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "text": "#### Cross-Area Intentions",
+        "sectionText": "#### Cross-Area Intentions\n\n- [Architect Roadmap](../architect/roadmap.md) keeps the high-level sequencing and delivery\n  plan across active architecture streams: agent coordination, coding domain,\n  component boundary, host invocation, Node-to-Rust migration, and packaging\n  distribution.\n- [Architecture Intent](../architect/architecture-intent.md) preserves architecture-wide\n  design intent across deferred capabilities. Its first active thread covers\n  widening fgOS from strict fan-out/fan-in and artifact-mediated coordination\n  toward richer group-thinking/problem-solving capability, while keeping\n  isolation-heavy fixtures intact.\n- [System Vision: Trong Mem Ngoai Cung](../architect/system-vision-trong-mem-ngoai-cung.md)\n  records the cross-system direction that fgOS must combine hard outer\n  contracts with soft inner soul/prose/skill, so architecture slices do not\n  become either unverifiable prose or rigid harness without living operating\n  intelligence.\n- [Workspace Topology Architecture](../architect/workspace-topology.md) defines\n  repository/workspace/work-state/runtime identities, state classes, root\n  ownership, worktree mode invariants, and mutation topology used by\n  packaging, work-state, coding-domain, coordination, and config/init/doctor.\n  Read this contract before packaging activation, work-state relocation,\n  coding-domain worktree changes, or runtime coordination changes.\n- [Workspace Topology Audit](../architect/workspace-topology-audit.md) records current\n  codebase evidence and gaps behind the topology contract.\n- [Workspace Topology Roadmap](../architect/workspace-topology-roadmap.md) sequences the\n  decisions and migration slices needed to make the contract enforceable."
+      }
+    },
+    {
+      "claimId": "claim_8e07597a0163d64f1d5ca3ab8ad7b02a",
+      "sourceUnitDigest": "e10db7d91f47b1d28d58d88cf1496d275c349f6269dd430171b27bf95d3737e9",
+      "targetUnitDigest": "317afa51c7f2a4104fb813f126eca9a13f6ae6a7274d31c43fb5822f848b50a4",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_8e07597a0163d64f1d5ca3ab8ad7b02a",
+        "sourceUnitDigest": "e10db7d91f47b1d28d58d88cf1496d275c349f6269dd430171b27bf95d3737e9",
+        "targetOwner": "docs/platform/README.md",
+        "targetAnchor": "unheaded-block-13",
+        "targetUnitDigest": "317afa51c7f2a4104fb813f126eca9a13f6ae6a7274d31c43fb5822f848b50a4",
+        "targetAncestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design",
+          "Cross-Area Intentions"
+        ],
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/README.md#unheaded-block-3 (lines 15–38) into docs/platform/README.md#unheaded-block-13 (lines 109–132), the frozen whole-system platform-portal owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 15,
+        "endLine": 38,
+        "textDigest": "e10db7d91f47b1d28d58d88cf1496d275c349f6269dd430171b27bf95d3737e9",
+        "sample": "- [Architect Roadmap](roadmap.md) keeps the high-level sequencing and delivery\n  plan across active architecture streams: agent coordination, coding domain,\n  component boundary, h",
+        "identityFingerprint": "615098d8b561762ece9892d2997228579ac66c941ca20ef530dc0ed36c45b103",
+        "ancestry": [
+          "Architect-Level Design",
+          "Cross-Area Intentions"
+        ],
+        "text": "- [Architect Roadmap](roadmap.md) keeps the high-level sequencing and delivery\n  plan across active architecture streams: agent coordination, coding domain,\n  component boundary, host invocation, Node-to-Rust migration, and packaging\n  distribution.\n- [Architecture Intent](architecture-intent.md) preserves architecture-wide\n  design intent across deferred capabilities. Its first active thread covers\n  widening fgOS from strict fan-out/fan-in and artifact-mediated coordination\n  toward richer group-thinking/problem-solving capability, while keeping\n  isolation-heavy fixtures intact.\n- [System Vision: Trong Mem Ngoai Cung](system-vision-trong-mem-ngoai-cung.md)\n  records the cross-system direction that fgOS must combine hard outer\n  contracts with soft inner soul/prose/skill, so architecture slices do not\n  become either unverifiable prose or rigid harness without living operating\n  intelligence.\n- [Workspace Topology Architecture](workspace-topology.md) defines\n  repository/workspace/work-state/runtime identities, state classes, root\n  ownership, worktree mode invariants, and mutation topology used by\n  packaging, work-state, coding-domain, coordination, and config/init/doctor.\n  Read this contract before packaging activation, work-state relocation,\n  coding-domain worktree changes, or runtime coordination changes.\n- [Workspace Topology Audit](workspace-topology-audit.md) records current\n  codebase evidence and gaps behind the topology contract.\n- [Workspace Topology Roadmap](workspace-topology-roadmap.md) sequences the\n  decisions and migration slices needed to make the contract enforceable."
+      },
+      "target": {
+        "path": "docs/platform/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 109,
+        "endLine": 132,
+        "textDigest": "317afa51c7f2a4104fb813f126eca9a13f6ae6a7274d31c43fb5822f848b50a4",
+        "sample": "- [Architect Roadmap](../architect/roadmap.md) keeps the high-level sequencing and delivery\n  plan across active architecture streams: agent coordination, coding domain,\n  componen",
+        "identityFingerprint": "8ed54733a1fbdbe29a2edb7723506c81c8cdabade1ad203bb5503823e6bfe210",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design",
+          "Cross-Area Intentions"
+        ],
+        "text": "- [Architect Roadmap](../architect/roadmap.md) keeps the high-level sequencing and delivery\n  plan across active architecture streams: agent coordination, coding domain,\n  component boundary, host invocation, Node-to-Rust migration, and packaging\n  distribution.\n- [Architecture Intent](../architect/architecture-intent.md) preserves architecture-wide\n  design intent across deferred capabilities. Its first active thread covers\n  widening fgOS from strict fan-out/fan-in and artifact-mediated coordination\n  toward richer group-thinking/problem-solving capability, while keeping\n  isolation-heavy fixtures intact.\n- [System Vision: Trong Mem Ngoai Cung](../architect/system-vision-trong-mem-ngoai-cung.md)\n  records the cross-system direction that fgOS must combine hard outer\n  contracts with soft inner soul/prose/skill, so architecture slices do not\n  become either unverifiable prose or rigid harness without living operating\n  intelligence.\n- [Workspace Topology Architecture](../architect/workspace-topology.md) defines\n  repository/workspace/work-state/runtime identities, state classes, root\n  ownership, worktree mode invariants, and mutation topology used by\n  packaging, work-state, coding-domain, coordination, and config/init/doctor.\n  Read this contract before packaging activation, work-state relocation,\n  coding-domain worktree changes, or runtime coordination changes.\n- [Workspace Topology Audit](../architect/workspace-topology-audit.md) records current\n  codebase evidence and gaps behind the topology contract.\n- [Workspace Topology Roadmap](../architect/workspace-topology-roadmap.md) sequences the\n  decisions and migration slices needed to make the contract enforceable."
+      }
+    },
+    {
+      "claimId": "claim_75dee385e5e27c6f5cf816ce81da66f3",
+      "sourceUnitDigest": "f237948c6913adc9448f1eac6c38c2c470579ec5c50787ac277a4ce1e579431a",
+      "targetUnitDigest": "9de4c9e6e752cf7002d6d260c85a20994df0bdb6b6840f9666617fc6603067c0",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_75dee385e5e27c6f5cf816ce81da66f3",
+        "sourceUnitDigest": "f237948c6913adc9448f1eac6c38c2c470579ec5c50787ac277a4ce1e579431a",
+        "targetOwner": "docs/platform/README.md",
+        "targetAnchor": "area-portals",
+        "targetUnitDigest": "9de4c9e6e752cf7002d6d260c85a20994df0bdb6b6840f9666617fc6603067c0",
+        "targetAncestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/README.md#area-portals (lines 40–40) into docs/platform/README.md#area-portals (lines 134–134), the frozen whole-system platform-portal owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/README.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Area Portals",
+        "anchor": "area-portals",
+        "githubAnchor": "area-portals",
+        "stableAnchor": "h-685615469380",
+        "startLine": 40,
+        "endLine": 40,
+        "textDigest": "f237948c6913adc9448f1eac6c38c2c470579ec5c50787ac277a4ce1e579431a",
+        "sample": "Area Portals",
+        "sectionPayloadDigest": "9e7c255cf914d8c5c1323713a63906c2c9d51bfd55c03e6443cc4f86e80bc6ac",
+        "followingBlockDigest": "9e7c255cf914d8c5c1323713a63906c2c9d51bfd55c03e6443cc4f86e80bc6ac",
+        "identityFingerprint": "13168d21399feea2435889f99c89216a21ff5e742aaef3e1502d3a09e243283c",
+        "ancestry": [
+          "Architect-Level Design"
+        ],
+        "text": "## Area Portals",
+        "sectionText": "## Area Portals\n\n- [Agent Coordination](agent-coordination/README.md)\n- [Component Boundary](component-boundary/README.md)\n- [Domainization](domainization/README.md)\n- [Host Invocation And Provider Routing](host-invocation-routing/host-invocation-provider-routing.md)\n- [Packaging And Distribution](packaging-distribution/README.md)"
+      },
+      "target": {
+        "path": "docs/platform/README.md",
+        "unitKind": "heading",
+        "level": 4,
+        "title": "Area Portals",
+        "anchor": "area-portals",
+        "githubAnchor": "area-portals",
+        "stableAnchor": "h-e12a625330af",
+        "startLine": 134,
+        "endLine": 134,
+        "textDigest": "9de4c9e6e752cf7002d6d260c85a20994df0bdb6b6840f9666617fc6603067c0",
+        "sample": "Area Portals",
+        "sectionPayloadDigest": "bf98fd90b7ce1fac97e09a5bde9e43389e4f86f1dae0a108e30d9d4026f4bd61",
+        "followingBlockDigest": "bf98fd90b7ce1fac97e09a5bde9e43389e4f86f1dae0a108e30d9d4026f4bd61",
+        "identityFingerprint": "33bc49c587f37d374e628b565b79af14d760f9bfa33ac8ce665f9c228004954b",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "text": "#### Area Portals",
+        "sectionText": "#### Area Portals\n\n- [Agent Coordination](../architect/agent-coordination/README.md)\n- [Component Boundary](../architect/component-boundary/README.md)\n- [Domainization](../architect/domainization/README.md)\n- [Host Invocation And Provider Routing](../architect/host-invocation-routing/host-invocation-provider-routing.md)\n- [Packaging And Distribution](../architect/packaging-distribution/README.md)"
+      }
+    },
+    {
+      "claimId": "claim_6729755c0a3b1b48ae5fa04ad0b634ef",
+      "sourceUnitDigest": "9e7c255cf914d8c5c1323713a63906c2c9d51bfd55c03e6443cc4f86e80bc6ac",
+      "targetUnitDigest": "bf98fd90b7ce1fac97e09a5bde9e43389e4f86f1dae0a108e30d9d4026f4bd61",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_6729755c0a3b1b48ae5fa04ad0b634ef",
+        "sourceUnitDigest": "9e7c255cf914d8c5c1323713a63906c2c9d51bfd55c03e6443cc4f86e80bc6ac",
+        "targetOwner": "docs/platform/README.md",
+        "targetAnchor": "unheaded-block-14",
+        "targetUnitDigest": "bf98fd90b7ce1fac97e09a5bde9e43389e4f86f1dae0a108e30d9d4026f4bd61",
+        "targetAncestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design",
+          "Area Portals"
+        ],
+        "claimKind": "contract",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/README.md#unheaded-block-4 (lines 42–46) into docs/platform/README.md#unheaded-block-14 (lines 136–140), the frozen whole-system platform-portal owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 42,
+        "endLine": 46,
+        "textDigest": "9e7c255cf914d8c5c1323713a63906c2c9d51bfd55c03e6443cc4f86e80bc6ac",
+        "sample": "- [Agent Coordination](agent-coordination/README.md)\n- [Component Boundary](component-boundary/README.md)\n- [Domainization](domainization/README.md)\n- [Host Invocation And Provider",
+        "identityFingerprint": "df1f50382fd3c74d8d149e4e4faab3a4c11535d192fec54a943e1c70c598255c",
+        "ancestry": [
+          "Architect-Level Design",
+          "Area Portals"
+        ],
+        "text": "- [Agent Coordination](agent-coordination/README.md)\n- [Component Boundary](component-boundary/README.md)\n- [Domainization](domainization/README.md)\n- [Host Invocation And Provider Routing](host-invocation-routing/host-invocation-provider-routing.md)\n- [Packaging And Distribution](packaging-distribution/README.md)"
+      },
+      "target": {
+        "path": "docs/platform/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 136,
+        "endLine": 140,
+        "textDigest": "bf98fd90b7ce1fac97e09a5bde9e43389e4f86f1dae0a108e30d9d4026f4bd61",
+        "sample": "- [Agent Coordination](../architect/agent-coordination/README.md)\n- [Component Boundary](../architect/component-boundary/README.md)\n- [Domainization](../architect/domainization/REA",
+        "identityFingerprint": "1608b527af2cfd49845b6d07bb4b0fe4e9a109caa9b2b4d9d475ffcc9927ae27",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design",
+          "Area Portals"
+        ],
+        "text": "- [Agent Coordination](../architect/agent-coordination/README.md)\n- [Component Boundary](../architect/component-boundary/README.md)\n- [Domainization](../architect/domainization/README.md)\n- [Host Invocation And Provider Routing](../architect/host-invocation-routing/host-invocation-provider-routing.md)\n- [Packaging And Distribution](../architect/packaging-distribution/README.md)"
+      }
+    },
+    {
+      "claimId": "claim_51a26e783af2c2a7ff8150886092366b",
+      "sourceUnitDigest": "c18a4e139a27d780f7b72f62023eccce6bf17b105e5ab5d51a86b7eb96fb78fe",
+      "targetUnitDigest": "bca95d4d0317f17a3c721637dcc0da5d019deac1b79733304e81cb867011396d",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_51a26e783af2c2a7ff8150886092366b",
+        "sourceUnitDigest": "c18a4e139a27d780f7b72f62023eccce6bf17b105e5ab5d51a86b7eb96fb78fe",
+        "targetOwner": "docs/platform/README.md",
+        "targetAnchor": "cross-area-proposals",
+        "targetUnitDigest": "bca95d4d0317f17a3c721637dcc0da5d019deac1b79733304e81cb867011396d",
+        "targetAncestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/README.md#cross-area-proposals (lines 48–48) into docs/platform/README.md#cross-area-proposals (lines 142–142), the frozen whole-system platform-portal owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/README.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Cross-Area Proposals",
+        "anchor": "cross-area-proposals",
+        "githubAnchor": "cross-area-proposals",
+        "stableAnchor": "h-6d19861f031c",
+        "startLine": 48,
+        "endLine": 48,
+        "textDigest": "c18a4e139a27d780f7b72f62023eccce6bf17b105e5ab5d51a86b7eb96fb78fe",
+        "sample": "Cross-Area Proposals",
+        "sectionPayloadDigest": "cc271694835a9bca595580cf746c3cde2c759fc15276e16858466c2cec581a28",
+        "followingBlockDigest": "cc271694835a9bca595580cf746c3cde2c759fc15276e16858466c2cec581a28",
+        "identityFingerprint": "46caf9e861b21c0eac0a193e9818d1c57b2eac92bb15d31fd7e125e2500225f0",
+        "ancestry": [
+          "Architect-Level Design"
+        ],
+        "text": "## Cross-Area Proposals",
+        "sectionText": "## Cross-Area Proposals\n\n- [Architect-Level Proposals](proposals/README.md) holds discussion drafts\n  whose scope crosses one architecture area. These are not accepted design\n  until extracted into canonical architect-level or area-specific documents."
+      },
+      "target": {
+        "path": "docs/platform/README.md",
+        "unitKind": "heading",
+        "level": 4,
+        "title": "Cross-Area Proposals",
+        "anchor": "cross-area-proposals",
+        "githubAnchor": "cross-area-proposals",
+        "stableAnchor": "h-5f05afd40d62",
+        "startLine": 142,
+        "endLine": 142,
+        "textDigest": "bca95d4d0317f17a3c721637dcc0da5d019deac1b79733304e81cb867011396d",
+        "sample": "Cross-Area Proposals",
+        "sectionPayloadDigest": "fe53ead8782ad2f6e6fc5f681b19506aeb5d62b3f3e9c7905760b2fb94dbe1ff",
+        "followingBlockDigest": "fe53ead8782ad2f6e6fc5f681b19506aeb5d62b3f3e9c7905760b2fb94dbe1ff",
+        "identityFingerprint": "f348e913e8bdfbb4c99913419e808b81eb98df9e8df0c3a262f69c53b941783e",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "text": "#### Cross-Area Proposals",
+        "sectionText": "#### Cross-Area Proposals\n\n- [Architect-Level Proposals](../architect/proposals/README.md) holds discussion drafts\n  whose scope crosses one architecture area. These are not accepted design\n  until extracted into canonical architect-level or area-specific documents."
+      }
+    },
+    {
+      "claimId": "claim_9ef07c1714bdc408ccfcafaa152e41f9",
+      "sourceUnitDigest": "cc271694835a9bca595580cf746c3cde2c759fc15276e16858466c2cec581a28",
+      "targetUnitDigest": "fe53ead8782ad2f6e6fc5f681b19506aeb5d62b3f3e9c7905760b2fb94dbe1ff",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_9ef07c1714bdc408ccfcafaa152e41f9",
+        "sourceUnitDigest": "cc271694835a9bca595580cf746c3cde2c759fc15276e16858466c2cec581a28",
+        "targetOwner": "docs/platform/README.md",
+        "targetAnchor": "unheaded-block-15",
+        "targetUnitDigest": "fe53ead8782ad2f6e6fc5f681b19506aeb5d62b3f3e9c7905760b2fb94dbe1ff",
+        "targetAncestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design",
+          "Cross-Area Proposals"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/README.md#unheaded-block-5 (lines 50–52) into docs/platform/README.md#unheaded-block-15 (lines 144–146), the frozen whole-system platform-portal owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 50,
+        "endLine": 52,
+        "textDigest": "cc271694835a9bca595580cf746c3cde2c759fc15276e16858466c2cec581a28",
+        "sample": "- [Architect-Level Proposals](proposals/README.md) holds discussion drafts\n  whose scope crosses one architecture area. These are not accepted design\n  until extracted into canonic",
+        "identityFingerprint": "ec1344488a1fd9c66635490ef31b6cda685fec3153a179da98c23f1a051094dd",
+        "ancestry": [
+          "Architect-Level Design",
+          "Cross-Area Proposals"
+        ],
+        "text": "- [Architect-Level Proposals](proposals/README.md) holds discussion drafts\n  whose scope crosses one architecture area. These are not accepted design\n  until extracted into canonical architect-level or area-specific documents."
+      },
+      "target": {
+        "path": "docs/platform/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-15",
+        "githubAnchor": "unheaded-block-15",
+        "stableAnchor": "unheaded-block-15",
+        "title": "Unheaded block 15",
+        "startLine": 144,
+        "endLine": 146,
+        "textDigest": "fe53ead8782ad2f6e6fc5f681b19506aeb5d62b3f3e9c7905760b2fb94dbe1ff",
+        "sample": "- [Architect-Level Proposals](../architect/proposals/README.md) holds discussion drafts\n  whose scope crosses one architecture area. These are not accepted design\n  until extracted",
+        "identityFingerprint": "8ee16b5bf187ab89714a97e91506cff9c65d4aba123b400fd09e48c594607b11",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design",
+          "Cross-Area Proposals"
+        ],
+        "text": "- [Architect-Level Proposals](../architect/proposals/README.md) holds discussion drafts\n  whose scope crosses one architecture area. These are not accepted design\n  until extracted into canonical architect-level or area-specific documents."
+      }
+    },
+    {
+      "claimId": "claim_966fde97560d95682b95eaf79ad687e6",
+      "sourceUnitDigest": "03967938736daae01140765c27634b8c0b60ab3d3c028a2e1acf6dd21c7a8f43",
+      "targetUnitDigest": "3d9cac1e701b09bbd35c7b3753d34ae6d4cdb5dc7e7de6978730c69ee9ffa670",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_966fde97560d95682b95eaf79ad687e6",
+        "sourceUnitDigest": "03967938736daae01140765c27634b8c0b60ab3d3c028a2e1acf6dd21c7a8f43",
+        "targetOwner": "docs/platform/README.md",
+        "targetAnchor": "other-architecture-drafts",
+        "targetUnitDigest": "3d9cac1e701b09bbd35c7b3753d34ae6d4cdb5dc7e7de6978730c69ee9ffa670",
+        "targetAncestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Judgment: no target digest match. Carry the complete heading at docs/architect/README.md#other-architecture-drafts (lines 54–54) into docs/platform/README.md#other-architecture-drafts (lines 148–148), the frozen whole-system platform-portal owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/README.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Other Architecture Drafts",
+        "anchor": "other-architecture-drafts",
+        "githubAnchor": "other-architecture-drafts",
+        "stableAnchor": "h-7da039d297f0",
+        "startLine": 54,
+        "endLine": 54,
+        "textDigest": "03967938736daae01140765c27634b8c0b60ab3d3c028a2e1acf6dd21c7a8f43",
+        "sample": "Other Architecture Drafts",
+        "sectionPayloadDigest": "bb699555388ff13671ac77bc5c1f5f4c04540426a29df43b80101d350eb7bbc2",
+        "followingBlockDigest": "bb699555388ff13671ac77bc5c1f5f4c04540426a29df43b80101d350eb7bbc2",
+        "identityFingerprint": "dcb357f5268b302545c933440874ab3caf794539ed8470408286bdda956172a5",
+        "ancestry": [
+          "Architect-Level Design"
+        ],
+        "text": "## Other Architecture Drafts",
+        "sectionText": "## Other Architecture Drafts\n\n- [Dispatch Control Plane Redesign](dispatch-control-plane-redesign.md)\n- [Doing Coordination Redesign](doing-coordination-redesign.md)\n- [Knowledge Registry Redesign](knowledge-registry-redesign.md)"
+      },
+      "target": {
+        "path": "docs/platform/README.md",
+        "unitKind": "heading",
+        "level": 4,
+        "title": "Other Architecture Drafts",
+        "anchor": "other-architecture-drafts",
+        "githubAnchor": "other-architecture-drafts",
+        "stableAnchor": "h-000169536636",
+        "startLine": 148,
+        "endLine": 148,
+        "textDigest": "3d9cac1e701b09bbd35c7b3753d34ae6d4cdb5dc7e7de6978730c69ee9ffa670",
+        "sample": "Other Architecture Drafts",
+        "sectionPayloadDigest": "442292211d93a3f6229329f1000f6a6d3288a2374569dc8e0ce3754adefdb19b",
+        "followingBlockDigest": "442292211d93a3f6229329f1000f6a6d3288a2374569dc8e0ce3754adefdb19b",
+        "identityFingerprint": "7e57d7e439c60ee3c4c4492589f62db0923515715ba537d5929082795f2c1021",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design"
+        ],
+        "text": "#### Other Architecture Drafts",
+        "sectionText": "#### Other Architecture Drafts\n\n- [Dispatch Control Plane Redesign](../architect/dispatch-control-plane-redesign.md)\n- [Doing Coordination Redesign](../architect/doing-coordination-redesign.md)\n- [Knowledge Registry Redesign](../architect/knowledge-registry-redesign.md)"
+      }
+    },
+    {
+      "claimId": "claim_f42e391a572ab02fa51adb4e64446f0e",
+      "sourceUnitDigest": "bb699555388ff13671ac77bc5c1f5f4c04540426a29df43b80101d350eb7bbc2",
+      "targetUnitDigest": "442292211d93a3f6229329f1000f6a6d3288a2374569dc8e0ce3754adefdb19b",
+      "reviewAuthor": "codex-session:37@2026-10-15",
+      "decision": {
+        "claimId": "claim_f42e391a572ab02fa51adb4e64446f0e",
+        "sourceUnitDigest": "bb699555388ff13671ac77bc5c1f5f4c04540426a29df43b80101d350eb7bbc2",
+        "targetOwner": "docs/platform/README.md",
+        "targetAnchor": "unheaded-block-16",
+        "targetUnitDigest": "442292211d93a3f6229329f1000f6a6d3288a2374569dc8e0ce3754adefdb19b",
+        "targetAncestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design",
+          "Other Architecture Drafts"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Judgment: no target digest match. Carry the complete unheaded-block at docs/architect/README.md#unheaded-block-6 (lines 56–58) into docs/platform/README.md#unheaded-block-16 (lines 150–152), the frozen whole-system platform-portal owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. Digest differences come only from the recorded candidate header/frontmatter fence, heading-level shift or physical relative-link rebasing; full before/after units and line mapping are in authoring accounting. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending."
+      },
+      "source": {
+        "path": "docs/architect/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 56,
+        "endLine": 58,
+        "textDigest": "bb699555388ff13671ac77bc5c1f5f4c04540426a29df43b80101d350eb7bbc2",
+        "sample": "- [Dispatch Control Plane Redesign](dispatch-control-plane-redesign.md)\n- [Doing Coordination Redesign](doing-coordination-redesign.md)\n- [Knowledge Registry Redesign](knowledge-re",
+        "identityFingerprint": "f8d46a77af22474e71aae48c9fe4950e5e9b3e1d71ea30469b2ad09c85d9eaa4",
+        "ancestry": [
+          "Architect-Level Design",
+          "Other Architecture Drafts"
+        ],
+        "text": "- [Dispatch Control Plane Redesign](dispatch-control-plane-redesign.md)\n- [Doing Coordination Redesign](doing-coordination-redesign.md)\n- [Knowledge Registry Redesign](knowledge-registry-redesign.md)"
+      },
+      "target": {
+        "path": "docs/platform/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-16",
+        "githubAnchor": "unheaded-block-16",
+        "stableAnchor": "unheaded-block-16",
+        "title": "Unheaded block 16",
+        "startLine": 150,
+        "endLine": 152,
+        "textDigest": "442292211d93a3f6229329f1000f6a6d3288a2374569dc8e0ce3754adefdb19b",
+        "sample": "- [Dispatch Control Plane Redesign](../architect/dispatch-control-plane-redesign.md)\n- [Doing Coordination Redesign](../architect/doing-coordination-redesign.md)\n- [Knowledge Regis",
+        "identityFingerprint": "a95c526cba54d8500a540cf0833316800b500fe7ae6b2fde6ae9cf2abd53a305",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage",
+          "Architect-Level Design",
+          "Other Architecture Drafts"
+        ],
+        "text": "- [Dispatch Control Plane Redesign](../architect/dispatch-control-plane-redesign.md)\n- [Doing Coordination Redesign](../architect/doing-coordination-redesign.md)\n- [Knowledge Registry Redesign](../architect/knowledge-registry-redesign.md)"
+      }
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "a36PopulationByClass": {
+    "Unit-exact": [],
+    "Weak-exact": [
+      "claim_2896a30027e0e6b1d5790748308d08e6",
+      "claim_50a65e67f2ed6c8391a0e104b46640cb"
+    ],
+    "Judgment": [
+      "claim_feceb74ddacd9505b466b57828944dbe",
+      "claim_e27539fb720c07fc732d6c0b8ac106c6",
+      "claim_8e07597a0163d64f1d5ca3ab8ad7b02a",
+      "claim_75dee385e5e27c6f5cf816ce81da66f3",
+      "claim_6729755c0a3b1b48ae5fa04ad0b634ef",
+      "claim_51a26e783af2c2a7ff8150886092366b",
+      "claim_9ef07c1714bdc408ccfcafaa152e41f9",
+      "claim_966fde97560d95682b95eaf79ad687e6",
+      "claim_f42e391a572ab02fa51adb4e64446f0e"
+    ]
+  }
+}

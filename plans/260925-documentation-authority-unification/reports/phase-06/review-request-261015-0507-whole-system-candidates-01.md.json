@@ -1,0 +1,2107 @@
+{
+  "pin": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+  "status": "candidate-unverified",
+  "rows": [
+    {
+      "claimId": "claim_fa634b3e30b51cd9a715a68c66a6c6cd",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "architecture-map",
+      "unitDigest": "bcd8d331cdf19bae5bd9e2c905ae105b6602bc14fcbcc49936d94a465648acf0",
+      "status": "candidate-unverified",
+      "shownText": "# Architecture Map\n\n```txt\nDocument type: Platform architecture map\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through the whole-system architecture map\nDesign status: Draft\nImplementation status: Partial\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted anchor from docs/architecture-map.md\nLast reviewed: 2026-09-13\nRelated:\n- docs/platform/README.md\n- docs/platform/component-boundary.md\n- docs/architecture-map.md\n```",
+      "shownTextDigest": "ef63545ee3a205a14a521cfe02ee50966adab834e1a5d6d82c44cfe664cebc8b",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Architecture Map",
+        "anchor": "architecture-map",
+        "githubAnchor": "architecture-map",
+        "stableAnchor": "h-77b8a1b8c2ff",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "bcd8d331cdf19bae5bd9e2c905ae105b6602bc14fcbcc49936d94a465648acf0",
+        "sample": "Architecture Map",
+        "sectionPayloadDigest": "23c5433eab71eb0bf72530aa096a6fb852745b86503954b0b364a77b3e18670b",
+        "followingBlockDigest": "23c5433eab71eb0bf72530aa096a6fb852745b86503954b0b364a77b3e18670b",
+        "identityFingerprint": "ea4365f9710bec02d0da045a2b51e8076a5b01085aa32672213f561822bd7377",
+        "ancestry": [],
+        "text": "# Architecture Map",
+        "sectionText": "# Architecture Map\n\n```txt\nDocument type: Platform architecture map\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through the whole-system architecture map\nDesign status: Draft\nImplementation status: Partial\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted anchor from docs/architecture-map.md\nLast reviewed: 2026-09-13\nRelated:\n- docs/platform/README.md\n- docs/platform/component-boundary.md\n- docs/architecture-map.md\n```"
+      }
+    },
+    {
+      "claimId": "claim_7b42d1f1ec85abb92f9124fa12ff86e0",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "23c5433eab71eb0bf72530aa096a6fb852745b86503954b0b364a77b3e18670b",
+      "status": "candidate-unverified",
+      "shownText": "```txt\nDocument type: Platform architecture map\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through the whole-system architecture map\nDesign status: Draft\nImplementation status: Partial\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted anchor from docs/architecture-map.md\nLast reviewed: 2026-09-13\nRelated:\n- docs/platform/README.md\n- docs/platform/component-boundary.md\n- docs/architecture-map.md\n```",
+      "shownTextDigest": "23c5433eab71eb0bf72530aa096a6fb852745b86503954b0b364a77b3e18670b",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 17,
+        "textDigest": "23c5433eab71eb0bf72530aa096a6fb852745b86503954b0b364a77b3e18670b",
+        "sample": "```txt\nDocument type: Platform architecture map\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through the whole-system architecture map\nDesign statu",
+        "identityFingerprint": "4c501dce73f6c8b9a36763a72ed0ae4c9315429ce490c61f7c7c1aba0416a2ad",
+        "ancestry": [
+          "Architecture Map"
+        ],
+        "text": "```txt\nDocument type: Platform architecture map\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through the whole-system architecture map\nDesign status: Draft\nImplementation status: Partial\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted anchor from docs/architecture-map.md\nLast reviewed: 2026-09-13\nRelated:\n- docs/platform/README.md\n- docs/platform/component-boundary.md\n- docs/architecture-map.md\n```"
+      }
+    },
+    {
+      "claimId": "claim_0cac3815f330102dda880aa4a9cee9a9",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "1-purpose",
+      "unitDigest": "be40287dd052e2a58a481eca5a9c26803a99c71e079cbe5d1f48ebbf08d8f313",
+      "status": "candidate-unverified",
+      "shownText": "## 1. Purpose\n\nThis is the target platform-docs anchor for the whole-system architecture map.\n\nThe legacy full map remains at `docs/architecture-map.md` during migration. Use this file as the stable reader entry in the new documentation system.",
+      "shownTextDigest": "d00255e629bebfe17562da8f6fd8b04ea654a27e27a4cd5e3d34d9a9f43ea07f",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "1. Purpose",
+        "anchor": "1-purpose",
+        "githubAnchor": "1-purpose",
+        "stableAnchor": "h-9ee4d0f9174a",
+        "startLine": 19,
+        "endLine": 19,
+        "textDigest": "be40287dd052e2a58a481eca5a9c26803a99c71e079cbe5d1f48ebbf08d8f313",
+        "sample": "1. Purpose",
+        "sectionPayloadDigest": "42f067470b943570302195644025e8488100c4e9d9b0224cdf4d446ac6a92dbc",
+        "followingBlockDigest": "68716afb3dda001cd96ab7a995e126ac526255487b5047319b29fecd24fe8775",
+        "identityFingerprint": "1062674d18dc5fa14bf8dd6b40364e924fd416722c348ccf4019e03e39a7f839",
+        "ancestry": [
+          "Architecture Map"
+        ],
+        "text": "## 1. Purpose",
+        "sectionText": "## 1. Purpose\n\nThis is the target platform-docs anchor for the whole-system architecture map.\n\nThe legacy full map remains at `docs/architecture-map.md` during migration. Use this file as the stable reader entry in the new documentation system."
+      }
+    },
+    {
+      "claimId": "claim_26777b895aa016631ca689bd4f87afc7",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "68716afb3dda001cd96ab7a995e126ac526255487b5047319b29fecd24fe8775",
+      "status": "candidate-unverified",
+      "shownText": "This is the target platform-docs anchor for the whole-system architecture map.",
+      "shownTextDigest": "68716afb3dda001cd96ab7a995e126ac526255487b5047319b29fecd24fe8775",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 21,
+        "endLine": 21,
+        "textDigest": "68716afb3dda001cd96ab7a995e126ac526255487b5047319b29fecd24fe8775",
+        "sample": "This is the target platform-docs anchor for the whole-system architecture map.",
+        "identityFingerprint": "086bbf2de2d4e6b248f72b0610e4c532d18b0e6017f8d2146c034b9f7bd8ece3",
+        "ancestry": [
+          "Architecture Map",
+          "1. Purpose"
+        ],
+        "text": "This is the target platform-docs anchor for the whole-system architecture map."
+      }
+    },
+    {
+      "claimId": "claim_5d0c6632450568243317dd086a5853bf",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "afc142aea3205ebe232bc65cfcad405006ce0c5dbbcf129c23ac7d3daae41deb",
+      "status": "candidate-unverified",
+      "shownText": "The legacy full map remains at `docs/architecture-map.md` during migration. Use this file as the stable reader entry in the new documentation system.",
+      "shownTextDigest": "afc142aea3205ebe232bc65cfcad405006ce0c5dbbcf129c23ac7d3daae41deb",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "afc142aea3205ebe232bc65cfcad405006ce0c5dbbcf129c23ac7d3daae41deb",
+        "sample": "The legacy full map remains at `docs/architecture-map.md` during migration. Use this file as the stable reader entry in the new documentation system.",
+        "identityFingerprint": "1c189e5c6fd077ff421a8fdf9a1209e0e844569fc4cb973506c78177c6b0fafd",
+        "ancestry": [
+          "Architecture Map",
+          "1. Purpose"
+        ],
+        "text": "The legacy full map remains at `docs/architecture-map.md` during migration. Use this file as the stable reader entry in the new documentation system."
+      }
+    },
+    {
+      "claimId": "claim_9b2a0e0128ac38f2400fdd8239a9a75d",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "2-reading-model",
+      "unitDigest": "e12c2ee084ca79541f3df7e3e9e91cf6bc0689c249f3dbba9d59c95351d70377",
+      "status": "candidate-unverified",
+      "shownText": "## 2. Reading Model\n\nThe legacy architecture map organizes fgOS through:\n\n- a structural layer: where code lives and how import direction works;\n- a data/physics layer: store, event, state, signal, run;\n- an authority layer: who may decide or write which truth;\n- component and contract registries.\n\nThe target documentation system separates these concerns into clearer anchors:\n\n| Concern | Target doc |\n| --- | --- |\n| Mission and direction | `vision.md` |\n| Durable laws | `platform-foundations.md` |\n| Whole-system structure | `architecture-map.md` |\n| Component ownership and authority | `component-boundary.md` |\n| Area-specific behavior | `docs/platform/<area>/spec.md` |\n| Area-specific rationale | `docs/platform/<area>/architecture/` |\n| Exact cross-area rules | `docs/platform/<area>/contracts/` or `docs/platform/contracts/` |",
+      "shownTextDigest": "8c0d5d2d0be2b041d4421d81b31fc61ff97bf533a2f0220ca7c17804cc98cc54",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "2. Reading Model",
+        "anchor": "2-reading-model",
+        "githubAnchor": "2-reading-model",
+        "stableAnchor": "h-f2dfcf0abd02",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "e12c2ee084ca79541f3df7e3e9e91cf6bc0689c249f3dbba9d59c95351d70377",
+        "sample": "2. Reading Model",
+        "sectionPayloadDigest": "600722a408c4d92ce0e0fb3669477eb3572049a104efb642b873d1bed11513b5",
+        "followingBlockDigest": "241aac718cd28f3b4e86328c1b53e14ab43ab2457b01d7fae55786c3b706288f",
+        "identityFingerprint": "ef62ce02452a08f0ca753dc3e5fc981bce8268c96cc8a0351e5d109ab4ed0fb9",
+        "ancestry": [
+          "Architecture Map"
+        ],
+        "text": "## 2. Reading Model",
+        "sectionText": "## 2. Reading Model\n\nThe legacy architecture map organizes fgOS through:\n\n- a structural layer: where code lives and how import direction works;\n- a data/physics layer: store, event, state, signal, run;\n- an authority layer: who may decide or write which truth;\n- component and contract registries.\n\nThe target documentation system separates these concerns into clearer anchors:\n\n| Concern | Target doc |\n| --- | --- |\n| Mission and direction | `vision.md` |\n| Durable laws | `platform-foundations.md` |\n| Whole-system structure | `architecture-map.md` |\n| Component ownership and authority | `component-boundary.md` |\n| Area-specific behavior | `docs/platform/<area>/spec.md` |\n| Area-specific rationale | `docs/platform/<area>/architecture/` |\n| Exact cross-area rules | `docs/platform/<area>/contracts/` or `docs/platform/contracts/` |"
+      }
+    },
+    {
+      "claimId": "claim_99b07c1da9ac5d14a39dfde1c2750131",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "241aac718cd28f3b4e86328c1b53e14ab43ab2457b01d7fae55786c3b706288f",
+      "status": "candidate-unverified",
+      "shownText": "The legacy architecture map organizes fgOS through:",
+      "shownTextDigest": "241aac718cd28f3b4e86328c1b53e14ab43ab2457b01d7fae55786c3b706288f",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "241aac718cd28f3b4e86328c1b53e14ab43ab2457b01d7fae55786c3b706288f",
+        "sample": "The legacy architecture map organizes fgOS through:",
+        "identityFingerprint": "95c2ee5c6ff4ab74e5188164b914dfcbc73493e016b12816dd9f88f2890ee92b",
+        "ancestry": [
+          "Architecture Map",
+          "2. Reading Model"
+        ],
+        "text": "The legacy architecture map organizes fgOS through:"
+      }
+    },
+    {
+      "claimId": "claim_5663da2b2b3c94add15ab1ba5b75917d",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "5b19cb31509d7bb8693310e3a6b1994f68301f63b2d339ea39dbfe7635a8d72f",
+      "status": "candidate-unverified",
+      "shownText": "- a structural layer: where code lives and how import direction works;\n- a data/physics layer: store, event, state, signal, run;\n- an authority layer: who may decide or write which truth;\n- component and contract registries.",
+      "shownTextDigest": "5b19cb31509d7bb8693310e3a6b1994f68301f63b2d339ea39dbfe7635a8d72f",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 29,
+        "endLine": 32,
+        "textDigest": "5b19cb31509d7bb8693310e3a6b1994f68301f63b2d339ea39dbfe7635a8d72f",
+        "sample": "- a structural layer: where code lives and how import direction works;\n- a data/physics layer: store, event, state, signal, run;\n- an authority layer: who may decide or write which",
+        "identityFingerprint": "b322798199fb9f648d6f53a4f8eacd8d09b74957484278e25a45313e9adf6bb8",
+        "ancestry": [
+          "Architecture Map",
+          "2. Reading Model"
+        ],
+        "text": "- a structural layer: where code lives and how import direction works;\n- a data/physics layer: store, event, state, signal, run;\n- an authority layer: who may decide or write which truth;\n- component and contract registries."
+      }
+    },
+    {
+      "claimId": "claim_ee2fe1fcb299bfa19c57700b45be1766",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "a03df4ba273840097cc9d52875113f631a2a913028f8eec37b3d7778c95e2923",
+      "status": "candidate-unverified",
+      "shownText": "The target documentation system separates these concerns into clearer anchors:",
+      "shownTextDigest": "a03df4ba273840097cc9d52875113f631a2a913028f8eec37b3d7778c95e2923",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 34,
+        "endLine": 34,
+        "textDigest": "a03df4ba273840097cc9d52875113f631a2a913028f8eec37b3d7778c95e2923",
+        "sample": "The target documentation system separates these concerns into clearer anchors:",
+        "identityFingerprint": "83869b2220478c553b97e87d74bece83630acd27bf3a9d2ca27ddb371a126b85",
+        "ancestry": [
+          "Architecture Map",
+          "2. Reading Model"
+        ],
+        "text": "The target documentation system separates these concerns into clearer anchors:"
+      }
+    },
+    {
+      "claimId": "claim_4bbe5a740067198320d036fdd8743e7c",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "e3d1ba266d00910dcfc85ee6662a3354211640e1f315223f84db62981f8d73ba",
+      "status": "candidate-unverified",
+      "shownText": "| Concern | Target doc |\n| --- | --- |\n| Mission and direction | `vision.md` |\n| Durable laws | `platform-foundations.md` |\n| Whole-system structure | `architecture-map.md` |\n| Component ownership and authority | `component-boundary.md` |\n| Area-specific behavior | `docs/platform/<area>/spec.md` |\n| Area-specific rationale | `docs/platform/<area>/architecture/` |\n| Exact cross-area rules | `docs/platform/<area>/contracts/` or `docs/platform/contracts/` |",
+      "shownTextDigest": "e3d1ba266d00910dcfc85ee6662a3354211640e1f315223f84db62981f8d73ba",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 36,
+        "endLine": 44,
+        "textDigest": "e3d1ba266d00910dcfc85ee6662a3354211640e1f315223f84db62981f8d73ba",
+        "sample": "| Concern | Target doc |\n| --- | --- |\n| Mission and direction | `vision.md` |\n| Durable laws | `platform-foundations.md` |\n| Whole-system structure | `architecture-map.md` |\n| Com",
+        "identityFingerprint": "2b67e497977683eb2d1442deb2101c3b782babf15f8b68ec9c5319734f7e8ef5",
+        "ancestry": [
+          "Architecture Map",
+          "2. Reading Model"
+        ],
+        "text": "| Concern | Target doc |\n| --- | --- |\n| Mission and direction | `vision.md` |\n| Durable laws | `platform-foundations.md` |\n| Whole-system structure | `architecture-map.md` |\n| Component ownership and authority | `component-boundary.md` |\n| Area-specific behavior | `docs/platform/<area>/spec.md` |\n| Area-specific rationale | `docs/platform/<area>/architecture/` |\n| Exact cross-area rules | `docs/platform/<area>/contracts/` or `docs/platform/contracts/` |"
+      }
+    },
+    {
+      "claimId": "claim_08b63da9e9f152cd8f66e576898d1d37",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "3-current-shape",
+      "unitDigest": "0943acc71e69148395194b8e69ab99d9f4d519c633e407b3745574241dbf8ad2",
+      "status": "candidate-unverified",
+      "shownText": "## 3. Current Shape\n\nfgOS should be read as a platform with:\n\n```txt\nentry / surface\n  -> use-case orchestration\n  -> side-effect ports and host adapters\n  -> domain-neutral engines\n  -> durable state/log substrate\n  -> domain and extension layers\n```\n\nThis target anchor intentionally stays compact. Detailed component authority now belongs in `component-boundary.md`.",
+      "shownTextDigest": "7c18f9e4ce7c447f6693974b880e5a7038d7d75cf05bcb6a27ef98dbf08201db",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "3. Current Shape",
+        "anchor": "3-current-shape",
+        "githubAnchor": "3-current-shape",
+        "stableAnchor": "h-c10ecbdc8b32",
+        "startLine": 46,
+        "endLine": 46,
+        "textDigest": "0943acc71e69148395194b8e69ab99d9f4d519c633e407b3745574241dbf8ad2",
+        "sample": "3. Current Shape",
+        "sectionPayloadDigest": "c63de195c8b1d34fcd4b4c251660ac1e75be2ad5e66bc3560c69f3c3aaac9575",
+        "followingBlockDigest": "d357c0787f40103f6284132aa5e82344685766c2cac1c2a9fd2634ea9b6f0def",
+        "identityFingerprint": "10423dc1f06dbfed7d330a00c48724401665cc5015c9c0d96eda158a669f3059",
+        "ancestry": [
+          "Architecture Map"
+        ],
+        "text": "## 3. Current Shape",
+        "sectionText": "## 3. Current Shape\n\nfgOS should be read as a platform with:\n\n```txt\nentry / surface\n  -> use-case orchestration\n  -> side-effect ports and host adapters\n  -> domain-neutral engines\n  -> durable state/log substrate\n  -> domain and extension layers\n```\n\nThis target anchor intentionally stays compact. Detailed component authority now belongs in `component-boundary.md`."
+      }
+    },
+    {
+      "claimId": "claim_1704754baa11baa361c23479e876c7b9",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "d357c0787f40103f6284132aa5e82344685766c2cac1c2a9fd2634ea9b6f0def",
+      "status": "candidate-unverified",
+      "shownText": "fgOS should be read as a platform with:",
+      "shownTextDigest": "d357c0787f40103f6284132aa5e82344685766c2cac1c2a9fd2634ea9b6f0def",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 48,
+        "endLine": 48,
+        "textDigest": "d357c0787f40103f6284132aa5e82344685766c2cac1c2a9fd2634ea9b6f0def",
+        "sample": "fgOS should be read as a platform with:",
+        "identityFingerprint": "d3dfffec185965c157bf851000105b8e5a2702e481e10bee9679a5fef6807717",
+        "ancestry": [
+          "Architecture Map",
+          "3. Current Shape"
+        ],
+        "text": "fgOS should be read as a platform with:"
+      }
+    },
+    {
+      "claimId": "claim_eb7750bfa1cf3ed6959126bb83345f40",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "86c7ae350779393f0a5557b684231621791068d099cfe10c17bd6a4493e85872",
+      "status": "candidate-unverified",
+      "shownText": "```txt\nentry / surface\n  -> use-case orchestration\n  -> side-effect ports and host adapters\n  -> domain-neutral engines\n  -> durable state/log substrate\n  -> domain and extension layers\n```",
+      "shownTextDigest": "86c7ae350779393f0a5557b684231621791068d099cfe10c17bd6a4493e85872",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 50,
+        "endLine": 57,
+        "textDigest": "86c7ae350779393f0a5557b684231621791068d099cfe10c17bd6a4493e85872",
+        "sample": "```txt\nentry / surface\n  -> use-case orchestration\n  -> side-effect ports and host adapters\n  -> domain-neutral engines\n  -> durable state/log substrate\n  -> domain and extension l",
+        "identityFingerprint": "ea927d4d2f84a79c2785fcd9578aa084dbface4d55ce9ad7218a87019b146203",
+        "ancestry": [
+          "Architecture Map",
+          "3. Current Shape"
+        ],
+        "text": "```txt\nentry / surface\n  -> use-case orchestration\n  -> side-effect ports and host adapters\n  -> domain-neutral engines\n  -> durable state/log substrate\n  -> domain and extension layers\n```"
+      }
+    },
+    {
+      "claimId": "claim_412840f35b9e3f874c394dd8b85cf297",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "3f49089a112019f9506460f7fcd819e3ce194cc76ed02c88efa0e41e28e50853",
+      "status": "candidate-unverified",
+      "shownText": "This target anchor intentionally stays compact. Detailed component authority now belongs in `component-boundary.md`.",
+      "shownTextDigest": "3f49089a112019f9506460f7fcd819e3ce194cc76ed02c88efa0e41e28e50853",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 59,
+        "endLine": 59,
+        "textDigest": "3f49089a112019f9506460f7fcd819e3ce194cc76ed02c88efa0e41e28e50853",
+        "sample": "This target anchor intentionally stays compact. Detailed component authority now belongs in `component-boundary.md`.",
+        "identityFingerprint": "6b31d017a9283ce96c2547a69e384a5eee5111517aa0a23574da69bfbbaa99a3",
+        "ancestry": [
+          "Architecture Map",
+          "3. Current Shape"
+        ],
+        "text": "This target anchor intentionally stays compact. Detailed component authority now belongs in `component-boundary.md`."
+      }
+    },
+    {
+      "claimId": "claim_e6c17a2321df4b31d36ae8f830f011d9",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "4-change-rule",
+      "unitDigest": "572faca05bb217c28e934745c6bc1540a7571bdcdeb3389e1e34f7b43b376aac",
+      "status": "candidate-unverified",
+      "shownText": "## 4. Change Rule\n\nIf a design changes whole-system structure, do all of the following:\n\n1. Update the owning area docs.\n2. Check `component-boundary.md`.\n3. Update this architecture map when the structural reading path changes.\n4. Link proof or record `No component-boundary change`.",
+      "shownTextDigest": "4cb2091f1cc3103a394e34a51429d437f44c52f85691ed5fcf11337a73f68e4e",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "4. Change Rule",
+        "anchor": "4-change-rule",
+        "githubAnchor": "4-change-rule",
+        "stableAnchor": "h-6a6316e074ae",
+        "startLine": 61,
+        "endLine": 61,
+        "textDigest": "572faca05bb217c28e934745c6bc1540a7571bdcdeb3389e1e34f7b43b376aac",
+        "sample": "4. Change Rule",
+        "sectionPayloadDigest": "8c5d8043a439f2b33502665fc375beb3b38eee06c29ad5c4ca73aeaba5bbd9a3",
+        "followingBlockDigest": "78466155eac7663bb68e6a1e1837c864a54f828f562596d07991a13197fd3a60",
+        "identityFingerprint": "99923ef733c31d5ecbdf2ee6877f2424809109da794e3978456bbb3e5931da4b",
+        "ancestry": [
+          "Architecture Map"
+        ],
+        "text": "## 4. Change Rule",
+        "sectionText": "## 4. Change Rule\n\nIf a design changes whole-system structure, do all of the following:\n\n1. Update the owning area docs.\n2. Check `component-boundary.md`.\n3. Update this architecture map when the structural reading path changes.\n4. Link proof or record `No component-boundary change`."
+      }
+    },
+    {
+      "claimId": "claim_8490c1969dc4668c7875c3360295da0b",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "78466155eac7663bb68e6a1e1837c864a54f828f562596d07991a13197fd3a60",
+      "status": "candidate-unverified",
+      "shownText": "If a design changes whole-system structure, do all of the following:",
+      "shownTextDigest": "78466155eac7663bb68e6a1e1837c864a54f828f562596d07991a13197fd3a60",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 63,
+        "endLine": 63,
+        "textDigest": "78466155eac7663bb68e6a1e1837c864a54f828f562596d07991a13197fd3a60",
+        "sample": "If a design changes whole-system structure, do all of the following:",
+        "identityFingerprint": "e30426c9964f124fda6e0403e92d1245ce92dc09e3241f773139c7bebc4f22ae",
+        "ancestry": [
+          "Architecture Map",
+          "4. Change Rule"
+        ],
+        "text": "If a design changes whole-system structure, do all of the following:"
+      }
+    },
+    {
+      "claimId": "claim_d63ead69be42bc59fd0ba597b9c56f73",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "42579709d7a4138710205008d889fd495f9fcd931526a5ca4db5e5e5d2594ba0",
+      "status": "candidate-unverified",
+      "shownText": "1. Update the owning area docs.\n2. Check `component-boundary.md`.\n3. Update this architecture map when the structural reading path changes.\n4. Link proof or record `No component-boundary change`.",
+      "shownTextDigest": "42579709d7a4138710205008d889fd495f9fcd931526a5ca4db5e5e5d2594ba0",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 65,
+        "endLine": 68,
+        "textDigest": "42579709d7a4138710205008d889fd495f9fcd931526a5ca4db5e5e5d2594ba0",
+        "sample": "1. Update the owning area docs.\n2. Check `component-boundary.md`.\n3. Update this architecture map when the structural reading path changes.\n4. Link proof or record `No component-bo",
+        "identityFingerprint": "9e3b9677bc13abd005a9964c5b73f02c8372a7ffc73c4a4bb723a8e38daeb239",
+        "ancestry": [
+          "Architecture Map",
+          "4. Change Rule"
+        ],
+        "text": "1. Update the owning area docs.\n2. Check `component-boundary.md`.\n3. Update this architecture map when the structural reading path changes.\n4. Link proof or record `No component-boundary change`."
+      }
+    },
+    {
+      "claimId": "claim_87bee0710bd078c1fbd49e651c3e3280",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "5-legacy-source",
+      "unitDigest": "419f628006c4594febd9b033d546a640bceb9ea3f2b64424457928d06fbcc151",
+      "status": "candidate-unverified",
+      "shownText": "## 5. Legacy Source\n\n`docs/architecture-map.md` is still the full legacy map. Do not delete or rewrite it wholesale until its component and contract registry content has been promoted or redirected.",
+      "shownTextDigest": "89f81f3d6bf600ae4b6e1e261bacd60d12d7bc57e253c2c5de3d0f9ebd9c40d9",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "5. Legacy Source",
+        "anchor": "5-legacy-source",
+        "githubAnchor": "5-legacy-source",
+        "stableAnchor": "h-3208e54d6a66",
+        "startLine": 70,
+        "endLine": 70,
+        "textDigest": "419f628006c4594febd9b033d546a640bceb9ea3f2b64424457928d06fbcc151",
+        "sample": "5. Legacy Source",
+        "sectionPayloadDigest": "2bf6a602063a801647d08720214fd9ab86045a5e8fa89dfbb0cc81a8befed87c",
+        "followingBlockDigest": "2bf6a602063a801647d08720214fd9ab86045a5e8fa89dfbb0cc81a8befed87c",
+        "identityFingerprint": "a614a57bc4c1f869d7d53303469e5bc4485ba792f59069c42f72f2cc3990c73c",
+        "ancestry": [
+          "Architecture Map"
+        ],
+        "text": "## 5. Legacy Source",
+        "sectionText": "## 5. Legacy Source\n\n`docs/architecture-map.md` is still the full legacy map. Do not delete or rewrite it wholesale until its component and contract registry content has been promoted or redirected."
+      }
+    },
+    {
+      "claimId": "claim_9733e00101a0e8571c2b13b1b7659902",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "2bf6a602063a801647d08720214fd9ab86045a5e8fa89dfbb0cc81a8befed87c",
+      "status": "candidate-unverified",
+      "shownText": "`docs/architecture-map.md` is still the full legacy map. Do not delete or rewrite it wholesale until its component and contract registry content has been promoted or redirected.",
+      "shownTextDigest": "2bf6a602063a801647d08720214fd9ab86045a5e8fa89dfbb0cc81a8befed87c",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 72,
+        "endLine": 72,
+        "textDigest": "2bf6a602063a801647d08720214fd9ab86045a5e8fa89dfbb0cc81a8befed87c",
+        "sample": "`docs/architecture-map.md` is still the full legacy map. Do not delete or rewrite it wholesale until its component and contract registry content has been promoted or redirected.",
+        "identityFingerprint": "9bc592e5da89a84d53a0ad717bc12d9be698c9deecb2bfb3bb6f9f579f900edc",
+        "ancestry": [
+          "Architecture Map",
+          "5. Legacy Source"
+        ],
+        "text": "`docs/architecture-map.md` is still the full legacy map. Do not delete or rewrite it wholesale until its component and contract registry content has been promoted or redirected."
+      }
+    },
+    {
+      "claimId": "claim_bdeec56f775d4bbd0bab5b121cb21184",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "added-in-candidate-architecture-map-source-carriage",
+      "unitDigest": "753970a184e63b9cb95829096fbffaaba089f4b519f5b13f6ef7ea188c07f977",
+      "status": "candidate-unverified",
+      "shownText": "## Added in candidate: architecture-map source carriage\n\nCarriage from `docs/architecture-map.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+      "shownTextDigest": "9dcfa2c4a9847f2e6fd7c04cfdf707a52485105ebeada121c4370e9030f54404",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Added in candidate: architecture-map source carriage",
+        "anchor": "added-in-candidate-architecture-map-source-carriage",
+        "githubAnchor": "added-in-candidate-architecture-map-source-carriage",
+        "stableAnchor": "h-171a59164cf0",
+        "startLine": 74,
+        "endLine": 74,
+        "textDigest": "753970a184e63b9cb95829096fbffaaba089f4b519f5b13f6ef7ea188c07f977",
+        "sample": "Added in candidate: architecture-map source carriage",
+        "sectionPayloadDigest": "ff0cebcb42c0dda1443764763345db7ce15cced9342aab59a7a5e1a129177e36",
+        "followingBlockDigest": "ff0cebcb42c0dda1443764763345db7ce15cced9342aab59a7a5e1a129177e36",
+        "identityFingerprint": "c8fe2d31f5e771b752e7ec0dc4fc1ebfc4349a64026647d6e674a0235cf9bce7",
+        "ancestry": [
+          "Architecture Map"
+        ],
+        "text": "## Added in candidate: architecture-map source carriage",
+        "sectionText": "## Added in candidate: architecture-map source carriage\n\nCarriage from `docs/architecture-map.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+      }
+    },
+    {
+      "claimId": "claim_7807bb743d35f824e666aea198deb475",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "ff0cebcb42c0dda1443764763345db7ce15cced9342aab59a7a5e1a129177e36",
+      "status": "candidate-unverified",
+      "shownText": "Carriage from `docs/architecture-map.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+      "shownTextDigest": "ff0cebcb42c0dda1443764763345db7ce15cced9342aab59a7a5e1a129177e36",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 76,
+        "endLine": 76,
+        "textDigest": "ff0cebcb42c0dda1443764763345db7ce15cced9342aab59a7a5e1a129177e36",
+        "sample": "Carriage from `docs/architecture-map.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and p",
+        "identityFingerprint": "bb067038c58c78ab2780458845d3bdf2515d6cc3ad98f5e3044fcc72119abf81",
+        "ancestry": [
+          "Architecture Map",
+          "Added in candidate: architecture-map source carriage"
+        ],
+        "text": "Carriage from `docs/architecture-map.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+      }
+    },
+    {
+      "claimId": "claim_b3accab399a342e74cfc9f0a80322ab0",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "component-boundary",
+      "unitDigest": "6bc383951cb3164cfe0d7eda0a0fda55cbab77c5de19185f0f9e72c3dcba8081",
+      "status": "candidate-unverified",
+      "shownText": "# Component Boundary\n\n```txt\nDocument type: Platform architecture anchor\nAudience: Human reviewer, architect, maintainer, design-shaping agent\nPurpose: Track the whole-system component and authority boundary map\nDesign status: Draft\nImplementation status: Partial\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted anchor for docs/architect/component-boundary/**\nLast reviewed: 2026-10-04\nRelated:\n- docs/architect/component-boundary/README.md\n- docs/architect/component-boundary/component-boundary-advisory.md\n- docs/architect/proposals/component-authority-boundary-map.md\n- docs/platform/README.md\n```",
+      "shownTextDigest": "73669c7b54d0ed4e7a083bc6e950203711ba8de293f2a69ec75d4fc27217960a",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Component Boundary",
+        "anchor": "component-boundary",
+        "githubAnchor": "component-boundary",
+        "stableAnchor": "h-065adbde00f9",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "6bc383951cb3164cfe0d7eda0a0fda55cbab77c5de19185f0f9e72c3dcba8081",
+        "sample": "Component Boundary",
+        "sectionPayloadDigest": "4440935e581cf4814a9fd23e8fd1c81f854cbd7b40144e05bad405a94bd979ec",
+        "followingBlockDigest": "4440935e581cf4814a9fd23e8fd1c81f854cbd7b40144e05bad405a94bd979ec",
+        "identityFingerprint": "15e19d80e46c5563a44f451738ba30bdd3d707a1eafe0f8c6484a648bcef1c26",
+        "ancestry": [],
+        "text": "# Component Boundary",
+        "sectionText": "# Component Boundary\n\n```txt\nDocument type: Platform architecture anchor\nAudience: Human reviewer, architect, maintainer, design-shaping agent\nPurpose: Track the whole-system component and authority boundary map\nDesign status: Draft\nImplementation status: Partial\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted anchor for docs/architect/component-boundary/**\nLast reviewed: 2026-10-04\nRelated:\n- docs/architect/component-boundary/README.md\n- docs/architect/component-boundary/component-boundary-advisory.md\n- docs/architect/proposals/component-authority-boundary-map.md\n- docs/platform/README.md\n```"
+      }
+    },
+    {
+      "claimId": "claim_84a933eabe0c7693f8286447605b07dc",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "4440935e581cf4814a9fd23e8fd1c81f854cbd7b40144e05bad405a94bd979ec",
+      "status": "candidate-unverified",
+      "shownText": "```txt\nDocument type: Platform architecture anchor\nAudience: Human reviewer, architect, maintainer, design-shaping agent\nPurpose: Track the whole-system component and authority boundary map\nDesign status: Draft\nImplementation status: Partial\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted anchor for docs/architect/component-boundary/**\nLast reviewed: 2026-10-04\nRelated:\n- docs/architect/component-boundary/README.md\n- docs/architect/component-boundary/component-boundary-advisory.md\n- docs/architect/proposals/component-authority-boundary-map.md\n- docs/platform/README.md\n```",
+      "shownTextDigest": "4440935e581cf4814a9fd23e8fd1c81f854cbd7b40144e05bad405a94bd979ec",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 18,
+        "textDigest": "4440935e581cf4814a9fd23e8fd1c81f854cbd7b40144e05bad405a94bd979ec",
+        "sample": "```txt\nDocument type: Platform architecture anchor\nAudience: Human reviewer, architect, maintainer, design-shaping agent\nPurpose: Track the whole-system component and authority bou",
+        "identityFingerprint": "7b49f13ce9655c11bdf3026bcdf50af6198f6b1c1435a24c1b979e2636d6b097",
+        "ancestry": [
+          "Component Boundary"
+        ],
+        "text": "```txt\nDocument type: Platform architecture anchor\nAudience: Human reviewer, architect, maintainer, design-shaping agent\nPurpose: Track the whole-system component and authority boundary map\nDesign status: Draft\nImplementation status: Partial\nCanonical: Yes, after review\nOwner: Platform documentation\nSource type: Promoted anchor for docs/architect/component-boundary/**\nLast reviewed: 2026-10-04\nRelated:\n- docs/architect/component-boundary/README.md\n- docs/architect/component-boundary/component-boundary-advisory.md\n- docs/architect/proposals/component-authority-boundary-map.md\n- docs/platform/README.md\n```"
+      }
+    },
+    {
+      "claimId": "claim_d75dabab4a879f6c66f46958eaf99ef5",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "1-purpose",
+      "unitDigest": "488337d8f1b00cc529dab2f10ee67e4e0ee1ac6775d1f63985676f08048245b0",
+      "status": "candidate-unverified",
+      "shownText": "## 1. Purpose\n\nThis document is the platform-wide anchor for component boundaries.\n\nIt answers:\n\n- which major components exist;\n- which parent/child responsibilities belong together;\n- which component owns a decision or state write;\n- which areas depend on each other through explicit contracts;\n- when a design changes the whole-system boundary map.",
+      "shownTextDigest": "f1dcd9c0533a14d78dc03f61aa3f2dc8dd1c48b1a26d0124811d2af54c20c74d",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "1. Purpose",
+        "anchor": "1-purpose",
+        "githubAnchor": "1-purpose",
+        "stableAnchor": "h-6ec4ceadfbb3",
+        "startLine": 20,
+        "endLine": 20,
+        "textDigest": "488337d8f1b00cc529dab2f10ee67e4e0ee1ac6775d1f63985676f08048245b0",
+        "sample": "1. Purpose",
+        "sectionPayloadDigest": "d8b411af5416726f77acd31f24899183ed66dabe7a6ab1b45250ed231ce1a7a5",
+        "followingBlockDigest": "00dd08421918b12e434bb0709bce8fa430b156f3940834dcb773529bed602a8f",
+        "identityFingerprint": "f223caf3136a3efbaeb389350718daa4d8fa361c30666aacc8856b449fee5eba",
+        "ancestry": [
+          "Component Boundary"
+        ],
+        "text": "## 1. Purpose",
+        "sectionText": "## 1. Purpose\n\nThis document is the platform-wide anchor for component boundaries.\n\nIt answers:\n\n- which major components exist;\n- which parent/child responsibilities belong together;\n- which component owns a decision or state write;\n- which areas depend on each other through explicit contracts;\n- when a design changes the whole-system boundary map."
+      }
+    },
+    {
+      "claimId": "claim_1f96489735bc11e76a941f7c0bba2bad",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "00dd08421918b12e434bb0709bce8fa430b156f3940834dcb773529bed602a8f",
+      "status": "candidate-unverified",
+      "shownText": "This document is the platform-wide anchor for component boundaries.",
+      "shownTextDigest": "00dd08421918b12e434bb0709bce8fa430b156f3940834dcb773529bed602a8f",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 22,
+        "endLine": 22,
+        "textDigest": "00dd08421918b12e434bb0709bce8fa430b156f3940834dcb773529bed602a8f",
+        "sample": "This document is the platform-wide anchor for component boundaries.",
+        "identityFingerprint": "cd6f924e8b9862f007689dd3eeccc8d1da7fda8158f3bdd8fa013b13e120c7cd",
+        "ancestry": [
+          "Component Boundary",
+          "1. Purpose"
+        ],
+        "text": "This document is the platform-wide anchor for component boundaries."
+      }
+    },
+    {
+      "claimId": "claim_6b0bb16dca9de7dfe5721722a0a798a3",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "86fae76e86657b80527ef9314b287130c2af7f5a29391b155b5934082a1d1498",
+      "status": "candidate-unverified",
+      "shownText": "It answers:\n\n- which major components exist;\n- which parent/child responsibilities belong together;\n- which component owns a decision or state write;\n- which areas depend on each other through explicit contracts;\n- when a design changes the whole-system boundary map.",
+      "shownTextDigest": "86fae76e86657b80527ef9314b287130c2af7f5a29391b155b5934082a1d1498",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 24,
+        "endLine": 30,
+        "textDigest": "86fae76e86657b80527ef9314b287130c2af7f5a29391b155b5934082a1d1498",
+        "sample": "It answers:\n\n- which major components exist;\n- which parent/child responsibilities belong together;\n- which component owns a decision or state write;\n- which areas depend on each o",
+        "identityFingerprint": "b2f114f797732a3d31a8a2497a2b4d64aaaad1a0aa6fc7f6e211b7bdd53eaca8",
+        "ancestry": [
+          "Component Boundary",
+          "1. Purpose"
+        ],
+        "text": "It answers:\n\n- which major components exist;\n- which parent/child responsibilities belong together;\n- which component owns a decision or state write;\n- which areas depend on each other through explicit contracts;\n- when a design changes the whole-system boundary map."
+      }
+    },
+    {
+      "claimId": "claim_8f18b63b71b7d9431414d08beedc3921",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "2-current-source-during-migration",
+      "unitDigest": "5341c959c3d2fdd7e6713f825e09d581449633c8f54de7a70ca0421f34cdfd85",
+      "status": "candidate-unverified",
+      "shownText": "## 2. Current Source During Migration\n\nThe current detailed source remains:\n\n| Source | Role |\n| --- | --- |\n| [../architect/component-boundary/README.md](../architect/component-boundary/README.md) | Reading portal for the existing component-boundary architecture package. |\n| [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) | Advisory map of components, bounded contexts, and authority boundaries. |\n| [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) | Draft authority map with parent/child and dependency vocabulary. |\n\nUntil this anchor is fully promoted, use those sources for detail and update this file as the stable entry point.",
+      "shownTextDigest": "c52cd37a0cbba0cd634ddb350512d383086910e82ce626bcf7b7382d82c30cba",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "2. Current Source During Migration",
+        "anchor": "2-current-source-during-migration",
+        "githubAnchor": "2-current-source-during-migration",
+        "stableAnchor": "h-c4fe7e8b3ce7",
+        "startLine": 32,
+        "endLine": 32,
+        "textDigest": "5341c959c3d2fdd7e6713f825e09d581449633c8f54de7a70ca0421f34cdfd85",
+        "sample": "2. Current Source During Migration",
+        "sectionPayloadDigest": "5dc5861d60c0dfd83b61cd4a9e3523b1c913a1f2d2d9c083f7a70ed27128d702",
+        "followingBlockDigest": "5a4f9608c6c88b211b79a9e695b3242279891daf915424ff0dfc42f1ff7ccded",
+        "identityFingerprint": "63a1920e677b3220ea97d5467d6b9c4947e8968721260d08b90b80275555ea97",
+        "ancestry": [
+          "Component Boundary"
+        ],
+        "text": "## 2. Current Source During Migration",
+        "sectionText": "## 2. Current Source During Migration\n\nThe current detailed source remains:\n\n| Source | Role |\n| --- | --- |\n| [../architect/component-boundary/README.md](../architect/component-boundary/README.md) | Reading portal for the existing component-boundary architecture package. |\n| [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) | Advisory map of components, bounded contexts, and authority boundaries. |\n| [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) | Draft authority map with parent/child and dependency vocabulary. |\n\nUntil this anchor is fully promoted, use those sources for detail and update this file as the stable entry point."
+      }
+    },
+    {
+      "claimId": "claim_88b807df35d765018f92641351a46283",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "5a4f9608c6c88b211b79a9e695b3242279891daf915424ff0dfc42f1ff7ccded",
+      "status": "candidate-unverified",
+      "shownText": "The current detailed source remains:",
+      "shownTextDigest": "5a4f9608c6c88b211b79a9e695b3242279891daf915424ff0dfc42f1ff7ccded",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 34,
+        "endLine": 34,
+        "textDigest": "5a4f9608c6c88b211b79a9e695b3242279891daf915424ff0dfc42f1ff7ccded",
+        "sample": "The current detailed source remains:",
+        "identityFingerprint": "13dbb1e1f641a069ce11870676d2e262b4f594e423d7389800226acba7e25c86",
+        "ancestry": [
+          "Component Boundary",
+          "2. Current Source During Migration"
+        ],
+        "text": "The current detailed source remains:"
+      }
+    },
+    {
+      "claimId": "claim_aacc38bae14d6ddc021cc4278795f5af",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "ef970220b2a0deaa9fe9d0aabe96a61d29451f0955f547b511aaa46b7f5df403",
+      "status": "candidate-unverified",
+      "shownText": "| Source | Role |\n| --- | --- |\n| [../architect/component-boundary/README.md](../architect/component-boundary/README.md) | Reading portal for the existing component-boundary architecture package. |\n| [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) | Advisory map of components, bounded contexts, and authority boundaries. |\n| [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) | Draft authority map with parent/child and dependency vocabulary. |",
+      "shownTextDigest": "ef970220b2a0deaa9fe9d0aabe96a61d29451f0955f547b511aaa46b7f5df403",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 36,
+        "endLine": 40,
+        "textDigest": "ef970220b2a0deaa9fe9d0aabe96a61d29451f0955f547b511aaa46b7f5df403",
+        "sample": "| Source | Role |\n| --- | --- |\n| [../architect/component-boundary/README.md](../architect/component-boundary/README.md) | Reading portal for the existing component-boundary archit",
+        "identityFingerprint": "67102ecc4221285f2db64734c2963afa8d99f2578d48da693bd4fb119a6eef9c",
+        "ancestry": [
+          "Component Boundary",
+          "2. Current Source During Migration"
+        ],
+        "text": "| Source | Role |\n| --- | --- |\n| [../architect/component-boundary/README.md](../architect/component-boundary/README.md) | Reading portal for the existing component-boundary architecture package. |\n| [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) | Advisory map of components, bounded contexts, and authority boundaries. |\n| [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) | Draft authority map with parent/child and dependency vocabulary. |"
+      }
+    },
+    {
+      "claimId": "claim_98c0bcbf807cefc91820028ca5a3ea76",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "146d21b69eac577a72cd212c76f8a62a0538f00e5c1a882abd5654b2351fda42",
+      "status": "candidate-unverified",
+      "shownText": "Until this anchor is fully promoted, use those sources for detail and update this file as the stable entry point.",
+      "shownTextDigest": "146d21b69eac577a72cd212c76f8a62a0538f00e5c1a882abd5654b2351fda42",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 42,
+        "endLine": 42,
+        "textDigest": "146d21b69eac577a72cd212c76f8a62a0538f00e5c1a882abd5654b2351fda42",
+        "sample": "Until this anchor is fully promoted, use those sources for detail and update this file as the stable entry point.",
+        "identityFingerprint": "5d264b27fdba71fc69f826b3834a4b6c28b853f5cfb66834ab1f4b338f632e63",
+        "ancestry": [
+          "Component Boundary",
+          "2. Current Source During Migration"
+        ],
+        "text": "Until this anchor is fully promoted, use those sources for detail and update this file as the stable entry point."
+      }
+    },
+    {
+      "claimId": "claim_2c77e24af387b57a9c1c75101fac6e73",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "3-update-rule",
+      "unitDigest": "1ca2e20b0caaa2013cfa2c065d5fa85202034197e86aac5ac162a44c2c61451d",
+      "status": "candidate-unverified",
+      "shownText": "## 3. Update Rule\n\nAny design discussion or documentation rewrite must check this boundary map when it changes:\n\n- a platform component;\n- a parent/child component relationship;\n- ownership of a state write, decision, runtime authority, or contract;\n- a cross-area dependency;\n- the boundary between platform core, platform support, domain layer, host surface, or extension/plugin layer.\n\nIf the boundary changes, update this document or the current detailed source listed above. If it does not change, record `No component-boundary change` in the implementation alignment, verification note, discussion summary, or PR note.",
+      "shownTextDigest": "b4bac5dd44dad2e053be1ffa676db3fefa9baacb06ca9b220a1fdaaa3a72188d",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "3. Update Rule",
+        "anchor": "3-update-rule",
+        "githubAnchor": "3-update-rule",
+        "stableAnchor": "h-e8145fd82497",
+        "startLine": 44,
+        "endLine": 44,
+        "textDigest": "1ca2e20b0caaa2013cfa2c065d5fa85202034197e86aac5ac162a44c2c61451d",
+        "sample": "3. Update Rule",
+        "sectionPayloadDigest": "fe500c64172aa64dcaf1eba122d31954f6611cc610dca83826b321602a8a99e7",
+        "followingBlockDigest": "931c4d6895bd0c9820534e6587755c4ff1370b0737dc6cd169f806faf5643af0",
+        "identityFingerprint": "7cb836998881597e61ca3ed8fc812d80ae5321e8937a719d22871c0e367a50b8",
+        "ancestry": [
+          "Component Boundary"
+        ],
+        "text": "## 3. Update Rule",
+        "sectionText": "## 3. Update Rule\n\nAny design discussion or documentation rewrite must check this boundary map when it changes:\n\n- a platform component;\n- a parent/child component relationship;\n- ownership of a state write, decision, runtime authority, or contract;\n- a cross-area dependency;\n- the boundary between platform core, platform support, domain layer, host surface, or extension/plugin layer.\n\nIf the boundary changes, update this document or the current detailed source listed above. If it does not change, record `No component-boundary change` in the implementation alignment, verification note, discussion summary, or PR note."
+      }
+    },
+    {
+      "claimId": "claim_87aa008d95f5575a18f9c8a84d86f74d",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "931c4d6895bd0c9820534e6587755c4ff1370b0737dc6cd169f806faf5643af0",
+      "status": "candidate-unverified",
+      "shownText": "Any design discussion or documentation rewrite must check this boundary map when it changes:",
+      "shownTextDigest": "931c4d6895bd0c9820534e6587755c4ff1370b0737dc6cd169f806faf5643af0",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 46,
+        "endLine": 46,
+        "textDigest": "931c4d6895bd0c9820534e6587755c4ff1370b0737dc6cd169f806faf5643af0",
+        "sample": "Any design discussion or documentation rewrite must check this boundary map when it changes:",
+        "identityFingerprint": "480e18cc99f8c5f601be5bbd55ef0efe5adc7d51d77df3af0dc193fca8e14d39",
+        "ancestry": [
+          "Component Boundary",
+          "3. Update Rule"
+        ],
+        "text": "Any design discussion or documentation rewrite must check this boundary map when it changes:"
+      }
+    },
+    {
+      "claimId": "claim_f1d9a8653090838260a111f47381ee1a",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "a9dc381fff40284c0c3b7e441652537e68064a92adad8e838afe267b4ad7a6bc",
+      "status": "candidate-unverified",
+      "shownText": "- a platform component;\n- a parent/child component relationship;\n- ownership of a state write, decision, runtime authority, or contract;\n- a cross-area dependency;\n- the boundary between platform core, platform support, domain layer, host surface, or extension/plugin layer.",
+      "shownTextDigest": "a9dc381fff40284c0c3b7e441652537e68064a92adad8e838afe267b4ad7a6bc",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 48,
+        "endLine": 52,
+        "textDigest": "a9dc381fff40284c0c3b7e441652537e68064a92adad8e838afe267b4ad7a6bc",
+        "sample": "- a platform component;\n- a parent/child component relationship;\n- ownership of a state write, decision, runtime authority, or contract;\n- a cross-area dependency;\n- the boundary b",
+        "identityFingerprint": "d67f9dadc883b6c716eb9038395d733fd134ec33894e93a877e89e645108d11c",
+        "ancestry": [
+          "Component Boundary",
+          "3. Update Rule"
+        ],
+        "text": "- a platform component;\n- a parent/child component relationship;\n- ownership of a state write, decision, runtime authority, or contract;\n- a cross-area dependency;\n- the boundary between platform core, platform support, domain layer, host surface, or extension/plugin layer."
+      }
+    },
+    {
+      "claimId": "claim_4c287afb27181ca336afd0459b6df321",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "0de4043eee48d40910da8a29038a48444c7348e7b16df286dbd5726fa7e3d6e6",
+      "status": "candidate-unverified",
+      "shownText": "If the boundary changes, update this document or the current detailed source listed above. If it does not change, record `No component-boundary change` in the implementation alignment, verification note, discussion summary, or PR note.",
+      "shownTextDigest": "0de4043eee48d40910da8a29038a48444c7348e7b16df286dbd5726fa7e3d6e6",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 54,
+        "endLine": 54,
+        "textDigest": "0de4043eee48d40910da8a29038a48444c7348e7b16df286dbd5726fa7e3d6e6",
+        "sample": "If the boundary changes, update this document or the current detailed source listed above. If it does not change, record `No component-boundary change` in the implementation alignm",
+        "identityFingerprint": "f6c36897d928f57563b23fabce36a71a95bdffde47c8efc1b7a83ddff39ca270",
+        "ancestry": [
+          "Component Boundary",
+          "3. Update Rule"
+        ],
+        "text": "If the boundary changes, update this document or the current detailed source listed above. If it does not change, record `No component-boundary change` in the implementation alignment, verification note, discussion summary, or PR note."
+      }
+    },
+    {
+      "claimId": "claim_60b200d89cba5da6157ee4c3b7311a2e",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "4-current-high-level-components",
+      "unitDigest": "074412d0f27fb46eef0f2f874fa82854cfe3d19f27ec43eb1bceb4234a3c7108",
+      "status": "candidate-unverified",
+      "shownText": "## 4. Current High-Level Components\n\nThis table is a compact navigation surface, not a full replacement for the advisory docs.\n\n| Component | Current role | Current source |\n| --- | --- | --- |\n| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gates. Does not own stage or sequencing (owned by Workflow runner). Owns worker slots (`OccupancyPort`), and fail-safe claim settlement (`fgos return --to blocked`). | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |\n| Workflow (Định nghĩa + Run + Runner + Tích hợp) | Domain-neutral step & Unit DAG scheduling (`src/workflow/**`), human review gates, pure git integration. Single sequencer for plans, workflows, and multi-unit tasks. | [../specs/runner.md](../specs/runner.md) |\n| Execution Core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture) | Single authority for \"ai làm / model / persona / cơ chế\" (`src/runner/execution/bind.mjs`), single run door for new work (`fgos run` via `src/runner/execution/run.mjs`, herdr pane default, cli fallback), OS confinement posture for both herdr and cli, verifiable mutating gate. Strictly forbids L3 Work lifecycle dependencies (`src/state/**`). | [../specs/runner.md](../specs/runner.md) |\n| Collaboration Patterns (Execution Core) | Domain-neutral small collaboration loops (`solo`, `reviewed`, `panel`) and presets (`consult`, `research-fan-out`, `rfc`). Replaces retired coordination engine. | [../specs/runner.md](../specs/runner.md) |\n| Herdr (Transport chính + Bề mặt quan sát) | Transport mặc định cho out-of-process runs, pane execution liveness, plugin `herdr-dashboard/` (TUI trong pane herdr + pick/pane supervisor; herdr nạp qua `herdr-plugin.toml`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| fgos Gateway | Tiến trình detached duy nhất phục vụ REST API (`/v1`, hợp đồng CTR010), MCP `search`/`execute` trên cùng cổng, và bundle web dashboard nhúng sẵn (`apps/fgos-gateway/`: `gateway.rs`, `mcp.rs`, `cf_access.rs`, `remote_invocation.rs`, `web/`). Vòng đời duy nhất qua `fgos gateway start\\|status\\|stop`; không phải một phần của herdr và không phải \"herdr-gateway\" (tên đó chỉ repo tham chiếu ngoài). Dùng chung với `herdr-dashboard` lớp adapter CLI fgos tại `packages/herdr-fgos-common/rust` (`fgos.rs`, `settings.rs`, trait `WorkItemSource`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| Dispatch Transport & Confinement | Machine backend registry, isolation confinement (`bwrap` v1 driver, attestation storage, fail-closed probes), executor adapters; the `bwrap` driver calls the credential renewal module at provisioning (`copyCredentialFiles`, the write-back marker) and removing a private home (`confinement/cleanup.mjs`) calls it again for write-back (dependency confinement → provider capacity, for the account lock only). | [../specs/confinement-authority.md](../specs/confinement-authority.md) |\n| Run Result Evaluator | Evidence/confidence boundary for assignment run results. | [../architect/agent-coordination/architecture/evidence-and-results.md](../architect/agent-coordination/architecture/evidence-and-results.md) |\n| Domain Components And Extension Layer | Domain-specific behavior, workflows, skills, task specs, doctrine. L2 prose no longer picks executors or mechanisms (lớp matching L2 cũ đã thu hồi per 0048); thin driver `fgos-run` delegates directly to Workflow runner and P1 Execution Core. | [../../domains/](../../domains/), [../architect/domainization/](../architect/domainization/) |\n| Host And Surface Layer | CLI, fgos Gateway (REST/MCP/web), `herdr-dashboard` plugin and other Herdr surfaces into platform engines. | Host invocation and gateway docs |\n| Packaging-Distribution | Runtime packaging, install, activation, setup/doctor readiness. | [packaging-distribution/README.md](packaging-distribution/README.md) |\n| Knowledge, Learning, And Documentation Registry | Retrospective learning, doc registry, end-user docs index, trace/evolve signals. | Knowledge and docs registry docs |\n| Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](../specs/observe.md) |\n| Convention (Executable Names & Placement) | Platform-core authority for deterministic artifact names, repository-relative placement, path classification, and conformance checking. Implemented; owns no state and depends only on `fgos-host-runtime`. | [convention/spec.md](convention/spec.md) |",
+      "shownTextDigest": "43f73c70cebffac00e92aa64361b5aaae11c176df6106a2ff49ca7a19b362352",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "4. Current High-Level Components",
+        "anchor": "4-current-high-level-components",
+        "githubAnchor": "4-current-high-level-components",
+        "stableAnchor": "h-77bc65cf69af",
+        "startLine": 56,
+        "endLine": 56,
+        "textDigest": "074412d0f27fb46eef0f2f874fa82854cfe3d19f27ec43eb1bceb4234a3c7108",
+        "sample": "4. Current High-Level Components",
+        "sectionPayloadDigest": "74e2fb4b4284d4ea86d6aa5752da5f8ad013fd89059199bd0c2282fcea6f5455",
+        "followingBlockDigest": "36c91b4a266f2cce40ec42a6cbd62b58b528279168a1f18813f26320a368c040",
+        "identityFingerprint": "93f6a55d180947f73bff3b620e4ee026a3cf53e7709b3ea5adbb69b89eb27c46",
+        "ancestry": [
+          "Component Boundary"
+        ],
+        "text": "## 4. Current High-Level Components",
+        "sectionText": "## 4. Current High-Level Components\n\nThis table is a compact navigation surface, not a full replacement for the advisory docs.\n\n| Component | Current role | Current source |\n| --- | --- | --- |\n| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gates. Does not own stage or sequencing (owned by Workflow runner). Owns worker slots (`OccupancyPort`), and fail-safe claim settlement (`fgos return --to blocked`). | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |\n| Workflow (Định nghĩa + Run + Runner + Tích hợp) | Domain-neutral step & Unit DAG scheduling (`src/workflow/**`), human review gates, pure git integration. Single sequencer for plans, workflows, and multi-unit tasks. | [../specs/runner.md](../specs/runner.md) |\n| Execution Core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture) | Single authority for \"ai làm / model / persona / cơ chế\" (`src/runner/execution/bind.mjs`), single run door for new work (`fgos run` via `src/runner/execution/run.mjs`, herdr pane default, cli fallback), OS confinement posture for both herdr and cli, verifiable mutating gate. Strictly forbids L3 Work lifecycle dependencies (`src/state/**`). | [../specs/runner.md](../specs/runner.md) |\n| Collaboration Patterns (Execution Core) | Domain-neutral small collaboration loops (`solo`, `reviewed`, `panel`) and presets (`consult`, `research-fan-out`, `rfc`). Replaces retired coordination engine. | [../specs/runner.md](../specs/runner.md) |\n| Herdr (Transport chính + Bề mặt quan sát) | Transport mặc định cho out-of-process runs, pane execution liveness, plugin `herdr-dashboard/` (TUI trong pane herdr + pick/pane supervisor; herdr nạp qua `herdr-plugin.toml`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| fgos Gateway | Tiến trình detached duy nhất phục vụ REST API (`/v1`, hợp đồng CTR010), MCP `search`/`execute` trên cùng cổng, và bundle web dashboard nhúng sẵn (`apps/fgos-gateway/`: `gateway.rs`, `mcp.rs`, `cf_access.rs`, `remote_invocation.rs`, `web/`). Vòng đời duy nhất qua `fgos gateway start\\|status\\|stop`; không phải một phần của herdr và không phải \"herdr-gateway\" (tên đó chỉ repo tham chiếu ngoài). Dùng chung với `herdr-dashboard` lớp adapter CLI fgos tại `packages/herdr-fgos-common/rust` (`fgos.rs`, `settings.rs`, trait `WorkItemSource`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| Dispatch Transport & Confinement | Machine backend registry, isolation confinement (`bwrap` v1 driver, attestation storage, fail-closed probes), executor adapters; the `bwrap` driver calls the credential renewal module at provisioning (`copyCredentialFiles`, the write-back marker) and removing a private home (`confinement/cleanup.mjs`) calls it again for write-back (dependency confinement → provider capacity, for the account lock only). | [../specs/confinement-authority.md](../specs/confinement-authority.md) |\n| Run Result Evaluator | Evidence/confidence boundary for assignment run results. | [../architect/agent-coordination/architecture/evidence-and-results.md](../architect/agent-coordination/architecture/evidence-and-results.md) |\n| Domain Components And Extension Layer | Domain-specific behavior, workflows, skills, task specs, doctrine. L2 prose no longer picks executors or mechanisms (lớp matching L2 cũ đã thu hồi per 0048); thin driver `fgos-run` delegates directly to Workflow runner and P1 Execution Core. | [../../domains/](../../domains/), [../architect/domainization/](../architect/domainization/) |\n| Host And Surface Layer | CLI, fgos Gateway (REST/MCP/web), `herdr-dashboard` plugin and other Herdr surfaces into platform engines. | Host invocation and gateway docs |\n| Packaging-Distribution | Runtime packaging, install, activation, setup/doctor readiness. | [packaging-distribution/README.md](packaging-distribution/README.md) |\n| Knowledge, Learning, And Documentation Registry | Retrospective learning, doc registry, end-user docs index, trace/evolve signals. | Knowledge and docs registry docs |\n| Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](../specs/observe.md) |\n| Convention (Executable Names & Placement) | Platform-core authority for deterministic artifact names, repository-relative placement, path classification, and conformance checking. Implemented; owns no state and depends only on `fgos-host-runtime`. | [convention/spec.md](convention/spec.md) |"
+      }
+    },
+    {
+      "claimId": "claim_4b3482e666dba2d9678b4f8bf0fefcea",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "36c91b4a266f2cce40ec42a6cbd62b58b528279168a1f18813f26320a368c040",
+      "status": "candidate-unverified",
+      "shownText": "This table is a compact navigation surface, not a full replacement for the advisory docs.",
+      "shownTextDigest": "36c91b4a266f2cce40ec42a6cbd62b58b528279168a1f18813f26320a368c040",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 58,
+        "endLine": 58,
+        "textDigest": "36c91b4a266f2cce40ec42a6cbd62b58b528279168a1f18813f26320a368c040",
+        "sample": "This table is a compact navigation surface, not a full replacement for the advisory docs.",
+        "identityFingerprint": "3373275896fbe4e3bb2a4ca47b16ffa6a94c12a7cd33b5a52a82dfd94fff03f4",
+        "ancestry": [
+          "Component Boundary",
+          "4. Current High-Level Components"
+        ],
+        "text": "This table is a compact navigation surface, not a full replacement for the advisory docs."
+      }
+    },
+    {
+      "claimId": "claim_281124881201e09f11dbb099caeee81c",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "6bea55eabbf3ca711b55d4bee07df1e778082b2c93056e32cd2385c41465f4df",
+      "status": "candidate-unverified",
+      "shownText": "| Component | Current role | Current source |\n| --- | --- | --- |\n| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gates. Does not own stage or sequencing (owned by Workflow runner). Owns worker slots (`OccupancyPort`), and fail-safe claim settlement (`fgos return --to blocked`). | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |\n| Workflow (Định nghĩa + Run + Runner + Tích hợp) | Domain-neutral step & Unit DAG scheduling (`src/workflow/**`), human review gates, pure git integration. Single sequencer for plans, workflows, and multi-unit tasks. | [../specs/runner.md](../specs/runner.md) |\n| Execution Core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture) | Single authority for \"ai làm / model / persona / cơ chế\" (`src/runner/execution/bind.mjs`), single run door for new work (`fgos run` via `src/runner/execution/run.mjs`, herdr pane default, cli fallback), OS confinement posture for both herdr and cli, verifiable mutating gate. Strictly forbids L3 Work lifecycle dependencies (`src/state/**`). | [../specs/runner.md](../specs/runner.md) |\n| Collaboration Patterns (Execution Core) | Domain-neutral small collaboration loops (`solo`, `reviewed`, `panel`) and presets (`consult`, `research-fan-out`, `rfc`). Replaces retired coordination engine. | [../specs/runner.md](../specs/runner.md) |\n| Herdr (Transport chính + Bề mặt quan sát) | Transport mặc định cho out-of-process runs, pane execution liveness, plugin `herdr-dashboard/` (TUI trong pane herdr + pick/pane supervisor; herdr nạp qua `herdr-plugin.toml`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| fgos Gateway | Tiến trình detached duy nhất phục vụ REST API (`/v1`, hợp đồng CTR010), MCP `search`/`execute` trên cùng cổng, và bundle web dashboard nhúng sẵn (`apps/fgos-gateway/`: `gateway.rs`, `mcp.rs`, `cf_access.rs`, `remote_invocation.rs`, `web/`). Vòng đời duy nhất qua `fgos gateway start\\|status\\|stop`; không phải một phần của herdr và không phải \"herdr-gateway\" (tên đó chỉ repo tham chiếu ngoài). Dùng chung với `herdr-dashboard` lớp adapter CLI fgos tại `packages/herdr-fgos-common/rust` (`fgos.rs`, `settings.rs`, trait `WorkItemSource`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| Dispatch Transport & Confinement | Machine backend registry, isolation confinement (`bwrap` v1 driver, attestation storage, fail-closed probes), executor adapters; the `bwrap` driver calls the credential renewal module at provisioning (`copyCredentialFiles`, the write-back marker) and removing a private home (`confinement/cleanup.mjs`) calls it again for write-back (dependency confinement → provider capacity, for the account lock only). | [../specs/confinement-authority.md](../specs/confinement-authority.md) |\n| Run Result Evaluator | Evidence/confidence boundary for assignment run results. | [../architect/agent-coordination/architecture/evidence-and-results.md](../architect/agent-coordination/architecture/evidence-and-results.md) |\n| Domain Components And Extension Layer | Domain-specific behavior, workflows, skills, task specs, doctrine. L2 prose no longer picks executors or mechanisms (lớp matching L2 cũ đã thu hồi per 0048); thin driver `fgos-run` delegates directly to Workflow runner and P1 Execution Core. | [../../domains/](../../domains/), [../architect/domainization/](../architect/domainization/) |\n| Host And Surface Layer | CLI, fgos Gateway (REST/MCP/web), `herdr-dashboard` plugin and other Herdr surfaces into platform engines. | Host invocation and gateway docs |\n| Packaging-Distribution | Runtime packaging, install, activation, setup/doctor readiness. | [packaging-distribution/README.md](packaging-distribution/README.md) |\n| Knowledge, Learning, And Documentation Registry | Retrospective learning, doc registry, end-user docs index, trace/evolve signals. | Knowledge and docs registry docs |\n| Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](../specs/observe.md) |\n| Convention (Executable Names & Placement) | Platform-core authority for deterministic artifact names, repository-relative placement, path classification, and conformance checking. Implemented; owns no state and depends only on `fgos-host-runtime`. | [convention/spec.md](convention/spec.md) |",
+      "shownTextDigest": "6bea55eabbf3ca711b55d4bee07df1e778082b2c93056e32cd2385c41465f4df",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 60,
+        "endLine": 75,
+        "textDigest": "6bea55eabbf3ca711b55d4bee07df1e778082b2c93056e32cd2385c41465f4df",
+        "sample": "| Component | Current role | Current source |\n| --- | --- | --- |\n| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gat",
+        "identityFingerprint": "590448af4b68b0424ce98e45ee303f03ad923ac7a8a2910b8cd06c5565d94b8e",
+        "ancestry": [
+          "Component Boundary",
+          "4. Current High-Level Components"
+        ],
+        "text": "| Component | Current role | Current source |\n| --- | --- | --- |\n| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gates. Does not own stage or sequencing (owned by Workflow runner). Owns worker slots (`OccupancyPort`), and fail-safe claim settlement (`fgos return --to blocked`). | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |\n| Workflow (Định nghĩa + Run + Runner + Tích hợp) | Domain-neutral step & Unit DAG scheduling (`src/workflow/**`), human review gates, pure git integration. Single sequencer for plans, workflows, and multi-unit tasks. | [../specs/runner.md](../specs/runner.md) |\n| Execution Core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture) | Single authority for \"ai làm / model / persona / cơ chế\" (`src/runner/execution/bind.mjs`), single run door for new work (`fgos run` via `src/runner/execution/run.mjs`, herdr pane default, cli fallback), OS confinement posture for both herdr and cli, verifiable mutating gate. Strictly forbids L3 Work lifecycle dependencies (`src/state/**`). | [../specs/runner.md](../specs/runner.md) |\n| Collaboration Patterns (Execution Core) | Domain-neutral small collaboration loops (`solo`, `reviewed`, `panel`) and presets (`consult`, `research-fan-out`, `rfc`). Replaces retired coordination engine. | [../specs/runner.md](../specs/runner.md) |\n| Herdr (Transport chính + Bề mặt quan sát) | Transport mặc định cho out-of-process runs, pane execution liveness, plugin `herdr-dashboard/` (TUI trong pane herdr + pick/pane supervisor; herdr nạp qua `herdr-plugin.toml`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| fgos Gateway | Tiến trình detached duy nhất phục vụ REST API (`/v1`, hợp đồng CTR010), MCP `search`/`execute` trên cùng cổng, và bundle web dashboard nhúng sẵn (`apps/fgos-gateway/`: `gateway.rs`, `mcp.rs`, `cf_access.rs`, `remote_invocation.rs`, `web/`). Vòng đời duy nhất qua `fgos gateway start\\|status\\|stop`; không phải một phần của herdr và không phải \"herdr-gateway\" (tên đó chỉ repo tham chiếu ngoài). Dùng chung với `herdr-dashboard` lớp adapter CLI fgos tại `packages/herdr-fgos-common/rust` (`fgos.rs`, `settings.rs`, trait `WorkItemSource`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| Dispatch Transport & Confinement | Machine backend registry, isolation confinement (`bwrap` v1 driver, attestation storage, fail-closed probes), executor adapters; the `bwrap` driver calls the credential renewal module at provisioning (`copyCredentialFiles`, the write-back marker) and removing a private home (`confinement/cleanup.mjs`) calls it again for write-back (dependency confinement → provider capacity, for the account lock only). | [../specs/confinement-authority.md](../specs/confinement-authority.md) |\n| Run Result Evaluator | Evidence/confidence boundary for assignment run results. | [../architect/agent-coordination/architecture/evidence-and-results.md](../architect/agent-coordination/architecture/evidence-and-results.md) |\n| Domain Components And Extension Layer | Domain-specific behavior, workflows, skills, task specs, doctrine. L2 prose no longer picks executors or mechanisms (lớp matching L2 cũ đã thu hồi per 0048); thin driver `fgos-run` delegates directly to Workflow runner and P1 Execution Core. | [../../domains/](../../domains/), [../architect/domainization/](../architect/domainization/) |\n| Host And Surface Layer | CLI, fgos Gateway (REST/MCP/web), `herdr-dashboard` plugin and other Herdr surfaces into platform engines. | Host invocation and gateway docs |\n| Packaging-Distribution | Runtime packaging, install, activation, setup/doctor readiness. | [packaging-distribution/README.md](packaging-distribution/README.md) |\n| Knowledge, Learning, And Documentation Registry | Retrospective learning, doc registry, end-user docs index, trace/evolve signals. | Knowledge and docs registry docs |\n| Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](../specs/observe.md) |\n| Convention (Executable Names & Placement) | Platform-core authority for deterministic artifact names, repository-relative placement, path classification, and conformance checking. Implemented; owns no state and depends only on `fgos-host-runtime`. | [convention/spec.md](convention/spec.md) |"
+      }
+    },
+    {
+      "claimId": "claim_04ad87d13e4de217b79136140dab35f4",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "5-how-to-change",
+      "unitDigest": "b4423d9bf996a66389e78604c6db56148f7538f902148aa7d25570efb7952fd3",
+      "status": "candidate-unverified",
+      "shownText": "## 5. How To Change\n\n1. Read this anchor and the current detailed component-boundary source.\n2. Identify whether the change is component packaging, bounded context, authority boundary, or physical layout.\n3. Update the owning area docs.\n4. Update this anchor or the detailed source when the whole-system map changes.\n5. Link evidence or record `No component-boundary change`.",
+      "shownTextDigest": "00dbe006291933588382d8ff6387073c2d35a5f8a5ca9c2ec8db8f6e32dda3b5",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "5. How To Change",
+        "anchor": "5-how-to-change",
+        "githubAnchor": "5-how-to-change",
+        "stableAnchor": "h-ecffba242f34",
+        "startLine": 76,
+        "endLine": 76,
+        "textDigest": "b4423d9bf996a66389e78604c6db56148f7538f902148aa7d25570efb7952fd3",
+        "sample": "5. How To Change",
+        "sectionPayloadDigest": "345cb600b2af33bffdee76c814f7c800ca86d7f801ea60f040e38c6e9a251405",
+        "followingBlockDigest": "345cb600b2af33bffdee76c814f7c800ca86d7f801ea60f040e38c6e9a251405",
+        "identityFingerprint": "ba2b752896f7344f169d6646e4788e5d7d87375fdecf8576bd7a2223cefdc06e",
+        "ancestry": [
+          "Component Boundary"
+        ],
+        "text": "## 5. How To Change",
+        "sectionText": "## 5. How To Change\n\n1. Read this anchor and the current detailed component-boundary source.\n2. Identify whether the change is component packaging, bounded context, authority boundary, or physical layout.\n3. Update the owning area docs.\n4. Update this anchor or the detailed source when the whole-system map changes.\n5. Link evidence or record `No component-boundary change`."
+      }
+    },
+    {
+      "claimId": "claim_494478c0f174c1316cb79499ecd22da7",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "345cb600b2af33bffdee76c814f7c800ca86d7f801ea60f040e38c6e9a251405",
+      "status": "candidate-unverified",
+      "shownText": "1. Read this anchor and the current detailed component-boundary source.\n2. Identify whether the change is component packaging, bounded context, authority boundary, or physical layout.\n3. Update the owning area docs.\n4. Update this anchor or the detailed source when the whole-system map changes.\n5. Link evidence or record `No component-boundary change`.",
+      "shownTextDigest": "345cb600b2af33bffdee76c814f7c800ca86d7f801ea60f040e38c6e9a251405",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 78,
+        "endLine": 82,
+        "textDigest": "345cb600b2af33bffdee76c814f7c800ca86d7f801ea60f040e38c6e9a251405",
+        "sample": "1. Read this anchor and the current detailed component-boundary source.\n2. Identify whether the change is component packaging, bounded context, authority boundary, or physical layo",
+        "identityFingerprint": "3c6b2100d616f5a7cc0dde093d572585e96b002df3463bf8f3e2f09a0a3d127f",
+        "ancestry": [
+          "Component Boundary",
+          "5. How To Change"
+        ],
+        "text": "1. Read this anchor and the current detailed component-boundary source.\n2. Identify whether the change is component packaging, bounded context, authority boundary, or physical layout.\n3. Update the owning area docs.\n4. Update this anchor or the detailed source when the whole-system map changes.\n5. Link evidence or record `No component-boundary change`."
+      }
+    },
+    {
+      "claimId": "claim_5d3c632ef3e6b7631307307d54682e71",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "6-related-files",
+      "unitDigest": "1313f97e7dee44b4db59dac70ff9b0a41c4bc904dde3ca26cac5926a20f19c3a",
+      "status": "candidate-unverified",
+      "shownText": "## 6. Related Files\n\n| Relationship | File |\n| --- | --- |\n| platform portal | [README.md](README.md) |\n| detailed component-boundary source | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |\n| draft authority map | [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) |\n| packaging-distribution area | [packaging-distribution/README.md](packaging-distribution/README.md) |\n| observe component | [../specs/observe.md](../specs/observe.md) |",
+      "shownTextDigest": "c2ef85b2529e7d9406b1245bc9e52152f7096faed96cae3632926b56f396f543",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "6. Related Files",
+        "anchor": "6-related-files",
+        "githubAnchor": "6-related-files",
+        "stableAnchor": "h-43995ac3f53d",
+        "startLine": 84,
+        "endLine": 84,
+        "textDigest": "1313f97e7dee44b4db59dac70ff9b0a41c4bc904dde3ca26cac5926a20f19c3a",
+        "sample": "6. Related Files",
+        "sectionPayloadDigest": "dd9bdd0cd63e539a2ae55a9d73c2ba85351ad2befc50c30551992df9f7efd894",
+        "followingBlockDigest": "dd9bdd0cd63e539a2ae55a9d73c2ba85351ad2befc50c30551992df9f7efd894",
+        "identityFingerprint": "ea87577b8029a142e5ac5bc3b8e79474a60f1fb279c76218667e51dbfa080a7f",
+        "ancestry": [
+          "Component Boundary"
+        ],
+        "text": "## 6. Related Files",
+        "sectionText": "## 6. Related Files\n\n| Relationship | File |\n| --- | --- |\n| platform portal | [README.md](README.md) |\n| detailed component-boundary source | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |\n| draft authority map | [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) |\n| packaging-distribution area | [packaging-distribution/README.md](packaging-distribution/README.md) |\n| observe component | [../specs/observe.md](../specs/observe.md) |"
+      }
+    },
+    {
+      "claimId": "claim_088901bb1c7d69b87da383ddce95fe18",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "dd9bdd0cd63e539a2ae55a9d73c2ba85351ad2befc50c30551992df9f7efd894",
+      "status": "candidate-unverified",
+      "shownText": "| Relationship | File |\n| --- | --- |\n| platform portal | [README.md](README.md) |\n| detailed component-boundary source | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |\n| draft authority map | [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) |\n| packaging-distribution area | [packaging-distribution/README.md](packaging-distribution/README.md) |\n| observe component | [../specs/observe.md](../specs/observe.md) |",
+      "shownTextDigest": "dd9bdd0cd63e539a2ae55a9d73c2ba85351ad2befc50c30551992df9f7efd894",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 86,
+        "endLine": 92,
+        "textDigest": "dd9bdd0cd63e539a2ae55a9d73c2ba85351ad2befc50c30551992df9f7efd894",
+        "sample": "| Relationship | File |\n| --- | --- |\n| platform portal | [README.md](README.md) |\n| detailed component-boundary source | [../architect/component-boundary/component-boundary-adviso",
+        "identityFingerprint": "40c7c8b5cdd8b96a146005b37c78a53a4d1cccf9fe23403dd48ccbb5afb72b8d",
+        "ancestry": [
+          "Component Boundary",
+          "6. Related Files"
+        ],
+        "text": "| Relationship | File |\n| --- | --- |\n| platform portal | [README.md](README.md) |\n| detailed component-boundary source | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |\n| draft authority map | [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) |\n| packaging-distribution area | [packaging-distribution/README.md](packaging-distribution/README.md) |\n| observe component | [../specs/observe.md](../specs/observe.md) |"
+      }
+    },
+    {
+      "claimId": "claim_568f01ef849f421829301c6915bb229a",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "added-in-candidate-component-boundary-advisory-source-carriage",
+      "unitDigest": "f1c3eb7baa65505f9f680c1a52a1ee64950b98f9b8af505785789ed587b2e985",
+      "status": "candidate-unverified",
+      "shownText": "## Added in candidate: component-boundary-advisory source carriage\n\nCarriage from `docs/architect/component-boundary/component-boundary-advisory.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+      "shownTextDigest": "0a60bb8cbdac5f47463d36ca41292f04564c938fadee9d755a54500e68b50241",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Added in candidate: component-boundary-advisory source carriage",
+        "anchor": "added-in-candidate-component-boundary-advisory-source-carriage",
+        "githubAnchor": "added-in-candidate-component-boundary-advisory-source-carriage",
+        "stableAnchor": "h-fc1bd31ab33d",
+        "startLine": 94,
+        "endLine": 94,
+        "textDigest": "f1c3eb7baa65505f9f680c1a52a1ee64950b98f9b8af505785789ed587b2e985",
+        "sample": "Added in candidate: component-boundary-advisory source carriage",
+        "sectionPayloadDigest": "5c900dfeaf4d283852e8c26b515a900fa5260d59ba760a3d6bc82174f54c2699",
+        "followingBlockDigest": "5c900dfeaf4d283852e8c26b515a900fa5260d59ba760a3d6bc82174f54c2699",
+        "identityFingerprint": "e4a269f2bb114110860f31e08bf2a50d512bab8b60d7bfc655d5cf47f025ec19",
+        "ancestry": [
+          "Component Boundary"
+        ],
+        "text": "## Added in candidate: component-boundary-advisory source carriage",
+        "sectionText": "## Added in candidate: component-boundary-advisory source carriage\n\nCarriage from `docs/architect/component-boundary/component-boundary-advisory.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+      }
+    },
+    {
+      "claimId": "claim_07791d764c90e9fb064d1f2d24405532",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "5c900dfeaf4d283852e8c26b515a900fa5260d59ba760a3d6bc82174f54c2699",
+      "status": "candidate-unverified",
+      "shownText": "Carriage from `docs/architect/component-boundary/component-boundary-advisory.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+      "shownTextDigest": "5c900dfeaf4d283852e8c26b515a900fa5260d59ba760a3d6bc82174f54c2699",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 96,
+        "endLine": 96,
+        "textDigest": "5c900dfeaf4d283852e8c26b515a900fa5260d59ba760a3d6bc82174f54c2699",
+        "sample": "Carriage from `docs/architect/component-boundary/component-boundary-advisory.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source",
+        "identityFingerprint": "65360c83f8c3ba4f19eeece5b6a6595b7c6b04f69315bb7e44e65960a64df49b",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage"
+        ],
+        "text": "Carriage from `docs/architect/component-boundary/component-boundary-advisory.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+      }
+    },
+    {
+      "claimId": "claim_a1b1028d7f59d5c4abc36be529d775ce",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "added-in-candidate-readme-source-carriage",
+      "unitDigest": "fe10be3720c20ffc8fa0f52158bcf0bf08bfbeb870c8080a4e82ad3903e79419",
+      "status": "candidate-unverified",
+      "shownText": "## Added in candidate: README source carriage\n\nCarriage from `docs/architect/component-boundary/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+      "shownTextDigest": "16b7a83892f39d57c3933eb3342f07e74a3ac8ef9bfc5b77b472deb3a7efd0e4",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Added in candidate: README source carriage",
+        "anchor": "added-in-candidate-readme-source-carriage",
+        "githubAnchor": "added-in-candidate-readme-source-carriage",
+        "stableAnchor": "h-8f4d40c1e7af",
+        "startLine": 1150,
+        "endLine": 1150,
+        "textDigest": "fe10be3720c20ffc8fa0f52158bcf0bf08bfbeb870c8080a4e82ad3903e79419",
+        "sample": "Added in candidate: README source carriage",
+        "sectionPayloadDigest": "c6fa906e1372bdc87bca865c0a89d94a184e689c9880bf94c6dce80ff25cd0a6",
+        "followingBlockDigest": "c6fa906e1372bdc87bca865c0a89d94a184e689c9880bf94c6dce80ff25cd0a6",
+        "identityFingerprint": "cdca96e49b8662afbb72ae1578c89400affdc35abfef979058625a6de9420fd0",
+        "ancestry": [
+          "Component Boundary"
+        ],
+        "text": "## Added in candidate: README source carriage",
+        "sectionText": "## Added in candidate: README source carriage\n\nCarriage from `docs/architect/component-boundary/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+      }
+    },
+    {
+      "claimId": "claim_9f9d5f8014b5411013ef1423cdddc32f",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-159",
+      "unitDigest": "c6fa906e1372bdc87bca865c0a89d94a184e689c9880bf94c6dce80ff25cd0a6",
+      "status": "candidate-unverified",
+      "shownText": "Carriage from `docs/architect/component-boundary/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+      "shownTextDigest": "c6fa906e1372bdc87bca865c0a89d94a184e689c9880bf94c6dce80ff25cd0a6",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-159",
+        "githubAnchor": "unheaded-block-159",
+        "stableAnchor": "unheaded-block-159",
+        "title": "Unheaded block 159",
+        "startLine": 1152,
+        "endLine": 1152,
+        "textDigest": "c6fa906e1372bdc87bca865c0a89d94a184e689c9880bf94c6dce80ff25cd0a6",
+        "sample": "Carriage from `docs/architect/component-boundary/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with h",
+        "identityFingerprint": "c9a045e05ff37cdcb9b4e03870603ff0de8445f2cbddbbd5be9d4f0117ab075b",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: README source carriage"
+        ],
+        "text": "Carriage from `docs/architect/component-boundary/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+      }
+    },
+    {
+      "claimId": "claim_779a50ced8b8ee88dfc0a5c0d13ea897",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "added-in-candidate-repo-layout-vision-source-carriage",
+      "unitDigest": "8a51c360ba667e340a596d974c46ad4e74450a36b375c5a34460fdbc87da9058",
+      "status": "candidate-unverified",
+      "shownText": "## Added in candidate: repo-layout-vision source carriage\n\nCarriage from `docs/architect/component-boundary/repo-layout-vision.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+      "shownTextDigest": "104093e8a381cc82c3d1c503cd96b4605276a2268a5886e65524610c64ad5361",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Added in candidate: repo-layout-vision source carriage",
+        "anchor": "added-in-candidate-repo-layout-vision-source-carriage",
+        "githubAnchor": "added-in-candidate-repo-layout-vision-source-carriage",
+        "stableAnchor": "h-5b6105b28562",
+        "startLine": 1385,
+        "endLine": 1385,
+        "textDigest": "8a51c360ba667e340a596d974c46ad4e74450a36b375c5a34460fdbc87da9058",
+        "sample": "Added in candidate: repo-layout-vision source carriage",
+        "sectionPayloadDigest": "8d6eec3640a155c73aafb3fdb2868e4e9747da8885c6c2b4b8a779146f44569a",
+        "followingBlockDigest": "8d6eec3640a155c73aafb3fdb2868e4e9747da8885c6c2b4b8a779146f44569a",
+        "identityFingerprint": "4f86c1a9184590687dea8aefd21ad505562f74d72f3263674f49c467e582a02f",
+        "ancestry": [
+          "Component Boundary"
+        ],
+        "text": "## Added in candidate: repo-layout-vision source carriage",
+        "sectionText": "## Added in candidate: repo-layout-vision source carriage\n\nCarriage from `docs/architect/component-boundary/repo-layout-vision.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+      }
+    },
+    {
+      "claimId": "claim_2ca8344b20f24a67a8414f3d6ac78158",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-200",
+      "unitDigest": "8d6eec3640a155c73aafb3fdb2868e4e9747da8885c6c2b4b8a779146f44569a",
+      "status": "candidate-unverified",
+      "shownText": "Carriage from `docs/architect/component-boundary/repo-layout-vision.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+      "shownTextDigest": "8d6eec3640a155c73aafb3fdb2868e4e9747da8885c6c2b4b8a779146f44569a",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-200",
+        "githubAnchor": "unheaded-block-200",
+        "stableAnchor": "unheaded-block-200",
+        "title": "Unheaded block 200",
+        "startLine": 1387,
+        "endLine": 1387,
+        "textDigest": "8d6eec3640a155c73aafb3fdb2868e4e9747da8885c6c2b4b8a779146f44569a",
+        "sample": "Carriage from `docs/architect/component-boundary/repo-layout-vision.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text fol",
+        "identityFingerprint": "d2164e2371d13b26b0d1062468ca5048033dc2f59563ac5b4e34a3e3c4e6d556",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: repo-layout-vision source carriage"
+        ],
+        "text": "Carriage from `docs/architect/component-boundary/repo-layout-vision.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+      }
+    },
+    {
+      "claimId": "claim_33cab447f5d37437033c2024d39072cc",
+      "path": "docs/platform/README.md",
+      "anchor": "platform-documentation",
+      "unitDigest": "8fc9c0389780b881695ab47666312083822592c77e4e6e7edc4ab35da7c1299e",
+      "status": "candidate-unverified",
+      "shownText": "# Platform Documentation\n\n```txt\nDocument type: Platform portal\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through platform-wide and area-specific fgOS docs\nDesign status: Accepted\nImplementation: Partial\nProvenance: Promoted from documentation-system redesign\nWriter type: Human + agent coauthor\nCanonical for: Platform documentation entry and area registry\nUse this when: You need to understand or change fgOS platform behavior or design\nDo not use this for: User-facing task guidance or generated indexes\nLast reviewed: 2026-09-25\nRelated:\n- `docs/doc-governance.md`\n- `docs/transitional-switchboard.md`\n- `docs/reading-map.md`\n```\n\nThis is the portal for fgOS platform documentation.",
+      "shownTextDigest": "8b9b687a321a47184d15c0d24ecf5cfa60b96c82ed3305ff06416056bcec47be",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Platform Documentation",
+        "anchor": "platform-documentation",
+        "githubAnchor": "platform-documentation",
+        "stableAnchor": "h-c7fc5b3ec9d6",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "8fc9c0389780b881695ab47666312083822592c77e4e6e7edc4ab35da7c1299e",
+        "sample": "Platform Documentation",
+        "sectionPayloadDigest": "4f0dd9935f2f809c0ebaacd8d28f2bdcd5f4b2a2d8e707bdf9b91ee20f54c1db",
+        "followingBlockDigest": "de17bdcf6470426386de3e75549ce8239a1e535e747842facdc53dd258fb1479",
+        "identityFingerprint": "54ecddd4da0034931b2f1c0ef77abee67a460c8ddc12d8ab396bef88ed764e05",
+        "ancestry": [],
+        "text": "# Platform Documentation",
+        "sectionText": "# Platform Documentation\n\n```txt\nDocument type: Platform portal\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through platform-wide and area-specific fgOS docs\nDesign status: Accepted\nImplementation: Partial\nProvenance: Promoted from documentation-system redesign\nWriter type: Human + agent coauthor\nCanonical for: Platform documentation entry and area registry\nUse this when: You need to understand or change fgOS platform behavior or design\nDo not use this for: User-facing task guidance or generated indexes\nLast reviewed: 2026-09-25\nRelated:\n- `docs/doc-governance.md`\n- `docs/transitional-switchboard.md`\n- `docs/reading-map.md`\n```\n\nThis is the portal for fgOS platform documentation."
+      }
+    },
+    {
+      "claimId": "claim_b45c04655f2d6427c8dcb5ee6579e3dd",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "de17bdcf6470426386de3e75549ce8239a1e535e747842facdc53dd258fb1479",
+      "status": "candidate-unverified",
+      "shownText": "```txt\nDocument type: Platform portal\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through platform-wide and area-specific fgOS docs\nDesign status: Accepted\nImplementation: Partial\nProvenance: Promoted from documentation-system redesign\nWriter type: Human + agent coauthor\nCanonical for: Platform documentation entry and area registry\nUse this when: You need to understand or change fgOS platform behavior or design\nDo not use this for: User-facing task guidance or generated indexes\nLast reviewed: 2026-09-25\nRelated:\n- `docs/doc-governance.md`\n- `docs/transitional-switchboard.md`\n- `docs/reading-map.md`\n```",
+      "shownTextDigest": "de17bdcf6470426386de3e75549ce8239a1e535e747842facdc53dd258fb1479",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 19,
+        "textDigest": "de17bdcf6470426386de3e75549ce8239a1e535e747842facdc53dd258fb1479",
+        "sample": "```txt\nDocument type: Platform portal\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through platform-wide and area-specific fgOS docs\nDesign status:",
+        "identityFingerprint": "16d6410beb39f4806f64d4a433290b739867e2e131d5ebe40b43f0ba19a31a56",
+        "ancestry": [
+          "Platform Documentation"
+        ],
+        "text": "```txt\nDocument type: Platform portal\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through platform-wide and area-specific fgOS docs\nDesign status: Accepted\nImplementation: Partial\nProvenance: Promoted from documentation-system redesign\nWriter type: Human + agent coauthor\nCanonical for: Platform documentation entry and area registry\nUse this when: You need to understand or change fgOS platform behavior or design\nDo not use this for: User-facing task guidance or generated indexes\nLast reviewed: 2026-09-25\nRelated:\n- `docs/doc-governance.md`\n- `docs/transitional-switchboard.md`\n- `docs/reading-map.md`\n```"
+      }
+    },
+    {
+      "claimId": "claim_026114d1153a519da8c725be403babc1",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "efc34ef6f5aa655035efac51a724089ce84dd17cd231f6dacdef63f5d1356c05",
+      "status": "candidate-unverified",
+      "shownText": "This is the portal for fgOS platform documentation.",
+      "shownTextDigest": "efc34ef6f5aa655035efac51a724089ce84dd17cd231f6dacdef63f5d1356c05",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 21,
+        "endLine": 21,
+        "textDigest": "efc34ef6f5aa655035efac51a724089ce84dd17cd231f6dacdef63f5d1356c05",
+        "sample": "This is the portal for fgOS platform documentation.",
+        "identityFingerprint": "9a3a5f665ac4b434a6dfae4c0eea2e55d6dae2eaa89dea6dc1b90cbcc55c4c04",
+        "ancestry": [
+          "Platform Documentation"
+        ],
+        "text": "This is the portal for fgOS platform documentation."
+      }
+    },
+    {
+      "claimId": "claim_b4cf0df2f8bcb0d3daa27b5fc3bfdadb",
+      "path": "docs/platform/README.md",
+      "anchor": "1-platform-wide-anchors",
+      "unitDigest": "a50bb1654cb8fda3fd30a1d4de47465b15870f24a5a7034d6c003f6ee386612c",
+      "status": "candidate-unverified",
+      "shownText": "## 1. Platform-wide Anchors\n\nThese docs are cross-area authority and live directly under `docs/platform/` in\nthe target structure.\n\n| Target doc | Role | Current source during migration |\n|---|---|---|\n| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](../platform-foundations.md), [../work-item-lifecycle-vision.md](../work-item-lifecycle-vision.md), design discussions |\n| [intent-preservation-ledger.md](intent-preservation-ledger.md) | Whole-platform preserved intent across simplified implementation slices | Documentation-system discussion, [../architect/agent-coordination/intent-preservation-ledger.md](../architect/agent-coordination/intent-preservation-ledger.md) |\n| [platform-foundations.md](platform-foundations.md) | Platform laws and durable constraints | [../platform-foundations.md](../platform-foundations.md), [../specs/platform-foundations.md](../specs/platform-foundations.md) |\n| [architecture-map.md](architecture-map.md) | Whole-system architecture map | [../architecture-map.md](../architecture-map.md) |\n| [component-boundary.md](component-boundary.md) | Layers, parent/child components, responsibilities, authority boundaries | [../architect/component-boundary/](../architect/component-boundary/) |\n| [../contracts/](../contracts/) | Cross-area contracts during migration | [../routing-handoff-contract.md](../routing-handoff-contract.md), [../contracts/](../contracts/) |",
+      "shownTextDigest": "bd6bd5165990fc92dc27c7b865fb6952039ed0322a95df2ef144290894756687",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "1. Platform-wide Anchors",
+        "anchor": "1-platform-wide-anchors",
+        "githubAnchor": "1-platform-wide-anchors",
+        "stableAnchor": "h-2a8e21e406df",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "a50bb1654cb8fda3fd30a1d4de47465b15870f24a5a7034d6c003f6ee386612c",
+        "sample": "1. Platform-wide Anchors",
+        "sectionPayloadDigest": "b57724220efedb3f165fe73453a90335985514025faf92f291384a2b47eaf489",
+        "followingBlockDigest": "b91459b47f7a7aec45a0e03afc29342b26e9cdba66f334988a648ac9acf6e4bd",
+        "identityFingerprint": "4efdf860593f6345616b516b7b33a100e370a7fa9765b6cf9af5d3eca28f7e42",
+        "ancestry": [
+          "Platform Documentation"
+        ],
+        "text": "## 1. Platform-wide Anchors",
+        "sectionText": "## 1. Platform-wide Anchors\n\nThese docs are cross-area authority and live directly under `docs/platform/` in\nthe target structure.\n\n| Target doc | Role | Current source during migration |\n|---|---|---|\n| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](../platform-foundations.md), [../work-item-lifecycle-vision.md](../work-item-lifecycle-vision.md), design discussions |\n| [intent-preservation-ledger.md](intent-preservation-ledger.md) | Whole-platform preserved intent across simplified implementation slices | Documentation-system discussion, [../architect/agent-coordination/intent-preservation-ledger.md](../architect/agent-coordination/intent-preservation-ledger.md) |\n| [platform-foundations.md](platform-foundations.md) | Platform laws and durable constraints | [../platform-foundations.md](../platform-foundations.md), [../specs/platform-foundations.md](../specs/platform-foundations.md) |\n| [architecture-map.md](architecture-map.md) | Whole-system architecture map | [../architecture-map.md](../architecture-map.md) |\n| [component-boundary.md](component-boundary.md) | Layers, parent/child components, responsibilities, authority boundaries | [../architect/component-boundary/](../architect/component-boundary/) |\n| [../contracts/](../contracts/) | Cross-area contracts during migration | [../routing-handoff-contract.md](../routing-handoff-contract.md), [../contracts/](../contracts/) |"
+      }
+    },
+    {
+      "claimId": "claim_0ce4eb1bfa6b34e3831ae06a72ae3542",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "b91459b47f7a7aec45a0e03afc29342b26e9cdba66f334988a648ac9acf6e4bd",
+      "status": "candidate-unverified",
+      "shownText": "These docs are cross-area authority and live directly under `docs/platform/` in\nthe target structure.",
+      "shownTextDigest": "b91459b47f7a7aec45a0e03afc29342b26e9cdba66f334988a648ac9acf6e4bd",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 25,
+        "endLine": 26,
+        "textDigest": "b91459b47f7a7aec45a0e03afc29342b26e9cdba66f334988a648ac9acf6e4bd",
+        "sample": "These docs are cross-area authority and live directly under `docs/platform/` in\nthe target structure.",
+        "identityFingerprint": "0e6010e0ecc77c907eb61aa3fd6514d30490ea2e490afb12156a7e4768a9fe28",
+        "ancestry": [
+          "Platform Documentation",
+          "1. Platform-wide Anchors"
+        ],
+        "text": "These docs are cross-area authority and live directly under `docs/platform/` in\nthe target structure."
+      }
+    },
+    {
+      "claimId": "claim_8f3435494fd3ab6edecb312621fd044d",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24",
+      "status": "candidate-unverified",
+      "shownText": "| Target doc | Role | Current source during migration |\n|---|---|---|\n| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](../platform-foundations.md), [../work-item-lifecycle-vision.md](../work-item-lifecycle-vision.md), design discussions |\n| [intent-preservation-ledger.md](intent-preservation-ledger.md) | Whole-platform preserved intent across simplified implementation slices | Documentation-system discussion, [../architect/agent-coordination/intent-preservation-ledger.md](../architect/agent-coordination/intent-preservation-ledger.md) |\n| [platform-foundations.md](platform-foundations.md) | Platform laws and durable constraints | [../platform-foundations.md](../platform-foundations.md), [../specs/platform-foundations.md](../specs/platform-foundations.md) |\n| [architecture-map.md](architecture-map.md) | Whole-system architecture map | [../architecture-map.md](../architecture-map.md) |\n| [component-boundary.md](component-boundary.md) | Layers, parent/child components, responsibilities, authority boundaries | [../architect/component-boundary/](../architect/component-boundary/) |\n| [../contracts/](../contracts/) | Cross-area contracts during migration | [../routing-handoff-contract.md](../routing-handoff-contract.md), [../contracts/](../contracts/) |",
+      "shownTextDigest": "9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 28,
+        "endLine": 35,
+        "textDigest": "9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24",
+        "sample": "| Target doc | Role | Current source during migration |\n|---|---|---|\n| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](",
+        "identityFingerprint": "d409eaa04d1cb9c9d10bd44060a68a74b3017c77c97bc1c795be9d8292dd48f2",
+        "ancestry": [
+          "Platform Documentation",
+          "1. Platform-wide Anchors"
+        ],
+        "text": "| Target doc | Role | Current source during migration |\n|---|---|---|\n| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](../platform-foundations.md), [../work-item-lifecycle-vision.md](../work-item-lifecycle-vision.md), design discussions |\n| [intent-preservation-ledger.md](intent-preservation-ledger.md) | Whole-platform preserved intent across simplified implementation slices | Documentation-system discussion, [../architect/agent-coordination/intent-preservation-ledger.md](../architect/agent-coordination/intent-preservation-ledger.md) |\n| [platform-foundations.md](platform-foundations.md) | Platform laws and durable constraints | [../platform-foundations.md](../platform-foundations.md), [../specs/platform-foundations.md](../specs/platform-foundations.md) |\n| [architecture-map.md](architecture-map.md) | Whole-system architecture map | [../architecture-map.md](../architecture-map.md) |\n| [component-boundary.md](component-boundary.md) | Layers, parent/child components, responsibilities, authority boundaries | [../architect/component-boundary/](../architect/component-boundary/) |\n| [../contracts/](../contracts/) | Cross-area contracts during migration | [../routing-handoff-contract.md](../routing-handoff-contract.md), [../contracts/](../contracts/) |"
+      }
+    },
+    {
+      "claimId": "claim_1898cdafa7835d675526173d39eb5cd2",
+      "path": "docs/platform/README.md",
+      "anchor": "2-area-registry",
+      "unitDigest": "c1c8d66852c686b940eb0ceab00d7f6abde4f143be360919f223176afeae88d1",
+      "status": "candidate-unverified",
+      "shownText": "## 2. Area Registry\n\nTarget area docs live at `docs/platform/<area>/`.\n\n| Area | Current source during migration |\n|---|---|\n| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |\n| `work-state` | [../specs/work-state.md](../specs/work-state.md) |\n| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |\n| [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |\n| [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |\n| [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |\n| `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |\n| `ui-spec` | [../ui-spec/](../ui-spec/) |\n| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `plans/260825-1841-knowledge-registry/plan.md` |",
+      "shownTextDigest": "3e59f62ce08d78b6d09eb355762508b965b05c62689bf12203d1f3acc89b9463",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "2. Area Registry",
+        "anchor": "2-area-registry",
+        "githubAnchor": "2-area-registry",
+        "stableAnchor": "h-b63f72db9e44",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "c1c8d66852c686b940eb0ceab00d7f6abde4f143be360919f223176afeae88d1",
+        "sample": "2. Area Registry",
+        "sectionPayloadDigest": "387d9dcb2cc4c87aeff1311e7859bd6ae58a054e944f1308db4d8a1a44804bf3",
+        "followingBlockDigest": "ca9b55008482c55a9c860c3c957855a19075bdd07ef9e882435be2c6d2413069",
+        "identityFingerprint": "73cc47463387789866cde5fc3dd83d10df7a84e0767e0316fd5a6a03aa5abab3",
+        "ancestry": [
+          "Platform Documentation"
+        ],
+        "text": "## 2. Area Registry",
+        "sectionText": "## 2. Area Registry\n\nTarget area docs live at `docs/platform/<area>/`.\n\n| Area | Current source during migration |\n|---|---|\n| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |\n| `work-state` | [../specs/work-state.md](../specs/work-state.md) |\n| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |\n| [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |\n| [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |\n| [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |\n| `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |\n| `ui-spec` | [../ui-spec/](../ui-spec/) |\n| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `plans/260825-1841-knowledge-registry/plan.md` |"
+      }
+    },
+    {
+      "claimId": "claim_cb178b2f0832cfa84b1cbd611e0f7e3a",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "ca9b55008482c55a9c860c3c957855a19075bdd07ef9e882435be2c6d2413069",
+      "status": "candidate-unverified",
+      "shownText": "Target area docs live at `docs/platform/<area>/`.",
+      "shownTextDigest": "ca9b55008482c55a9c860c3c957855a19075bdd07ef9e882435be2c6d2413069",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 39,
+        "endLine": 39,
+        "textDigest": "ca9b55008482c55a9c860c3c957855a19075bdd07ef9e882435be2c6d2413069",
+        "sample": "Target area docs live at `docs/platform/<area>/`.",
+        "identityFingerprint": "e53221fb94586ca7918101aa3cb6069551dcbdf1963147a67fd170023257235f",
+        "ancestry": [
+          "Platform Documentation",
+          "2. Area Registry"
+        ],
+        "text": "Target area docs live at `docs/platform/<area>/`."
+      }
+    },
+    {
+      "claimId": "claim_ec78621ff44b9fe7fa47ce85bd84bfa6",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "f2d3701022f39f5669ec2aa50aa078458032d0aad4398630e3aaf3dcc5b353ca",
+      "status": "candidate-unverified",
+      "shownText": "| Area | Current source during migration |\n|---|---|\n| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |\n| `work-state` | [../specs/work-state.md](../specs/work-state.md) |\n| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |\n| [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |\n| [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |\n| [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |\n| `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |\n| `ui-spec` | [../ui-spec/](../ui-spec/) |\n| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `plans/260825-1841-knowledge-registry/plan.md` |",
+      "shownTextDigest": "f2d3701022f39f5669ec2aa50aa078458032d0aad4398630e3aaf3dcc5b353ca",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 41,
+        "endLine": 51,
+        "textDigest": "f2d3701022f39f5669ec2aa50aa078458032d0aad4398630e3aaf3dcc5b353ca",
+        "sample": "| Area | Current source during migration |\n|---|---|\n| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |\n| `work-state` | [../specs/work-state.md](../",
+        "identityFingerprint": "a64fe5651b695781599ad7efa333eadc1d62171bf009e0394a8cef3f9f4f0416",
+        "ancestry": [
+          "Platform Documentation",
+          "2. Area Registry"
+        ],
+        "text": "| Area | Current source during migration |\n|---|---|\n| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |\n| `work-state` | [../specs/work-state.md](../specs/work-state.md) |\n| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |\n| [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |\n| [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |\n| [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |\n| `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |\n| `ui-spec` | [../ui-spec/](../ui-spec/) |\n| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `plans/260825-1841-knowledge-registry/plan.md` |"
+      }
+    },
+    {
+      "claimId": "claim_e6c39f56c4d05238618e1a7fb7004af1",
+      "path": "docs/platform/README.md",
+      "anchor": "3-decision-surface",
+      "unitDigest": "5b577ba76c013ac3079053a37da9764292815a862e3d1519d54172d8d9bf7e3c",
+      "status": "candidate-unverified",
+      "shownText": "## 3. Decision Surface\n\n| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–02 are completed, Phases 03–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |",
+      "shownTextDigest": "46d748040e36f776fb8bd024f619ddef4f6bc88c148f0b9f8fa0216ecffbac0a",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "3. Decision Surface",
+        "anchor": "3-decision-surface",
+        "githubAnchor": "3-decision-surface",
+        "stableAnchor": "h-c9cbf4401a4b",
+        "startLine": 53,
+        "endLine": 53,
+        "textDigest": "5b577ba76c013ac3079053a37da9764292815a862e3d1519d54172d8d9bf7e3c",
+        "sample": "3. Decision Surface",
+        "sectionPayloadDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+        "followingBlockDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+        "identityFingerprint": "05bac3bdda78f251d2a45cfaa0114f36070f45f5f003deb6c60423140ae6d9b9",
+        "ancestry": [
+          "Platform Documentation"
+        ],
+        "text": "## 3. Decision Surface",
+        "sectionText": "## 3. Decision Surface\n\n| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–02 are completed, Phases 03–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |"
+      }
+    },
+    {
+      "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+      "status": "candidate-unverified",
+      "shownText": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–02 are completed, Phases 03–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |",
+      "shownTextDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 55,
+        "endLine": 61,
+        "textDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+        "sample": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance",
+        "identityFingerprint": "fe63eaa97a07c7508568bcb6a0773767319b96730cba46d11df8f7f86bf1d4df",
+        "ancestry": [
+          "Platform Documentation",
+          "3. Decision Surface"
+        ],
+        "text": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–02 are completed, Phases 03–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |"
+      }
+    },
+    {
+      "claimId": "claim_6143f65cb5e3d4d41e7b957306ab6e4e",
+      "path": "docs/platform/README.md",
+      "anchor": "4-how-to-change-platform-docs",
+      "unitDigest": "26ba4bbb4020dfcf0e9c7691d01fae431c0ade4e92ec48d9e28793ac84ccd34b",
+      "status": "candidate-unverified",
+      "shownText": "## 4. How To Change Platform Docs\n\n1. Read `docs/doc-governance.md`.\n2. Read [migration-authoring-rules.md](migration-authoring-rules.md) and [../transitional-switchboard.md](../transitional-switchboard.md).\n3. Read this portal and the relevant area portal/spec.\n4. Read the relevant vision and intent-preservation ledger when the change\n   narrows, stages, or simplifies the full design.\n5. Use a discussion scratchpad for multi-round shaping.\n6. Promote settled content into the right canonical doc.\n7. Update links and verification pointers.",
+      "shownTextDigest": "af132fe59e106381a1d86b9cb54b8f23e179925ee090d54d277c11b6fd24f94d",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "4. How To Change Platform Docs",
+        "anchor": "4-how-to-change-platform-docs",
+        "githubAnchor": "4-how-to-change-platform-docs",
+        "stableAnchor": "h-77a1e1305dab",
+        "startLine": 63,
+        "endLine": 63,
+        "textDigest": "26ba4bbb4020dfcf0e9c7691d01fae431c0ade4e92ec48d9e28793ac84ccd34b",
+        "sample": "4. How To Change Platform Docs",
+        "sectionPayloadDigest": "e4046fd7c27a762982d49241b30e3f99899719586530455fb4e9dfc7fbb6734f",
+        "followingBlockDigest": "e4046fd7c27a762982d49241b30e3f99899719586530455fb4e9dfc7fbb6734f",
+        "identityFingerprint": "48a282bb398d9f4f881ed6df795fa2a999f876f2f8fa29e42f5a14a4d4e020c9",
+        "ancestry": [
+          "Platform Documentation"
+        ],
+        "text": "## 4. How To Change Platform Docs",
+        "sectionText": "## 4. How To Change Platform Docs\n\n1. Read `docs/doc-governance.md`.\n2. Read [migration-authoring-rules.md](migration-authoring-rules.md) and [../transitional-switchboard.md](../transitional-switchboard.md).\n3. Read this portal and the relevant area portal/spec.\n4. Read the relevant vision and intent-preservation ledger when the change\n   narrows, stages, or simplifies the full design.\n5. Use a discussion scratchpad for multi-round shaping.\n6. Promote settled content into the right canonical doc.\n7. Update links and verification pointers."
+      }
+    },
+    {
+      "claimId": "claim_471738010525b3b6490003c96f408273",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "e4046fd7c27a762982d49241b30e3f99899719586530455fb4e9dfc7fbb6734f",
+      "status": "candidate-unverified",
+      "shownText": "1. Read `docs/doc-governance.md`.\n2. Read [migration-authoring-rules.md](migration-authoring-rules.md) and [../transitional-switchboard.md](../transitional-switchboard.md).\n3. Read this portal and the relevant area portal/spec.\n4. Read the relevant vision and intent-preservation ledger when the change\n   narrows, stages, or simplifies the full design.\n5. Use a discussion scratchpad for multi-round shaping.\n6. Promote settled content into the right canonical doc.\n7. Update links and verification pointers.",
+      "shownTextDigest": "e4046fd7c27a762982d49241b30e3f99899719586530455fb4e9dfc7fbb6734f",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 65,
+        "endLine": 72,
+        "textDigest": "e4046fd7c27a762982d49241b30e3f99899719586530455fb4e9dfc7fbb6734f",
+        "sample": "1. Read `docs/doc-governance.md`.\n2. Read [migration-authoring-rules.md](migration-authoring-rules.md) and [../transitional-switchboard.md](../transitional-switchboard.md).\n3. Read",
+        "identityFingerprint": "c5533ea89efe2eb51d486871d591384832a74f5d1b7f9c613bd384a851ca861b",
+        "ancestry": [
+          "Platform Documentation",
+          "4. How To Change Platform Docs"
+        ],
+        "text": "1. Read `docs/doc-governance.md`.\n2. Read [migration-authoring-rules.md](migration-authoring-rules.md) and [../transitional-switchboard.md](../transitional-switchboard.md).\n3. Read this portal and the relevant area portal/spec.\n4. Read the relevant vision and intent-preservation ledger when the change\n   narrows, stages, or simplifies the full design.\n5. Use a discussion scratchpad for multi-round shaping.\n6. Promote settled content into the right canonical doc.\n7. Update links and verification pointers."
+      }
+    },
+    {
+      "claimId": "claim_cf06097fa740bba9d230af78ec04463d",
+      "path": "docs/platform/README.md",
+      "anchor": "5-related-files",
+      "unitDigest": "c216275c70704b3851ca22c07410a6743b69a249a0fda11cf67bc8b848cce2a5",
+      "status": "candidate-unverified",
+      "shownText": "## 5. Related Files\n\n| Relationship | File |\n|---|---|\n| governs docs | [../doc-governance.md](../doc-governance.md) |\n| operative transitional switchboard | [../transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [migration-authoring-rules.md](migration-authoring-rules.md) |\n| routes readers | [../reading-map.md](../reading-map.md) |\n| defines platform direction | [vision.md](vision.md) |\n| preserves platform intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| defines durable laws | [platform-foundations.md](platform-foundations.md) |\n| maps architecture | [architecture-map.md](architecture-map.md) |\n| maps component boundaries | [component-boundary.md](component-boundary.md) |\n| preserves deferred documentation-system architecture | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| proposes full documentation operating system | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) |\n| plans near-term authority unification | `plans/260925-documentation-authority-unification/plan.md` |",
+      "shownTextDigest": "018ea3cc3b32fa90786c98ed1e78b367f5499b2f573971312efe6ff7f827e8b6",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "5. Related Files",
+        "anchor": "5-related-files",
+        "githubAnchor": "5-related-files",
+        "stableAnchor": "h-553950624328",
+        "startLine": 74,
+        "endLine": 74,
+        "textDigest": "c216275c70704b3851ca22c07410a6743b69a249a0fda11cf67bc8b848cce2a5",
+        "sample": "5. Related Files",
+        "sectionPayloadDigest": "233073464aa7a066ec6812e54a3bbc87f523a2f83c8b0a1c87d09448296f8c74",
+        "followingBlockDigest": "233073464aa7a066ec6812e54a3bbc87f523a2f83c8b0a1c87d09448296f8c74",
+        "identityFingerprint": "6d7eb7bfc59e37763e502e3dc1c685defb5dd96ef96896b525d3c2c607320005",
+        "ancestry": [
+          "Platform Documentation"
+        ],
+        "text": "## 5. Related Files",
+        "sectionText": "## 5. Related Files\n\n| Relationship | File |\n|---|---|\n| governs docs | [../doc-governance.md](../doc-governance.md) |\n| operative transitional switchboard | [../transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [migration-authoring-rules.md](migration-authoring-rules.md) |\n| routes readers | [../reading-map.md](../reading-map.md) |\n| defines platform direction | [vision.md](vision.md) |\n| preserves platform intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| defines durable laws | [platform-foundations.md](platform-foundations.md) |\n| maps architecture | [architecture-map.md](architecture-map.md) |\n| maps component boundaries | [component-boundary.md](component-boundary.md) |\n| preserves deferred documentation-system architecture | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| proposes full documentation operating system | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) |\n| plans near-term authority unification | `plans/260925-documentation-authority-unification/plan.md` |"
+      }
+    },
+    {
+      "claimId": "claim_b9ae3399674ba8e92c79e75b7b35c6c3",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "233073464aa7a066ec6812e54a3bbc87f523a2f83c8b0a1c87d09448296f8c74",
+      "status": "candidate-unverified",
+      "shownText": "| Relationship | File |\n|---|---|\n| governs docs | [../doc-governance.md](../doc-governance.md) |\n| operative transitional switchboard | [../transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [migration-authoring-rules.md](migration-authoring-rules.md) |\n| routes readers | [../reading-map.md](../reading-map.md) |\n| defines platform direction | [vision.md](vision.md) |\n| preserves platform intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| defines durable laws | [platform-foundations.md](platform-foundations.md) |\n| maps architecture | [architecture-map.md](architecture-map.md) |\n| maps component boundaries | [component-boundary.md](component-boundary.md) |\n| preserves deferred documentation-system architecture | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| proposes full documentation operating system | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) |\n| plans near-term authority unification | `plans/260925-documentation-authority-unification/plan.md` |",
+      "shownTextDigest": "233073464aa7a066ec6812e54a3bbc87f523a2f83c8b0a1c87d09448296f8c74",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 76,
+        "endLine": 89,
+        "textDigest": "233073464aa7a066ec6812e54a3bbc87f523a2f83c8b0a1c87d09448296f8c74",
+        "sample": "| Relationship | File |\n|---|---|\n| governs docs | [../doc-governance.md](../doc-governance.md) |\n| operative transitional switchboard | [../transitional-switchboard.md](../transit",
+        "identityFingerprint": "07ac612f293671b3f8d80b112a3a1f8a6228d4029fc95d4ef2dab3863c0716fc",
+        "ancestry": [
+          "Platform Documentation",
+          "5. Related Files"
+        ],
+        "text": "| Relationship | File |\n|---|---|\n| governs docs | [../doc-governance.md](../doc-governance.md) |\n| operative transitional switchboard | [../transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [migration-authoring-rules.md](migration-authoring-rules.md) |\n| routes readers | [../reading-map.md](../reading-map.md) |\n| defines platform direction | [vision.md](vision.md) |\n| preserves platform intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| defines durable laws | [platform-foundations.md](platform-foundations.md) |\n| maps architecture | [architecture-map.md](architecture-map.md) |\n| maps component boundaries | [component-boundary.md](component-boundary.md) |\n| preserves deferred documentation-system architecture | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| proposes full documentation operating system | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) |\n| plans near-term authority unification | `plans/260925-documentation-authority-unification/plan.md` |"
+      }
+    },
+    {
+      "claimId": "claim_e88d54e093c0cbc64cf8a291109760aa",
+      "path": "docs/platform/README.md",
+      "anchor": "added-in-candidate-readme-source-carriage",
+      "unitDigest": "7ae95d9a526d22db68c323a88db9e35e1ec667750e5a4616445c67012f0669e8",
+      "status": "candidate-unverified",
+      "shownText": "## Added in candidate: README source carriage\n\nCarriage from `docs/architect/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+      "shownTextDigest": "846f9c1d0f178e731ee0771f3a4bc01bc3b614a4b628855009937177295c866c",
+      "nativeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Added in candidate: README source carriage",
+        "anchor": "added-in-candidate-readme-source-carriage",
+        "githubAnchor": "added-in-candidate-readme-source-carriage",
+        "stableAnchor": "h-b9682c640121",
+        "startLine": 91,
+        "endLine": 91,
+        "textDigest": "7ae95d9a526d22db68c323a88db9e35e1ec667750e5a4616445c67012f0669e8",
+        "sample": "Added in candidate: README source carriage",
+        "sectionPayloadDigest": "921a04d4bd874a25f9f0f4abb48bb704c8eb0203baacd7b5b20407d268aa1638",
+        "followingBlockDigest": "921a04d4bd874a25f9f0f4abb48bb704c8eb0203baacd7b5b20407d268aa1638",
+        "identityFingerprint": "9849258c6ffcda26ae7d574e9b22f7359a2f06c0d5c7560ae5c2a28ca8b4e6c2",
+        "ancestry": [
+          "Platform Documentation"
+        ],
+        "text": "## Added in candidate: README source carriage",
+        "sectionText": "## Added in candidate: README source carriage\n\nCarriage from `docs/architect/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+      }
+    },
+    {
+      "claimId": "claim_fdf5951f6ac14750049b17bc79477f9c",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "921a04d4bd874a25f9f0f4abb48bb704c8eb0203baacd7b5b20407d268aa1638",
+      "status": "candidate-unverified",
+      "shownText": "Carriage from `docs/architect/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+      "shownTextDigest": "921a04d4bd874a25f9f0f4abb48bb704c8eb0203baacd7b5b20407d268aa1638",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 93,
+        "endLine": 93,
+        "textDigest": "921a04d4bd874a25f9f0f4abb48bb704c8eb0203baacd7b5b20407d268aa1638",
+        "sample": "Carriage from `docs/architect/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and p",
+        "identityFingerprint": "4e926758ba79c1c90dbf737798164b6371936c1d709da6394ae0cc256e539490",
+        "ancestry": [
+          "Platform Documentation",
+          "Added in candidate: README source carriage"
+        ],
+        "text": "Carriage from `docs/architect/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+      }
+    },
+    {
+      "claimId": "claim_a5bea09289d356820c12b650f473b9a5",
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "29832c476e0e8af9e461a1d23df4767e64382135d014ec3b3160de320e645d6d",
+      "status": "candidate-unverified",
+      "shownText": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architecture-intent.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/architecture-intent.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob e72b0e930345e01bca1b97c81fd7a528092cd098)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/architecture-intent.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/architecture-intent.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```",
+      "shownTextDigest": "29832c476e0e8af9e461a1d23df4767e64382135d014ec3b3160de320e645d6d",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 21,
+        "textDigest": "29832c476e0e8af9e461a1d23df4767e64382135d014ec3b3160de320e645d6d",
+        "sample": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architecture-intent.md source at its frozen-map candidate o",
+        "identityFingerprint": "d7caa012f26d2e71ac3d17aff099adb7df9662ff243c004a4e6cc3fb1b245ec3",
+        "ancestry": [
+          "Architecture Intent"
+        ],
+        "text": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architecture-intent.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/architecture-intent.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob e72b0e930345e01bca1b97c81fd7a528092cd098)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/architecture-intent.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/architecture-intent.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```"
+      }
+    },
+    {
+      "claimId": "claim_ac1a0faff59618ebf38ccf8e6000fd40",
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified",
+      "shownText": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion.",
+      "shownTextDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+        "sample": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Curren",
+        "identityFingerprint": "13fbdbccd37af4d8cf83c4e828a422e45d84868d0e5a604f625e063b5372d4d4",
+        "ancestry": [
+          "Architecture Intent"
+        ],
+        "text": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion."
+      }
+    },
+    {
+      "claimId": "claim_6cd449ef115de0465d810e5dfccc2bc7",
+      "path": "docs/platform/system-architecture/architecture/roadmap.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "76468776b88732bb4e083b27d96380bb697fc12ccd88a349be860800200ef2a0",
+      "status": "candidate-unverified",
+      "shownText": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete roadmap.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/roadmap.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 9f457e6a5bc4dfe7da05a6f7dec7c14aa5dc44a3)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/roadmap.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/roadmap.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```",
+      "shownTextDigest": "76468776b88732bb4e083b27d96380bb697fc12ccd88a349be860800200ef2a0",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 21,
+        "textDigest": "76468776b88732bb4e083b27d96380bb697fc12ccd88a349be860800200ef2a0",
+        "sample": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete roadmap.md source at its frozen-map candidate owner\nDesign ",
+        "identityFingerprint": "10c243d039761c92e2b05bde983a31adae0ce44e85568cddc7e36f5aa573a554",
+        "ancestry": [
+          "Architect Roadmap"
+        ],
+        "text": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete roadmap.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/roadmap.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 9f457e6a5bc4dfe7da05a6f7dec7c14aa5dc44a3)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/roadmap.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/roadmap.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```"
+      }
+    },
+    {
+      "claimId": "claim_d63d7990151f2781a8a4da339c62ac64",
+      "path": "docs/platform/system-architecture/architecture/roadmap.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified",
+      "shownText": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion.",
+      "shownTextDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+        "sample": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Curren",
+        "identityFingerprint": "13fbdbccd37af4d8cf83c4e828a422e45d84868d0e5a604f625e063b5372d4d4",
+        "ancestry": [
+          "Architect Roadmap"
+        ],
+        "text": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion."
+      }
+    },
+    {
+      "claimId": "claim_3194ec35382127f6edde53d0697a232d",
+      "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "c0c113ba85ee7b2d4de003e40d27463f653fe08013463bb68aa5830df5015113",
+      "status": "candidate-unverified",
+      "shownText": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete system-vision-trong-mem-ngoai-cung.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/system-vision-trong-mem-ngoai-cung.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 473dd8f1f28f4573194c47ca787973c52cc65756)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/system-vision-trong-mem-ngoai-cung.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/system-vision-trong-mem-ngoai-cung.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```",
+      "shownTextDigest": "c0c113ba85ee7b2d4de003e40d27463f653fe08013463bb68aa5830df5015113",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 21,
+        "textDigest": "c0c113ba85ee7b2d4de003e40d27463f653fe08013463bb68aa5830df5015113",
+        "sample": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete system-vision-trong-mem-ngoai-cung.md source at its frozen-",
+        "identityFingerprint": "338db25a33185c0e2c7618c516a3b5e81daf0dc2b57aa11ecf2b5d4ee7da2fee",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete system-vision-trong-mem-ngoai-cung.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/system-vision-trong-mem-ngoai-cung.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 473dd8f1f28f4573194c47ca787973c52cc65756)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/system-vision-trong-mem-ngoai-cung.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/system-vision-trong-mem-ngoai-cung.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```"
+      }
+    },
+    {
+      "claimId": "claim_3a39f4a6f5622e7db7a9913956c9aa6e",
+      "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified",
+      "shownText": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion.",
+      "shownTextDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+        "sample": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Curren",
+        "identityFingerprint": "13fbdbccd37af4d8cf83c4e828a422e45d84868d0e5a604f625e063b5372d4d4",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung"
+        ],
+        "text": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion."
+      }
+    },
+    {
+      "claimId": "claim_1200f05152a6a9b464b6c12bc17f21db",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "b851e6ad89a3503be3a6cbdf0b6a4e6b9ef978e2aefa616c3032ddc3235b7599",
+      "status": "candidate-unverified",
+      "shownText": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete workspace-topology-audit.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/workspace-topology-audit.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 024cac1f17203b20d4fcfdf95d1672c17fd4e5a5)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/workspace-topology-audit.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/workspace-topology-audit.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```",
+      "shownTextDigest": "b851e6ad89a3503be3a6cbdf0b6a4e6b9ef978e2aefa616c3032ddc3235b7599",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 21,
+        "textDigest": "b851e6ad89a3503be3a6cbdf0b6a4e6b9ef978e2aefa616c3032ddc3235b7599",
+        "sample": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete workspace-topology-audit.md source at its frozen-map candid",
+        "identityFingerprint": "2e07d2e3dc20e90687134992d5e350809e67491e6dae2955427da8fe6af24942",
+        "ancestry": [
+          "Workspace Topology Codebase Audit"
+        ],
+        "text": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete workspace-topology-audit.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/workspace-topology-audit.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 024cac1f17203b20d4fcfdf95d1672c17fd4e5a5)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/workspace-topology-audit.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/workspace-topology-audit.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```"
+      }
+    },
+    {
+      "claimId": "claim_b5f698f6088c010eec3a5fa77d0e9e61",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified",
+      "shownText": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion.",
+      "shownTextDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+        "sample": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Curren",
+        "identityFingerprint": "13fbdbccd37af4d8cf83c4e828a422e45d84868d0e5a604f625e063b5372d4d4",
+        "ancestry": [
+          "Workspace Topology Codebase Audit"
+        ],
+        "text": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion."
+      }
+    },
+    {
+      "claimId": "claim_638ffba5b4214918a4123ad8ac2def28",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "120fffc25f8269b4e34d850a9c84e43796aa1fafc9cd67808c67ecd0579b9042",
+      "status": "candidate-unverified",
+      "shownText": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete workspace-topology-roadmap.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/workspace-topology-roadmap.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 17fefba5747976105b7797be9e99e7dfc9bed510)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/workspace-topology-roadmap.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/workspace-topology-roadmap.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```",
+      "shownTextDigest": "120fffc25f8269b4e34d850a9c84e43796aa1fafc9cd67808c67ecd0579b9042",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 21,
+        "textDigest": "120fffc25f8269b4e34d850a9c84e43796aa1fafc9cd67808c67ecd0579b9042",
+        "sample": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete workspace-topology-roadmap.md source at its frozen-map cand",
+        "identityFingerprint": "d8509c47b56552ff9c1506c95e338cccd2ef719efe1466659bfa35afa2b143e9",
+        "ancestry": [
+          "Workspace Topology Roadmap"
+        ],
+        "text": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete workspace-topology-roadmap.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/workspace-topology-roadmap.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 17fefba5747976105b7797be9e99e7dfc9bed510)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/workspace-topology-roadmap.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/workspace-topology-roadmap.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```"
+      }
+    },
+    {
+      "claimId": "claim_faf6a192a58c297957a66b34b5e395d7",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified",
+      "shownText": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion.",
+      "shownTextDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+        "sample": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Curren",
+        "identityFingerprint": "13fbdbccd37af4d8cf83c4e828a422e45d84868d0e5a604f625e063b5372d4d4",
+        "ancestry": [
+          "Workspace Topology Roadmap"
+        ],
+        "text": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion."
+      }
+    },
+    {
+      "claimId": "claim_ba08d1a48089f77718d81c9b2c825202",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "e44eb7add5cc37f535199ac750be110dd7e016fcab5900b300da62673e7f921f",
+      "status": "candidate-unverified",
+      "shownText": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete workspace-topology.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/workspace-topology.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 0513cd70c080c546bb009a253adab60dbb5d43f1)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/workspace-topology.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/workspace-topology.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```",
+      "shownTextDigest": "e44eb7add5cc37f535199ac750be110dd7e016fcab5900b300da62673e7f921f",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 21,
+        "textDigest": "e44eb7add5cc37f535199ac750be110dd7e016fcab5900b300da62673e7f921f",
+        "sample": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete workspace-topology.md source at its frozen-map candidate ow",
+        "identityFingerprint": "5cc74aa53e2bd54f21edbd2a56e974e1adc5062f1a26513e3fede3ca9dba650f",
+        "ancestry": [
+          "Workspace Topology Architecture"
+        ],
+        "text": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete workspace-topology.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/workspace-topology.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 0513cd70c080c546bb009a253adab60dbb5d43f1)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/workspace-topology.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/workspace-topology.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```"
+      }
+    },
+    {
+      "claimId": "claim_411decb502d39d43876c5d7da7e1cf7f",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified",
+      "shownText": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion.",
+      "shownTextDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+        "sample": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Curren",
+        "identityFingerprint": "13fbdbccd37af4d8cf83c4e828a422e45d84868d0e5a604f625e063b5372d4d4",
+        "ancestry": [
+          "Workspace Topology Architecture"
+        ],
+        "text": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion."
+      }
+    },
+    {
+      "claimId": "claim_0dc85618100636a09598f0d426315ac8",
+      "path": "docs/platform/system-overview/spec.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "7149b336edba9024596b27d6733db1774fc939667ae9f7962e1e17948534a9b6",
+      "status": "candidate-unverified",
+      "shownText": "```txt\nDocument type: Area spec\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete system-overview.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/specs/system-overview.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob c24c5561dc60cce7e53d0a0c5e34ff97414845ac)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/specs/system-overview.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/specs/system-overview.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```",
+      "shownTextDigest": "7149b336edba9024596b27d6733db1774fc939667ae9f7962e1e17948534a9b6",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 21,
+        "textDigest": "7149b336edba9024596b27d6733db1774fc939667ae9f7962e1e17948534a9b6",
+        "sample": "```txt\nDocument type: Area spec\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete system-overview.md source at its frozen-map candidate owner\nDe",
+        "identityFingerprint": "64439131ddfa328a43cdacf5f63e07e06ca68ab07ae51f51fd1acd7cc961f3e9",
+        "ancestry": [
+          "Spec: System Overview"
+        ],
+        "text": "```txt\nDocument type: Area spec\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete system-overview.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/specs/system-overview.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob c24c5561dc60cce7e53d0a0c5e34ff97414845ac)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/specs/system-overview.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/specs/system-overview.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```"
+      }
+    },
+    {
+      "claimId": "claim_bb7cef766e9e315e8d571c2439266591",
+      "path": "docs/platform/system-overview/spec.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified",
+      "shownText": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion.",
+      "shownTextDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+        "sample": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Curren",
+        "identityFingerprint": "13fbdbccd37af4d8cf83c4e828a422e45d84868d0e5a604f625e063b5372d4d4",
+        "ancestry": [
+          "Spec: System Overview"
+        ],
+        "text": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion."
+      }
+    },
+    {
+      "claimId": "claim_ac724d4356d7b0991556746868bdf769",
+      "path": "docs/platform/system-overview/spec.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "c14e6d885d8ddd0d15c5c8e447c051e813669cf0889523b27d14ab00267a9ea8",
+      "status": "candidate-unverified",
+      "shownText": "Added in candidate: original source frontmatter (verbatim provenance).",
+      "shownTextDigest": "c14e6d885d8ddd0d15c5c8e447c051e813669cf0889523b27d14ab00267a9ea8",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "c14e6d885d8ddd0d15c5c8e447c051e813669cf0889523b27d14ab00267a9ea8",
+        "sample": "Added in candidate: original source frontmatter (verbatim provenance).",
+        "identityFingerprint": "8b31b94e584a59d450c62335804ac88da2f858fcdf5b241a6ccc9de960a4ec7f",
+        "ancestry": [
+          "Spec: System Overview"
+        ],
+        "text": "Added in candidate: original source frontmatter (verbatim provenance)."
+      }
+    }
+  ]
+}
