@@ -1,0 +1,374 @@
+{
+  "version": 1,
+  "contentCommit": "b1e53b4fb0e99963328e84b63a4764c0d87abb21",
+  "requests": [
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0027-root-truth-resume.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0027-root-truth-resume.md",
+      "entries": 35,
+      "mode": "Truth: 100% corrected units and A22 rebound/successor conservation",
+      "packSHA256": "87c4c2ddc235f9524b81f7c6ebe07d76109e24dacbe8b5bfa7e1b6fdb3a65357",
+      "differingDigestRows": [
+        "truth-docs/platform/work-state/spec.md#2-entry-points-and-triggers",
+        "truth-docs/platform/work-state/spec.md#unheaded-block-3",
+        "truth-docs/platform/work-state/spec.md#planning-stage",
+        "truth-docs/platform/work-state/spec.md#unheaded-block-39",
+        "truth-docs/platform/work-state/spec.md#7-pull-door-take-and-return",
+        "truth-docs/platform/work-state/spec.md#unheaded-block-55",
+        "truth-docs/platform/work-state/spec.md#init-verb",
+        "truth-docs/platform/work-state/spec.md#unheaded-block-64",
+        "truth-docs/platform/work-state/spec.md#submit-verb",
+        "truth-docs/platform/work-state/spec.md#unheaded-block-67",
+        "truth-docs/platform/work-state/spec.md#discover-verb",
+        "truth-docs/platform/work-state/spec.md#unheaded-block-68",
+        "truth-docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack",
+        "truth-docs/platform/platform-foundations.md#unheaded-block-12",
+        "claim_b8dbd6e5b0014db31359419b93bb22f7",
+        "claim_32d0beb22a64eadc4714946feef4bb4c",
+        "claim_bf41e5090dd12c430e3a55206ea11658",
+        "claim_e56acda46bfc3c474d9bb6eed3c6b2ac",
+        "claim_bee83aee35ec25ec87d88a57a984cf50",
+        "claim_e3d06a1b8f2bf25a2fb2a85d80cdf7db",
+        "claim_44e9aa951025f9b7e71066c325ec7df1",
+        "claim_05086f8eb3a7fe8c76475c68250251ce",
+        "claim_34205657a84c4f1e6610db2ea48aecde",
+        "claim_be95c2d548d7fa5a1d2406be5584a36a",
+        "claim_8f6ab9b2c2de71369769d27719a09b8e",
+        "claim_a5326477491a9bc30a98744da8e9bfb9",
+        "claim_6174137a754842159b087cb0c603e8e5",
+        "claim_ec5d5e0befef92d8598542ed3b0db18f",
+        "claim_2d8114529b804f49494e6d42548e1372",
+        "claim_eb0bf7783bb1b1027c012f050c782203",
+        "claim_3c9b65402d8ece4ef57ad337ba5d9d72",
+        "claim_1f9fb4feceda8f5bf6a18b151ce0a397",
+        "claim_acab595482e4f9f7ae05e21a1a28f11b",
+        "claim_7c4295aa058b6a7fa5c6b945a0441a35",
+        "claim_02a2110f086ac00ef2d59c9d4d9afeb1"
+      ]
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0027-root-pending-resume.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0027-root-pending-resume.md",
+      "entries": 18,
+      "mode": "A36: previous bounded alias, reopened decision and retained-path wording re-review",
+      "packSHA256": "cbddc3777b72f6937ac6cfc67ce93da772be754025f5e471f330d9a27a26e6c9",
+      "differingDigestRows": [
+        "claim_0956ea2eadf0a32787b7fd0e51d693a6",
+        "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "claim_c295c4c899afa37544bda841421c92e4",
+        "claim_d7660c15ae6c2d2e7d610c1aa571101c",
+        "claim_743cde02b9562c5f8e4724512ee6fc8f",
+        "claim_56db2b3b7a6258289e1ab13f5c69d47f",
+        "claim_60329d1f27688d4a78c094951d5ac119",
+        "claim_337ac8c09351c841eae612279299eb52",
+        "claim_1be7573f879e8eda05723b6d40b3b84e",
+        "root-authorities-draft-0263",
+        "root-authorities-draft-0300",
+        "retained-path-01",
+        "retained-path-02",
+        "retained-path-04",
+        "retained-path-05",
+        "retained-path-06"
+      ]
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-01.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-01.md",
+      "entries": 75,
+      "mode": "A31: merge conflict resolutions, created conservation rows and evidence-pin accounting only",
+      "packSHA256": "cb58fb10bd52ce79102b3bb4fb06e7eb4e84ed2e51fda276caf15e95815c5b55",
+      "differingDigestRows": [
+        "conflict-docs/platform/agent-coordination/README.md",
+        "conflict-docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+        "conflict-docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+        "conflict-docs/specs/reading-map.md",
+        "claim_9c6c68acbcd413ec5d826804b07650c0",
+        "claim_9959e82e2874baeb627a8441faa07e9a",
+        "claim_ce947d10ed900598bde4df5b552e0265",
+        "claim_477a30f4902261e390c34ab888145dcd",
+        "claim_fda67d0dfc15159dc0e4c62b9dfddd87",
+        "claim_19495d2772ced1aa1af4b20d4640fa3a",
+        "claim_e2377849e4ba8e3d3beaf70880e4ed23",
+        "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+        "claim_2b155082055823ccabf6fb40242abe42",
+        "claim_992a812b2fcaa4f93dd86d2190d7ac3a",
+        "claim_dd296404e1163caafba00641cf0adc79",
+        "claim_bbeafe6e3e5396a33b48f77c3dec9756",
+        "claim_f4a5ce7ed6d48bdbbe996501f088c288",
+        "claim_f42fcb530d066e79cb2632b13a7faa0e",
+        "claim_16c34b67099ca4c97df600750a78d72c",
+        "claim_d7b301f8fb707e0d981814d24bb15baf",
+        "claim_ebe7d2366429303cb74938b60f5cf2fb",
+        "claim_7c56791bc2955ef63687b7134d2cd053",
+        "claim_ab182560a5142f22e010e35a97b115dc",
+        "claim_d277029b4e3a80bc6eb3c33a7990b182",
+        "claim_194da7d0a9b40e6ba93d40df2b58eaec",
+        "claim_a5297db7dd5392e3acf511564f7cb642",
+        "claim_4eeb2f406288458e61bad21531966ab1",
+        "claim_7b2641076e23f0d2528c250d4e59cba2",
+        "claim_a1a323052194c5140b628b5f3861fa05",
+        "claim_797fb0be5db3c260c97745cd0894bec8",
+        "claim_8e290abbe8f1344bf8f19c997da11921",
+        "claim_bdfe277773eef55558042590ce9590af",
+        "claim_4b96f4f42ea417623dcc794155fa17ce",
+        "claim_0c7119af692eb2f3eb43cf2e9f4fdbbd",
+        "claim_142558254b0fa5e0b0fe78096f4caa9c",
+        "claim_d11900e7305d31956a2f066f6e29db57",
+        "claim_e0e3f54e0ac694fa7a5542eac3f7a721",
+        "claim_44e6d52dac61b16b646f7fadc1a8afe7",
+        "claim_e5e2846158bbd249d1ebbd70161f02a0",
+        "claim_b8fa7fa2cd614433de754bbb92302140",
+        "claim_f7459f118bd93b8769e6c90ace8c68fe",
+        "claim_f703aeda7755ab376e6e3eee88eb82c2",
+        "claim_53838c4268148341ce0069394572d0eb",
+        "claim_daaf3726036adad15b2529ad43f71d44",
+        "claim_d956ba3fb9a8cce9589194e5f59d021f",
+        "claim_d76334798a7de5ca967d48855418497f",
+        "claim_9be8a10fa3ce503d2ebc2ffe6ffc76ad",
+        "claim_045b588f4d839f90c40b48fbc0fc3f4d",
+        "claim_b69096018a7da1d3dc629b5d37f6fdac",
+        "claim_5c520fcb1a68ba27e2093341834258c7",
+        "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+        "claim_47e8159f8179edd8e17fd67c744d1e89",
+        "claim_1a97144c81c563726dfeb3413c4eaddc",
+        "claim_755cc3f7baeabc42702373bb6d09154c",
+        "claim_f162d77427a68d4fd4ba8a43c39ba746",
+        "claim_e8446ab5cec97974f2099db88f606c3f"
+      ]
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-02.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-02.md",
+      "entries": 75,
+      "mode": "A31: merge conflict resolutions, created conservation rows and evidence-pin accounting only",
+      "packSHA256": "07628e0b7da352fbf8ffdef820ba7c4ce871f21630895abb131e353dfeff170f",
+      "differingDigestRows": [
+        "claim_6b514c8b4b2a093c292c034910f88967",
+        "claim_4aaead9c70d5ee34ecd075e726a5ada3",
+        "claim_ba149847526096094f03951b68e8de88",
+        "claim_e5e168e23061583ac8d6e17486ddaef7",
+        "claim_942340421f82e17fab0ef9d210141a65",
+        "claim_b6ff5b306a6ee73547e62548362341b9",
+        "claim_4b1910a70def813eb4f7f5aed13f3d0c",
+        "claim_25e7de5470ee9fda566c3de5be00f57b",
+        "claim_5ad7915f076019507cae1a93c14ad2d7",
+        "claim_0b03338bd7576f97d0cd046630a49fee",
+        "claim_d85a5331d5712b2f5c2ecd9cab60e487",
+        "claim_b741539a16b6eb2792ca6c4178b23671",
+        "claim_4b0be5d6b3c4382616bd5748e7bd6c94",
+        "claim_19b74556b576db8c4a0acfdd6e5fe1fe",
+        "claim_c3f7f02e554068e22d81262ad18df6df",
+        "claim_5f8671a3f3421989a05e27f088a086ef",
+        "claim_d8d20682950e9f29f5fbce07c6a850c3",
+        "claim_7ae2ffc8a883b917293312f8b63805eb",
+        "claim_75041e871c0b191949808b55f541184d",
+        "claim_b9b42545b42b04889685191ada1a3892",
+        "claim_2f7cbb5fabfc5e77f7014c54f020c524",
+        "claim_c201fb480171293641c2fb049fd33936",
+        "claim_199501685fd82d464892f7a06aad9516",
+        "claim_73221307a66a364372a7f8206227e62f",
+        "claim_05845829294e08426b2f9395aab26d05",
+        "claim_8e98d801bec98373306633c016311e24",
+        "claim_4217ac86de0ba075ca046202b2ce4284",
+        "claim_0bf4d10d1c0f4cda16abe6091d639b64",
+        "claim_bc055098a9e2bedf2ed30ab0dfcacf79",
+        "claim_3d2d87a2a9582e2faebabc79470d8ee8",
+        "claim_975c8349e0d069aabf88161d933f2228",
+        "claim_b7876fcb567891ddc8431cdab2f2dab0",
+        "claim_c2cb6de3e8b1288ed15fcd60f3154bbb",
+        "claim_dd06c2555dc0e81c54c80376fee8ff91",
+        "claim_9c7e133ec44851189185dbb7b04a78a0",
+        "claim_7a0776311f7105750a4f234681f513a3",
+        "claim_35d0f259a0c0828577dcfd003821fb3a",
+        "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+        "claim_1d724afb521915455a45db2b1f3b34cd",
+        "claim_b91c86788522c3516bef2c7bab859093",
+        "claim_4a023fa2faa879fb0e1dfd8bc5c051e7",
+        "claim_7333c439fa8d29886b82168e015ca113",
+        "claim_522c26efde7ef029b3ce6e25829a8915",
+        "claim_f1eca3e6fcc3886007fa5de37d686e54",
+        "claim_9bb5739f68a7b4bafcd959ef59104e6a",
+        "claim_500d588a939fd6109cf102b8343484bb",
+        "claim_d9db34871d7f7b24bdfaa6790972929e",
+        "claim_0abb403f0f4bb4bb6b916849e4895d65",
+        "claim_5bcbc702fe7871f4aa75438608e11ed5",
+        "claim_9791b2c8e56e8a5c2ade4a9aa217983a",
+        "claim_aa3eea4d98170ab62b6b47ef96e1b60a",
+        "claim_09ff561d37bbda20da2142e7689f648e",
+        "claim_4bc815996fac3aa23edd525c535de0cf",
+        "claim_1c3bcebb94ec5ac3461041e669efe71d",
+        "claim_55c394350b3154e23c7c3a1287088301",
+        "claim_e41b4bcf688480211f8708d1ba9165a9",
+        "claim_0264cb8f75e6809260542f2c469d101f"
+      ]
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-03.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-03.md",
+      "entries": 75,
+      "mode": "A31: merge conflict resolutions, created conservation rows and evidence-pin accounting only",
+      "packSHA256": "555da3fbc5b97a44907cc47d9606c632690e9edc7330d7e1281f899d517ebac2",
+      "differingDigestRows": []
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-04.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-04.md",
+      "entries": 25,
+      "mode": "A31: merge conflict resolutions, created conservation rows and evidence-pin accounting only",
+      "packSHA256": "ee8adfcff2e14996bd6b56421604c3120b49d028c57e43754ff769e8d8a1b76d",
+      "differingDigestRows": [
+        "classification-claim_75041e871c0b191949808b55f541184d",
+        "classification-claim_0e2474daa2e50a259dd3a37b94f26b81",
+        "classification-claim_b9b42545b42b04889685191ada1a3892"
+      ]
+    }
+  ],
+  "conventionCalls": [
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "root-truth-resume",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0027-root-truth-resume.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "root-truth-resume",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0027-root-truth-resume.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "root-pending-resume",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0027-root-pending-resume.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "root-pending-resume",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0027-root-pending-resume.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "boundary-sync-resume-01",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-01.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "boundary-sync-resume-01",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-01.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "boundary-sync-resume-02",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-02.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "boundary-sync-resume-02",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-02.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "boundary-sync-resume-03",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-03.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "boundary-sync-resume-03",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-03.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "boundary-sync-resume-04",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-04.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "boundary-sync-resume-04",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-04.md"
+    }
+  ],
+  "priorConventionCalls": [
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "root-truth-resume",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0027-root-truth-resume.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "root-truth-resume",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0027-root-truth-resume.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "root-pending-resume",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0027-root-pending-resume.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "root-pending-resume",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0027-root-pending-resume.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "boundary-sync-resume-01",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-01.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "boundary-sync-resume-01",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-01.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "boundary-sync-resume-02",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-02.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "boundary-sync-resume-02",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-02.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "boundary-sync-resume-03",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-03.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "boundary-sync-resume-03",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-03.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-pack",
+      "slug": "boundary-sync-resume-04",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-04.md"
+    },
+    {
+      "reusedConventionName": true,
+      "type": "review-request",
+      "slug": "boundary-sync-resume-04",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-04.md"
+    }
+  ]
+}

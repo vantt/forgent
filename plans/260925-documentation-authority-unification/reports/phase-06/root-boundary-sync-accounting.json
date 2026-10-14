@@ -7548,7 +7548,7 @@
         "claimId": "claim_522c26efde7ef029b3ce6e25829a8915",
         "sourceAnchor": "trợ-giúp-theo-từng-verb-fgos---help",
         "unitKind": "heading",
-        "sourceUnitDigest": "aadcac783bf59267",
+        "sourceUnitDigest": "aadcac783bf592674ae3d58de41b7e75038b16e2550de06a19c322c91a088be9",
         "claimKind": "contract",
         "status": "removed-pending-disposition",
         "priorStatus": "current",
@@ -7568,7 +7568,7 @@
         "claimId": "claim_9bb5739f68a7b4bafcd959ef59104e6a",
         "sourceAnchor": "unheaded-block-104",
         "unitKind": "unheaded-block",
-        "sourceUnitDigest": "19f7dcac1af1f366",
+        "sourceUnitDigest": "19f7dcac1af1f366369c2b1b75261b376f12ecaabf4b65f5f0d6f92c191a712d",
         "claimKind": "specification",
         "status": "removed-pending-disposition",
         "priorStatus": "current",
@@ -7588,7 +7588,7 @@
         "claimId": "claim_f1eca3e6fcc3886007fa5de37d686e54",
         "sourceAnchor": "unheaded-block-70",
         "unitKind": "unheaded-block",
-        "sourceUnitDigest": "49da8c71336ea054",
+        "sourceUnitDigest": "49da8c71336ea054dce887759a9eea0ef5f841792858d401b66341c4d0d8734d",
         "claimKind": "contract",
         "status": "removed-pending-disposition",
         "priorStatus": "current",
@@ -7606,7 +7606,7 @@
       {
         "claimId": "claim_522c26efde7ef029b3ce6e25829a8915",
         "authoredBy": "codex-session:27@2026-10-14",
-        "sourceUnitDigest": "aadcac783bf59267",
+        "sourceUnitDigest": "aadcac783bf592674ae3d58de41b7e75038b16e2550de06a19c322c91a088be9",
         "targetOwner": null,
         "targetAnchor": null,
         "claimKind": "contract",
@@ -7619,7 +7619,7 @@
       {
         "claimId": "claim_f1eca3e6fcc3886007fa5de37d686e54",
         "authoredBy": "codex-session:27@2026-10-14",
-        "sourceUnitDigest": "49da8c71336ea054",
+        "sourceUnitDigest": "49da8c71336ea054dce887759a9eea0ef5f841792858d401b66341c4d0d8734d",
         "targetOwner": null,
         "targetAnchor": null,
         "claimKind": "contract",
@@ -7631,7 +7631,7 @@
       },
       {
         "claimId": "claim_9bb5739f68a7b4bafcd959ef59104e6a",
-        "sourceUnitDigest": "19f7dcac1af1f366",
+        "sourceUnitDigest": "19f7dcac1af1f366369c2b1b75261b376f12ecaabf4b65f5f0d6f92c191a712d",
         "targetOwner": null,
         "targetAnchor": null,
         "claimKind": "specification",
@@ -9645,5 +9645,28 @@
     }
   },
   "nativeRegistryBytes": 59841390,
-  "sourceContentCommit": "6c6a65e8543fa72012bd55f8999f13f9ed6193c4"
+  "sourceContentCommit": "6c6a65e8543fa72012bd55f8999f13f9ed6193c4",
+  "retiredNativeFullDigestRepair": [
+    {
+      "claimId": "claim_522c26efde7ef029b3ce6e25829a8915",
+      "beforeDigest": "aadcac783bf59267",
+      "afterDigest": "aadcac783bf592674ae3d58de41b7e75038b16e2550de06a19c322c91a088be9",
+      "path": "docs/specs/work-state.md",
+      "anchor": "trợ-giúp-theo-từng-verb-fgos---help"
+    },
+    {
+      "claimId": "claim_9bb5739f68a7b4bafcd959ef59104e6a",
+      "beforeDigest": "19f7dcac1af1f366",
+      "afterDigest": "19f7dcac1af1f366369c2b1b75261b376f12ecaabf4b65f5f0d6f92c191a712d",
+      "path": "docs/specs/work-state.md",
+      "anchor": "unheaded-block-104"
+    },
+    {
+      "claimId": "claim_f1eca3e6fcc3886007fa5de37d686e54",
+      "beforeDigest": "49da8c71336ea054",
+      "afterDigest": "49da8c71336ea054dce887759a9eea0ef5f841792858d401b66341c4d0d8734d",
+      "path": "docs/specs/work-state.md",
+      "anchor": "unheaded-block-70"
+    }
+  ]
 }

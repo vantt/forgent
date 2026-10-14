@@ -1,0 +1,72 @@
+{
+  "contentCommit": "b1e53b4fb0e99963328e84b63a4764c0d87abb21",
+  "requests": [
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0027-root-truth-resume.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0027-root-truth-resume.md",
+      "entries": 35,
+      "packSHA256": "87c4c2ddc235f9524b81f7c6ebe07d76109e24dacbe8b5bfa7e1b6fdb3a65357"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0027-root-pending-resume.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0027-root-pending-resume.md",
+      "entries": 18,
+      "packSHA256": "cbddc3777b72f6937ac6cfc67ce93da772be754025f5e471f330d9a27a26e6c9"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-01.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-01.md",
+      "entries": 75,
+      "packSHA256": "cb58fb10bd52ce79102b3bb4fb06e7eb4e84ed2e51fda276caf15e95815c5b55"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-02.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-02.md",
+      "entries": 75,
+      "packSHA256": "07628e0b7da352fbf8ffdef820ba7c4ce871f21630895abb131e353dfeff170f"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-03.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-03.md",
+      "entries": 75,
+      "packSHA256": "555da3fbc5b97a44907cc47d9606c632690e9edc7330d7e1281f899d517ebac2"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0044-boundary-sync-resume-04.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0044-boundary-sync-resume-04.md",
+      "entries": 25,
+      "packSHA256": "ee8adfcff2e14996bd6b56421604c3120b49d028c57e43754ff769e8d8a1b76d"
+    }
+  ],
+  "totalEntries": 303,
+  "fullNativeShownTextAndDigests": true,
+  "exactPendingDecisionEquality": true,
+  "allOrdinaryRowsPending": true,
+  "completeScopeEquality": true,
+  "uniqueIDs": true,
+  "differingAndAbsentListsEqual": true,
+  "retiredFullDigestExpansions": [
+    {
+      "claimId": "claim_522c26efde7ef029b3ce6e25829a8915",
+      "beforeDigest": "aadcac783bf59267",
+      "afterDigest": "aadcac783bf592674ae3d58de41b7e75038b16e2550de06a19c322c91a088be9",
+      "path": "docs/specs/work-state.md",
+      "anchor": "trợ-giúp-theo-từng-verb-fgos---help"
+    },
+    {
+      "claimId": "claim_9bb5739f68a7b4bafcd959ef59104e6a",
+      "beforeDigest": "19f7dcac1af1f366",
+      "afterDigest": "19f7dcac1af1f366369c2b1b75261b376f12ecaabf4b65f5f0d6f92c191a712d",
+      "path": "docs/specs/work-state.md",
+      "anchor": "unheaded-block-104"
+    },
+    {
+      "claimId": "claim_f1eca3e6fcc3886007fa5de37d686e54",
+      "beforeDigest": "49da8c71336ea054",
+      "afterDigest": "49da8c71336ea054dce887759a9eea0ef5f841792858d401b66341c4d0d8734d",
+      "path": "docs/specs/work-state.md",
+      "anchor": "unheaded-block-70"
+    }
+  ],
+  "helperSource": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';import {buildConservationUnitLookup} from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs';\nconst root=process.cwd(),r='plans/260925-documentation-authority-unification/reports/phase-06/',index=JSON.parse(fs.readFileSync(r+'bounded-review-set-resume.json')),sha=s=>crypto.createHash('sha256').update(s).digest('hex'),lookups=new Map(),shards=new Map(),all=[];\nfunction lookup(pin){if(!lookups.has(pin))lookups.set(pin,buildConservationUnitLookup(root,pin));return lookups.get(pin);}\nfunction checkUnit(u,d,pin,kind){if(!u)return;const text=execFileSync('git',['show',(u.contentCommit||pin)+':'+u.path],{encoding:'utf8',maxBuffer:100e6});if(!u.nativeDigest){assert.equal(u.text,text);assert.equal(d,sha(text));return;}const units=lookup(u.contentCommit||pin)(u.path);if(u.path.endsWith('.md')){const unit=units.find(v=>v.anchor===u.anchor&&v.textDigest===u.nativeDigest);assert(unit,'native unit '+u.path+'#'+u.anchor);assert.equal(u.text,unit.sectionText||unit.text);assert.equal(u.nativeDigest,unit.textDigest);assert.equal(d,kind==='alias-accounting'?sha(u.text):unit.textDigest);}else{assert.equal(u.text,text);assert.equal(d,sha(text));}}\nfor(const req of index.requests){const md=fs.readFileSync(req.pack,'utf8'),side=JSON.parse(fs.readFileSync(req.pack+'.json')),request=fs.readFileSync(req.request,'utf8');assert(side.rows.length<=80);assert.equal(side.rows.length,req.entries);assert.equal(sha(md),req.packSHA256);assert.equal(sha(md),side.packSHA256);assert(request.includes(req.packSHA256));assert.deepEqual(side.differingDigestRows,side.rows.filter(e=>e.sourceDigest!==e.targetDigest).map(e=>e.id));assert.deepEqual(side.absentTargetRows,side.rows.filter(e=>e.targetDigest==='none').map(e=>e.id));assert.equal(new Set(side.rows.map(e=>e.id)).size,side.rows.length);\n for(const e of side.rows){for(const d of [e.sourceDigest,e.targetDigest])assert(d==='none'||/^[0-9a-f]{64}$/.test(d),e.id);for(const u of [e.source,e.target])if(u){assert(md.includes(u.text),'full displayed '+e.id);assert(md.includes(sha(u.text)),'shown digest '+e.id);}try{checkUnit(e.source,e.sourceDigest,side.contentCommit,e.kind);checkUnit(e.target,e.targetDigest,side.contentCommit,e.kind);}catch(err){console.error(e.id);throw err;}\n if(e.kind.startsWith('ordinary-')){if(!shards.has(e.shard))shards.set(e.shard,JSON.parse(fs.readFileSync(e.shard)));const shard=shards.get(e.shard),decision=[...(shard.claims||[]),...(shard.registryGaps||[])].find(x=>x.claimId===e.id);assert.deepEqual(e.decision,decision);assert.equal(e.claimId,e.id);assert(decision.reviewStatus!=='reviewed');if(decision.sourceUnitDigest)assert(e.sourceDigest.startsWith(decision.sourceUnitDigest),e.id+' source mismatch '+e.sourceDigest+' '+decision.sourceUnitDigest);if(decision.targetOwner){assert.equal(e.target.path,decision.targetOwner);assert.equal(e.target.anchor,decision.targetAnchor);assert(e.targetDigest.startsWith(decision.targetUnitDigest));}}\n all.push(e);\n }\n}\nconst data=JSON.parse(fs.readFileSync('/tmp/fgos-work/resume-truth/pack-entries.json')),a=JSON.parse(fs.readFileSync(r+'root-boundary-sync-accounting.json'));\nassert.equal(all.length,303);assert.equal(new Set(all.map(e=>e.id)).size,303);assert.equal(data.truth.length,35);assert.equal(data.pending.length,18);assert.equal(data.merge.length,250);assert.equal(data.pending.filter(e=>e.kind==='alias-accounting').length,4);assert.equal(data.pending.filter(e=>e.kind==='retained-path-accounting').length,5);assert.equal(data.pending.filter(e=>e.kind.startsWith('ordinary-')).length,9);\nfor(const b of [...a.bindings.rows.map(x=>x.after),...a.bindings.newCurrentRows,...a.bindings.newGapRows,...a.bindings.existingGapRebindings.map(x=>x.after)])assert(data.merge.some(e=>e.id===b.claimId),'missing merge '+b.claimId);\nfor(const b of a.retiredNativeFullDigestRepair){assert(b.afterDigest.startsWith(b.beforeDigest));const entries=data.merge.filter(e=>e.id===b.claimId);assert.equal(entries.length,1);assert.equal(entries[0].sourceDigest,b.afterDigest);}\nconst proof={contentCommit:index.contentCommit,requests:index.requests.map(q=>({request:q.request,pack:q.pack,entries:q.entries,packSHA256:q.packSHA256})),totalEntries:all.length,fullNativeShownTextAndDigests:true,exactPendingDecisionEquality:true,allOrdinaryRowsPending:true,completeScopeEquality:true,uniqueIDs:true,differingAndAbsentListsEqual:true,retiredFullDigestExpansions:a.retiredNativeFullDigestRepair,helperSource:fs.readFileSync(import.meta.filename,'utf8')};fs.writeFileSync(r+'bounded-review-validation-resume.json',JSON.stringify(proof,null,2)+'\\n');console.log('Validated',all.length,'entries',index.requests.map(q=>q.entries));\n"
+}

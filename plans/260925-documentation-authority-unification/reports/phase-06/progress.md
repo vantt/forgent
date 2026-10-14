@@ -1,3 +1,37 @@
+# Bounded review set validated — final native rerun pending
+
+Date: 2026-10-15
+Executor: codex-session:28@2026-10-15
+Session counter: 28
+Step: 5
+State: ready-for-review / final native verification in progress
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Starting checkpoint: e1b75bc70
+Recovery checkpoint: b1e53b4fb
+Shown source/target content pin: b1e53b4fb0e99963328e84b63a4764c0d87abb21
+
+303 entries are validated against immutable full native units and complete file bytes, exact pending shard decisions, full 64-hex digests, complete displayed text, Markdown hashes and differing/absent lists. Requests and packs are indexed in bounded-review-set-resume.json; complete validation and reproduction source are in bounded-review-validation-resume.json. Truth: 35 entries (14 corrected units, 14 source rebounds, seven predecessor successors), 100% independent truth review. Pending: 18 entries (four aliases, nine reopened decisions, five retained-path rationales). Merge-only A31: 250 entries in 75/75/75/25 packs (four conflicts, 113 distinct source/gap decisions, 15 retired dispositions, 15 exact ancestry identity witnesses, 100 receipt references, three changed classification withdrawals). The 100 receipt references include two distinct shard references for one claim; accounting IDs retain shard identity to avoid duplicate verdict IDs. No self-review, approval carry or alias activation.
+
+The inherited three retired digest prefixes are expanded only after complete historical native source digest proof; exact IDs and prefix/full-digest pairs are recorded in root-boundary-sync-accounting.json and validated in the review. The registry expansion is still scratch until final native D/E and equality pass. The inherited JSON-gap packaging helper incorrectly displayed the current file as a predecessor; full native digest validation caught and corrected it. Obsolete uncommitted draft packs were removed. No checker/gate/extractor/vocabulary/baseline change.
+
+Review/apply tests: 39/39 pass with env -u CLAUDE_CODE_SESSION_ID; preservation B/C/F/H/I passes. Full-suite and final native proof are not yet claimed. The early full native run is replaced at this review-set commit so the final committed packs are included in the complete inventory. Separate log: /tmp/fgos-work/resume-truth/native-final.log.
+
+Remaining Step 5 closure items:
+
+1. Lead independently reviews all six requests, including A37 corrected assertions (100%), A36 mechanical checks plus seeded deep/differing reads, and A31 conflict/conservation/machine re-pin accounting. Apply committed notes verbatim through the existing native channels, no approval carry.
+2. Refresh from the persisted working registry after verdicts; repeat both-prior D, full scoped E and full identity/list equality. Preserve the three Coordination Rings holds, existing exact identical-unit exceptions and digest-bound A34 partial-carry residuals. Pending gap/retired/classification accounting remains owed even if a proposed disposition removes a native open category.
+3. Independent 50-block invented-claim sample and hostile red-team pass; resolve every open Critical/High finding under the authorized frame.
+4. Commit the fresh-reader key; owner starts two independent readers for three scenarios; score and verify actual anchors and reading limits.
+5. Account final review-artifact consumer-edge changes against the committed preview lineage; preserve history citations/README former-source cells. Generated/executable .fgos consumers owe owning regeneration/contract review. Keep backlog at its live path until its missing source is restored. Reading-map navigation consolidation, 0117–0150 full digest re-pins and 16 exact stale law fragments remain explicit cutover obligations.
+6. Final batch report with exact holds/exceptions/A34 residuals, truth correction acceptance, A31 review/accounting results, consumer obligations, session/row effort and owner effort checkpoint. A37 supersedes the further truth-draw obligation: no new Step 5 draw or whole-area truth sweep. Full work-state truth remains owed at promotion under A28/A35/A37.
+
+No new owner/Lead direction decision is required within this scope. Final native completion is pending; independent acceptance and batch closure are not claimed. Finish and persist only passing native output under the 90 MB compact registry limit, commit proof/progress, then STOP. No promotion, push, new main merge or Step 6.
+
+Preview: http://design-lap:7701/s/4478ddd41bed.
+
+---
+
 # Active resume — bounded review packaging and final native proof
 
 Date: 2026-10-15
