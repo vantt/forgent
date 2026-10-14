@@ -255,7 +255,7 @@ function classifyEvidenceToOutcomeFacts({
   claimInvalid = false,
   workerArtifacts = [],
   changedFiles = [],
-  editedInScopeDirt = [],
+  editedSyncConflicts = [],
   isReadOnlyOperation = true,
   attributionRefusal = null,
   role,
@@ -309,7 +309,7 @@ function classifyEvidenceToOutcomeFacts({
     };
   }
 
-  const hasExternalEvidence = changedFiles.length > 0 || editedInScopeDirt.length > 0;
+  const hasExternalEvidence = changedFiles.length > 0 || editedSyncConflicts.length > 0;
 
   // Only a write proven to be the run's own is refused (evaluateAttributionPolicy);
   // a change merely seen across the run travels as a warning instead.
@@ -708,11 +708,13 @@ export async function settleRunOutcome({
   // A read-only seat in a writing unit carries the unit's writes too, but none of them are its own.
   const declaredWrites = !isReadOnly && Array.isArray(assignment?.writes) && assignment.writes.length > 0 ? assignment.writes : null;
   const declaredCoverage = declaredWrites ? { paths: declaredWrites } : null;
-  // A writing seat whose task is to edit files already dirty at launch (the conflicted files of a
-  // merge the runner left open for it) changes nothing `changedFiles` counts: a file dirty inside
-  // its declared scope whose content changed during the turn is its evidence too.
-  const editedInScopeDirt = declaredWrites && dirtyBeforeSnapshots
-    ? findMutatedDirtyBeforeFiles(settlementCwd, dirtyBeforeSnapshots).filter((p) => matchesWriteScope(p, declaredWrites))
+  // A writing seat whose task is to edit the conflicted files of a merge the runner left open for
+  // it (`assignment.syncConflicts`) changes only files already dirty at launch, which
+  // `changedFiles` never counts: those conflicted files, inside its scope and changed during the
+  // turn, are its evidence. Any other dirt a seat rewrites still is not.
+  const syncConflicts = declaredWrites && Array.isArray(assignment?.syncConflicts) ? new Set(assignment.syncConflicts) : null;
+  const editedSyncConflicts = syncConflicts && dirtyBeforeSnapshots
+    ? findMutatedDirtyBeforeFiles(settlementCwd, dirtyBeforeSnapshots).filter((p) => syncConflicts.has(p) && matchesWriteScope(p, declaredWrites))
     : [];
   const evidenceData = {
     operationMutability: isReadOnly ? 'read-only' : 'mutates-repo',
@@ -724,7 +726,7 @@ export async function settleRunOutcome({
     mutatedDirtyBeforeFiles,
     changedFiles,
     changedFileReasons,
-    ...(editedInScopeDirt.length > 0 ? { editedInScopeDirt } : {}),
+    ...(editedSyncConflicts.length > 0 ? { editedSyncConflicts } : {}),
     attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: resolvedDirtyAfter, declaredCoverage }),
     artifacts: workerArtifacts,
     tests: [],
@@ -760,7 +762,7 @@ export async function settleRunOutcome({
     claimInvalid,
     workerArtifacts: workerArtifactPaths,
     changedFiles,
-    editedInScopeDirt,
+    editedSyncConflicts,
     isReadOnlyOperation: isReadOnly,
     attributionRefusal: attributionPolicy.disposition === 'refuse' ? attributionPolicy : null,
     role: assignment?.role,

@@ -157,6 +157,9 @@ test('a sync-only unit whose merge is clean is committed by the runner and passe
   assert.equal(fs.readFileSync(path.join(worktree, 'base.txt'), 'utf8'), 'from main\n');
   assert.equal(res.sync.status, 'merged');
   assert.equal(res.sync.sha, mainSha);
+  assert.equal(res.results.at(-1).role, 'sync');
+  assert.equal(res.results.at(-1).commit.status, 'committed');
+  assert.equal(res.results.at(-1).commit.sha, headOf(worktree));
   assert.equal(res.sync.commit.sha, headOf(worktree));
   const record = unitRecordOf(repoRoot, res.unitRunId);
   assert.equal(record.sync.status, 'merged');
@@ -207,8 +210,12 @@ test('conflicted paths enter the write scope and the brief; the runner finishes 
   assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]?.commit ?? res.results[0]?.refused));
   assert.equal(producerSpawns(repoRoot, res.unitRunId), 1);
   const record = unitRecordOf(repoRoot, res.unitRunId);
-  assert.deepEqual(record.writeScope, ['docs', 'README.md']);
+  // The conflicted path was in scope only to conclude the merge; a later round cannot write it.
+  assert.deepEqual(record.writeScope, ['docs']);
+  assert.deepEqual(record.sync.scopeAdded, ['README.md']);
   assert.deepEqual(record.sync.conflicts, ['README.md']);
+  const assignment = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'producer', '1', 'assignment.json'), 'utf8'));
+  assert.deepEqual(assignment.writes, ['docs', 'README.md'], 'the seat that resolved the conflict had it in scope');
   assert.equal(record.sync.status, 'merged');
   const brief = reportsOf(repoRoot, res.unitRunId);
   assert.match(brief, /conflict/i);
@@ -314,4 +321,22 @@ test('a sync ref that names no commit, or a sync from the main checkout, is refu
     (e) => e instanceof RunnerConfigError && /linked worktree/.test(e.message),
   );
   assert.deepEqual(runs(), []);
+});
+
+test('a writing unit without a sync whose worker only rewrites a file already dirty in scope still has no evidence', async () => {
+  const { repoRoot, worktree, script } = setup({ mainFiles: {}, branchFiles: { 'docs/page.md': 'committed\n' } });
+  writeWorker(script, { files: { 'docs/page.md': 'the worker rewrote it\n' } });
+  fs.writeFileSync(path.join(worktree, 'docs', 'page.md'), 'a person is half way through this\n');
+  const res = await runUnit({ unitData: { id: 'u-dirt', objective: 'Edit the page', capability: 'docs:write', writes: ['docs'] }, repoRoot, cwd: worktree });
+  assert.equal(res.outcome, 'execution-failure');
+  assert.equal(res.results[0].runResult.evidence.editedSyncConflicts, undefined);
+});
+
+test('a conflicted path a scope cannot name exactly (surrounding whitespace) aborts the merge', async () => {
+  const { repoRoot, worktree, script } = setup({ mainFiles: { ' padded.txt': 'main\n' }, branchFiles: { ' padded.txt': 'branch\n' } });
+  writeWorker(script);
+  const res = await runUnit({ unitData: { id: 'u-ws', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
+  assert.equal(res.outcome, 'policy-refusal');
+  assert.equal(res.results[0].refused.reason, 'unscopable-conflict-path');
+  assert.equal(mergeHeadOf(worktree), null);
 });

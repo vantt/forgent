@@ -40,12 +40,19 @@ export function assertSyncResumable(unitRunId, unitRecord, mainRoot) {
   if (state === 'done') {
     sync.status = 'merged';
     sync.commit = { by: 'outside' };
+    narrowScope(unitRecord);
     return;
   }
   const what = state === 'not-started'
     ? 'was aborted in the worktree'
     : `is no longer in progress (MERGE_HEAD ${mergeHead ?? 'none'}, HEAD ${head})`;
   throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": the merge of ${sync.ref} (${sync.sha}) it left for the worker ${what}; start a new run`);
+}
+
+/** Once the merge is concluded, the conflicted paths it added leave the write scope again. */
+function narrowScope(unitRecord) {
+  const added = new Set(unitRecord.sync?.scopeAdded ?? []);
+  if (added.size > 0) unitRecord.writeScope = (unitRecord.writeScope ?? []).filter((p) => !added.has(p));
 }
 
 /**
@@ -57,7 +64,7 @@ export function assertSyncResumable(unitRunId, unitRecord, mainRoot) {
 export function runPendingSync(unitRecord, mainRoot, persist) {
   const sync = unitRecord.sync;
   if (!sync || !['pending', 'failed'].includes(sync.status)) {
-    return sync?.status === 'merged' && unitRecord.unit.syncOnly && !unitRecord.bindings?.['producer/1'] ? { outcome: 'pass' } : null;
+    return sync?.status === 'merged' && unitRecord.unit.syncOnly && !unitRecord.bindings?.['producer/1'] ? syncOnlyPass(sync) : null;
   }
   // Only a run that already marked this sync as started (and died before recording its result)
   // may find its own merge open; a first start never takes over a merge someone else opened.
@@ -72,12 +79,22 @@ export function runPendingSync(unitRecord, mainRoot, persist) {
     return { outcome, results: [{ outcome, role: 'producer', round: 1, refused: { reason: result.reason, detail: result.error } }] };
   }
   if (result.status === 'conflicted') {
+    // In scope only until the merge is concluded (commitRoundWithSync takes them out again).
     const scope = unitRecord.writeScope ?? unitRecord.unit.writes ?? [];
-    unitRecord.writeScope = [...scope, ...result.conflicts.filter((p) => !matchesWriteScope(p, scope))];
+    result.scopeAdded = result.conflicts.filter((p) => !matchesWriteScope(p, scope));
+    unitRecord.writeScope = [...scope, ...result.scopeAdded];
     persist();
     return null;
   }
-  return unitRecord.unit.syncOnly ? { outcome: 'pass' } : null;
+  return unitRecord.unit.syncOnly ? syncOnlyPass(result) : null;
+}
+
+/** A sync-only unit that needed no worker: its one result is the runner's merge commit (or none). */
+function syncOnlyPass(sync) {
+  const commit = sync.commit?.sha
+    ? { status: 'committed', sha: sync.commit.sha, subject: sync.commit.subject, outOfScope: [], preExistingInScope: [] }
+    : { status: 'no-changes', outOfScope: [], preExistingInScope: [] };
+  return { outcome: 'pass', results: [{ outcome: 'pass', role: 'sync', round: 0, commit }] };
 }
 
 /** What a writing seat is told about a merge left open for it; empty when there is none. */
@@ -108,6 +125,7 @@ export function commitRoundWithSync(unitRecord, mainRoot, commitWork, excludePat
   }
   sync.status = 'merged';
   sync.commit = merge.status === 'committed' ? { sha: merge.sha, subject: merge.subject, files: merge.files } : { by: 'outside' };
+  narrowScope(unitRecord);
   return { ...commitWork(), sync: merge };
 }
 

@@ -426,7 +426,7 @@ export function startSyncMerge({ worktree, repoRoot, ref, sha, adoptOpenMerge = 
 
     for (const p of unmergedPaths(ctx).filter((u) => !outsideStore(u))) takeBaseSide(ctx, p);
     const conflicts = unmergedPaths(ctx);
-    const unscopable = conflicts.filter((p) => p.includes('*') || p.includes('\\'));
+    const unscopable = conflicts.filter((p) => p.includes('*') || p.includes('\\') || p !== p.trim());
     if (unscopable.length > 0) {
       abortMerge(ctx);
       return failed('unscopable-conflict-path', `the merge of ${ref} conflicts in paths a write scope cannot name literally (${unscopable.join(', ')}); merge it by hand`);

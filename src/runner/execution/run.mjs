@@ -590,6 +590,9 @@ export async function runUnit(options = {}) {
       expectedOutputs: unit.expectedOutputs || [],
       contextRefs,
       writes: unitRecord.writeScope ?? unit.writes ?? [],
+      // The conflicted files of a merge the runner left open for this writing seat: settlement
+      // counts the seat's edits to them as its evidence, though they were dirty at launch.
+      ...(!readOnly && unitRecord.sync?.status === 'conflicted' ? { syncConflicts: [...unitRecord.sync.conflicts] } : {}),
       policy: {
         tier: bound.tier,
         preferExecutor: bound.executor,
