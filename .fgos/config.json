@@ -1447,7 +1447,12 @@
         }
       }
     },
-    "generatedPaths": []
+    "generatedPaths": [
+      {
+        "from": "core/skills/**",
+        "also": [".agents/skills/**", "plugins/fgOS/skills/**", ".claude/skills/**"]
+      }
+    ]
   },
   "gateBypass": {
     "level": "standard"
