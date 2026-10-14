@@ -571,7 +571,7 @@
   ],
   "noTruthDraw": true,
   "truthPopulationAndReportsUnchanged": true,
-  "noContentCommitYet": true,
+  "noContentCommitYet": false,
   "countMeaning": "11 exact replacement fragments cover 12 false assertions (the decompose fragment replaces two assertions); 1 borderline STR48 daemon assertion is retained under A37. The report numbers 12 entries while its summary says 13 false sentences.",
   "rebindings": {
     "count": 14,
@@ -2394,7 +2394,7 @@
     "unchangedRowsChecked": 202,
     "noApprovalCarry": true,
     "noIdentityGraft": true,
-    "postcommitNativeSuccessorAccountingOwed": true
+    "postcommitNativeSuccessorAccountingOwed": false
   },
   "currentLineEvidenceRecomputedAgainstInputHEADAndWorkingTree": true,
   "fileSHA256": {
@@ -2408,219 +2408,7 @@
     }
   },
   "allOtherDecisionRowsAndMetadataUnchanged": true,
-  "postcommitNativeAccountingOwed": [
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "2-entry-points-and-triggers",
-      "beforeDigest": "6e306b169de96db64ba2f8cd2b68bf3640d76bb956db97859d5e627e54ef31f5",
-      "afterDigest": "03a0e8994292975079c7a2b309b047eb29e3fa5afa1dcaa5f89c47dab1b44538",
-      "ancestry": [
-        "Work State Specification"
-      ],
-      "predecessorClaimIds": [
-        "claim_3ca224640befa35ff3bbbbee38de029d"
-      ],
-      "unitKind": "heading",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "unheaded-block-3",
-      "beforeDigest": "c8fc6e5bf49179cb6f37f3247ad25c3217a40bd23b96748f5fdf6893dff5581e",
-      "afterDigest": "21e9b6c7342fa4e8f55cbc2f791698156e82ba65eeb4cacc8f80decfa70fc58c",
-      "ancestry": [
-        "Work State Specification",
-        "2. Entry Points And Triggers"
-      ],
-      "predecessorClaimIds": [
-        "claim_eb0bf7783bb1b1027c012f050c782203"
-      ],
-      "unitKind": "unheaded-block",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "planning-stage",
-      "beforeDigest": "ad4b3ce7e44af669b6d5a850c82c1127c6bb32dfe343da691e1d7a1ab2c53ab2",
-      "afterDigest": "dc25cbbc53b8ff3aabd48e69f832c6f53bc9b46bbbdd514a6a6539f3e6feb007",
-      "ancestry": [
-        "Work State Specification",
-        "5. Workflow Step And Stage Model"
-      ],
-      "predecessorClaimIds": [
-        "claim_65b74b08a22424208eda648d24a512fd"
-      ],
-      "unitKind": "heading",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "unheaded-block-39",
-      "beforeDigest": "fadda0c2061d00de158fb62f8d16aba1e58002c1165e5b3d416be97331217f3e",
-      "afterDigest": "f092e335e21534b0c6d0a03e9d98b8b6311f62d646ae9216dafb872d86c23ba0",
-      "ancestry": [
-        "Work State Specification",
-        "5. Workflow Step And Stage Model",
-        "Planning Stage"
-      ],
-      "predecessorClaimIds": [
-        "claim_3c9b65402d8ece4ef57ad337ba5d9d72"
-      ],
-      "unitKind": "unheaded-block",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "7-pull-door-take-and-return",
-      "beforeDigest": "69eb01f3f5134b71523424d41de4c6e5215d81a6c0448dec0ae378e3eb3cbb97",
-      "afterDigest": "f810d0eb8682dd94d4cdfe5c083ae4c706090a5cbb458a572d0c15d2949fb48a",
-      "ancestry": [
-        "Work State Specification"
-      ],
-      "predecessorClaimIds": [
-        "claim_300fc56a55b379c3082dd035d0cd70ec"
-      ],
-      "unitKind": "heading",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "unheaded-block-55",
-      "beforeDigest": "4b215c2fd35cfdf4e6786cf9adbb44f0e1bbb55662a39329bc271641ef99f6b0",
-      "afterDigest": "b93b1271702eedfac07aee1897bce1aa36c6322ede478bf5b3df20194da452ad",
-      "ancestry": [
-        "Work State Specification",
-        "7. Pull Door Take And Return"
-      ],
-      "predecessorClaimIds": [
-        "claim_1f9fb4feceda8f5bf6a18b151ce0a397"
-      ],
-      "unitKind": "unheaded-block",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "init-verb",
-      "beforeDigest": "044d32feeaadf43b8ebd50cbb9328e601bc9e0341ee23e0eaf9008037583ed2d",
-      "afterDigest": "abb64fde3e8378bd816bf355972ff0e513db00b273decd9dd4c478957061e965",
-      "ancestry": [
-        "Work State Specification",
-        "9. Behaviors And Operations"
-      ],
-      "predecessorClaimIds": [
-        "claim_7bb12ae27ec5dd9642c00f48ee02af81"
-      ],
-      "unitKind": "heading",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "unheaded-block-64",
-      "beforeDigest": "6507aee6bfe4534417362ff8fbb85c58f51a633e49c81ef69ea29c75effb773a",
-      "afterDigest": "8c083fa704b78795877465578a80d3603ef9ef8bbf2f9000c1547daead10880f",
-      "ancestry": [
-        "Work State Specification",
-        "9. Behaviors And Operations",
-        "Init Verb"
-      ],
-      "predecessorClaimIds": [
-        "claim_acab595482e4f9f7ae05e21a1a28f11b"
-      ],
-      "unitKind": "unheaded-block",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "submit-verb",
-      "beforeDigest": "efb90fe882b0fbb11659db82440c3c004cbdd1006bb240abbadc2b2404773ee1",
-      "afterDigest": "c94deabc102d0852530a7b68cef8520d4b138ebcb8bebb30ed32060c0a499ed7",
-      "ancestry": [
-        "Work State Specification",
-        "9. Behaviors And Operations"
-      ],
-      "predecessorClaimIds": [
-        "claim_82f3293e4b07b943677a3777eeaf9932"
-      ],
-      "unitKind": "heading",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "unheaded-block-67",
-      "beforeDigest": "0cee9be267f694d7ef523f3c96e35b1837c9d6bd8f4eb275770357dab32a2cdf",
-      "afterDigest": "dbfcaa1881570e24492daa35eb776b4fbea75fab92318188517e6b81ee2bdbd2",
-      "ancestry": [
-        "Work State Specification",
-        "9. Behaviors And Operations",
-        "Submit Verb"
-      ],
-      "predecessorClaimIds": [
-        "claim_7c4295aa058b6a7fa5c6b945a0441a35"
-      ],
-      "unitKind": "unheaded-block",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "discover-verb",
-      "beforeDigest": "f33a86417aeeb82bb3127686df99ed16ed2b3c30f4ebb6f10272dc8e99885111",
-      "afterDigest": "192aa951764bb446127846b0d8530387ae2d7ad50e64179ad23a51ea53b8f98b",
-      "ancestry": [
-        "Work State Specification",
-        "9. Behaviors And Operations"
-      ],
-      "predecessorClaimIds": [
-        "claim_a18f9b1f71b434fb444b4040b69f475f"
-      ],
-      "unitKind": "heading",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "unheaded-block-68",
-      "beforeDigest": "ecb4ec26f8d1cd8578eb40c2e93a7e12016dc4658e1593d04c48fddaf40d4691",
-      "afterDigest": "bc0b6df719a361a226f5f5c04024ef0cb5a149307ffccb2cbd07d1c556d51616",
-      "ancestry": [
-        "Work State Specification",
-        "9. Behaviors And Operations",
-        "Discover Verb"
-      ],
-      "predecessorClaimIds": [
-        "claim_02a2110f086ac00ef2d59c9d4d9afeb1"
-      ],
-      "unitKind": "unheaded-block",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/platform-foundations.md",
-      "anchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack",
-      "beforeDigest": "5df48342e3d20011f98051cecac1bd8e9ea955597798ea40216715006696e0a8",
-      "afterDigest": "e21714ad09a8c40f44e5a35635b288d3b0a533f093d9c3e31c89ff84ca886526",
-      "ancestry": [
-        "Platform Foundations"
-      ],
-      "predecessorClaimIds": [
-        "claim_8b6d45b881262e60c2c6491832969f63"
-      ],
-      "unitKind": "heading",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    },
-    {
-      "path": "docs/platform/platform-foundations.md",
-      "anchor": "unheaded-block-12",
-      "beforeDigest": "8fc59c5dbdac8ab4ef8e31cefed6cddbcce54e9c0f32a697f7101bed0056a06f",
-      "afterDigest": "de888795c53722a1fceec49302307ace1e440cf43aa639e2d32fce78aad12273",
-      "ancestry": [
-        "Platform Foundations",
-        "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ],
-      "predecessorClaimIds": [
-        "claim_2d8114529b804f49494e6d42548e1372"
-      ],
-      "unitKind": "unheaded-block",
-      "status": "await runner-produced commit, native refresh and A22 successor accounting; no identity graft or approval"
-    }
-  ],
+  "postcommitNativeAccountingOwed": [],
   "otherCandidateOccurrenceCheck": {
     "command": [
       "rg",
@@ -3858,5 +3646,8 @@
     "daemonExceptionConfirmed": true,
     "scratchMovedOutOfRepository": true,
     "nativePostcommitProofNext": true
-  }
+  },
+  "contentCommit": "58705f6d6461770629128075d4c4dfe8de79dafa",
+  "nativeSuccessorAccounting": "root-truth-successor-accounting.json",
+  "nativeProof": "verification-261014-2300-root-truth-corrections.json"
 }

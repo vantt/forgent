@@ -1,17 +1,21 @@
-# Active resume — truth corrections, boundary sync and bounded review packaging
+# Active resume — truth correction proof complete; boundary sync next
 
 Date: 2026-10-14
 Executor: codex-session:27@2026-10-14
 Session counter: 27
 Step: 5
 State: rework
-Input HEAD: cd2e221ac (verify full pin in current evidence)
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Content commit: 58705f6d6461770629128075d4c4dfe8de79dafa
 
-Owner explicitly authorized resuming the interrupted uncommitted A37 work, then merging main under A31 and packaging a single bounded review set. Inherited modifications are the two candidate docs, four decision shards, candidate-unverified list, two untracked evidence files, and an unrelated .fgos/config.json modification which will remain untouched and uncommitted. The inherited scratch directory was moved outside the repository to /tmp/fgos-work/resume-truth/inherited; it will never be committed.
+A37 completed: 11 exact replacement fragments correct 12 false assertions. The remaining borderline daemon assertion belongs to the unbuilt STR48 push/attention consumer and is retained under A37, with current and historical context shown. Fourteen source decisions are rebound pending; seven native predecessor gaps have pending exact same-file successors; no approval carry or identity graft. The CLI I/O carrier has the A35/A37 promotion caveat. Scratch moved to /tmp/fgos-work/resume-truth; the inherited .turn26-tmp is absent. The unrelated inherited .fgos/config.json generatedPaths edit remains uncommitted.
 
-Next: verify every listed correction and current code citation; refresh from the persisted working registry, rebind mechanically with no approval carry, run D/scoped E/native equality and commit. Then merge main, account changed source/candidate units and receipts, prove and commit. Finally package truth (100%), pending previous proposals and A31 conservation/conflicts, update remaining closure obligations and stop. No promotion, push or Step 6.
+Both-prior D: zero fatal and full parsed equality. Scoped E: pending review and candidate-unverified categories only (exact counts in the complete compressed native proof). Full known-ID preservation and inventory/registry tuple equality pass. Seven changed stable-heading tuples and seven native new IDs are enumerated exactly. Persisted registry is compact one-line, below 90 MB; bytes/hash in proof. Preservation and 39/39 related tests pass. Proof inventories include every native field; no filtered inventory or checker/extractor changes. The native inbound-edge grouping is slow on the large previously committed preview shards; read-only debugger observations located this cost, without changing code or execution bindings.
+
+Next: merge main under A31, resolve the four expected conflicts preserving plan shape and importing upstream meaning, re-carry changed source units, account ratchet changes and receipt pins, rerun D/scoped E/native equality and commit. Then package A37 truth (100%), 14 rebounds and seven successors, the previous 18 pending proposals/decisions, and A31 merge-only conservation/conflicts. No promotion, push or Step 6.
+
+Technical blockers: none. Independent reviews and remaining Step 5 closure work are still owed. MDView progress preview: http://design-lap:7701/s/4478ddd41bed.
 
 Earlier progress follows intact.
 

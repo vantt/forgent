@@ -1,0 +1,564 @@
+{
+  "pin": "58705f6d6461770629128075d4c4dfe8de79dafa",
+  "bindings": [
+    {
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/platform-foundations.md",
+        "unitDigest": "f2e316330e340e5e29977fcce263806a60a95f5e299ca251e4bdb87bd61f3be3",
+        "identityFingerprint": "f2e316330e340e5e29977fcce263806a60a95f5e299ca251e4bdb87bd61f3be3",
+        "claimId": "claim_2d8114529b804f49494e6d42548e1372",
+        "sourceAnchor": "unheaded-block-12",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8fc59c5dbdac8ab4ef8e31cefed6cddbcce54e9c0f32a697f7101bed0056a06f",
+        "claimKind": "normative-law",
+        "status": "future",
+        "origin": "added-since-55ec1e0c40410b70b1e4024232a233d4e3d96b3d",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-12 is not a stable heading anchor"
+      },
+      "successorIdentity": {
+        "sourcePath": "docs/platform/platform-foundations.md",
+        "unitDigest": "d357de892935a166f61d6f555644bb0a6d8835f566b0a37a79be8890c6fea3a7",
+        "identityFingerprint": "d357de892935a166f61d6f555644bb0a6d8835f566b0a37a79be8890c6fea3a7",
+        "claimId": "claim_279955a57a70ce601ca2d9090e7cfabb",
+        "sourceAnchor": "unheaded-block-12",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "de888795c53722a1fceec49302307ace1e440cf43aa639e2d32fce78aad12273",
+        "claimKind": "normative-law",
+        "status": "future",
+        "origin": "added-since-cd82746a8ba169600d987eeb0f5ca274304712f3"
+      },
+      "beforeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 98,
+        "endLine": 105,
+        "textDigest": "8fc59c5dbdac8ab4ef8e31cefed6cddbcce54e9c0f32a697f7101bed0056a06f",
+        "sample": "Tài liệu này khóa các **luật thiết kế** đứng trên mọi code của compound stack\n(state/FSM → routing → compound-learning). Mỗi luật kèm: phát biểu, nguồn gốc\nbằng chứng (cú pháp `ngu",
+        "identityFingerprint": "f2e316330e340e5e29977fcce263806a60a95f5e299ca251e4bdb87bd61f3be3",
+        "ancestry": [
+          "Platform Foundations",
+          "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+        ],
+        "text": "Tài liệu này khóa các **luật thiết kế** đứng trên mọi code của compound stack\n(state/FSM → routing → compound-learning). Mỗi luật kèm: phát biểu, nguồn gốc\nbằng chứng (cú pháp `nguồn:slug` tra trong `docs/distillery/sources/`), hệ quả\nthực hành, và **ngưỡng xem lại** — luật không bất tử, nó bất tử *cho tới khi\nngưỡng có tên của nó bị chạm*. Quyết định gốc mang D-ID trong\n`.bee/decisions.jsonl`; chất liệu đầy đủ:\n`plans/reports/distill-consult-260713-2323-compound-learning-stack-report.md`\n+ `docs/distillery/deep-dives/{state,compound-engineering,routing}.md`."
+      },
+      "afterUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 98,
+        "endLine": 105,
+        "textDigest": "de888795c53722a1fceec49302307ace1e440cf43aa639e2d32fce78aad12273",
+        "sample": "Tài liệu này khóa các **luật thiết kế** đứng trên mọi code của compound stack\n(state/FSM → routing → compound-learning). Mỗi luật kèm: phát biểu, nguồn gốc\nbằng chứng (cú pháp `ngu",
+        "identityFingerprint": "d357de892935a166f61d6f555644bb0a6d8835f566b0a37a79be8890c6fea3a7",
+        "ancestry": [
+          "Platform Foundations",
+          "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+        ],
+        "text": "Tài liệu này khóa các **luật thiết kế** đứng trên mọi code của compound stack\n(state/FSM → routing → compound-learning). Mỗi luật kèm: phát biểu, nguồn gốc\nbằng chứng (cú pháp `nguồn:slug` tra trong `docs/distillery/sources/`), hệ quả\nthực hành, và **ngưỡng xem lại** — luật không bất tử, nó bất tử *cho tới khi\nngưỡng có tên của nó bị chạm*. Quyết định platform/repo-wide được chiếu tại\n`docs/decisions/index.md`; narrative nằm trong các mục \"Lịch sử quyết định\"\ncủa `docs/specs/<area>.md`; chất liệu còn lưu:\n`docs/distillery/deep-dives/{state,compound-engineering,routing}.md`."
+      },
+      "decision": {
+        "claimId": "claim_2d8114529b804f49494e6d42548e1372",
+        "sourcePath": "docs/platform/platform-foundations.md",
+        "sourceAnchor": "unheaded-block-12",
+        "sourceUnitDigest": "8fc59c5dbdac8ab4ef8e31cefed6cddbcce54e9c0f32a697f7101bed0056a06f",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/platform-foundations.md",
+        "targetAnchor": "unheaded-block-12",
+        "targetUnitDigest": "de888795c53722a1fceec49302307ace1e440cf43aa639e2d32fce78aad12273",
+        "targetAncestry": [
+          "Platform Foundations",
+          "Luật nền platform forgent (Phase 0 — compound-learning stack)"
+        ],
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      }
+    },
+    {
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "7b1dbcd5028c5d952a5ce70a10e7ec3a0f8e313fa0808f1ec43dd57cf2fff5b2",
+        "identityFingerprint": "7b1dbcd5028c5d952a5ce70a10e7ec3a0f8e313fa0808f1ec43dd57cf2fff5b2",
+        "claimId": "claim_eb0bf7783bb1b1027c012f050c782203",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c8fc6e5bf49179cb6f37f3247ad25c3217a40bd23b96748f5fdf6893dff5581e",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      "successorIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "9b58d8cd5e6d84a1beb35a9eec463ca73d5ce845481fa6462cd9130b94c54755",
+        "identityFingerprint": "9b58d8cd5e6d84a1beb35a9eec463ca73d5ce845481fa6462cd9130b94c54755",
+        "claimId": "claim_df750ed2a810507dee8b4a604447031f",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "21e9b6c7342fa4e8f55cbc2f791698156e82ba65eeb4cacc8f80decfa70fc58c",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-cd82746a8ba169600d987eeb0f5ca274304712f3"
+      },
+      "beforeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 25,
+        "endLine": 48,
+        "textDigest": "c8fc6e5bf49179cb6f37f3247ad25c3217a40bd23b96748f5fdf6893dff5581e",
+        "sample": "- `fgos init` → khởi tạo kho work-state rỗng tại thư mục làm việc hiện hành (nhật ký rỗng + bản chiếu rỗng); đồng thời quét READ-ONLY project tìm marker của harness agent khác đã c",
+        "identityFingerprint": "7b1dbcd5028c5d952a5ce70a10e7ec3a0f8e313fa0808f1ec43dd57cf2fff5b2",
+        "ancestry": [
+          "Work State Specification",
+          "2. Entry Points And Triggers"
+        ],
+        "text": "- `fgos init` → khởi tạo kho work-state rỗng tại thư mục làm việc hiện hành (nhật ký rỗng + bản chiếu rỗng); đồng thời quét READ-ONLY project tìm marker của harness agent khác đã có mặt (thư mục dấu ấn như `.bee/`, `.claude/`, `.codex/`, `.cursor/`, và khối managed trong `AGENTS.md` khi file đó tồn tại — `init` không bao giờ tạo/sửa `AGENTS.md`), ghi kết quả phát hiện ra output + vào manifest `.fgos/coexistence.json`; lỗi phát hiện không bao giờ chặn `init` (fail-safe), re-init lặp lại ghi manifest nhất quán (idempotent) — doctrine đầy đủ: `docs/coexistence.md`\n- `fgos submit \"<mô tả tự do>\" [--async|--unattended] [--deps <id1,id2,...>]` → **cửa vào công khai duy nhất** cho việc mới: khai một work item từ một câu mô tả văn xuôi duy nhất — id, title, kind, risk, tier đều TỰ SUY (không cần người submit tự đặt); toàn văn mô tả gốc được giữ nguyên trên trường `description` (Data Dictionary #17, per discovery-context STR30) — nguồn ngữ cảnh đầy đủ cho context-discovery đọc lại sau, không bị cắt gọn như `title`; `verify` nhận placeholder cố định chờ bổ sung sau; `--deps` (tùy chọn, mirror hệt `add`'s `deps` sẵn có) ghi trực tiếp danh sách id phụ thuộc, đi qua ĐÚNG cửa ghi/kiểm chu trình mà mọi verb khác dùng — vắng cờ này thì `deps` rỗng, byte-identical hành vi trước đây (per str83-fgos-slash-commands / 757e5dd7); kết quả in ra bọc trong một phong bì máy-đọc chuẩn (xem \"Phong bì output\" dưới)\n- `fgos move` → chuyển trạng thái một item, kèm `--expect` (kỳ vọng, chống ghi đè mù); cạnh từ-chối-đề-xuất bắt buộc `--reason`\n- `fgos decision --text \"...\"` → ghi một quyết định vào nhật ký\n- `fgos ask <id> --text \"...\"` → đưa một item vào chờ người (`awaiting-human`), kèm **câu hỏi** người phải quyết; item rời tập việc-sẵn-sàng cho tới khi được trả lời; nếu item có `parent`, `ask` còn chụp thêm một ảnh `{id, title, status}` của gốc lúc này làm mốc so sánh sau (per str61-chat-context-continuity — xem RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm))\n- `fgos answer <id> --text \"...\"` → **trả lời** câu hỏi của một item đang chờ; ghi câu trả lời vào nhật ký rồi đưa item rời `awaiting-human` về `todo`, thành việc actionable trở lại\n- `fgos list` → đọc danh sách item từ bản chiếu hiện hành; item đang `awaiting-human` hiện kèm câu hỏi của nó (không cần lệnh đọc riêng); item `awaiting-human` có `parent` còn kèm thêm `awaitingContext` — gốc hiện tại để neo ngữ cảnh, cộng phần đổi-từ-lúc-hỏi nếu có (per str61-chat-context-continuity — xem RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)), khóa này vắng mặt hoàn toàn khi không có item nào thuộc diện đó\n- `fgos ready` → đọc frontier: mọi item `todo` có toàn bộ deps đã ngã-ngũ, đang ở stage `executing`, VÀ không còn hậu duệ nào (qua `parent`) dang dở, thứ tự đúng thứ tự khai — thao tác ĐỌC thuần; item `awaiting-human`, còn ở stage `discovery`/`exploring`/`planning`, hoặc còn con dang dở KHÔNG BAO GIỜ xuất hiện trong tập này. \"Ngã-ngũ\" ở đây tính từ `delivered` trở đi (`delivered`/`retrospective`/`cleanup`/`done`), cộng item bị hủy — nghĩa là code đã vào cây chính là đủ mở dep, không phải chờ hết cả phần đuôi tổng-hợp/thu-hồi (xem RUL12 (frontier dẫn xuất))\n- `fgos discover <id> [--verdict clear|unclear]` → chạy context-discovery cho một item đang ở stage `discovery` hoặc `exploring`, mang theo verdict của chính người gọi — đọc gì trước \"Giai đoạn Soi-rõ (stage discovery) và Đào-sâu (stage exploring)\" dưới; item ở stage lập-kế-hoạch dùng `plan`, không dùng verb này\n- `fgos plan <id> [--verdict pass-through|decompose|need-human] [--children <json>]` → chạy phán chia-việc cho một item đang ở stage `planning` (hoặc bí danh di sản `decompose`) — verb RIÊNG, tách bạch khỏi `discover`, xem \"Giai đoạn Lập-kế-hoạch\" dưới\n- `fgos rebuild` → dựng lại bản chiếu từ zero bằng cách phát lại toàn bộ nhật ký\n- `fgos repair` → sửa CHỈ MỘT hình dạng hỏng hẹp của nhật ký sự kiện: dòng cuối bị cắt cụt (crash giữa lúc append). Trước khi cắt, sao lưu nguyên trạng nhật ký hỏng ra file backup có dấu thời gian; sau khi cắt, tự đọc lại kiểm chứng nhật ký sạch trước khi báo thành công. Hỏng hình dạng khác (giữa file, nhiều dòng hỏng, hoặc nhật ký vốn đã sạch) đều bị từ chối rõ lý do, KHÔNG đụng file — cửa fail-closed cho `corrupt-log` (mã thoát 5) không bị nới, chỉ có đúng một khe hẹp này được vá tay bởi người vận hành. **Yêu cầu KHÔNG-tiến-trình-song-song (per fgos-multi-session-checkout Epic 3):** `repair` là ghi-đè-cả-file (`writeFileSync` sau khi sao lưu) và CỐ Ý không lấy `.fgos/events.lock` của `appendEvent` — nó phải chỉ chạy khi KHÔNG có tiến trình fgos nào đang sống, vì một `appendEvent` chen vào giữa lúc đọc và lúc ghi-đè của repair sẽ bị âm thầm nuốt mất (drop). Đây là thao tác hiếm, người vận hành chủ động gọi, không nằm trên đường append thường; bảo vệ repair khỏi ca đó là ngoài phạm vi, chỉ ghi nhận yêu cầu chứ không cưỡng chế\n- `fgos metrics outcomes [id]` → đọc bản chiếu, in cặp dự đoán/thực tế (outcome) đã gộp cho một item, hoặc cho mọi item đang có dữ liệu nếu không truyền id — thao tác ĐỌC thuần\n- `fgos rollup <id>` → đọc bản chiếu, in một item gốc (title/status) kèm đếm con theo status (`k/n done`) và liệt kê từng con trực tiếp (qua `parent`, dựng từ STR16 decompose) cùng status của nó; item không con in `0/0 done` + ghi rõ \"không có con\"; id không tồn tại báo lỗi `validation` — thao tác ĐỌC thuần, không sự kiện mới\n- `fgos triage` → đọc bản chiếu, xếp hạng mọi item CHƯA `done` theo số item khác (cũng chưa `done`) đang phụ thuộc vào nó qua đồ thị hợp nhất `deps` + `parent` (`blocks`; một parent được tính cả từ con còn mở, không chỉ `deps`), giảm dần rồi id tăng dần (tie-break); mỗi dòng còn kèm `blockedBy` — chiều ngược lại, danh sách id mà CHÍNH dòng này còn đang chờ (unmet `deps`, cộng con còn mở nếu dòng là parent); backlog-triage impact ranking (STR21), tách bạch khỏi phân loại rủi ro/lane lúc intake (STR14 `classify.mjs`) — thao tác ĐỌC thuần, không sự kiện mới\n- `fgos take [--id <id>] [--role human|session]` → **cửa pull giao–nhận việc** (bên ngoài vòng runner): một tác nhân ngoài (người mặc định, hoặc một phiên đang sống) cầm đúng một item từ ĐÚNG tập frontier runner dispatch-được — xem \"Cửa pull giao–nhận việc\" dưới\n- `fgos return <id> [--timeout <ms>]` → trả kết quả cho một item đã `take` — verb tự đo tiến độ thật (tree sạch + HEAD tiến + verify thật), KHÔNG tin lời người gọi — xem \"Cửa pull giao–nhận việc\" dưới\n- `fgos pick [id]` → **cửa pull giao–nhận việc CỘNG dựng workspace**, một lệnh kết hợp `take` + tạo/tái dùng worktree cho item claim được: không truyền `id` thì cầm đầu frontier (giống `take`), truyền `id` thì cầm đúng item đó (kể cả đường tái claim `blocked→doing` mang nhánh sống, giống `take`) — role LUÔN `session`, không có cờ `--role` (khác `take`); sau khi claim thành công, dựng (hoặc tái dùng) một worktree + nhánh `fgw/<id>` qua CHÍNH `createWorktree` mà vòng tự hành dùng (xem spec Runner Data Dictionary #2) — xem \"Cầm việc + dựng workspace (pick)\" dưới\n- `fgos retrospective` → quét cơ học MỌI item đang `delivered` và chuyển từng cái sang `retrospective` — không nhận id, không phán xét, chạy lại nhiều lần vẫn ra cùng kết quả; đây là cửa vào của chặng tổng hợp sau-thi-công\n- `fgos compound <id>` → GẮN NHÃN tài liệu lên bản ghi capture của một item đang ở status `retrospective` — item ở status khác bị từ chối rõ lý do, không sự kiện nào ghi thêm. Verb này KHÔNG còn chuyển stage: stage `compound-learn` mà nó từng mở lối vào đã rút, nên nó chỉ ghi outcome. Cờ tùy chọn `--doc-type <quadrant>` ghi nhãn Diataxis, cờ tùy chọn `--doc-path <path>` ghi con trỏ nguồn↔tài liệu (linkage) lên cùng outcome — xem RUL51 (verb compound — nay là cửa gắn nhãn, không còn là cửa chuyển stage)/RUL52 (nhãn Diataxis docType — trường capture cộng-thêm, trực giao và tùy chọn)/RUL53 (con trỏ tài liệu docPath — trường linkage cộng-thêm trên outcome)\n- `fgos cleanup <id>` → đóng chặng cuối: đòi item đang ở status `cleanup`, chạy phép kiểm thu-hồi (TTL toàn cục đã trôi qua, và merge của item vẫn còn giải được) rồi mới cho `cleanup → done`; không đạt thì item rẽ `cleanup → blocked` nêu rõ lý do. Là harness thuần — KHÔNG skill nào nạp cho chặng này\n- `fgos docs-index` → sinh chỉ mục đọc-theo-tag máy-đọc-được của tài liệu người-dùng-cuối (manifest `docs/enduser-docs-index.json`) — verb ĐỌC-THUẦN (quyền `read`): không ghi sự kiện, không đổi trạng thái item, không sửa tài liệu nào; enumerate các quadrant Diataxis trên đĩa và truy ngược mỗi tài liệu về capture đã sinh nó — chi tiết hành vi + hình dạng manifest ở area `enduser-docs-index` (per bước-3 compound-learn-enduser-docs)\n- `fgos review <id>` / `fgos approve <id> [--timeout <ms>]` / `fgos reject <id> --reason \"...\"` → cổng duyệt PR nội bộ, MỘT cổng cho mọi đề xuất `awaiting-approval` bất kể nguồn (runner hay pull-door) — bề mặt CLI này sống ở đây (cửa lệnh `fgos` một cửa), nhưng cơ chế merge/verify đầy đủ được đặc tả ở spec Runner \"Cổng duyệt PR nội bộ\"\n- Bản ghi dự đoán/thực tế (outcome) không có verb ghi riêng qua cửa lệnh: nó được ghi từ bên trong vòng tự hành (xem spec Runner) — nửa dự đoán lúc nhận việc, nửa thực tế lúc việc tới trạng thái cuối (thành công lẫn thất bại); cửa pull `take`/`return` ghi hai nửa này trực tiếp, cùng khuôn"
+      },
+      "afterUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 25,
+        "endLine": 48,
+        "textDigest": "21e9b6c7342fa4e8f55cbc2f791698156e82ba65eeb4cacc8f80decfa70fc58c",
+        "sample": "- `fgos init` → khởi tạo kho work-state rỗng tại thư mục làm việc hiện hành (nhật ký rỗng + bản chiếu rỗng); đồng thời quét READ-ONLY project tìm marker của harness agent khác đã c",
+        "identityFingerprint": "9b58d8cd5e6d84a1beb35a9eec463ca73d5ce845481fa6462cd9130b94c54755",
+        "ancestry": [
+          "Work State Specification",
+          "2. Entry Points And Triggers"
+        ],
+        "text": "- `fgos init` → khởi tạo kho work-state rỗng tại thư mục làm việc hiện hành (nhật ký rỗng + bản chiếu rỗng); đồng thời quét READ-ONLY project tìm marker của harness agent khác đã có mặt (thư mục dấu ấn như `.bee/`, `.claude/`, `.codex/`, `.cursor/`, và khối managed trong `AGENTS.md` khi file đó tồn tại — `init` không bao giờ tạo/sửa `AGENTS.md`), ghi kết quả phát hiện ra output + vào manifest `.fgos/coexistence.json`; lỗi phát hiện không bao giờ chặn `init` (fail-safe), re-init lặp lại ghi manifest nhất quán (idempotent) — doctrine đầy đủ: `docs/coexistence.md`\n- `fgos submit \"<mô tả tự do>\" [--async|--unattended] [--deps <id1,id2,...>]` → **cửa vào công khai duy nhất** cho việc mới: khai một work item từ một câu mô tả văn xuôi duy nhất — id, title, kind, risk, size đều TỰ SUY (không cần người submit tự đặt); toàn văn mô tả gốc được giữ nguyên trên trường `description` (Data Dictionary #17, per discovery-context STR30) — nguồn ngữ cảnh đầy đủ cho context-discovery đọc lại sau, không bị cắt gọn như `title`; `verify` nhận placeholder cố định chờ bổ sung sau; `--deps` (tùy chọn, mirror hệt `add`'s `deps` sẵn có) ghi trực tiếp danh sách id phụ thuộc, đi qua ĐÚNG cửa ghi/kiểm chu trình mà mọi verb khác dùng — vắng cờ này thì `deps` rỗng, byte-identical hành vi trước đây (per str83-fgos-slash-commands / 757e5dd7); kết quả in ra bọc trong một phong bì máy-đọc chuẩn (xem \"Phong bì output\" dưới)\n- `fgos move` → chuyển trạng thái một item, kèm `--expect` (kỳ vọng, chống ghi đè mù); cạnh từ-chối-đề-xuất bắt buộc `--reason`\n- `fgos decision --text \"...\"` → ghi một quyết định vào nhật ký\n- `fgos ask <id> --text \"...\"` → đưa một item vào chờ người (`awaiting-human`), kèm **câu hỏi** người phải quyết; item rời tập việc-sẵn-sàng cho tới khi được trả lời; nếu item có `parent`, `ask` còn chụp thêm một ảnh `{id, title, status}` của gốc lúc này làm mốc so sánh sau (per str61-chat-context-continuity — xem RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm))\n- `fgos answer <id> --text \"...\"` → **trả lời** câu hỏi của một item đang chờ; ghi câu trả lời vào nhật ký rồi đưa item rời `awaiting-human` về `todo`, thành việc actionable trở lại\n- `fgos list` → đọc danh sách item từ bản chiếu hiện hành; item đang `awaiting-human` hiện kèm câu hỏi của nó (không cần lệnh đọc riêng); item `awaiting-human` có `parent` còn kèm thêm `awaitingContext` — gốc hiện tại để neo ngữ cảnh, cộng phần đổi-từ-lúc-hỏi nếu có (per str61-chat-context-continuity — xem RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)), khóa này vắng mặt hoàn toàn khi không có item nào thuộc diện đó\n- `fgos ready` → đọc frontier: mọi item `todo` có toàn bộ deps đã ngã-ngũ, đang ở stage `executing`, VÀ không còn hậu duệ nào (qua `parent`) dang dở, thứ tự đúng thứ tự khai — thao tác ĐỌC thuần; item `awaiting-human`, còn ở stage `discovery`/`exploring`/`planning`, hoặc còn con dang dở KHÔNG BAO GIỜ xuất hiện trong tập này. \"Ngã-ngũ\" ở đây tính từ `delivered` trở đi (`delivered`/`retrospective`/`cleanup`/`done`), cộng item bị hủy — nghĩa là code đã vào cây chính là đủ mở dep, không phải chờ hết cả phần đuôi tổng-hợp/thu-hồi (xem RUL12 (frontier dẫn xuất))\n- `fgos discover <id> [--verdict clear|unclear]` → chạy context-discovery cho một item đang ở stage `discovery` hoặc `exploring`, mang theo verdict của chính người gọi — đọc gì trước \"Giai đoạn Soi-rõ (stage discovery) và Đào-sâu (stage exploring)\" dưới; item ở stage lập-kế-hoạch dùng `plan`, không dùng verb này\n- `fgos plan <id> [--verdict pass-through|decompose|need-human] [--children <json>]` → chạy phán chia-việc cho một item đang ở stage `planning` (hoặc bí danh di sản `decompose`) — verb RIÊNG, tách bạch khỏi `discover`, xem \"Giai đoạn Lập-kế-hoạch\" dưới\n- `fgos rebuild` → dựng lại bản chiếu từ zero bằng cách phát lại toàn bộ nhật ký\n- `fgos repair` → sửa CHỈ MỘT hình dạng hỏng hẹp của nhật ký sự kiện: dòng cuối bị cắt cụt (crash giữa lúc append). Trước khi cắt, sao lưu nguyên trạng nhật ký hỏng ra file backup có dấu thời gian; sau khi cắt, tự đọc lại kiểm chứng nhật ký sạch trước khi báo thành công. Hỏng hình dạng khác (giữa file, nhiều dòng hỏng, hoặc nhật ký vốn đã sạch) đều bị từ chối rõ lý do, KHÔNG đụng file — cửa fail-closed cho `corrupt-log` (mã thoát 5) không bị nới, chỉ có đúng một khe hẹp này được vá tay bởi người vận hành. **Yêu cầu KHÔNG-tiến-trình-song-song (per fgos-multi-session-checkout Epic 3):** `repair` là ghi-đè-cả-file (`writeFileSync` sau khi sao lưu) và CỐ Ý không lấy `.fgos/events.lock` của `appendEvent` — nó phải chỉ chạy khi KHÔNG có tiến trình fgos nào đang sống, vì một `appendEvent` chen vào giữa lúc đọc và lúc ghi-đè của repair sẽ bị âm thầm nuốt mất (drop). Đây là thao tác hiếm, người vận hành chủ động gọi, không nằm trên đường append thường; bảo vệ repair khỏi ca đó là ngoài phạm vi, chỉ ghi nhận yêu cầu chứ không cưỡng chế\n- `fgos metrics outcomes [id]` → đọc bản chiếu, in cặp dự đoán/thực tế (outcome) đã gộp cho một item, hoặc cho mọi item đang có dữ liệu nếu không truyền id — thao tác ĐỌC thuần\n- `fgos rollup <id>` → đọc bản chiếu, in một item gốc (title/status) kèm đếm con theo status (`k/n done`) và liệt kê từng con trực tiếp (qua `parent`, dựng từ STR16 decompose) cùng status của nó; item không con in `0/0 done` + ghi rõ \"không có con\"; id không tồn tại báo lỗi `validation` — thao tác ĐỌC thuần, không sự kiện mới\n- `fgos triage` → đọc bản chiếu, xếp hạng mọi item CHƯA `done` theo số item khác (cũng chưa `done`) đang phụ thuộc vào nó qua đồ thị hợp nhất `deps` + `parent` (`blocks`; một parent được tính cả từ con còn mở, không chỉ `deps`), giảm dần rồi id tăng dần (tie-break); mỗi dòng còn kèm `blockedBy` — chiều ngược lại, danh sách id mà CHÍNH dòng này còn đang chờ (unmet `deps`, cộng con còn mở nếu dòng là parent); backlog-triage impact ranking (STR21), tách bạch khỏi phân loại rủi ro/lane lúc intake (STR14 `classify.mjs`) — thao tác ĐỌC thuần, không sự kiện mới\n- `fgos take [--id <id>] [--role human|session]` → **cửa pull giao–nhận việc** (bên ngoài vòng runner): một tác nhân ngoài (người mặc định, hoặc một phiên đang sống) cầm đúng một item từ ĐÚNG tập frontier runner dispatch-được — xem \"Cửa pull giao–nhận việc\" dưới\n- `fgos return <id> [--timeout <ms>]` → trả kết quả cho một item đã `take` — verb tự đo tiến độ thật (tree sạch + HEAD tiến + verify thật), KHÔNG tin lời người gọi — xem \"Cửa pull giao–nhận việc\" dưới\n- `fgos pick [id]` → **cửa pull giao–nhận việc CỘNG dựng workspace**, một lệnh kết hợp `take` + tạo/tái dùng worktree cho item claim được: không truyền `id` thì cầm đầu frontier (giống `take`), truyền `id` thì cầm đúng item đó (kể cả đường tái claim `blocked→doing` mang nhánh sống, giống `take`) — role LUÔN `session`, không có cờ `--role` (khác `take`); sau khi claim thành công, dựng (hoặc tái dùng) một worktree + nhánh `fgw/<id>` qua CHÍNH `createWorktree` mà vòng tự hành dùng (xem spec Runner Data Dictionary #2) — xem \"Cầm việc + dựng workspace (pick)\" dưới\n- `fgos retrospective` → quét cơ học MỌI item đang `delivered` và chuyển từng cái sang `retrospective` — không nhận id, không phán xét, chạy lại nhiều lần vẫn ra cùng kết quả; đây là cửa vào của chặng tổng hợp sau-thi-công\n- `fgos compound <id>` → GẮN NHÃN tài liệu lên bản ghi capture của một item đang ở status `retrospective` — item ở status khác bị từ chối rõ lý do, không sự kiện nào ghi thêm. Verb này KHÔNG còn chuyển stage: stage `compound-learn` mà nó từng mở lối vào đã rút, nên nó chỉ ghi outcome. Cờ tùy chọn `--doc-type <quadrant>` ghi nhãn Diataxis, cờ tùy chọn `--doc-path <path>` ghi con trỏ nguồn↔tài liệu (linkage) lên cùng outcome — xem RUL51 (verb compound — nay là cửa gắn nhãn, không còn là cửa chuyển stage)/RUL52 (nhãn Diataxis docType — trường capture cộng-thêm, trực giao và tùy chọn)/RUL53 (con trỏ tài liệu docPath — trường linkage cộng-thêm trên outcome)\n- `fgos cleanup <id>` → đóng chặng cuối: đòi item đang ở status `cleanup`, chạy phép kiểm thu-hồi (TTL theo item đã trôi qua: leaf dùng `cleanup.leafTtlDays` mặc định 0 ngày, item khác dùng `cleanup.ttlDays` mặc định 7 ngày; và merge của item vẫn còn giải được) rồi mới cho `cleanup → done`; TTL chưa trôi qua thì item giữ `cleanup` với kết quả noop; chỉ phép kiểm thất bại mới đưa item sang `cleanup → blocked` nêu rõ lý do. Là harness thuần — KHÔNG skill nào nạp cho chặng này\n- `fgos docs-index` → sinh chỉ mục đọc-theo-tag máy-đọc-được của tài liệu người-dùng-cuối (manifest `docs/enduser-docs-index.json`) — verb ĐỌC-THUẦN (quyền `read`): không ghi sự kiện, không đổi trạng thái item, không sửa tài liệu nào; enumerate các quadrant Diataxis trên đĩa và truy ngược mỗi tài liệu về capture đã sinh nó — chi tiết hành vi + hình dạng manifest ở area `enduser-docs-index` (per bước-3 compound-learn-enduser-docs)\n- `fgos review <id>` / `fgos approve <id> [--timeout <ms>]` / `fgos reject <id> --reason \"...\"` → cổng duyệt PR nội bộ, MỘT cổng cho mọi đề xuất `awaiting-approval` bất kể nguồn (runner hay pull-door) — bề mặt CLI này sống ở đây (cửa lệnh `fgos` một cửa), nhưng cơ chế merge/verify đầy đủ được đặc tả ở spec Runner \"Cổng duyệt PR nội bộ\"\n- Bản ghi dự đoán/thực tế (outcome) không có verb ghi riêng qua cửa lệnh: nó được ghi từ bên trong vòng tự hành (xem spec Runner) — nửa dự đoán lúc nhận việc, nửa thực tế lúc việc tới trạng thái cuối (thành công lẫn thất bại); cửa pull `take`/`return` ghi hai nửa này trực tiếp, cùng khuôn"
+      },
+      "decision": {
+        "claimId": "claim_eb0bf7783bb1b1027c012f050c782203",
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "sourceAnchor": "unheaded-block-3",
+        "sourceUnitDigest": "c8fc6e5bf49179cb6f37f3247ad25c3217a40bd23b96748f5fdf6893dff5581e",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-3",
+        "targetUnitDigest": "21e9b6c7342fa4e8f55cbc2f791698156e82ba65eeb4cacc8f80decfa70fc58c",
+        "targetAncestry": [
+          "Work State Specification",
+          "2. Entry Points And Triggers"
+        ],
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      }
+    },
+    {
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "fea9f0879fe7af602564961550096e4dc43f46a5952cedf350d19246be0041d8",
+        "identityFingerprint": "fea9f0879fe7af602564961550096e4dc43f46a5952cedf350d19246be0041d8",
+        "claimId": "claim_3c9b65402d8ece4ef57ad337ba5d9d72",
+        "sourceAnchor": "unheaded-block-39",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "fadda0c2061d00de158fb62f8d16aba1e58002c1165e5b3d416be97331217f3e",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-39 is not a stable heading anchor"
+      },
+      "successorIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "f4dcd94029194e36eaef5e4f96ac1843eac77e192edd25d8229615c8fe83652c",
+        "identityFingerprint": "f4dcd94029194e36eaef5e4f96ac1843eac77e192edd25d8229615c8fe83652c",
+        "claimId": "claim_a82462ca8d08b036f8ff1c79e5eebfee",
+        "sourceAnchor": "unheaded-block-39",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "f092e335e21534b0c6d0a03e9d98b8b6311f62d646ae9216dafb872d86c23ba0",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-cd82746a8ba169600d987eeb0f5ca274304712f3"
+      },
+      "beforeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-39",
+        "githubAnchor": "unheaded-block-39",
+        "stableAnchor": "unheaded-block-39",
+        "title": "Unheaded block 39",
+        "startLine": 344,
+        "endLine": 353,
+        "textDigest": "fadda0c2061d00de158fb62f8d16aba1e58002c1165e5b3d416be97331217f3e",
+        "sample": "**`decompose` là bí danh di sản, CHỈ để tháo cạn (drain-only).** Stage này\ntừng là tên của chính bước lập-kế-hoạch và đã được đổi tên thành `planning`.\nCái tên cũ được GIỮ LẠI tron",
+        "identityFingerprint": "fea9f0879fe7af602564961550096e4dc43f46a5952cedf350d19246be0041d8",
+        "ancestry": [
+          "Work State Specification",
+          "5. Workflow Step And Stage Model",
+          "Planning Stage"
+        ],
+        "text": "**`decompose` là bí danh di sản, CHỈ để tháo cạn (drain-only).** Stage này\ntừng là tên của chính bước lập-kế-hoạch và đã được đổi tên thành `planning`.\nCái tên cũ được GIỮ LẠI trong sổ đăng ký — cùng hai cạnh `exploring →\ndecompose` và `decompose → executing` — vì `stage` không nằm trong danh sách\ntrường sửa được, nên các item đang đỗ trên tên đó không thể gán nhãn lại và\nsẽ mắc kẹt vĩnh viễn nếu tên bị gỡ. Nhưng KHÔNG item mới nào còn tới được đây:\n`decompose` cố ý không mang mục step-mapping nào, nên phép tra \"stage nào thỏa\nbước Chia-việc\" luôn trả về `planning`. Bí danh này biến mất khi số item còn\nđỗ trên nó về 0 (lúc viết lại mục này: 5 item còn mở). Mọi điều mục này nói về\n`planning` áp dụng nguyên vẹn cho một item còn đỗ ở `decompose`."
+      },
+      "afterUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-39",
+        "githubAnchor": "unheaded-block-39",
+        "stableAnchor": "unheaded-block-39",
+        "title": "Unheaded block 39",
+        "startLine": 344,
+        "endLine": 353,
+        "textDigest": "f092e335e21534b0c6d0a03e9d98b8b6311f62d646ae9216dafb872d86c23ba0",
+        "sample": "**`decompose` là bí danh di sản, CHỈ để tháo cạn (drain-only).** Stage này\ntừng là tên của chính bước lập-kế-hoạch và đã được đổi tên thành `planning`.\nCái tên cũ được GIỮ LẠI dưới",
+        "identityFingerprint": "f4dcd94029194e36eaef5e4f96ac1843eac77e192edd25d8229615c8fe83652c",
+        "ancestry": [
+          "Work State Specification",
+          "5. Workflow Step And Stage Model",
+          "Planning Stage"
+        ],
+        "text": "**`decompose` là bí danh di sản, CHỈ để tháo cạn (drain-only).** Stage này\ntừng là tên của chính bước lập-kế-hoạch và đã được đổi tên thành `planning`.\nCái tên cũ được GIỮ LẠI dưới dạng bí danh workflow `decompose: planning`;\nworkflow coding không có step `decompose` hay hai cạnh `exploring →\ndecompose` và `decompose → executing`, mà phân giải tên cũ sang `planning`\nkhi đọc item di sản. Nhưng KHÔNG item mới nào còn tới được đây:\n`decompose` cố ý không mang mục step-mapping nào, nên phép tra \"stage nào thỏa\nbước Chia-việc\" luôn trả về `planning`. Bí danh này biến mất khi số item còn\nđỗ trên nó về 0 (lúc viết lại mục này: 5 item còn mở). Mọi điều mục này nói về\n`planning` áp dụng nguyên vẹn cho một item còn đỗ ở `decompose`."
+      },
+      "decision": {
+        "claimId": "claim_3c9b65402d8ece4ef57ad337ba5d9d72",
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "sourceAnchor": "unheaded-block-39",
+        "sourceUnitDigest": "fadda0c2061d00de158fb62f8d16aba1e58002c1165e5b3d416be97331217f3e",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-39",
+        "targetUnitDigest": "f092e335e21534b0c6d0a03e9d98b8b6311f62d646ae9216dafb872d86c23ba0",
+        "targetAncestry": [
+          "Work State Specification",
+          "5. Workflow Step And Stage Model",
+          "Planning Stage"
+        ],
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      }
+    },
+    {
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "a0fd9fc981f01a4c7c54ae6aaf37b6506030c0671219a6324661d0a694d9f77c",
+        "identityFingerprint": "a0fd9fc981f01a4c7c54ae6aaf37b6506030c0671219a6324661d0a694d9f77c",
+        "claimId": "claim_1f9fb4feceda8f5bf6a18b151ce0a397",
+        "sourceAnchor": "unheaded-block-55",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "4b215c2fd35cfdf4e6786cf9adbb44f0e1bbb55662a39329bc271641ef99f6b0",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-55 is not a stable heading anchor"
+      },
+      "successorIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "65b8bb71a2e3e6c12922464d11446b0b24efd650e5bb7495332d671d4e274229",
+        "identityFingerprint": "65b8bb71a2e3e6c12922464d11446b0b24efd650e5bb7495332d671d4e274229",
+        "claimId": "claim_daa1644d1d821b366653bcb9d9f315fc",
+        "sourceAnchor": "unheaded-block-55",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "b93b1271702eedfac07aee1897bce1aa36c6322ede478bf5b3df20194da452ad",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-cd82746a8ba169600d987eeb0f5ca274304712f3"
+      },
+      "beforeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-55",
+        "githubAnchor": "unheaded-block-55",
+        "stableAnchor": "unheaded-block-55",
+        "title": "Unheaded block 55",
+        "startLine": 519,
+        "endLine": 525,
+        "textDigest": "4b215c2fd35cfdf4e6786cf9adbb44f0e1bbb55662a39329bc271641ef99f6b0",
+        "sample": "Song song với vòng tự hành (runner tự dispatch việc — xem spec Runner), một\n**cửa pull** đơn giản cho phép một tác nhân NGOÀI runner — người vận hành,\nmột phiên đang sống, hay một ",
+        "identityFingerprint": "a0fd9fc981f01a4c7c54ae6aaf37b6506030c0671219a6324661d0a694d9f77c",
+        "ancestry": [
+          "Work State Specification",
+          "7. Pull Door Take And Return"
+        ],
+        "text": "Song song với vòng tự hành (runner tự dispatch việc — xem spec Runner), một\n**cửa pull** đơn giản cho phép một tác nhân NGOÀI runner — người vận hành,\nmột phiên đang sống, hay một runner thứ hai — cầm đúng một item và tự trả\nkết quả, không qua bất kỳ tiến trình điều phối nào đứng giữa (không\nregistry/heartbeat/push/lease — tầng đó, khi cần, đắp sau trên cùng nhật ký,\nxem Open Gaps). Tập item cửa pull mở ra là ĐÚNG tập frontier mà runner tự\ndispatch (`fgos ready`) — cửa pull không mở một tập riêng."
+      },
+      "afterUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-55",
+        "githubAnchor": "unheaded-block-55",
+        "stableAnchor": "unheaded-block-55",
+        "title": "Unheaded block 55",
+        "startLine": 519,
+        "endLine": 525,
+        "textDigest": "b93b1271702eedfac07aee1897bce1aa36c6322ede478bf5b3df20194da452ad",
+        "sample": "Song song với vòng tự hành (runner tự dispatch việc — xem spec Runner), một\n**cửa pull** đơn giản cho phép một tác nhân NGOÀI runner — người vận hành,\nmột phiên đang sống, hay một ",
+        "identityFingerprint": "65b8bb71a2e3e6c12922464d11446b0b24efd650e5bb7495332d671d4e274229",
+        "ancestry": [
+          "Work State Specification",
+          "7. Pull Door Take And Return"
+        ],
+        "text": "Song song với vòng tự hành (runner tự dispatch việc — xem spec Runner), một\n**cửa pull** đơn giản cho phép một tác nhân NGOÀI runner — người vận hành,\nmột phiên đang sống, hay một runner thứ hai — cầm đúng một item và tự trả\nkết quả, không qua bất kỳ tiến trình điều phối nào đứng giữa (không\nregistry/heartbeat/push/lease — tầng đó, khi cần, đắp sau trên cùng nhật ký,\nxem Open Gaps). Khi không truyền id, `take`/`pick` cầm đầu frontier mà runner tự\ndispatch (`fgos ready`); với id tường minh, lớp CLI của `pick` không kiểm frontier/stage, nhưng chốt claim vẫn kiểm status và deps chưa giải quyết của leaf; `take` kiểm deps và lineage khi item đang `todo`, không kiểm stage."
+      },
+      "decision": {
+        "claimId": "claim_1f9fb4feceda8f5bf6a18b151ce0a397",
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "sourceAnchor": "unheaded-block-55",
+        "sourceUnitDigest": "4b215c2fd35cfdf4e6786cf9adbb44f0e1bbb55662a39329bc271641ef99f6b0",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-55",
+        "targetUnitDigest": "b93b1271702eedfac07aee1897bce1aa36c6322ede478bf5b3df20194da452ad",
+        "targetAncestry": [
+          "Work State Specification",
+          "7. Pull Door Take And Return"
+        ],
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      }
+    },
+    {
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "b14a7cb5dc52a4c00b9effd79c5602a3abe5c8b4f8559ff871b91c34d31077c0",
+        "identityFingerprint": "b14a7cb5dc52a4c00b9effd79c5602a3abe5c8b4f8559ff871b91c34d31077c0",
+        "claimId": "claim_acab595482e4f9f7ae05e21a1a28f11b",
+        "sourceAnchor": "unheaded-block-64",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6507aee6bfe4534417362ff8fbb85c58f51a633e49c81ef69ea29c75effb773a",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-64 is not a stable heading anchor"
+      },
+      "successorIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "2308d8632e935847b10b30fe3cf6ee8a3bfc46cdaf063d98cf355267302133f2",
+        "identityFingerprint": "2308d8632e935847b10b30fe3cf6ee8a3bfc46cdaf063d98cf355267302133f2",
+        "claimId": "claim_2053e22c38abb6bd9fda28307c4e1818",
+        "sourceAnchor": "unheaded-block-64",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8c083fa704b78795877465578a80d3603ef9ef8bbf2f9000c1547daead10880f",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-cd82746a8ba169600d987eeb0f5ca274304712f3"
+      },
+      "beforeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-64",
+        "githubAnchor": "unheaded-block-64",
+        "stableAnchor": "unheaded-block-64",
+        "title": "Unheaded block 64",
+        "startLine": 677,
+        "endLine": 703,
+        "textDigest": "6507aee6bfe4534417362ff8fbb85c58f51a633e49c81ef69ea29c75effb773a",
+        "sample": "- **Runs when:** người/agent gọi `fgos init` tại thư mục làm việc — bước đầu\n  tiên trước khi bất kỳ verb nào khác dùng được kho work-state.\n- **Blocked when:** không có điều kiện ",
+        "identityFingerprint": "b14a7cb5dc52a4c00b9effd79c5602a3abe5c8b4f8559ff871b91c34d31077c0",
+        "ancestry": [
+          "Work State Specification",
+          "9. Behaviors And Operations",
+          "Init Verb"
+        ],
+        "text": "- **Runs when:** người/agent gọi `fgos init` tại thư mục làm việc — bước đầu\n  tiên trước khi bất kỳ verb nào khác dùng được kho work-state.\n- **Blocked when:** không có điều kiện chặn — `init` luôn thành công bất kể\n  phát hiện gì (per install-coexistence / f1715488).\n- **What changes:** tạo `.fgos/` rỗng (nhật ký rỗng + bản chiếu rỗng) tại cwd\n  nếu chưa có; quét READ-ONLY project tìm marker của harness agent khác đã có\n  mặt (thư mục dấu ấn — `.bee/`, `.claude/`, `.codex/`, `.cursor/` là tập khởi\n  đầu, mở rộng được — và khối managed trong `AGENTS.md` của host nếu file đó\n  tồn tại); ghi kết quả phát hiện vào `.fgos/coexistence.json` (manifest v1:\n  `territory` {data, worktrees {descriptor, resolved}, branches} +\n  `detected_harnesses`), và in ra output những gì phát hiện được.\n- Cộng thêm, phi-chặn: `init` còn tự kiểm project directory có phải một repo\n  git với HEAD resolve được hay không (`git rev-parse --verify --quiet HEAD`,\n  bọc try/catch fail-safe — git vắng mặt hay repo chưa có commit nào đều rơi\n  cùng một nhánh, không phân biệt); khi KHÔNG resolve được, kết quả trả về\n  mang thêm trường `gitHeadless: true` — một trường dữ liệu cộng-thêm trên\n  phong bì `fgos.v1` sẵn có, không banner riêng, không đổi mã thoát, không\n  chặn `init` (per D ecfd0d1a). Repo có ≥1 commit: không mang trường này\n  (vắng mặt, không phải `false`) — hành vi/hình dạng output không đổi cho case\n  đã có từ trước.\n- **Side effects:** không ghi/sửa/xóa bất kỳ file nào thuộc harness khác —\n  host không có `AGENTS.md` thì `init` bỏ qua bước đó, không tự tạo.\n  Lỗi đọc một marker (vd `AGENTS.md` hỏng quyền) không chặn `init` — ghi nhận\n  lỗi vào manifest, `init` vẫn thành công (fail-safe).\n- **Afterwards:** re-init trên cùng project ghi lại manifest nhất quán\n  (idempotent — không tích lũy/trùng lặp entry qua nhiều lần chạy). Doctrine\n  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/coexistence.md`."
+      },
+      "afterUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-64",
+        "githubAnchor": "unheaded-block-64",
+        "stableAnchor": "unheaded-block-64",
+        "title": "Unheaded block 64",
+        "startLine": 677,
+        "endLine": 703,
+        "textDigest": "8c083fa704b78795877465578a80d3603ef9ef8bbf2f9000c1547daead10880f",
+        "sample": "- **Runs when:** người/agent gọi `fgos init` tại thư mục làm việc — bước đầu\n  tiên trước khi bất kỳ verb nào khác dùng được kho work-state.\n- **Blocked when:** `init` bị từ chối t",
+        "identityFingerprint": "2308d8632e935847b10b30fe3cf6ee8a3bfc46cdaf063d98cf355267302133f2",
+        "ancestry": [
+          "Work State Specification",
+          "9. Behaviors And Operations",
+          "Init Verb"
+        ],
+        "text": "- **Runs when:** người/agent gọi `fgos init` tại thư mục làm việc — bước đầu\n  tiên trước khi bất kỳ verb nào khác dùng được kho work-state.\n- **Blocked when:** `init` bị từ chối trong linked worktree; kết quả quét\n  phát hiện harness không chặn `init` (per install-coexistence / f1715488).\n- **What changes:** tạo `.fgos/` rỗng (nhật ký rỗng + bản chiếu rỗng) tại cwd\n  nếu chưa có; quét READ-ONLY project tìm marker của harness agent khác đã có\n  mặt (thư mục dấu ấn — `.bee/`, `.claude/`, `.codex/`, `.cursor/` là tập khởi\n  đầu, mở rộng được — và khối managed trong `AGENTS.md` của host nếu file đó\n  tồn tại); ghi kết quả phát hiện vào `.fgos/coexistence.json` (manifest v1:\n  `territory` {data, worktrees {descriptor, resolved}, branches} +\n  `detected_harnesses`), và in ra output những gì phát hiện được.\n- Cộng thêm, phi-chặn: `init` còn tự kiểm project directory có phải một repo\n  git với HEAD resolve được hay không (`git rev-parse --verify --quiet HEAD`,\n  bọc try/catch fail-safe — git vắng mặt hay repo chưa có commit nào đều rơi\n  cùng một nhánh, không phân biệt); khi KHÔNG resolve được, kết quả trả về\n  mang thêm trường `gitHeadless: true` — một trường dữ liệu cộng-thêm trên\n  phong bì `fgos.v1` sẵn có, không banner riêng, không đổi mã thoát, không\n  chặn `init` (per D ecfd0d1a). Repo có ≥1 commit: không mang trường này\n  (vắng mặt, không phải `false`) — hành vi/hình dạng output không đổi cho case\n  đã có từ trước.\n- **Side effects:** không ghi/sửa/xóa bất kỳ file nào thuộc harness khác —\n  host không có `AGENTS.md` thì `init` bỏ qua bước đó, không tự tạo.\n  Lỗi đọc một marker (vd `AGENTS.md` hỏng quyền) không chặn `init` — ghi nhận\n  lỗi vào manifest, `init` vẫn thành công (fail-safe).\n- **Afterwards:** re-init trên cùng project ghi lại manifest nhất quán\n  (idempotent — không tích lũy/trùng lặp entry qua nhiều lần chạy). Doctrine\n  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/coexistence.md`."
+      },
+      "decision": {
+        "claimId": "claim_acab595482e4f9f7ae05e21a1a28f11b",
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "sourceAnchor": "unheaded-block-64",
+        "sourceUnitDigest": "6507aee6bfe4534417362ff8fbb85c58f51a633e49c81ef69ea29c75effb773a",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-64",
+        "targetUnitDigest": "8c083fa704b78795877465578a80d3603ef9ef8bbf2f9000c1547daead10880f",
+        "targetAncestry": [
+          "Work State Specification",
+          "9. Behaviors And Operations",
+          "Init Verb"
+        ],
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      }
+    },
+    {
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "68d8281fde226c928441640ff823f743b86d45848ca3508dcb6a9edaf420f1e1",
+        "identityFingerprint": "68d8281fde226c928441640ff823f743b86d45848ca3508dcb6a9edaf420f1e1",
+        "claimId": "claim_7c4295aa058b6a7fa5c6b945a0441a35",
+        "sourceAnchor": "unheaded-block-67",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "0cee9be267f694d7ef523f3c96e35b1837c9d6bd8f4eb275770357dab32a2cdf",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-67 is not a stable heading anchor"
+      },
+      "successorIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "bc8c3d71b2783a2b9ecacde8c736f4440c91135fb92bcf70f194e908ff67e297",
+        "identityFingerprint": "bc8c3d71b2783a2b9ecacde8c736f4440c91135fb92bcf70f194e908ff67e297",
+        "claimId": "claim_175366bb026c14ed1f79f00b6753bdcb",
+        "sourceAnchor": "unheaded-block-67",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "dbfcaa1881570e24492daa35eb776b4fbea75fab92318188517e6b81ee2bdbd2",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-cd82746a8ba169600d987eeb0f5ca274304712f3"
+      },
+      "beforeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-67",
+        "githubAnchor": "unheaded-block-67",
+        "stableAnchor": "unheaded-block-67",
+        "title": "Unheaded block 67",
+        "startLine": 731,
+        "endLine": 784,
+        "textDigest": "0cee9be267f694d7ef523f3c96e35b1837c9d6bd8f4eb275770357dab32a2cdf",
+        "sample": "- **Runs when:** người/agent gọi `fgos submit \"<mô tả>\" [--async|--unattended] [--domain <tên>] [--deps <id1,id2,...>] [--tier <bậc>] [--kind <loại>] [--risk <mức>]` —\n  song song ",
+        "identityFingerprint": "68d8281fde226c928441640ff823f743b86d45848ca3508dcb6a9edaf420f1e1",
+        "ancestry": [
+          "Work State Specification",
+          "9. Behaviors And Operations",
+          "Submit Verb"
+        ],
+        "text": "- **Runs when:** người/agent gọi `fgos submit \"<mô tả>\" [--async|--unattended] [--domain <tên>] [--deps <id1,id2,...>] [--tier <bậc>] [--kind <loại>] [--risk <mức>]` —\n  song song với `add`, không thay thế; dùng khi người submit không muốn/không\n  thể tự điền các trường tách rời của `add`.\n- **Blocked when:** thiếu mô tả (không truyền văn bản nào) — `validation` (mã\n  4), KHÔNG sự kiện nào được ghi; `--deps` trỏ một id không tồn tại —\n  `validation` (mã 4) qua ĐÚNG cửa kiểm `add` đã dùng, KHÔNG sự kiện nào được\n  ghi. Không có điều kiện chặn nào khác — mọi mô tả không khớp từ khóa phân\n  loại nào vẫn tạo item thành công (rơi về mặc định an toàn), đúng tinh thần\n  \"không bao giờ chặn vì không đoán được loại\".\n- **What changes:** một sự kiện khai-item (đúng loại `work.add` như `add`,\n  không phải sự kiện mới) vào nhật ký. Các trường được suy tự động từ mô tả:\n  - **title** — câu/dòng đầu tiên của mô tả, hoặc một đoạn cắt gọn nếu mô tả\n    không có ranh giới câu tự nhiên.\n  - **id** — sinh từ title, kèm hậu tố chống trùng; nếu trùng với id đã có\n    (hai mô tả tương tự nhau), tự thử lại với hậu tố khác cho tới khi ra một\n    id chưa dùng.\n  - **tier, kind, risk** — mặc định suy bằng cách đếm các từ khóa rủi ro/loại-việc\n    xuất hiện trong mô tả (quy tắc cơ học, không dùng model/AI) — không khớp\n    từ khóa nào thì `tier`/`risk` về mặc định `standard`, `kind` về mặc định\n    `task`. Ba cờ tùy chọn `--tier`/`--kind`/`--risk` (str51-llm-assist-classify)\n    GHI ĐÈ suy luận cơ học TỪNG TRƯỜNG MỘT khi có mặt — cờ nào vắng thì\n    trường đó vẫn suy như cũ, không phụ thuộc các cờ khác có mặt hay không\n    (per RUL60 (submit — ba cờ ghi-đè tier/kind/risk, độc lập từng trường) dưới). Luôn ghi đè được bằng một sửa (`edit`) sau đó dù trường\n    đến từ suy luận hay từ cờ tường minh.\n  - **verify** — một giá trị placeholder cố định, đánh dấu \"chưa xác định\" —\n    một stage sau bổ sung proof thật.\n  - **mode** — `sync` nếu không truyền cờ; `async` nếu truyền `--async` hoặc\n    `--unattended` (hai cờ cùng nghĩa). Chỉ được GHI lại ở bước này, chưa có\n    hành vi nào khác đi kèm — không có gì tự động đậu chờ người ở bước submit,\n    kể cả với `--async`.\n  - **deps** — tùy chọn qua `--deps <id1,id2,...>`, mirror HỆT cách `add` đã xử\n    lý deps từ trước: mỗi id được kiểm tồn tại + kiểm chu trình qua ĐÚNG cửa\n    ghi `addWork` mọi verb khác dùng, không cửa ghi mới; vắng cờ → `deps: []`,\n    y hệt hành vi `submit` trước khi cờ này tồn tại (per str83-fgos-slash-commands / 757e5dd7).\n  - item xuất hiện trong bản chiếu ở `todo` — y hệt `add`, ngay lập tức actionable\n    nếu deps rỗng (mặc định của submit).\n  - **domain** — tùy chọn qua `--domain <tên>`; vắng mặt đọc ra `coding`.\n  - **acceptance** — tùy chọn qua `--acceptance '<json>'`, mirror HỆT `add`\n    (Data Dictionary #24, RUL58 (acceptance-clause gate — chặn ở cửa delivered, không phải cửa done)): cùng kiểm hỏng-dạng, cùng khuôn vắng-cờ-là-\n    vắng-mặt, không mặc định mảng rỗng.\n  - **stage** — stage của domain đó thỏa bước Làm-rõ, nếu domain đó có (per\n    \"Mô hình domain\" trên); với `coding` (mặc định/vắng mặt) là `discovery`,\n    stage đầu chuỗi (xem \"Giai đoạn Soi-rõ\" dưới) — item từ `submit`\n    KHÔNG BAO GIỜ xuất hiện trong `ready` cho tới khi context-discovery cho\n    qua, dù deps đã rỗng. Một domain KHÔNG có stage nào thỏa bước Làm-rõ (vd\n    `synthetic`) nhận stage đầu tiên trong danh sách khai của domain đó thay\n    thế — bỏ qua context-discovery hoàn toàn (per R-domain-1 trên); `submit`\n    cho một domain như vậy chưa có proof thật (`verify` vẫn là placeholder\n    của `submit`, không ai điền lại) — dùng `add --domain <tên> --verify ...`\n    cho một domain bỏ-qua-discovery thay vì `submit`.\n- **Side effects:** không.\n- **Afterwards:** kết quả in ra là work item vừa tạo, bọc trong phong bì máy-đọc\n  (xem dưới); item xuất hiện trong `list` ngay (ở stage `discovery`); chỉ xuất\n  hiện trong `ready` sau khi qua context-discovery VÀ phán chia-việc."
+      },
+      "afterUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-67",
+        "githubAnchor": "unheaded-block-67",
+        "stableAnchor": "unheaded-block-67",
+        "title": "Unheaded block 67",
+        "startLine": 731,
+        "endLine": 785,
+        "textDigest": "dbfcaa1881570e24492daa35eb776b4fbea75fab92318188517e6b81ee2bdbd2",
+        "sample": "- **Runs when:** người/agent gọi `fgos submit \"<mô tả>\" [--async|--unattended] [--domain <tên>] [--deps <id1,id2,...>] [--size <cỡ>] [--rigor <độ nghiêm>] [--kind <loại>] [--risk <",
+        "identityFingerprint": "bc8c3d71b2783a2b9ecacde8c736f4440c91135fb92bcf70f194e908ff67e297",
+        "ancestry": [
+          "Work State Specification",
+          "9. Behaviors And Operations",
+          "Submit Verb"
+        ],
+        "text": "- **Runs when:** người/agent gọi `fgos submit \"<mô tả>\" [--async|--unattended] [--domain <tên>] [--deps <id1,id2,...>] [--size <cỡ>] [--rigor <độ nghiêm>] [--kind <loại>] [--risk <mức>]` —\n  song song với `add`, không thay thế; dùng khi người submit không muốn/không\n  thể tự điền các trường tách rời của `add`.\n- **Blocked when:** thiếu mô tả (không truyền văn bản nào) — `validation` (mã\n  4), KHÔNG sự kiện nào được ghi; `--deps` trỏ một id không tồn tại —\n  `validation` (mã 4) qua ĐÚNG cửa kiểm `add` đã dùng, KHÔNG sự kiện nào được\n  ghi. Không có điều kiện chặn nào khác — mọi mô tả không khớp từ khóa phân\n  loại nào vẫn tạo item thành công (rơi về mặc định an toàn), đúng tinh thần\n  \"không bao giờ chặn vì không đoán được loại\".\n- **What changes:** một sự kiện khai-item (đúng loại `work.add` như `add`,\n  không phải sự kiện mới) vào nhật ký. Các trường được suy tự động từ mô tả:\n  - **title** — câu/dòng đầu tiên của mô tả, hoặc một đoạn cắt gọn nếu mô tả\n    không có ranh giới câu tự nhiên.\n  - **id** — sinh từ title, kèm hậu tố chống trùng; nếu trùng với id đã có\n    (hai mô tả tương tự nhau), tự thử lại với hậu tố khác cho tới khi ra một\n    id chưa dùng.\n  - **size, kind, risk** — mặc định suy bằng cách đếm các từ khóa rủi ro/loại-việc\n    xuất hiện trong mô tả (quy tắc cơ học, không dùng model/AI) — không khớp\n    từ khóa nào thì `size`/`risk` về mặc định `standard`, `kind` về mặc định\n    `task`. Ba cờ tùy chọn `--size`/`--kind`/`--risk` (str51-llm-assist-classify)\n    GHI ĐÈ suy luận cơ học TỪNG TRƯỜNG MỘT khi có mặt — cờ nào vắng thì\n    trường đó vẫn suy như cũ, không phụ thuộc các cờ khác có mặt hay không;\n    `--rigor` tùy chọn, vắng cờ thì không khai `rigor`\n    (per RUL60 (submit — cờ phân loại hiện hành) dưới). Luôn ghi đè được bằng một sửa (`edit`) sau đó dù trường\n    đến từ suy luận hay từ cờ tường minh.\n  - **verify** — một giá trị placeholder cố định, đánh dấu \"chưa xác định\" —\n    một stage sau bổ sung proof thật.\n  - **mode** — `sync` nếu không truyền cờ; `async` nếu truyền `--async` hoặc\n    `--unattended` (hai cờ cùng nghĩa). Chỉ được GHI lại ở bước này, chưa có\n    hành vi nào khác đi kèm — không có gì tự động đậu chờ người ở bước submit,\n    kể cả với `--async`.\n  - **deps** — tùy chọn qua `--deps <id1,id2,...>`, mirror HỆT cách `add` đã xử\n    lý deps từ trước: mỗi id được kiểm tồn tại + kiểm chu trình qua ĐÚNG cửa\n    ghi `addWork` mọi verb khác dùng, không cửa ghi mới; vắng cờ → `deps: []`,\n    y hệt hành vi `submit` trước khi cờ này tồn tại (per str83-fgos-slash-commands / 757e5dd7).\n  - item xuất hiện trong bản chiếu ở `todo` — y hệt `add`, ngay lập tức actionable\n    nếu deps rỗng (mặc định của submit).\n  - **domain** — tùy chọn qua `--domain <tên>`; vắng mặt đọc ra `coding`.\n  - **acceptance** — tùy chọn qua `--acceptance '<json>'`, mirror HỆT `add`\n    (Data Dictionary #24, RUL58 (acceptance-clause gate — chặn ở cửa delivered, không phải cửa done)): cùng kiểm hỏng-dạng, cùng khuôn vắng-cờ-là-\n    vắng-mặt, không mặc định mảng rỗng.\n  - **stage** — stage của domain đó thỏa bước Làm-rõ, nếu domain đó có (per\n    \"Mô hình domain\" trên); với `coding` (mặc định/vắng mặt) là `discovery`,\n    stage đầu chuỗi (xem \"Giai đoạn Soi-rõ\" dưới) — item từ `submit`\n    KHÔNG BAO GIỜ xuất hiện trong `ready` cho tới khi context-discovery cho\n    qua, dù deps đã rỗng. Một domain KHÔNG có stage nào thỏa bước Làm-rõ (vd\n    `synthetic`) nhận stage đầu tiên trong danh sách khai của domain đó thay\n    thế — bỏ qua context-discovery hoàn toàn (per R-domain-1 trên); `submit`\n    cho một domain như vậy chưa có proof thật (`verify` vẫn là placeholder\n    của `submit`, không ai điền lại) — dùng `add --domain <tên> --verify ...`\n    cho một domain bỏ-qua-discovery thay vì `submit`.\n- **Side effects:** không.\n- **Afterwards:** kết quả in ra là work item vừa tạo, bọc trong phong bì máy-đọc\n  (xem dưới); item xuất hiện trong `list` ngay (ở stage `discovery`); chỉ xuất\n  hiện trong `ready` sau khi qua context-discovery VÀ phán chia-việc."
+      },
+      "decision": {
+        "claimId": "claim_7c4295aa058b6a7fa5c6b945a0441a35",
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "sourceAnchor": "unheaded-block-67",
+        "sourceUnitDigest": "0cee9be267f694d7ef523f3c96e35b1837c9d6bd8f4eb275770357dab32a2cdf",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-67",
+        "targetUnitDigest": "dbfcaa1881570e24492daa35eb776b4fbea75fab92318188517e6b81ee2bdbd2",
+        "targetAncestry": [
+          "Work State Specification",
+          "9. Behaviors And Operations",
+          "Submit Verb"
+        ],
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      }
+    },
+    {
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "29d521eaf6bff95e8a038bd83878d88ba25ea59e67c471410a1d0c630c86ea2d",
+        "identityFingerprint": "29d521eaf6bff95e8a038bd83878d88ba25ea59e67c471410a1d0c630c86ea2d",
+        "claimId": "claim_02a2110f086ac00ef2d59c9d4d9afeb1",
+        "sourceAnchor": "unheaded-block-68",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "ecb4ec26f8d1cd8578eb40c2e93a7e12016dc4658e1593d04c48fddaf40d4691",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-68 is not a stable heading anchor"
+      },
+      "successorIdentity": {
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "unitDigest": "df483a3f359a6c19c1657ebbcc96d6f6adf39925b7375ebf00041d4791430011",
+        "identityFingerprint": "df483a3f359a6c19c1657ebbcc96d6f6adf39925b7375ebf00041d4791430011",
+        "claimId": "claim_10dcec7d1c23029e3b3cc98207ef8aaa",
+        "sourceAnchor": "unheaded-block-68",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "bc0b6df719a361a226f5f5c04024ef0cb5a149307ffccb2cbd07d1c556d51616",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-cd82746a8ba169600d987eeb0f5ca274304712f3"
+      },
+      "beforeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-68",
+        "githubAnchor": "unheaded-block-68",
+        "stableAnchor": "unheaded-block-68",
+        "title": "Unheaded block 68",
+        "startLine": 788,
+        "endLine": 822,
+        "textDigest": "ecb4ec26f8d1cd8578eb40c2e93a7e12016dc4658e1593d04c48fddaf40d4691",
+        "sample": "- **Runs when:** người/agent gọi\n  `fgos discover <id> [--verdict clear|unclear] [--tier <bậc>] [--kind <loại>] [--risk <mức>]`\n  — điểm gọi tay/phiên-sống (mode `sync`). Verb này ",
+        "identityFingerprint": "29d521eaf6bff95e8a038bd83878d88ba25ea59e67c471410a1d0c630c86ea2d",
+        "ancestry": [
+          "Work State Specification",
+          "9. Behaviors And Operations",
+          "Discover Verb"
+        ],
+        "text": "- **Runs when:** người/agent gọi\n  `fgos discover <id> [--verdict clear|unclear] [--tier <bậc>] [--kind <loại>] [--risk <mức>]`\n  — điểm gọi tay/phiên-sống (mode `sync`). Verb này phục vụ ĐÚNG hai stage đầu\n  chuỗi (`discovery`, `exploring`); item ở stage lập-kế-hoạch dùng verb `plan`\n  riêng bên dưới, KHÔNG dispatch chéo. Vòng tự hành cũng quét đúng hai stage\n  này mỗi lượt chạy (xem spec Runner) — cùng hành vi, khác điểm gọi.\n- **Blocked when:** item không tồn tại — `validation`; item đang ở stage mà\n  verb này không phục vụ — báo rõ và chỉ sang verb đúng, không âm thầm làm\n  việc khác. Người gọi tương tác KHÔNG cung cấp verdict cũng bị từ chối, trừ\n  khi tín hiệu tin-cậy (artifact quyết định đã commit dưới `docsRef`) trả lời\n  thay: engine không bao giờ tự đoán verdict hộ.\n- **What changes:** một bản ghi discovery (xem trên); rồi HOẶC một sự kiện\n  đổi-stage `discovery → planning` (verdict `clear`, kèm `verify` thật) hoặc\n  `discovery → exploring` (verdict `unclear`) hoặc `exploring → planning`\n  (đã chốt xong), HOẶC một sự kiện đổi-status sang `awaiting-human` (kèm câu\n  hỏi) khi còn cần người quyết. Kèm theo, khi người gọi có truyền\n  `--tier`/`--kind`/`--risk`: một bản vá phân loại lên chính item — đây là\n  chỗ `tier`/`kind`/`risk` được phán LẠI sau khi có bằng chứng, thay\n  cho giá trị đếm-từ-khoá mà `submit` gán lúc sinh. Ba cờ đều tùy chọn và\n  độc lập từng trường.\n- **Side effects:** không có lời gọi model nào từ bên trong verb. Phán-quan\n  lồng bên trong đã rút — lập luận nằm ở người gọi, verb chỉ áp dụng verdict\n  nhận được. Bản vá phân loại đi qua ĐÚNG một chốt chặn dùng chung với đường\n  headless của runner: chỉ áp dụng khi cả kết cục lẫn verdict đều `clear`,\n  nên một verdict `unclear` (hay một tranh chấp `verify` đang park) không bao\n  giờ ghi phân loại; và một giá trị ngoài từ vựng của domain bị từ chối\n  TRƯỚC khi verb ghi bất cứ thứ gì. Trước đây chỉ đường headless có hợp đồng\n  dữ liệu này còn đường tương tác chỉ có prose (\"skill tự nhớ gọi `fgos\n  edit`\") — hai đường nay dùng chung một cửa.\n- **Afterwards:** verdict `clear` → item sang `planning` (chưa lọt `ready` —\n  còn một giai đoạn nữa phải qua) với `verify` thật, không còn placeholder;\n  verdict `unclear` → item sang `exploring`; cần người → item xuất hiện trong\n  `list` ở `awaiting-human` kèm câu hỏi, y hệt mọi cổng chờ-người khác. Mọi\n  nhánh chưa xong đều trả lời xong rồi gọi lại `discover` (hoặc để vòng tự\n  hành tự quét) sẽ soi lại."
+      },
+      "afterUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-68",
+        "githubAnchor": "unheaded-block-68",
+        "stableAnchor": "unheaded-block-68",
+        "title": "Unheaded block 68",
+        "startLine": 789,
+        "endLine": 823,
+        "textDigest": "bc0b6df719a361a226f5f5c04024ef0cb5a149307ffccb2cbd07d1c556d51616",
+        "sample": "- **Runs when:** người/agent gọi\n  `fgos discover <id> [--verdict clear|unclear] [--size <cỡ>] [--rigor <độ nghiêm>] [--kind <loại>] [--risk <mức>]`\n  — điểm gọi tay/phiên-sống (mo",
+        "identityFingerprint": "df483a3f359a6c19c1657ebbcc96d6f6adf39925b7375ebf00041d4791430011",
+        "ancestry": [
+          "Work State Specification",
+          "9. Behaviors And Operations",
+          "Discover Verb"
+        ],
+        "text": "- **Runs when:** người/agent gọi\n  `fgos discover <id> [--verdict clear|unclear] [--size <cỡ>] [--rigor <độ nghiêm>] [--kind <loại>] [--risk <mức>]`\n  — điểm gọi tay/phiên-sống (mode `sync`). Verb này phục vụ ĐÚNG hai stage đầu\n  chuỗi (`discovery`, `exploring`); item ở stage lập-kế-hoạch dùng verb `plan`\n  riêng bên dưới, KHÔNG dispatch chéo. Vòng tự hành cũng quét đúng hai stage\n  này mỗi lượt chạy (xem spec Runner) — cùng hành vi, khác điểm gọi.\n- **Blocked when:** item không tồn tại — `validation`; item đang ở stage mà\n  verb này không phục vụ — báo rõ và chỉ sang verb đúng, không âm thầm làm\n  việc khác. Người gọi tương tác KHÔNG cung cấp verdict cũng bị từ chối, trừ\n  khi tín hiệu tin-cậy (artifact quyết định đã commit dưới `docsRef`) trả lời\n  thay: engine không bao giờ tự đoán verdict hộ.\n- **What changes:** một bản ghi discovery (xem trên); rồi HOẶC một sự kiện\n  đổi-stage `discovery → planning` (verdict `clear`, kèm `verify` thật) hoặc\n  `discovery → exploring` (verdict `unclear`) hoặc `exploring → planning`\n  (đã chốt xong), HOẶC một sự kiện đổi-status sang `awaiting-human` (kèm câu\n  hỏi) khi còn cần người quyết. Kèm theo, khi người gọi có truyền\n  `--size`/`--rigor`/`--kind`/`--risk`: một bản vá phân loại lên chính item — đây là\n  chỗ `size`/`rigor`/`kind`/`risk` được phán LẠI sau khi có bằng chứng, thay\n  cho phân loại tạm mà `submit` gán lúc sinh hoặc bổ sung `rigor` chưa khai. Bốn cờ đều tùy chọn và\n  độc lập từng trường.\n- **Side effects:** không có lời gọi model nào từ bên trong verb. Phán-quan\n  lồng bên trong đã rút — lập luận nằm ở người gọi, verb chỉ áp dụng verdict\n  nhận được. Bản vá phân loại đi qua ĐÚNG một chốt chặn dùng chung với đường\n  headless của runner: chỉ áp dụng khi cả kết cục lẫn verdict đều `clear`,\n  nên một verdict `unclear` (hay một tranh chấp `verify` đang park) không bao\n  giờ ghi phân loại; và một giá trị ngoài từ vựng của domain bị từ chối\n  TRƯỚC khi verb ghi bất cứ thứ gì. Trước đây chỉ đường headless có hợp đồng\n  dữ liệu này còn đường tương tác chỉ có prose (\"skill tự nhớ gọi `fgos\n  edit`\") — hai đường nay dùng chung một cửa.\n- **Afterwards:** verdict `clear` → item sang `planning` (chưa lọt `ready` —\n  còn một giai đoạn nữa phải qua) với `verify` thật, không còn placeholder;\n  verdict `unclear` → item sang `exploring`; cần người → item xuất hiện trong\n  `list` ở `awaiting-human` kèm câu hỏi, y hệt mọi cổng chờ-người khác. Mọi\n  nhánh chưa xong đều trả lời xong rồi gọi lại `discover` (hoặc để vòng tự\n  hành tự quét) sẽ soi lại."
+      },
+      "decision": {
+        "claimId": "claim_02a2110f086ac00ef2d59c9d4d9afeb1",
+        "sourcePath": "docs/platform/work-state/spec.md",
+        "sourceAnchor": "unheaded-block-68",
+        "sourceUnitDigest": "ecb4ec26f8d1cd8578eb40c2e93a7e12016dc4658e1593d04c48fddaf40d4691",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/spec.md",
+        "targetAnchor": "unheaded-block-68",
+        "targetUnitDigest": "bc0b6df719a361a226f5f5c04024ef0cb5a149307ffccb2cbd07d1c556d51616",
+        "targetAncestry": [
+          "Work State Specification",
+          "9. Behaviors And Operations",
+          "Discover Verb"
+        ],
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      }
+    }
+  ]
+}
