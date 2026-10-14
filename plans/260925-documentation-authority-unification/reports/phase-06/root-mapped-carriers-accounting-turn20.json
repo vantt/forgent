@@ -1,0 +1,260 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:20@2026-10-14",
+  "sourceCommit": "ad2ca83e245bbd76c0d275cc30366457b26c8df3",
+  "pairs": [
+    [
+      "docs/templates/decision.md",
+      "docs/platform/documentation/history/templates/decision.md",
+      "History"
+    ],
+    [
+      "docs/templates/discussion.md",
+      "docs/platform/documentation/history/templates/discussion.md",
+      "History"
+    ],
+    [
+      "docs/templates/generated.md",
+      "docs/platform/documentation/history/templates/generated.md",
+      "History"
+    ],
+    [
+      "docs/templates/intent-preservation-ledger.md",
+      "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
+      "History"
+    ],
+    [
+      "docs/templates/spec.md",
+      "docs/platform/documentation/history/templates/spec.md",
+      "History"
+    ],
+    [
+      "docs/templates/subcomponent-readme.md",
+      "docs/platform/documentation/history/templates/subcomponent-readme.md",
+      "History"
+    ],
+    [
+      "docs/templates/verification.md",
+      "docs/platform/documentation/history/templates/verification.md",
+      "History"
+    ],
+    [
+      "docs/templates/vision.md",
+      "docs/platform/documentation/history/templates/vision.md",
+      "History"
+    ],
+    [
+      "docs/coexistence.md",
+      "docs/platform/coexistence/spec.md",
+      "Spec"
+    ],
+    [
+      "docs/id-systems-audit.md",
+      "docs/platform/documentation/history/id-systems-audit.md",
+      "History"
+    ],
+    [
+      "docs/operator-runbook-herdr-cockpit.md",
+      "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+      "Guide / Runbook"
+    ],
+    [
+      "docs/routing-handoff-contract.md",
+      "docs/platform/runner/contracts/routing-handoff.md",
+      "Contract"
+    ],
+    [
+      "docs/distribution-vision.md",
+      "docs/platform/packaging-distribution/history/distribution-vision.md",
+      "History"
+    ],
+    [
+      "docs/transitional-switchboard.md",
+      "docs/platform/documentation/switchboard.md",
+      "Switchboard doc"
+    ],
+    [
+      "docs/README.md",
+      "docs/platform/documentation/operations/portals/docs-portal.md",
+      "Portal"
+    ]
+  ],
+  "linkAdjustments": [
+    {
+      "source": "docs/transitional-switchboard.md",
+      "target": "docs/platform/documentation/switchboard.md",
+      "original": "[docs/platform/migration-authoring-rules.md](platform/migration-authoring-rules.md)",
+      "result": "[docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/transitional-switchboard.md",
+      "target": "docs/platform/documentation/switchboard.md",
+      "original": "[docs/reading-map.md](reading-map.md)",
+      "result": "[docs/reading-map.md](../../reading-map.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/transitional-switchboard.md",
+      "target": "docs/platform/documentation/switchboard.md",
+      "original": "[docs/platform/README.md](platform/README.md)",
+      "result": "[docs/platform/README.md](../README.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/transitional-switchboard.md",
+      "target": "docs/platform/documentation/switchboard.md",
+      "original": "[docs/doc-governance.md](doc-governance.md)",
+      "result": "[docs/doc-governance.md](../../doc-governance.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/transitional-switchboard.md",
+      "target": "docs/platform/documentation/switchboard.md",
+      "original": "[docs/platform/migration-authoring-rules.md](platform/migration-authoring-rules.md)",
+      "result": "[docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/transitional-switchboard.md",
+      "target": "docs/platform/documentation/switchboard.md",
+      "original": "[plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md)",
+      "result": "[plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../../../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/transitional-switchboard.md",
+      "target": "docs/platform/documentation/switchboard.md",
+      "original": "[plans/260925-documentation-authority-unification/plan.md](../plans/260925-documentation-authority-unification/plan.md)",
+      "result": "[plans/260925-documentation-authority-unification/plan.md](../../../plans/260925-documentation-authority-unification/plan.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[doc-governance.md](doc-governance.md)",
+      "result": "[doc-governance.md](../../../../doc-governance.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[reading-map.md](reading-map.md)",
+      "result": "[reading-map.md](../../../../reading-map.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[platform/README.md](platform/README.md)",
+      "result": "[platform/README.md](../../../README.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[specs/reading-map.md](specs/reading-map.md)",
+      "result": "[specs/reading-map.md](../../../../specs/reading-map.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[user/](user/)",
+      "result": "[user/](../../../../user)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[how-to/](how-to/)",
+      "result": "[how-to/](../../../../how-to)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[reference/](reference/)",
+      "result": "[reference/](../../../../reference)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[explanation/](explanation/)",
+      "result": "[explanation/](../../../../explanation)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[platform/](platform/)",
+      "result": "[platform/](../../..)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[user/](user/)",
+      "result": "[user/](../../../../user)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[generated/](generated/)",
+      "result": "[generated/](../../../../generated)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[knowledge/](knowledge/)",
+      "result": "[knowledge/](../../../../knowledge)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[history/](history/)",
+      "result": "[history/](../../../../history)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[templates/](templates/)",
+      "result": "[templates/](../../../../templates)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[doc-governance.md](doc-governance.md)",
+      "result": "[doc-governance.md](../../../../doc-governance.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[reading-map.md](reading-map.md)",
+      "result": "[reading-map.md](../../../../reading-map.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[platform/README.md](platform/README.md)",
+      "result": "[platform/README.md](../../../README.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "original": "[specs/reading-map.md](specs/reading-map.md)",
+      "result": "[specs/reading-map.md](../../../../specs/reading-map.md)",
+      "reason": "Relative spelling changes only; original repository destination conserved."
+    }
+  ],
+  "truthNotCertified": true
+}

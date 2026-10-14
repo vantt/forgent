@@ -1,0 +1,113 @@
+# Routing Handoff Contract — fgos-runner
+
+```txt
+Document type: Contract
+Audience: Documentation migration reviewer, maintainer, agent
+Purpose: Preserve the mapped source as candidate material for conservation review
+Design status: Candidate
+Implementation: Historical source retained; current truth not certified
+Provenance: docs/routing-handoff-contract.md at ad2ca83e245bbd76c0d275cc30366457b26c8df3
+Writer type: Agent draft writer
+Canonical: No
+Canonical for: None; candidate only
+Use this when: Reviewing conservation of the mapped legacy source
+Do not use this for: Current canonical authority or proof of implemented behavior
+Last reviewed: 2026-10-14
+Related:
+- docs/routing-handoff-contract.md
+Supersedes: None; candidate only
+Superseded by: None
+```
+
+Contract chuyển việc **agent ↔ agent trong chain** cho vòng lặp runner (Phase
+2, epic E3). Theo luật routing-theo-audience (`docs/platform-foundations.md`
+L4, D-ID `14ebeea9`): agent↔agent trong chain dùng **prose-handoff tường
+minh**, không JSON contract — LLM đọc prose tốt hơn parse JSON. Tài liệu này
+là bản chốt bằng văn xuôi của contract đó cho runner cụ thể; không phải code
+runtime mới (chỉ prose + bảng).
+
+## Khung prompt 4 phần
+
+Mỗi lần dispatch, runner dựng prompt cho worker từ đúng bốn phần cố định
+(nguồn: `src/runner/dispatch.mjs`'s `buildPrompt`, per D3) — thứ tự và tiêu
+đề là contract, test đã pin sự hiện diện của cả bốn:
+
+1. **Goal** — tiêu đề + kind của work item, lấy nguyên từ item, không diễn
+   giải thêm.
+2. **Worktree boundary** — worker chạy trên một worktree/nhánh cô lập riêng
+   cho đúng item này (per D4); ở lại trong checkout đó, không chạm working
+   tree chính, nhánh khác, hay worktree khác.
+3. **Expected proof** — câu lệnh `verify` của chính item, nói rõ: runner tự
+   chạy lại câu lệnh này sau khi worker xong (goal-check, per D3) — báo cáo
+   của worker không bao giờ được tin một mình.
+4. **Constraints** — cấm gọi `fgos` hoặc ghi `.fgos/` trực tiếp (runner là
+   người ghi duy nhất trong vòng dispatch, per D3); commit trên nhánh của
+   mình và báo cáo; không merge/push/tự duyệt việc của mình.
+
+## Bảng entry-router
+
+Route theo audience (L4): skill/agent forgent tương lai muốn tham gia chain
+runner đọc bảng này để biết vào từ đâu — không có một điểm vào toàn cục.
+
+| Vai trò tương lai | Đọc gì trước | Vào ở đâu | Không được làm |
+|---|---|---|---|
+| Skill khởi tạo backlog (đề xuất work item mới) | `docs/specs/work-state.md` (schema work) | `fgos add` — CLI, một cửa ghi | Không tự ghi `.fgos/events.jsonl` |
+| Skill giám sát vòng runner (dashboard/report) | `fgos list` / `fgos ready` (đọc, không ghi, per request-class D1) | Đọc `state.json` hoặc gọi `ready` | Không suy luận frontier bằng danh sách tay — luôn derive (RUL5 (platform-foundations)) |
+| Skill duyệt đề xuất (review `proposed` → `done`) | Nhánh `fgw/<id>` + báo cáo worker | `fgos move <id> --to done --expect proposed` | Không tự động merge khi review chưa chạy (per D4 — người/vòng review quyết) |
+| Worker kế tiếp trong chain con (agent nối tiếp) | Chính work item đã dispatch (title/kind/refs/verify) | Nhận đúng bốn phần prompt ở trên, không phần nào khác | Không tự gọi `fgos`; không giả định trạng thái ngoài những gì prompt nói |
+| Executor mới (đổi agent CLI, ví dụ `codex exec`) | `.fgos/config.json`'s `runner` section — `executor.command`/`args`, template `{prompt}`/`{model}` | Sửa config, không sửa `dispatch.mjs` | Không nối chuỗi prompt vào một lệnh shell (luôn argv, `shell: false`) |
+
+## Câu handoff chuẩn
+
+Mọi bước trong chain (runner → worker → review) khép lại bằng đúng một câu,
+không paraphrase:
+
+> "Việc `<id>` đã đề xuất trên nhánh `<fgw/id>` với goal-check tự chạy —
+> chưa phải xong; cần duyệt/merge (per D4) mới thành `done`."
+
+Khi từ chối (`proposed → todo`), câu tương ứng:
+
+> "Việc `<id>` bị từ chối, lý do `<reason>`; quay lại `todo`, sẽ vào lại
+> frontier trừ khi chạm anti-loop max-visits."
+
+## Ranh giới tin cậy
+
+Bất biến môi trường: mỗi agent khởi đầu tại project-root CỦA NÓ (git-root của cwd nó đứng); worker không bao giờ thấy harness phát triển của xưởng — cách ly vị trí đến từ worktree-trong-tmp, đo định kỳ bằng canary item (worker tự khai môi trường, verify assert). Diễn tập/canary không bao giờ ghi vào nhật ký sự kiện thật.
+
+Ba bất biến, tách bạch rõ để không ai đọc nhầm đây là sandbox:
+
+- **Containment bằng chỉ dẫn + nhánh vứt-được, KHÔNG PHẢI sandbox.** Worker
+  chạy full quyền của user hiện tại (per `worktree.mjs`'s "SAME-USER TRUST
+  INVARIANT"); cô lập ở đây nghĩa là "nhánh/worktree riêng, sai thì vứt" (D4),
+  không phải giới hạn hệ điều hành nào. Không tin containment này chặn được
+  một worker cố ý phá hoại.
+- **Work item phải do chính user tạo.** `dispatch.mjs`'s "TRUST INVARIANT":
+  `verify` chạy như một shell command thật (goal-check, D3) — một item nạp từ
+  nguồn không được rà soát là một injection vector trước khi tới dispatch.
+  Không bao giờ nối một intake path bên ngoài/không tin cậy vào `work` mà
+  thiếu một cửa review ở giữa.
+- **`.fgos/config.json`'s `runner` section là
+  config THỰC THI ĐƯỢC, không phải dữ liệu thụ động.** Ai sửa được file này
+  quyết định runner spawn tiến trình gì, với argument gì (per
+  `dispatch.mjs`'s "TRUSTED-CONFIG NOTE"). File này committed (D2 — bền
+  vĩnh viễn, review được như code) nhưng mang đúng mức tin cậy của code: chỉ
+  áp dụng từ một checkout đã tin cậy sẵn.
+- **Context ref tới kết quả vai/bước trước là đường dẫn tuyệt đối dưới
+  `.fgos/assignments/` của main checkout.** Worker chỉ đọc, không ghi; runner
+  kiểm sha256 lúc settle trước khi trao. Không mở rộng quyền đọc: worker vốn
+  đọc được (`--ro-bind / /`, `hostRead: allow`). Câu trả lời của owner ở cổng
+  người của một Workflow run cũng đi đường này (`gate-answer:` → file dưới
+  `.fgos/workflow-runs/<id>/gate-answers/`): là input của owner, không phải
+  output của agent khác, và brief nói rõ như vậy. Với `anonymizeInputs` các
+  report được chép sang `<unitDir>/inputs/seat-*.md` để brief không lộ ai nói;
+  đó chỉ là ẩn danh theo thứ được trao, không phải ranh giới đọc.
+  Hợp đồng cấm worker *ghi* `.fgos`; Unit `blind: true` còn cấm nó *đọc* run state của
+  peer (`.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs`, socket herdr,
+  home và tiến trình của dispatch khác): vai blind chỉ đọc thư mục của chính nó (kết quả vai/bước trước tới nó dưới dạng bản chép nguyên byte
+  trong `inputs/` của thư mục đó) và bị từ chối chạy nếu không thực thi được (`docs/specs/confinement-authority.md` §9.2).
+
+## Tham chiếu
+
+`src/runner/dispatch.mjs` (prompt + trust invariant) · `src/runner/worktree.mjs`
+(same-user trust invariant) · `docs/platform-foundations.md` L4 (`14ebeea9`)
+· `docs/specs/runner.md` (ADR-0005 Runner & cô lập worker, D3/D4).

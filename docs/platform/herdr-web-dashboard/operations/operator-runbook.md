@@ -1,0 +1,93 @@
+# Operator runbook — herdr cockpit
+
+```txt
+Document type: Guide / Runbook
+Audience: Documentation migration reviewer, maintainer, agent
+Purpose: Preserve the mapped source as candidate material for conservation review
+Design status: Candidate
+Implementation: Historical source retained; current truth not certified
+Provenance: docs/operator-runbook-herdr-cockpit.md at ad2ca83e245bbd76c0d275cc30366457b26c8df3
+Writer type: Agent draft writer
+Canonical: No
+Canonical for: None; candidate only
+Use this when: Reviewing conservation of the mapped legacy source
+Do not use this for: Current canonical authority or proof of implemented behavior
+Last reviewed: 2026-10-14
+Related:
+- docs/operator-runbook-herdr-cockpit.md
+Supersedes: None; candidate only
+Superseded by: None
+```
+
+The official fgOS operator cockpit (STR40 / decision D d3dbe7f5 — its hard-law clause re-scoped 2026-09-06 by decision "RUL40 re-scope" (scope runner, supersedes d3dbe7f5; see docs/specs/runner.md RUL40) — which itself supersedes the
+earlier tmux-based D ef6ed305). herdr arranges panes; every pane runs the
+real fgOS CLI standalone — herdr is chrome, not a brain.
+
+## Prerequisites
+
+- [herdr](https://herdr.dev) installed and on `PATH`.
+- Running inside a herdr-managed pane: `test "${HERDR_ENV:-}" = 1`. See
+  `upstreams/herdr/SKILL.md` for how herdr exposes this to every pane it
+  manages.
+
+## Quick start
+
+From inside a herdr-managed pane, at the repo root:
+
+```bash
+bash scripts/herdr-cockpit.sh
+```
+
+This creates one new tab with 4 panes in your current workspace and prints
+the attach command:
+
+```
+herdr tab focus <tab_id>
+```
+
+## What each pane does
+
+1. **fgos-runner-loop** — `node bin/fgos-runner.mjs --once` in a poll-sleep
+   shell loop (5s). No new runner flag: `--once` + `runner.lock` are already
+   idempotent, so this is a plain wrapper, not new runner behavior.
+2. **fgos-tail-log** — `tail -F .fgos/logs/*.log`, live per-item worker
+   output as it's produced (STR39).
+3. **human-door** — a plain interactive shell. This pane *is* where you type
+   the next `fgos` verb (`submit`, `ask`/`answer`, `review`/`approve`/
+   `reject`, `catchup`) — intentionally unscripted.
+4. **fgos-dashboard** — polls `fgos list --json` every 5s, prints a compact
+   status line (counts per status), and fires exactly one native
+   `herdr notification show` the first time an item enters `awaiting-human`
+   (never again while it stays in that status; fires again if it leaves and
+   later re-enters).
+
+## Hard rule
+
+**herdr is used ONLY as chrome** — `pane split`/`pane run`/`pane read`/
+`tab create`/`notification show`. This cockpit **never** calls
+`herdr agent start` and **never** reads herdr's own `agent_status`
+(idle/working/blocked/done) as a decision signal. Every real status signal
+comes from the fgOS event log, via the fgOS CLI (`fgos list`/`rollup`/
+`triage`) — one source of truth.
+
+This is not a style preference: herdr's own agent-detection layer caused a
+measured production bug elsewhere ("idle killed an agent", observed in this
+project's own dogfooding) precisely because it became a second, competing
+source of truth about what was happening. If you're extending this cockpit,
+do not reach for `herdr agent ...` commands or any `agent_status` field —
+read fgOS's own CLI instead. See decision D d3dbe7f5 for the original reasoning; superseded 2026-09-06 by decision "RUL40 re-scope" (docs/specs/runner.md RUL40): herdr is still never the source of truth, but Dispatch may use herdr's agent API as transport and failure detector.
+
+## Multi-operator use
+
+If a second operator attaches to the same herdr session, herdr's own
+protocol negotiates ownership (`herdr terminal attach <id> --takeover`) —
+this is existing herdr behavior, not something this feature builds. The
+first attached client keeps write access unless a later client explicitly
+takes over; anyone else can still read.
+
+## Concurrent-merge safety
+
+This cockpit adds no new code on the merge/approve path. `approve` already
+does not false-alarm when the runner merges in parallel — that guarantee was
+fixed by STR35 (`fgos-multi-session-checkout`) and this cockpit only exposes it
+through the dashboard pane, it does not re-implement it.
