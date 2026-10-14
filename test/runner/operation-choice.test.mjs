@@ -24,48 +24,11 @@ import { runOnce as loopRunOnce } from '../../src/runner/loop.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { confinedUnitConfig, ensureGitRepo } from './driver-unit-fixture.helper.mjs';
 
 // A driver operation runs as a Unit (runUnit): its worker runs confined (bwrap), and it binds
 // from the runner config the caller hands over, so that config needs confined executors.
 seedFileLocalBwrapRegistry();
-
-const UNIT_CAPABILITIES = ['review', 'coding:review', 'implement', 'code:implement'];
-
-/** A runner config a confined Unit can bind with: each executor (the global `executor` too) under
- * a `fixture-` id -- a bare `claude` id would pick up the real CLI from the machine's global
- * config -- with a bwrap-confined cli invocation, and a pool for each driver capability. */
-function confinedUnitConfig(config = {}) {
-  const source = { ...(config.executors ?? {}) };
-  if (config.executor && !source.claude) source.claude = { ...config.executor };
-  const executors = {};
-  for (const [id, entry] of Object.entries(source)) {
-    executors[`fixture-${id}`] = Array.isArray(entry.invocations) && entry.invocations.length > 0 ? entry : {
-      kind: 'agent',
-      allowCrossProvider: true,
-      providerModel: 'node',
-      ...entry,
-      invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: entry.command, args: entry.args ?? [] }],
-    };
-  }
-  const first = Object.keys(executors)[0];
-  const capabilities = { ...(config.capabilities ?? {}) };
-  for (const cap of UNIT_CAPABILITIES) capabilities[cap] ??= { prefer: [{ executor: first }] };
-  const modelPolicies = { ...(config.modelPolicies ?? {}) };
-  modelPolicies.node ??= modelPolicies.claude ?? { standard: 'test-model' };
-  return { ...config, executors, capabilities, modelPolicies };
-}
-
-/** A Unit runs only in a git repo: make `root` one when a test's temp dir is not. */
-function ensureGitRepo(root) {
-  try {
-    execFileSync('git', ['rev-parse', '--git-dir'], { cwd: root, stdio: 'ignore' });
-  } catch {
-    execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: root });
-    execFileSync('git', ['config', 'user.name', 'test'], { cwd: root });
-    execFileSync('git', ['config', 'user.email', 'test@test'], { cwd: root });
-    execFileSync('git', ['commit', '-q', '--allow-empty', '-m', 'initial commit'], { cwd: root });
-  }
-}
 
 function unitReady(opts = {}) {
   if (!opts.runnerConfig) return opts;
