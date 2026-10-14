@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:22@2026-10-14",
+  "beforeCommit": "f0efa3330a14d117ad89feba91bdb9b61d768339",
+  "pairs": [
+    {
+      "source": "docs/platform-foundations.md",
+      "target": "docs/platform/platform-foundations.md",
+      "kind": "Platform foundations",
+      "operation": "additive complete legacy source, heading depths +1; existing stub prose preserved",
+      "sourceBlob": "31b0ae0eb3d5f62e55d412952e43ca07127fcc12",
+      "beforeTargetSHA256": "fa28d36512d7c6683e7bd1312703da24fd32f737afdb69604591c2ce54119541",
+      "afterTargetSHA256": "090a712e11120dc19b6a48714e3b90f5868579b38a73a2fd6acf6dd0ab11761a",
+      "sourceTextSHA256": "22636a8d5d3314242428e7bad1e8f1196dec7548b17dc5c8b0d0ae15525e6fa4",
+      "sourceTitle": "# Luật nền platform forgent (Phase 0 — compound-learning stack)"
+    },
+    {
+      "source": "docs/work-item-lifecycle-vision.md",
+      "target": "docs/platform/vision.md",
+      "kind": "Platform vision",
+      "operation": "additive complete legacy source, heading depths +1; existing stub prose preserved",
+      "sourceBlob": "2f672212ecb5b9f38aa900892534e76e1552e28c",
+      "beforeTargetSHA256": "f72272064118920c12afc5a86562793bbfae6c4615ba2475fa465f4a44eb2ed6",
+      "afterTargetSHA256": "46663f04172cb3777158e28c2214e1c8fb78ae37c4be6a524fbdc755e9cb6d00",
+      "sourceTextSHA256": "d4267552c03638faa76d826ba5f47677a7ee683e23f50e933d1705bb78b6cf08",
+      "sourceTitle": "# Chu trình Work-Item của fgOS — tầm nhìn nền tảng"
+    },
+    {
+      "source": "docs/architecture-manifest.json",
+      "target": "docs/platform/contracts/architecture-manifest.json",
+      "kind": "Contract",
+      "operation": "whole non-Markdown payload byte-identical",
+      "sourceBlob": "e923fa822dadf885952546d50b29fa88f352147e",
+      "sourceSHA256": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85"
+    },
+    {
+      "source": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "target": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "kind": "Contract",
+      "operation": "whole non-Markdown payload byte-identical",
+      "sourceBlob": "11684583c2ac84357168e237f3ac045201377712",
+      "sourceSHA256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f"
+    }
+  ],
+  "sourceAndConsumersUnchanged": true,
+  "noLawChange": true,
+  "noTruthSweep": true,
+  "priorArt": "Existing target summary anchors created at 23fb220e3; kept in place and extended with the complete mapped source, no new parallel owner."
+}

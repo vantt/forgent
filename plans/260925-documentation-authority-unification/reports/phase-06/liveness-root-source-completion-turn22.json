@@ -1,0 +1,1491 @@
+{
+  "version": 1,
+  "sourceCommit": "f0efa3330a14d117ad89feba91bdb9b61d768339",
+  "authorSession": "codex-session:22@2026-10-14",
+  "scanBeforeCarriage": true,
+  "files": [
+    {
+      "source": "docs/platform-foundations.md",
+      "target": "docs/platform/platform-foundations.md",
+      "classification": "Current law/contract or explicitly dated vision; carry verbatim per frozen map, no truth sweep or retirement.",
+      "references": [
+        {
+          "path": "AGENTS.md",
+          "line": 8,
+          "text": "- docs/platform-foundations.md — L1-L8 locked design laws; L5 is this repo's definition of done (six questions, below)"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 62,
+          "text": "4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 132,
+          "text": "Laws in `docs/platform-foundations.md` are fixed until their named review"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 275,
+          "text": "Platform laws L1-L8 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 277,
+          "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 278,
+          "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 279,
+          "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 280,
+          "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 281,
+          "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 282,
+          "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 283,
+          "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 284,
+          "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 286,
+          "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 50,
+          "text": "| Platform laws | candidate | maintained-authority + retained-source + generated | `docs/platform-foundations.md` (authoritative text); enter at `docs/platform/platform-foundations.md` (candidate entry/summary) | `docs/specs/platform-foundations.md` (non-authority spec projection; binding source: `docs/platform-foundations.md`) | Complete binding wording, rationale, sources, and review thresholds are owned exclusively by `docs/platform-foundations.md`; generated projections never establish authority. |"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 51,
+          "text": "| Platform vision and work lifecycle | candidate | maintained-authority + retained-source | `docs/work-item-lifecycle-vision.md` and `docs/platform-foundations.md` (retained sources/locked wording); enter at `docs/platform/vision.md` (candidate entry/navigation) | `docs/work-item-lifecycle-vision.md` | Target vision is candidate (\"Yes, after review\"); retained root docs own locked mission/priority wording. |"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 85,
+          "text": "| `docs/platform-foundations.md` | legacy-current | maintained-authority | Canonical platform operating laws (L1–L8). Target file is summary/entry. |"
+        },
+        {
+          "path": "core/instructions/platform-laws.md",
+          "line": 15,
+          "text": "Platform laws L1-L8 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+        },
+        {
+          "path": "core/instructions/platform-laws.md",
+          "line": 17,
+          "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)"
+        },
+        {
+          "path": "core/instructions/platform-laws.md",
+          "line": 18,
+          "text": "- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)"
+        },
+        {
+          "path": "core/instructions/platform-laws.md",
+          "line": 19,
+          "text": "- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)"
+        },
+        {
+          "path": "core/instructions/platform-laws.md",
+          "line": 20,
+          "text": "- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)"
+        },
+        {
+          "path": "core/instructions/platform-laws.md",
+          "line": 21,
+          "text": "- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)"
+        },
+        {
+          "path": "core/instructions/platform-laws.md",
+          "line": 22,
+          "text": "- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)"
+        },
+        {
+          "path": "core/instructions/platform-laws.md",
+          "line": 23,
+          "text": "- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)"
+        },
+        {
+          "path": "core/instructions/platform-laws.md",
+          "line": 24,
+          "text": "- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+        },
+        {
+          "path": "core/instructions/platform-laws.md",
+          "line": 26,
+          "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+        },
+        {
+          "path": "docs/specs/platform-foundations.md",
+          "line": 26,
+          "text": "| 3 | Mức bền (5 cấp, nhãn chính thức tại `docs/platform-foundations.md` §L7) | Mức durability mọi artifact phải khai | đề xuất chờ duyệt · truth vĩnh viễn được commit · bằng chứng phiên, nén được · dựng lại được từ truth vĩnh viễn · chỉ tồn tại máy này |"
+        },
+        {
+          "path": "docs/specs/platform-foundations.md",
+          "line": 71,
+          "text": "- **RUL8 (chạy xong ≠ merge ≠ bền — mọi artifact khai mức bền tường minh).** \"Chạy xong ≠ đã merge ≠ đã bền\" — mọi artifact khai mức bền tường minh theo 5 cấp của `docs/platform-foundations.md` §L7 (L7)."
+        },
+        {
+          "path": "docs/specs/platform-foundations.md",
+          "line": 92,
+          "text": "- `docs/platform-foundations.md` — văn bản gốc đầy đủ của 8 luật (phát biểu + nguồn `nguồn:slug` + hệ quả + ngưỡng xem lại)"
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 2078,
+          "text": "placement test của `0008`'s họ hàng luật L8 (`docs/platform-foundations.md`):"
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 2527,
+          "text": "`docs/platform-foundations.md`): thứ tự ưu tiên áp dụng MỌI lúc, không"
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 2678,
+          "text": "Iron Law **không** nằm trong `docs/platform-foundations.md` (đã kiểm bằng"
+        },
+        {
+          "path": "docs/specs/work-state.md",
+          "line": 1924,
+          "text": "luật L3, `docs/platform-foundations.md`):"
+        },
+        {
+          "path": "docs/specs/reading-map.md",
+          "line": 11,
+          "text": "- `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md"
+        },
+        {
+          "path": "docs/knowledge/why-merge-standardization-tsk-4j9-reuses-existing-mechanisms/why-merge-standardization-reuses-existing-mechanisms.md",
+          "line": 25,
+          "text": "`proposed` already means exactly that (`docs/platform-foundations.md` L9,"
+        },
+        {
+          "path": "docs/knowledge/why-register-a-finished-item-into-the-merge-list-needs-no-ne/merge-ready-registration-is-already-idempotent.md",
+          "line": 31,
+          "text": "  `docs/platform-foundations.md`): \"worker chạy xong + verify xanh TRÊN"
+        },
+        {
+          "path": "docs/backlog.md",
+          "line": 50,
+          "text": "| p-36af7086 | `research-260929-1203-herdr-cook-plan-vs-fgos-dispatch-coordination.md` đề xuất chạy thật một plan 3-4 phase qua cả `thieung/herdr-cook-plan` lẫn engine dispatch/coordination riêng của fgOS trên MỘT PROJECT NGOÀI repo này (đúng mission #1/#2, D-ADR0035 (ranh giới sứ mệnh fgOS) trong `docs/platform-foundations.md` — fgOS tồn tại để phát triển project khác, không phải tự phát triển chính nó), để so sánh throughput/friction thật thay vì chỉ so code tĩnh. Chưa bắt đầu. | Một plan thật (3-4 phase) chạy xong trọn vẹn một lượt qua `herdr-cook-plan` và một lượt qua chính engine fgOS, trên cùng một project ngoài; có ghi chú so sánh friction/throughput cụ thể, không chỉ lý thuyết | proposed | — |"
+        },
+        {
+          "path": "docs/history/phase-2-status-category-schema/DISCUSSION.md",
+          "line": 130,
+          "text": "  lazy-default). Scout: L3 (`docs/platform-foundations.md`, luật khoá) —"
+        },
+        {
+          "path": "docs/history/phase-2-status-category-schema/CONTEXT.md",
+          "line": 35,
+          "text": "| D4 | Backfill `statusCategory` cho ~1500+ event `work.move` cũ qua 1 migration script mới (khuôn `migrate-status-proposed-to-awaiting-approval.mjs`) — KHÔNG lazy-default, vì L3 (luật khoá, `docs/platform-foundations.md`) đòi hỏi replay-from-zero xác định tuyệt đối. |"
+        },
+        {
+          "path": "docs/history/phase-2-status-category-schema/CONTEXT.md",
+          "line": 62,
+          "text": "- `docs/platform-foundations.md` L3 — luật khoá \"DB là view, rebuild từ zero bằng replay\" (nguồn D4)."
+        },
+        {
+          "path": "docs/history/merge-next-loop-wait-passthrough/CONTEXT.md",
+          "line": 19,
+          "text": "`docs/platform-foundations.md` L3's single-writer premise has crossed its"
+        },
+        {
+          "path": "docs/history/merge-next-loop-wait-passthrough/CONTEXT.md",
+          "line": 29,
+          "text": "| D3 | tsk-328 scopes down to D1's mechanical fix only. The \"evaluate whether L3's multi-writer premise needs reopening\" half is deferred to a separate future item — a strategic assessment of a locked platform law (`docs/platform-foundations.md` L3) is a different nature of work than a CLI/skill passthrough fix and should not share one verify/review bar. Creating that follow-up item is left to whoever picks this up next, not done by this item. |"
+        },
+        {
+          "path": "docs/history/merge-next-loop-wait-passthrough/CONTEXT.md",
+          "line": 54,
+          "text": "- `docs/platform-foundations.md` (L3 — referenced only as the deferred follow-up's own subject, not read/analyzed in depth by this item)"
+        },
+        {
+          "path": "docs/history/merge-standardization/plan.md",
+          "line": 10,
+          "text": "  CTR005 merge-approval gate (L9, `docs/platform-foundations.md`); any"
+        },
+        {
+          "path": "docs/history/merge-standardization/CONTEXT.md",
+          "line": 50,
+          "text": "- `docs/platform-foundations.md` L9 (\"Thang hoàn tất của MỘT việc: run ≠"
+        },
+        {
+          "path": "docs/history/rul11-tum-lum-doctrine-anchor/plan.md",
+          "line": 33,
+          "text": "- `docs/platform-foundations.md:187-209` (L8, the un-summarized original"
+        },
+        {
+          "path": "docs/history/skill-prose-verify-standard/CONTEXT.md",
+          "line": 95,
+          "text": "- `docs/platform-foundations.md` L5 câu 5 — DoD \"changed behavior gets a matching test\"; D3 là câu trả lời cho vế prose"
+        },
+        {
+          "path": "docs/history/iron-law-gate-human-ux/CONTEXT.md",
+          "line": 86,
+          "text": "| Iron Law **không** nằm trong platform-foundations | grep `docs/platform-foundations.md` — không khớp; RUL34/RUL37 ở `docs/specs/runner.md`, truy về `D16/D17 self-improve-loop` |"
+        },
+        {
+          "path": "docs/history/iron-law-gate-human-ux/DISCUSSION.md",
+          "line": 59,
+          "text": "  self-improve-loop`. **Không** nằm trong `docs/platform-foundations.md`"
+        },
+        {
+          "path": "docs/history/iron-law-gate-human-ux/DISCUSSION.md",
+          "line": 421,
+          "text": "- Không sửa `docs/platform-foundations.md` — đã grep, Iron Law không nằm"
+        },
+        {
+          "path": "docs/history/spec-docs-lifecycle-realignment/RESEARCH.md",
+          "line": 141,
+          "text": "not a stage name. `docs/platform-foundations.md`'s five hits are all the phrase"
+        },
+        {
+          "path": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+          "line": 412,
+          "text": "| 5 | Doctrine layer (AGENTS.md/CLAUDE.md) đã có tiền lệ \"luôn nạp vs nạp theo nhu cầu\" nào gần với trục engine/skill chưa? | Rõ một phần (scout) | `docs/platform-foundations.md` L8 đã khoá placement test này CHO RIÊNG tầng doctrine (standing sheet vs reference nạp theo nhu cầu) — cùng tinh thần trục (b) nhưng chưa từng generalize ra toàn cây thư mục. |"
+        },
+        {
+          "path": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+          "line": 481,
+          "text": "  `docs/platform-foundations.md` L1/L2/L8, cây thư mục top-level +"
+        },
+        {
+          "path": "docs/history/tsk-13r-validateapprove-tier-ceiling-friction/RESEARCH.md",
+          "line": 44,
+          "text": "a locked design law (`docs/platform-foundations.md` / gate-bypass D9),"
+        },
+        {
+          "path": "docs/history/fanout-and-delegation-rubric/DISCUSSION.md",
+          "line": 643,
+          "text": "(`docs/platform-foundations.md`, single-writer): mọi ghi state đi qua CLI."
+        },
+        {
+          "path": "docs/history/merge-conductor-throughput-and-human-release/CONTEXT.md",
+          "line": 93,
+          "text": "- `docs/platform-foundations.md` L9, L10 — luật khoá phải tôn trọng"
+        },
+        {
+          "path": "docs/history/herdr-plugin-parkreason-pane-filter/plan.md",
+          "line": 51,
+          "text": "pattern is required by `docs/platform-foundations.md`'s L3 replay-from-zero"
+        },
+        {
+          "path": "docs/history/fgos-mission-boundary/CONTEXT.md",
+          "line": 35,
+          "text": "| D4 | Physical placement: `docs/decisions/0035` (real next number after 0034) + a new `AGENTS.md` pointer right after \"Product priority order\" — no new law entry in `docs/platform-foundations.md` | Content is narrow/concrete enough for one decision + one AGENTS.md paragraph; a separate platform-foundations law would duplicate the record, violating KISS. \"Standing beside\" (D1) doesn't require its own L-law. |"
+        },
+        {
+          "path": "docs/history/fgos-mission-boundary/DISCUSSION.md",
+          "line": 48,
+          "text": "| D4 | Vị trí vật lý: `docs/decisions/0035` (số kế tiếp thật sau 0034) + một đoạn trỏ mới trong `AGENTS.md` ngay sau \"Product priority order\" — KHÔNG thêm mục L-law mới vào `docs/platform-foundations.md` | Nội dung đủ hẹp/cụ thể để nằm gọn trong 1 decision + 1 đoạn AGENTS.md; thêm L-law riêng sẽ nhân đôi chỗ ghi, vi phạm KISS. D1 chốt \"đứng cạnh\" không bắt buộc phải có L-law riêng. Ghi máy: seq 18969 |"
+        },
+        {
+          "path": "docs/history/fgos-mission-boundary/DISCUSSION.md",
+          "line": 103,
+          "text": "- Đọc `docs/platform-foundations.md` L8 (doctrine placement rule) và L9"
+        },
+        {
+          "path": "docs/history/fgos-mission-boundary/DISCUSSION.md",
+          "line": 128,
+          "text": "Giống hệt cách `docs/platform-foundations.md` L9 tách riêng \"run-complete"
+        },
+        {
+          "path": "docs/history/fgos-mission-boundary/DISCUSSION.md",
+          "line": 410,
+          "text": "mục L-law mới vào `docs/platform-foundations.md` — nội dung đủ hẹp để nằm"
+        },
+        {
+          "path": "docs/history/fgos-mission-boundary/plan.md",
+          "line": 44,
+          "text": "(`docs/platform-foundations.md` L8's placement test: \"does this rule need"
+        },
+        {
+          "path": "docs/history/fgos-marketing-domain-foundation/CONTEXT.md",
+          "line": 93,
+          "text": "- `docs/platform-foundations.md` L5 — the DoD law the deferred"
+        },
+        {
+          "path": "docs/history/events-lock-concurrency-race/CONTEXT.md",
+          "line": 74,
+          "text": "  (\"nhiều agent ghi đồng thời như tải chính\", `docs/platform-foundations.md`"
+        },
+        {
+          "path": "docs/history/events-jsonl-git-tracked-truncation/RESEARCH.md",
+          "line": 57,
+          "text": "- `docs/platform-foundations.md:69` — L3 (\"truth ở JSONL, db là view\") is a"
+        },
+        {
+          "path": "docs/history/canonical-decision-projection/DISCUSSION.md",
+          "line": 240,
+          "text": "  lên `docs/specs/*.md`, `docs/platform-foundations.md`, hay `AGENTS.md`."
+        },
+        {
+          "path": "docs/routing-handoff-contract.md",
+          "line": 4,
+          "text": "2, epic E3). Theo luật routing-theo-audience (`docs/platform-foundations.md`"
+        },
+        {
+          "path": "docs/routing-handoff-contract.md",
+          "line": 93,
+          "text": "(same-user trust invariant) · `docs/platform-foundations.md` L4 (`14ebeea9`)"
+        }
+      ]
+    },
+    {
+      "source": "docs/work-item-lifecycle-vision.md",
+      "target": "docs/platform/vision.md",
+      "classification": "Current law/contract or explicitly dated vision; carry verbatim per frozen map, no truth sweep or retirement.",
+      "references": [
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 51,
+          "text": "| Platform vision and work lifecycle | candidate | maintained-authority + retained-source | `docs/work-item-lifecycle-vision.md` and `docs/platform-foundations.md` (retained sources/locked wording); enter at `docs/platform/vision.md` (candidate entry/navigation) | `docs/work-item-lifecycle-vision.md` | Target vision is candidate (\"Yes, after review\"); retained root docs own locked mission/priority wording. |"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 54,
+          "text": "| Work state / work lifecycle engine | legacy-current | maintained-authority + retained-source | `docs/specs/work-state.md` | `docs/io-contract.md`, `docs/work-item-lifecycle-vision.md` | `docs/specs/work-state.md` owns core state, events, fsm, store, and envelope. `docs/io-contract.md` owns CLI I/O contract. Candidate route `docs/platform/work-state/**` (scope candidate-target): candidate target, not read by any reader; canonical route stays `docs/specs/work-state.md`. |"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 88,
+          "text": "| `docs/work-item-lifecycle-vision.md` | non-authority | retained-source | Directional foundation; active navigation starts at `docs/platform/vision.md`. |"
+        },
+        {
+          "path": "docs/specs/reading-map.md",
+          "line": 14,
+          "text": "- `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI STR14-STR18"
+        }
+      ]
+    },
+    {
+      "source": "docs/architecture-manifest.json",
+      "target": "docs/platform/contracts/architecture-manifest.json",
+      "classification": "Current law/contract or explicitly dated vision; carry verbatim per frozen map, no truth sweep or retirement.",
+      "references": [
+        {
+          "path": "src/cli/command-registry.mjs",
+          "line": 7,
+          "text": "// this module sits at the `kernel` layer in docs/architecture-manifest.json:"
+        },
+        {
+          "path": "src/setup/instruction-registry.mjs",
+          "line": 450,
+          "text": " * architecture manifest (e.g. docs/architecture-manifest.json), rejecting unregistered roots."
+        },
+        {
+          "path": "src/setup/instruction-registry.mjs",
+          "line": 583,
+          "text": " * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected."
+        },
+        {
+          "path": "src/verbs/merge/iron-law-level.mjs",
+          "line": 9,
+          "text": "// refactor exists to keep one-directional (docs/architecture-manifest.json)."
+        },
+        {
+          "path": "docs/architect/doing-coordination-redesign.md",
+          "line": 984,
+          "text": "- `docs/architecture-manifest.json` — module registration."
+        },
+        {
+          "path": "docs/architect/knowledge-registry-redesign.md",
+          "line": 720,
+          "text": "- `CHANGELOG.md`, `docs/architecture-manifest.json` — user-visible change log"
+        },
+        {
+          "path": "src/state/events-compaction.mjs",
+          "line": 12,
+          "text": "// (one-way-down layering, docs/architecture-manifest.json), and this"
+        },
+        {
+          "path": "docs/architecture-map.md",
+          "line": 306,
+          "text": "**đủ 13/13 module** (bản máy-đọc: `docs/architecture-manifest.json`), và §9.3 giao"
+        },
+        {
+          "path": "docs/architecture-map.md",
+          "line": 459,
+          "text": "   `planned`/`idea`. Hiện thực (STR20): **`docs/architecture-manifest.json`**"
+        },
+        {
+          "path": "src/runner/dispatch/execution-contract.mjs",
+          "line": 76,
+          "text": "// docs/architecture-manifest.json -- never import upward from"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md",
+          "line": 26,
+          "text": "| `--i04b` (Lead, no coordination round) | Post-recheck close chore | `npm test` under the merged fix-3 HEAD failed 109 lines matching ~54 unique tests, entirely because this linked worktree had no compiled Rust binary (`target/release/{fgos,fgctl}` absent — a fresh `git worktree add` never carries build artifacts, the same class of gap `node_modules` needed a manual symlink for). Symlinking `target/` from the `forgentX` main checkout dropped all Rust-host failures and surfaced 2 real, new `test/architecture.test.mjs` failures: `src/runner/dispatch/runtime-inspection.mjs` and `src/verbs/dispatch/inspect.mjs` were never registered in `docs/architecture-manifest.json` — the same class of gap I03's own trace already documents for I01/I02/I03's modules. Fixed directly by the Lead (commit `579ef117`, both files added to the manifest at their sibling layers: `infra` next to `run-result.mjs`, `use-case` next to `show-run.mjs`) and reverified: `test/architecture.test.mjs` 10/10 green. |"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md",
+          "line": 35,
+          "text": "| `--i05` commit `85038c30` | Manifest registration | Full-suite gate surfaced the same class of gap I04 hit: `reconciliation-planner.mjs`/`reconcile.mjs` were never registered in `docs/architecture-manifest.json`. Fixed directly by the Lead, reverified: `test/architecture.test.mjs` 10/10. |"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md",
+          "line": 63,
+          "text": "- `test/architecture.test.mjs`'s manifest-completeness/import-direction pair — real gap (I05's new modules unregistered in `docs/architecture-manifest.json`), fixed same-session (commit `85038c30`), reverified 10/10."
+        },
+        {
+          "path": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "line": 937,
+          "text": "| `tsk-5x7-2` | `docs/architecture-manifest.json` (registration only; governance code landed with the root). |"
+        },
+        {
+          "path": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "line": 941,
+          "text": "| `tsk-5jl` | `src/runner/dispatch/config.mjs`, `src/runner/dispatch/live-renderers/claude-stream-json.mjs` (new), `src/runner/dispatch/live-renderers/pi-agent-session.mjs` (new), `src/runner/dispatch/resolve.mjs`, `src/runner/dispatch/transport.mjs`, `test/runner/herdr-spawn-adapter.test.mjs`, `docs/architecture-manifest.json`, `docs/enduser-docs-index.json` |"
+        },
+        {
+          "path": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "line": 944,
+          "text": "| `tsk-2tr` | `src/runner/dispatch/cli.mjs`, `src/runner/dispatch/result-ladder.mjs` (new), `test/runner/dispatch.test.mjs`, `docs/architecture-manifest.json` |"
+        },
+        {
+          "path": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "line": 945,
+          "text": "| `tsk-1g6` | `bin/fgos.mjs`, `src/cli/command-registry.mjs`, `src/report/dispatch-confidence.mjs` (new), `test/runner/dispatch.test.mjs`, `docs/architecture-manifest.json` |"
+        },
+        {
+          "path": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "line": 947,
+          "text": "| `tsk-by0` | `src/runner/dispatch/transport.mjs` (shrunk), `test/runner/herdr-spawn-adapter.test.mjs` (shrunk), `CHANGELOG.md`, `docs/architecture-manifest.json` (entries removed); deleted `src/runner/dispatch/live-renderers/claude-stream-json.mjs` and `pi-agent-session.mjs` (the two live-renderer files `tsk-5jl` had added) |"
+        },
+        {
+          "path": "docs/specs/distribution.md",
+          "line": 419,
+          "text": "- `repo/docs/architecture-manifest.json` — layer registration for the four"
+        },
+        {
+          "path": "docs/explanation/herdr-spawn-adapter-fresh-pane.md",
+          "line": 343,
+          "text": "with their `docs/architecture-manifest.json` entries — dead code the"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md",
+          "line": 16,
+          "text": "| `--i03` | Produce (op_016) + first review/red-team (op_017/018) | Doer `done`/`verified`, commit `1904655f`. Reviewer found 2/200 focused tests failing (a reviewer-findings claim settling `confidence:failed` instead of `reported`). Red-team found the same root cause plus a HIGH: `reconcileHerdrSpawnRun` (`herdr-round.mjs`) still read `result.json` raw, bypassing `interpretRunResult`, so a corrupt v2 result was accepted there instead of failing closed. **Lead found the doer's own worktree was NOT clean when review started**: uncommitted changes on top of `1904655f` (a real fix for the reviewer's 2 failing tests, plus the required `docs/architecture-manifest.json` registration for I01/I02/I03's new modules — `test/architecture.test.mjs` would have failed on the track branch without it). Verified the diff line-by-line, reverted only the incidental GitNexus-regenerated `AGENTS.md`/`CLAUDE.md` reindex noise (found and cleared a stale, process-less `index.lock` first), and committed the rest as `8100c46e`. |"
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 1206,
+          "text": "- `src/runner/merge.mjs` — cỗ máy cơ chế của cổng duyệt (per pr-lifecycle / 1359ab5e), tách khỏi CLI cùng khuôn `worktree.mjs`/`goal-check.mjs`: `classifySource` (runner/pull/legacy — nhánh sống qua `worktree.mjs`'s `branchExists`, hay cặp `headAtTake`+`headAtReturn`, hay không cả hai); `reviewDiff(repoRoot, item, opts)` (diff theo nguồn + cảnh báo degrade trung thực; `opts.trunk` TÙY CHỌN mặc định `'main'`, per fan-out-parallel — cây nhánh tích hợp truyền nhánh của gốc cho một đề xuất con); `mergeRunnerItem` (`git merge --no-commit --no-ff` → verify trên staged tree qua `runGoalCheck` → renew/check lock ownership synchronously → commit-hoặc-abort, spike-proven; mất lock ở bước kiểm tra cuối trả `lock-lost-mid-merge` và KHÔNG abort merge state vì tree đó có thể thuộc chủ lock mới; target-agnostic — người gọi checkout đúng nhánh đích trước, cây chính cho gốc hoặc nhánh của gốc cho con); `cleanupMergedBranch` (dọn nhánh/worktree sau merge sạch, best-effort); `changedFiles(repoRoot, item, opts)` (STR13 Slice 3) — mirror hóa cơ chế phân giải trunk/nhánh của `reviewDiff` nhưng chạy `git diff --name-only` thay vì `git diff`, trả mảng path đã đổi; nguồn khác `runner` trả mảng rỗng (Iron Law approve-side chỉ soi đề xuất nguồn runner); dùng bởi `approve` để nạp `filesChanged` cho `classifyIronLaw`. KHÔNG BAO GIỜ ghi `.fgos/` trực tiếp — mọi chuyển trạng thái (`awaiting-approval→done`/`awaiting-approval→blocked`) vẫn ở `bin/fgos.mjs` qua `store.mjs`. Manifest layer (`docs/architecture-manifest.json`): infra"
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 1216,
+          "text": "- `src/runner/worker-log.mjs` — cửa ghi DUY NHẤT cho bản ghi output cục bộ (`.fgos/logs/<id>.log`, per worker-dispatch-log) — tách khỏi `store.mjs` vì đây là văn bản tự do (output trợ lý), khác nhật ký sự kiện có cấu trúc của `store.mjs`; `appendWorkerLog(dir, workId, entry)` nối thêm một khối, không bao giờ đè; field vắng mặt (vd không tier/model/output khi lỗi không phải của trợ lý) render mà không throw. `loop.mjs`'s `dispatchClaimedItem` gọi nó ở hai điểm: ngay sau trợ lý chạy xong (trước goal-check — bắt cả đề xuất lẫn chấm-trượt), và trong nhánh bắt lỗi mang `errorClass` (quá-giờ/hỏng-spawn/hỏng-worktree). Thư mục `.fgos/logs/` được git-ignore (không bao giờ vào cây committed) — khác `.fgos/events.jsonl` (committed, là truth) và giống `.fgos/state.json` (view cục bộ). `store.mjs`'s cửa ghi duy nhất (`events.jsonl`+`state.json`) không đổi phạm vi — bản ghi output là một cửa RIÊNG, không đi qua `moveWork`/`appendEvent`. Manifest layer (`docs/architecture-manifest.json`): infra."
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 1813,
+          "text": "  `docs/architecture-manifest.json`'s import-direction check (chỉ quét"
+        },
+        {
+          "path": "docs/distribution-vision.md",
+          "line": 119,
+          "text": "   một cơ chế khác (vd manifest file như `docs/architecture-manifest.json`)?"
+        },
+        {
+          "path": "docs/specs/work-state.md",
+          "line": 2276,
+          "text": "  `docs/architecture-manifest.json` (không thì `test/architecture."
+        },
+        {
+          "path": "docs/specs/reading-map.md",
+          "line": 23,
+          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
+        },
+        {
+          "path": "docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md",
+          "line": 23,
+          "text": "fixtures, and `docs/architecture-manifest.json`/`docs/architecture-map.md`'s"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md",
+          "line": 30,
+          "text": "no row in `docs/architecture-manifest.json`. Commit `c306b3cc` (\"register"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md",
+          "line": 107,
+          "text": "git show HEAD:docs/architecture-manifest.json | grep -c \"deliberation/schema\"  # -> 0"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md",
+          "line": 113,
+          "text": "  row in `docs/architecture-manifest.json`. Both facts read straight out of"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md",
+          "line": 116,
+          "text": "  cannot be the cause. Not fixed from here: `docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md",
+          "line": 325,
+          "text": "- ~~**`docs/architecture-manifest.json` is missing a row for"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.4.md",
+          "line": 147,
+          "text": "named `docs/architecture-manifest.json` as an out-of-May-Touch-list file for"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.3.md",
+          "line": 360,
+          "text": "`.mjs` module was created, so `docs/architecture-manifest.json` needed no"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10.md",
+          "line": 228,
+          "text": "  `docs/architecture-manifest.json`'s own layer ranking, confirmed before"
+        },
+        {
+          "path": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+          "line": 17,
+          "text": "`entry` is the shallowest. `docs/architecture-manifest.json` records every"
+        },
+        {
+          "path": "docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md",
+          "line": 89,
+          "text": "`docs/architecture-manifest.json` layer row in the SAME cell\" (feature"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.3.md",
+          "line": 188,
+          "text": "No new `src/` `.mjs` module was created, so `docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.1.md",
+          "line": 20,
+          "text": "| `docs/architecture-manifest.json` | One line added: `\"src/verbs/coordination/group-thinking-pack.mjs\": \"use-case\"`. | Mechanical consequence of adding one new `src/` file — `test/architecture.test.mjs`'s \"every `.mjs` on disk has exactly one manifest row\" invariant requires it; not a scope expansion beyond what adding the file itself already required. |"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.1.md",
+          "line": 207,
+          "text": "generator correctly, exactly parallel to the `docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.1.md",
+          "line": 376,
+          "text": " M docs/architecture-manifest.json"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.1.md",
+          "line": 393,
+          "text": "`docs/architecture-manifest.json` (a one-line registration required by"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md",
+          "line": 357,
+          "text": "had no `docs/architecture-manifest.json` row. Fixed directly (pure data"
+        },
+        {
+          "path": "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+          "line": 16,
+          "text": "with no matching row in `docs/architecture-manifest.json`."
+        },
+        {
+          "path": "docs/history/tsk-1lv-3/iron-law-evidence.md",
+          "line": 27,
+          "text": "`docs/architecture-manifest.json`, `.agents/skills/fgos-coding-exploring/"
+        },
+        {
+          "path": "docs/history/tsk-5z0/iron-law-evidence.md",
+          "line": 26,
+          "text": "`HEAD:.gitignore`, `HEAD:docs/architecture-manifest.json`, and deleting"
+        },
+        {
+          "path": "docs/history/state-runner-merge-boundary/RESEARCH.md",
+          "line": 13,
+          "text": "- **A2** — Schema thật của một row trong `docs/architecture-manifest.json`, và"
+        },
+        {
+          "path": "docs/history/state-runner-merge-boundary/RESEARCH.md",
+          "line": 20,
+          "text": "`docs/architecture-manifest.json` và `bin/fgos.mjs:540-599`."
+        },
+        {
+          "path": "docs/history/state-runner-merge-boundary/RESEARCH.md",
+          "line": 54,
+          "text": "  (`docs/architecture-manifest.json:12,:23,:61,:70`)."
+        },
+        {
+          "path": "docs/history/state-runner-merge-boundary/DISCUSSION.md",
+          "line": 52,
+          "text": "| 13 | Repo ĐÃ có tầng `use-case` khai báo chính thức | Rõ (mới, round 4) | `docs/architecture-manifest.json` layers `[entry, use-case, infra, domain, kernel]`, enforce một-chiều-xuống bằng `test/architecture.test.mjs`; 7 file đang ở tầng use-case sẵn (`runner/loop.mjs`, `intake/{discovery,plan,classify}.mjs`, `setup/{checks,registrations}.mjs`, `state/cursor.mjs`) — tầng theo manifest, không theo tên folder. File mới chỉ cần thêm row `use-case`; import same-rank (use-case → use-case) hợp lệ theo chính test đó |"
+        },
+        {
+          "path": "docs/history/state-runner-merge-boundary/DISCUSSION.md",
+          "line": 379,
+          "text": "`docs/architecture-manifest.json` khai 5 tầng `entry > use-case > infra >"
+        },
+        {
+          "path": "docs/history/state-runner-merge-boundary/DISCUSSION.md",
+          "line": 883,
+          "text": "- Registry: mỗi file mới thêm 1 row vào `docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/history/state-runner-merge-boundary/plan.md",
+          "line": 155,
+          "text": "      \"docs/architecture-manifest.json\","
+        },
+        {
+          "path": "docs/history/state-runner-merge-boundary/plan.md",
+          "line": 186,
+          "text": "      \"docs/architecture-manifest.json\""
+        },
+        {
+          "path": "docs/history/state-runner-merge-boundary/plan.md",
+          "line": 197,
+          "text": "`docs/architecture-manifest.json`). Đây không phải xung đột cần gỡ: hai"
+        },
+        {
+          "path": "docs/history/state-runner-merge-boundary/CONTEXT.md",
+          "line": 38,
+          "text": "- **Tầng (layer)** — giá trị trong `docs/architecture-manifest.json`'s"
+        },
+        {
+          "path": "docs/history/state-runner-merge-boundary/CONTEXT.md",
+          "line": 68,
+          "text": "- `docs/architecture-manifest.json` + `test/architecture.test.mjs` — luật"
+        },
+        {
+          "path": "docs/history/tsk-25b-test-wallclock-split/RESEARCH.md",
+          "line": 41,
+          "text": "  (\"đủ sổ\" so `docs/architecture-manifest.json` với file .mjs dưới `src`,"
+        },
+        {
+          "path": "docs/history/tsk-25b-test-wallclock-split/plan.md",
+          "line": 60,
+          "text": "| Vỡ ràng buộc kiến trúc | không | `test/` nằm ngoài `docs/architecture-manifest.json`; `test/architecture.test.mjs` chỉ quét `src/`+`bin/`. |"
+        },
+        {
+          "path": "docs/history/tsk-25b-test-wallclock-split/CONTEXT.md",
+          "line": 55,
+          "text": "  `docs/architecture-manifest.json`; **`test/` nằm ngoài manifest** → tách"
+        },
+        {
+          "path": "docs/history/herdr-spawn-remove-noninteractive-paths/RESEARCH.md",
+          "line": 59,
+          "text": "   `docs/architecture-manifest.json`). No other `src` consumer exists —"
+        },
+        {
+          "path": "docs/history/herdr-spawn-remove-noninteractive-paths/RESEARCH.md",
+          "line": 61,
+          "text": "   `liveOutput` is removed. `docs/architecture-manifest.json` is a generated"
+        },
+        {
+          "path": "docs/history/herdr-spawn-remove-noninteractive-paths/plan.md",
+          "line": 116,
+          "text": "| `docs/architecture-manifest.json` | light — hand-maintained layer manifest, not generated | its two `live-renderers/*.mjs` entries (lines 29-30) removed alongside the files |"
+        },
+        {
+          "path": "docs/history/herdr-spawn-remove-noninteractive-paths/plan.md",
+          "line": 131,
+          "text": "- `docs/architecture-manifest.json` — remove the two `live-renderers/*.mjs`"
+        },
+        {
+          "path": "docs/history/tsk-lya/iron-law-evidence.md",
+          "line": 23,
+          "text": "docs/architecture-manifest.json"
+        },
+        {
+          "path": "docs/history/tsk-lya/iron-law-evidence.md",
+          "line": 109,
+          "text": "- `docs/architecture-manifest.json`: registered `src/state/plan-pool.mjs`"
+        },
+        {
+          "path": "docs/history/tsk-60f/iron-law-evidence.md",
+          "line": 105,
+          "text": "`docs/architecture-manifest.json`:"
+        },
+        {
+          "path": "docs/history/tsk-3jk/iron-law-evidence.md",
+          "line": 188,
+          "text": "The layering was checked rather than assumed: `docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/history/backfill-risk-kind-vocabulary-drift/plan.md",
+          "line": 221,
+          "text": "Import-direction check (`docs/architecture-manifest.json`): `registrations.mjs`"
+        },
+        {
+          "path": "docs/history/setup-doctor-config-registry/plan.md",
+          "line": 81,
+          "text": "- Manifest JSON (`docs/architecture-manifest.json`-style) — rejected per"
+        },
+        {
+          "path": "docs/history/tsk-480-approve-movework-friction-guard/iron-law-evidence.md",
+          "line": 18,
+          "text": "- `docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/history/tsk-480-approve-movework-friction-guard/iron-law-evidence.md",
+          "line": 111,
+          "text": "  has no row in `docs/architecture-manifest.json` (pre-existing gap,"
+        },
+        {
+          "path": "docs/history/setup-doctor-config-registry/CONTEXT.md",
+          "line": 28,
+          "text": "| D1 | Cơ chế discovery: một file registrations tường minh riêng (vd `src/setup/registrations.mjs`) import từng module cung cấp check/config-default và gộp vào một mảng; `checks.mjs`/`config-merge.mjs` chỉ duyệt qua mảng đó. Module mới sửa `registrations.mjs`, không bao giờ sửa `checks.mjs`. Không chọn manifest JSON kiểu `docs/architecture-manifest.json` (JSON không giữ được function, và file đó đã mang nghĩa khác — layer classification) và không chọn directory auto-scan (magic ngầm, không khớp phong cách registry tường minh sẵn có của repo — `DOCTOR_CHECKS` array, `tool-registry.mjs`'s register verb, `command-registry.mjs`). |"
+        },
+        {
+          "path": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+          "line": 430,
+          "text": "| 23 | Layout nội bộ + cách kết nối module của `upstreams/pi` (\"everything is a plugin\") có bài học gì cho fgOS? | Chốt — D12 | Pi enforce ranh giới module bằng `package.json`'s `exports` map (path không khai = không import được, Node tự chặn) — cấp package thật, mỗi package trong workspace tự khai bề mặt công khai. fgOS là 1 package, không workspace — chuyển sang mô hình pi tốn hơn hẳn. NHƯNG fgOS đã có tương đương: `docs/architecture-manifest.json` + `test/architecture.test.mjs` (5 layer kỹ thuật: entry/use-case/infra/domain/kernel, import chỉ được xuống tầng sâu hơn, ngược tầng = test đỏ). Bài học thật: mở rộng cơ chế ĐÃ CÓ này thêm 1 rule domain-siloing, không xây cơ chế mới kiểu pi. **Lưu ý naming va chạm:** layer `\"domain\"` trong manifest là khái niệm DDD kỹ thuật, KHÔNG liên quan `DOMAINS` (coding/marketing) của toàn thảo luận này — cùng từ, 2 nghĩa khác nhau, cùng tồn tại trong 1 repo. |"
+        },
+        {
+          "path": "docs/history/core-foundation-domain-boundary/DISCUSSION.md",
+          "line": 453,
+          "text": "| D12 | Mở rộng `docs/architecture-manifest.json` + `test/architecture.test.mjs` thêm 1 rule domain-siloing: core không import domain cụ thể nào, `domains/<name>/` không import `domains/<other>/` — tái dùng nguyên cơ chế one-directional-import đã chứng minh cho 5 layer kỹ thuật. | So sánh `upstreams/pi` (\"everything is a plugin\"): pi enforce ranh giới bằng `package.json`'s `exports` map (path không khai = Node tự chặn import) — cấp package thật, cần workspace. fgOS là 1 package, không workspace — chuyển hẳn sang mô hình pi tốn hơn hẳn cái đang có. fgOS đã có tương đương thật: architecture-manifest + test đỏ khi import ngược layer. Bài học từ pi không phải \"xây cơ chế mới\" mà \"mở rộng cơ chế đã có sang trục domain\". |"
+        },
+        {
+          "path": "docs/history/core-foundation-domain-boundary/plan.md",
+          "line": 90,
+          "text": "`src/config/skill-wrappers.mjs`, `docs/architecture-manifest.json`,"
+        },
+        {
+          "path": "docs/history/core-foundation-domain-boundary/plan.md",
+          "line": 373,
+          "text": "    \"footprint\": [\"docs/architecture-manifest.json\", \"test/architecture.test.mjs\"],"
+        },
+        {
+          "path": "docs/history/core-foundation-domain-boundary/plan.md",
+          "line": 483,
+          "text": "- `docs/architecture-manifest.json` (+11 lines), `src/setup/"
+        },
+        {
+          "path": "docs/history/core-foundation-domain-boundary/CONTEXT.md",
+          "line": 113,
+          "text": "- `docs/architecture-manifest.json:80` classifies"
+        },
+        {
+          "path": "docs/history/tsk-1kh-architecture-manifest-missing-row/plan.md",
+          "line": 9,
+          "text": "`docs/architecture-manifest.json`'s `files` map, alongside its"
+        },
+        {
+          "path": "docs/history/tsk-1kh-architecture-manifest-missing-row/CONTEXT.md",
+          "line": 16,
+          "text": "  branch) has no row in `docs/architecture-manifest.json`'s `files` map."
+        },
+        {
+          "path": "docs/history/tsk-1kh-architecture-manifest-missing-row/CONTEXT.md",
+          "line": 23,
+          "text": "  (manifest: `use-case`). Layer order (`docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/history/tsk-3wo/iron-law-evidence.md",
+          "line": 15,
+          "text": "Adding `src/state/cleanup-harness.mjs` without registering it in `docs/architecture-manifest.json` reproduced a real failing-before state on the full suite:"
+        },
+        {
+          "path": "docs/history/tsk-3wo/iron-law-evidence.md",
+          "line": 45,
+          "text": "New `src/state/cleanup-harness.mjs` (`assessCleanupReadiness` + its three component checks) gating `cleanup -> done` (D8). `workflow-stage-graphs.mjs` gains a `worktreeBacked` field per domain (D5). Two new CLI verbs in `bin/fgos.mjs`: `retrospective` (D9 batch sweep) and `cleanup` (harness-gated finish, performs the actual branch cleanup + `done`/`blocked` transition). A global `cleanup.ttlDays` config default is registered via `registerConfigDefault` (D7). `docs/architecture-manifest.json` gains the new file's layer row."
+        },
+        {
+          "path": "docs/history/tsk-3xd/iron-law-evidence.md",
+          "line": 96,
+          "text": "left untouched (see item decision log): `docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/history/tsk-3um-cli-test-split/plan.md",
+          "line": 111,
+          "text": "| Vỡ ràng buộc kiến trúc | không | `test/` ngoài `docs/architecture-manifest.json`; `test/architecture.test.mjs` chỉ quét `src/`+`bin/`. |"
+        },
+        {
+          "path": "docs/history/tsk-104-cook-gate-bypass-prose-reconciliation/iron-law-evidence.md",
+          "line": 26,
+          "text": "docs/architecture-manifest.json"
+        },
+        {
+          "path": "docs/history/tsk-104-cook-gate-bypass-prose-reconciliation/iron-law-evidence.md",
+          "line": 42,
+          "text": "(`src/evolve/iron-law.mjs:20-38`); `docs/architecture-manifest.json` is"
+        },
+        {
+          "path": "docs/history/tsk-3dt/iron-law-evidence.md",
+          "line": 43,
+          "text": "     `docs/architecture-manifest.json`; without it both the one-to-one"
+        },
+        {
+          "path": "docs/history/tsk-2n2-gateway-control-race-fixes/iron-law-evidence.md",
+          "line": 107,
+          "text": "`gateway-control.mjs`), so `docs/architecture-manifest.json` needed no"
+        },
+        {
+          "path": "docs/history/tsk-2tr/iron-law-evidence.md",
+          "line": 84,
+          "text": "`docs/architecture-manifest.json` — a real blocking gap the first full-suite"
+        },
+        {
+          "path": "docs/history/fgos-marketing-domain-foundation/DISCUSSION.md",
+          "line": 464,
+          "text": "  `docs/architecture-manifest.json`, `agents/*.yaml` và viết plan chi"
+        },
+        {
+          "path": "docs/history/fgos-marketing-domain-foundation/DISCUSSION.md",
+          "line": 472,
+          "text": "  `docs/architecture-manifest.json` nếu không `test/architecture.test.mjs`"
+        },
+        {
+          "path": "docs/history/fgos-marketing-domain-foundation/plan.md",
+          "line": 157,
+          "text": "| `docs/architecture-manifest.json` | — | **Add the row** `\"src/state/handoff.mjs\": \"domain\"`. Without it `test/architecture.test.mjs` fails on \"đủ sổ\" (one-to-one file↔row) — a hard, easily-missed gate. |"
+        },
+        {
+          "path": "docs/history/fgos-marketing-domain-foundation/plan.md",
+          "line": 374,
+          "text": "    \"footprint\": [\"src/state/workflow-stage-graphs.mjs\", \"src/state/work.mjs\", \"src/state/handoff.mjs\", \"src/state/events.mjs\", \"src/state/replay.mjs\", \"src/state/store.mjs\", \"src/cli/command-registry.mjs\", \"bin/fgos.mjs\", \"docs/architecture-manifest.json\", \"docs/specs/work-state.md\", \"CHANGELOG.md\", \"test/state/handoff.test.mjs\", \"test/cli/fgos-handoff.test.mjs\"],"
+        },
+        {
+          "path": "docs/history/fgos-marketing-domain-foundation/design-distill.md",
+          "line": 208,
+          "text": "  phải có row trong `docs/architecture-manifest.json` (không thì"
+        },
+        {
+          "path": "docs/history/cli-invocation-fault-provenance/plan.md",
+          "line": 92,
+          "text": "   `docs/architecture-manifest.json`, not `kernel`. Layer is per-file, not"
+        },
+        {
+          "path": "docs/history/cli-invocation-fault-provenance/plan.md",
+          "line": 157,
+          "text": "- `docs/architecture-manifest.json` — new row for the above, layer `infra` (P2, mandatory)."
+        },
+        {
+          "path": "docs/history/tsk-1lv-6/iron-law-evidence.md",
+          "line": 17,
+          "text": "skill-prose files, `docs/architecture-manifest.json`, and a new pure"
+        },
+        {
+          "path": "docs/history/tsk-1lv-6/iron-law-evidence.md",
+          "line": 87,
+          "text": "have; unrelated to `docs/architecture-manifest.json`,"
+        },
+        {
+          "path": "docs/history/tsk-2eq-leaf-approve-lock-scope/iron-law-evidence.md",
+          "line": 91,
+          "text": "`docs/architecture-manifest.json`. Both fixes are unrelated to tsk-2eq's"
+        },
+        {
+          "path": "docs/history/tsk-516-approve-reverify-scope/RESEARCH.md",
+          "line": 45,
+          "text": "    `docs/architecture-manifest.json`."
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md",
+          "line": 133,
+          "text": "missing its `docs/architecture-manifest.json` row, failing"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md",
+          "line": 188,
+          "text": "- Re-ran `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/verbs/coordination*.test.mjs'` myself: **40 pass, 0 fail**, matching the Doer's count exactly (25 pre-existing + 15 new). Also re-ran `test/architecture.test.mjs` standalone: **6/6 pass** — the `docs/architecture-manifest.json` row `\"src/verbs/coordination/launch-master-loop.mjs\": \"use-case\"` is consistent with its siblings (`run.mjs`, `show.mjs` are both `\"use-case\"` at the same manifest location), and it is the correct layer since the module imports `run.mjs` (same layer) and `runner/definitions/protocol-loader.mjs` (a layer `run.mjs` itself already imports from — no new layering direction introduced)."
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md",
+          "line": 193,
+          "text": "- Scope: `git status --porcelain` shows only `bin/fgos.mjs`, `src/cli/command-registry.mjs`, `docs/architecture-manifest.json` modified plus the two new files (`src/verbs/coordination/launch-master-loop.mjs`, `test/verbs/coordination-launch-master-loop.test.mjs`) and this cell's own trace docs — no `group-cognition-framework.yaml`, no `src/runner/coordination/{session-engine,store,replay,schema}.mjs`, no retry/`run-retried` machinery touched. `find` for any new skill/slash-command file under `.claude/skills`/`.agents/skills`/`plugins` matching this feature returned nothing."
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md",
+          "line": 246,
+          "text": "  and `docs/architecture-manifest.json`/`src/cli/command-registry.mjs`"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md",
+          "line": 353,
+          "text": "`docs/architecture-manifest.json`, plus this cell's own trace docs; new"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md",
+          "line": 361,
+          "text": "`grep -n '\"src/verbs/coordination/' docs/architecture-manifest.json` shows"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md",
+          "line": 477,
+          "text": "   `index.md`, `docs/architecture-manifest.json`,"
+        },
+        {
+          "path": "docs/history/tsk-516-approve-reverify-scope/CONTEXT.md",
+          "line": 30,
+          "text": "`docs/architecture-manifest.json`. `test/architecture.test.mjs` đỏ **trên"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/runtime-recovery/p08.md",
+          "line": 40,
+          "text": "1. **Architecture-manifest completeness for this track's own files** (`docs/architecture-manifest.json`): added rows for `src/runner/dispatch/cli-spawn-supervisor.mjs` (P02L), `src/runner/coordination/read-evaluators.mjs` (P04), `src/runner/coordination/recovery-planner.mjs` and `src/verbs/coordination/recover.mjs` (P05S) — all four had been repeatedly flagged as \"pre-existing, not this cell's fault\" by every closed cell from P02H onward. This restores `test/architecture.test.mjs`'s one-directional-layer import check to green for every file this track touches."
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/runtime-recovery/p05.md",
+          "line": 17,
+          "text": "1. **Fix-1**: HIGH finding (both reviewer and red-team) — `expectedControlEpoch` was a shadow field read from/written to `run.json` directly, never the Run's real P01 control epoch tracked by `run-lock.mjs`'s `control/generations/`, so a live controller takeover between plan and apply was never actually fenced. Fixed by routing the epoch check through `run-lock.mjs`'s own real generation primitive. Also fixed in this round: a CAS-vs-settle-writer race (F5, first pass), a snapshot-hash blindness to settled runs (F1), `actionKey` not binding to the action/expiry it was issued for (F3), a dead-PID `.recovery.lock` with no reclaim (M1), and missing `docs/architecture-manifest.json` rows (M2)."
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/runtime-recovery/p05.md",
+          "line": 33,
+          "text": "- **R5/PRE-ARCH/PRE-R5**: pre-existing, unrelated failures confirmed identical on the parent commit — `docs/architecture-manifest.json` missing rows for `read-evaluators.mjs`/`cli-spawn-supervisor.mjs` (P04/P02L's files, not this cell's), and `coordination-research-fan-out.test.mjs`'s R5 concurrency test."
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P02.1.md",
+          "line": 57,
+          "text": "Result: 6/6 pass — `assignment-normalizer.mjs` and `execution-contract.mjs` registered as `infra` (same layer as `assignment.mjs`, their sibling in `src/runner/dispatch/`) in `docs/architecture-manifest.json` before this cell was considered done."
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P02.1.md",
+          "line": 74,
+          "text": "- Read `docs/architecture-manifest.json`: both new modules"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P02.1.md",
+          "line": 644,
+          "text": "  is `kernel` (`docs/architecture-manifest.json`), and `infra -> kernel` is a"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P02.4.md",
+          "line": 22,
+          "text": "| Review HIGH fix (`mission-lite.mjs:runMissionAssignment`, string-ID read-back branch, ~line 305-345) | New local `fallbackMutationForAssignment(asgn)` helper (mirrors `operation-choice.mjs`'s helper of the same name/shape, but defined locally in `mission-lite.mjs` rather than imported cross-file -- both are `use-case`-layer siblings per `docs/architecture-manifest.json`, so a new same-layer coupling edge between two independent use-case modules was avoided in favor of each deriving from the same `assignment-normalizer.mjs` infra-layer source of truth). `assignment` is reassigned (never mutated in place) to `Object.freeze({ ...assignment, mutation: effectiveMutation })` before both the local `isReadOnlyAssignment` gate check AND the `executeAssignment(assignment, ...)` call below it -- required because `executeAssignment`'s own internal `validateAssignmentLegality(assignment, opts)` (assignment-runner.mjs:509, called with the raw, not-yet-`effectiveAssignment`-rebuilt object) independently re-checks legality on whatever object it is handed | `test/runner/mission-lite.test.mjs` `runMissionAssignment by string ID backfills mutation for a legacy assignment.json missing the field (ADR-006 R7 gap)` (new; builds a real read-only `resolve-question`/`researcher` mission assignment, strips `mutation`/`resultKind`/`evidence`/`onAdvance` from the persisted `assignment.json` to simulate a pre-ADR-006-R2 file, calls `runMissionAssignment` with the **string** assignmentId, asserts `status: 'done'`/`confidence: 'reported'`) | Confirmed by `git stash push -- src/runner/dispatch/mission-lite.mjs`, re-running the new test in isolation: fails with the false-refusal `RunnerConfigError` thrown from `mission-lite.mjs:316` (pre-fix line), then `git stash pop` restores the fix and it passes (see Fix Evidence) | Test run output below | proved |"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P02.4.md",
+          "line": 658,
+          "text": "  `operation-choice.mjs`: `docs/architecture-manifest.json` lists both"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+          "line": 476,
+          "text": "- **`docs/architecture-manifest.json` drift** — `test/architecture.test.mjs`"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+          "line": 606,
+          "text": "- **`docs/architecture-manifest.json` touched, not in phase-02's own Files"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P01.1.md",
+          "line": 88,
+          "text": "  infra layer (`docs/architecture-manifest.json` ranks both `infra`), no new"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P02.1.md",
+          "line": 49,
+          "text": "`docs/architecture-manifest.json` row yet; explicitly deferred to cell"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P02.1.md",
+          "line": 58,
+          "text": "`git status --porcelain -- src test domains docs/architecture-manifest.json`:"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P02.1.md",
+          "line": 226,
+          "text": "Baseline table). `docs/architecture-manifest.json` registered"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
+          "line": 28,
+          "text": "| R4 | Deleted `src/runner/dispatch/mission-lite.mjs` + `test/runner/mission-lite.test.mjs`; `assignment.mjs`/`assignment-runner.mjs`/`cli.mjs`/`dispatch.mjs` minimal-surface edits; `.gitignore`/`CHANGELOG.md`/`docs/specs/reading-map.md`/`docs/specs/runner.md`/`docs/architecture-manifest.json` updated | `assignment-dispatch.test.mjs`/`assignment-provenance.test.mjs`/`assignment-runresult.test.mjs` updated and green; `coordination-static.test.mjs` proves no accidental reintroduction path | `grep -rln \"\\.fgos/missions\" src/ bin/ domains/` → no matches; `grep -rn \"isMissionLite\\|missionId\" src/` → only the intentional retained error-message text and historical/doc comments | see Commands below; full suite comparison below | done |"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
+          "line": 79,
+          "text": "`mission-lite.mjs` not yet being registered in `docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
+          "line": 165,
+          "text": "  - `docs/architecture-manifest.json`: removed the `mission-lite.mjs` row,"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
+          "line": 177,
+          "text": "Independent verification performed against BASE_REF `75505c75812703b355f1291d618244c75a5d7b09`: full read of `schema.mjs`/`store.mjs`/`replay.mjs`, all four `coordination-*.test.mjs` files, the diffs of `dispatch.mjs`/`assignment.mjs`/`assignment-runner.mjs`/`cli.mjs` and their test files, `.gitignore`/`CHANGELOG.md`/`docs/specs/reading-map.md`/`docs/specs/runner.md`/`docs/architecture-manifest.json` diffs, the deleted `mission-lite.mjs` at BASE_REF, `execution-contract.mjs`, `state/events.mjs`, and `assignment.mjs`'s `createAssignmentId`/`claimAssignmentId`. Ran the focused 750-test command and the full suite myself (see Evidence below)."
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
+          "line": 211,
+          "text": "- **Doctrine registrations**: `.gitignore`/`CHANGELOG.md`/`docs/specs/reading-map.md`/`docs/specs/runner.md`/`docs/architecture-manifest.json` diffs are all genuine and accurately described. The \"no doctor check, no precedent for `.fgos/assignments/` either\" claim is correct — `grep -n \"assignments\\|coordination\" src/setup/registrations.mjs` shows no doctor-check registration for either directory."
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P04.1.md",
+          "line": 263,
+          "text": "`docs/architecture-manifest.json` registered"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md",
+          "line": 56,
+          "text": "  `docs/architecture-manifest.json`, tripping both the disk/manifest"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md",
+          "line": 1238,
+          "text": "`docs/architecture-manifest.json` are untouched by this fix, per the fix"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md",
+          "line": 1398,
+          "text": "`docs/architecture-manifest.json` are untouched by this fix, per the fix"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md",
+          "line": 1673,
+          "text": "parsing/detection logic, `docs/architecture-manifest.json`, `resolvePlan`'s"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md",
+          "line": 1841,
+          "text": "`docs/architecture-manifest.json` are untouched, per the fix task's"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md",
+          "line": 1866,
+          "text": "  (`plan-verdict-from-plan-md.mjs`, `loop.mjs`, `docs/architecture-manifest.json`,"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P02.2.md",
+          "line": 194,
+          "text": "`docs/architecture-manifest.json` registered"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+          "line": 58,
+          "text": "as `use-case` in `docs/architecture-manifest.json`, same classification as its"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+          "line": 100,
+          "text": "(`git status --porcelain -- src test domains docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+          "line": 104,
+          "text": "`docs/architecture-manifest.json` (modified, +1 line) — nothing under"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+          "line": 109,
+          "text": "`docs/architecture-manifest.json`, `store.mjs`'s `createSessionAssignment`/"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+          "line": 701,
+          "text": "  docs/architecture-manifest.json` reproduces exactly the claimed 5-file"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+          "line": 1300,
+          "text": "`git status --porcelain -- src test domains docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+          "line": 1309,
+          "text": "`docs/architecture-manifest.json` carry only their pre-existing round-1"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P07.1.md",
+          "line": 22,
+          "text": "`src/setup/registrations.mjs`, `docs/architecture-manifest.json`,"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt",
+          "line": 8,
+          "text": " M docs/architecture-manifest.json"
+        },
+        {
+          "path": "docs/history/tsk-1lv-2/iron-law-evidence.md",
+          "line": 124,
+          "text": "`docs/architecture-manifest.json` was also touched (registering the new"
+        },
+        {
+          "path": "docs/history/tsk-2uf-1/iron-law-evidence.md",
+          "line": 56,
+          "text": "check (the same check this item's own `docs/architecture-manifest.json`"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-after.txt",
+          "line": 8,
+          "text": " M docs/architecture-manifest.json"
+        },
+        {
+          "path": "docs/history/dispatch-result-confidence-reader/plan.md",
+          "line": 116,
+          "text": "4. `docs/architecture-manifest.json` — register the new file's layer"
+        },
+        {
+          "path": "docs/history/tsk-bc7/iron-law-evidence.md",
+          "line": 83,
+          "text": "`CHANGELOG.md`, and `docs/architecture-manifest.json` against"
+        },
+        {
+          "path": "docs/history/tsk-bc7/plan.md",
+          "line": 54,
+          "text": "| `CHANGELOG.md` / `docs/architecture-manifest.json` | low — no runtime behavior | Presence/content check only |"
+        },
+        {
+          "path": "docs/history/tsk-5x7-2/plan.md",
+          "line": 63,
+          "text": "  `docs/architecture-manifest.json`. This slipped through `tsk-5x7-1`'s own"
+        }
+      ]
+    },
+    {
+      "source": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "target": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "classification": "Current law/contract or explicitly dated vision; carry verbatim per frozen map, no truth sweep or retirement.",
+      "references": [
+        {
+          "path": "apps/fgos-gateway/web/src/api/client.ts",
+          "line": 76,
+          "text": " * Typed wrapper over docs/contracts/fgos-gateway-api-v1.yaml -- one"
+        },
+        {
+          "path": "apps/fgos-gateway/web/src/api/types.ts",
+          "line": 1,
+          "text": "// Types mirrored from docs/contracts/fgos-gateway-api-v1.yaml (tsk-yo0"
+        },
+        {
+          "path": "apps/fgos-gateway/Cargo.toml",
+          "line": 44,
+          "text": "# (`docs/contracts/fgos-gateway-api-v1.yaml`) into a queryable operation list"
+        },
+        {
+          "path": "apps/fgos-gateway/src/mcp.rs",
+          "line": 22,
+          "text": "//! **`search`** parses `docs/contracts/fgos-gateway-api-v1.yaml` (the same"
+        },
+        {
+          "path": "apps/fgos-gateway/src/mcp.rs",
+          "line": 127,
+          "text": "    let contract_path = root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\");"
+        },
+        {
+          "path": "apps/fgos-gateway/src/mcp.rs",
+          "line": 530,
+          "text": "            root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\"),"
+        },
+        {
+          "path": "apps/fgos-gateway/src/mcp.rs",
+          "line": 547,
+          "text": "            root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\"),"
+        },
+        {
+          "path": "apps/fgos-gateway/src/mcp.rs",
+          "line": 564,
+          "text": "            root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\"),"
+        },
+        {
+          "path": "apps/fgos-gateway/src/gateway.rs",
+          "line": 2,
+          "text": "//! locks (CONTEXT.md D1/D4/D5/D7/D8, `docs/contracts/fgos-gateway-api-v1.yaml`,"
+        },
+        {
+          "path": "apps/fgos-gateway/src/gateway.rs",
+          "line": 40,
+          "text": "/// Default listening port — same default `docs/contracts/fgos-gateway-api-v1.yaml`'s"
+        },
+        {
+          "path": "apps/fgos-gateway/src/gateway.rs",
+          "line": 188,
+          "text": "/// `docs/contracts/fgos-gateway-api-v1.yaml`'s `ErrorEnvelope.category` enum."
+        },
+        {
+          "path": "apps/fgos-gateway/src/gateway.rs",
+          "line": 254,
+          "text": "/// `docs/contracts/fgos-gateway-api-v1.yaml`'s `ErrorEnvelope` shape."
+        },
+        {
+          "path": "apps/fgos-gateway/src/gateway.rs",
+          "line": 555,
+          "text": "/// (`docs/contracts/fgos-gateway-api-v1.yaml`) tells clients to \"branch on"
+        },
+        {
+          "path": "apps/fgos-gateway/src/gateway.rs",
+          "line": 1178,
+          "text": "/// contract\" — see `docs/contracts/fgos-gateway-api-v1.yaml`). Reads the"
+        },
+        {
+          "path": "apps/fgos-gateway/src/gateway.rs",
+          "line": 1187,
+          "text": "    let path = state.root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\");"
+        },
+        {
+          "path": "apps/fgos-gateway/src/gateway.rs",
+          "line": 1741,
+          "text": "        std::fs::write(root.join(\"docs/contracts/fgos-gateway-api-v1.yaml\"), \"openapi: 3.1.0\\n\").unwrap();"
+        },
+        {
+          "path": "docs/specs/herdr-web-dashboard.md",
+          "line": 278,
+          "text": "  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18"
+        },
+        {
+          "path": "docs/ui-spec/15-system-events.md",
+          "line": 16,
+          "text": "(`docs/contracts/fgos-gateway-api-v1.yaml`; 17 routes, none of them a"
+        },
+        {
+          "path": "docs/ui-spec/screens/S03-task-detail.md",
+          "line": 99,
+          "text": "`docs/contracts/fgos-gateway-api-v1.yaml`) carries more than the id/title/"
+        },
+        {
+          "path": "docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md",
+          "line": 13,
+          "text": "lives at `docs/contracts/fgos-gateway-api-v1.yaml`, tagged"
+        },
+        {
+          "path": "docs/knowledge/why-the-herdr-web-dashboard-s-architecture-moved-from-a-stan/why-the-herdr-web-dashboard-became-a-static-client-of-the-gateway-not-its-own-server.md",
+          "line": 133,
+          "text": "`docs/contracts/fgos-gateway-api-v1.yaml` (18 paths, matching 1:1 against"
+        },
+        {
+          "path": "docs/knowledge/the-9-findings-from-the-2026-08-14-haiku-scan-fable-code-rev/gateway-subsystem-audit-260814-findings.md",
+          "line": 14,
+          "text": "Scope: `herdr-plugin/src/gateway.rs`, `docs/contracts/fgos-gateway-api-v1.yaml`,"
+        },
+        {
+          "path": "docs/knowledge/why-the-gateway-s-patch-work-id-edit-route-uses-patch-semant/why-the-gateway-edit-route-reuses-editable-fields-and-passes-through-fgos-edits-refusal.md",
+          "line": 50,
+          "text": "`docs/contracts/fgos-gateway-api-v1.yaml`) overlaps two siblings already"
+        },
+        {
+          "path": "docs/history/tsk-4qf/iron-law-evidence.md",
+          "line": 49,
+          "text": "$ git show HEAD~1:docs/contracts/fgos-gateway-api-v1.yaml | node -e \"...\""
+        },
+        {
+          "path": "docs/history/tsk-5m1/iron-law-evidence.md",
+          "line": 6,
+          "text": "Verify command: parse `docs/contracts/fgos-gateway-api-v1.yaml` and assert"
+        },
+        {
+          "path": "docs/history/tsk-5m1/iron-law-evidence.md",
+          "line": 18,
+          "text": "$ git show HEAD~1:docs/contracts/fgos-gateway-api-v1.yaml | grep -c \"WriterId\\|WriterRole\""
+        },
+        {
+          "path": "docs/history/tsk-5m1/iron-law-evidence.md",
+          "line": 30,
+          "text": "$ grep -c \"WriterId\\|WriterRole\" docs/contracts/fgos-gateway-api-v1.yaml"
+        },
+        {
+          "path": "docs/history/tsk-5m1/iron-law-evidence.md",
+          "line": 36,
+          "text": "const doc=parse(fs.readFileSync('docs/contracts/fgos-gateway-api-v1.yaml','utf8'));"
+        },
+        {
+          "path": "docs/history/tsk-yo0-web-client-scaffold/RESEARCH.md",
+          "line": 12,
+          "text": "**Checked — `docs/contracts/fgos-gateway-api-v1.yaml`:**"
+        },
+        {
+          "path": "docs/history/tsk-yo0-web-client-scaffold/plan.md",
+          "line": 11,
+          "text": "(consumes `docs/contracts/fgos-gateway-api-v1.yaml`, never edits it), no"
+        },
+        {
+          "path": "docs/history/tsk-yo0-web-client-scaffold/plan.md",
+          "line": 118,
+          "text": "| API client types match the contract yaml | Medium — a hand-drift between the client's TypeScript types and the contract's schemas would silently produce a client that compiles but lies about response shape | Read the full relevant contract sections at this validating pass (`docs/contracts/fgos-gateway-api-v1.yaml:57-69,403-429,560-689`) — `Envelope`, `ErrorEnvelope`, `WorkItem`, `Session`, `/state/digest`'s own inline schema are all fully typed (`required`/`properties` on every schema, no `additionalProperties`-style ambiguity), so there is a complete, unambiguous source to type against; remaining risk is a hand-transcription slip, not an underspecified contract. A unit test (vitest, since D14 locks it alongside vite/TypeScript) per contract operation asserting the client parses a fixture response shaped exactly like the contract's own schema — not just that the function compiles — is the proof point that catches that slip |"
+        },
+        {
+          "path": "docs/history/gateway-contract-take-role-enum/RESEARCH.md",
+          "line": 6,
+          "text": "runner, session]` (`docs/contracts/fgos-gateway-api-v1.yaml:284`) or the"
+        },
+        {
+          "path": "docs/history/gateway-contract-take-role-enum/plan.md",
+          "line": 9,
+          "text": "(`docs/contracts/fgos-gateway-api-v1.yaml:284`) from `[human, runner,"
+        },
+        {
+          "path": "docs/history/gateway-contract-take-role-enum/plan.md",
+          "line": 32,
+          "text": "- `docs/contracts/fgos-gateway-api-v1.yaml` — only file. No split."
+        },
+        {
+          "path": "docs/history/fgos-gateway-mcp-surface/plan.md",
+          "line": 78,
+          "text": "`get_contract` handler already serves (`docs/contracts/fgos-gateway-api-v1.yaml`,"
+        },
+        {
+          "path": "docs/history/fgos-gateway-mcp-surface/CONTEXT.md",
+          "line": 11,
+          "text": "contract (`docs/contracts/fgos-gateway-api-v1.yaml`, `tsk-7l9-1`,"
+        },
+        {
+          "path": "docs/history/fgos-gateway-mcp-surface/CONTEXT.md",
+          "line": 35,
+          "text": "  contract (`docs/contracts/fgos-gateway-api-v1.yaml`, `CTR010 ·"
+        },
+        {
+          "path": "docs/history/fgos-gateway-mcp-surface/CONTEXT.md",
+          "line": 52,
+          "text": "- `docs/contracts/fgos-gateway-api-v1.yaml` — the OpenAPI contract `search`"
+        },
+        {
+          "path": "docs/history/fgos-gateway-mcp-surface/CONTEXT.md",
+          "line": 92,
+          "text": "- `docs/contracts/fgos-gateway-api-v1.yaml` — `CTR010 · fgos-gateway.v1`"
+        },
+        {
+          "path": "docs/history/fgos-interface-daemon/plan.md",
+          "line": 75,
+          "text": "    \"verify\": \"node -e \\\"const {parse}=require('yaml');const fs=require('fs');const doc=parse(fs.readFileSync('docs/contracts/fgos-gateway-api-v1.yaml','utf8'));if(!doc.openapi||!doc.paths||!doc.info)throw new Error('invalid or incomplete OpenAPI spec');console.log('ok')\\\"\","
+        },
+        {
+          "path": "docs/history/fgos-interface-daemon/plan.md",
+          "line": 76,
+          "text": "    \"footprint\": [\"docs/contracts/fgos-gateway-api-v1.yaml\"],"
+        },
+        {
+          "path": "docs/history/herdr-web-dashboard-plan-realignment/plan.md",
+          "line": 9,
+          "text": "- **public contracts** — D1 buộc `docs/contracts/fgos-gateway-api-v1.yaml` phải mọc thêm route."
+        },
+        {
+          "path": "docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md",
+          "line": 30,
+          "text": "| **D1** | **Giữ Edit mode.** Thêm route edit vào gateway `/v1` và vào `docs/contracts/fgos-gateway-api-v1.yaml`; `docs/ui-spec/modals/M03-add-edit-item.md` giữ nguyên, không cắt khỏi v1. |"
+        },
+        {
+          "path": "docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md",
+          "line": 35,
+          "text": "| **D6** | **Item mới dựng khung client**: vite + TypeScript + Tailwind dưới `herdr-plugin/web/`, kèm lớp API client đọc theo `docs/contracts/fgos-gateway-api-v1.yaml` với base URL cấu hình được. Việc này **supersede `plan.md:158-161` (D14 của cụm)**, vốn giao `package.json`/`vite.config.ts` cho P3; phải sửa `deps` của tsk-5jr và tsk-4id trỏ vào item khung mới. Lý do tách: khung giờ gồm cả API client + auth nên đủ nặng để đứng riêng, và tách ra thì P3/P4 chạy song song được. |"
+        },
+        {
+          "path": "docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md",
+          "line": 39,
+          "text": "| **D10** | **tsk-5jr (P3) và tsk-4id (P4) nắn mô tả**: từ \"viết trong binary `herdr-fgos`\" (D1 cũ của cụm, đã bị tsk-7l9 D8 đóng) sang \"web client độc lập gọi API gateway `/v1` qua HTTP\", và trích `docs/contracts/fgos-gateway-api-v1.yaml` làm nguồn hợp đồng thay vì tự mô tả endpoint. |"
+        },
+        {
+          "path": "docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md",
+          "line": 41,
+          "text": "| **D12** | **Sửa `docs/specs/herdr-web-dashboard.md` nằm trong scope tsk-6d2.** Dòng 277-282 còn ghi \"The gateway's own API contract does not exist yet\" trong khi `docs/contracts/fgos-gateway-api-v1.yaml` đã tồn tại; chính spec đó viết sẵn \"once that contract lands, this spec should cite it instead of describing the boundary in prose\". Để lại đúng là loại drift item này tồn tại để dọn. |"
+        },
+        {
+          "path": "docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md",
+          "line": 64,
+          "text": "  khớp 1-1 với 18 path key của `docs/contracts/fgos-gateway-api-v1.yaml`."
+        },
+        {
+          "path": "docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md",
+          "line": 101,
+          "text": "- `docs/contracts/fgos-gateway-api-v1.yaml` — hợp đồng gateway, nguồn duy"
+        },
+        {
+          "path": "docs/history/tsk-67gr/iron-law-evidence.md",
+          "line": 6,
+          "text": "Verify command: parse `docs/contracts/fgos-gateway-api-v1.yaml` and assert"
+        },
+        {
+          "path": "docs/history/tsk-67gr/iron-law-evidence.md",
+          "line": 15,
+          "text": "$ git show HEAD~1:docs/contracts/fgos-gateway-api-v1.yaml | node -e \""
+        },
+        {
+          "path": "docs/history/tsk-67gr/iron-law-evidence.md",
+          "line": 36,
+          "text": "const doc=parse(fs.readFileSync('docs/contracts/fgos-gateway-api-v1.yaml','utf8'));"
+        },
+        {
+          "path": "docs/history/gateway-error-envelope-auth-drift/RESEARCH.md",
+          "line": 47,
+          "text": "`docs/contracts/fgos-gateway-api-v1.yaml`'s top-level `info.description`"
+        },
+        {
+          "path": "docs/history/gateway-error-envelope-auth-drift/plan.md",
+          "line": 52,
+          "text": "- `docs/contracts/fgos-gateway-api-v1.yaml`"
+        },
+        {
+          "path": "docs/history/herdr-web-dashboard/RESEARCH.md",
+          "line": 41,
+          "text": "### B — gateway thật (nguồn: `herdr-plugin/src/gateway.rs`, `docs/contracts/fgos-gateway-api-v1.yaml`)"
+        },
+        {
+          "path": "docs/history/herdr-web-dashboard/CONTEXT.md",
+          "line": 47,
+          "text": "| **D17** | **S03 CONTEXT hiện đủ field thật của `WorkItem`** (`description`, `domain`, `tier`, `deps`, `parent` khi không null, `verify`, `footprint`, `docsRef`), không chỉ id/title/status pill như bản spec gốc. Lý do: người dùng phát hiện trực tiếp (2026-08-15), so với chính `WorkItem` schema đã có sẵn trong `docs/contracts/fgos-gateway-api-v1.yaml` — CONTEXT trước D17 bỏ sót gần hết field thật, mâu thuẫn với chính acceptance criterion của màn hình này (\"người không có ngữ cảnh phải trả lời được nhanh\") vì thiếu `description`/`verify` thì không đủ để tin câu trả lời. `kind` cố ý KHÔNG thêm (trùng lặp thông tin với `domain` với một người đọc). Field null/absent thì không render dòng, cùng convention `docsRef` đã dùng trước đó. | — |"
+        },
+        {
+          "path": "docs/history/herdr-web-dashboard/plan.md",
+          "line": 11,
+          "text": "> `docs/contracts/fgos-gateway-api-v1.yaml`, auth `Authorization: Bearer`"
+        },
+        {
+          "path": "docs/history/herdr-web-dashboard/plan.md",
+          "line": 216,
+          "text": ">    `docs/contracts/fgos-gateway-api-v1.yaml`. Làm tươi bằng cheap-poll"
+        },
+        {
+          "path": "docs/history/gateway-contract-dead-attribution-headers/RESEARCH.md",
+          "line": 11,
+          "text": "- `grep -n \"WriterId\\|WriterRole\" docs/contracts/fgos-gateway-api-v1.yaml`"
+        },
+        {
+          "path": "docs/history/gateway-contract-dead-attribution-headers/plan.md",
+          "line": 11,
+          "text": "and every `$ref` to them from `docs/contracts/fgos-gateway-api-v1.yaml`, so"
+        },
+        {
+          "path": "docs/history/gateway-contract-dead-attribution-headers/plan.md",
+          "line": 40,
+          "text": "- `docs/contracts/fgos-gateway-api-v1.yaml` — only file. No split."
+        },
+        {
+          "path": "docs/history/gateway-v1-route-prefix/plan.md",
+          "line": 19,
+          "text": "(`docs/contracts/fgos-gateway-api-v1.yaml:54-59`) and the gateway's own"
+        },
+        {
+          "path": "docs/history/tsk-41h-gateway-edit-route/RESEARCH.md",
+          "line": 15,
+          "text": "  item. `docs/contracts/fgos-gateway-api-v1.yaml`'s `/work/{id}` path"
+        },
+        {
+          "path": "docs/history/tsk-41h-gateway-edit-route/plan.md",
+          "line": 9,
+          "text": "edits `docs/contracts/fgos-gateway-api-v1.yaml`, the one source of truth"
+        },
+        {
+          "path": "docs/history/tsk-41h-gateway-edit-route/plan.md",
+          "line": 56,
+          "text": "4. `docs/contracts/fgos-gateway-api-v1.yaml` updated in the SAME commit as"
+        }
+      ]
+    }
+  ]
+}
