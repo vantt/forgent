@@ -1,3 +1,23 @@
+# Latest resume state — Root conservation continuation
+
+Date: 2026-10-14
+Executor: codex-session:19@2026-10-14
+Session counter: 19
+Step: 5
+State: authoring
+Starting HEAD: 18962827a371c629b91475e6b2540a998fa30e9a
+Last green content pin: 7833bb4c11125394ea5482fdc781ccd1cf8e4e1d
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Resume: required worktree/branch verified, clean tree and last-green ancestry confirmed.
+Scope: apply all 73 ordinary ok verdicts pinned to 18962827a with verbatim notes; re-prove both-prior D/scoped E/native equality; continue remaining Step 5 rows in at least three bounded review packs if no blocker.
+Truth report/sample stay untouched; owner decision on 5/30 false units remains parked. AGENTS/CLAUDE wait for Step 10. No promotion, push, rebase, main write/merge, Step 6 or protected-tool/baseline edit.
+Next: resume checks, exact review application and cheap bookkeeping fixes, then pending source decisions and candidate-unverified scope expansion. Registry compact one-line, stop at 90 MB.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Two bounded conservation requests committed; STOP
 
 Date: 2026-10-14
