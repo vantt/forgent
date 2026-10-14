@@ -1062,12 +1062,16 @@ pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
     let pin_snapshot = if let Some(pin) = args.tracked_pin {
         serde_json::to_value(pin).unwrap_or(serde_json::json!({}))
     } else {
+        let snap_version = args
+            .release_tag
+            .map(str::to_string)
+            .or_else(|| args.manifest.release_version.clone());
         serde_json::json!({
             "schemaVersion": 1,
             "projectRuntime": {
                 "policy": "exact-digest",
                 "artifactDigest": args.manifest.artifact_digest,
-                "releaseVersion": args.manifest.release_version,
+                "releaseVersion": snap_version,
                 "channel": null,
                 "allowPrerelease": false
             }
@@ -1211,8 +1215,70 @@ pub fn check_state_schema_compatibility(
     Ok(current_schema)
 }
 
+/// Executes `fgctl upgrade`, choosing the release candidate by precedence
+/// (`--from` flag > `FGCTL_FROM` > `FGCTL_VERSION` > the latest GitHub release)
+/// and downloading it first when it is a URL or a release asset. The download is
+/// checksum-verified before it reaches [`upgrade_workspace`], and its scratch
+/// copy is removed when upgrade returns.
+pub fn upgrade_workspace_resolving(
+    start_dir: &Path,
+    inputs: &crate::fetch::SourceInputs,
+    endpoint: &crate::fetch::DownloadEndpoint,
+) -> Result<(), InitError> {
+    use crate::fetch::{choose_source, fetch_release, fetch_url, SourceChoice};
+
+    // Refuse outside a repository checkout or when no runtime is active before
+    // any network traffic.
+    let workspace_root = resolve_workspace_root(start_dir)?;
+    let activation_path = workspace_root
+        .join(".fgos")
+        .join("installation")
+        .join("activation.json");
+    if !activation_path.exists() {
+        return Err(InitError::Custom(
+            "no active runtime found in workspace -- run 'fgctl init' first".to_string(),
+        ));
+    }
+
+    // Upgrade moves the workspace to a new candidate rather than re-satisfying
+    // the current pin, so `has_pin` is false: no explicit source means the
+    // latest GitHub release.
+    match choose_source(inputs, false) {
+        SourceChoice::Local(path) => upgrade_workspace(start_dir, &path),
+        SourceChoice::Url(url) => {
+            eprintln!("downloading {url}");
+            let downloaded = fetch_url(&url)?;
+            upgrade_workspace(start_dir, &downloaded.tarball)
+        }
+        SourceChoice::Release(version) => {
+            let which = version.as_deref().unwrap_or("latest release");
+            eprintln!("no local release given; downloading {which}");
+            let downloaded = fetch_release(endpoint, version.as_deref())?;
+            eprintln!("downloaded and verified {}", downloaded.origin);
+            upgrade_workspace_tagged(
+                start_dir,
+                &downloaded.tarball,
+                downloaded.tag.as_deref(),
+            )
+        }
+        SourceChoice::Pinned => unreachable!("choose_source(_, false) never returns Pinned"),
+    }
+}
+
 /// Upgrades workspace to a new release candidate (--from <source>).
 pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), InitError> {
+    upgrade_workspace_tagged(start_dir, from_source, None)
+}
+
+/// [`upgrade_workspace`] plus the release tag the candidate was downloaded as.
+/// The updated `.fgos/distribution.json` pin records that tag
+/// (`projectRuntime.releaseVersion`) so a teammate with an empty machine store
+/// can download the upgraded release via plain `fgctl init`.
+fn upgrade_workspace_tagged(
+    start_dir: &Path,
+    from_source: &Path,
+    release_tag: Option<&str>,
+) -> Result<(), InitError> {
     let workspace_root = resolve_workspace_root(start_dir)?;
     let workspace_id = compute_workspace_id(&workspace_root);
     let work_state_id = compute_work_state_id(&workspace_id);
@@ -1220,6 +1286,7 @@ pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), Ini
     let store_root = resolve_machine_release_store_root();
     let installation_dir = workspace_root.join(".fgos").join("installation");
     let activation_path = installation_dir.join("activation.json");
+    let distribution_path = workspace_root.join(".fgos").join("distribution.json");
 
     if !activation_path.exists() {
         return Err(InitError::Custom(
@@ -1245,6 +1312,21 @@ pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), Ini
         check_main_checkout_lock(&workspace_root)?;
         let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
         cleanup_stale_activation_tmp_files(&installation_dir);
+        if let Some(tag) = release_tag {
+            let pin = TrackedDistributionPin {
+                schema_version: 1,
+                project_runtime: ProjectRuntimePin {
+                    policy: "exact-digest".to_string(),
+                    artifact_digest: current_activation.artifact_digest.clone(),
+                    release_version: Some(tag.to_string()),
+                    channel: None,
+                    allow_prerelease: false,
+                },
+            };
+            let pin_bytes = serde_json::to_vec_pretty(&pin)?;
+            std::fs::create_dir_all(workspace_root.join(".fgos"))?;
+            std::fs::write(&distribution_path, pin_bytes)?;
+        }
         let shim_fgos = installation_dir.join("bin").join("fgos");
         run_tail(
             &workspace_root,
@@ -1317,6 +1399,21 @@ pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), Ini
             && current.status != "quarantined"
             && is_release_staged(&store_root, &current.artifact_digest)
         {
+            if let Some(tag) = release_tag {
+                let pin = TrackedDistributionPin {
+                    schema_version: 1,
+                    project_runtime: ProjectRuntimePin {
+                        policy: "exact-digest".to_string(),
+                        artifact_digest: current.artifact_digest.clone(),
+                        release_version: Some(tag.to_string()),
+                        channel: None,
+                        allow_prerelease: false,
+                    },
+                };
+                let pin_bytes = serde_json::to_vec_pretty(&pin)?;
+                std::fs::create_dir_all(workspace_root.join(".fgos"))?;
+                std::fs::write(&distribution_path, pin_bytes)?;
+            }
             let shim_fgos = installation_dir.join("bin").join("fgos");
             run_tail(
                 &workspace_root,
@@ -1349,7 +1446,7 @@ pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), Ini
         previous_artifact_digest,
         tracked_pin: None,
         update_pin: true,
-        release_tag: None,
+        release_tag,
         _lock: &lock,
     })
 }

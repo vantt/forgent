@@ -130,10 +130,13 @@ refuses outside one).
 Later, to move the project to a newer release:
 
 ```bash
+fgctl upgrade
+# or a specific tag / local archive:
+FGCTL_VERSION=v0.2.0 fgctl upgrade
 fgctl upgrade --from ./fgos-<new-version>-x86_64-unknown-linux-gnu.tar.gz
 ```
 
-`fgctl upgrade` records the previous release so `fgctl repair` can roll back.
+`fgctl upgrade` downloads and verifies the release when no `--from` is given, updates `.fgos/distribution.json` (recording the tag when downloaded), and records the previous release so `fgctl repair` can roll back.
 Check what is active with `fgctl status` (`--json` for machines).
 
 ### 2.1. What each command does
@@ -143,7 +146,7 @@ Check what is active with `fgctl status` (`--json` for machines).
 | `install.sh` | Installs the `fgctl` binary | `~/.local/bin/fgctl` |
 | `fgctl stage --from <release>` | Puts a release into the machine store without activating it | machine store |
 | `fgctl init [--from <release or URL>]` | Downloads the release when none is given or pinned, stages (if needed), activates in this project, runs the init/doctor tail | `.fgos/installation/`, machine store |
-| `fgctl upgrade --from <release>` | Moves the project to another release, keeps the previous one, runs the tail | `.fgos/installation/` |
+| `fgctl upgrade [--from <release or URL>]` | Downloads the latest or `FGCTL_VERSION` release when none is given, moves the project to it, updates `.fgos/distribution.json`, keeps the previous release, runs the tail | `.fgos/installation/`, `.fgos/distribution.json`, machine store |
 | `fgctl repair` | Rolls back to the previous release if one is recorded, otherwise re-verifies and re-publishes the same one | `.fgos/installation/` |
 | `fgctl verify` | Verifies the active release's files against its manifest and quarantines it on drift | quarantine on failure |
 | `fgctl status` | Shows the active and previous release and staged releases | nothing |

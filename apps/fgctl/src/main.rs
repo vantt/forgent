@@ -2,7 +2,7 @@ use fgos_distribution::store::{
     list_releases, resolve_machine_release_store_root, stage_release, StageOutcome,
 };
 use fgos_distribution::{
-    get_workspace_status, repair_workspace, upgrade_workspace, verify_workspace,
+    get_workspace_status, repair_workspace, upgrade_workspace_resolving, verify_workspace,
 };
 use std::path::PathBuf;
 
@@ -15,6 +15,7 @@ fn print_usage_and_exit() -> ! {
     eprintln!("  init     Initialize and activate fgOS in a workspace");
     eprintln!("           release source: --from <path|URL> > FGCTL_FROM > FGCTL_VERSION=<tag> > project pin > latest release");
     eprintln!("  upgrade  Upgrade workspace to a new release candidate");
+    eprintln!("           release source: --from <path|URL> > FGCTL_FROM > FGCTL_VERSION=<tag> > latest release");
     eprintln!("  repair   Repair or rollback workspace activation");
     eprintln!("  verify   Verify active release files against manifest");
     std::process::exit(1);
@@ -157,25 +158,17 @@ fn main() {
             }
         }
         "upgrade" => {
-            let mut from_path: Option<PathBuf> = None;
+            let mut from_path: Option<String> = None;
             let mut i = 2;
             while i < args.len() {
                 if args[i] == "--from" && i + 1 < args.len() {
-                    from_path = Some(PathBuf::from(&args[i + 1]));
+                    from_path = Some(args[i + 1].clone());
                     i += 2;
                 } else {
                     eprintln!("Unknown option: {}", args[i]);
                     print_usage_and_exit();
                 }
             }
-
-            let from = match from_path {
-                Some(p) => p,
-                None => {
-                    eprintln!("Error: --from <path> is required for 'fgctl upgrade'");
-                    print_usage_and_exit();
-                }
-            };
 
             let cwd = match std::env::current_dir() {
                 Ok(d) => d,
@@ -185,7 +178,9 @@ fn main() {
                 }
             };
 
-            match upgrade_workspace(&cwd, &from) {
+            let inputs = fgos_distribution::fetch::SourceInputs::from_env(from_path);
+            let endpoint = fgos_distribution::fetch::DownloadEndpoint::from_env();
+            match upgrade_workspace_resolving(&cwd, &inputs, &endpoint) {
                 Ok(()) => {}
                 Err(err) => {
                     eprintln!("Error: {}", err);

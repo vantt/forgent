@@ -1,11 +1,11 @@
-//! Source selection and verified download for `fgctl init`.
+//! Source selection and verified download for `fgctl init` and `fgctl upgrade`.
 //!
-//! `fgctl init` can take its release from a local path, from a URL, or from a
-//! GitHub release asset. Anything that crosses the network goes through the
-//! system `curl` (same flags, timeouts and `FGCTL_ASSET_BASE_URL` override as
-//! `install.sh`) and is verified against the release's `SHA256SUMS` before a
-//! single byte of it is handed to staging. A missing entry or a mismatch is a
-//! refusal, never a warning.
+//! `fgctl init` and `fgctl upgrade` can take a release from a local path, from
+//! a URL, or from a GitHub release asset. Anything that crosses the network
+//! goes through the system `curl` (same flags, timeouts and
+//! `FGCTL_ASSET_BASE_URL` override as `install.sh`) and is verified against the
+//! release's `SHA256SUMS` before a single byte of it is handed to staging. A
+//! missing entry or a mismatch is a refusal, never a warning.
 
 use sha2::{Digest, Sha256};
 use std::io::Read;

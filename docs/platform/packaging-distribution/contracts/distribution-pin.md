@@ -51,7 +51,7 @@ The schema is frozen at `schemaVersion: 1`. Rust serde definitions live in `pack
 | `projectRuntime` | object | Yes | Project runtime policy container. |
 | `projectRuntime.policy` | string | Yes | Policy mode (`"exact-digest"`, `"channel"`, etc.). |
 | `projectRuntime.artifactDigest` | string | Yes | Target canonical release digest. |
-| `projectRuntime.releaseVersion` | string | Optional | Release tag the pin was installed from (for example `v0.2.0-rc.1`), written only when `fgctl init` downloads the release (a local or URL install leaves it null). A tag without the leading `v` is read as `v<tag>`. When present and the pinned digest is not staged on a machine, plain `fgctl init` downloads this tag (checksum-verified) and refuses if the fetched digest is not `artifactDigest`. Absent or null: a digest-only pin, which needs an explicit source on a machine that has not staged it. |
+| `projectRuntime.releaseVersion` | string | Optional | Release tag the pin was installed or upgraded from (for example `v0.2.0-rc.1`), written only when `fgctl init` or `fgctl upgrade` downloads the release (a local or URL source leaves it null). A tag without the leading `v` is read as `v<tag>`. When present and the pinned digest is not staged on a machine, plain `fgctl init` downloads this tag (checksum-verified) and refuses if the fetched digest is not `artifactDigest`. Absent or null: a digest-only pin, which needs an explicit source on a machine that has not staged it. |
 | `projectRuntime.channel` | string | Optional | Distribution channel (e.g. `"stable"`, `"beta"`, `"nightly"`). |
 | `projectRuntime.allowPrerelease` | boolean | Optional | Whether prerelease builds may satisfy the pin (default `false`). |
 
