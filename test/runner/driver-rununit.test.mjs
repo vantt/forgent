@@ -394,3 +394,88 @@ test('a pinned input in a worktree nested inside the main checkout is recorded a
   assert.equal(digest.root, fs.realpathSync(wt));
   assert.equal(digest.rel, `${DOCS_REF}/plan.md`);
 });
+
+// Red-team attacks on this lane, kept as regression tests.
+test('a caller runnerConfig decides which executor runs the driver operation', async () => {
+  const { repo, runner } = setupRepo();
+  writePlan(repo);
+  const notReadyDir = makeFixtureDir('fgos-driver-rununit-alt-');
+  const notReady = path.join(notReadyDir, 'worker.mjs');
+  fs.writeFileSync(notReady, WORKER.replace("verdict: 'READY'", "verdict: 'NOT READY'"));
+  const alt = JSON.parse(JSON.stringify(runner));
+  alt.executors.fake.args = [notReady, '{prompt}'];
+  alt.executors.fake.invocations[0].args = [notReady, '{prompt}'];
+  const work = workItem('tsk-drv-altcfg');
+  const outcome = await executeDriverOperationChoice(work, { operation: 'validate-plan', dispatch: 'assignment', stage: 'planning' }, { repoRoot: repo, cwd: repo, runnerConfig: alt });
+  assert.equal(outcome.canAdvanceEdge, false, 'the caller config named a NOT READY executor');
+});
+
+test('a unit-run: ref from item data never becomes a unit input through choice.contextRefs', async () => {
+  const { repo, runner } = setupRepo();
+  writePlan(repo);
+  const other = await executeDriverOperationChoice(workItem('tsk-drv-ref-a'), { operation: 'validate-plan', dispatch: 'assignment', stage: 'planning' }, { repoRoot: repo, cwd: repo, runnerConfig: runner });
+  // (a gate-answer:<run>/<step> ref takes the same path; left out because resolving a missing one throws)
+  const evil = [`unit-run:${other.unitRunId}/producer`];
+  const b = workItem('tsk-drv-ref-b', { refs: evil });
+  const out = await executeDriverOperationChoice(b, { operation: 'validate-plan', dispatch: 'assignment', stage: 'planning', contextRefs: evil }, { repoRoot: repo, cwd: repo, runnerConfig: runner });
+  const rec = unitJson(repo, out.unitRunId);
+  for (const ref of evil) assert.ok(!rec.unit.inputs.includes(ref), ref);
+});
+
+test('a declared operation refuses a non-solo pattern in object form, and no other seat carries the stamp', async () => {
+  const { repo } = setupRepo();
+  const cfgPath = path.join(repo, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  cfg.runner.executors.fake2 = { ...cfg.runner.executors.fake, providerModel: 'node2' };
+  cfg.runner.modelPolicies.node2 = { ...cfg.runner.modelPolicies.node };
+  for (const cap of Object.values(cfg.runner.capabilities)) cap.prefer = [{ executor: 'fake' }, { executor: 'fake2' }];
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+  writePlan(repo);
+  const ops = operationsForStep(getDomain('coding'), 'planning');
+  const before = fs.existsSync(path.join(repo, '.fgos', 'assignments')) ? fs.readdirSync(path.join(repo, '.fgos', 'assignments')) : [];
+  for (const pattern of [{ pattern: 'reviewed' }, { patternName: 'panel' }, { pattern: 'code-change' }]) {
+    await assert.rejects(
+      runUnit({
+        unitData: { id: 'u', objective: 'x', capability: 'review', writes: [], pattern: 'solo' },
+        pattern,
+        declared: { workId: 'w-obj', domain: 'coding', workflow: 'feature', stage: 'planning', operation: 'validate-plan', operations: ops },
+        repoRoot: repo, cwd: repo, worktree: repo, session: { headless: true, herdrPresent: false },
+      }),
+      (err) => err instanceof RunnerConfigError && /runs solo/.test(err.message),
+      JSON.stringify(pattern),
+    );
+  }
+  const after = fs.existsSync(path.join(repo, '.fgos', 'assignments')) ? fs.readdirSync(path.join(repo, '.fgos', 'assignments')) : [];
+  assert.deepEqual(after, before);
+});
+
+test('a resumed declared unit keeps its stored pattern, never the caller pattern', async () => {
+  const { repo } = setupRepo();
+  writePlan(repo);
+  const ops = operationsForStep(getDomain('coding'), 'planning');
+  const first = await runUnit({
+    unitData: { id: 'u', objective: 'x', capability: 'review', writes: [] },
+    declared: { workId: 'w-resume-pat', domain: 'coding', workflow: 'feature', stage: 'planning', operation: 'validate-plan', operations: ops },
+    repoRoot: repo, cwd: repo, worktree: repo, session: { headless: true, herdrPresent: false },
+  });
+  const resumed = await runUnit({
+    resumeUnitRunId: first.unitRunId,
+    pattern: { pattern: 'reviewed' },
+    repoRoot: repo, cwd: repo, worktree: repo, session: { headless: true, herdrPresent: false },
+  });
+  assert.deepEqual(resumed.results.map((r) => r.role).filter((r) => r !== 'producer'), []);
+  assert.equal(unitJson(repo, first.unitRunId).pattern, 'solo');
+});
+
+test('a stale listed worktree path replaced by a symlink is not an allowed root', () => {
+  const { repo } = setupRepo();
+  const wt = makeFixtureDir('fgos-driver-rununit-stale-');
+  fs.rmSync(wt, { recursive: true, force: true });
+  git(repo, ['worktree', 'add', '-b', 'fgw/stale', wt]);
+  const outside = makeFixtureDir('fgos-driver-rununit-outside2-');
+  fs.writeFileSync(path.join(outside, 'secret.md'), 'secret\n');
+  fs.rmSync(wt, { recursive: true, force: true });
+  fs.symlinkSync(outside, wt);
+  assert.equal(digestPinnedInputs([path.join(outside, 'secret.md')], repo)[0].sha256, null);
+});
+

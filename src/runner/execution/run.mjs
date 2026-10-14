@@ -140,8 +140,8 @@ export function resolveGitRoots(cwd = process.cwd()) {
 /**
  * Capture snapshot of runner config from the main checkout root.
  */
-export function snapshotRunnerConfig(mainCheckoutRoot) {
-  const cfg = ensureRunnerConfigForDir(mainCheckoutRoot);
+export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
+  const cfg = runnerConfig ?? ensureRunnerConfigForDir(mainCheckoutRoot);
   const filtered = {
     capabilities: cfg.capabilities || {},
     patterns: cfg.patterns || {},
@@ -219,9 +219,10 @@ function declaredOperationOf(declared, unit, patternName, { taskSpecRoot } = {})
   if ((fields.mutation === 'read-only') !== unitReadOnly) {
     throw new RunnerConfigError(`runUnit: operation "${declared.operation}" is ${fields.mutation} but the unit ${unitReadOnly ? 'writes nothing' : 'declares writes'}`);
   }
-  const name = typeof patternName === 'string' ? patternName : patternName?.name;
-  if ((name ?? 'solo') !== 'solo') {
-    throw new RunnerConfigError(`runUnit: a unit carrying operation "${declared.operation}" runs solo, not "${name}"`);
+  // Through the same resolver the run uses, so a preset or an object form cannot slip past.
+  const { patternName: resolved } = resolvePattern(patternName);
+  if (resolved !== 'solo') {
+    throw new RunnerConfigError(`runUnit: a unit carrying operation "${declared.operation}" runs solo, not "${resolved}"`);
   }
   return fields;
 }
@@ -284,6 +285,8 @@ async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
  *   stage, operation, operations } (operations are the step's operation objects). Stored in unit.json.
  * @param {string[]} [options.pinInputs] Absolute paths whose bytes the dispatch hashes at launch
  *   (`inputDigests` of the result). Stored in unit.json.
+ * @param {object} [options.runnerConfig] Runner config the caller already resolved (e.g. from
+ *   `--config <path>`); snapshotted into unit.json instead of reading `.fgos/config.json`.
  * @param {Function} [options.onLog] Log callback
  * @returns {Promise<{unitRunId: string, outcome: string, rounds: number, results: Array}>}
  */
@@ -387,7 +390,7 @@ export async function runUnit(options = {}) {
       declaredOp = declaredOperationOf(options.declared, unit, callerPatternObject || unit.pattern || options.pattern || 'solo', { taskSpecRoot: mainRoot });
     }
     const pinInputs = options.declared !== undefined ? checkedPinInputs(options.pinInputs) : [];
-    const configSnapshot = snapshotRunnerConfig(mainRoot);
+    const configSnapshot = snapshotRunnerConfig(mainRoot, options.runnerConfig);
     // A pinned account is checked before the unit run exists: every seat it applies to must bind an
     // executor whose provider lists it, and it must not be quarantined now.
     await assertAccountPinsBeforeRun(unit, configSnapshot.runner, options);
@@ -528,7 +531,8 @@ export async function runUnit(options = {}) {
 
     // A unit that runs a Work step operation is that operation's assignment: its seat keeps its
     // name in provenance.role and its directory, the assignment carries the operation's role and stamp.
-    const operationFields = declaredOp ? {
+    const carriesOperation = declaredOp && role === 'producer';
+    const operationFields = carriesOperation ? {
       workId: unitRecord.declared.workId,
       domain: declaredOp.domain,
       ...(declaredOp.workflow ? { workflow: declaredOp.workflow } : {}),
@@ -545,7 +549,7 @@ export async function runUnit(options = {}) {
     const assignment = {
       assignmentId,
       unitRunId,
-      role: declaredOp ? declaredOp.role : role,
+      role: carriesOperation ? declaredOp.role : role,
       round,
       ...operationFields,
       // The role's own task when the pattern gave it a unit of its own (a reviewer is told to
@@ -559,7 +563,7 @@ export async function runUnit(options = {}) {
         role,
         round,
         binding: bound,
-        ...(declaredOp ? { declared: declaredOp.declared } : {}),
+        ...(carriesOperation ? { declared: declaredOp.declared } : {}),
       },
       expectedOutputs: unit.expectedOutputs || [],
       contextRefs,
@@ -595,7 +599,7 @@ export async function runUnit(options = {}) {
       },
       isReadOnlyMode: readOnly,
       session,
-      ...(declaredOp ? { operations: unitRecord.declared.operations, pinInputs: unitRecord.pinInputs ?? [] } : {}),
+      ...(carriesOperation ? { operations: unitRecord.declared.operations, pinInputs: unitRecord.pinInputs ?? [] } : {}),
       ...(options.providerCapacityRuntimeDir ? { providerCapacityRuntimeDir: options.providerCapacityRuntimeDir } : {}),
       // Every role of a blind unit is dispatched blind or refused, never run unblind.
       ...(unit.blind ? { blind: true } : {}),
@@ -879,8 +883,11 @@ export async function runUnit(options = {}) {
 
   // A caller that passes `{ pattern, params }` is choosing the pattern's params as well as its
   // name, so that object form wins over the unit's own pattern string.
+  // A resume runs the pattern its unit.json recorded, never one its caller names now.
   const callerPattern = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
-  const patternName = callerPattern || unit.pattern || options.pattern || 'solo';
+  const patternName = options.resumeUnitRunId && unitRecord.pattern
+    ? unitRecord.pattern
+    : callerPattern || unit.pattern || options.pattern || 'solo';
   unitRecord.pattern = patternName;
   persistUnitRecord();
   const patternResult = await runPattern(patternName, unit, unitRecord.configSnapshot.runner, {

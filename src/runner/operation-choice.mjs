@@ -151,6 +151,8 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
         if (resultKind && asgn.resultKind && asgn.resultKind !== resultKind) continue;
         // Two operations of one item never stand in for each other.
         if (operation && asgn.operation && asgn.operation !== operation) continue;
+        // In a Unit run only the producer seat carries the operation, and always names it.
+        if (asgn.provenance?.kind === 'unit-run' && (asgn.provenance.role !== 'producer' || !asgn.operation)) continue;
         // evidence -- driver operation choice must never interpret it as a
         // Stage verdict or lifecycle signal. Skip it here, in the same
         // filter chain as the declared-shape checks above (not a
@@ -2319,13 +2321,17 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
     });
     // A caller ref joins the Unit inputs only as a plain repo-relative name; anything else is
     // dropped here rather than failing the whole step in validateUnit.
+    // Item data never gets to name another run's output (`unit-run:`, `gate-answer:`).
     const callerRefs = (Array.isArray(choice.contextRefs) ? choice.contextRefs : [])
       .filter((ref) => typeof ref === 'string' && ref.trim() && !ref.startsWith('/')
+        && !ref.startsWith('unit-run:') && !ref.startsWith('gate-answer:')
         && !ref.includes('\\') && !ref.includes('\0') && !ref.split('/').includes('..'));
     const unitData = { ...built.unitData, inputs: [...new Set([...callerRefs, ...built.unitData.inputs])] };
 
     const unitRun = await runUnit({
       unitData,
+      // The one config of this step: the unit's capability and prefer came from it too.
+      runnerConfig: cfg,
       declared: built.declared,
       pinInputs: built.pinInputs,
       repoRoot: stateRoot,

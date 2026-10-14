@@ -1241,7 +1241,11 @@ function allowedInputRoots(mainRoot) {
       cwd: mainRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
     });
     for (const field of listing.split('\n')) {
-      if (field.startsWith('worktree ')) add(field.slice('worktree '.length));
+      if (!field.startsWith('worktree ')) continue;
+      const listed = field.slice('worktree '.length);
+      // A listed path that is now a symlink is not that worktree any more.
+      try { if (fs.lstatSync(listed).isSymbolicLink()) continue; } catch { continue; }
+      add(listed);
     }
   } catch { /* no git: only the main checkout is allowed */ }
   return [...roots];

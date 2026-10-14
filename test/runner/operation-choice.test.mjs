@@ -25,8 +25,8 @@ import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
-// A driver operation runs as a Unit (runUnit): its worker runs confined (bwrap), and the Unit
-// reads its runner config from the repo's own .fgos/config.json, never from the caller's memory.
+// A driver operation runs as a Unit (runUnit): its worker runs confined (bwrap), and it binds
+// from the runner config the caller hands over, so that config needs confined executors.
 seedFileLocalBwrapRegistry();
 
 const UNIT_CAPABILITIES = ['review', 'coding:review', 'implement', 'code:implement'];
@@ -52,37 +52,33 @@ function confinedUnitConfig(config = {}) {
   for (const cap of UNIT_CAPABILITIES) capabilities[cap] ??= { prefer: [{ executor: first }] };
   const modelPolicies = { ...(config.modelPolicies ?? {}) };
   modelPolicies.node ??= modelPolicies.claude ?? { standard: 'test-model' };
-  const { executor, ...rest } = config;
-  void executor;
-  return { ...rest, executors, capabilities, modelPolicies };
+  return { ...config, executors, capabilities, modelPolicies };
 }
 
-/** Make `opts.repoRoot` a git repo holding the confined config on disk, as runUnit needs it. */
-function unitReady(opts = {}) {
-  const root = opts.repoRoot ?? opts.cwd;
-  if (root && opts.runnerConfig) {
-    try {
-      execFileSync('git', ['rev-parse', '--git-dir'], { cwd: root, stdio: 'ignore' });
-    } catch {
-      execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: root });
-      execFileSync('git', ['config', 'user.name', 'test'], { cwd: root });
-      execFileSync('git', ['config', 'user.email', 'test@test'], { cwd: root });
-      execFileSync('git', ['commit', '-q', '--allow-empty', '-m', 'initial commit'], { cwd: root });
-    }
-    const file = path.join(root, '.fgos', 'config.json');
-    let existing = {};
-    try { existing = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { /* none yet */ }
-    fs.mkdirSync(path.dirname(file), { recursive: true });
-    fs.writeFileSync(file, JSON.stringify({ ...existing, runner: confinedUnitConfig(opts.runnerConfig) }, null, 2));
+/** A Unit runs only in a git repo: make `root` one when a test's temp dir is not. */
+function ensureGitRepo(root) {
+  try {
+    execFileSync('git', ['rev-parse', '--git-dir'], { cwd: root, stdio: 'ignore' });
+  } catch {
+    execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: root });
+    execFileSync('git', ['config', 'user.name', 'test'], { cwd: root });
+    execFileSync('git', ['config', 'user.email', 'test@test'], { cwd: root });
+    execFileSync('git', ['commit', '-q', '--allow-empty', '-m', 'initial commit'], { cwd: root });
   }
-  return opts;
+}
+
+function unitReady(opts = {}) {
+  if (!opts.runnerConfig) return opts;
+  ensureGitRepo(opts.repoRoot ?? opts.cwd);
+  return { ...opts, runnerConfig: confinedUnitConfig(opts.runnerConfig) };
 }
 
 const executeDriverOperationChoice = (work, choice, opts) => driverExecute(work, choice, unitReady(opts));
-// The loop's driver steps read the same on-disk config; the loop itself keeps the config it was given.
+// The loop hands its config to its driver steps, so it gets the confined one too.
 const runOnce = (options) => {
-  unitReady({ repoRoot: options.repoRoot, runnerConfig: options.config });
-  return loopRunOnce(options);
+  if (!options.config) return loopRunOnce(options);
+  ensureGitRepo(options.repoRoot);
+  return loopRunOnce({ ...options, config: confinedUnitConfig(options.config) });
 };
 
 // Outside /tmp: a confined worker sees a private tmpfs there, not these files.
