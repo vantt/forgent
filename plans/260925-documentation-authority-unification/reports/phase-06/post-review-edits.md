@@ -44,3 +44,9 @@ Changed source-target bindings and native units are returned to pending review w
 ## Packaging owner-resolution representation (2026-10-14)
 
 Owner resolution at `5563bcb70d1c9f0706925271e8209e7eb49fd28b` supersedes the installed-default npm trigger by the dated coordinator window and leaves the end-of-window obligation owed to Packaging-distribution. Update the candidate decision and the release-boundaries retention status; preserve the literal original clause. All affected native units, stable headings, reviewed bindings and reverse tuples are shown in the bounded closure-resolution request and return for independent conservation review. No implementation change or promotion.
+
+## Upstream doctor registry conservation refresh
+
+Date: 2026-10-14. Author: codex-session:15@2026-10-14. Authorization: A31 boundary sync of main `88315d5de971bec51985d4adadbed10338a658db`, merge `48e3a992be1cd74a0960df953af16b5dae4275e4`.
+
+Before editing, affected reviewed source rows: `claim_4eeb2f406288458e61bad21531966ab1`, `claim_f2f1dadddff0c5440195d8c00b74d56e`. The source Data Dictionary table and its heading binding changed upstream. Replace only the exact retained table in `docs/platform/packaging-distribution/spec.md` with the complete current `docs/specs/distribution.md#unheaded-block-5` table. Preserve the candidate shape, header, earlier truth status notes and every other byte. This imports main's doctor retained-copy check/fix descriptions verbatim; no truth approval. Reopen every changed target binding; account native old/current tuples and request independent A31 conservation review. SC-1 is not started.
