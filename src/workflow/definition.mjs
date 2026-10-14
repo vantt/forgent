@@ -111,13 +111,22 @@ function normalizeOperation(raw, label) {
   });
 }
 
+// Where a definition comes from, as the caller that loaded it says -- never a field of the data.
+// Only a units file (`fgos workflow start --units`) is a one-off list of Units, so only its unit
+// templates may carry a soft executor `prefer`; a preset or plan is shipped to other projects
+// and keeps the G2 rule (its seats are tuned with --seats and personas instead).
+const UNITS_FILE_SOURCE = 'units-file';
+
 /**
  * Validate a Workflow definition object.
  *
  * @param {unknown} raw Raw workflow object from YAML or parser
+ * @param {object} [options]
+ * @param {string} [options.source] Who loaded the definition; 'units-file' lets unit templates carry `prefer`
  * @returns {Readonly<object>} Frozen, normalized Workflow object
  */
-export function validateWorkflow(raw) {
+export function validateWorkflow(raw, { source } = {}) {
+  const templateAllowsPrefer = source === UNITS_FILE_SOURCE;
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
     throw new WorkflowDefinitionError('Workflow definition must be a non-null object');
   }
@@ -262,6 +271,7 @@ export function validateWorkflow(raw) {
 
         const template = u.template && typeof u.template === 'object' ? u.template : u;
         for (const field of DISALLOWED_G2_FIELDS) {
+          if (field === 'prefer' && templateAllowsPrefer) continue;
           if (template[field] !== undefined) {
             throw new WorkflowDefinitionError(`${unitLabel}.template contains disallowed infrastructure field "${field}" (G2 constraint).`);
           }
@@ -344,6 +354,8 @@ export function validateWorkflow(raw) {
               writes,
               taskSpec: typeof template.taskSpec === 'string' ? template.taskSpec.trim() : undefined,
               persona: typeof template.persona === 'string' && template.persona.trim() ? template.persona.trim() : undefined,
+              // Shape is checked by the Unit contract (validateUnit) before a units file gets here and again at run.
+              ...(templateAllowsPrefer && template.prefer !== undefined ? { prefer: Object.freeze(structuredClone(template.prefer)) } : {}),
               params: template.params === undefined ? undefined : structuredClone(template.params),
               contextRefs,
               ...(template.pattern === 'reviewed' ? { acceptOutcomes: Object.freeze([...acceptOutcomes]) } : {}),
