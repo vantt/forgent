@@ -99,10 +99,10 @@ Tài liệu này khóa các **luật thiết kế** đứng trên mọi code c�
 (state/FSM → routing → compound-learning). Mỗi luật kèm: phát biểu, nguồn gốc
 bằng chứng (cú pháp `nguồn:slug` tra trong `docs/distillery/sources/`), hệ quả
 thực hành, và **ngưỡng xem lại** — luật không bất tử, nó bất tử *cho tới khi
-ngưỡng có tên của nó bị chạm*. Quyết định gốc mang D-ID trong
-`.bee/decisions.jsonl`; chất liệu đầy đủ:
-`plans/reports/distill-consult-260713-2323-compound-learning-stack-report.md`
-+ `docs/distillery/deep-dives/{state,compound-engineering,routing}.md`.
+ngưỡng có tên của nó bị chạm*. Quyết định platform/repo-wide được chiếu tại
+`docs/decisions/index.md`; narrative nằm trong các mục "Lịch sử quyết định"
+của `docs/specs/<area>.md`; chất liệu còn lưu:
+`docs/distillery/deep-dives/{state,compound-engineering,routing}.md`.
 
 Trạng thái: **chốt 2026-07-13/14** (user). Thay đổi luật = supersede quyết định
 D-ID tương ứng, không sửa tại chỗ.

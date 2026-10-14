@@ -23,7 +23,7 @@ Bộ nhớ công việc tự quản của forgent: nơi duy nhất ghi nhận "�
 ## 2. Entry Points And Triggers
 
 - `fgos init` → khởi tạo kho work-state rỗng tại thư mục làm việc hiện hành (nhật ký rỗng + bản chiếu rỗng); đồng thời quét READ-ONLY project tìm marker của harness agent khác đã có mặt (thư mục dấu ấn như `.bee/`, `.claude/`, `.codex/`, `.cursor/`, và khối managed trong `AGENTS.md` khi file đó tồn tại — `init` không bao giờ tạo/sửa `AGENTS.md`), ghi kết quả phát hiện ra output + vào manifest `.fgos/coexistence.json`; lỗi phát hiện không bao giờ chặn `init` (fail-safe), re-init lặp lại ghi manifest nhất quán (idempotent) — doctrine đầy đủ: `docs/coexistence.md`
-- `fgos submit "<mô tả tự do>" [--async|--unattended] [--deps <id1,id2,...>]` → **cửa vào công khai duy nhất** cho việc mới: khai một work item từ một câu mô tả văn xuôi duy nhất — id, title, kind, risk, tier đều TỰ SUY (không cần người submit tự đặt); toàn văn mô tả gốc được giữ nguyên trên trường `description` (Data Dictionary #17, per discovery-context STR30) — nguồn ngữ cảnh đầy đủ cho context-discovery đọc lại sau, không bị cắt gọn như `title`; `verify` nhận placeholder cố định chờ bổ sung sau; `--deps` (tùy chọn, mirror hệt `add`'s `deps` sẵn có) ghi trực tiếp danh sách id phụ thuộc, đi qua ĐÚNG cửa ghi/kiểm chu trình mà mọi verb khác dùng — vắng cờ này thì `deps` rỗng, byte-identical hành vi trước đây (per str83-fgos-slash-commands / 757e5dd7); kết quả in ra bọc trong một phong bì máy-đọc chuẩn (xem "Phong bì output" dưới)
+- `fgos submit "<mô tả tự do>" [--async|--unattended] [--deps <id1,id2,...>]` → **cửa vào công khai duy nhất** cho việc mới: khai một work item từ một câu mô tả văn xuôi duy nhất — id, title, kind, risk, size đều TỰ SUY (không cần người submit tự đặt); toàn văn mô tả gốc được giữ nguyên trên trường `description` (Data Dictionary #17, per discovery-context STR30) — nguồn ngữ cảnh đầy đủ cho context-discovery đọc lại sau, không bị cắt gọn như `title`; `verify` nhận placeholder cố định chờ bổ sung sau; `--deps` (tùy chọn, mirror hệt `add`'s `deps` sẵn có) ghi trực tiếp danh sách id phụ thuộc, đi qua ĐÚNG cửa ghi/kiểm chu trình mà mọi verb khác dùng — vắng cờ này thì `deps` rỗng, byte-identical hành vi trước đây (per str83-fgos-slash-commands / 757e5dd7); kết quả in ra bọc trong một phong bì máy-đọc chuẩn (xem "Phong bì output" dưới)
 - `fgos move` → chuyển trạng thái một item, kèm `--expect` (kỳ vọng, chống ghi đè mù); cạnh từ-chối-đề-xuất bắt buộc `--reason`
 - `fgos decision --text "..."` → ghi một quyết định vào nhật ký
 - `fgos ask <id> --text "..."` → đưa một item vào chờ người (`awaiting-human`), kèm **câu hỏi** người phải quyết; item rời tập việc-sẵn-sàng cho tới khi được trả lời; nếu item có `parent`, `ask` còn chụp thêm một ảnh `{id, title, status}` của gốc lúc này làm mốc so sánh sau (per str61-chat-context-continuity — xem RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm))
@@ -42,7 +42,7 @@ Bộ nhớ công việc tự quản của forgent: nơi duy nhất ghi nhận "�
 - `fgos pick [id]` → **cửa pull giao–nhận việc CỘNG dựng workspace**, một lệnh kết hợp `take` + tạo/tái dùng worktree cho item claim được: không truyền `id` thì cầm đầu frontier (giống `take`), truyền `id` thì cầm đúng item đó (kể cả đường tái claim `blocked→doing` mang nhánh sống, giống `take`) — role LUÔN `session`, không có cờ `--role` (khác `take`); sau khi claim thành công, dựng (hoặc tái dùng) một worktree + nhánh `fgw/<id>` qua CHÍNH `createWorktree` mà vòng tự hành dùng (xem spec Runner Data Dictionary #2) — xem "Cầm việc + dựng workspace (pick)" dưới
 - `fgos retrospective` → quét cơ học MỌI item đang `delivered` và chuyển từng cái sang `retrospective` — không nhận id, không phán xét, chạy lại nhiều lần vẫn ra cùng kết quả; đây là cửa vào của chặng tổng hợp sau-thi-công
 - `fgos compound <id>` → GẮN NHÃN tài liệu lên bản ghi capture của một item đang ở status `retrospective` — item ở status khác bị từ chối rõ lý do, không sự kiện nào ghi thêm. Verb này KHÔNG còn chuyển stage: stage `compound-learn` mà nó từng mở lối vào đã rút, nên nó chỉ ghi outcome. Cờ tùy chọn `--doc-type <quadrant>` ghi nhãn Diataxis, cờ tùy chọn `--doc-path <path>` ghi con trỏ nguồn↔tài liệu (linkage) lên cùng outcome — xem RUL51 (verb compound — nay là cửa gắn nhãn, không còn là cửa chuyển stage)/RUL52 (nhãn Diataxis docType — trường capture cộng-thêm, trực giao và tùy chọn)/RUL53 (con trỏ tài liệu docPath — trường linkage cộng-thêm trên outcome)
-- `fgos cleanup <id>` → đóng chặng cuối: đòi item đang ở status `cleanup`, chạy phép kiểm thu-hồi (TTL toàn cục đã trôi qua, và merge của item vẫn còn giải được) rồi mới cho `cleanup → done`; không đạt thì item rẽ `cleanup → blocked` nêu rõ lý do. Là harness thuần — KHÔNG skill nào nạp cho chặng này
+- `fgos cleanup <id>` → đóng chặng cuối: đòi item đang ở status `cleanup`, chạy phép kiểm thu-hồi (TTL theo item đã trôi qua: leaf dùng `cleanup.leafTtlDays` mặc định 0 ngày, item khác dùng `cleanup.ttlDays` mặc định 7 ngày; và merge của item vẫn còn giải được) rồi mới cho `cleanup → done`; TTL chưa trôi qua thì item giữ `cleanup` với kết quả noop; chỉ phép kiểm thất bại mới đưa item sang `cleanup → blocked` nêu rõ lý do. Là harness thuần — KHÔNG skill nào nạp cho chặng này
 - `fgos docs-index` → sinh chỉ mục đọc-theo-tag máy-đọc-được của tài liệu người-dùng-cuối (manifest `docs/enduser-docs-index.json`) — verb ĐỌC-THUẦN (quyền `read`): không ghi sự kiện, không đổi trạng thái item, không sửa tài liệu nào; enumerate các quadrant Diataxis trên đĩa và truy ngược mỗi tài liệu về capture đã sinh nó — chi tiết hành vi + hình dạng manifest ở area `enduser-docs-index` (per bước-3 compound-learn-enduser-docs)
 - `fgos review <id>` / `fgos approve <id> [--timeout <ms>]` / `fgos reject <id> --reason "..."` → cổng duyệt PR nội bộ, MỘT cổng cho mọi đề xuất `awaiting-approval` bất kể nguồn (runner hay pull-door) — bề mặt CLI này sống ở đây (cửa lệnh `fgos` một cửa), nhưng cơ chế merge/verify đầy đủ được đặc tả ở spec Runner "Cổng duyệt PR nội bộ"
 - Bản ghi dự đoán/thực tế (outcome) không có verb ghi riêng qua cửa lệnh: nó được ghi từ bên trong vòng tự hành (xem spec Runner) — nửa dự đoán lúc nhận việc, nửa thực tế lúc việc tới trạng thái cuối (thành công lẫn thất bại); cửa pull `take`/`return` ghi hai nửa này trực tiếp, cùng khuôn
@@ -343,10 +343,10 @@ phán chia-việc. Không có cạnh nào đi thẳng từ `discovery`/`explorin
 
 **`decompose` là bí danh di sản, CHỈ để tháo cạn (drain-only).** Stage này
 từng là tên của chính bước lập-kế-hoạch và đã được đổi tên thành `planning`.
-Cái tên cũ được GIỮ LẠI trong sổ đăng ký — cùng hai cạnh `exploring →
-decompose` và `decompose → executing` — vì `stage` không nằm trong danh sách
-trường sửa được, nên các item đang đỗ trên tên đó không thể gán nhãn lại và
-sẽ mắc kẹt vĩnh viễn nếu tên bị gỡ. Nhưng KHÔNG item mới nào còn tới được đây:
+Cái tên cũ được GIỮ LẠI dưới dạng bí danh workflow `decompose: planning`;
+workflow coding không có step `decompose` hay hai cạnh `exploring →
+decompose` và `decompose → executing`, mà phân giải tên cũ sang `planning`
+khi đọc item di sản. Nhưng KHÔNG item mới nào còn tới được đây:
 `decompose` cố ý không mang mục step-mapping nào, nên phép tra "stage nào thỏa
 bước Chia-việc" luôn trả về `planning`. Bí danh này biến mất khi số item còn
 đỗ trên nó về 0 (lúc viết lại mục này: 5 item còn mở). Mọi điều mục này nói về
@@ -521,8 +521,8 @@ Song song với vòng tự hành (runner tự dispatch việc — xem spec Runne
 một phiên đang sống, hay một runner thứ hai — cầm đúng một item và tự trả
 kết quả, không qua bất kỳ tiến trình điều phối nào đứng giữa (không
 registry/heartbeat/push/lease — tầng đó, khi cần, đắp sau trên cùng nhật ký,
-xem Open Gaps). Tập item cửa pull mở ra là ĐÚNG tập frontier mà runner tự
-dispatch (`fgos ready`) — cửa pull không mở một tập riêng.
+xem Open Gaps). Khi không truyền id, `take`/`pick` cầm đầu frontier mà runner tự
+dispatch (`fgos ready`); với id tường minh, lớp CLI của `pick` không kiểm frontier/stage, nhưng chốt claim vẫn kiểm status và deps chưa giải quyết của leaf; `take` kiểm deps và lineage khi item đang `todo`, không kiểm stage.
 
 - **`fgos take [--id <id>] [--role human|session]`** (mặc định `human`) —
   cầm đúng một item: không truyền `--id` thì cầm đầu frontier; truyền
@@ -676,8 +676,8 @@ never tools" — US-027, ported nguyên vẹn).
 
 - **Runs when:** người/agent gọi `fgos init` tại thư mục làm việc — bước đầu
   tiên trước khi bất kỳ verb nào khác dùng được kho work-state.
-- **Blocked when:** không có điều kiện chặn — `init` luôn thành công bất kể
-  phát hiện gì (per install-coexistence / f1715488).
+- **Blocked when:** `init` bị từ chối trong linked worktree; kết quả quét
+  phát hiện harness không chặn `init` (per install-coexistence / f1715488).
 - **What changes:** tạo `.fgos/` rỗng (nhật ký rỗng + bản chiếu rỗng) tại cwd
   nếu chưa có; quét READ-ONLY project tìm marker của harness agent khác đã có
   mặt (thư mục dấu ấn — `.bee/`, `.claude/`, `.codex/`, `.cursor/` là tập khởi
@@ -728,7 +728,7 @@ trực tiếp trong nhiều file tiếp tục dùng nguyên trạng (ví dụ `t
 
 ### Submit Verb
 
-- **Runs when:** người/agent gọi `fgos submit "<mô tả>" [--async|--unattended] [--domain <tên>] [--deps <id1,id2,...>] [--tier <bậc>] [--kind <loại>] [--risk <mức>]` —
+- **Runs when:** người/agent gọi `fgos submit "<mô tả>" [--async|--unattended] [--domain <tên>] [--deps <id1,id2,...>] [--size <cỡ>] [--rigor <độ nghiêm>] [--kind <loại>] [--risk <mức>]` —
   song song với `add`, không thay thế; dùng khi người submit không muốn/không
   thể tự điền các trường tách rời của `add`.
 - **Blocked when:** thiếu mô tả (không truyền văn bản nào) — `validation` (mã
@@ -744,13 +744,14 @@ trực tiếp trong nhiều file tiếp tục dùng nguyên trạng (ví dụ `t
   - **id** — sinh từ title, kèm hậu tố chống trùng; nếu trùng với id đã có
     (hai mô tả tương tự nhau), tự thử lại với hậu tố khác cho tới khi ra một
     id chưa dùng.
-  - **tier, kind, risk** — mặc định suy bằng cách đếm các từ khóa rủi ro/loại-việc
+  - **size, kind, risk** — mặc định suy bằng cách đếm các từ khóa rủi ro/loại-việc
     xuất hiện trong mô tả (quy tắc cơ học, không dùng model/AI) — không khớp
-    từ khóa nào thì `tier`/`risk` về mặc định `standard`, `kind` về mặc định
-    `task`. Ba cờ tùy chọn `--tier`/`--kind`/`--risk` (str51-llm-assist-classify)
+    từ khóa nào thì `size`/`risk` về mặc định `standard`, `kind` về mặc định
+    `task`. Ba cờ tùy chọn `--size`/`--kind`/`--risk` (str51-llm-assist-classify)
     GHI ĐÈ suy luận cơ học TỪNG TRƯỜNG MỘT khi có mặt — cờ nào vắng thì
-    trường đó vẫn suy như cũ, không phụ thuộc các cờ khác có mặt hay không
-    (per RUL60 (submit — ba cờ ghi-đè tier/kind/risk, độc lập từng trường) dưới). Luôn ghi đè được bằng một sửa (`edit`) sau đó dù trường
+    trường đó vẫn suy như cũ, không phụ thuộc các cờ khác có mặt hay không;
+    `--rigor` tùy chọn, vắng cờ thì không khai `rigor`
+    (per RUL60 (submit — cờ phân loại hiện hành) dưới). Luôn ghi đè được bằng một sửa (`edit`) sau đó dù trường
     đến từ suy luận hay từ cờ tường minh.
   - **verify** — một giá trị placeholder cố định, đánh dấu "chưa xác định" —
     một stage sau bổ sung proof thật.
@@ -786,7 +787,7 @@ trực tiếp trong nhiều file tiếp tục dùng nguyên trạng (ví dụ `t
 ### Discover Verb
 
 - **Runs when:** người/agent gọi
-  `fgos discover <id> [--verdict clear|unclear] [--tier <bậc>] [--kind <loại>] [--risk <mức>]`
+  `fgos discover <id> [--verdict clear|unclear] [--size <cỡ>] [--rigor <độ nghiêm>] [--kind <loại>] [--risk <mức>]`
   — điểm gọi tay/phiên-sống (mode `sync`). Verb này phục vụ ĐÚNG hai stage đầu
   chuỗi (`discovery`, `exploring`); item ở stage lập-kế-hoạch dùng verb `plan`
   riêng bên dưới, KHÔNG dispatch chéo. Vòng tự hành cũng quét đúng hai stage
@@ -801,9 +802,9 @@ trực tiếp trong nhiều file tiếp tục dùng nguyên trạng (ví dụ `t
   `discovery → exploring` (verdict `unclear`) hoặc `exploring → planning`
   (đã chốt xong), HOẶC một sự kiện đổi-status sang `awaiting-human` (kèm câu
   hỏi) khi còn cần người quyết. Kèm theo, khi người gọi có truyền
-  `--tier`/`--kind`/`--risk`: một bản vá phân loại lên chính item — đây là
-  chỗ `tier`/`kind`/`risk` được phán LẠI sau khi có bằng chứng, thay
-  cho giá trị đếm-từ-khoá mà `submit` gán lúc sinh. Ba cờ đều tùy chọn và
+  `--size`/`--rigor`/`--kind`/`--risk`: một bản vá phân loại lên chính item — đây là
+  chỗ `size`/`rigor`/`kind`/`risk` được phán LẠI sau khi có bằng chứng, thay
+  cho phân loại tạm mà `submit` gán lúc sinh hoặc bổ sung `rigor` chưa khai. Bốn cờ đều tùy chọn và
   độc lập từng trường.
 - **Side effects:** không có lời gọi model nào từ bên trong verb. Phán-quan
   lồng bên trong đã rút — lập luận nằm ở người gọi, verb chỉ áp dụng verdict

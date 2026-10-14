@@ -1,3 +1,22 @@
+# Active resume — truth corrections, boundary sync and bounded review packaging
+
+Date: 2026-10-14
+Executor: codex-session:27@2026-10-14
+Session counter: 27
+Step: 5
+State: rework
+Input HEAD: cd2e221ac (verify full pin in current evidence)
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+
+Owner explicitly authorized resuming the interrupted uncommitted A37 work, then merging main under A31 and packaging a single bounded review set. Inherited modifications are the two candidate docs, four decision shards, candidate-unverified list, two untracked evidence files, and an unrelated .fgos/config.json modification which will remain untouched and uncommitted. The inherited scratch directory was moved outside the repository to /tmp/fgos-work/resume-truth/inherited; it will never be committed.
+
+Next: verify every listed correction and current code citation; refresh from the persisted working registry, rebind mechanically with no approval carry, run D/scoped E/native equality and commit. Then merge main, account changed source/candidate units and receipts, prove and commit. Finally package truth (100%), pending previous proposals and A31 conservation/conflicts, update remaining closure obligations and stop. No promotion, push or Step 6.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Closure reviews applied; alias routing and cutover wording corrected
 
 Date: 2026-10-14

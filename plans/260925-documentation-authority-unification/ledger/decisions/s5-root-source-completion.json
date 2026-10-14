@@ -15,21 +15,15 @@
       "sourceUnitDigest": "41e92c8d1b769ce801adf6bfb5596e8f86dd508c788a2ebd08e5cebd24b3bab6",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:22@2026-10-14",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:26@2026-10-14",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack to docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion.",
-      "reviewNote": "deep: heading 'Luật nền platform forgent (Phase 0 — com' level 1 to 2, platform-foundations.md L1-1 to platform-foundations.md L85-85; section text equals source with only heading depth shifted, payload digest equal, text, payload and following block carried unchanged; supersede fits the changed heading digest, anchor ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-source-completion-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "5df48342e3d20011f98051cecac1bd8e9ea955597798ea40216715006696e0a8",
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack to docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. This heading binds its complete unchanged following source payload at depth +1. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Authorized A37 truth correction changes this target unit (claim_2d8114529b804f49494e6d42548e1372). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "targetUnitDigest": "e21714ad09a8c40f44e5a35635b288d3b0a533f093d9c3e31c89ff84ca886526",
       "targetAncestry": [
         "Platform Foundations"
-      ],
-      "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3"
+      ]
     },
     {
       "claimId": "claim_c35726c310bf820e3cda599f084761e2",
@@ -57,23 +51,17 @@
       "claimId": "claim_ec5d5e0befef92d8598542ed3b0db18f",
       "sourceUnitDigest": "8fc59c5dbdac8ab4ef8e31cefed6cddbcce54e9c0f32a697f7101bed0056a06f",
       "claimKind": "specification",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:22@2026-10-14",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:26@2026-10-14",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "unheaded-block-12",
-      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-2 to docs/platform/platform-foundations.md#unheaded-block-12. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion.",
-      "reviewNote": "mechanical: specification block platform-foundations.md L14-21 to platform-foundations.md L98-105; digest recomputed equal, shard equals pack, anchor ok, offset 84 lines matches whole-file shift",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-source-completion-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "8fc59c5dbdac8ab4ef8e31cefed6cddbcce54e9c0f32a697f7101bed0056a06f",
+      "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-2 to docs/platform/platform-foundations.md#unheaded-block-12. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion. Authorized A37 truth correction changes this target unit (claim_2d8114529b804f49494e6d42548e1372). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "targetUnitDigest": "de888795c53722a1fceec49302307ace1e440cf43aa639e2d32fce78aad12273",
       "targetAncestry": [
         "Platform Foundations",
         "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ],
-      "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3"
+      ]
     },
     {
       "claimId": "claim_df118c590b5e50994ebf902fcee81dd0",

@@ -76,20 +76,14 @@
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "2-entry-points-and-triggers",
       "claimKind": "specification",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Source heading \"Entry Points & Triggers\" is represented by the frozen heading \"2. Entry Points And Triggers\"; only the title (ampersand and numbering) differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "reviewNote": "deep: heading 'Entry Points & Triggers' (src line 13) to '2. Entry Points And Triggers' (target line 23): payload and following-block digests equal on both sides so only the title changes; anchor ok, ancestry recomputed equal, section order kept, target unit and ancestry unchanged vs resume tree; rationale truthful",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "6e306b169de96db64ba2f8cd2b68bf3640d76bb956db97859d5e627e54ef31f5",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Source heading \"Entry Points & Triggers\" is represented by the frozen heading \"2. Entry Points And Triggers\"; only the title (ampersand and numbering) differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "authoredBy": "codex-session:26@2026-10-14",
+      "targetUnitDigest": "03a0e8994292975079c7a2b309b047eb29e3fa5afa1dcaa5f89c47dab1b44538",
       "targetAncestry": [
         "Work State Specification"
-      ],
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      ]
     },
     {
       "claimId": "claim_a5326477491a9bc30a98744da8e9bfb9",
@@ -97,21 +91,15 @@
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-3",
       "claimKind": "specification",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "The 24-line CLI entry-point verb list is identical in the candidate block under 2. Entry Points And Triggers (diff clean); the map keeps it as specification, not contract. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "reviewNote": "deep: block src lines 15-38 to spec.md#unheaded-block-3 under '2. Entry Points And Triggers': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "c8fc6e5bf49179cb6f37f3247ad25c3217a40bd23b96748f5fdf6893dff5581e",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "The 24-line CLI entry-point verb list is identical in the candidate block under 2. Entry Points And Triggers (diff clean); the map keeps it as specification, not contract. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "authoredBy": "codex-session:26@2026-10-14",
+      "targetUnitDigest": "21e9b6c7342fa4e8f55cbc2f791698156e82ba65eeb4cacc8f80decfa70fc58c",
       "targetAncestry": [
         "Work State Specification",
         "2. Entry Points And Triggers"
-      ],
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      ]
     },
     {
       "claimId": "claim_949f208343809a8ca04870aea74402de",

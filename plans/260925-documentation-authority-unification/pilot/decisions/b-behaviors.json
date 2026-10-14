@@ -32,21 +32,15 @@
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "init-verb",
       "claimKind": "specification",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Source heading at line 803 is carried as the frozen target heading \"Init Verb\" (anchor init-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "reviewNote": "deep: heading 'Khởi tạo (init)' (src line 803) to 'Init Verb' (target line 675): payload and following-block digests equal on both sides so only the title changes; anchor ok, ancestry recomputed equal, section order kept, target unit and ancestry unchanged vs resume tree; rationale truthful",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "044d32feeaadf43b8ebd50cbb9328e601bc9e0341ee23e0eaf9008037583ed2d",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Source heading at line 803 is carried as the frozen target heading \"Init Verb\" (anchor init-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Authorized A37 truth correction changes this target unit (claim_acab595482e4f9f7ae05e21a1a28f11b). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "authoredBy": "codex-session:26@2026-10-14",
+      "targetUnitDigest": "abb64fde3e8378bd816bf355972ff0e513db00b273decd9dd4c478957061e965",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations"
-      ],
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      ]
     },
     {
       "claimId": "claim_32d0beb22a64eadc4714946feef4bb4c",
@@ -54,22 +48,16 @@
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-64",
       "claimKind": "specification",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Body of the init verb section (source lines 805-831) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-64 of spec.md under the init verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "reviewNote": "deep: block src lines 805-831 to spec.md#unheaded-block-64 under 'Init Verb': source and target text identical by recomputed sha256 on both sides, hand-recomputed from file lines; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (seeded sample)",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "6507aee6bfe4534417362ff8fbb85c58f51a633e49c81ef69ea29c75effb773a",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Body of the init verb section (source lines 805-831) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-64 of spec.md under the init verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Authorized A37 truth correction changes this target unit (claim_acab595482e4f9f7ae05e21a1a28f11b). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "authoredBy": "codex-session:26@2026-10-14",
+      "targetUnitDigest": "8c083fa704b78795877465578a80d3603ef9ef8bbf2f9000c1547daead10880f",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Init Verb"
-      ],
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      ]
     },
     {
       "claimId": "claim_b7cdc84d6130cac22511eed0ed6e4e6c",
@@ -145,21 +133,15 @@
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "submit-verb",
       "claimKind": "specification",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Source heading at line 857 is carried as the frozen target heading \"Submit Verb\" (anchor submit-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "reviewNote": "deep: heading 'Nộp vấn đề tự do (submit)' (src line 857) to 'Submit Verb' (target line 729): payload and following-block digests equal on both sides so only the title changes; anchor ok, ancestry recomputed equal, section order kept, target unit and ancestry unchanged vs resume tree; rationale truthful",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "efb90fe882b0fbb11659db82440c3c004cbdd1006bb240abbadc2b2404773ee1",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Source heading at line 857 is carried as the frozen target heading \"Submit Verb\" (anchor submit-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Authorized A37 truth correction changes this target unit (claim_7c4295aa058b6a7fa5c6b945a0441a35, claim_7c4295aa058b6a7fa5c6b945a0441a35). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "authoredBy": "codex-session:26@2026-10-14",
+      "targetUnitDigest": "c94deabc102d0852530a7b68cef8520d4b138ebcb8bebb30ed32060c0a499ed7",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations"
-      ],
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      ]
     },
     {
       "claimId": "claim_e56acda46bfc3c474d9bb6eed3c6b2ac",
@@ -167,22 +149,16 @@
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-67",
       "claimKind": "specification",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Body of the submit verb section (source lines 859-912) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-67 of spec.md under the submit verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "reviewNote": "deep: block src lines 859-912 to spec.md#unheaded-block-67 under 'Submit Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (seeded sample)",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "0cee9be267f694d7ef523f3c96e35b1837c9d6bd8f4eb275770357dab32a2cdf",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Body of the submit verb section (source lines 859-912) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-67 of spec.md under the submit verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Authorized A37 truth correction changes this target unit (claim_7c4295aa058b6a7fa5c6b945a0441a35, claim_7c4295aa058b6a7fa5c6b945a0441a35). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "authoredBy": "codex-session:26@2026-10-14",
+      "targetUnitDigest": "dbfcaa1881570e24492daa35eb776b4fbea75fab92318188517e6b81ee2bdbd2",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Submit Verb"
-      ],
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      ]
     },
     {
       "claimId": "claim_bee83aee35ec25ec87d88a57a984cf50",
@@ -190,21 +166,15 @@
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "discover-verb",
       "claimKind": "specification",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Source heading at line 914 is carried as the frozen target heading \"Discover Verb\" (anchor discover-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "reviewNote": "deep: heading 'Chạy context-discovery (discover)' (src line 914) to 'Discover Verb' (target line 786): payload and following-block digests equal on both sides so only the title changes; anchor ok, ancestry recomputed equal, section order kept, target unit and ancestry unchanged vs resume tree; rationale truthful",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "f33a86417aeeb82bb3127686df99ed16ed2b3c30f4ebb6f10272dc8e99885111",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Source heading at line 914 is carried as the frozen target heading \"Discover Verb\" (anchor discover-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Authorized A37 truth correction changes this target unit (claim_02a2110f086ac00ef2d59c9d4d9afeb1, claim_02a2110f086ac00ef2d59c9d4d9afeb1). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "authoredBy": "codex-session:26@2026-10-14",
+      "targetUnitDigest": "192aa951764bb446127846b0d8530387ae2d7ad50e64179ad23a51ea53b8f98b",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations"
-      ],
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      ]
     },
     {
       "claimId": "claim_e3d06a1b8f2bf25a2fb2a85d80cdf7db",
@@ -212,22 +182,16 @@
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-68",
       "claimKind": "specification",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Body of the discover verb section (source lines 916-950) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-68 of spec.md under the discover verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "reviewNote": "deep: block src lines 916-950 to spec.md#unheaded-block-68 under 'Discover Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (seeded sample)",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "ecb4ec26f8d1cd8578eb40c2e93a7e12016dc4658e1593d04c48fddaf40d4691",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Body of the discover verb section (source lines 916-950) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-68 of spec.md under the discover verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Authorized A37 truth correction changes this target unit (claim_02a2110f086ac00ef2d59c9d4d9afeb1, claim_02a2110f086ac00ef2d59c9d4d9afeb1). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "authoredBy": "codex-session:26@2026-10-14",
+      "targetUnitDigest": "bc0b6df719a361a226f5f5c04024ef0cb5a149307ffccb2cbd07d1c556d51616",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Discover Verb"
-      ],
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      ]
     },
     {
       "claimId": "claim_e2682084346c72123f9bad31f345fb99",
