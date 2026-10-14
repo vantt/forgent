@@ -196,3 +196,100 @@ test('an executor governance blocks is passed over for the next candidate, and t
   const event = readRawEvents(fx.dir).find((e) => e.type === 'executor.dispatch');
   assert.equal(event.payload.executorId, 'beta', 'the step preferred fgos-coding-implement; governance refused it; beta ran');
 });
+
+test('a worker round that fails after writing files is a failed attempt: goal-check never judges its uncommitted files, so a branch holding an old commit is not proposed', async () => {
+  const fx = setup();
+  // A rework: the item's branch already carries a rejected commit.
+  git(fx.repoRoot, 'checkout', '-q', '-b', 'fgw/item-rework');
+  fs.writeFileSync(path.join(fx.repoRoot, 'bad.txt'), 'rejected attempt\n');
+  git(fx.repoRoot, 'add', 'bad.txt');
+  git(fx.repoRoot, 'commit', '-q', '-m', 'rejected attempt');
+  git(fx.repoRoot, 'checkout', '-q', 'main');
+  seedItem(fx.dir, { id: 'item-rework', verify: 'test -f fix.txt' });
+  // The worker writes the fix, then fails.
+  const script = writeWorker(fx.scriptDir, 'fails-after-writing', `fs.writeFileSync('fix.txt', 'fix\\n');\nprocess.exit(1);`);
+
+  const result = await runLoop(fx, { executors: { 'fgos-coding-implement': executorFor(script) }, modelPolicies: modelPolicies('node') });
+
+  assert.equal(result.dispatched[0].outcome, 'parked', 'a failed round is never proposed');
+  assert.equal(result.dispatched[0].errorClass, 'worker-failed');
+  assert.equal(listWork(fx.dir).work['item-rework'].status, 'blocked');
+  assert.equal(git(fx.repoRoot, 'show', '--format=', '--name-only', 'fgw/item-rework'), 'bad.txt', 'the branch still holds only the old commit');
+});
+
+test('a worker claim the runner refuses after the worker ran is a failed attempt of that item, never a halt of the whole runner', async () => {
+  const fx = setup();
+  seedItem(fx.dir, { id: 'item-bad-claim' });
+  seedItem(fx.dir, { id: 'item-fine', verify: 'test -f fine.txt' });
+  // The bad-claim item's worker writes its file and an incomplete claim; the other item's worker is fine.
+  const script = writeWorker(fx.scriptDir, 'bad-claim', `import path from 'node:path';
+const prompt = process.argv.slice(3).join(' ');
+if (prompt.includes('item-bad-claim')) {
+  fs.writeFileSync('output.txt', 'produced\\n');
+  const claim = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+  const outbox = path.join(path.dirname(claim[1]), 'worker-output', 'outbox');
+  const dir = fs.existsSync(outbox) ? outbox : path.dirname(claim[1]);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'agent-result.json'), '{"status": "done"');
+} else {
+  fs.writeFileSync('fine.txt', 'fine\\n');
+}`);
+
+  const result = await runLoop(fx, { executors: { 'fgos-coding-implement': executorFor(script) }, modelPolicies: modelPolicies('node') });
+
+  assert.equal(result.exitCode, 0, 'the runner did not halt');
+  const byId = Object.fromEntries(result.dispatched.map((d) => [d.id, d]));
+  assert.equal(byId['item-bad-claim'].outcome, 'parked');
+  assert.equal(byId['item-bad-claim'].errorClass, 'worker-failed');
+  assert.equal(byId['item-fine'].outcome, 'awaiting-approval', 'the other item in the wave still ran');
+});
+
+test('an item whose capability has no executor pool parks as no-executor with what to configure, and the runner keeps serving other items', async () => {
+  const fx = setup();
+  // The synthetic domain's step asks for capability "assembling", which no pool serves.
+  seedItem(fx.dir, { id: 'item-no-pool', domain: 'synthetic' });
+  seedItem(fx.dir, { id: 'item-served', verify: 'test -f output.txt' });
+  const script = writeWorker(fx.scriptDir, 'producing', PRODUCING);
+
+  const result = await runLoop(fx, { executors: { 'fgos-coding-implement': executorFor(script) }, modelPolicies: modelPolicies('node') });
+
+  assert.equal(result.exitCode, 0, 'a config gap of one capability never halts the runner');
+  const byId = Object.fromEntries(result.dispatched.map((d) => [d.id, d]));
+  assert.equal(byId['item-no-pool'].outcome, 'parked');
+  assert.equal(byId['item-no-pool'].errorClass, 'no-executor');
+  assert.equal(byId['item-no-pool'].attempts, 1, 'retrying cannot fix a config gap');
+  assert.match(fs.readFileSync(path.join(fx.dir, 'logs', 'item-no-pool.log'), 'utf8'), /runner\.capabilities\["assembling"\]\.prefer/);
+  assert.equal(byId['item-served'].outcome, 'awaiting-approval');
+});
+
+test('a write into the main checkout during the round reaches the loop log as a stray-write warning, and the round still settles', async () => {
+  const fx = setup();
+  seedItem(fx.dir, { id: 'item-stray' });
+  const script = writeWorker(fx.scriptDir, 'holding', `fs.writeFileSync('output.txt', 'produced\\n');
+fs.writeFileSync('.started', '');
+const until = Date.now() + 20000;
+while (!fs.existsSync('.go') && Date.now() < until) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+fs.rmSync('.go', { force: true });
+fs.rmSync('.started', { force: true });`);
+  const logs = [];
+  const confined = confinedRunnerConfig({ timeoutMs: 30000, executors: { 'fgos-coding-implement': executorFor(script) }, modelPolicies: modelPolicies('node') });
+  persistRunnerConfig(fx.repoRoot, confined);
+  const run = runOnce({ repoRoot: fx.repoRoot, config: confined, worktreeDir: fx.worktreeDir, log: (l) => logs.push(l) });
+  // Another session dirties the main checkout while the worker holds.
+  for (const deadline = Date.now() + 20000; Date.now() < deadline;) {
+    const started = fs.readdirSync(fx.worktreeDir).find((n) => fs.existsSync(path.join(fx.worktreeDir, n, '.started')));
+    if (started) {
+      fs.writeFileSync(path.join(fx.repoRoot, 'seed.txt'), 'changed elsewhere\n');
+      fs.writeFileSync(path.join(fx.worktreeDir, started, '.go'), '');
+      break;
+    }
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  const result = await run;
+
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval', 'the warning is reported, never blocking');
+  const warning = logs.find((l) => l.includes('warning for "item-stray"'));
+  assert.ok(warning, `expected a stray-write warning in the loop log: ${JSON.stringify(logs)}`);
+  assert.match(warning, /stray-write-correlated/);
+  assert.match(warning, /seed\.txt/);
+});

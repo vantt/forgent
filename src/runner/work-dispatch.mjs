@@ -18,7 +18,7 @@ import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { deriveOperationCapability } from './operation-capability.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorConfig } from './dispatch/resolve.mjs';
 import { DispatchError } from './dispatch/dispatch-error.mjs';
-import { resolveAgentTypeForTaskSpec } from './dispatch/cli.mjs';
+import { resolveAgentTypeForTaskSpec, watchWritesOutsideWorkspace, strayWriteWarning } from './dispatch/cli.mjs';
 import { runUnit, resolveGitRoots } from './execution/run.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHints, buildPrompt } from './work-compat.mjs';
 import { getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';
@@ -79,8 +79,9 @@ export function resolveAgentTypeForWork(work, cwd, stage) {
  * Rejects with a `DispatchError` whose `errorClass` is recovery-matrix vocabulary:
  * `worker-timeout`, `worker-spawn-fail`, `provider-limit` (every candidate of the pool hit its
  * limit), `worktree-fail` (the runner commit failed, or an index someone else staged refused the
- * launch) and `confinement-policy-error` (nothing may run this Unit). A worker that ran and exited
- * non-zero is not an error here: per D3 only `verify` decides.
+ * launch), `no-executor` (nothing may run this Unit, decided before any worker started) and `worker-failed` (the worker ran, its round did not pass, and it left uncommitted
+ * changes). A round that did not pass and left nothing behind resolves with `commit: 'none'`:
+ * per D3 only `verify` decides, on the branch as it stands.
  *
  * `opts.stage` names the step (default: the item's own); `opts.feedback` rides into the prompt;
  * `opts.onUnitRunCreated(unitRunId)` is told the run's id as soon as it exists.
@@ -90,11 +91,16 @@ export function resolveAgentTypeForWork(work, cwd, stage) {
  */
 export async function spawnWorker(work, cfg, cwd, opts = {}) {
   const repoRoot = opts.repoRoot ?? (opts.fgosDir ? path.dirname(opts.fgosDir) : undefined);
-  const { unitData } = workUnitFor(work, { cfg, stage: opts.stage, feedback: opts.feedback, worktree: cwd });
+  const { unitData, warnings: unitWarnings } = workUnitFor(work, { cfg, stage: opts.stage, feedback: opts.feedback, worktree: cwd });
   const templateName = selectTemplate({ kind: work.kind, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
   const baseCommit = gitIn(cwd, ['rev-parse', 'HEAD']);
   const headRef = gitIn(cwd, ['symbolic-ref', '--quiet', '--short', 'HEAD']);
+
+  const mainRoot = repoRoot ?? resolveGitRoots(cwd).mainCheckoutRoot;
+  // Settling says the worker finished, not where it wrote: a file outside its worktree that
+  // became dirty in the main checkout during the round is reported (never blocked).
+  const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: mainRoot, cwd });
 
   let unitRunId = null;
   const unit = await runUnit({
@@ -109,13 +115,14 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
     },
   });
   unitRunId = unit.unitRunId ?? unitRunId;
-  const mainRoot = repoRoot ?? resolveGitRoots(cwd).mainCheckoutRoot;
   const seat = unit.results?.[unit.results.length - 1] ?? {};
   const runResult = seat.runResult ?? null;
   const binding = seat.binding ?? null;
   const ran = describeBinding(mainRoot, unitRunId, binding);
   const stdout = workerOutput(mainRoot, runResult, binding);
   const stderr = readRunLog(mainRoot, runResult?.runtime?.stderrLog) ?? '';
+  const strayWarning = strayWriteWarning({ repoRoot: mainRoot, strayPaths: outsideWatch.strayPaths() });
+  const warnings = [...(unitWarnings ?? []), ...(runResult?.warnings ?? []), ...(strayWarning ? [strayWarning] : [])];
   const facts = {
     unitRunId,
     executorId: binding?.executor ?? null,
@@ -133,7 +140,7 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
     headRef,
     templateName,
     templateHash,
-    ...(runResult?.warnings?.length ? { warnings: runResult.warnings } : {}),
+    ...(warnings.length ? { warnings } : {}),
   };
   process.stderr.write(
     `fgos: dispatch unit=${unitRunId} executor=${facts.executorId ?? '(none)'} via=${binding?.transport ?? '(none)'} model=${facts.model} tier=${facts.tier} outcome=${seat.outcome ?? unit.outcome}\n`,
@@ -150,12 +157,13 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
       : gitIn(cwd, ['rev-parse', 'HEAD']) === baseCommit ? 'none' : 'self';
     return { ...facts, commit, runnerCommit: seat.commit ?? null };
   }
-  if (outcome === 'policy-refusal') {
+  // Refused before any worker started: the launch itself could not happen.
+  if (outcome === 'policy-refusal' && !runResult) {
     const refused = seat.refused ?? {};
     if (refused.reason === 'foreign-staged-index') {
       throw fail('worktree-fail', `the worktree's index holds changes the runner did not stage: ${refused.detail ?? ''}`.trim(), { refused });
     }
-    throw fail('confinement-policy-error', `no executor may run this work: ${refused.reason ?? 'refused'}${refused.detail ? ` (${refused.detail})` : ''}`, { refused });
+    throw fail('no-executor', `no executor may run this work (capability "${unitData.capability}"): ${refused.reason ?? 'refused'}${refused.detail ? ` (${refused.detail})` : ''}; register an executor with a confined invocation in runner.capabilities["${unitData.capability}"].prefer`, { refused });
   }
   if (outcome === 'provider-limit') {
     throw fail('provider-limit', `every candidate for this work hit its provider limit${seat.fallbackExhausted?.detail ? `: ${seat.fallbackExhausted.detail}` : ''}`, { fallbackExhausted: seat.fallbackExhausted ?? null });
@@ -167,7 +175,14 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
   if (!runResult || failureCode === 'supervisor-spawn-fail' || facts.status === 127) {
     throw fail('worker-spawn-fail', `the worker could not be started (unit run ${unitRunId}${failureCode ? `, ${failureCode}` : ''})`);
   }
-  // Ran and failed, or reported findings: nothing was committed. Goal-check decides.
+  // The worker ran and its round did not pass, so nothing was committed. Files it left in the
+  // worktree must never reach goal-check, which would judge them as if they were on the branch:
+  // that round is a failed attempt. A round that left nothing behind is judged on the branch as
+  // it stands, as before.
+  const reason = runResult.classification?.outcome?.reason ?? seat.refused?.reason ?? outcome;
+  if (gitIn(cwd, ['status', '--porcelain', '--untracked-files=all'])) {
+    throw fail('worker-failed', `the worker round ended ${outcome} (${reason}, unit run ${unitRunId}); its uncommitted changes were not committed`);
+  }
   return { ...facts, commit: 'none', runnerCommit: seat.commit ?? null, outcome };
 }
 

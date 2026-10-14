@@ -1149,7 +1149,8 @@ test('live log: the item log names the Unit run and its stdout log before the wo
   const [{ unitRunId }] = unitRuns(repoRoot);
   const pointer = content.indexOf(`worker running as unit run ${unitRunId}`);
   assert.ok(pointer >= 0, 'the log names the Unit run as soon as it exists');
-  assert.match(content, new RegExp(`\\.fgos/assignments/${unitRunId}/producer/\\*/runs/\\*/stdout\\.log`), 'and where its stdout lives');
+  assert.match(content, new RegExp(`\\.fgos/assignments/${unitRunId}/producer/\\*/runs/\\*/protected/capture/`), 'and where its output is captured while it runs');
+  assert.match(content, /stdout\.log once it settles/);
   // the terminal block (D1/D3/D4 recap) appends after the pointer
   const terminalBlock = content.indexOf('=== ');
   assert.ok(terminalBlock > pointer, 'terminal block appended after the run pointer');

@@ -189,16 +189,25 @@ test('spawnWorker: the runner commits what the worker left (commit "runner"); a 
   assert.equal(none.runnerCommit, null);
 });
 
-test('spawnWorker surfaces a non-zero exit without throwing and commits nothing (goal-check decides, not dispatch)', async () => {
-  const failing = writeScript(scriptDir(), 'failing', `import fs from 'node:fs';\nfs.writeFileSync('half.txt', 'half\\n');\nprocess.exit(7);\n`);
-  const fx = fixture(baseConfig([failing, '{prompt}']));
+test('spawnWorker: a round that fails after writing files is worker-failed and commits nothing; one that fails clean returns commit "none" for goal-check', async () => {
+  const dir = scriptDir();
+  const dirty = writeScript(dir, 'failing-dirty', `import fs from 'node:fs';\nfs.writeFileSync('half.txt', 'half\\n');\nprocess.exit(7);\n`);
+  const fx = fixture(baseConfig([dirty, '{prompt}']));
   const before = git(fx.worktree, 'rev-parse', 'HEAD');
+  await assert.rejects(() => fx.run(), (err) => {
+    assert.ok(err instanceof DispatchError);
+    assert.equal(err.errorClass, 'worker-failed');
+    assert.equal(err.status, 7);
+    return true;
+  });
+  assert.equal(git(fx.worktree, 'rev-parse', 'HEAD'), before, 'a failed round is never committed');
+  assert.deepEqual(resolveAction('worker-failed', 1), { action: 'retry', errorClass: 'worker-failed', attempt: 1 });
 
-  const result = await fx.run();
-
+  const clean = writeScript(dir, 'failing-clean', 'process.exit(7);\n');
+  const fx2 = fixture(baseConfig([clean, '{prompt}']));
+  const result = await fx2.run();
   assert.equal(result.status, 7);
   assert.equal(result.commit, 'none');
-  assert.equal(git(fx.worktree, 'rev-parse', 'HEAD'), before, 'a failed round is never committed');
 });
 
 test('spawnWorker throws worker-timeout past the time budget and keeps what the worker printed before the kill', async () => {
@@ -406,7 +415,7 @@ test('spawnWorker rejects a work item it cannot turn into a Unit before any work
   assert.equal(unitRuns(fx.repoRoot).length, 0, 'no Unit run was even created');
 });
 
-test('spawnWorker refuses with confinement-policy-error when no executor may run the Unit, and nothing starts', async () => {
+test('spawnWorker refuses with no-executor when no executor may run the Unit, nothing starts, and the item parks', async () => {
   const echo = writeScript(scriptDir(), 'echo', ECHO);
   // A pool exists, but its only executor declares no confinement, so it cannot write.
   const fx = fixture(baseConfig([echo, '{prompt}']));
@@ -416,10 +425,11 @@ test('spawnWorker refuses with confinement-policy-error when no executor may run
 
   await assert.rejects(() => fx.run(), (err) => {
     assert.ok(err instanceof DispatchError);
-    assert.equal(err.errorClass, 'confinement-policy-error');
+    assert.equal(err.errorClass, 'no-executor');
     assert.match(err.message, /posture-unavailable/);
+    assert.match(err.message, /runner\.capabilities\["code:implement"\]\.prefer/, 'the message names what to configure');
     return true;
   });
   assert.equal(countWorkerRuns(fx.repoRoot), 0);
-  assert.equal(resolveAction('confinement-policy-error', 1).action, 'halt', 'a config that can run nothing stops the runner, as before');
+  assert.deepEqual(resolveAction('no-executor', 1), { action: 'park', errorClass: 'no-executor' }, 'one capability without a runnable executor parks its item, never halts the runner');
 });

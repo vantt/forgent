@@ -118,6 +118,8 @@ const FRICTION_LAYER = Object.freeze({
   'worker-timeout': 'environment',
   'worktree-fail': 'environment',
   'provider-limit': 'environment',
+  'worker-failed': 'executor',
+  'no-executor': 'executor',
   'corrupt-log': 'state',
   'stale-doing': 'state',
   'state-conflict': 'state',
@@ -345,7 +347,7 @@ function git(repoRoot, args) {
 /** The line the item's live log carries for a worker run: the Unit run streams nothing back, so
  * the log points at the run's own output files instead. */
 function workerRunPointer(unitRunId) {
-  return `fgos-runner: worker running as unit run ${unitRunId}; its output is in .fgos/assignments/${unitRunId}/producer/*/runs/*/stdout.log\n`;
+  return `fgos-runner: worker running as unit run ${unitRunId}; while it runs its output is captured under .fgos/assignments/${unitRunId}/producer/*/runs/*/protected/capture/, and lands in that run's stdout.log once it settles\n`;
 }
 
 /** Where `branch` is checked out in a worktree of `repoRoot`, or null. */
@@ -1113,7 +1115,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         stdout: worker.stdout,
         stderr: worker.stderr,
       });
-      for (const warning of worker.warnings ?? []) log(`fgos-runner: warning for "${item.id}": ${warning}`);
+      for (const warning of worker.warnings ?? []) log(`fgos-runner: warning for "${item.id}": ${typeof warning === 'string' ? warning : JSON.stringify(warning)}`);
 
       const check = await runGoalCheck(item, wt.path, config.timeoutMs);
       const facts = branchFacts(repoRoot, wt.branch);
