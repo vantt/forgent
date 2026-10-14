@@ -552,6 +552,29 @@ test('a read-only run that would advance Work stops instead when its result carr
     assert.equal(warned.reason, 'assignment-validate-plan-correlated-mutation', code);
   }
 
+  // A main-checkout change seen while an isolated round ran is not a change to what Work advances on.
+  const strayOnly = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: { ...lastRunResult, warnings: [{ code: 'stray-write-correlated', level: 'correlated', paths: ['plans/'] }] },
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.equal(strayOnly.canAdvanceEdge, true);
+
+  // A stored result cannot declare itself mutating to slip past the gate.
+  const forged = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      ...lastRunResult,
+      assignment: { mutation: 'mutating' },
+      warnings: [{ code: 'read-only-mutation-correlated', level: 'correlated', paths: ['docs/plan.md'] }],
+    },
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.equal(forged.canAdvanceEdge, false);
+  assert.equal(forged.reason, 'assignment-validate-plan-correlated-mutation');
+
   // A stored result whose warnings were stripped still re-derives the mutation from its evidence.
   const stripped = interpretAssignmentRunResult({
     choice: { operation: 'validate-plan' },

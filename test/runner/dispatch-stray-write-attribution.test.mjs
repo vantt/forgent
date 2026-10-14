@@ -228,8 +228,9 @@ process.stdout.write('reviewed\\n');
 // adapters) watches the main checkout as well as its workspace. A read-only
 // round that leaves its worktree alone while a file appears in the main
 // checkout is the agy incident: accepted with a warning, and the warning must
-// reach the settled result so Work, reading it, does not advance on it.
-test('a read-only Assignment round that writes into the main checkout carries the warning in its result and Work does not advance', { skip }, async () => {
+// reach the settled result. Work does not stop on it alone: the round's own
+// checkout, holding what Work would advance on, is unchanged.
+test('a read-only Assignment round that writes into the main checkout carries the warning in its settled result', { skip }, async () => {
   const { base, root, worktree } = fixture();
   const harness = path.join(base, 'harness');
   fs.mkdirSync(harness);
@@ -267,8 +268,7 @@ process.stdout.write('reviewed\\n');
       `settled warnings: ${JSON.stringify(result.warnings)}`,
     );
     const interpreted = interpretAssignmentRunResult({ choice: { operation: 'validate-plan', assignment }, runResult: result, repoRoot: root });
-    assert.equal(interpreted.canAdvanceEdge, false);
-    assert.equal(interpreted.reason, 'assignment-validate-plan-correlated-mutation');
+    assert.notEqual(interpreted.reason, 'assignment-validate-plan-correlated-mutation');
   } finally {
     fs.rmSync(base, { recursive: true, force: true });
   }

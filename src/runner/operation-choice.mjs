@@ -1709,12 +1709,14 @@ function fallbackMutationForAssignment(asgn) {
   }
 }
 
+// Changes seen in the round's own checkout, the one holding what Work would
+// advance on. `stray-write-correlated` (the main checkout changed while an
+// isolated round ran) is kept in the result but does not stop Work: on a busy
+// main checkout nearly every round would carry it, and it cannot have edited
+// the plan in the round's own worktree.
 const CORRELATED_MUTATION_WARNING_CODES = new Set([
   'read-only-mutation-correlated',
   'mutated-dirty-before-correlated',
-  // The executor CLI door's repo-root watch: the main checkout changed while
-  // the round's own workspace may have stayed clean.
-  'stray-write-correlated',
 ]);
 
 // A round that failed on its own terms keeps its failure reason even when its
@@ -1735,7 +1737,9 @@ function runFailedOnItsOwn(runResult, outcome) {
 // changed files or a mutated pre-existing dirty file.
 function hasReadOnlyCorrelatedMutation({ choice, runResult }) {
   if (!runResult || typeof runResult !== 'object') return false;
-  const asgn = choice?.assignment ?? runResult.assignment ?? {};
+  // The mutation comes from the Assignment the caller built, or else from the
+  // operation; a stored result never declares its own (it has no such field).
+  const asgn = choice?.assignment ?? {};
   const operation = asgn.operation ?? choice?.operation;
   const mutation = asgn.mutation === 'read-only' || asgn.mutation === 'mutating'
     ? asgn.mutation
