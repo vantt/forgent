@@ -50,7 +50,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "rationale": "Source heading at line 833 is carried as the frozen target heading \"Add Verb\" (anchor add-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
-      "targetUnitDigest": "3256b62b8e105b79b24d7894dcdeb5154881ad00a5f1fb46632e61dba5ced11c",
+      "targetUnitDigest": "a91ff340a101cd39a19a7c164207fcaac01be42dca50384221f27fe28c4154b9",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations"
@@ -66,7 +66,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "rationale": "Body of the add verb section (source lines 835-840) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-65 of spec.md under the add verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
-      "targetUnitDigest": "77383b5068174f1360ab2935a2580cb6073fa2951dcd0567a1d06968f32e790c",
+      "targetUnitDigest": "72721c54253ba541180f7b7114d858ce2af06671f1fa05f45162063962b681b2",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",

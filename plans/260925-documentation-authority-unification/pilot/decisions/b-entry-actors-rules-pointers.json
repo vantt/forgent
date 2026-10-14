@@ -98,7 +98,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "rationale": "Source heading \"Business Rules\" is represented by frozen heading \"11. Business Rules\"; only the numbering prefix differs. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
-      "targetUnitDigest": "c04d374ea1f5e2ff1147c0e6019b8d25df277536388f5f6b168b8131dc2d8783",
+      "targetUnitDigest": "8a8e46193a5e7ed1e3c8eae9b9e28d98ac24ee5c492e7f407053141886757782",
       "targetAncestry": [
         "Work State Specification"
       ],
@@ -113,7 +113,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "rationale": "The RUL1..RULn single unit is identical in the candidate (diff clean); kind stays specification, not normative-law, since the vocabulary reserves normative-law for platform laws L1-L8 (map section 7). Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
-      "targetUnitDigest": "9001107509933cabc29145fc4206dc8a3d34b6c285ae9b180f444b666d388c30",
+      "targetUnitDigest": "5c61302d66e78a5c872334e3a00927d6a8230642fd670dc0af923cad3e83f3b8",
       "targetAncestry": [
         "Work State Specification",
         "11. Business Rules"
