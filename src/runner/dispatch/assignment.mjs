@@ -869,6 +869,21 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     }
   }
 
+  // A unit run's mutating seat only writes files; trusted runner code outside the confinement commits
+  // them after the round passes, and only inside the declared scope. A brief that never said so let a
+  // worker commit itself: the confined gitdir is read-only, the claim came back blocked, and the round
+  // never reached the runner's commit.
+  const runnerCommits = isRunnerCommittedAssignment(assignment);
+  if (runnerCommits) {
+    const scope = assignment.writes ?? [];
+    lines.push('Write scope:');
+    lines.push('- Write only files inside this scope (repo-relative):');
+    lines.push(...(scope.length > 0 ? scope.map((entry) => `  - ${entry}`) : ['  - (none declared: the runner commits nothing)']));
+    lines.push('- Do not run `git add` or `git commit`: the runner commits after the round passes, and only the files inside the scope.');
+    lines.push('- The first line of "summary" is the commit subject, in conventional form: `type(scope): ...`.');
+    lines.push('- Need to write a file outside the scope? Do not write it: list it in "needsWrites": [<path>, ...] in agent-result.json and say why in "summary".');
+  }
+
   // Step 04 §5.1: include concrete result artifact paths when runDir is known.
   // Prefer absolute paths so the worker is unambiguous across worktrees.
   //
@@ -915,7 +930,11 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     lines.push(`- Mutation: ${ec.mutation}`);
     lines.push(`- Claim path: ${ec.resultClaim?.path || (options.runDir ? path.join(options.runDir, 'agent-result.json') : '(none)')}`);
     lines.push(`- Timeout: ${ec.limits?.executorTimeoutMs ?? ec.limits?.timeoutMs}ms`);
-    lines.push(`- Write scope: ${ec.workspace?.writeScope && ec.workspace.writeScope.length > 0 ? ec.workspace.writeScope.join(', ') : 'none in the workspace (read-only); your result files are still required'}`);
+    const mount = ec.workspace?.writeScope ?? [];
+    // The mount is the whole worktree; next to a declared scope it must not read as leave to write anywhere in it.
+    lines.push(`- Write scope: ${runnerCommits && (assignment.writes ?? []).length > 0 && mount.length > 0
+      ? `${assignment.writes.join(', ')} (the workspace mount ${mount.join(', ')} is wider; write only inside the scope)`
+      : mount.length > 0 ? mount.join(', ') : 'none in the workspace (read-only); your result files are still required'}`);
     lines.push(`- Permission enforcement: ${ec.enforcementPosture ?? 'instructed'}`);
   }
 
@@ -944,6 +963,11 @@ export function renderAssignmentPrompt(assignment, options = {}) {
 // for the declared mutation mapping) and re-exported here unchanged so this
 // module's public surface is unaffected.
 export { READ_ONLY_ROLES };
+
+/** A unit run's mutating seat: its files are committed by the runner, never by the worker. */
+function isRunnerCommittedAssignment(assignment) {
+  return assignment?.provenance?.kind === 'unit-run' && assignment.mutation === 'mutating';
+}
 
 export function isReadOnlyAssignment(assignment) {
   if (!assignment || typeof assignment !== 'object') return false;

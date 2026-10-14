@@ -242,6 +242,68 @@ test('a read-only prompt says the result files are still to be written: a worker
   assert.doesNotMatch(renderAssignmentPrompt(writing, { runDir }), /This operation is read-only/);
 });
 
+// A unit run's producer writes files only: the runner commits them after the round passes. A brief
+// that never said so let a worker commit itself, the read-only gitdir refused, and the round blocked
+// before the runner's commit was reached.
+function unitRunAssignment({ role = 'producer', mutation = 'mutating', writes = ['docs', 'src/runner/**/*.mjs'] } = {}) {
+  return {
+    assignmentId: 'unit-run-1-abc/producer-r1',
+    unitRunId: 'unit-run-1-abc',
+    role,
+    round: 1,
+    objective: 'Write the guide.',
+    mutation,
+    provenance: { kind: 'unit-run', unitRunId: 'unit-run-1-abc', role, round: 1 },
+    expectedOutputs: [],
+    contextRefs: [],
+    writes,
+  };
+}
+
+const UNIT_RUN_CONTRACT = (mutation) => ({
+  contract: { id: 'effective-execution-contract', version: 1 },
+  mutation,
+  resultClaim: { path: '/tmp/fgos-unit-brief/runs/01/agent-result.json' },
+  limits: { timeoutMs: 1000 },
+  workspace: { writeScope: mutation === 'read-only' ? [] : ['/tmp/fgos-unit-brief/worktree'] },
+  enforcementPosture: 'confined',
+});
+
+test('a mutating unit-run brief names the write scope, leaves the commit to the runner, and asks for needsWrites instead of an outside write', () => {
+  const prompt = renderAssignmentPrompt(unitRunAssignment(), {
+    runDir: '/tmp/fgos-unit-brief/runs/01',
+    effectiveContract: UNIT_RUN_CONTRACT('mutating'),
+  });
+  assert.match(prompt, /^- Write only files inside this scope \(repo-relative\):\n {2}- docs\n {2}- src\/runner\/\*\*\/\*\.mjs$/m);
+  assert.match(prompt, /^- Do not run `git add` or `git commit`: the runner commits after the round passes, and only the files inside the scope\.$/m);
+  assert.match(prompt, /^- The first line of "summary" is the commit subject, in conventional form: `type\(scope\): \.\.\.`\.$/m);
+  assert.match(prompt, /^- Need to write a file outside the scope\? Do not write it: list it in "needsWrites": \[<path>, \.\.\.\] in agent-result\.json and say why in "summary"\.$/m);
+  // The mount is the whole worktree; the line naming it must not read as leave to write anywhere in it.
+  assert.match(prompt, /^- Write scope: docs, src\/runner\/\*\*\/\*\.mjs \(the workspace mount \/tmp\/fgos-unit-brief\/worktree is wider; write only inside the scope\)$/m);
+});
+
+test('a read-only unit-run brief and a declared Work brief carry none of the runner-commit lines', () => {
+  const readOnly = renderAssignmentPrompt(unitRunAssignment({ role: 'reviewer', mutation: 'read-only', writes: ['docs'] }), {
+    runDir: '/tmp/fgos-unit-brief/runs/01',
+    effectiveContract: UNIT_RUN_CONTRACT('read-only'),
+  });
+  const work = renderAssignmentPrompt(buildAssignment({ workId: 'tsk-unit-brief-rw', stage: 'executing', operation: 'implement-item' }), {
+    runDir: '/tmp/fgos-unit-brief/runs/01',
+    effectiveContract: UNIT_RUN_CONTRACT('mutating'),
+  });
+  for (const prompt of [readOnly, work]) {
+    assert.doesNotMatch(prompt, /Write only files inside this scope/);
+    assert.doesNotMatch(prompt, /the runner commits after the round passes/);
+    assert.doesNotMatch(prompt, /is the commit subject/);
+  }
+  assert.match(work, /^- Write scope: \/tmp\/fgos-unit-brief\/worktree$/m);
+});
+
+test('the claim instructions name needsWrites as an optional list of repo-relative paths', () => {
+  const prompt = renderAssignmentPrompt(unitRunAssignment(), { runDir: '/tmp/fgos-unit-brief/runs/01' });
+  assert.match(prompt, /"needsWrites" must be an array of repo-relative paths if provided/);
+});
+
 test('renderAssignmentPrompt states the real agent-result.json status enum -- tsk-5zim: dispatched actors (claude-reviewer x2, codex-cli) wrote status:"DONE"/"objection" and failed schema validation because this was never disclosed', () => {
   const assignment = buildAssignment({
     workId: 'tsk-rd-test-2',

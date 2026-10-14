@@ -12,6 +12,9 @@ export const CLAIM_FIELD_RULES = Object.freeze([
   Object.freeze({ path: 'blocker', description: 'a non-empty string when status is "blocked"', requiredWhen: 'blocked' }),
   Object.freeze({ path: 'error', description: 'a non-empty string or object when status is "failed"', requiredWhen: 'failed' }),
   Object.freeze({ path: 'evidenceRefs', description: 'an array of non-empty strings if provided' }),
+  // A request, not a write: files outside the declared write scope the worker needed and left alone.
+  // Never checked, so a claim that carries it is exactly as valid as one that does not.
+  Object.freeze({ path: 'needsWrites', description: 'an array of repo-relative paths if provided: files outside your write scope you needed to write and did not' }),
 ]);
 
 function nonEmptyString(value) {
