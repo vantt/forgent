@@ -677,8 +677,14 @@ export function inspectPendingCopiesOverLimit({ runtimeDir }) {
  * with the staging time) and scratch homes a dead runner left (age by modification time). Read-only;
  * names, kinds and ages only. Only copies at least `minAgeMs` old are listed: a younger one is simply
  * waiting for the next renewal.
+ *
+ * With the provider account `inventory`, each copy also says whether it is `stranded`: it sits in a store
+ * directory the account's current layout never reads (the account root after the account moved to one
+ * store per CLI, `stores/<cli>` after it went back to one store or dropped that CLI, or an account the
+ * inventory no longer lists), so no dispatch will ever apply it. `storeDir` names that directory. Without
+ * an inventory nothing is judged stranded.
  */
-export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), minAgeMs = 0 }) {
+export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), minAgeMs = 0, inventory } = {}) {
   const found = [];
   const root = path.join(runtimeDir, 'account-locks');
   const subdirs = (dir) => {
@@ -689,19 +695,32 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
       const accountDir = path.join(root, provider, accountId);
       // An account with one login store per CLI keeps each store's copies under stores/<cli>.
       const storeDirs = [accountDir, ...subdirs(path.join(accountDir, 'stores')).map((cli) => path.join(accountDir, 'stores', cli))];
+      const readStoreDirs = inventory === undefined ? null : layoutStoreDirs(accountDir, inventory?.[provider]?.accounts?.[accountId]);
       const tornIn = (dir) => { try { return fs.readdirSync(path.join(dir, TORN_DIR)).filter((n) => !n.startsWith('.')).map((n) => path.join(dir, TORN_DIR, n)); } catch { return []; } };
-      for (const dir of storeDirs.flatMap((storeDir) => [...listLeftovers(storeDir), ...tornIn(storeDir)])) {
-        const name = path.basename(dir);
-        const staged = /^(\d{15})-/.exec(name);
-        let at;
-        if (staged) at = Number(staged[1]);
-        else { try { at = fs.statSync(dir).mtimeMs; } catch { continue; } }
-        const ageMs = now - at;
-        if (ageMs >= minAgeMs || path.basename(path.dirname(dir)) === TORN_DIR) found.push({ provider, accountId, kind: path.basename(path.dirname(dir)) === TORN_DIR ? 'torn' : staged ? 'pending' : 'scratch', ageMs });
+      for (const storeDir of storeDirs) {
+        const stranded = readStoreDirs !== null && !readStoreDirs.has(storeDir);
+        for (const dir of [...listLeftovers(storeDir), ...tornIn(storeDir)]) {
+          const name = path.basename(dir);
+          const staged = /^(\d{15})-/.exec(name);
+          let at;
+          if (staged) at = Number(staged[1]);
+          else { try { at = fs.statSync(dir).mtimeMs; } catch { continue; } }
+          const ageMs = now - at;
+          const torn = path.basename(path.dirname(dir)) === TORN_DIR;
+          if (ageMs >= minAgeMs || torn) found.push({ provider, accountId, kind: torn ? 'torn' : staged ? 'pending' : 'scratch', ageMs, storeDir, stranded });
+        }
       }
     }
   }
   return found;
+}
+
+// The store directories a dispatch reads for an inventory account: the account directory for one store,
+// `stores/<cli>` for each declared CLI otherwise; none for an account the inventory does not list.
+function layoutStoreDirs(accountDir, account) {
+  if (!account) return new Set();
+  if (account.credentialSources) return new Set(Object.keys(account.credentialSources).map((cli) => path.join(accountDir, 'stores', cli)));
+  return new Set([accountDir]);
 }
 
 function syncPath(target) {

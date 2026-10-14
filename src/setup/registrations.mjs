@@ -5435,8 +5435,10 @@ export function checkCredentialCopiesRetained({
   roots = defaultConfinementTempRoots(),
   now = Date.now(),
   minAgeMs = RETAINED_COPY_REPORT_AFTER_MS,
+  inventory,
 } = {}) {
-  const copies = inspectRetainedCredentialCopies({ runtimeDir, now, minAgeMs });
+  const copies = inspectRetainedCredentialCopies({ runtimeDir, now, minAgeMs, inventory });
+  const stranded = copies.filter((c) => c.stranded && c.kind !== 'torn');
   const homes = roots.flatMap((root) => listKeptCredentialHomes(root))
     .map((home) => ({ ...home, ageMs: home.since ? now - Date.parse(home.since) : 0 }));
   const held = homes.filter((home) => home.held);
@@ -5446,16 +5448,30 @@ export function checkCredentialCopiesRetained({
     return { passed: true, message: 'no login copy is being retained past its dispatch' };
   }
   // Each of these may hold the only valid refresh token, so none is ever deleted for its age. A held home is
-  // a failure (nothing but the owner or a repair clears it); copies waiting for a renewal are a warning.
+  // a failure (nothing but the owner or a repair clears it); copies waiting for a renewal are a warning. A copy
+  // in a store directory the account's layout no longer reads is never applied, so it fails like a held home,
+  // and it is only named, never applied to the new layout's stores or dropped.
   const problems = [
     ...overLimit.map((a) => `${a.provider}/${a.accountId}: ${a.count} pending login copies waiting, over the limit of ${MAX_PENDING_COPIES} (the limit drops only copies identical to another, never one that may be the only valid login; a dispatch for that account re-checks them, and if the source stays unreadable recover the logins by hand)`),
-    ...summarizeByAccount(copies.filter((c) => c.kind !== 'torn'), 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)'),
+    ...strandedByStore(stranded),
+    ...summarizeByAccount(copies.filter((c) => c.kind !== 'torn' && !c.stranded), 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)'),
     ...summarizeByAccount(copies.filter((c) => c.kind === 'torn'), 'half-written login copy(ies) kept for hand recovery (never applied or dropped automatically)'),
     ...held.map((home) => `${home.provider}/${home.accountId}: private home held after repeated staging failures, ${formatAge(home.ageMs)} old, at ${home.dir} ("fgos doctor --fix" re-checks it and removes it once its login is shown to be applied or obsolete; otherwise recover the login from it by hand)`),
     ...summarizeByAccount(retrying, 'private home(s) kept after a staging failure, retried by the reaper'),
   ];
   const text = problems.join('; ');
-  return held.length > 0 ? { passed: false, message: text } : { passed: true, message: `warning: ${text}` };
+  return held.length > 0 || stranded.length > 0 ? { passed: false, message: text } : { passed: true, message: `warning: ${text}` };
+}
+
+function strandedByStore(copies) {
+  const groups = new Map();
+  for (const copy of copies) {
+    const group = groups.get(copy.storeDir) ?? { provider: copy.provider, accountId: copy.accountId, count: 0, oldestMs: 0 };
+    group.count += 1;
+    group.oldestMs = Math.max(group.oldestMs, copy.ageMs);
+    groups.set(copy.storeDir, group);
+  }
+  return [...groups].map(([dir, g]) => `${g.provider}/${g.accountId}: ${g.count} login copy(ies) that no dispatch applies, oldest ${formatAge(g.oldestMs)}, at ${dir} (the account's login store layout in the provider inventory no longer reads this directory; recover the login from them by hand, they are never applied or dropped automatically)`);
 }
 
 export function fixCredentialCopiesRetained({ roots = defaultConfinementTempRoots(), ...options } = {}) {
@@ -5476,7 +5492,11 @@ export function fixCredentialCopiesRetained({ roots = defaultConfinementTempRoot
 registerCheck({
   id: 'credential-copies-retained',
   description: 'no login copy (pending, scratch, or a kept private home) that may hold the only valid refresh token is left unapplied',
-  check: () => checkCredentialCopiesRetained(),
+  check: (cwd) => {
+    let inventory;
+    try { inventory = providerAccountInventory(loadRunnerConfigFromDir(cwd)); } catch { inventory = undefined; }
+    return checkCredentialCopiesRetained({ inventory });
+  },
 });
 
 registerFix({

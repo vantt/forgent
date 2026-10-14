@@ -156,3 +156,74 @@ test('a half-written copy is reported at any age', () => {
     assert.match(run(w, now).message, /xai\/acct: 1 half-written login copy\(ies\) kept for hand recovery/);
   } finally { w.cleanup(); }
 });
+
+function addPendingIn(w, provider, accountId, storeSubdir, stagedAtMs) {
+  const dir = path.join(w.runtimeDir, 'account-locks', provider, accountId, storeSubdir, 'pending', `${String(stagedAtMs).padStart(15, '0')}-abcd`);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'auth.json'), JSON.stringify({ refresh: FAKE_TOKEN }));
+}
+
+const perCliAccount = { credentialSources: { codex: { kind: 'codex-home', home: '/x' }, pi: { kind: 'home-files', home: '/y' } } };
+const singleAccount = { credentialSource: { kind: 'codex-home', home: '/x' } };
+const runWith = (w, inventory, now = Date.now()) => checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot], now, inventory });
+
+test('copies left at the account root after the account moved to one login store per CLI are named for hand recovery, never as applied by a dispatch', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    addPendingIn(w, 'openai', 'acct', '.', now - 3 * 24 * HOUR);
+    const result = runWith(w, { openai: { accounts: { acct: perCliAccount } } }, now);
+    assert.equal(result.passed, false, 'no dispatch will ever apply them, so the owner has to act');
+    const root = path.join(w.runtimeDir, 'account-locks', 'openai', 'acct');
+    assert.match(result.message, /openai\/acct: 1 login copy\(ies\) that no dispatch applies/);
+    assert.ok(result.message.includes(`at ${root} `), 'the stranded directory is named');
+    assert.match(result.message, /recover the login from them by hand/);
+    assert.equal(result.message.includes('a dispatch for that account applies them'), false);
+    assert.equal(result.message.includes(FAKE_TOKEN), false);
+  } finally { w.cleanup(); }
+});
+
+test('copies under stores/<cli> after the account went back to one login store are named for hand recovery', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    addPendingIn(w, 'openai', 'acct', 'stores/pi', now - 3 * 24 * HOUR);
+    const result = runWith(w, { openai: { accounts: { acct: singleAccount } } }, now);
+    assert.equal(result.passed, false);
+    assert.ok(result.message.includes(`at ${path.join(w.runtimeDir, 'account-locks', 'openai', 'acct', 'stores', 'pi')} `));
+    assert.equal(result.message.includes('a dispatch for that account applies them'), false);
+  } finally { w.cleanup(); }
+});
+
+test('copies in a login store the inventory still uses keep the waiting-for-renewal wording', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    addPendingIn(w, 'openai', 'acct', 'stores/pi', now - 3 * 24 * HOUR);
+    const result = runWith(w, { openai: { accounts: { acct: perCliAccount } } }, now);
+    assert.equal(result.passed, true);
+    assert.match(result.message, /openai\/acct: 1 pending login copy\(ies\) waiting for a renewal \(a dispatch for that account applies them\)/);
+  } finally { w.cleanup(); }
+});
+
+test('copies of an account the inventory no longer lists are named for hand recovery', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    addPendingIn(w, 'openai', 'gone', '.', now - 3 * 24 * HOUR);
+    const result = runWith(w, { openai: { accounts: { acct: singleAccount } } }, now);
+    assert.equal(result.passed, false);
+    assert.match(result.message, /openai\/gone: 1 login copy\(ies\) that no dispatch applies/);
+  } finally { w.cleanup(); }
+});
+
+test('without a readable inventory the layout is not judged and the copies keep the waiting wording', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    addPendingIn(w, 'openai', 'acct', 'stores/pi', now - 3 * 24 * HOUR);
+    const result = runWith(w, undefined, now);
+    assert.equal(result.passed, true);
+    assert.match(result.message, /a dispatch for that account applies them/);
+  } finally { w.cleanup(); }
+});
