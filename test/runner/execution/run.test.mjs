@@ -1483,3 +1483,27 @@ test('a resumed unit recorded before write scopes existed hands its own writes t
   assert.deepEqual(assignment.writes, ['core/skills/z.md']);
   assert.equal(JSON.parse(fs.readFileSync(unitJson, 'utf8')).writeScope, undefined);
 });
+
+test('a resume is refused while a live process holds the dispatch lock of the unit worktree, and proceeds once that holder is dead', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  const unitData = { id: 'resume-lock', capability: 'not-configured:answer', objective: 'Answer question', writes: [] };
+  const refused = await runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir });
+  assert.equal(refused.outcome, 'policy-refusal');
+  const runDir = path.join(repoRoot, '.fgos', 'assignments', refused.unitRunId, 'producer', '1', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
+    runId: 'synthetic-resumed-run', settledAt: '2026-10-05T01:00:00Z',
+    classification: { outcome: { category: 'ok' } },
+  }));
+  // The lock name and the composite holder identity are exactly what a mutating dispatch writes.
+  const lockPath = path.join(repoRoot, '.fgos', `dispatch--${encodeURIComponent(path.resolve(worktreeDir))}.lock`);
+  const resume = () => runUnit({ resumeUnitRunId: refused.unitRunId, repoRoot, cwd: worktreeDir, worktree: worktreeDir });
+
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: `${process.pid}:${Date.now()}:live`, ts: Date.now() }));
+  await assert.rejects(resume, /holds lock/);
+
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: `2147483646:${Date.now()}:dead`, ts: Date.now() }));
+  assert.equal((await resume()).outcome, 'pass');
+});

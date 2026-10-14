@@ -17,6 +17,7 @@ import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
 import { commitUnitWork } from './commit-unit-work.mjs';
+import { dispatchLockFile, parseCompositePidIdentity } from '../main-checkout-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
@@ -183,27 +184,27 @@ export async function runUnit(options = {}) {
       throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json has no resolvedInputs`);
     }
 
-    // Check in-flight lock for holder
-    const safeKey = worktreePath.replace(/[^a-zA-Z0-9_-]/g, '_');
-    const lockPath = path.join(mainRoot, '.fgos', `dispatch--${safeKey}.lock`);
-    if (fs.existsSync(lockPath)) {
+    // A mutating dispatch holds `.fgos/dispatch--<cwd>.lock` with a composite
+    // "pid:acquiredAtMs:rand" identity while its worker runs; resuming under a
+    // live holder would launch a second worker into the same worktree.
+    const lockPath = path.join(mainRoot, '.fgos', dispatchLockFile(worktreePath));
+    let holder;
+    try {
+      holder = JSON.parse(fs.readFileSync(lockPath, 'utf8'))?.pid;
+    } catch {
+      holder = undefined;
+    }
+    const pid = Number.isInteger(holder) ? holder : parseCompositePidIdentity(holder)?.pid;
+    if (Number.isInteger(pid) && pid > 0) {
+      let alive;
       try {
-        const lockData = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
-        const pid = lockData?.pid;
-        if (typeof pid === 'number') {
-          let alive = false;
-          try {
-            process.kill(pid, 0);
-            alive = true;
-          } catch {
-            alive = false;
-          }
-          if (alive) {
-            throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": another process (PID ${pid}) holds lock at "${lockPath}"`);
-          }
-        }
+        process.kill(pid, 0);
+        alive = true;
       } catch (err) {
-        if (err instanceof RunnerConfigError) throw err;
+        alive = err.code === 'EPERM';
+      }
+      if (alive) {
+        throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": another process (PID ${pid}) holds lock at "${lockPath}"`);
       }
     }
   } else {
