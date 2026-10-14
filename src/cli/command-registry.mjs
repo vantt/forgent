@@ -1276,7 +1276,7 @@ export const COMMAND_REGISTRY = [
   }),
   {
     name: 'run',
-    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <id>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
+    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] [--sync <ref>] | --sync <ref> --writes <a>,<b> | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <id>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
     description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`. Also "record" for inline producer turns.',
     parameters: {
       type: 'object',
@@ -1288,6 +1288,7 @@ export const COMMAND_REGISTRY = [
         writes: { type: 'string', description: 'One-liner: comma-separated repo-relative paths the Unit may write; needs a linked worktree (--worktree, or run from inside one). Omitted: a read-only Unit.' },
         capability: { type: 'string', description: 'One-liner: capability the Unit asks for (default "execute").' },
         rigor: { type: 'string', description: 'One-liner: Unit rigor (low, standard, high, critical).' },
+        sync: { type: 'string', description: 'One-liner: a ref (branch, tag or commit) the runner merges into the worktree\'s branch before the worker runs (Unit field syncBase); needs --writes. Without a prompt: a sync-only Unit, no worker unless the merge conflicts. Conflicted paths join the write scope and the brief; the runner commits the merge, never the worker.' },
         unit: { type: 'string', description: 'Path to unit YAML/JSON file or "-" for stdin.' },
         pattern: { type: 'string', description: 'Pattern name or preset (solo, reviewed, panel, code-change).' },
         override: { type: 'string', description: 'JSON-encoded array or object of overrides.' },
@@ -1315,6 +1316,7 @@ export const COMMAND_REGISTRY = [
       'fgos run "Summarize the open review findings" --provider openai',
       'fgos run "Fix the typo in the README" --writes README.md --worktree ../wt-typo',
       'fgos run "Port the parser to the new AST" --writes src/parser --worktree ../wt-parser --timeout 90m',
+      'fgos run --sync main --writes docs --worktree ../wt-feature',
     ],
     touchesState: true,
     requiresExistingStore: false,

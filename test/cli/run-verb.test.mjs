@@ -363,3 +363,22 @@ test('fgos run --account needs an account id', () => {
   const out = failCliHome(['Check it', '--capability', 'docs:write', '--account', '--dir', tmp], tmp, accountHome());
   assert.match(out, /--account requires an account id/);
 });
+
+test('fgos run --sync <ref> without a prompt makes a sync-only unit; with --unit, --resume or no --writes it is refused', () => {
+  const tmp = setupTestRepo();
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: tmp, stdio: 'ignore' });
+  const wt = makeFixtureDir('fgos-cli-run-sync-wt-');
+  fs.rmSync(wt, { recursive: true, force: true });
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: tmp, stdio: 'ignore' });
+  assert.match(failCli(['--unit', 'x.yaml', '--sync', 'main', '--dir', tmp], tmp), /--sync only applies to fgos run "<prompt>" or a bare --sync/);
+  assert.match(failCli(['--sync', 'main', '--capability', 'docs:write', '--dir', tmp], wt), /--sync needs --writes/);
+  assert.match(failCli(['--sync', '--writes', 'docs', '--dir', tmp], wt), /--sync requires a ref/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+  // main is already in the branch: a sync-only unit is up to date and passes without a worker.
+  const stdout = runCli(['--sync', 'main', '--capability', 'docs:write', '--writes', 'docs', '--dir', tmp], wt);
+  const record = unitRecordOf(tmp, stdout);
+  assert.equal(record.unit.syncBase, 'main');
+  assert.equal(record.unit.syncOnly, true);
+  assert.equal(record.sync.status, 'up-to-date');
+  assert.equal(record.settlement.outcome, 'pass');
+});

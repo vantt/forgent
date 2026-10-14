@@ -101,6 +101,16 @@ function isValidInput(inp) {
 }
 
 /**
+ * A ref name `git merge` may take as the sync base, read as a name and never as an option, a range
+ * or a revision expression: letters, digits, `.`, `_`, `/`, `-`, not starting with `-` or `/`, and
+ * no `..` (also refuses `@{`, `^`, `~`, `:` and whitespace).
+ */
+function isSyncRef(ref) {
+  return typeof ref === 'string' && /^[A-Za-z0-9._][A-Za-z0-9._/-]*$/.test(ref)
+    && !ref.includes('..') && !ref.endsWith('/') && !ref.endsWith('.lock');
+}
+
+/**
  * Validates raw input against the Unit contract and returns a frozen normalized Unit object.
  *
  * Unit contract:
@@ -121,6 +131,8 @@ function isValidInput(inp) {
  * - persona?: non-empty string
  * - timeoutMs?: the time each of its runs may take instead of `runner.timeoutMs` (whole ms, 1m..4h);
  *   the size of the work, not how it is executed
+ * - syncBase?: ref the runner merges into the unit's branch before the worker runs (needs writes)
+ * - syncOnly?: set when a unit with a syncBase leaves out its objective: no worker unless the merge conflicts
  * - MUST NOT contain: executor, provider, model, tier, invocation, actors, overrides (G2)
  *
  * @param {unknown} raw
@@ -159,7 +171,22 @@ export function validateUnit(raw) {
   }
   const id = raw.id.trim();
 
+  // syncBase: a ref the runner merges into the unit's branch before any worker runs. A unit with
+  // a syncBase and no objective is sync-only: no worker unless the merge stops on conflicts.
+  let syncBase;
+  if (raw.syncBase !== undefined) {
+    if (!isSyncRef(raw.syncBase)) {
+      throw new RunnerConfigError(`unit.syncBase must be a branch, tag or commit name (letters, digits, ".", "_", "/", "-"; not starting with "-" or "/", no ".."), got: ${JSON.stringify(raw.syncBase)}.`);
+    }
+    syncBase = raw.syncBase;
+  }
+  if (raw.syncOnly !== undefined && (raw.syncOnly !== true || syncBase === undefined)) {
+    throw new RunnerConfigError('unit.syncOnly needs syncBase; it is set by leaving out the objective of a unit with a syncBase.');
+  }
+  const syncOnly = syncBase !== undefined && (raw.syncOnly === true || raw.objective === undefined);
+
   // objective
+  if (syncOnly && raw.objective === undefined) raw = { ...raw, objective: `Merge ${syncBase} into this branch.` };
   if (typeof raw.objective !== 'string' || !raw.objective.trim()) {
     throw new RunnerConfigError('unit.objective must be a non-empty string.');
   }
@@ -196,6 +223,9 @@ export function validateUnit(raw) {
     }
     if (!writes.includes(entry)) writes.push(entry);
   });
+  if (syncBase !== undefined && writes.length === 0) {
+    throw new RunnerConfigError('unit.syncBase needs writes: merging a ref changes the branch, so the unit must be a writing unit in a linked worktree.');
+  }
 
   // dependsOn
   if (raw.dependsOn !== undefined && !Array.isArray(raw.dependsOn)) {
@@ -281,6 +311,8 @@ export function validateUnit(raw) {
     ...(prefer !== undefined ? { prefer } : {}),
     ...(raw.persona !== undefined ? { persona: raw.persona.trim() } : {}),
     ...(raw.timeoutMs !== undefined ? { timeoutMs: raw.timeoutMs } : {}),
+    ...(syncBase !== undefined ? { syncBase } : {}),
+    ...(syncOnly ? { syncOnly: true } : {}),
     inputs: Object.freeze(inputs),
     ...(raw.anonymizeInputs === true ? { anonymizeInputs: true } : {}),
     ...(raw.blind === true ? { blind: true } : {}),

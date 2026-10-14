@@ -128,11 +128,18 @@ const outsideStore = (p) => !p.startsWith(STORE_PREFIX) && p !== '.fgos';
  * them, it stages only what it chose) and paths already dirty inside the scope (never committed
  * by the run; they stay for whoever left them).
  */
-export function preflightUnitWorktree({ worktree, repoRoot, scope }) {
+export function preflightUnitWorktree({ worktree, repoRoot, scope, sync = null }) {
   const ctx = gitContext({ worktree, repoRoot });
+  // The merge a sync of this run left open is the run's own: its staged and conflicted paths are
+  // neither foreign nor dirt to keep out of the commit. Any other open merge is someone else's.
+  const mergeHead = mergeHeadOf(ctx);
+  const own = sync?.status === 'conflicted' && mergeHead === sync.sha
+    ? new Set([...sync.conflicts, ...(sync.mergeStaged ?? [])])
+    : new Set();
   return {
-    foreignStaged: stagedPaths(ctx),
-    preExistingInScope: partitionPaths(changedPaths(ctx).filter(outsideStore), scope).inScope,
+    foreignStaged: stagedPaths(ctx).filter((p) => !own.has(p)),
+    foreignMerge: mergeHead && own.size === 0 ? mergeHead : null,
+    preExistingInScope: partitionPaths(changedPaths(ctx).filter((p) => outsideStore(p) && !own.has(p)), scope).inScope,
   };
 }
 
@@ -230,6 +237,10 @@ export function commitUnitWork({ worktree, repoRoot, unitId, summary, objective,
       if (err instanceof UntrustedWorktreeError) return failed('untrusted-worktree', err.message);
       throw err;
     }
+    const openMerge = mergeHeadOf(ctx);
+    if (openMerge) {
+      return failed('merge-in-progress', `the worktree has a merge in progress (MERGE_HEAD ${openMerge}); a commit now would conclude it with the agent's files`);
+    }
     const foreign = stagedPaths(ctx);
     if (foreign.length > 0) {
       return failed('foreign-staged-index', foreignIndexDetail(foreign), { stagedPaths: foreign });
@@ -261,16 +272,8 @@ export function commitUnitWork({ worktree, repoRoot, unitId, summary, objective,
     }
 
     const subject = subjectFrom(summary, unitId, objective);
-    // Use the repository's own identity; only fill the gap when it has none.
-    const identity = {};
-    if (!hasConfigured(ctx, 'user.name')) {
-      identity.GIT_AUTHOR_NAME = identity.GIT_COMMITTER_NAME = 'fgOS runner';
-    }
-    if (!hasConfigured(ctx, 'user.email')) {
-      identity.GIT_AUTHOR_EMAIL = identity.GIT_COMMITTER_EMAIL = 'runner@fgos.local';
-    }
     try {
-      git(ctx, ['commit', '-q', '-m', subject], { env: identity });
+      git(ctx, ['commit', '-q', '-m', subject], { env: commitIdentity(ctx) });
     } catch (err) {
       unstage();
       throw err;
@@ -301,5 +304,226 @@ export function commitOnBranch(worktree, sha, repoRoot) {
     return true;
   } catch {
     return false;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Sync: the runner merges a base ref into the unit's branch.
+//
+// A confined worker cannot run `git merge` (the gitdir is read-only to it), so this trusted code
+// runs the merge, through the same gitdir, hooks and environment rules as the commit above. A
+// clean merge is committed at once; a conflicted one is left in progress for the worker, whose
+// only job is to edit the conflicted files; `finishSyncMerge` then concludes the merge commit.
+// The shape follows `performCatchUp` (merge --no-commit --no-ff, list `--diff-filter=U`, commit or
+// abort, `.fgos/` conflicts take the base side); its code is not reused because it runs plain git
+// in its own throwaway worktree.
+
+/** A line git writes to open, split or close a conflict hunk (`=======` alone is too common). */
+const CONFLICT_MARKER = /^(?:<{7}|>{7}|\|{7})(?: |$)/m;
+
+/** What a merge must never take from the caller's config: rerere replays, autostash moves dirt. */
+const MERGE_FLAGS = ['-c', 'rerere.enabled=false', '-c', 'merge.autoStash=false'];
+
+/** The subject of the runner's sync merge commit. */
+export const syncSubject = (ref) => fitSubject(`chore(sync): merge ${ref}`);
+
+function mergeHeadOf(ctx) {
+  try {
+    return git(ctx, ['rev-parse', '-q', '--verify', 'MERGE_HEAD']).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+function isAncestor(ctx, sha, rev = 'HEAD') {
+  try {
+    git(ctx, ['merge-base', '--is-ancestor', sha, rev]);
+    return true;
+  } catch (err) {
+    if (err.status === 1) return false;
+    throw err;
+  }
+}
+
+function unmergedPaths(ctx) {
+  return nulPaths(git(ctx, ['diff', '--name-only', '--no-relative', '--diff-filter=U', '-z']));
+}
+
+/** Git's identity for a commit the runner makes: the repository's own, else the runner's. */
+function commitIdentity(ctx) {
+  const identity = {};
+  if (!hasConfigured(ctx, 'user.name')) identity.GIT_AUTHOR_NAME = identity.GIT_COMMITTER_NAME = 'fgOS runner';
+  if (!hasConfigured(ctx, 'user.email')) identity.GIT_AUTHOR_EMAIL = identity.GIT_COMMITTER_EMAIL = 'runner@fgos.local';
+  return identity;
+}
+
+/** The commit `ref` names, read through the trusted gitdir; null when it names none. */
+export function resolveSyncBase({ worktree, repoRoot, ref }) {
+  const ctx = gitContext({ worktree, repoRoot });
+  try {
+    return git(ctx, ['rev-parse', '-q', '--verify', '--end-of-options', `${ref}^{commit}`]).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+/** A conflict under `.fgos/` takes the base side: a worker branch never decides fgOS state. */
+function takeBaseSide(ctx, p) {
+  const stages = git(ctx, ['ls-files', '-u', '-z', '--', p], { env: { GIT_LITERAL_PATHSPECS: '1' } });
+  if (/^\d+ [0-9a-f]+ 3\t/m.test(stages.replace(/\0/g, '\n'))) {
+    git(ctx, ['checkout', '--theirs', '--', p], { env: { GIT_LITERAL_PATHSPECS: '1' } });
+    git(ctx, ['add', '--', p], { env: { GIT_LITERAL_PATHSPECS: '1' } });
+  } else {
+    git(ctx, ['rm', '-q', '--', p], { env: { GIT_LITERAL_PATHSPECS: '1' } });
+  }
+}
+
+function abortMerge(ctx) {
+  if (mergeHeadOf(ctx)) git(ctx, ['merge', '--abort']);
+}
+
+/**
+ * Merge `sha` (named `ref`) into the worktree's branch.
+ *
+ * - `up-to-date`: `sha` is already in the branch; nothing changed.
+ * - `merged`: the merge was clean and the runner committed it (`commit: { sha, subject }`).
+ * - `conflicted`: the merge is left in progress; `conflicts` are the paths with conflict markers
+ *   for the worker, `mergeStaged` the paths the merge already staged cleanly.
+ * - `failed`: nothing is left in progress; `reason` is `untrusted-worktree`, `merge-in-progress`
+ *   (a merge someone else started), `foreign-staged-index`, `merge-refused` (git would not start,
+ *   e.g. a dirty file it would overwrite), `unscopable-conflict-path` (a conflicted path a write
+ *   scope cannot name literally) or `git-error`.
+ */
+export function startSyncMerge({ worktree, repoRoot, ref, sha, adoptOpenMerge = false }) {
+  const failed = (reason, error, extra = {}) => ({ status: 'failed', reason, error, ref, sha, ...extra });
+  let ctx;
+  try {
+    ctx = gitContext({ worktree, repoRoot });
+  } catch (err) {
+    if (err instanceof UntrustedWorktreeError) return failed('untrusted-worktree', err.message);
+    throw err;
+  }
+  try {
+    const head = git(ctx, ['rev-parse', 'HEAD']).trim();
+    const openMerge = mergeHeadOf(ctx);
+    // A run that died between starting git and recording the result finds its own merge open.
+    const adopted = adoptOpenMerge && openMerge === sha;
+    if (openMerge && !adopted) {
+      return failed('merge-in-progress', `the worktree already has a merge in progress (MERGE_HEAD ${openMerge}) that this run did not start; finish or abort it (git merge --abort), then run again`);
+    }
+    if (!adopted) {
+      const staged = stagedPaths(ctx);
+      if (staged.length > 0) return failed('foreign-staged-index', foreignIndexDetail(staged), { stagedPaths: staged });
+      if (isAncestor(ctx, sha)) return { status: 'up-to-date', ref, sha, head };
+      try {
+        git(ctx, [...MERGE_FLAGS, 'merge', '--no-commit', '--no-ff', '--no-edit', '-q', sha]);
+      } catch (err) {
+        if (!mergeHeadOf(ctx)) {
+          return failed('merge-refused', `git did not start the merge of ${ref}: ${String(err.stderr || err.message).trim()}`);
+        }
+      }
+    }
+
+    for (const p of unmergedPaths(ctx).filter((u) => !outsideStore(u))) takeBaseSide(ctx, p);
+    const conflicts = unmergedPaths(ctx);
+    const unscopable = conflicts.filter((p) => p.includes('*') || p.includes('\\'));
+    if (unscopable.length > 0) {
+      abortMerge(ctx);
+      return failed('unscopable-conflict-path', `the merge of ${ref} conflicts in paths a write scope cannot name literally (${unscopable.join(', ')}); merge it by hand`);
+    }
+    if (conflicts.length > 0) {
+      const mergeStaged = stagedPaths(ctx).filter((p) => !conflicts.includes(p));
+      return { status: 'conflicted', ref, sha, head, conflicts, mergeStaged };
+    }
+
+    const subject = syncSubject(ref);
+    try {
+      git(ctx, ['commit', '-q', '--no-edit', '-m', subject], { env: commitIdentity(ctx) });
+    } catch (err) {
+      abortMerge(ctx);
+      return failed('git-error', `the clean merge of ${ref} could not be committed: ${String(err.stderr || err.message).trim()}`);
+    }
+    return { status: 'merged', ref, sha, head, commit: { sha: git(ctx, ['rev-parse', 'HEAD']).trim(), subject } };
+  } catch (err) {
+    try { abortMerge(ctx); } catch { /* reported below */ }
+    return failed('git-error', err.stderr ? String(err.stderr).trim() : err.message);
+  }
+}
+
+/**
+ * Where a sync this run started stands now: `in-progress` (its merge is still open: MERGE_HEAD is
+ * its sha and HEAD has not moved), `done` (its sha is in the branch: committed, by the runner or
+ * by hand), `not-started` (no merge open and HEAD where it was), or `lost` (anything else).
+ */
+export function syncMergeState({ worktree, repoRoot, sync }) {
+  const ctx = gitContext({ worktree, repoRoot });
+  const mergeHead = mergeHeadOf(ctx);
+  const head = git(ctx, ['rev-parse', 'HEAD']).trim();
+  if (mergeHead === sync.sha && head === sync.head) return { state: 'in-progress', unmerged: unmergedPaths(ctx), staged: stagedPaths(ctx) };
+  if (!mergeHead && isAncestor(ctx, sync.sha)) return { state: 'done' };
+  if (!mergeHead && head === sync.head) return { state: 'not-started' };
+  return { state: 'lost', mergeHead, head };
+}
+
+/** The paths of `paths` whose content still holds a conflict marker (binary files are not read). */
+export function pathsWithConflictMarkers(worktree, paths) {
+  return paths.filter((p) => {
+    let st;
+    try { st = fs.lstatSync(path.join(worktree, p)); } catch { return false; }
+    if (!st.isFile()) return false;
+    const bytes = fs.readFileSync(path.join(worktree, p));
+    return !bytes.includes(0) && CONFLICT_MARKER.test(bytes.toString('utf8'));
+  });
+}
+
+/**
+ * Conclude the merge `startSyncMerge` left `conflicted`, after the worker edited its conflicts:
+ * refuse while a conflict marker is left (`conflict-markers`, nothing staged, the merge kept),
+ * stage the conflicted paths, check the index holds only the merge's own paths, and commit with
+ * MERGE_HEAD as second parent. `merged-outside` when the sha is already in the branch (someone
+ * concluded it by hand); `sync-merge-lost` when the merge is gone or HEAD moved.
+ */
+export function finishSyncMerge({ worktree, repoRoot, sync }) {
+  const failed = (reason, error, extra = {}) => ({ status: 'failed', reason, error, ...extra });
+  let ctx;
+  try {
+    ctx = gitContext({ worktree, repoRoot });
+  } catch (err) {
+    if (err instanceof UntrustedWorktreeError) return failed('untrusted-worktree', err.message);
+    throw err;
+  }
+  try {
+    const mergeHead = mergeHeadOf(ctx);
+    const head = git(ctx, ['rev-parse', 'HEAD']).trim();
+    if (mergeHead !== sync.sha || head !== sync.head) {
+      if (!mergeHead && isAncestor(ctx, sync.sha)) return { status: 'merged-outside', sha: head };
+      return failed('sync-merge-lost', `the merge of ${sync.ref} this run started is no longer in progress (MERGE_HEAD ${mergeHead ?? 'none'}, HEAD ${head}, expected ${sync.sha} over ${sync.head}); start a new run`);
+    }
+    const marked = pathsWithConflictMarkers(ctx.cwd, sync.conflicts);
+    if (marked.length > 0) {
+      return failed('conflict-markers', `conflict markers are still in ${marked.join(', ')}; remove them, then resume the run to commit the merge of ${sync.ref}`, { paths: marked });
+    }
+    withPaths(ctx, ['add', '-A'], sync.conflicts);
+    const left = unmergedPaths(ctx);
+    if (left.length > 0) return failed('staged-set-mismatch', `paths are still unmerged after staging: ${left.join(', ')}`, { unexpected: left });
+    const allowed = new Set([...sync.conflicts, ...(sync.mergeStaged ?? [])]);
+    const staged = stagedPaths(ctx);
+    const unexpected = staged.filter((p) => !allowed.has(p));
+    if (unexpected.length > 0) {
+      return failed('staged-set-mismatch', `the index holds paths the merge of ${sync.ref} did not stage: ${unexpected.join(', ')}`, { unexpected });
+    }
+    const subject = syncSubject(sync.ref);
+    git(ctx, ['commit', '-q', '--no-edit', '-m', subject], { env: commitIdentity(ctx) });
+    const sha = git(ctx, ['rev-parse', 'HEAD']).trim();
+    const parents = git(ctx, ['rev-list', '--parents', '-n', '1', 'HEAD']).trim().split(' ').slice(1);
+    const files = nulPaths(git(ctx, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${sync.head}`, 'HEAD']));
+    if (parents[0] !== sync.head || parents[1] !== sync.sha || !sameSet(files, staged)) {
+      return failed('committed-set-mismatch', `merge commit ${sha} is on the branch but is not the merge of ${sync.ref} over ${sync.head} holding exactly its staged paths`, {
+        sha, subject, files, unexpected: files.filter((p) => !staged.includes(p)), missing: staged.filter((p) => !files.includes(p)),
+      });
+    }
+    return { status: 'committed', sha, subject, files };
+  } catch (err) {
+    return failed('git-error', err.stderr ? String(err.stderr).trim() : err.message);
   }
 }

@@ -21,6 +21,7 @@ import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
+import { assertSyncResumable, commitRoundWithSync, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { resolveAgentDefinition } from '../agent-definitions.mjs';
 import { dispatchLockFile, parseCompositePidIdentity } from '../main-checkout-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
@@ -245,6 +246,19 @@ function foreignIndexRefusal(role, round, paths) {
   };
 }
 
+/** The preflight refusal of a writing seat: an open merge this run did not start, or a foreign index. */
+function preflightRefusal(role, round, { foreignMerge, foreignStaged }) {
+  if (foreignMerge) {
+    return {
+      outcome: 'policy-refusal',
+      role,
+      round,
+      refused: { reason: 'merge-in-progress', detail: `the worktree has a merge in progress (MERGE_HEAD ${foreignMerge}) that this run did not start; finish or abort it (git merge --abort), then run again` },
+    };
+  }
+  return foreignStaged.length > 0 ? foreignIndexRefusal(role, round, foreignStaged) : null;
+}
+
 /**
  * Refuse a pinned account before a unit run exists: each seat an `account` override applies to
  * (bound the way the run would bind it) must take that account, at least one seat must, and the
@@ -349,6 +363,7 @@ export async function runUnit(options = {}) {
       }
     }
     assertNoStrayCommit(unitRunId, unitRecord, mainRoot);
+    assertSyncResumable(unitRunId, unitRecord, mainRoot);
     assertPinnedAccountsUsable(lastAttempts(unitRecord).filter((a) => a.outcome !== 'pass').map((a) => a.binding ?? {}), {
       runnerConfig: unitRecord.configSnapshot?.runner,
       runtimeDir: options.providerCapacityRuntimeDir,
@@ -398,6 +413,8 @@ export async function runUnit(options = {}) {
     // A pinned account is checked before the unit run exists: every seat it applies to must bind an
     // executor whose provider lists it, and it must not be quarantined now.
     await assertAccountPinsBeforeRun(unit, configSnapshot.runner, options);
+    // A sync ref is resolved to its commit once, before the run exists; a resume merges that commit.
+    const sync = seedSync(unit, { worktree: worktreePath, mainRoot });
     // Resolved before the unit directory exists, so a ref that points nowhere leaves nothing behind.
     unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const unitDir = path.join(assignmentsDir, unitRunId);
@@ -432,6 +449,7 @@ export async function runUnit(options = {}) {
       // Which input each neutral name stands for; only the owner reads this, never a role.
       ...(unit.anonymizeInputs || unit.blind ? { inputMap: resolved.inputMap } : {}),
       worktree: fs.realpathSync(worktreePath),
+      ...(sync ? { sync } : {}),
       // The Work step operation and the files its verdict is bound to; a resume reads them back
       // from here and never takes them from its caller again.
       ...(options.declared !== undefined ? {
@@ -661,32 +679,39 @@ export async function runUnit(options = {}) {
     noteRoleExecutor(role, bound.executor);
 
     const writeScope = unitRecord.writeScope ?? unit.writes ?? [];
-    const commitWork = (summarySource, runResult, excludePaths) => commitUnitWork({
-      worktree: unitRecord.worktree,
-      // The gitdir and hooks come from the main checkout, never from the worker-writable worktree.
-      repoRoot: mainRoot,
-      unitId: summarySource.id,
-      summary: runResult?.agentClaim?.summary,
-      objective: summarySource.objective,
-      scope: writeScope,
-      changedFiles: runResult?.evidence?.changedFiles ?? null,
-      excludePaths,
-      needsWrites: runResult?.agentClaim?.needsWrites,
-    });
+    // A merge a sync left open for this round is concluded first (unit-sync.mjs), then the rest.
+    const commitWork = (summarySource, runResult, excludePaths) => {
+      const commit = commitRoundWithSync(unitRecord, mainRoot, () => commitUnitWork({
+        worktree: unitRecord.worktree,
+        // The gitdir and hooks come from the main checkout, never from the worker-writable worktree.
+        repoRoot: mainRoot,
+        unitId: summarySource.id,
+        summary: runResult?.agentClaim?.summary,
+        objective: summarySource.objective,
+        scope: writeScope,
+        changedFiles: runResult?.evidence?.changedFiles ?? null,
+        excludePaths,
+        needsWrites: runResult?.agentClaim?.needsWrites,
+      }), excludePaths);
+      persistUnitRecord();
+      return commit;
+    };
 
     // The agent already did this round's work and only the runner commit failed: commit again,
     // never spawn the agent a second time.
     const lastRecorded = recorded[recorded.length - 1];
     if (!readOnly && commitPending(lastRecorded, unitRecord.worktree, mainRoot)) {
-      const { foreignStaged } = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope });
-      if (foreignStaged.length > 0) return foreignIndexRefusal(role, round, foreignStaged);
+      const refusal = preflightRefusal(role, round, preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope, sync: unitRecord.sync }));
+      if (refusal) return refusal;
       const prior = readUnitRunHistory(unitDir).find((h) => h.role === role && (h.round ?? 1) === round);
       const excludePaths = lastRecorded.preExistingInScope ?? [];
       let commit = commitWork(rUnit || unit, prior?.runResult, excludePaths);
       if (commit.status === 'no-changes') {
         // The agent's in-scope files are gone (cleaned up with the index): that is not a pass.
+        // Files a sync merge commit of this round took are not missing.
+        const inMerge = commit.sync?.files ?? [];
         const missing = partitionPaths((prior?.runResult?.evidence?.changedFiles ?? [])
-          .filter((p) => !excludePaths.includes(p)), writeScope).inScope;
+          .filter((p) => !excludePaths.includes(p) && !inMerge.includes(p)), writeScope).inScope;
         if (missing.length > 0) {
           commit = { ...commit, status: 'failed', reason: 'work-missing', missing,
             error: `the files this round changed in scope are no longer in the worktree: ${missing.join(', ')}; run the unit again` };
@@ -725,8 +750,9 @@ export async function runUnit(options = {}) {
     // runner never commits them. A resumed attempt keeps what its first launch saw.
     let preExistingInScope = [];
     if (!readOnly) {
-      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope });
-      if (preflight.foreignStaged.length > 0) return foreignIndexRefusal(role, round, preflight.foreignStaged);
+      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope, sync: unitRecord.sync });
+      const refusal = preflightRefusal(role, round, preflight);
+      if (refusal) return refusal;
       preExistingInScope = recorded[0]?.preExistingInScope ?? preflight.preExistingInScope;
     }
 
@@ -773,7 +799,9 @@ export async function runUnit(options = {}) {
         persistUnitRecord();
       }
 
-      const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs, objective: (rUnit || unit).objective });
+      // A writing seat over a merge left open for it is told which files hold the conflicts.
+      const objective = `${(rUnit || unit).objective}${readOnly ? '' : syncBrief(unitRecord.sync)}`;
+      const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs, objective });
 
       // The worker only writes files; this trusted code, outside the confinement, commits the
       // ones inside the write scope. No change is recorded as such, and a commit that cannot be
@@ -897,6 +925,18 @@ export async function runUnit(options = {}) {
     : callerPattern || unit.pattern || options.pattern || 'solo';
   unitRecord.pattern = patternName;
   persistUnitRecord();
+
+  // A unit with a syncBase merges it before any seat runs. A refusal, or a sync-only unit whose
+  // merge needed no worker, ends the run here; a conflicted merge stays open for the producer.
+  if (unitRecord.sync) {
+    const early = runPendingSync(unitRecord, mainRoot, persistUnitRecord);
+    if (early) {
+      executionSettled = true;
+      settle(early.outcome);
+      return { unitRunId, outcome: early.outcome, rounds: 0, results: early.results ?? [], findings: [], sync: syncSummary(unitRecord.sync) };
+    }
+  }
+
   const patternResult = await runPattern(patternName, unit, unitRecord.configSnapshot.runner, {
     runRole,
     verify,
@@ -916,6 +956,7 @@ export async function runUnit(options = {}) {
     rounds: patternResult.rounds,
     results: patternResult.results,
     findings: patternResult.findings || [],
+    ...(unitRecord.sync ? { sync: syncSummary(unitRecord.sync) } : {}),
   };
   } catch (error) {
     if (!executionSettled) {

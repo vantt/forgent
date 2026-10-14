@@ -23,6 +23,7 @@ import { normalizeRunResultV2, normalizeRunResultV3, interpretRunResult } from '
 import { validateAgentResultClaim, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
 import { attributeWorkspaceChanges, evaluateAttributionPolicy } from './evidence-attribution.mjs';
+import { matchesWriteScope } from './write-scope.mjs';
 import { parseUsageForAdapter } from './usage-parsers.mjs';
 
 export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
@@ -254,6 +255,7 @@ function classifyEvidenceToOutcomeFacts({
   claimInvalid = false,
   workerArtifacts = [],
   changedFiles = [],
+  editedInScopeDirt = [],
   isReadOnlyOperation = true,
   attributionRefusal = null,
   role,
@@ -307,7 +309,7 @@ function classifyEvidenceToOutcomeFacts({
     };
   }
 
-  const hasExternalEvidence = changedFiles.length > 0;
+  const hasExternalEvidence = changedFiles.length > 0 || editedInScopeDirt.length > 0;
 
   // Only a write proven to be the run's own is refused (evaluateAttributionPolicy);
   // a change merely seen across the run travels as a warning instead.
@@ -706,6 +708,12 @@ export async function settleRunOutcome({
   // A read-only seat in a writing unit carries the unit's writes too, but none of them are its own.
   const declaredWrites = !isReadOnly && Array.isArray(assignment?.writes) && assignment.writes.length > 0 ? assignment.writes : null;
   const declaredCoverage = declaredWrites ? { paths: declaredWrites } : null;
+  // A writing seat whose task is to edit files already dirty at launch (the conflicted files of a
+  // merge the runner left open for it) changes nothing `changedFiles` counts: a file dirty inside
+  // its declared scope whose content changed during the turn is its evidence too.
+  const editedInScopeDirt = declaredWrites && dirtyBeforeSnapshots
+    ? findMutatedDirtyBeforeFiles(settlementCwd, dirtyBeforeSnapshots).filter((p) => matchesWriteScope(p, declaredWrites))
+    : [];
   const evidenceData = {
     operationMutability: isReadOnly ? 'read-only' : 'mutates-repo',
     gitBefore,
@@ -716,6 +724,7 @@ export async function settleRunOutcome({
     mutatedDirtyBeforeFiles,
     changedFiles,
     changedFileReasons,
+    ...(editedInScopeDirt.length > 0 ? { editedInScopeDirt } : {}),
     attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: resolvedDirtyAfter, declaredCoverage }),
     artifacts: workerArtifacts,
     tests: [],
@@ -751,6 +760,7 @@ export async function settleRunOutcome({
     claimInvalid,
     workerArtifacts: workerArtifactPaths,
     changedFiles,
+    editedInScopeDirt,
     isReadOnlyOperation: isReadOnly,
     attributionRefusal: attributionPolicy.disposition === 'refuse' ? attributionPolicy : null,
     role: assignment?.role,
