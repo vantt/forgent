@@ -17,6 +17,7 @@ import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
+import { resolveAgentDefinition } from '../agent-definitions.mjs';
 import { dispatchLockFile, parseCompositePidIdentity } from '../main-checkout-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
@@ -45,13 +46,32 @@ function publishUnitSummary(unitDir) {
 }
 
 /**
- * `{ personaPin }` for an assignment policy when an override scoped to this very role bound `persona`
- * with pinned text, else nothing. Matching on role and name keeps one role's pin from reaching another
- * role that happens to resolve the same persona name from the capability.
+ * `{ personaPin }` for an assignment policy when the persona bound for this role carries pinned
+ * text, else nothing. An override scoped to this very role wins; otherwise the unit's own persona,
+ * pinned when the unit run started, applies to whichever role bound that same name. Matching on
+ * name keeps a pin from reaching a role that resolved a different persona.
  */
-function pinnedPersonaFor(overrides, role, persona) {
-  const hit = (overrides ?? []).find((o) => o?.personaPin && o.scope?.role === role && o.persona === persona);
-  return hit ? { personaPin: hit.personaPin } : {};
+function pinnedPersonaFor(unitRecord, role, persona) {
+  const hit = (unitRecord.overrides ?? []).find((o) => o?.personaPin && o.scope?.role === role && o.persona === persona);
+  if (hit) return { personaPin: hit.personaPin };
+  const unitPin = unitRecord.personaPin;
+  return unitPin && unitPin.name === persona ? { personaPin: unitPin } : {};
+}
+
+/**
+ * The text of a unit's persona, read once from the persona tiers so every attempt and resume
+ * renders the same definition, including one that lives only in the workspace tier. A name no tier
+ * defines keeps today's rendering by name; the one-liner already refuses it before the run.
+ */
+function unitPersonaPin(persona, mainRoot) {
+  if (typeof persona !== 'string') return null;
+  try {
+    const { name, digest, text } = resolveAgentDefinition(persona, { projectRoot: mainRoot });
+    return { name, digest, text };
+  } catch (err) {
+    if (err instanceof RunnerConfigError) return null;
+    throw err;
+  }
 }
 
 /**
@@ -292,6 +312,7 @@ export async function runUnit(options = {}) {
     fs.mkdirSync(unitDir, { recursive: true });
 
     const configSnapshot = snapshotRunnerConfig(mainRoot);
+    const personaPin = unitPersonaPin(unit.persona, mainRoot);
     unitRecord = {
       unit,
       workflow: workflowLink,
@@ -301,6 +322,7 @@ export async function runUnit(options = {}) {
       // The scope this run may write, widened once to the render targets of generated sources it
       // touches. A resumed run reads it back and never recomputes it against a changed config.
       writeScope: expandGenerated(unit.writes, configSnapshot.runner.generatedPaths ?? []),
+      ...(personaPin ? { personaPin } : {}),
       resolvedInputs: resolved.refs,
       // Which input each neutral name stands for; only the owner reads this, never a role.
       ...(unit.anonymizeInputs || unit.blind ? { inputMap: resolved.inputMap } : {}),
@@ -419,7 +441,7 @@ export async function runUnit(options = {}) {
         preferPersona: bound.persona,
         // The persona text a caller pinned for this role when it supplied the override: the prompt
         // renders that text, never a file read again at dispatch time.
-        ...pinnedPersonaFor(unitRecord.overrides, role, bound.persona),
+        ...pinnedPersonaFor(unitRecord, role, bound.persona),
       },
     };
 

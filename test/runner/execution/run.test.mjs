@@ -1717,3 +1717,37 @@ test('a commit-only resume whose in-scope work is gone fails as work-missing ins
   assert.deepEqual(resumed.results[0].commit.missing, ['docs/in.md']);
   assert.equal(producerSpawns(repoRoot, first.unitRunId), 1);
 });
+
+test('a unit persona defined in the workspace tier reaches the prompt as text pinned when the unit run starts', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  const personaText = [
+    'name: ledger-keeper',
+    'version: 0.1.0',
+    'description: Keeps the ledger straight for {objective}',
+    'role: Producer',
+    'persona:',
+    '  voice: Plain ledger voice',
+    '  style: Numbers first',
+    '  archetype: A careful bookkeeper',
+    'decision_boundary:',
+    '  can_decide:',
+    '    - How to order the entries',
+    '  must_escalate:',
+    '    - Anything that moves money',
+    '',
+  ].join('\n');
+  fs.mkdirSync(path.join(repoRoot, 'fgos', 'agents'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'fgos', 'agents', 'ledger-keeper.yaml'), personaText);
+  const res = await runUnit({
+    unitData: { id: 'u-persona', objective: 'Write docs', capability: 'docs:write', writes: [], persona: 'ledger-keeper' },
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);
+  const assignment = JSON.parse(fs.readFileSync(path.join(unitDir, 'producer', '1', 'assignment.json'), 'utf8'));
+  assert.equal(assignment.policy.personaPin?.name, 'ledger-keeper');
+  assert.equal(assignment.policy.personaPin?.text, personaText);
+  // The pin is recorded once, so an edit to the file after the start never reaches a resume.
+  assert.equal(JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).personaPin.text, personaText);
+});
