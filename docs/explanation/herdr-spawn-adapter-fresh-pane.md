@@ -4,6 +4,14 @@ authoritative_for: herdr-spawn adapter launching a dispatched worker inside a re
 
 # Watching an agent work in a real pane, without letting the next dispatch talk to a stranger's session
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `tsk-5x7-3` is the third of `tsk-5x7`'s three dependency-free children —
 the `herdr-spawn` adapter, satisfying the one real immediate need D6
 carved out from the larger redesign: let a person watch a dispatched

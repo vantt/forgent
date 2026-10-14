@@ -9,6 +9,14 @@ mode: explanation
 ---
 # Why fanout's worktree isolation race is a recoverable self-heal, not a lowered batch cap
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `tsk-2k0`. `fgos-fanout` is designed to fire up to 5 Agents at once, each
 running `/fgOS:pick <id>` end to end — which stands up and enters its own
 worktree as part of its own claim step. This item's real incident showed

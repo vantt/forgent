@@ -4,6 +4,14 @@ authoritative_for: root=$(git rev-parse ...) worktree-guard refusal, two-separat
 
 # The `root=$(...)` worktree-guard workaround note reaches its last two skill files
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `tsk-jyn` closed a real coverage gap: the piped one-liner `root=$(git
 rev-parse --path-format=absolute --git-common-dir | xargs dirname)` —
 prescribed verbatim for resolving the main-checkout root across at least

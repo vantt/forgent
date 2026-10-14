@@ -253,8 +253,9 @@ and obey the answer:
 - "in-process": use your own live Agent/Task capability, but only if that exact
   mechanism's confinement has been proven for this roster. An unproven
   in-process boundary counts as no independent dispatch.
-- "out-of-process": run it through `node src/runner/dispatch.mjs execute` with
-  the immutable prompt file, tier, and cwd.
+- "out-of-process": run it as a read-only Unit, `fgos run "$(cat <immutable
+  prompt file>)" --provider <safe-executor-id> --capability review --json`
+  (no `--writes`), from the actor's cwd.
 - "unavailable": there is no independent dispatch for this actor. Record the
   gap. Do NOT perform the role inline and present it as panel output.
 

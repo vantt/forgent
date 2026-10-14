@@ -70,8 +70,10 @@ capability selector would use. `compileDispatchPlan()`'s
 ontology; nothing downstream branches on `purpose` as a concept distinct from
 capability. Renaming these call sites internally is compatibility work
 (tracked as Slice D/E in the normalization plan above), not a semantic
-change — `--for`, `--work`, and `--assignment` stay supported at the CLI/API
-adapter layer.
+change — `--for` and `--work` stay supported on `decide` at the CLI/API
+adapter layer. (`execute --assignment` was removed with the rest of the raw
+`dispatch execute` door, decision 0062 in `docs/specs/runner.md`; work runs
+through `fgos run`.)
 
 `job` is not a routing identity. ADR-004 reserves the term for a possible
 future scheduler; where it appears (e.g. in logs), it names a caller's
@@ -277,7 +279,7 @@ Component-Outer Boundary Note's responsibilities.
 Forbidden dependencies for all eight:
 
 - no `Work` lifecycle mutation (`pick`, `return`, `claim`, `take`): enforced by boundary grep tests (`test/runner/dispatch-reconciliation-import-graph.test.mjs`). Work driving orchestration lives exclusively in Work Driver (`src/runner/loop.mjs`, `src/runner/fanout-batch.mjs`);
-- no event store append (`appendEvent`): audit dispatch logging is isolated to `src/runner/dispatch-log.mjs` outside dispatch core;
+- no event store append (`appendEvent`): audit dispatch logging was isolated to `src/runner/dispatch-log.mjs` outside dispatch core (module removed with `dispatch log`, decision 0062; `fgos run` records provenance under `.fgos/assignments/<unitRunId>/`);
 - no workflow/stage/task/skill lookup: dispatch core contains no Work lookup implementations. Work capability lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) are housed in dedicated leaf compatibility module `src/runner/work-compat.mjs` (registered as `infra` in architecture manifest) with zero imports into dispatch core; `src/runner/dispatch/resolve.mjs` and `prepare.mjs` provide backward-compatible re-exports without importing `workflow-stage-graphs` or `operation-choice.mjs`, consumed by pre-existing callers (`plan.mjs` for `compileDispatchPlan({work})` and `cli.mjs` for `spawnWorker`). All 13 strictly decoupled dispatch core modules contain zero `workflow-stage-graphs` imports, and boundary tests enforce that strict core modules cannot import Work lookup symbols or `work-compat.mjs` (verified by `test/runner/dispatch-reconciliation-import-graph.test.mjs`);
 - no semantic operation choice;
 - no direct protocol/skill/domain executor launch;
@@ -351,4 +353,4 @@ target-state sections are reconciled with implementation.
 | Work Driver Compatibility | `src/runner/work-compat.mjs` | Leaf compatibility module (registered as "infra" in architecture manifest) housing Work Driver compatibility lookup implementations (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) with zero imports into dispatch core; consumed by `plan.mjs`/`cli.mjs` via compatibility re-export. |
 | Stage Operation Selection | `src/runner/dispatch/operation-choice.mjs` | Bridge for stage operation selection (`chooseStageOperation`, `executeDriverOperationChoice`) consuming hardened RunResult. |
 | Work Driver | `src/runner/loop.mjs`, `src/runner/fanout-batch.mjs` | Work item lifecycle orchestration, batch fan-out driving (`pick -> executeExecutorCli -> return`), fail-safe settlement (`fgos return --to blocked`), and worker slots occupancy (`OccupancyPort`). |
-| Audit Seam | `src/runner/dispatch-log.mjs` | Audit event logging (`logExecutorDispatch`) isolated from dispatch core. |
+| Audit Seam | removed (`src/runner/dispatch-log.mjs`, decision 0062) | Audit event logging (`logExecutorDispatch`) was isolated from dispatch core; `fgos run` now records provenance under `.fgos/assignments/<unitRunId>/`. |

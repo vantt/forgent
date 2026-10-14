@@ -31,7 +31,7 @@ logic changed. That's why the branch logic now lives in one shared file.
    `runner.executors.<id>` entry, declare it as a tool-registry entry too
    (a `capability` field on that same entry, tsk-in1-1 D1 — no longer a
    `fgos tool register` verb call), and confirm it with
-   `dispatch.mjs decide` followed by `dispatch.mjs execute` when the
+   `fgos dispatch decide` followed by `fgos run --provider <id>` when the
    mechanism is `out-of-process`.
 
 2. **Point your `SKILL.md`'s reasoning step at the shared fragment**

@@ -89,14 +89,13 @@ nothing is configured.
    describes.)
 
 3. **Give the skill a way to dispatch through the real command/args without
-   a second argv-building implementation.** `dispatch.mjs`'s own
-   `decide`/`execute` CLI pair, both already built on the same
-   `resolveExecutorConfig`/`resolveExecutorCommand` cli-dispatch uses:
-   `node src/runner/dispatch.mjs decide <executorId>` to learn the
-   mechanism first, then `node src/runner/dispatch.mjs execute <executorId>
-   --prompt <text>` to actually self-execute it and hand back the real
-   result as JSON. task-dispatch skills invoke this exact `decide`→`execute`
-   pair, never a parallel prompt/argv builder of their own, and never run a
+   a second argv-building implementation.** `fgos dispatch decide
+   <executorId>` learns the mechanism first, then `fgos run "<text>"
+   --provider <executorId> --capability <purpose> --json` runs it as a Unit
+   and hands back the real result as JSON (the earlier
+   `node src/runner/dispatch.mjs execute` door was removed, decision 0062 in
+   `docs/specs/runner.md`). task-dispatch skills invoke this exact
+   `decide`→`fgos run` pair, never a parallel prompt/argv builder of their own, and never run a
    resolved command themselves through Bash.
 
 4. **In the skill's own `SKILL.md`, point at the shared fragment instead

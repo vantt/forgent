@@ -4,6 +4,14 @@ authoritative_for: dispatch execute unsignaled outcome, [DONE]/[BLOCKED] signal 
 
 # `dispatch execute` now flags a worker that never signaled `[DONE]`/`[BLOCKED]`
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `tsk-4oq` closed a real gap: `[DONE]`/`[BLOCKED]` was a documented worker
 contract with **zero code enforcement** — the entire repo had exactly one
 mention of both tokens together, and it was a comment

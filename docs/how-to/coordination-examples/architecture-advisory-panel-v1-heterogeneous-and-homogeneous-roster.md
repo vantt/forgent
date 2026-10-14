@@ -61,8 +61,9 @@ returns `{"mechanism":"out-of-process","configured":true}`). Re-run the
 `decide` check above before a real session if the config may have changed
 since. **P01.2 and P01.3, the two earlier proof sessions, predate this
 registration and worked around its absence by invoking `bwrap`/`codex`
-directly as a subprocess** — never through `dispatch.mjs execute` with
-these names — using the kongming-verified mount order (`--tmpfs /tmp`
+directly as a subprocess** — never through `dispatch.mjs execute` (a door
+since removed, decision 0062 in `docs/specs/runner.md`; such a run now goes
+through `fgos run --provider <executor>`) with these names — using the kongming-verified mount order (`--tmpfs /tmp`
 before re-pinning `PROJECT_ROOT`/`EVIDENCE_DIR`); that workaround is no
 longer necessary. P05.2, the later comparative live-proof session, dispatched
 through the registered executors directly and found two further real gaps

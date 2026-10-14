@@ -4,6 +4,14 @@ authoritative_for: dispatch execute per-item concurrency guard, dispatch-in-flig
 
 # Why `dispatch.mjs execute` needed a per-item concurrency guard
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `executeExecutorCli` (`src/runner/dispatch/cli.mjs`) had no guard against
 two concurrent out-of-process dispatches racing against the same
 worktree. Discovered live on `tsk-1z1`: a premature `ps`-based liveness

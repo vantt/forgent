@@ -4,6 +4,14 @@ authoritative_for: fanout-batch background-execution requirement, orphaned-claim
 
 # `fanout-batch` must run backgrounded — and a caller can outlive it
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `tsk-vuj` fixed three real, practice-discovered bugs in `fgos-fanout`'s
 own `references/wave-dispatch-mechanics.md` Step 3, discovered while
 dispatching [`tsk-397`'s own review-remediation children

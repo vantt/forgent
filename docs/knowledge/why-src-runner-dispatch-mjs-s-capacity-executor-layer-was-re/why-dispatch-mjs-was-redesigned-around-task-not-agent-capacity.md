@@ -9,6 +9,14 @@ mode: explanation
 ---
 # Why `dispatch.mjs` was redesigned around "task," not agent capacity
 
+> **Removed door (2026-10-14).** The raw dispatch CLI doors this document
+> mentions — `dispatch execute` (with `--contract`, `--assignment`,
+> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
+> `dispatch fanout-batch` — were removed (decision 0062 in
+> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `fgos run --unit` or `fgos workflow start`, and fanout through
+> `node src/runner/fanout-batch.mjs`. The account below is kept as history.
+
 `tsk-5tm` (parent). Full design: `docs/history/task-dispatch-unification/CONTEXT.md`.
 This is the design underlying `dispatch.mjs decide`/`execute` and
 `AGENTS.md`'s own Dispatch section — the mechanism every coding-domain
