@@ -171,35 +171,35 @@
       "claimId": "claim_a3b6c92bcb720f9335d5b0af77804543",
       "path": "docs/platform/documentation/history/templates/README.md",
       "anchor": "historical-authoring-templates",
-      "unitDigest": "0919348d846470c18e0c1e9e3294096e29dd9029e908d45636d463d0f4bd14a8",
+      "unitDigest": "a24731e3b7d56e56378666396e47b3e9a9130edcfbcc6871f7a71a48d66708a4",
       "status": "candidate-unverified"
     },
     {
       "claimId": "claim_0e8ec4eb8b34858d8ad510637f86dcba",
       "path": "docs/platform/documentation/history/templates/README.md",
       "anchor": "unheaded-block-1",
-      "unitDigest": "4a84bb3eeb287c99b007c5ed250e48ebff09a1358bf3d73681a1305693bb5412",
+      "unitDigest": "f8529a60605f9359a47859d267c54c7e8645044de2e5ca32e99eeb9078af123a",
       "status": "candidate-unverified"
     },
     {
       "claimId": "claim_6caa447ebc68c115c4beab1c64e06d4f",
       "path": "docs/platform/documentation/history/templates/README.md",
       "anchor": "template-index-added-in-candidate",
-      "unitDigest": "f927348ffeca4b4dee880a824e0c1662b50f3a43dd9fb317eb12d725802f14b6",
+      "unitDigest": "89606e5058683e2ac09d530523c5ff6c556872d7111095c8bba7252604379699",
       "status": "candidate-unverified"
     },
     {
       "claimId": "claim_b433273df822ece051bf33b9a3f1ee52",
       "path": "docs/platform/documentation/history/templates/README.md",
       "anchor": "unheaded-block-2",
-      "unitDigest": "34d41c242c241425114e92e65e9eb2b96560a326d58803f3c6f3e858f8decec5",
+      "unitDigest": "678848107b31d80edd136b22f13172d9108a04acba89fb1bcaae8a5731739655",
       "status": "candidate-unverified"
     },
     {
       "claimId": "claim_dae5c70a732ac4bb4c77bec7ad441513",
       "path": "docs/platform/documentation/history/templates/README.md",
       "anchor": "unheaded-block-3",
-      "unitDigest": "a05c0d40c3bd28f3cfa7023faa051ddfecccc94dcb17a554e31fd3f69f0f2e2b",
+      "unitDigest": "ffa2bb8733befa735bde4fc4bf9e7cd5db1001958a7227851491559ed29675f7",
       "status": "candidate-unverified"
     },
     {
@@ -5883,5 +5883,12 @@
     "verification": "reports/phase-06/root-boundary-native-verification.json nativeProofResume",
     "reviewStatus": "pending independent conservation review of changed tuples only",
     "supplementalMetadata": "Preserved receipt/reason metadata is historical evidence from the prior list; current decisions/classification refs are read from unchanged shards at the verified commit. It does not grant current truth approval."
+  },
+  "closureCorrectionRebinding": {
+    "inputCommit": "a3a4251f07d619adbb0184f29ec6e2254a008862",
+    "status": "pending independent re-review and next native identity verification; prior proof does not certify these changed tuples",
+    "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/root-closure-fixes-accounting.json",
+    "changedRows": 5,
+    "countUnchanged": 830
   }
 }

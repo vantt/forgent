@@ -163,19 +163,13 @@
       "targetAnchor": "11-business-rules",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "rationale": "Source heading \"Business Rules\" is represented by frozen heading \"11. Business Rules\"; only the numbering prefix differs. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "deep: Heading unit with section payload: only the RUL55 line differs from the prior source and the identical line is in the target; every other diff against the source is the earlier corrected text, none from this merge.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "765b8e058e0fff60e1af8dea50abdb3838bbcd5ae59f225920829e959a5de0df",
+      "reviewStatus": "pending",
+      "rationale": "Source heading \"Business Rules\" is represented by frozen heading \"11. Business Rules\"; only the numbering prefix differs. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. Closure correction: restore only the two A35-named RUL59 sentences while conserving every untouched source clause (R5-4); current real target digest and ancestry rebound under A22, pending independent re-review with no approval carry.",
+      "authoredBy": "codex-session:34@2026-10-15",
+      "targetUnitDigest": "18139e7cf11d2b16a88ed2badee889c8538fd67ce330706031f4556f2b401002",
       "targetAncestry": [
         "Work State Specification"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_904f21e704c3d43d63ae2a762bf9791c",

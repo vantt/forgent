@@ -20,6 +20,8 @@ reviewable integration change.
 
 ## Requirements
 
+Before source retirement, the Step 10 documentation-navigation owner must complete the independently reviewed entry-by-entry merge of `docs/specs/reading-map.md` into retained `docs/reading-map.md`, preserving its curated document and source-code navigation and checking all destinations. Repoint `AGENTS.md` and all other consumers only with the atomic cutover. The Step 5 reclassify disposition records retention, not a completed merge. Require the reviewed conservation/consumer receipts from [the Step 10 obligations](phase-06-transform-all-platform-areas-as-candidate-material.md#step-10-close) and [owner queue](reports/phase-06/owner-queue.md#root-authorities-cutover-obligations-after-closure-review). Resolve the digest-bound AGENTS two-line A34 residual before root-instruction cutover; no source-to-self retention authorizes its removal.
+
 **Cutover sequence:**
 
 1. acquire a migration-specific exclusive documentation-cutover lease; while it

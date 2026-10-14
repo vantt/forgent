@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "rule": "A34",
+  "status": "pending",
+  "residualFile": "plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json",
+  "residualSha256": "d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d",
+  "rows": [
+    {
+      "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+      "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+      "targetUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+      "residualSha256": "d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d",
+      "cutoverObligation": true
+    }
+  ],
+  "representationReview": {
+    "reviewStatus": "pending"
+  },
+  "strictE": "red; no A34 acceptance until independent representation ok; any digest drift revokes acceptance"
+}

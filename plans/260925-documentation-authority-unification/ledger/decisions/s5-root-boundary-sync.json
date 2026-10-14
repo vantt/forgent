@@ -346,20 +346,14 @@
       "targetAnchor": "unheaded-block-93",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewNote": "deep: Business Rules body: RUL55 extension carried verbatim into the spec; other differences are earlier accepted corrections.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "d8bf5e1f48a181d1cc996d8e39c12e715dbf18e894203ed47c457a4a3a4b8835",
+      "reviewStatus": "pending",
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry. Closure correction: restore only the two A35-named RUL59 sentences while conserving every untouched source clause (R5-4); current real target digest and ancestry rebound under A22, pending independent re-review with no approval carry.",
+      "authoredBy": "codex-session:34@2026-10-15",
+      "targetUnitDigest": "9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3",
       "targetAncestry": [
         "Work State Specification",
         "11. Business Rules"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_9c7dc2d7af79db454e4d63ffffe3d6f6",
@@ -476,21 +470,15 @@
       "disposition": "partial-carry",
       "targetOwner": "AGENTS.md",
       "targetAnchor": "unheaded-block-22",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:30@2026-10-15",
-      "rationale": "A31 upstream splits this old two-line unit by inserting a paragraph. This target carries only the first line. The second line has its own current native decision claim_2ae81c7bed935553943d6777b81e2114 at AGENTS.md#unheaded-block-24; together the two successors conserve the complete predecessor. Preserve the old opaque identity/digest; A22 pending independent conservation re-review, no approval carry.",
-      "remainder": "The second original line (the fgos dispatch decide routing-check sentence) is conserved by AGENTS.md#unheaded-block-24, native current claim claim_2ae81c7bed935553943d6777b81e2114 in ledger/decisions/s5-root-boundary-sync.json. The first line remains the existing target at unheaded-block-22; upstream inserted a separate paragraph between them.",
-      "reviewNote": "deep: old two-line unit split by an upstream inserted paragraph; now partial-carry with a substantive remainder naming line 2 as carried at AGENTS.md block-24 by claim_2ae81c7b. Line 1 equals target block-22 and line 2 equals block-24 verbatim, so together they conserve the predecessor; the A34 partial-carry residual stays visible.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:34@2026-10-15",
+      "rationale": "A31 upstream splits the exact old two-line AGENTS unit. The primary target retains the first line; the committed A34 residual shows the second line verbatim and binds both full native unit digests. Source-to-self retention is outside platform authority, not a truth certificate. Pending independent conservation/representation re-review; no approval carry.",
+      "remainder": "The second original line is shown verbatim in plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json, SHA256 d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d; current retained AGENTS.md#unheaded-block-24 is claim_2ae81c7bed935553943d6777b81e2114. This A34 representation is pending independent re-review and remains a Step 10 / cutover obligation.",
       "targetUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
       "targetAncestry": [
         "forgent",
         "Dispatch — routing work to an executor"
-      ],
-      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
+      ]
     },
     {
       "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
@@ -1306,20 +1294,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-93",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
-      "reviewNote": "deep: RUL55 line in the candidate equals main docs/specs/work-state.md RUL55 byte for byte, old tail clause deleted and the 2026-10-14 extension added exactly as upstream; sibling RUL lines unchanged",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "d8bf5e1f48a181d1cc996d8e39c12e715dbf18e894203ed47c457a4a3a4b8835",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:34@2026-10-15",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry. Closure correction: restore only the two A35-named RUL59 sentences while conserving every untouched source clause (R5-4); current real target digest and ancestry rebound under A22, pending independent re-review with no approval carry.",
+      "targetUnitDigest": "9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3",
       "targetAncestry": [
         "Work State Specification",
         "11. Business Rules"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_975c8349e0d069aabf88161d933f2228",

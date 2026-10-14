@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "rule": "A34",
+  "status": "pending independent representation re-review; not an accepted closure exception",
+  "sourceCommit": "c18020da3f04e77ff6cea7b97f65999159d86199",
+  "currentCommit": "a3a4251f07d619adbb0184f29ec6e2254a008862",
+  "rows": [
+    {
+      "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+      "disposition": "partial-carry",
+      "priorReview": {
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+        "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551",
+        "reviewNote": "deep: old two-line unit split by an upstream inserted paragraph; now partial-carry with a substantive remainder naming line 2 as carried at AGENTS.md block-24 by claim_2ae81c7b. Line 1 equals target block-22 and line 2 equals block-24 verbatim, so together they conserve the predecessor; the A34 partial-carry residual stays visible."
+      },
+      "source": {
+        "path": "AGENTS.md",
+        "anchor": "unheaded-block-22",
+        "unitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+        "shownText": "`fgos run` is the primary door for executing new work in the execution core.\nFor routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment.",
+        "shownTextDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+        "startLine": 149,
+        "endLine": 150
+      },
+      "primaryTarget": {
+        "path": "AGENTS.md",
+        "anchor": "unheaded-block-22",
+        "unitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+        "shownText": "`fgos run` is the primary door for executing new work in the execution core.",
+        "shownTextDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+        "startLine": 149,
+        "endLine": 149
+      },
+      "untransferredRemainder": {
+        "path": "AGENTS.md",
+        "anchor": "unheaded-block-24",
+        "unitDigest": "e4e33c148710cfb9775867b0160ed6e82d2e469d0f118ad9ba5ae33ce79c2484",
+        "shownText": "For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment.",
+        "shownTextDigest": "e4e33c148710cfb9775867b0160ed6e82d2e469d0f118ad9ba5ae33ce79c2484",
+        "startLine": 153,
+        "endLine": 153
+      },
+      "relatedCurrentClaim": "claim_2ae81c7bed935553943d6777b81e2114",
+      "cutoverObligation": "Step 10 root-instruction owner must settle both lines and native identities; source-to-self retention does not establish a platform carrier or authorize retirement.",
+      "relatedCitationCorrection": "claim_d956ba3fb9a8cce9589194e5f59d021f is docs/specs/reading-map.md current navigation, not this AGENTS line."
+    }
+  ]
+}

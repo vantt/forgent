@@ -335,6 +335,8 @@ Map the 157 headings first (retired decision history to `decisions/`, contracts 
 ### Step 10. Close
 
 1. Decide `AGENTS.md` and `CLAUDE.md` rows after the last sync.
+1a. Documentation navigation owner: independently review an entry-by-entry merge of `docs/specs/reading-map.md` into retained `docs/reading-map.md` before retiring the source. Preserve all curated document and source-code entries (53 at the Step 5 red-team pin; 51 absent from the retained singleton), check every destination/anchor, and queue `AGENTS.md` plus all other consumers for the Phase 9 atomic repoint. Step 5 reclassification is retention only, not merge completion or retirement permission. The obligation and done proof live in `reports/phase-06/owner-queue.md`.
+1b. Root-instruction owner: settle the AGENTS two-line split and its digest-bound A34 residual before cutover; `claim_5c520fcb1a68ba27e2093341834258c7` and current `claim_2ae81c7bed935553943d6777b81e2114` cannot be closed for cutover by source-to-self retention. Preserve the verbatim instructions, residual SHA256 and all native identities; independently review the final disposition.
 2. Link pass: repoint links between candidates in one pass (and any header stragglers), list them in `post-review-edits.md`, run D, `--rebind`, and send every returned row to a final review round.
 2b. Close by named rule or decision, with a done condition each: the 12 history semantic-conflict groups, the 2 history duplicate-content groups and the 78-file duplicate group that spans history copies (listed by `--summary`); link queues complete for all sources (every inbound edge classified with a target or a queue entry).
 3. Check E over every legacy source (the gate sources listed in `baseline-counts.md`); open data equals the hold list.

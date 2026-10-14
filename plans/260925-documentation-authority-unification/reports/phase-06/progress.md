@@ -1,3 +1,47 @@
+# Closure corrections complete in files — bounded independent re-review next
+
+Date: 2026-10-15
+Executor: codex-session:34@2026-10-15
+Session counter: 34
+Assignment: unit-run-1792009551298-843c49e1/producer/1
+Step: 5
+State: fixes authored / Step 5 open pending bounded independent re-review
+Input HEAD / Lead closure evidence: a3a4251f07d619adbb0184f29ec6e2254a008862
+Last full native source proof: 04e476784ed528970ae33b13dbd220bff9948a5a
+Last accepted ordinary review pin: 6fbb5aed0493b2afb99552ef5bd5cefac897e551
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Current-turn commit: none; runner commits declared files.
+
+Resumed by reading this journal first, then the phase protocol, Lead's committed red-team/sample/readers/key and A19/A22/A28/A34–A37. This assignment authorizes file edits only inside docs/ and this plan; scratch only /tmp/fgos-work/root-closure-fixes/. No git write, workspace .fgos write, secrets read, gate/checker/extractor/vocabulary/baseline edit, full native registry sync or review pack was performed. The required external result outbox is the explicit exception.
+
+R5-3: templates README now routes all eleven existing historical carriers in the index and Related metadata; its false three/unbuilt statement is removed. Five actual unverified unit digests are locally rebound, with statuses candidate-unverified and native identity verification explicitly pending. R5-4: target RUL59 at docs/platform/work-state/spec.md:1080 is the exact source line at docs/specs/work-state.md:1238 except the two A35-named false sentences. The original heading, RUL48 fail-safe cross-reference, schema/manual-edit clause and complete never-changes-frontier-set/mechanical-picker invariant are restored byte-for-byte. Correct priority/retired-intent facts cite src/intake/discovery.mjs:375-396 and review-5-root-authorities-truth.md:92. Unsampled source clauses are retained, not truth-certified.
+
+R5-5: verbatim old two-line AGENTS source, current first line and second-line remainder are committed in root-instructions-partial-carry-residual.json; root-instructions-partial-carry-binding.json binds source/target full digests and residual SHA256 d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d. Representation is pending independent re-review, not an A34 accepted exception. The actual related second-line row is claim_2ae81c7bed935553943d6777b81e2114; claim_d956ba3fb9a8cce9589194e5f59d021f is a retained reading-map unit. Step 10/cutover owner obligations remain explicit; source-to-self retention is no platform carrier.
+
+Exactly four decision bindings return to pending, all approval/report/note fields removed; old accepted objects are only audit history:
+
+- ledger/decisions/s5-root-boundary-sync.json claims claim_9be8a10fa3ce503d2ebc2ffe6ffc76ad (changed RUL block);
+- same shard registryGaps claim_3d2d87a2a9582e2faebabc79470d8ee8 (same current RUL target);
+- pilot/decisions/b-entry-actors-rules-pointers.json claims claim_477a30f4902261e390c34ab888145dcd (Business Rules heading consequence);
+- same boundary shard registryGaps claim_5c520fcb1a68ba27e2093341834258c7 (new A34 residual representation).
+
+Unchanged related AGENTS/source/navigation reviews remain intact. Historical predecessor target bindings are not silently updated. Seven changed native units (five index + two work-state) and the five unverified tuple deltas have full before/after digest/line/text witnesses in root-closure-fixes-accounting.json. Real local target digests/ancestry are rebound under A22 without carrying approval. Registry bytes and native IDs stay unchanged. The input registry/gate equality proof is historical for these changed bytes; post-correction D/E/full native identity/gap/list equality is not claimed.
+
+R5-2 is now an explicit documentation-navigation owner obligation in owner-queue.md, Phase 6 Step 10 and Phase 9 pre-cutover requirements: conserve every curated specs reading-map entry into the retained singleton under independent entry review and check destinations before source retirement and AGENTS/other-consumer repoint. Both source reading maps remain untouched. R5-1/R5-7/R5-9 are accepted notes under this assignment and recorded in the batch report. R5-6's sixteen stale reviewed rationale states remain owed: the existing applier returns reviewed rows unchanged and provides no reviewed-rationale-only path; exact diagnostic IDs are retained in accounting. R5-8 dates remain owed until correction acceptance, and missing Pilot B promotion fields to Step 10; embedded source metadata stays provenance. No semantic disposition tidy is made.
+
+Batch report: [step-05-report.md](step-05-report.md), matching Step 4's evidence/counts/open-data/truth/effort/preservation/owed sections. It records the 0 Critical/0 High/5 Medium/4 Low red-team result, accepted/scheduled/fixed/owed findings; 0/50 block defects and its seventeen pre-existing-block exception; all six fresh-reader cells 6/6 with ten partials credited, 38 checked anchors/zero wrong/zero legacy-authority answers, max four first-owner files, full-run thirteen/ten and instruction-only isolation limitations; eight area gaps; both truth escalations and outcomes; A31 sync/accounting; candidate-unverified counts and all cutover debts. A37 means no further Step 5 truth draw.
+
+Read-only recount of the actual current persisted registry yields 1,074 mapped-source units against the earlier journal snapshot 1,072. Source tuple checks, class/disposition tables and exact-ID witnesses are in root-closure-batch-counts.json, separately from the thirteen s5 shards' 722 claim / 73 gap rows. After this turn: mapped sources 1,072 reviewed including four reviewed history-corpus claims / two pending; s5 claims 721 reviewed / one pending and gaps 71 reviewed / two pending, plus one Pilot B pending. This is local accounting, not a new native inventory or strict closure. N1 retains a generated file role and four retain-as-evidence claim dispositions under the history corpus rule; no regenerate/corpus confusion. Thirty-two committed review reports have 1,642 explicit verdict occurrences (1,586 ok, 56 rework, zero hold), with rates and deep-denominator limits disclosed. Nineteen distinct documented Step 5 executor counters, nine explicit fgos run assignments; dispatch transport/call totals and unnumbered interrupted recovery remain unmeasured. No token-total claim.
+
+Validation: unchanged review/applier tests 39/39 pass, zero fail/cancel/skip/todo, using env -u CLAUDE_CODE_SESSION_ID and scratch TMPDIR. Local checks pass for all eleven live template links, unchanged RUL59 source clauses, verbatim two-line residual/SHA256, four exact pending bindings with no approval fields, five unverified digest changes, all 1,074 current source tuples, class/disposition sums and unchanged registry hash. Registry remains 59,808,373 bytes, SHA256 ed56c7750b36ee68ececea9399d6852f6ca07c41aa903d908102fb4666d8bce8; 95,000 unique known IDs across live/gap/retired. Full helper sources and test log are stored in accounting. No full suite, full current-truth, full native-sync or post-edit gate certification. No component-boundary change. No MDView MCP is exposed; CLI preview would require an out-of-scope database write, so no preview is attempted.
+
+**Next turn packages one bounded independent re-review of the R5-3/R5-4/R5-5 fixes from this turn's runner-produced commit**, including the four pending decisions, seven changed native units, five candidate tuples and A34 residual/binding. Keep the 795 previously reviewed rows and unchanged accepted notes out of the request. Independently review every changed clause/residual and bounded identity consequences, apply exact committed verdicts via existing channels, prove final D/E/native conservation/list equality and residual binding. **Then Step 5 closes.** No new truth draw; no Step 6 work is started here. Existing Coordination Rings holds, Host/Packaging A34 residuals, global native gaps, A35/A37 promotion truth and consumer/alias/cutover obligations remain.
+
+Blocker: no technical or owner-direction blocker to preparing the bounded request. Step 5 closure waits for that independent acceptance and resulting conservation proof. No review pack is made this turn, and no batch closure, promotion, push or main merge is claimed.
+
+---
+
 # Accepted review applied — source and review work complete
 
 Date: 2026-10-15
