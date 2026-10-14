@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0-rc.5] - 2026-10-14
+
 ### Added
 
 - `fgos dispatch execute <executor> --for <capability>` names the kind of work a dispatch does; the capability, not the executor, sets whether it may change files. `execute <agent>` without `--for` is now refused before spawning with the choices listed, and this door carries writing work only: read-only work runs sandboxed as a Workflow unit with `"writes": []` (`fgos workflow start --units <file>`); `execute --contract <file> --executor <id>` keeps a named provider but enforces read-only by instruction only, without a sandbox. `--timeout-ms` and `--idle-timeout-ms` override the configured timeouts for one call.
