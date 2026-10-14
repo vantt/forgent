@@ -18,7 +18,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { partitionPaths } from '../dispatch/write-scope.mjs';
+import { canonicalizeWriteEntry, partitionPaths } from '../dispatch/write-scope.mjs';
 import { nulPaths, statusPaths, GIT_LIST_MAX_BUFFER } from '../../util/git-paths.mjs';
 
 const STORE_PREFIX = '.fgos/';
@@ -318,8 +318,24 @@ export function commitOnBranch(worktree, sha, repoRoot) {
 // abort, `.fgos/` conflicts take the base side); its code is not reused because it runs plain git
 // in its own throwaway worktree.
 
-/** A line git writes to open, split or close a conflict hunk (`=======` alone is too common). */
-const CONFLICT_MARKER = /^(?:<{7}|>{7}|\|{7})(?: |$)/m;
+/**
+ * A line git writes to open, split or close a conflict hunk, at the default size or a larger
+ * `conflict-marker-size` (`=======` alone is too common to read as one).
+ */
+const CONFLICT_MARKER = /^(?:<{7,}|>{7,}|\|{7,})(?: |\r?$)/m;
+
+/**
+ * Whether a conflicted path can enter a write scope as itself: the scope's normalizer keeps it
+ * unchanged, it holds no glob and no control character (it is also printed into the brief).
+ */
+function scopableConflictPath(p) {
+  if (p.includes('*') || /[\u0000-\u001f\u007f]/.test(p)) return false;
+  try {
+    return canonicalizeWriteEntry(p) === p;
+  } catch {
+    return false;
+  }
+}
 
 /** What a merge must never take from the caller's config: rerere replays, autostash moves dirt. */
 const MERGE_FLAGS = ['-c', 'rerere.enabled=false', '-c', 'merge.autoStash=false'];
@@ -426,10 +442,10 @@ export function startSyncMerge({ worktree, repoRoot, ref, sha, adoptOpenMerge = 
 
     for (const p of unmergedPaths(ctx).filter((u) => !outsideStore(u))) takeBaseSide(ctx, p);
     const conflicts = unmergedPaths(ctx);
-    const unscopable = conflicts.filter((p) => p.includes('*') || p.includes('\\') || p !== p.trim());
+    const unscopable = conflicts.filter((p) => !scopableConflictPath(p));
     if (unscopable.length > 0) {
       abortMerge(ctx);
-      return failed('unscopable-conflict-path', `the merge of ${ref} conflicts in paths a write scope cannot name literally (${unscopable.join(', ')}); merge it by hand`);
+      return failed('unscopable-conflict-path', `the merge of ${ref} conflicts in paths a write scope cannot name exactly (${unscopable.map((p) => JSON.stringify(p)).join(', ')}); merge it by hand`);
     }
     if (conflicts.length > 0) {
       const mergeStaged = stagedPaths(ctx).filter((p) => !conflicts.includes(p));
@@ -437,13 +453,18 @@ export function startSyncMerge({ worktree, repoRoot, ref, sha, adoptOpenMerge = 
     }
 
     const subject = syncSubject(ref);
+    const staged = stagedPaths(ctx);
     try {
       git(ctx, ['commit', '-q', '--no-edit', '-m', subject], { env: commitIdentity(ctx) });
     } catch (err) {
       abortMerge(ctx);
       return failed('git-error', `the clean merge of ${ref} could not be committed: ${String(err.stderr || err.message).trim()}`);
     }
-    return { status: 'merged', ref, sha, head, commit: { sha: git(ctx, ['rev-parse', 'HEAD']).trim(), subject } };
+    const merged = mergeCommitCheck(ctx, { head, sha, staged });
+    if (merged.error) {
+      return failed('committed-set-mismatch', `merge commit ${merged.sha} is on the branch but ${merged.error}`, { head, commit: { sha: merged.sha, subject }, ...merged.detail });
+    }
+    return { status: 'merged', ref, sha, head, commit: { sha: merged.sha, subject } };
   } catch (err) {
     try { abortMerge(ctx); } catch { /* reported below */ }
     return failed('git-error', err.stderr ? String(err.stderr).trim() : err.message);
@@ -463,6 +484,24 @@ export function syncMergeState({ worktree, repoRoot, sync }) {
   if (!mergeHead && isAncestor(ctx, sync.sha)) return { state: 'done' };
   if (!mergeHead && head === sync.head) return { state: 'not-started' };
   return { state: 'lost', mergeHead, head };
+}
+
+/**
+ * Whether HEAD is the merge of `sha` over `head` holding exactly the `staged` paths (a hook can
+ * change the index between staging and the commit). Returns `{ sha, files }`, plus `error` and
+ * `detail` when it is not.
+ */
+function mergeCommitCheck(ctx, { head, sha, staged }) {
+  const commit = git(ctx, ['rev-parse', 'HEAD']).trim();
+  const parents = git(ctx, ['rev-list', '--parents', '-n', '1', 'HEAD']).trim().split(' ').slice(1);
+  const files = nulPaths(git(ctx, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', head, 'HEAD']));
+  if (parents[0] === head && parents[1] === sha && sameSet(files, staged)) return { sha: commit, files };
+  return {
+    sha: commit,
+    files,
+    error: `it is not the merge of ${sha} over ${head} holding exactly its staged paths`,
+    detail: { files, unexpected: files.filter((p) => !staged.includes(p)), missing: staged.filter((p) => !files.includes(p)) },
+  };
 }
 
 /** The paths of `paths` whose content still holds a conflict marker (binary files are not read). */
@@ -503,26 +542,24 @@ export function finishSyncMerge({ worktree, repoRoot, sync }) {
     if (marked.length > 0) {
       return failed('conflict-markers', `conflict markers are still in ${marked.join(', ')}; remove them, then resume the run to commit the merge of ${sync.ref}`, { paths: marked });
     }
-    withPaths(ctx, ['add', '-A'], sync.conflicts);
-    const left = unmergedPaths(ctx);
-    if (left.length > 0) return failed('staged-set-mismatch', `paths are still unmerged after staging: ${left.join(', ')}`, { unexpected: left });
     const allowed = new Set([...sync.conflicts, ...(sync.mergeStaged ?? [])]);
+    const before = new Set(stagedPaths(ctx));
+    withPaths(ctx, ['add', '-A'], sync.conflicts);
     const staged = stagedPaths(ctx);
     const unexpected = staged.filter((p) => !allowed.has(p));
     if (unexpected.length > 0) {
+      // Take back what this call staged outside the merge, so a resume does not find it as foreign.
+      const own = unexpected.filter((p) => !before.has(p));
+      if (own.length > 0) withPaths(ctx, ['reset', '-q'], own);
       return failed('staged-set-mismatch', `the index holds paths the merge of ${sync.ref} did not stage: ${unexpected.join(', ')}`, { unexpected });
     }
+    const left = unmergedPaths(ctx);
+    if (left.length > 0) return failed('staged-set-mismatch', `paths are still unmerged after staging: ${left.join(', ')}`, { unexpected: left });
     const subject = syncSubject(sync.ref);
     git(ctx, ['commit', '-q', '--no-edit', '-m', subject], { env: commitIdentity(ctx) });
-    const sha = git(ctx, ['rev-parse', 'HEAD']).trim();
-    const parents = git(ctx, ['rev-list', '--parents', '-n', '1', 'HEAD']).trim().split(' ').slice(1);
-    const files = nulPaths(git(ctx, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${sync.head}`, 'HEAD']));
-    if (parents[0] !== sync.head || parents[1] !== sync.sha || !sameSet(files, staged)) {
-      return failed('committed-set-mismatch', `merge commit ${sha} is on the branch but is not the merge of ${sync.ref} over ${sync.head} holding exactly its staged paths`, {
-        sha, subject, files, unexpected: files.filter((p) => !staged.includes(p)), missing: staged.filter((p) => !files.includes(p)),
-      });
-    }
-    return { status: 'committed', sha, subject, files };
+    const merged = mergeCommitCheck(ctx, { head: sync.head, sha: sync.sha, staged });
+    if (merged.error) return failed('committed-set-mismatch', `merge commit ${merged.sha} is on the branch but ${merged.error}`, { sha: merged.sha, subject, ...merged.detail });
+    return { status: 'committed', sha: merged.sha, subject, files: merged.files };
   } catch (err) {
     return failed('git-error', err.stderr ? String(err.stderr).trim() : err.message);
   }

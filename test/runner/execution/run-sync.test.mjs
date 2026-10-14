@@ -29,7 +29,7 @@ const unitRecordOf = (repoRoot, id) => JSON.parse(fs.readFileSync(path.join(repo
 function commitFile(cwd, rel, content, message) {
   fs.mkdirSync(path.dirname(path.join(cwd, rel)), { recursive: true });
   fs.writeFileSync(path.join(cwd, rel), content);
-  gitIn(cwd, 'add', '--', rel);
+  execFileSync('git', ['add', '--', rel], { cwd, stdio: 'ignore', env: { ...process.env, GIT_LITERAL_PATHSPECS: '1' } });
   gitIn(cwd, 'commit', '-q', '-m', message);
 }
 
@@ -339,4 +339,64 @@ test('a conflicted path a scope cannot name exactly (surrounding whitespace) abo
   assert.equal(res.outcome, 'policy-refusal');
   assert.equal(res.results[0].refused.reason, 'unscopable-conflict-path');
   assert.equal(mergeHeadOf(worktree), null);
+});
+
+test('conflicted paths a scope would read differently (":" magic, a newline) abort the merge instead of reaching the scope or the brief', async () => {
+  for (const name of [':colon.txt', 'line\nbreak.txt']) {
+    const { repoRoot, worktree, script } = setup({ mainFiles: { [name]: 'main\n' }, branchFiles: { [name]: 'branch\n' } });
+    writeWorker(script);
+    const res = await runUnit({ unitData: { id: 'u-odd', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
+    assert.equal(res.outcome, 'policy-refusal', JSON.stringify(name));
+    assert.equal(res.results[0].refused.reason, 'unscopable-conflict-path');
+    assert.equal(mergeHeadOf(worktree), null);
+  }
+});
+
+test('markers longer than seven characters (conflict-marker-size) are still found', async () => {
+  const { repoRoot, worktree, script } = setup({
+    mainFiles: { '.gitattributes': 'README.md conflict-marker-size=10\n' },
+    branchFiles: {},
+  });
+  commitFile(repoRoot, 'README.md', 'line one\nmain says two\nline three\n', 'main: readme');
+  commitFile(worktree, '.gitattributes', 'README.md conflict-marker-size=10\n', 'branch: attrs');
+  commitFile(worktree, 'README.md', 'line one\nbranch says two\nline three\n', 'branch: readme');
+  writeWorker(script, { files: { 'README.md': 'line one\n<<<<<<<<<< HEAD\nhalf\nline three\n' } });
+  const res = await runUnit({ unitData: { id: 'u-size', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
+  assert.equal(res.outcome, 'execution-failure');
+  assert.equal(res.results[0].commit.reason, 'conflict-markers');
+});
+
+test('a clean merge commit holding more than the merge (a hook added a file) is not taken as a pass, nor resumed past', async () => {
+  const { repoRoot, worktree, script } = setup();
+  writeWorker(script);
+  const hooks = path.join(repoRoot, 'test-hooks');
+  fs.mkdirSync(hooks);
+  fs.writeFileSync(path.join(hooks, 'pre-commit'), '#!/bin/sh\necho sneaky > sneaky.txt\ngit add sneaky.txt\n', { mode: 0o755 });
+  gitIn(repoRoot, 'config', 'core.hooksPath', hooks);
+  const res = await runUnit({ unitData: { id: 'u-hook', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
+  assert.equal(res.outcome, 'execution-failure');
+  assert.equal(res.results[0].refused.reason, 'committed-set-mismatch');
+  await assert.rejects(() => runUnit({ resumeUnitRunId: res.unitRunId, repoRoot, cwd: worktree }), /sneaky\.txt/);
+});
+
+test('resuming a sync-only run that was up to date passes again without a worker', async () => {
+  const { repoRoot, worktree, script } = setup({ mainFiles: {} });
+  writeWorker(script, { files: { 'docs/x.md': 'x\n' } });
+  const first = await runUnit({ unitData: { id: 'u-up2', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
+  assert.equal(first.outcome, 'pass');
+  const resumed = await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktree });
+  assert.equal(resumed.outcome, 'pass');
+  assert.equal(producerSpawns(repoRoot, first.unitRunId), 0);
+  assert.equal(fs.existsSync(path.join(worktree, 'docs', 'x.md')), false);
+});
+
+test('a conflicted file the worker turned into a directory refuses the conclusion and leaves no staging of the runner behind', async () => {
+  const { repoRoot, worktree, script } = conflicting();
+  writeWorker(script, { files: {} });
+  fs.writeFileSync(script, fs.readFileSync(script, 'utf8').replace("const prompt =", "fs.rmSync('README.md'); fs.mkdirSync('README.md'); fs.writeFileSync('README.md/inner.txt', 'x\\n');\n    const prompt ="));
+  const res = await runUnit({ unitData: { id: 'u-dir', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
+  assert.equal(res.outcome, 'execution-failure');
+  assert.equal(res.results[0].commit.reason, 'staged-set-mismatch');
+  assert.doesNotMatch(gitIn(worktree, 'diff', '--cached', '--name-only'), /inner\.txt/);
+  assert.equal(mergeHeadOf(worktree), headOf(repoRoot), 'the merge stays open for a person');
 });

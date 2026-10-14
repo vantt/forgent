@@ -12,7 +12,7 @@ import fs from 'node:fs';
 
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { matchesWriteScope } from '../dispatch/write-scope.mjs';
-import { finishSyncMerge, resolveSyncBase, startSyncMerge, syncMergeState } from './commit-unit-work.mjs';
+import { commitOnBranch, finishSyncMerge, resolveSyncBase, startSyncMerge, syncMergeState } from './commit-unit-work.mjs';
 
 /**
  * The sync record of a new unit run, checked before the run exists: the unit must run in a linked
@@ -34,6 +34,11 @@ export function seedSync(unit, { worktree, mainRoot }) {
  */
 export function assertSyncResumable(unitRunId, unitRecord, mainRoot) {
   const sync = unitRecord.sync;
+  // A clean merge commit that holds more than the merge stays on the branch; a person takes it off.
+  if (sync?.status === 'failed' && sync.reason === 'committed-set-mismatch' && sync.commit?.sha
+    && commitOnBranch(unitRecord.worktree, sync.commit.sha, mainRoot)) {
+    throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": ${sync.error} (unexpected: ${(sync.unexpected ?? []).join(', ') || 'none'}; missing: ${(sync.missing ?? []).join(', ') || 'none'}); inspect it and take it off the branch by hand (git reset --hard ${sync.head} drops it with its files), then resume`);
+  }
   if (sync?.status !== 'conflicted') return;
   const { state, mergeHead, head } = syncMergeState({ worktree: unitRecord.worktree, repoRoot: mainRoot, sync });
   if (state === 'in-progress') return;
@@ -64,7 +69,8 @@ function narrowScope(unitRecord) {
 export function runPendingSync(unitRecord, mainRoot, persist) {
   const sync = unitRecord.sync;
   if (!sync || !['pending', 'failed'].includes(sync.status)) {
-    return sync?.status === 'merged' && unitRecord.unit.syncOnly && !unitRecord.bindings?.['producer/1'] ? syncOnlyPass(sync) : null;
+    const done = sync?.status === 'merged' || sync?.status === 'up-to-date';
+    return done && unitRecord.unit.syncOnly && !unitRecord.bindings?.['producer/1'] ? syncOnlyPass(sync) : null;
   }
   // Only a run that already marked this sync as started (and died before recording its result)
   // may find its own merge open; a first start never takes over a merge someone else opened.
@@ -75,7 +81,8 @@ export function runPendingSync(unitRecord, mainRoot, persist) {
   unitRecord.sync = result;
   persist();
   if (result.status === 'failed') {
-    const outcome = result.reason === 'git-error' ? 'execution-failure' : 'policy-refusal';
+    // Git failing, or a commit that landed holding the wrong set, is a failure; anything else refused to start.
+    const outcome = ['git-error', 'committed-set-mismatch'].includes(result.reason) ? 'execution-failure' : 'policy-refusal';
     return { outcome, results: [{ outcome, role: 'producer', round: 1, refused: { reason: result.reason, detail: result.error } }] };
   }
   if (result.status === 'conflicted') {
