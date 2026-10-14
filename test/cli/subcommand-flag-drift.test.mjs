@@ -24,8 +24,11 @@
 //     after the last sub-verb block is a sub-verb's body (FALLTHROUGH), that
 //     tail is that sub-verb's own region;
 //   - a flag in a sub-verb's schema is read in its region or the shared one;
+//   - every sub-verb the registry lists has its own branch in the handler;
 //   - GLOBAL flags (read by main() for every verb) are exempt both ways.
-// Limits: a flag read through a computed key (`flags[name]`), or by code that
+// Limits: a flag read in the shared region passes when ANY sub-verb declares
+// it; nested modes inside one sub-verb (dispatch reconcile plan|apply|
+// provider-capacity), required-ness and types are not checked; a flag read through a computed key (`flags[name]`), or by code that
 // only receives an object already built from flags, is invisible to this
 // scan; regex literals containing braces would confuse the brace matcher.
 import { test } from 'node:test';
@@ -202,6 +205,9 @@ for (const entry of MULTI) {
     const subs = Object.keys(entry.subcommands);
     const caseText = verbCase(entry.name);
     const { regions, shared } = subRegions(entry.name, caseText, subs);
+    for (const sub of subs) {
+      assert.ok(regions[sub] !== undefined, `${entry.name}: the registry lists sub-verb "${sub}" but the handler has no branch for it`);
+    }
     const sharedReads = regionReads(shared, `${entry.name} (shared)`);
     const problems = [];
     const declaredAnywhere = new Set();
