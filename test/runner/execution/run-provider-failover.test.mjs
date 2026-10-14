@@ -360,3 +360,29 @@ test('a panel seat that walked to another provider lands on a family its sibling
   assert.ok(!finalExecutors.includes('alpha'));
   assert.equal(summaryOf(fx.repoRoot, res).sharedFamilies, undefined);
 });
+
+test('a unit-preferred executor that hits its usage limit walks on to the capability pool', { skip: SKIP }, async () => {
+  const fx = setup({ spent: { family: 'spentquota' }, beta: { family: 'beta' } }, { prefer: ['beta'] });
+  const res = await run(fx, { ...solo('u-prefer-limit'), prefer: ['spent'] });
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+  const attempts = attemptsOf(fx.repoRoot, res);
+  assert.deepEqual(attempts.map((a) => [a.binding.executor, a.binding.provenance.executor.source, a.outcome]), [
+    ['spent', 'unit-prefer', 'provider-limit'],
+    ['beta', 'capability:docs:write', 'pass'],
+  ]);
+  assert.equal(attempts[1].fallbackFrom.kind, 'next-candidate');
+});
+
+test('a writing unit with its own prefer passes the mutating gate, also on a walk out of it', { skip: SKIP }, async () => {
+  const providers = () => ({ spent: { family: 'spentquota' }, alpha: { family: 'alpha' }, beta: { family: 'beta' } });
+  const fx = setup(providers(), { prefer: ['beta'] });
+  const direct = await run(fx, { ...writer('u-prefer-writer'), prefer: ['alpha'] });
+  assert.equal(direct.outcome, 'pass', JSON.stringify(direct.results[0]).slice(0, 1500));
+  assert.deepEqual(attemptsOf(fx.repoRoot, direct).map((a) => [a.binding.executor, a.outcome]), [['alpha', 'pass']]);
+
+  // A fresh repo: the same file written twice in one worktree is no change, so no evidence.
+  const fy = setup(providers(), { prefer: ['beta'] });
+  const walked = await run(fy, { ...writer('u-prefer-writer-walk'), prefer: ['spent'] });
+  assert.equal(walked.outcome, 'pass', JSON.stringify(walked.results[0]).slice(0, 1500));
+  assert.deepEqual(attemptsOf(fy.repoRoot, walked).map((a) => [a.binding.executor, a.outcome]), [['spent', 'provider-limit'], ['beta', 'pass']]);
+});
