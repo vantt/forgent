@@ -571,6 +571,18 @@ test('a live dispatch-lock holder is judged by the ttlMs it took, not by a conte
   assert.equal(acquireMainCheckoutLock(dir, { identity: `${process.pid}:${Date.now()}:nextrun`, ttlMs: 35 * 60000, lockFile }).status, ACQUIRED);
 });
 
+// A pid reused after a holder was killed reads as live; the ttl a record claims is honoured only up to
+// the run-timeout ceiling, so no record blocks a worktree for longer than one run may take.
+test('a dispatch-lock holder\'s recorded ttl is honoured only up to the run-timeout ceiling', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const lockFile = dispatchLockFile('/some/worktree');
+  const H = 3600000;
+  fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: `${process.pid}:${Date.now()}:huge`, ts: Date.now() - 5 * H, ttlMs: 9e15 }));
+  const contender = acquireMainCheckoutLock(dir, { identity: `${process.pid}:${Date.now()}:next`, ttlMs: 15 * 60000, lockFile });
+  assert.equal(contender.status, ACQUIRED);
+});
+
 test('acquireMainCheckoutLock still fails closed (AMBIGUOUS) for a non-composite string identity with no ttlMs supplied -- the S2 fix only special-cases the dispatch lock\'s own pid-embedded shape', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });

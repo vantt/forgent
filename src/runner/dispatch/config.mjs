@@ -511,7 +511,10 @@ export function parseRunTimeout(text, label = '--timeout') {
   if (!match) {
     throw new RunnerConfigError(`${label} takes a whole number and a unit (ms, s, m or h), e.g. 90m or 5400s; got: ${JSON.stringify(text)}`);
   }
-  return assertRunTimeoutMs(Number(match[1]) * RUN_TIMEOUT_UNIT_MS[match[2]], label);
+  const ms = Number(match[1]) * RUN_TIMEOUT_UNIT_MS[match[2]];
+  // A number too large to count is named by the text that was typed, never by its float.
+  if (!Number.isSafeInteger(ms)) throw new RunnerConfigError(`${label} is too large: ${text.trim()} (at most ${RUN_TIMEOUT_MAX_MS / 3600000}h)`);
+  return assertRunTimeoutMs(ms, label);
 }
 
 /**
@@ -1616,6 +1619,11 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   validateProviderAccountInventory(cfg, sourceLabel);
   if (typeof cfg.timeoutMs !== 'number' || !Number.isFinite(cfg.timeoutMs) || cfg.timeoutMs <= 0) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);
+  }
+  // The default run timeout obeys the same ceiling as one run's own: the confinement reaper keeps a
+  // live run's private home and a contender honours a dispatch lock's ttl only up to it.
+  if (cfg.timeoutMs > RUN_TIMEOUT_MAX_MS) {
+    throw new RunnerConfigError(`runner config (${sourceLabel}) "timeoutMs" must be at most ${RUN_TIMEOUT_MAX_MS / 3600000}h, got ${cfg.timeoutMs}ms.`);
   }
   // OPTIONAL `idleTimeoutMs` (dispatch-execute optimization pass): absent
   // entirely keeps `cliSpawnAdapter`'s idle-timeout disarmed, byte-identical

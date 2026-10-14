@@ -14,7 +14,7 @@ const formatRunTimeout = (ms) => (ms % 3600000 === 0 ? `${ms / 3600000}h` : `${m
 
 /** Why `value` is not a usable run timeout (whole ms, floor..ceiling), or null when it is. */
 export function runTimeoutProblem(value, label = 'run timeout') {
-  if (!Number.isSafeInteger(value)) return `${label} must be a whole number of milliseconds, got: ${JSON.stringify(value)}`;
+  if (!Number.isSafeInteger(value)) return `${label} must be a whole number of milliseconds, got: ${typeof value === 'number' ? String(value) : JSON.stringify(value)}`;
   if (value < RUN_TIMEOUT_MIN_MS) return `${label} must be at least ${formatRunTimeout(RUN_TIMEOUT_MIN_MS)}, got ${value}ms`;
   if (value > RUN_TIMEOUT_MAX_MS) return `${label} must be at most ${formatRunTimeout(RUN_TIMEOUT_MAX_MS)}, got ${value}ms`;
   return null;

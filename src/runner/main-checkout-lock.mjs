@@ -46,6 +46,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveHolderLiveness as resolveHolderLivenessByIdentity } from './dispatch/process-identity.mjs';
+import { RUN_TIMEOUT_MAX_MS } from './dispatch/run-timeout.mjs';
 
 export const LOCK_FILE = 'main-checkout.lock';
 
@@ -344,7 +345,9 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = t
     } else {
       // A live dispatch-lock holder is judged by the longer of its own ttl and the contender's: it
       // renews every ttl/3 of its own run timeout, which may be longer than the contender's.
-      if (composite !== null && record.ttlMs !== undefined) effectiveTtlMs = Math.max(ttlMs, record.ttlMs);
+      // Held to the run-timeout ceiling: a holder killed without releasing, whose pid was reused,
+      // reads as live, and no record may block a worktree longer than one run may take.
+      if (composite !== null && record.ttlMs !== undefined) effectiveTtlMs = Math.max(ttlMs, Math.min(record.ttlMs, RUN_TIMEOUT_MAX_MS));
       held = now - record.ts <= effectiveTtlMs;
     }
   }
