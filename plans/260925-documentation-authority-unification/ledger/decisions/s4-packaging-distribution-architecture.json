@@ -5259,10 +5259,20 @@
       "targetAnchor": "6-workspaceactivationbinding",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:10@2026-10-14",
       "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#6-workspaceactivationbinding, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#6-workspaceactivationbinding. Heading depth changes; the target also adds the labelled Retained dated design — status note (2026-10-14) before the bootstrap-context permission and the labelled Status note (2026-10-14) after the candidate permission paragraph; the direct section payload follows the original source order. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Stored digest has no target match; independent re-review required."
+      "reviewNote": "Rationale now names both labelled notes with correct placement and dates; target diff is heading depth plus those two notes only; only rationale changed vs d57231686.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-rationale-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "32761eb7cc5ab63a191f4a707e6e56cf65a32c3dd5d605aa5558346377edfb40",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail"
+      ],
+      "reviewReportCommit": "ea04ae8585560bfb1c62c477fdeefb3019021723"
     },
     {
       "claimId": "claim_a0843b462d3bf38fde961cbb25ca58a0",
@@ -5570,10 +5580,21 @@
       "targetAnchor": "unheaded-block-25",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:10@2026-10-14",
       "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-63, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-25. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The target prepends the labelled Retained dated design — status note (2026-10-14), identifying the bootstrap-context permission as source design and static preflight as current behavior. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Stored digest has no target match; independent re-review required."
+      "reviewNote": "Rationale truthfully says the Retained dated design note is prepended to block 25 and says source design versus static preflight; source sentence kept verbatim; only rationale changed.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-rationale-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "273e89aa19e81dcc743483fe3e51606dcf949278cadecb37a885aa39014cec2b",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "6. WorkspaceActivationBinding"
+      ],
+      "reviewReportCommit": "ea04ae8585560bfb1c62c477fdeefb3019021723"
     },
     {
       "claimId": "claim_ba9547c5587487b5a423db3dfbd2a593",
@@ -5605,10 +5626,21 @@
       "targetAnchor": "unheaded-block-27",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:10@2026-10-14",
       "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-65, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-27. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The target appends the labelled Status note (2026-10-14), identifying the candidate permission as retained dated design, static preflight and the unimplemented environment-variable bootstrap context, while retaining the must-not obligation. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Stored digest has no target match; independent re-review required."
+      "reviewNote": "Rationale truthfully says the Status note is appended after the permission and must-not text (same paragraph, inline) and that the must-not obligation is retained; source sentences verbatim; only rationale changed.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-rationale-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "6fbabae72e49d14c8ea861f42ffc8ee4180d3b83c968871b6ea38ace19b92d9a",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "6. WorkspaceActivationBinding"
+      ],
+      "reviewReportCommit": "ea04ae8585560bfb1c62c477fdeefb3019021723"
     },
     {
       "claimId": "claim_179e4e3efced44d5c47758b3fff895fa",
