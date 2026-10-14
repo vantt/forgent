@@ -433,8 +433,9 @@ test('run-door call-site guard catches an aliased import, a dynamic import(), a 
     .some((v) => v.includes('src/runner/new.mjs')));
   assert.ok(checkRunDoorCallers({ commitUnitWork: ['src/runner/execution/run.mjs', 'src/runner/loop.mjs'] })
     .some((v) => v.includes('unexpected caller src/runner/loop.mjs')));
-  assert.ok(checkRunDoorCallers({ executeAssignment: ['src/runner/execution/run.mjs', 'src/runner/dispatch/cli.mjs'] })
-    .some((v) => v.includes('operation-choice.mjs no longer calls it')));
+  // Work runs on runUnit now: the Work driver calling a run door again is an unexpected caller.
+  assert.ok(checkRunDoorCallers({ executeAssignment: ['src/runner/execution/run.mjs', 'src/runner/dispatch/cli.mjs', 'src/runner/operation-choice.mjs'] })
+    .some((v) => v.includes('unexpected caller src/runner/operation-choice.mjs')));
 });
 
 test('executeAssignment(...) isReadOnlyMode posture: only session-engine.mjs\'s runExecutorAttempt may ever resolve it to false', () => {
