@@ -6,6 +6,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { confinedRunnerConfig } from '../runner/loop-worker-fixture.helper.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+
+// Workers run confined (bwrap) as Unit runs; the runner child inherits this
+// file-local backend registry through its environment.
+seedFileLocalBwrapRegistry();
 import { frontier } from '../../src/state/frontier.mjs';
 
 // e2e proof for base-workflow-model (D1-D4): a second, synthetic domain
@@ -38,7 +45,8 @@ const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 const RUNNER = path.resolve(__dirname, '../../bin/fgos-runner.mjs');
 
 function mkTempDir(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  // Outside /tmp: a confined worker sees a private tmpfs there.
+  return fs.realpathSync(makeFixtureDir(prefix));
 }
 
 // Pinned to "main" — same reason as runner-loop.test.mjs's own initTempRepo.
@@ -103,13 +111,16 @@ function writeRunnerConfig(repoRoot, executorScript) {
   fs.writeFileSync(
     path.join(repoRoot, '.fgos', 'config.json'),
     JSON.stringify({
-      runner: {
+      runner: confinedRunnerConfig({
+        // The fixture domains' execute step resolves to the generic `execute` capability;
+        // a Unit binds only from a pool the config names.
+        capabilities: { execute: { prefer: [{ executor: 'fgos-coding-implement' }] } },
         executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
         modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
         rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
         timeoutMs: 15000,
         parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
-      },
+      }),
     }),
   );
 }
@@ -150,8 +161,6 @@ const prompt = process.argv[2] ?? '';
 const match = prompt.match(/test -f (\\S+)/);
 const file = match ? match[1] : 'output.txt';
 fs.writeFileSync(file, 'produced by worker\\n');
-execFileSync('git', ['add', file]);
-execFileSync('git', ['commit', '-q', '-m', \`worker: \${file}\`]);
 `,
   );
   return scriptPath;
@@ -201,9 +210,11 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
   assert.equal(synth.domain, 'synthetic', 'the persisted item retains its explicit domain');
 
   assert.equal(branchExists(repoRoot, 'fgw/synth-item'), true);
-  assert.match(branchLog(repoRoot, 'fgw/synth-item'), /worker: synth-output\.txt/);
+  assert.match(branchLog(repoRoot, 'fgw/synth-item'), /chore\(work-synth-item-/);
+  assert.equal(execFileSync('git', ['show', '--format=', '--name-only', 'fgw/synth-item'], { cwd: repoRoot, encoding: 'utf8' }).trim(), 'synth-output.txt', 'the worker\'s file, committed by its Unit run');
   assert.equal(branchExists(repoRoot, 'fgw/coding-item'), true);
-  assert.match(branchLog(repoRoot, 'fgw/coding-item'), /worker: coding-output\.txt/);
+  assert.match(branchLog(repoRoot, 'fgw/coding-item'), /chore\(work-coding-item-/);
+  assert.equal(execFileSync('git', ['show', '--format=', '--name-only', 'fgw/coding-item'], { cwd: repoRoot, encoding: 'utf8' }).trim(), 'coding-output.txt', 'the worker\'s file, committed by its Unit run');
 
   // No cross-effect: each item's own verify (and only its own) rode the
   // dispatch; neither item's fields were altered by the other's presence.

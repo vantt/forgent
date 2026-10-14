@@ -166,6 +166,8 @@ test('the fanout command the fgos-fanout skill teaches runs as written: node src
   for (const key of ['fired', 'mechanismChanged', 'unavailable', 'deferred']) assert.ok(Array.isArray(result[key]), key);
   assert.deepEqual(result.fired.map((f) => [f.id, f.outcome, f.commit?.status]), [['cand1', 'pass', 'committed']]);
   assert.equal(listWork(fgosDir).work.cand1.status, 'awaiting-approval');
+});
+
 /** A repo with `executors` (completed with confined invocations) serving the implement step. */
 function setupExecutors(executors, items) {
   const { repoRoot, fgosDir } = mkRepo();

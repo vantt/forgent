@@ -6,6 +6,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { confinedRunnerConfig } from '../runner/loop-worker-fixture.helper.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+
+// Workers run confined (bwrap) as Unit runs; the runner child inherits this
+// file-local backend registry through its environment.
+seedFileLocalBwrapRegistry();
 
 // e2e regression for tsk-3xo: bin/fgos.mjs's `discover`/`decompose` CLI
 // gates and discovery.mjs/decompose.mjs's internal `moveStep` calls used to
@@ -30,7 +37,8 @@ const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 const RUNNER = path.resolve(__dirname, '../../bin/fgos-runner.mjs');
 
 function mkTempDir(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  // Outside /tmp: a confined worker sees a private tmpfs there.
+  return fs.realpathSync(makeFixtureDir(prefix));
 }
 
 function initTempRepo() {
@@ -96,13 +104,16 @@ function writeRunnerConfig(repoRoot, executorScript) {
   fs.writeFileSync(
     path.join(repoRoot, '.fgos', 'config.json'),
     JSON.stringify({
-      runner: {
+      runner: confinedRunnerConfig({
+        // The fixture domains' execute step resolves to the generic `execute` capability;
+        // a Unit binds only from a pool the config names.
+        capabilities: { execute: { prefer: [{ executor: 'fgos-coding-implement' }] } },
         executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
         modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
         rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
         timeoutMs: 15000,
         parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
-      },
+      }),
     }),
   );
 }
@@ -147,8 +158,6 @@ if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
   const match = prompt.match(/test -f (\\S+)/);
   const file = match ? match[1] : ${JSON.stringify(produce)};
   fs.writeFileSync(file, 'produced by worker\\n');
-  execFileSync('git', ['add', file]);
-  execFileSync('git', ['commit', '-q', '-m', \`worker: \${file}\`]);
 }
 `,
   );
@@ -173,8 +182,6 @@ const prompt = process.argv[2] ?? '';
 const match = prompt.match(/test -f (\\S+)/);
 const file = match ? match[1] : 'output.txt';
 fs.writeFileSync(file, 'produced by worker\\n');
-execFileSync('git', ['add', file]);
-execFileSync('git', ['commit', '-q', '-m', \`worker: \${file}\`]);
 `,
   );
   return scriptPath;
@@ -309,8 +316,6 @@ if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
   const match = prompt.match(/test -f (\\S+)/);
   const file = match ? match[1] : ${JSON.stringify(produce)};
   fs.writeFileSync(file, 'produced by worker\\n');
-  execFileSync('git', ['add', file]);
-  execFileSync('git', ['commit', '-q', '-m', 'worker: ' + file]);
   process.stdout.write('\\n' + fence + 'fgos-discovered\\n' + JSON.stringify({ title: ${JSON.stringify(discoveredTitle)} }) + '\\n' + fence + '\\n');
 }
 `,
@@ -421,12 +426,14 @@ test('runner sweep: a "triage" fixture-domain item at its own Clarify-mapped sta
   assert.equal(triage.workflowStep, 'assembling', 'the triage item crossed Clarify->Divide->Execute via its OWN domain\'s stage names in one sweep, same pass-through chaining coding gets');
   assert.equal(triage.status, 'awaiting-approval', 'the triage item was actually dispatched by the real runner, not just stage-advanced');
   assert.equal(branchExists(repoRoot, `fgw/${triageItem.id}`), true);
-  assert.match(branchLog(repoRoot, `fgw/${triageItem.id}`), /worker: triage-output\.txt/);
+  assert.match(branchLog(repoRoot, `fgw/${triageItem.id}`), new RegExp(`chore\\(work-${triageItem.id}-`));
+  assert.equal(execFileSync('git', ['show', '--format=', '--name-only', `fgw/${triageItem.id}`], { cwd: repoRoot, encoding: 'utf8' }).trim(), 'triage-output.txt', 'the worker\'s file, committed by its Unit run');
 
   // The regression proof: an ordinary coding item riding the SAME sweep
   // tick as the triage item is completely unaffected.
   assert.equal(coding.workflowStep, 'executing');
   assert.equal(coding.status, 'awaiting-approval', 'the plain coding item was dispatched in the SAME tick -- the triage item never halted the sweep');
   assert.equal(branchExists(repoRoot, `fgw/${codingItem.id}`), true);
-  assert.match(branchLog(repoRoot, `fgw/${codingItem.id}`), /worker: output\.txt/);
+  assert.match(branchLog(repoRoot, `fgw/${codingItem.id}`), new RegExp(`chore\\(work-${codingItem.id}-`));
+  assert.equal(execFileSync('git', ['show', '--format=', '--name-only', `fgw/${codingItem.id}`], { cwd: repoRoot, encoding: 'utf8' }).trim(), 'output.txt', 'the worker\'s file, committed by its Unit run');
 });

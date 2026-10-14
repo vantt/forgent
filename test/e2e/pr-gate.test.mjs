@@ -7,6 +7,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { confinedRunnerConfig } from '../runner/loop-worker-fixture.helper.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+
+// Workers run confined (bwrap) as Unit runs; the runner child inherits this
+// file-local backend registry through its environment.
+seedFileLocalBwrapRegistry();
 
 // e2e — the PR gate (pr-lifecycle D1-D5): review/approve/reject exercised
 // through the real fgos.mjs and fgos-runner.mjs binaries against a real,
@@ -37,7 +44,8 @@ const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 const RUNNER = path.resolve(__dirname, '../../bin/fgos-runner.mjs');
 
 function mkTempDir(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  // Outside /tmp: a confined worker sees a private tmpfs there.
+  return fs.realpathSync(makeFixtureDir(prefix));
 }
 
 function initTempRepo() {
@@ -155,12 +163,12 @@ function writeRunnerConfig(repoRoot, executorScript) {
   fs.writeFileSync(
     path.join(repoRoot, '.fgos', 'config.json'),
     JSON.stringify({
-      runner: {
+      runner: confinedRunnerConfig({
         executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
         modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
         rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
         timeoutMs: 15000,
-      },
+      }),
     }),
   );
 }
@@ -175,8 +183,6 @@ function writeCommittingExecutor(scriptDir, produce = 'output.txt') {
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
-execFileSync('git', ['add', ${JSON.stringify(produce)}]);
-execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`)}]);
 `,
   );
   return scriptPath;
@@ -194,8 +200,6 @@ function writeOverwritingExecutor(scriptDir, filename, content) {
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 fs.writeFileSync(${JSON.stringify(filename)}, ${JSON.stringify(content)});
-execFileSync('git', ['add', ${JSON.stringify(filename)}]);
-execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker changes ${filename}`)}]);
 `,
   );
   return scriptPath;
