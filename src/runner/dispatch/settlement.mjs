@@ -653,8 +653,13 @@ export async function settleRunOutcome({
   const settledAdapterOutcome = exitedOnDeadCredential || exitedOnQuota ? 'provider-limit' : adapterOutcome;
   // Whether the stop is a dead credential, as opposed to a quota: a caller that walks to another
   // candidate must not land on the provider whose login just failed.
-  const credentialFault = (settledAdapterOutcome === 'provider-limit' || settledAdapterOutcome === 'paused-limit')
-    && matchAuthFailureLine(stderrText) !== null;
+  // A quota sentence in the stderr tail is the provider's own last word and outranks a login
+  // wording further up, which in a streamed transcript may be the agent quoting it.
+  const quotaInTail = matchQuotaLimitLine(stderrText, { tailLines: AUTH_FAILURE_TAIL_LINES }) !== null;
+  const credentialFault = exitedOnDeadCredential
+    || ((settledAdapterOutcome === 'provider-limit' || settledAdapterOutcome === 'paused-limit')
+      && !quotaInTail
+      && matchAuthFailureLine(stderrText) !== null);
 
   let providerCapacityFault = null;
   if (providerCapacitySelection?.status === 'selected') {

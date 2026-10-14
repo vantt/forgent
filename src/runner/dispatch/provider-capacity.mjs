@@ -1194,7 +1194,11 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
   if (adapterOutcome === 'paused-limit' || adapterOutcome === 'provider-limit' || structuredAgent?.stopReason === 'paused-limit' || structuredAgent?.stopReason === 'provider-limit') {
     // A round that ended on a dead credential is not a quota hit: the account stays out until a
     // person logs in again, and the reset-window rule below must not retry it in an hour.
-    if (matchAuthFailureLine(text)) {
+    // A dead-credential line in the tail decides; further up it only decides when the tail does
+    // not end on a quota sentence (a streamed transcript may quote a login error).
+    const authInTail = matchAuthFailureLine(text, { tailLines: AUTH_FAILURE_TAIL_LINES });
+    const quotaInTail = !authInTail && matchQuotaLimitLine(text, { tailLines: AUTH_FAILURE_TAIL_LINES });
+    if (authInTail || (!quotaInTail && matchAuthFailureLine(text))) {
       return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
     }
     // The text carries the reset window when the provider named one; otherwise the
