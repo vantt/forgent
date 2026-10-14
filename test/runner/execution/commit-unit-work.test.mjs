@@ -162,6 +162,44 @@ test('j. subject: a conventional first line is kept, anything else gets chore(<u
   });
 });
 
+test('j2. subject: without a summary the first line of the objective names the change', () => {
+  const cases = [
+    [{ objective: 'Write the docs for the lane\nmore detail' }, 'chore(u1): Write the docs for the lane'],
+    [{ objective: '# Task: refresh the guide' }, 'chore(u1): Task: refresh the guide'],
+    [{ objective: 'docs(rununit): add the lane notes' }, 'docs(rununit): add the lane notes'],
+    [{ summary: 'Added the file', objective: 'Write the docs' }, 'chore(u1): Added the file'],
+    [{ objective: '' }, 'chore(u1): producer changes'],
+  ];
+  for (const [args, expected] of cases) {
+    withRepo(undefined, (dir) => {
+      write(dir, 'a.txt');
+      const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', scope: ['**'], ...args });
+      assert.equal(r.subject, expected, JSON.stringify(args));
+      assert.equal(subject(dir), expected);
+    });
+  }
+});
+
+test('j3. subject: a long line is cut at a sentence, else a word, never with a trailing or stray ellipsis', () => {
+  const sentence = 'docs(rununit): Wrote the lane guide. Created the scoped file list for every lane in the plan and checked each link twice before the release';
+  const words = `chore(u1): ${'Created the scoped file list for every lane '.repeat(4)}`;
+  const stray = 'docs(rununit): ... Created the scoped ...';
+  const unbroken = `feat: ${'y'.repeat(200)}`;
+  for (const [summary, check] of [
+    [sentence, (s) => assert.equal(s, 'docs(rununit): Wrote the lane guide')],
+    [words, (s) => { assert.ok(s.length <= 100); assert.ok(words.startsWith(s)); assert.match(s, /\w$/); assert.ok(/ /.test(words[s.length])); }],
+    [stray, (s) => assert.equal(s, 'docs(rununit): Created the scoped')],
+    [unbroken, (s) => assert.equal(s.length, 100)],
+  ]) {
+    withRepo(undefined, (dir) => {
+      write(dir, 'a.txt');
+      const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary, scope: ['**'] });
+      assert.doesNotMatch(r.subject, /\.\.\.|\u2026/, r.subject);
+      check(r.subject);
+    });
+  }
+});
+
 test('k. two thousand files commit in one go', () => withRepo(undefined, (dir) => {
   for (let i = 0; i < 2000; i += 1) write(dir, `docs/many/f-${i}.md`, `${i}\n`);
   const r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['docs'] });

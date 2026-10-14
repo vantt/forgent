@@ -661,6 +661,7 @@ export async function runUnit(options = {}) {
       repoRoot: mainRoot,
       unitId: summarySource.id,
       summary: runResult?.agentClaim?.summary,
+      objective: summarySource.objective,
       scope: writeScope,
       changedFiles: runResult?.evidence?.changedFiles ?? null,
       excludePaths,

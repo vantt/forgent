@@ -141,14 +141,40 @@ export function foreignIndexDetail(paths) {
   return `the index has staged changes this run did not make: ${paths.join(', ')}; unstage or commit them, then run again`;
 }
 
-/** First non-empty line of the agent's own summary, as a conventional subject. */
-export function subjectFrom(summary, unitId) {
-  const line = String(summary ?? '').split(/\r?\n/).map((l) => l.trim()).find(Boolean) ?? '';
-  const bounded = (text) => (text.length > SUBJECT_MAX ? `${text.slice(0, SUBJECT_MAX - 3)}...` : text);
-  if (CONVENTIONAL_SUBJECT.test(line)) return bounded(line);
+/** First non-empty line of `text`, without a leading markdown heading mark or any ellipsis. */
+function headline(text) {
+  const line = String(text ?? '').split(/\r?\n/).map((l) => l.trim().replace(/^#+\s*/, '')).find(Boolean) ?? '';
+  return line.replace(/\s*(?:\.{3,}|\u2026)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * `subject` within SUBJECT_MAX: cut at the last sentence end that fits, else at the last word
+ * boundary, else hard; never past the `type(scope): ` prefix, never ending in punctuation.
+ */
+function fitSubject(subject) {
+  if (subject.length <= SUBJECT_MAX) return subject;
+  const prefixEnd = subject.indexOf(': ') + 2;
+  const window = subject.slice(0, SUBJECT_MAX + 1);
+  let cut = -1;
+  for (const m of window.matchAll(/[.!?;](?=\s)/g)) if (m.index > prefixEnd) cut = m.index;
+  if (cut < 0) {
+    const space = window.lastIndexOf(' ');
+    cut = space > prefixEnd ? space : SUBJECT_MAX;
+  }
+  return subject.slice(0, cut).replace(/[\s.,;:!?-]+$/, '');
+}
+
+/**
+ * The runner's commit subject: the first line of the agent's own summary, or of the unit's
+ * objective when there is no summary, kept as it is when already conventional and otherwise
+ * filed under `chore(<unitId>)`.
+ */
+export function subjectFrom(summary, unitId, objective) {
+  const line = headline(summary) || headline(objective);
+  if (CONVENTIONAL_SUBJECT.test(line)) return fitSubject(line);
   const ownPrefix = `${unitId}: `;
   const text = line.startsWith(ownPrefix) ? line.slice(ownPrefix.length).trim() : line;
-  return bounded(`chore(${unitId}): ${text || 'producer changes'}`);
+  return fitSubject(`chore(${unitId}): ${text || 'producer changes'}`);
 }
 
 const sameSet = (a, b) => a.length === b.length && new Set([...a, ...b]).size === a.length;
@@ -175,6 +201,7 @@ function withPaths(ctx, args, paths) {
  * @param {string} p.repoRoot the main checkout; the trusted source of the gitdir and hooks
  * @param {string} p.unitId
  * @param {string} [p.summary]
+ * @param {string} [p.objective] the unit's objective; its first line names the commit when there is no summary
  * @param {string[]} p.scope canonical write scope; `['**']` for "everything outside .fgos"
  * @param {string[]|null} [p.changedFiles] what the run's evidence says the agent changed
  * @param {string[]} [p.excludePaths]
@@ -182,7 +209,7 @@ function withPaths(ctx, args, paths) {
  * @returns {{ status: 'committed'|'no-changes'|'failed', sha?: string, subject?: string, files?: string[],
  *   outOfScope: string[], preExistingInScope: string[], needsWrites?: string[], reason?: string, error?: string }}
  */
-export function commitUnitWork({ worktree, repoRoot, unitId, summary, scope, changedFiles = null, excludePaths = [], needsWrites }) {
+export function commitUnitWork({ worktree, repoRoot, unitId, summary, objective, scope, changedFiles = null, excludePaths = [], needsWrites }) {
   if (!Array.isArray(scope)) throw new TypeError('commitUnitWork requires a write scope (use ["**"] for the whole worktree)');
   if (!repoRoot) throw new TypeError('commitUnitWork requires repoRoot (the main checkout): the gitdir is never read from the worktree');
   const base = {
@@ -229,7 +256,7 @@ export function commitUnitWork({ worktree, repoRoot, unitId, summary, scope, cha
       });
     }
 
-    const subject = subjectFrom(summary, unitId);
+    const subject = subjectFrom(summary, unitId, objective);
     // Use the repository's own identity; only fill the gap when it has none.
     const identity = {};
     if (!hasConfigured(ctx, 'user.name')) {
