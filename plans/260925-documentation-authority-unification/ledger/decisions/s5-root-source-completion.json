@@ -15,15 +15,21 @@
       "sourceUnitDigest": "41e92c8d1b769ce801adf6bfb5596e8f86dd508c788a2ebd08e5cebd24b3bab6",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "luật-nền-platform-forgent-phase-0-compound-learning-stack",
       "rationale": "The source unit is carried to docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_2d8114529b804f49494e6d42548e1372). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "reviewNote": "deep: law heading; word diff vs source is the heading level shift plus the decisions-pointer fragment (.bee/decisions.jsonl replaced by docs/decisions/index.md and the specs history sections). The false sentence that the unit is unchanged is gone and the new rationale says it differs only in the A37 fragments and title or level, which the diff confirms.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e21714ad09a8c40f44e5a35635b288d3b0a533f093d9c3e31c89ff84ca886526",
       "targetAncestry": [
         "Platform Foundations"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_c35726c310bf820e3cda599f084761e2",
@@ -52,16 +58,22 @@
       "sourceUnitDigest": "8fc59c5dbdac8ab4ef8e31cefed6cddbcce54e9c0f32a697f7101bed0056a06f",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "unheaded-block-12",
       "rationale": "The source unit is carried to docs/platform/platform-foundations.md#unheaded-block-12. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_2d8114529b804f49494e6d42548e1372). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "reviewNote": "deep: summary block; word diff is the three decisions-pointer ops only; the claim that full native digests are equal is removed and replaced by the qualified wording. Digests de888795 vs 8fc59c5d differ as the rationale now says.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "de888795c53722a1fceec49302307ace1e440cf43aa639e2d32fce78aad12273",
       "targetAncestry": [
         "Platform Foundations",
         "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_df118c590b5e50994ebf902fcee81dd0",
@@ -2168,15 +2180,21 @@
       "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
       "rationale": "The complete merged architecture manifest is carried byte-for-byte at docs/platform/contracts/architecture-manifest.json#file-block. It differs from this historical source: upstream removes src/runner/dispatch-log.mjs; adds kernel mappings for src/runner/dispatch/write-scope.mjs and src/util/git-paths.mjs; adds infra mappings for src/runner/execution/account-pin.mjs, src/runner/execution/partial-writes.mjs and src/workflow/units-source.mjs; and changes src/runner/fanout-batch.mjs and src/runner/work-dispatch.mjs from infra to use-case. The old source digest is retained; the current target digest is different. A22/A31 independent conservation re-review is pending with no approval carry or truth certification.",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceAnchor": "file-block",
+      "reviewNote": "deep: manifest file-block; rationale now admits the old digest c1c23046 differs from the merged 0eab58e6 and lists the changes. I diffed them: dispatch-log removed, write-scope and git-paths kernel, account-pin partial-writes units-source infra, fanout-batch and work-dispatch infra to use-case, exactly as listed (7 added, 3 removed). Root and platform manifest are byte-equal at 7e9fd4bd5.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
       "targetAncestry": [],
-      "sourcePath": "docs/architecture-manifest.json",
-      "sourceAnchor": "file-block"
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     }
   ]
 }

@@ -33,14 +33,20 @@
       "targetAnchor": "init-verb",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The source unit is carried to docs/platform/work-state/spec.md#init-verb. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_acab595482e4f9f7ae05e21a1a28f11b). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
       "authoredBy": "codex-session:30@2026-10-15",
+      "reviewNote": "deep: Init Verb heading; diff vs source is title Khoi tao to Init Verb plus the three Blocked-when fragments (refused in a linked worktree, detection scan does not block init). The false pre-correction sentences (source, target and ancestry unchanged) were replaced; digest abb64fde recomputed by hand.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "abb64fde3e8378bd816bf355972ff0e513db00b273decd9dd4c478957061e965",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_32d0beb22a64eadc4714946feef4bb4c",
@@ -49,15 +55,21 @@
       "targetAnchor": "unheaded-block-64",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The source unit is carried to docs/platform/work-state/spec.md#unheaded-block-64. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_acab595482e4f9f7ae05e21a1a28f11b). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
       "authoredBy": "codex-session:30@2026-10-15",
+      "reviewNote": "deep: init body block; word diff equals the Blocked-when fragment only (delete, replace, replace); stale sentence removed and rationale qualified. Digest 8c083fa7 recomputed by script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8c083fa704b78795877465578a80d3603ef9ef8bbf2f9000c1547daead10880f",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Init Verb"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_b7cdc84d6130cac22511eed0ed6e4e6c",
@@ -134,14 +146,20 @@
       "targetAnchor": "submit-verb",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The source unit is carried to docs/platform/work-state/spec.md#submit-verb. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_7c4295aa058b6a7fa5c6b945a0441a35, claim_7c4295aa058b6a7fa5c6b945a0441a35). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
       "authoredBy": "codex-session:30@2026-10-15",
+      "reviewNote": "deep: Submit Verb heading; diff is title plus tier to size and rigor fragments and RUL60 wording; the old unchanged-target sentence is gone. Rationale cites claim_7c4295aa twice, a harmless duplicate carried from before.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c94deabc102d0852530a7b68cef8520d4b138ebcb8bebb30ed32060c0a499ed7",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_e56acda46bfc3c474d9bb6eed3c6b2ac",
@@ -150,15 +168,21 @@
       "targetAnchor": "unheaded-block-67",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The source unit is carried to docs/platform/work-state/spec.md#unheaded-block-67. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_7c4295aa058b6a7fa5c6b945a0441a35, claim_7c4295aa058b6a7fa5c6b945a0441a35). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
       "authoredBy": "codex-session:30@2026-10-15",
+      "reviewNote": "deep: submit body block; diff is exactly the size/rigor fragment ops and RUL60 wording, no extra change; the false byte-identical claim removed. Digest dbfcaa18 unchanged because only the rationale was edited.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "dbfcaa1881570e24492daa35eb776b4fbea75fab92318188517e6b81ee2bdbd2",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Submit Verb"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_bee83aee35ec25ec87d88a57a984cf50",
@@ -167,14 +191,20 @@
       "targetAnchor": "discover-verb",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The source unit is carried to docs/platform/work-state/spec.md#discover-verb. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_02a2110f086ac00ef2d59c9d4d9afeb1, claim_02a2110f086ac00ef2d59c9d4d9afeb1). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
       "authoredBy": "codex-session:30@2026-10-15",
+      "reviewNote": "deep: Discover Verb heading; diff is title plus size, rigor, kind, risk flag fragments and the four-flag wording; pre-correction sentence replaced by the qualified one. Digest 192aa951 checks.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "192aa951764bb446127846b0d8530387ae2d7ad50e64179ad23a51ea53b8f98b",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_e3d06a1b8f2bf25a2fb2a85d80cdf7db",
@@ -183,15 +213,21 @@
       "targetAnchor": "unheaded-block-68",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The source unit is carried to docs/platform/work-state/spec.md#unheaded-block-68. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_02a2110f086ac00ef2d59c9d4d9afeb1, claim_02a2110f086ac00ef2d59c9d4d9afeb1). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
       "authoredBy": "codex-session:30@2026-10-15",
+      "reviewNote": "deep: discover body block; five flag-fragment ops only, matches the finding; stale byte-identical sentence removed. Digest bc0b6df7 checks.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bc0b6df719a361a226f5f5c04024ef0cb5a149307ffccb2cbd07d1c556d51616",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Discover Verb"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_e2682084346c72123f9bad31f345fb99",

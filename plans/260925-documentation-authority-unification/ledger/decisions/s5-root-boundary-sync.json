@@ -214,16 +214,22 @@
       "targetAnchor": "unheaded-block-91",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "reviewNote": "deep: new native Business Rules block (source distribution.md block-14 at b1e53b4fb); source and target texts are byte-identical and both digests are 8f37278a, so the missing-upstream-text finding is fixed with no extra change. Supersede with owner spec.md block-91; generic four-change rationale but accurate.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Business Rules"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_f703aeda7755ab376e6e3eee88eb82c2",
@@ -232,16 +238,22 @@
       "targetAnchor": "unheaded-block-92",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "reviewNote": "deep: new native decision-history block with the 2026-10-14 follow-up; source and target byte-identical (4f47df08), so the old-entry target is gone. Supersede to block-92 holds; pending, no approval.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Lịch sử quyết định"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_53838c4268148341ce0069394572d0eb",
@@ -250,16 +262,22 @@
       "targetAnchor": "unheaded-block-93",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "reviewNote": "deep: new native Edge Cases block with the 9-line help-selector bullet; source and target byte-identical (b712c164) and the shown 9 lines match the fourth hunk of main's diff. Finding about missing 9 lines is resolved by carrying, nothing else added.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Edge Cases Settled"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_daaf3726036adad15b2529ad43f71d44",
@@ -268,16 +286,22 @@
       "targetAnchor": "unheaded-block-85",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "reviewNote": "deep: new native Data Dictionary table block; source and target byte-identical (b2602ce1); the doctor-check registry row now names runner-generated-paths as upstream does. Fix is exactly the finding, pending, no carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_d956ba3fb9a8cce9589194e5f59d021f",
@@ -367,15 +391,21 @@
       "targetAnchor": "unheaded-block-30",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete upstream work-state source unit is already carried verbatim in the CLI I/O contract, proved by full native digest equality. Bind this real contract unit rather than the unrelated same-number spec block. A22 independent conservation re-review is pending with no approval carry.",
       "authoredBy": "codex-session:30@2026-10-15",
+      "reviewNote": "deep: Sub-verb paragraph (lane help of two-doors-one-rununit) retargeted from the unrelated spec.md block-67 to cli-io-contract.md unheaded-block-30; source and target text are identical and both digests a5128895, anchor resolves, rationale says why. Exactly the retarget asked for.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a5128895b71f07c2e1baa3ecb90cd302f016fdb4191518ef02835a768c8dc156",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_e8c37a28267ca355475a2286b90ba453",
@@ -406,23 +436,35 @@
       "targetAnchor": "unheaded-block-38",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete upstream work-state source unit is already carried verbatim in the CLI I/O contract, proved by full native digest equality. Bind this real contract unit rather than the unrelated same-number spec block. A22 independent conservation re-review is pending with no approval carry.",
       "authoredBy": "codex-session:30@2026-10-15",
+      "reviewNote": "deep: per-verb help bullets (machine form, token, headline form) retargeted from spec.md block-72 (Edit Verb) to cli-io-contract.md unheaded-block-38; texts identical, digest 9b711cb5 both sides; spec.md block-72 stays referenced by claim_ff435eb0 so nothing is orphaned. Correct fix.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9b711cb5a088ede56ad00207289f1fed2ccc05887597169bbc41eb2e55429db3",
       "targetAncestry": [
         "CLI I/O Contract",
         "9. Per-Verb Help"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_2ae81c7bed935553943d6777b81e2114",
       "sourceUnitDigest": "e4e33c148710cfb9775867b0160ed6e82d2e469d0f118ad9ba5ae33ce79c2484",
       "claimKind": "historical-context",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
-      "rationale": "This current native AGENTS.md unit is the second line of predecessor claim_5c520fcb1a68ba27e2093341834258c7 after upstream inserted a paragraph. Its full text remains verbatim and is retained at AGENTS.md#unheaded-block-24. Root instructions are outside platform authority under Q5; this own row records that retained instruction owner and completes the predecessor split accounting. No source-to-self carry proof, approval carry or instruction truth certification. Independent conservation re-review pending."
+      "rationale": "This current native AGENTS.md unit is the second line of predecessor claim_5c520fcb1a68ba27e2093341834258c7 after upstream inserted a paragraph. Its full text remains verbatim and is retained at AGENTS.md#unheaded-block-24. Root instructions are outside platform authority under Q5; this own row records that retained instruction owner and completes the predecessor split accounting. No source-to-self carry proof, approval carry or instruction truth certification. Independent conservation re-review pending.",
+      "reviewNote": "deep: new native AGENTS.md block-24 (second line of the old two-line unit); text is byte-equal to the second line of the historical source, reclassify with no target and a rationale that admits no source-to-self carry proof. Optional nit: claimKind historical-context (registry says unclassified) is an odd label for a live routing instruction, procedure would read better; no approval carried.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     }
   ],
   "registryGaps": [
@@ -434,15 +476,21 @@
       "disposition": "partial-carry",
       "targetOwner": "AGENTS.md",
       "targetAnchor": "unheaded-block-22",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "A31 upstream splits this old two-line unit by inserting a paragraph. This target carries only the first line. The second line has its own current native decision claim_2ae81c7bed935553943d6777b81e2114 at AGENTS.md#unheaded-block-24; together the two successors conserve the complete predecessor. Preserve the old opaque identity/digest; A22 pending independent conservation re-review, no approval carry.",
+      "remainder": "The second original line (the fgos dispatch decide routing-check sentence) is conserved by AGENTS.md#unheaded-block-24, native current claim claim_2ae81c7bed935553943d6777b81e2114 in ledger/decisions/s5-root-boundary-sync.json. The first line remains the existing target at unheaded-block-22; upstream inserted a separate paragraph between them.",
+      "reviewNote": "deep: old two-line unit split by an upstream inserted paragraph; now partial-carry with a substantive remainder naming line 2 as carried at AGENTS.md block-24 by claim_2ae81c7b. Line 1 equals target block-22 and line 2 equals block-24 verbatim, so together they conserve the predecessor; the A34 partial-carry residual stays visible.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
       "targetAncestry": [
         "forgent",
         "Dispatch — routing work to an executor"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:30@2026-10-15",
-      "rationale": "A31 upstream splits this old two-line unit by inserting a paragraph. This target carries only the first line. The second line has its own current native decision claim_2ae81c7bed935553943d6777b81e2114 at AGENTS.md#unheaded-block-24; together the two successors conserve the complete predecessor. Preserve the old opaque identity/digest; A22 pending independent conservation re-review, no approval carry.",
-      "remainder": "The second original line (the fgos dispatch decide routing-check sentence) is conserved by AGENTS.md#unheaded-block-24, native current claim claim_2ae81c7bed935553943d6777b81e2114 in ledger/decisions/s5-root-boundary-sync.json. The first line remains the existing target at unheaded-block-22; upstream inserted a separate paragraph between them."
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",

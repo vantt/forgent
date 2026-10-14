@@ -15,3 +15,14 @@ Root lists are shown in full: 832 before and 830 after, with exact full-tuple se
 Review-format and decision-review tests: 39/39 pass, zero fail/cancel/skip/todo, with `env -u CLAUDE_CODE_SESSION_ID`; complete output is in the machine record. No full suite or new native sync is claimed. D/E, registry and union-list native evidence is reused from 04e476784, where D is zero fatal and strict E remains explicitly red. Four native gap dispositions and the remaining Step 5 closure items are owed.
 
 No git write, workspace `.fgos/` mutation, secret read, docs/decision shard edit, gate/checker/vocabulary/extractor/baseline change, preview database write, approval, promotion or closure was performed. Native convention-generated report basenames are used in the assignment's mandated report directory; its default `plans/reports/` placement is outside this assignment scope. Preview is unavailable within the authorized writes; the prior persisted MDView failure is preserved rather than generating a new database write.
+
+
+## Accepted verdict application and closure comparison
+
+All 44 committed ok verdicts were applied at `6fbb5aed0493b2afb99552ef5bd5cefac897e551`: 30 ordinary rows through the unchanged applier and 14 separately labelled accepted accounting receipts. Notes are verbatim; no classification truth approval, alias activation or registry disposition is inferred.
+
+D has zero fatal findings. Step 5 scoped strict E: claims-partial-carry=1, identical-units-multiple-owners=3, candidate-blocks-unreferenced=830. The A34 residual, three contextual identical-unit groups and 830 candidate tuples match existing committed accounting exactly. Raw strict E remains red. The wider union retains three inherited Coordination Rings holds; its 345 identical-unit groups and 1398 candidate tuples stay explicit.
+
+39/39 relevant tests pass with `env -u CLAUDE_CODE_SESSION_ID`; preservation and protected-byte checks pass. No full native registry sync was rerun. Optional decision-text/citation nits are left owed, with exact IDs/reasons in the machine record. Source and review work is complete; Lead still runs the red-team pass, invented-claim sample, fresh-reader key/two readers, then batch report.
+
+Complete applied notes, immutable report pins, actual gate output, scope lists, tuple comparisons, residual/exception checks and reproduction helpers are in the sidecar `verdictApplication`; see [progress.md](progress.md) for the next action.

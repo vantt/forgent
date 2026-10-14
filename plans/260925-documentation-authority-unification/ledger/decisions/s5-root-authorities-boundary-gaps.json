@@ -14,15 +14,21 @@
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-85",
       "authoredBy": "codex-session:30@2026-10-15",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate. A22 binding consequence of the authorized verbatim distribution re-carry: the actual target text/digest changed by the shown upstream hunk. The real full-document line map identifies this counterpart; independent conservation re-review is pending with no prior approval carried.",
+      "reviewNote": "deep: old candidate block-85 identity (0ce5ce17); target digest moved b2602ce1 only by the shown upstream doctor-check row hunk; added sentence is an accurate binding-consequence statement. Source/target text diff is the registry rows 7 and 7b, both from main; pending, no carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_04703f011b22383992b94545055b9e56",

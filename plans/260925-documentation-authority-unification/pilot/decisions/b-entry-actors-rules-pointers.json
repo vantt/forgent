@@ -77,13 +77,19 @@
       "targetAnchor": "2-entry-points-and-triggers",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The source unit is carried to docs/platform/work-state/spec.md#2-entry-points-and-triggers. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
       "authoredBy": "codex-session:30@2026-10-15",
+      "reviewNote": "deep: heading 2. Entry Points And Triggers; diff is title, tier to size, and the cleanup TTL and noop fragments, as the finding listed. The unchanged-target sentence was replaced; digest 03a0e899 recomputed.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "03a0e8994292975079c7a2b309b047eb29e3fa5afa1dcaa5f89c47dab1b44538",
       "targetAncestry": [
         "Work State Specification"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_a5326477491a9bc30a98744da8e9bfb9",
@@ -92,14 +98,20 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The source unit is carried to docs/platform/work-state/spec.md#unheaded-block-3. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
       "authoredBy": "codex-session:30@2026-10-15",
+      "reviewNote": "deep: entry-point verb list block; diff is the five fragment ops (tier to size, per-item TTL with leafTtlDays and ttlDays, noop on unelapsed TTL); the false diff-clean sentence is removed. Digest 21e9b6c7 checks.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "21e9b6c7342fa4e8f55cbc2f791698156e82ba65eeb4cacc8f80decfa70fc58c",
       "targetAncestry": [
         "Work State Specification",
         "2. Entry Points And Triggers"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_949f208343809a8ca04870aea74402de",

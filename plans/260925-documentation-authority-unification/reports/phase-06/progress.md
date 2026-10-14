@@ -1,3 +1,42 @@
+# Accepted review applied — source and review work complete
+
+Date: 2026-10-15
+Executor: codex-session:33@2026-10-15
+Session counter: 33
+Assignment: unit-run-1792007709760-c534245f/producer/1
+Step: 5
+State: reader-runs / source and review work complete; independent closure passes pending
+Input HEAD / immutable Lead report pin: 6fbb5aed0493b2afb99552ef5bd5cefac897e551
+Last green native source proof: 04e476784ed528970ae33b13dbd220bff9948a5a
+Last passing D in this turn: 6fbb5aed0493b2afb99552ef5bd5cefac897e551 (persisted registry unchanged; working decision-shard overlay)
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Current-turn commit: none; the runner commits the declared files.
+
+Resume: this journal was read first, then the phase resume protocol and the complete committed Lead report, including Notes. Initial tree clean, HEAD descends from the last green native source proof. The assignment replaces ordinary git-write/main-sync/full-native-sync actions: file edits only inside this plan; scratch only under `/tmp/fgos-work/verdict-close/`; no docs bytes, workspace .fgos mutation, secret read or protected checker/gate/vocabulary/extractor/baseline edit.
+
+Applied all 44 ok verdicts from [review-261015-0236-bounded-corrections.md](review-261015-0236-bounded-corrections.md) at the full immutable pin above. The unchanged ordinary `applyReviewVerdicts` API applied 30 ordinary claim/registry-gap rows to seven actual decision shards. The other 14 entries are accepted accounting receipts through the same API: three classification accounting, one draft-alias proposal, four changed native headings, four native gap/current-body conservation proposals, one root reverse-list delta and one 21-file user-knowledge check. Every note is verbatim and every receipt/approval binds the exact report commit; zero rework or hold in this report. Actual classification rows remain pending/candidate-unverified; changed-text historical truth receipts remain history. Accounting display IDs are never platform claim approvals. Alias 0114 stays a draft; the receipt distinguishes the printed historical aadcac78 from its real current 8bbf5f90 binding, with no activation. Native gap proposal acceptance is recorded separately from any registry disposition; all opaque old/current IDs and registry bytes remain unchanged.
+
+Optional Notes clean-ups: no reviewed decision text was changed. Owed optional nits are the section-specific distribution rationale wording, duplicate claim-ID citations in six A37 sentences, the claim_2ae81c7b citation (the actual related rework is claim_5c520fcb), and any semantic claimKind change to procedure. The immutable alias pack header is retained with the correct binding distinction in its receipt. These are non-blocking observations, not reopened source work or required re-review. Exact six duplicate-bearing IDs are recorded in `verdictApplication.cleanups`; no new review request is needed for this assignment.
+
+D/E were rerun from the existing persisted registry. Only the native inventory was generated read-only at HEAD; there was no carry-forward, registry refresh/persistence or full native registry sync. Full active claim-ID/path/anchor/digest tuple equality with the persisted registry passes, and both previous registries are supplied together to each D/E invocation; no known ID is lost. Registry remains 59808373 bytes, SHA256 ed56c7750b36ee68ececea9399d6852f6ca07c41aa903d908102fb4666d8bce8.
+
+D: zero fatal findings. Scoped Step 5 strict E (root-authority sources plus Packaging/Distribution sources): claims-partial-carry=1, identical-units-multiple-owners=3, candidate-blocks-unreferenced=830. Those are exactly the closure-allowed categories; no source not-reviewed, unknown-blocking, application, identity or T9 finding in this scope. The single partial carry is the existing Packaging A34 accepted residual claim_dc75ad7e, with source/target digests and committed residual SHA256 reverified. Three contextual identical-owner groups have the same exact source/owner membership as the existing union accounting (two Packaging exception groups plus the cross-area structural heading group). All candidate tuples equal the deduplicated root/Packaging committed lists. Raw strict E remains red by design; this is an allowed-open-data comparison, not cutover approval.
+
+Additional inherited full union strict E: claims-partial-carry=1, claims-not-reviewed=3, identical-units-multiple-owners=345, candidate-blocks-unreferenced=1398. Its three not-reviewed rows are exactly the unchanged Coordination Rings owner-intent holds in the already tracked Agent Coordination scope, outside Step 5. They are not cleared or hidden. Individual candidate list equality: root 830, agent 568, Packaging 694; root/Packaging deduplicated 830; full union 1398. Full native tuple lists, original strict outputs, scopes and exact exception/partial membership checks are recorded in [verification-261015-0236-bounded-corrections.md.json](verification-261015-0236-bounded-corrections.md.json), `verdictApplication.postApplicationProof`.
+
+Validation: review-format/decision-review tests 39/39 pass, zero fail/cancel/skip/todo, with `env -u CLAUDE_CODE_SESSION_ID`. Ratchet clean: 995 legacy files, 26 accounted edits and one accounted addition. Placement: 529 files, 528 matched, one recorded exception, zero gaps. Candidate-status findings zero; extractor, authority statuses, reader links and protected files unchanged. First-parent allowlist observations match the last green proof (seven pre-existing preparation paths, zero new violations); no gate or baseline is changed to conceal them. No full-suite or current-truth certification is claimed. Reproduction helpers and logs are included in the machine verification.
+
+Step 5 source and review work is complete. Remaining required closure work, run by Lead:
+
+1. Independent red-team/hostile pass; zero open Critical/High after fixes or owner acceptance.
+2. Independent seeded 50-block invented-claim sample: 20 unreferenced, 20 rewritten-rationale, 10 random.
+3. Commit the fresh-reader key, then two independent readers with three scenarios each; six DoD answers, at least 5/6 correct, zero nonexistent anchors, zero legacy-authority answers, at most eight files per run, with actual anchor/isolation evidence.
+4. Final Step 5 batch report, consolidating existing consumer-edge/cutover/draft-alias accounting, counts, holds, defects, review/rework effort and proof links.
+
+No active bounded review request or new external blocker remains for this assignment. A35/A37 known-stale carrier caveats and full truth check at promotion stay owed; A37 requires no further Step 5 truth draw. Existing owner queue, holds, A34 cutover obligations, alias activation and global native-gap obligations are preserved; they do not imply Step 5 source rework. No batch closure, Step 6, promotion, push or main merge is claimed. Markdown preview is not generated: no MDView MCP is available and the CLI would write an out-of-scope database.
+
+---
 # Bounded corrections pack ready — independent review next
 
 Date: 2026-10-15

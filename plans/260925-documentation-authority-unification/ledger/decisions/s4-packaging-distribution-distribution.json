@@ -150,15 +150,21 @@
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "reviewNote": "deep: distribution Data Dictionary heading; source and target are identical apart from heading depth (diff checked). The one upstream change in this section, the doctor-check registry entry with runner-generated-paths, is now in spec.md at line 531; target digest e8d05524 recomputes by script and by hand. Rationale is the shared four-change paragraph, wider than this section but not false.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e8d05524cc8e6a78761cdc9da1fe7e6fe6fd2ad2726e398f3b6af1780f719487",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",
@@ -470,15 +476,21 @@
       "targetAnchor": "business-rules",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "reviewNote": "deep: Business Rules heading; source equals target modulo heading depth. The three upstream lines (pin records the tag for init and upgrade, mandatory verification for upgrade, upgrade resolution order FGCTL_FROM then FGCTL_VERSION then latest, stage still takes only a path) are now verbatim in spec.md; old line 689 wording is gone. Digest 20742a59 recomputed.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "20742a59e4e674df21d7d96d98e3a18aadf88e4d17d678c1880078520370b0ac",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_8930ab9733374cfbb11470da79f610cf",
@@ -532,18 +544,24 @@
       "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
       "sourceUnitDigest": "7d3b22dcbeba036ee788b91dd1409d06f722321a5b10851c97cd677654203743",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh",
+      "targetAnchor": "lịch-sử-quyết-định",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "reviewNote": "deep: Lich su quyet dinh heading; the 2026-10-14 upgrade follow-up appended to the dated entry is now present verbatim, section equal to source modulo heading depth; digest 75835bc0 recomputed by script, anchor resolves.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "75835bc044b19fbcddfbe17788fe06579ba39bf2c99d1b381aa810e6390a9726",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_797fb0be5db3c260c97745cd0894bec8",
@@ -552,15 +570,21 @@
       "targetAnchor": "edge-cases-settled",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "reviewNote": "deep: Edge Cases Settled heading; the 9-line help-selector bullet (HELP_SELECTORS, --help and -h routes, Rust-native verbs sent to the payload, fgos version lists verbs only) is now verbatim in spec.md lines 746-754; section otherwise identical to source modulo depth. Digest 70b3e24c recomputed.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "70b3e24c7665deb086b89512653742923101d6225f10fe0b71857316abd91708",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_18420261f445f01acf39c262a9ce170c",
@@ -747,18 +771,24 @@
       "targetAnchor": "unheaded-block-85",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "The historical source unit is superseded by its complete current retained distribution counterpart. The target now includes only the authorized upstream doctor-check, download pin/verification, dated upgrade follow-up or help-selector additions shown in the exact source-to-current diff. Its native digest differs from the historical source while heading ancestry is retained. A23 requires supersede because claim-bearing words changed; A22 requires pending independent conservation re-review with no approval carry or truth certification.",
       "sourcePath": "docs/specs/distribution.md",
       "sourceAnchor": "unheaded-block-5",
+      "reviewNote": "deep: old Data Dictionary table gap row reopened because its target block-85 changed; target now differs from the historical source in exactly one table row (doctor check 7), the upstream hunk. Supersede with named owner and anchor, pending, no approval carried; rationale is accurate.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_bdeaa6f1cce78532047ba6bf959cc43a",
@@ -767,18 +797,24 @@
       "targetAnchor": "unheaded-block-91",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "The historical source unit is superseded by its complete current retained distribution counterpart. The target now includes only the authorized upstream doctor-check, download pin/verification, dated upgrade follow-up or help-selector additions shown in the exact source-to-current diff. Its native digest differs from the historical source while heading ancestry is retained. A23 requires supersede because claim-bearing words changed; A22 requires pending independent conservation re-review with no approval carry or truth certification.",
       "sourcePath": "docs/specs/distribution.md",
       "sourceAnchor": "unheaded-block-14",
+      "reviewNote": "deep: old Business Rules block-14 gap row; source to target diff is exactly the three upstream bullet lines (pin tag, mandatory verification, git-repo and upgrade resolution wording). Supersede at unheaded-block-91 is truthful and the rationale states the digest differs.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Business Rules"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_45e83e644c43384e188c16e20172a52c",
@@ -787,18 +823,24 @@
       "targetAnchor": "unheaded-block-92",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "The historical source unit is superseded by its complete current retained distribution counterpart. The target now includes only the authorized upstream doctor-check, download pin/verification, dated upgrade follow-up or help-selector additions shown in the exact source-to-current diff. Its native digest differs from the historical source while heading ancestry is retained. A23 requires supersede because claim-bearing words changed; A22 requires pending independent conservation re-review with no approval carry or truth certification.",
       "sourcePath": "docs/specs/distribution.md",
       "sourceAnchor": "unheaded-block-15",
+      "reviewNote": "deep: old decision-history block-15 gap row; the diff is only the appended 2026-10-14 upgrade follow-up inside the dated entry. Supersede to unheaded-block-92, pending, nothing else changed.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
-        "L\u1ecbch s\u1eed quy\u1ebft \u0111\u1ecbnh"
-      ]
+        "Lịch sử quyết định"
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
       "claimId": "claim_8d6b06dae659395981e196d4f7d33c15",
@@ -807,18 +849,24 @@
       "targetAnchor": "unheaded-block-93",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:30@2026-10-15",
       "rationale": "The historical source unit is superseded by its complete current retained distribution counterpart. The target now includes only the authorized upstream doctor-check, download pin/verification, dated upgrade follow-up or help-selector additions shown in the exact source-to-current diff. Its native digest differs from the historical source while heading ancestry is retained. A23 requires supersede because claim-bearing words changed; A22 requires pending independent conservation re-review with no approval carry or truth certification.",
       "sourcePath": "docs/specs/distribution.md",
       "sourceAnchor": "unheaded-block-16",
+      "reviewNote": "deep: old Edge Cases block-16 gap row; target gained only the 9-line help-selector bullet (+9 added, 0 removed, 0 modified), nothing else. Supersede to unheaded-block-93 is correct; no approval carried.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Edge Cases Settled"
-      ]
+      ],
+      "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     }
   ]
 }
