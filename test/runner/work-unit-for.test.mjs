@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { workUnitFor } from '../../src/runner/work-dispatch.mjs';
+import { workUnitFor, workRigorFor } from '../../src/runner/work-dispatch.mjs';
 import { buildPrompt } from '../../src/runner/work-compat.mjs';
 import { validateUnit } from '../../src/runner/execution/unit.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
@@ -154,4 +154,63 @@ test('prefer names the step executor only when it is configured', () => {
     worktree: '/wt',
   });
   assert.deepEqual(direct.unitData.prefer, ['fgos-coding-implement']);
+});
+
+test('work refs that name another run or a gate answer are skipped, never read as inputs', () => {
+  const { unitData, warnings } = workUnitFor(
+    item({ refs: ['unit-run:abc', 'gate-answer:run1/step1', 'unit-run:u1/producer', 'ok.md'] }),
+    { cfg: {}, worktree: '/wt' },
+  );
+  assert.deepEqual(unitData.inputs, ['ok.md']);
+  assert.equal(warnings.length, 3);
+  validateUnit(unitData);
+});
+
+test('an unsafe docsRef is treated as absent: nothing outside the repo is pinned or chosen as worktree', () => {
+  const stateRoot = tmpRoot();
+  const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-unit-for-outside-'));
+  fs.writeFileSync(path.join(outside, 'plan.md'), '# foreign\n');
+  const docsRef = path.relative(stateRoot, outside);
+  const { unitData, pinInputs, worktree, warnings } = workUnitFor(item({ docsRef }), {
+    cfg: {}, stateRoot, stage: 'planning', operation: 'validate-plan',
+  });
+  assert.deepEqual(unitData.inputs, []);
+  assert.deepEqual(pinInputs, []);
+  assert.equal(worktree, stateRoot);
+  assert.ok(warnings.some((w) => w.includes('docsRef')));
+});
+
+test('a docsRef without refs gives exactly the folder, its plan and its context', () => {
+  const { unitData } = workUnitFor(item({ docsRef: 'docs/history/x' }), { cfg: {}, worktree: '/wt' });
+  assert.deepEqual(unitData.inputs, ['docs/history/x', 'docs/history/x/plan.md', 'docs/history/x/CONTEXT.md']);
+});
+
+test('rigor: risk heavy raises an operation above its own rigor', () => {
+  const { unitData } = workUnitFor(item({ risk: 'heavy' }), { cfg: {}, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan' });
+  assert.equal(unitData.rigor, 'high');
+});
+
+test('rigor: an invalid operation rigor is refused', () => {
+  assert.throws(() => workRigorFor(item(), { rigor: 'extreme' }), RunnerConfigError);
+});
+
+test('an operation Unit takes the operation capability, and a work-product operation falls back to the step capability', () => {
+  const review = workUnitFor(item(), { cfg: { capabilities: { 'coding:review': {} } }, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan' });
+  assert.equal(review.unitData.capability, 'coding:review');
+  const step = workUnitFor(item(), { cfg: {}, worktree: '/wt', stage: 'executing' });
+  const product = workUnitFor(item(), { cfg: {}, stateRoot: tmpRoot(), stage: 'executing', operation: 'implement-item', worktree: '/wt' });
+  assert.equal(product.unitData.capability, step.unitData.capability);
+});
+
+test('an operation Unit without stateRoot is refused', () => {
+  assert.throws(() => workUnitFor(item(), { cfg: {}, stage: 'planning', operation: 'validate-plan' }), RunnerConfigError);
+});
+
+test('empty feedback adds no feedback section to an operation Unit', () => {
+  const { unitData } = workUnitFor(item(), { cfg: {}, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan', feedback: { answer: ' ', reason: '' } });
+  assert.equal(unitData.objective, 'Execute planning.validate-plan operation');
+});
+
+test('an item without an id is refused', () => {
+  assert.throws(() => workUnitFor(item({ id: undefined }), { cfg: {}, worktree: '/wt' }), RunnerConfigError);
 });

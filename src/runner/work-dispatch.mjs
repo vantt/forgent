@@ -353,8 +353,11 @@ function feedbackLines(feedback) {
   return lines.length ? `\n\n# Human feedback\n${lines.join('\n\n')}` : '';
 }
 
+// A Work ref names a file in the repo. `unit-run:`/`gate-answer:` are Unit input forms
+// that read another run's output; an item's editable refs never get to name one.
 function isSafeRepoRelative(ref) {
   return typeof ref === 'string' && ref.trim() !== '' && !ref.startsWith('/')
+    && !ref.startsWith('unit-run:') && !ref.startsWith('gate-answer:')
     && !ref.includes('\\') && !ref.includes('\0') && !ref.split('/').includes('..');
 }
 
@@ -380,6 +383,9 @@ function isSafeRepoRelative(ref) {
  */
 export function workUnitFor(item, opts = {}) {
   const { cfg = {}, stateRoot, operation, feedback, expectedFiles } = opts;
+  if (typeof item?.id !== 'string' || !item.id.trim()) {
+    throw new RunnerConfigError('workUnitFor: the work item needs an id.');
+  }
   const warnings = [];
   const domain = resolveDomainName(item?.domain);
   const domainObj = getDomain(item?.domain, { onUnrecognized: () => {} });
@@ -420,7 +426,13 @@ export function workUnitFor(item, opts = {}) {
     }
     if (!inputs.includes(ref)) inputs.push(ref);
   };
-  const docsRef = typeof item?.docsRef === 'string' && item.docsRef.trim() ? item.docsRef : null;
+  // An unsafe docsRef is treated as absent: it would otherwise pick the pinned plan and
+  // the default worktree outside the repo.
+  let docsRef = typeof item?.docsRef === 'string' && item.docsRef.trim() ? item.docsRef : null;
+  if (docsRef && !isSafeRepoRelative(docsRef)) {
+    warnings.push(`work-docsRef-skipped: ${JSON.stringify(docsRef)} is not a repo-relative path`);
+    docsRef = null;
+  }
   if (docsRef) {
     addInput(docsRef);
     addInput(path.posix.join(docsRef, 'plan.md'));
