@@ -2700,10 +2700,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
       }
       // `--effort <level>` is a reasoningEffort override for bind(): added to every override that
-      // does not name one, or as the only override. bind() checks it against the chosen executor.
+      // does not name one, and as a trailing unscoped override when none is unscoped, so a role a
+      // scoped override does not name still gets it. bind() checks it against the chosen executor.
       if (flags.effort !== undefined) {
         const effort = requireField(flags.effort, '--effort requires a level (low, medium, high, max)');
-        if (overrides.length === 0) overrides.push({ origin: 'human-cli' });
+        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({ origin: 'human-cli' });
         for (const ov of overrides) {
           if (ov.reasoningEffort === undefined) ov.reasoningEffort = effort;
         }

@@ -334,3 +334,37 @@ test('fgos run --effort reaches bind() as an override, and a level the executor 
   assert.equal(data.outcome, 'policy-refusal');
   assert.deepEqual(data.results[0].refused, { reason: 'reasoning-effort', detail: 'executor "claude" supports reasoningEffort [low, medium, high], not "max"' });
 });
+
+test('fgos run --effort still reaches a role that a scoped --override does not name', () => {
+  const repo = makeFixtureDir('fgos-cli-effort-scoped-');
+  for (const args of [['init', '-q', '-b', 'main'], ['config', 'user.email', 't@e.com'], ['config', 'user.name', 'T']]) execFileSync('git', args, { cwd: repo });
+  fs.writeFileSync(path.join(repo, 'README.md'), '# t\n');
+  fs.writeFileSync(path.join(repo, '.gitignore'), '.fgos/\n');
+  execFileSync('git', ['add', '.'], { cwd: repo });
+  execFileSync('git', ['commit', '-q', '-m', 'initial'], { cwd: repo });
+  // No real CLI is ever launched: the effort check refuses before spawn, and the
+  // command does not exist if it were reached.
+  const runner = {
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    executors: { claude: { kind: 'agent', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'fgos-test-no-such-cli', args: ['-p', '{prompt}'] }] } },
+    capabilities: { 'docs:write': { prefer: [{ executor: 'claude' }], rigor: 'standard' } },
+  };
+  fs.mkdirSync(path.join(repo, '.fgos'));
+  fs.writeFileSync(path.join(repo, '.fgos', 'config.json'), JSON.stringify({ runner }));
+  const wt = makeFixtureDir('fgos-cli-effort-scoped-wt-');
+  fs.rmSync(wt, { recursive: true, force: true });
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: repo });
+  const unitFile = path.join(wt, 'unit.json');
+  fs.writeFileSync(unitFile, JSON.stringify({ id: 'u', objective: 'x', capability: 'docs:write', writes: ['README.md'] }));
+  const override = JSON.stringify({ scope: { role: 'reviewer' }, executor: 'claude' });
+  let out;
+  try {
+    out = execFileSync(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repo, '--override', override, '--effort', 'max', '--json'], { cwd: wt, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  } catch (err) {
+    out = err.stdout;
+  }
+  const { data } = JSON.parse(out);
+  assert.equal(data.outcome, 'policy-refusal');
+  assert.deepEqual(data.results[0].refused, { reason: 'reasoning-effort', detail: 'executor "claude" supports reasoningEffort [low, medium, high], not "max"' });
+});
