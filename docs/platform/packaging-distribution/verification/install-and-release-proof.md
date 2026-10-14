@@ -26,7 +26,7 @@ This document points to evidence. It is not the design authority.
 | Release tree build | `scripts/build-rust-distribution.mjs`, `test/rust-host/release-tree.test.mjs` |
 | Repository/runtime layout boundaries | `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md`, `packages/distribution/rust/src/init.rs`, `src/setup/bin-discovery.mjs`, worker/worktree tests before promotion |
 | `fgctl stage` and release store verification | `test/rust-host/fgctl-stage.test.mjs`, `packages/distribution/rust/src/store.rs`, `packages/distribution/rust/src/verify.rs` |
-| `fgctl init` and activation | `test/rust-host/fgctl-init.test.mjs`, `packages/distribution/rust/src/init.rs`, `packages/distribution/rust/src/workspace.rs` |
+| `fgctl init` and activation | `test/rust-host/fgctl-init*.test.mjs` (shared fixture `test/rust-host/fgctl-init-fixture.mjs`), `packages/distribution/rust/src/init.rs`, `packages/distribution/rust/src/workspace.rs` |
 | Workspace local `fgos` enters Rust host | `test/rust-host/fgctl-init.test.mjs` asserts `.fgos/installation/bin/fgos version --runtime-json` reports `host: "rust"` and the activated `artifactDigest`; `scripts/ci-external-consumer.sh` repeats the same assertion against installed release assets |
 | `fgctl upgrade` and repair path | `test/rust-host/fgctl-upgrade.test.mjs`, `apps/fgctl/src/main.rs` |
 | External consumer flow | `scripts/ci-external-consumer.sh`, `.github/workflows/ci.yml`, `.github/workflows/release.yml` |
@@ -45,7 +45,7 @@ Use targeted commands when editing docs only:
 ```bash
 npm test -- test/rust-host/release-tree.test.mjs
 npm test -- test/rust-host/fgctl-stage.test.mjs
-npm test -- test/rust-host/fgctl-init.test.mjs
+npm test -- test/rust-host/fgctl-init.test.mjs test/rust-host/fgctl-init-activation.test.mjs test/rust-host/fgctl-init-preflight-tail.test.mjs test/rust-host/fgctl-init-download.test.mjs test/rust-host/fgctl-init-download-sources.test.mjs
 npm test -- test/rust-host/fgctl-upgrade.test.mjs
 npm test -- test/install/install-sh.test.mjs
 npm test -- test/install-packaging.test.mjs
