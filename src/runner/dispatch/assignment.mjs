@@ -234,7 +234,7 @@ export function claimAssignmentId(buildCandidate, assignmentsDir) {
 const INLINE_ASSIGNMENT_PARAM_WHITELIST = new Set(['provenance', 'workId', 'createdBy', 'options']);
 
 export function buildAssignment(params = {}) {
-  refuseWorkItemInput(params, 'buildAssignment');
+  refuseWorkItemInput(params, 'buildAssignment()');
   if (params?.provenance?.kind === 'inline') {
     const conflicting = Object.keys(params).filter((key) => !INLINE_ASSIGNMENT_PARAM_WHITELIST.has(key));
     if (conflicting.length > 0) {

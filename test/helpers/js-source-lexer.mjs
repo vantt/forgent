@@ -8,6 +8,20 @@ const REGEX_AFTER_WORD = new Set(['return', 'typeof', 'case', 'in', 'of', 'new',
 // starts a regular expression (`if (x) /re/.test(y)`), unlike after a call's or group's paren.
 const CONTROL_BEFORE_PAREN = new Set(['if', 'while', 'for', 'with']);
 
+// Words after which a brace opens a block even though a slash after them would open a regex.
+const BLOCK_AFTER_WORD = new Set(['else', 'do']);
+
+/** Whether a `{` at `index`, after the token `last`, opens a block rather than an object literal. */
+function opensBlock(last, source, index) {
+  if (!last || last.header) return true;
+  if (last.kind === 'word') return BLOCK_AFTER_WORD.has(last.text);
+  if (last.kind === 'punct') {
+    if (last.text === '>' && source.slice(0, index).trimEnd().endsWith('=>')) return true; // arrow body
+    return ')};'.includes(last.text);
+  }
+  return true; // a name: `class A {`, `extends B {`, `try {`, `finally {`
+}
+
 /**
  * Two same-length views of a source file. `code` has comments blanked
  * (newlines kept) and everything else intact. `shape` also blanks the inside
@@ -22,6 +36,7 @@ export function lexSource(source) {
   const templateResume = [];
   let braces = 0;
   const parenIsHeader = []; // one entry per open paren: whether it opened a control statement's head
+  const braceIsBlock = []; // one entry per open brace (not a template's): whether it opened a block
   let last = null; // previous significant token: { kind: 'punct'|'word'|'value', text }
   let i = 0;
   const scanTemplate = (from) => {
@@ -97,13 +112,20 @@ export function lexSource(source) {
       while (j < n && /[\w.]/.test(source[j])) j++;
       i = j; last = { kind: 'value' }; continue;
     }
-    if (c === '{') braces++;
-    else if (c === '}') braces = Math.max(0, braces - 1);
+    if (c === '{') {
+      braces++;
+      braceIsBlock.push(opensBlock(last, source, i));
+    } else if (c === '}') {
+      braces = Math.max(0, braces - 1);
+      // After a block (an if/function/class body), a slash starts a regular expression;
+      // after an object literal it divides.
+      if (braceIsBlock.pop()) { last = { kind: 'word', text: 'return', header: true }; i++; continue; }
+    }
     if (c === '(') {
       parenIsHeader.push(last?.kind === 'control');
     } else if (c === ')') {
       // The head of an if/while/for/with is followed by a statement, so a slash there opens a regex.
-      last = parenIsHeader.pop() ? { kind: 'word', text: 'return' } : { kind: 'punct', text: c };
+      last = parenIsHeader.pop() ? { kind: 'word', text: 'return', header: true } : { kind: 'punct', text: c };
       i++; continue;
     }
     if (!/\s/.test(c)) last = { kind: 'punct', text: c };

@@ -42,11 +42,15 @@ export { RIGOR_VALUES, RIGOR_RANK };
 // Option names that once carried a Work item (or the pieces dispatch used to read off one)
 // into dispatch. Dispatch takes generic inputs only, so a caller still passing one is refused
 // instead of having it silently ignored.
-const WORK_ITEM_INPUT_KEYS = Object.freeze(['work', 'workItem', 'workExecutorId']);
+export const WORK_ITEM_KEYS = Object.freeze(['work', 'workItem']);
+const WORK_ITEM_INPUT_KEYS = Object.freeze([...WORK_ITEM_KEYS, 'workExecutorId']);
 
-/** Throws when `params` still carries a Work item input; `where` names the entry point. */
-export function refuseWorkItemInput(params, where) {
-  const found = params && typeof params === 'object' ? WORK_ITEM_INPUT_KEYS.filter((key) => Object.hasOwn(params, key)) : [];
+/**
+ * Throws when `params` still carries a Work item input; `where` names the entry point. `keys`
+ * narrows the check (a `--work` hint legitimately carries `workExecutorId`).
+ */
+export function refuseWorkItemInput(params, where, keys = WORK_ITEM_INPUT_KEYS) {
+  const found = params && typeof params === 'object' ? keys.filter((key) => Object.hasOwn(params, key)) : [];
   if (found.length) {
     throw new RunnerConfigError(
       `${where} takes no Work item (${found.join(', ')}): pass its demand as generic inputs (assignment rigor/domain, a work hint, capability hints, agent type)`,
@@ -219,7 +223,7 @@ export function resolveAssignmentDispatchPolicy({
   // this rename) since reassigning the one binding here covers all of them
   // without a large, error-prone rename sweep across this whole function.
   if (policyInputs !== undefined) cliOverride = policyInputs;
-  refuseWorkItemInput(arguments[0], 'resolveAssignmentDispatchPolicy');
+  refuseWorkItemInput(arguments[0], 'resolveAssignmentDispatchPolicy()');
   if (!assignment || typeof assignment !== 'object') {
     throw new RunnerConfigError('resolveAssignmentDispatchPolicy requires an assignment object');
   }

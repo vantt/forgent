@@ -32,6 +32,7 @@ import {
 } from '../../src/runner/dispatch.mjs';
 import { buildPrompt, executorIdForWork } from '../../src/runner/work-compat.mjs';
 import { spawnWorker, resolveAgentTypeForWork, resolveWorkForDispatch, workDispatchHint } from '../../src/runner/work-dispatch.mjs';
+import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
 import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
@@ -4624,12 +4625,16 @@ test('decide --work keeps the item rigor: a risk-heavy item plans at rigor high,
   assert.equal(compileDispatchPlan(cfg, { workId: critical.id, workHint: workDispatchHint(critical) }).policy.rigor, 'critical');
 });
 
-test('decide --work: a resolver that still returns the old { workItem, executorId } shape is refused, not sent to a default executor', async () => {
+test('decide --work: a resolver that still returns the old { workItem, executorId } shape, or no executor identity, is refused, not sent to a default executor', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' } }, timeoutMs: 5000 });
   const oldShape = () => ({ workItem: { id: 'tsk-old' }, executorId: 'fgos-coding-implement' });
   await assert.rejects(
     () => decideExecutorCli(undefined, { repoRoot: root, resolveWork: oldShape, workId: 'tsk-old', hasLiveTaskAccess: true }),
+    /the --work resolver result takes no Work item \(workItem\)/,
+  );
+  await assert.rejects(
+    () => decideExecutorCli(undefined, { repoRoot: root, resolveWork: () => ({ agentType: null }), workId: 'tsk-old', hasLiveTaskAccess: true }),
     /without the executor identity/,
   );
 });
@@ -4647,9 +4652,10 @@ test('decide --work: an item with a malformed legacy rigor still resolves its ex
 });
 
 test('dispatch doors refuse a Work item instead of ignoring it', async () => {
-  assert.throws(() => compileDispatchPlan({}, { work: 'tsk-x', workItem: { id: 'tsk-x' } }), /compileDispatchPlan takes no Work item/);
-  await assert.rejects(() => decideExecutorCli(undefined, { repoRoot: mkTempDir(), work: 'tsk-x' }), /decideExecutorCli takes no Work item \(work\)/);
-  await assert.rejects(() => executeExecutorCli('agy', { work: { id: 'tsk-x' } }), /executeExecutorCli takes no Work item/);
+  assert.throws(() => compileDispatchPlan({}, { work: 'tsk-x', workItem: { id: 'tsk-x' } }), /compileDispatchPlan\(\) takes no Work item/);
+  await assert.rejects(() => decideExecutorCli(undefined, { repoRoot: mkTempDir(), work: 'tsk-x' }), /decideExecutorCli\(\) takes no Work item \(work\)/);
+  await assert.rejects(() => executeExecutorCli('agy', { work: { id: 'tsk-x' } }), /executeExecutorCli\(\) takes no Work item/);
+  await assert.rejects(() => executeAssignment({ assignmentId: 'a' }, { work: { id: 'tsk-x' } }), /executeAssignment\(\) takes no Work item/);
 });
 
 test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-coding-implement.prefer -- the real tsk-34n/D3 migration shape (no literal executors.fgos-coding-implement entry, only agy declaring "for")', async () => {

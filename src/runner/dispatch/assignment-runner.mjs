@@ -1280,7 +1280,7 @@ export function digestPinnedInputs(pinInputs, mainRoot) {
 }
 
 export async function executeAssignment(assignment, opts = {}) {
-  refuseWorkItemInput(opts, 'executeAssignment');
+  refuseWorkItemInput(opts, 'executeAssignment()');
   validateAssignmentLegality(assignment, opts);
 
   const cwd = opts.cwd ?? process.cwd();

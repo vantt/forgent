@@ -24,7 +24,7 @@ import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../pa
 import { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily, resolveCapabilityDetailsFromHints } from './resolve.mjs';
-import { refuseWorkItemInput, resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
+import { WORK_ITEM_KEYS, refuseWorkItemInput, resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';
 import { executeThroughConfinement, buildConfinementAttestation } from './confinement/authority.mjs';
@@ -451,7 +451,7 @@ export async function executeExecutorCli(
     sharedCwd = false,
   } = {},
 ) {
-  refuseWorkItemInput(arguments[1], 'executeExecutorCli');
+  refuseWorkItemInput(arguments[1], 'executeExecutorCli()');
   const purpose = purposeArg;
   if (!executorIdArg && !purpose) {
     throw new RunnerConfigError(
@@ -1009,7 +1009,7 @@ export async function decideExecutorCli(
     resolveWork,
   } = {},
 ) {
-  refuseWorkItemInput(arguments[1], 'decideExecutorCli');
+  refuseWorkItemInput(arguments[1], 'decideExecutorCli()');
   if (!executorIdArg && !purpose && !workIdArg && !assignmentArg && !needsSoul) {
     throw new RunnerConfigError(
       'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
@@ -1041,6 +1041,7 @@ export async function decideExecutorCli(
     }
     // The executor identity is required (null when the Workflow declares none); a resolver
     // that leaves it out is refused by the plan instead of falling back to a default executor.
+    refuseWorkItemInput(resolved, 'the --work resolver result', WORK_ITEM_KEYS);
     workHint = resolved;
   }
 
