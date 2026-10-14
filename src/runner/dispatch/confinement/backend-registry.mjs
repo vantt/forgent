@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { bwrapDriver } from './drivers/bwrap.mjs';
-import { resolveConfinementTempRoot } from './cleanup.mjs';
+import { resolveConfinementTempRoot, canonicalRoot } from './cleanup.mjs';
 
 export class ConfinementBackendRegistryError extends Error {
   constructor(message) {
@@ -365,12 +365,12 @@ export function defaultConfinementTempRoots() {
  * kept logins only.
  */
 export function credentialScanRoots() {
-  const roots = new Set(defaultConfinementTempRoots().map((root) => path.resolve(root)));
+  const roots = new Set(defaultConfinementTempRoots().map(canonicalRoot));
   try {
     const registry = loadMachineBackendRegistry();
     for (const instance of Object.values(registry?.confinementBackends || {})) {
       for (const root of [instance?.tempRoot, instance?.privateHomeRoot]) {
-        if (typeof root === 'string' && root.trim()) roots.add(path.resolve(root));
+        if (typeof root === 'string' && root.trim()) roots.add(canonicalRoot(root));
       }
     }
   } catch { /* the default roots only */ }

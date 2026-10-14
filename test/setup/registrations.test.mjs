@@ -159,7 +159,16 @@ test('runFixes invokes every registered fix against the given cwd and reports id
     id: 'registrations-test-runfixes-throwaway',
     fix: (cwd) => ({ changed: true, message: `ran against ${cwd}` }),
   });
-  const results = runFixes('/tmp/some-cwd');
+  // Every registered fix runs for real here, and the credential one sweeps and settles under HOME: a
+  // throwaway HOME keeps it off the machine's own ~/.fgos.
+  const savedHome = process.env.HOME;
+  const throwawayHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-runfixes-home-'));
+  process.env.HOME = throwawayHome;
+  let results;
+  try { results = runFixes('/tmp/some-cwd'); } finally {
+    if (savedHome === undefined) delete process.env.HOME; else process.env.HOME = savedHome;
+    fs.rmSync(throwawayHome, { recursive: true, force: true });
+  }
   assert.equal(results.length, before + 1);
   const entry = results.find((r) => r.id === 'registrations-test-runfixes-throwaway');
   assert.deepEqual(entry, { id: 'registrations-test-runfixes-throwaway', changed: true, message: 'ran against /tmp/some-cwd' });

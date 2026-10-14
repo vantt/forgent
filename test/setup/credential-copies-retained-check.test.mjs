@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -6,6 +6,13 @@ import path from 'node:path';
 
 import { checkCredentialCopiesRetained, fixCredentialCopiesRetained, checkConfinementOrphanedResourcesReaped, DOCTOR_CHECKS } from '../../src/setup/registrations.mjs';
 import { extendOwnershipMarker, writeOwnershipMarker, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+
+// Every default path of the code under test (the provider runtime directory, the global config, the backend
+// registry) is under HOME. A throwaway HOME for the whole file means a call that forgets to name its own
+// directories can only reach this one, never the real ~/.fgos.
+const FILE_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cred-doctor-file-home-'));
+process.env.HOME = FILE_HOME;
+after(() => fs.rmSync(FILE_HOME, { recursive: true, force: true }));
 
 const HOUR = 60 * 60 * 1000;
 const FAKE_TOKEN = 'FAKE-REFRESH-TOKEN-DO-NOT-PRINT';
@@ -327,7 +334,7 @@ test('the fix reads each store through the inventory: a staging the source login
   try {
     const source = path.join(w.tmp, 'source-home');
     fs.mkdirSync(source, { recursive: true });
-    const doc = (expires, refresh) => JSON.stringify({ 'x-ai': { type: 'oauth', access: 'FAKE-ACCESS', refresh, expires } });
+    const doc = (expires, refresh) => JSON.stringify({ xai: { type: 'oauth', access: 'FAKE-ACCESS', refresh, expires } });
     fs.writeFileSync(path.join(source, 'auth.json'), doc(Date.now() + 6 * HOUR, 'FAKE-REFRESH-A'));
     const accountDir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct');
     const older = addStaging(accountDir, `.tmp-${deadPid()}-older`, doc(Date.now() + HOUR, 'FAKE-REFRESH-A'));
@@ -337,8 +344,10 @@ test('the fix reads each store through the inventory: a staging the source login
     const otherDir = path.join(w.runtimeDir, 'account-locks', 'xai', 'other');
     const noSource = addStaging(otherDir, `.tmp-${deadPid()}-older`, doc(Date.now() + HOUR, 'FAKE-REFRESH-A'));
     inventory.xai.accounts.other = { credentialSource: { kind: 'home-files', home: source, files: ['other.json'] } };
+    const newer = addStaging(accountDir, `.tmp-${deadPid()}-newer`, doc(Date.now() + 12 * HOUR, 'FAKE-REFRESH-B'));
     const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, inventory });
     assert.equal(fs.existsSync(older), false, fixed.message);
+    assert.equal(fs.existsSync(newer), true, 'a staging the source cannot show to be no newer stays');
     assert.equal(fs.existsSync(noSource), true, 'a store with no source login to judge by keeps its staging');
   } finally { w.cleanup(); }
 });
@@ -484,7 +493,7 @@ test('the doctor fix leaves a stranded copy in place', () => {
   try {
     const now = Date.now();
     addPendingIn(w, 'openai', 'acct', '.', now - 3 * 24 * HOUR);
-    fixCredentialCopiesRetained({ roots: [w.tempRoot], runtimeDir: w.runtimeDir });
+    fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, inventory: { openai: { accounts: { acct: perCliAccount } } } });
     assert.equal(fs.readdirSync(path.join(storeDir(w, 'openai', 'acct'), 'pending')).length, 1);
     assert.equal(runWith(w, { openai: { accounts: { acct: perCliAccount } } }, now).passed, false);
   } finally { w.cleanup(); }
@@ -544,4 +553,88 @@ test('the registered check fails with the reason when the global config cannot b
       assert.match(result.message, /openai\/acct: 1 login copy\(ies\) kept/, 'a young copy is listed too');
     } finally { fs.rmSync(home, { recursive: true, force: true }); }
   }
+});
+
+test('the fix never sweeps a stores/constructor staging that the check calls stranded', () => {
+  const w = workspace();
+  try {
+    const dir = path.join(w.runtimeDir, 'account-locks', 'openai', 'acct', 'stores', 'constructor');
+    const staging = addStaging(dir, `.tmp-${deadPid()}-proto`, 'ONLY-COPY-BYTES');
+    const inventory = { openai: { accounts: { acct: perCliAccount } } };
+    assert.match(runWith(w, inventory).message, /that no dispatch applies/);
+    fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, inventory });
+    assert.equal(fs.existsSync(staging), true);
+  } finally { w.cleanup(); }
+});
+
+test('an interrupted staging row does not offer a source-login judgement when the inventory cannot be read', () => {
+  const w = workspace();
+  try {
+    addStaging(path.join(w.runtimeDir, 'account-locks', 'xai', 'acct'), `.tmp-${deadPid()}-x`, 'PART');
+    const result = checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot], retriedRoots: [w.tempRoot], inventoryUnreadable: 'global config unreadable (test) at /x' });
+    assert.match(result.message, /interrupted staging\(s\)/);
+    assert.match(result.message, /cannot judge one against the source login of the account until the provider inventory can be read/);
+    assert.equal(result.message.includes('shown by the source login of the account to be no newer'), false);
+  } finally { w.cleanup(); }
+});
+
+test('a registry root that is a symlink to the retried root is the same root: its homes are counted once and still count as retried', () => {
+  const w = workspace();
+  try {
+    addKeptHome(w, 'disp_linked', 1);
+    const alias = path.join(w.tmp, 'alias-of-confinement-root');
+    fs.symlinkSync(w.tempRoot, alias);
+    const result = checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot, alias], retriedRoots: [w.tempRoot] });
+    assert.equal(result.passed, true, result.message);
+    assert.equal(result.message.split('private home(s) kept after a staging failure').length - 1, 1);
+    assert.equal(result.message.includes('under a root that nothing retries by itself'), false);
+    const aliasOnly = checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [alias], retriedRoots: [w.tempRoot] });
+    assert.equal(aliasOnly.passed, true, 'reached through the link alone it is still a retried root');
+  } finally { w.cleanup(); }
+});
+
+// A home under a root no reaper retries holds a login renewed inside it: the fix writes it back before the home goes.
+function renewedHomeUnderScanOnlyRoot(w, scanOnly) {
+  const source = path.join(w.tmp, 'source-home');
+  fs.mkdirSync(source, { recursive: true });
+  const doc = (expires, refresh) => JSON.stringify({ xai: { type: 'oauth', access: 'FAKE-ACCESS', refresh, expires } });
+  fs.writeFileSync(path.join(source, 'auth.json'), doc(Date.now() + HOUR, 'FAKE-REFRESH-OLD'));
+  const dir = path.join(scanOnly, 'disp_renewed', 'home');
+  fs.mkdirSync(dir, { recursive: true });
+  writeOwnershipMarker(dir, { dispatchId: 'disp_renewed' });
+  fs.writeFileSync(path.join(dir, 'auth.json'), doc(Date.now() + 12 * HOUR, 'FAKE-REFRESH-NEW'));
+  extendOwnershipMarker(dir, {
+    credentialWriteBack: { provider: 'xai', accountId: 'acct', home: source, layout: 'pi-auth-json', runtimeDir: w.runtimeDir },
+    credentialKept: { attempts: 1, since: new Date(Date.now() - HOUR).toISOString() },
+  });
+  return { dir, source };
+}
+
+test('the fix settles a renewed home under a scan-only root by writing the newer login back before it removes the home', () => {
+  const w = workspace();
+  const scanOnly = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-scan-only-root-'));
+  try {
+    const { dir, source } = renewedHomeUnderScanOnlyRoot(w, scanOnly);
+    const result = fixCredentialCopiesRetained({ roots: [w.tempRoot, scanOnly], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, runtimeDir: w.runtimeDir });
+    assert.equal(result.changed, true, result.message);
+    assert.equal(fs.existsSync(dir), false, 'the home goes once its login is safe');
+    const written = fs.readFileSync(path.join(source, 'auth.json'), 'utf8');
+    assert.equal(written.includes('FAKE-REFRESH-NEW') || fs.readdirSync(path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'pending')).length > 0, true, 'the newer login is in the source or staged beside it');
+  } finally { fs.rmSync(scanOnly, { recursive: true, force: true }); w.cleanup(); }
+});
+
+test('the fix keeps a renewed home under a scan-only root when its login cannot be made safe', () => {
+  const w = workspace();
+  const scanOnly = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-scan-only-root-'));
+  try {
+    const { dir, source } = renewedHomeUnderScanOnlyRoot(w, scanOnly);
+    const before = fs.readFileSync(path.join(source, 'auth.json'), 'utf8');
+    // The login cannot be staged beside the account: a file stands where its pending directory would be.
+    fs.mkdirSync(path.join(w.runtimeDir, 'account-locks', 'xai', 'acct'), { recursive: true });
+    fs.writeFileSync(path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'pending'), 'not a directory');
+    const result = fixCredentialCopiesRetained({ roots: [w.tempRoot, scanOnly], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, runtimeDir: w.runtimeDir });
+    assert.equal(fs.existsSync(dir), true, `the home stays: ${result.message}`);
+    assert.equal(fs.readFileSync(path.join(source, 'auth.json'), 'utf8'), before, 'the source is untouched');
+    assert.equal(fs.readFileSync(path.join(dir, 'auth.json'), 'utf8').includes('FAKE-REFRESH-NEW'), true, 'and still holds the newer login');
+  } finally { fs.rmSync(scanOnly, { recursive: true, force: true }); w.cleanup(); }
 });

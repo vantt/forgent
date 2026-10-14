@@ -294,20 +294,28 @@ export function listKeptCredentialHomes(tempRoot) {
  * `unretriedRoots`: roots nothing retries by itself (a registered backend's own roots); a kept home there counts
  * as held. `lockHeld`: the caller already holds the account lock. Returns `{settled, held}` as counts.
  */
+/**
+ * A root as the file system sees it: the real path when it exists (a symlink to another root is the same
+ * root), the resolved path otherwise. Roots are compared by this, never by how they were spelled.
+ */
+export function canonicalRoot(root) {
+  try { return fs.realpathSync(root); } catch { return path.resolve(root); }
+}
+
 export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempRoot()], unretriedRoots = [], provider, accountId, runtimeDir, lockHeld = false, loadSqlite, now, tryLock } = {}) {
   let settled = 0;
   let held = 0;
   const seen = new Set();
-  const unretried = new Set(unretriedRoots.map((root) => path.resolve(root)));
+  const unretried = new Set(unretriedRoots.map(canonicalRoot));
   for (const root of tempRoots) {
     for (const home of listKeptCredentialHomes(root)) {
       // A root nested inside another is listed twice; a home is looked at once.
-      const dir = path.resolve(home.dir);
+      const dir = path.join(canonicalRoot(path.dirname(home.dir)), path.basename(home.dir));
       if (seen.has(dir)) continue;
       seen.add(dir);
       // A home under a root no reaper or dispatch retries is never going to count its own attempts up, so
       // it is treated as held from the start.
-      if (!home.held && !unretried.has(path.resolve(root))) continue;
+      if (!home.held && !unretried.has(canonicalRoot(root))) continue;
       if (provider !== undefined && (home.provider !== provider || home.accountId !== accountId)) continue;
       if (runtimeDir !== undefined && home.marker.credentialWriteBack?.runtimeDir !== runtimeDir) continue;
       const result = settleHeldCredentialHome(home.dir, home.marker, { lockHeld, loadSqlite, now, tryLock });
