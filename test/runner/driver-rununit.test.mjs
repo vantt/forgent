@@ -366,3 +366,31 @@ test('declared and pinInputs come back from unit.json on resume, never from the 
   assert.deepEqual(again.pinInputs, [planPath]);
   void runner;
 });
+
+test('a mutating operation whose runner commit fails never lets the driver proceed', async () => {
+  const { repo, runner } = setupRepo();
+  const id = 'tsk-drv-commit-fail';
+  const wt = makeFixtureDir('fgos-driver-rununit-hook-');
+  fs.rmSync(wt, { recursive: true, force: true });
+  git(repo, ['worktree', 'add', '-b', `fgw/${id}`, wt]);
+  // The runner takes hooks from the main checkout's gitdir: a pre-commit that refuses fails the commit.
+  const hook = path.join(repo, '.git', 'hooks', 'pre-commit');
+  fs.writeFileSync(hook, '#!/bin/sh\nexit 1\n');
+  fs.chmodSync(hook, 0o755);
+  const work = workItem(id, { workflowStep: 'executing', docsRef: undefined });
+  const outcome = await executeDriverOperationChoice(work, { operation: 'scoped-subtask', dispatch: 'assignment', stage: 'executing', expectedFiles: ['feature.txt'] }, { repoRoot: repo, cwd: wt, runnerConfig: runner });
+  assert.equal(outcome.commit?.status, 'failed');
+  assert.equal(outcome.canProceed, false);
+  assert.equal(outcome.stop, true);
+  assert.equal(outcome.reason, 'unit-commit-failed');
+});
+
+test('a pinned input in a worktree nested inside the main checkout is recorded against that worktree', () => {
+  const { repo } = setupRepo();
+  const wt = path.join(repo, '.claude', 'worktrees', 'w1');
+  git(repo, ['worktree', 'add', '-b', 'nested-wt', wt]);
+  const plan = writePlan(wt);
+  const [digest] = digestPinnedInputs([plan], repo);
+  assert.equal(digest.root, fs.realpathSync(wt));
+  assert.equal(digest.rel, `${DOCS_REF}/plan.md`);
+});

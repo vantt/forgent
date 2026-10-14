@@ -1263,7 +1263,10 @@ export function digestPinnedInputs(pinInputs, mainRoot) {
   return pinInputs.map((p) => {
     let real;
     try { real = fs.realpathSync(p); } catch { return { path: p, sha256: null, warning: 'pin-missing' }; }
-    const root = roots.find((r) => real === r || real.startsWith(`${r}${path.sep}`));
+    // The innermost root that holds it: a worktree may sit inside the main checkout.
+    const root = roots
+      .filter((r) => real === r || real.startsWith(`${r}${path.sep}`))
+      .sort((a, b) => b.length - a.length)[0];
     if (!root) return { path: p, sha256: null, warning: 'pin-outside-allowed-roots' };
     const rel = path.relative(root, real).split(path.sep).join('/');
     try {

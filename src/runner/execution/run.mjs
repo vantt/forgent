@@ -306,6 +306,7 @@ export async function runUnit(options = {}) {
   let unit;
   let unitRunId;
   let unitRecord;
+  let declaredOp = null;
   const assignmentsDir = path.join(mainRoot, '.fgos', 'assignments');
 
   if (options.resumeUnitRunId) {
@@ -350,6 +351,7 @@ export async function runUnit(options = {}) {
       runtimeDir: options.providerCapacityRuntimeDir,
       what: `cannot resume unit run "${unitRunId}"`,
     });
+    if (unitRecord.declared) declaredOp = declaredOperationOf(unitRecord.declared, unit, unitRecord.pattern);
   } else {
     if (options.declared === undefined && options.pinInputs !== undefined) {
       throw new RunnerConfigError('runUnit: pinInputs needs declared');
@@ -378,10 +380,11 @@ export async function runUnit(options = {}) {
     }
 
     unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
-    // Checked before the unit directory exists: an operation the step does not allow leaves nothing behind.
+    // Checked before the unit directory exists: an operation the step does not allow leaves nothing
+    // behind. The pattern checked is the one the run will use (see patternName below).
     if (options.declared !== undefined) {
-      const callerPatternName = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
-      declaredOperationOf(options.declared, unit, callerPatternName || unit.pattern || options.pattern || 'solo', { taskSpecRoot: mainRoot });
+      const callerPatternObject = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
+      declaredOp = declaredOperationOf(options.declared, unit, callerPatternObject || unit.pattern || options.pattern || 'solo', { taskSpecRoot: mainRoot });
     }
     const pinInputs = options.declared !== undefined ? checkedPinInputs(options.pinInputs) : [];
     const configSnapshot = snapshotRunnerConfig(mainRoot);
@@ -447,7 +450,6 @@ export async function runUnit(options = {}) {
   }
 
   const unitDir = path.join(assignmentsDir, unitRunId);
-  const declaredOp = unitRecord.declared ? declaredOperationOf(unitRecord.declared, unit, unitRecord.pattern) : null;
   if (options.resumeUnitRunId) {
     const summaryFile = path.join(unitDir, 'unit-summary.json');
     try {

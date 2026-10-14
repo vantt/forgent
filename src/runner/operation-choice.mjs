@@ -24,7 +24,7 @@ import { runUnit, snapshotRunnerConfig } from './execution/run.mjs';
 import { interpretRunResult, runOutcome } from './dispatch/run-result.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { detectTrunk } from './worktree.mjs';
-import { listAssignmentRuns } from './dispatch/assignment-layout.mjs';
+import { assignmentDir, listAssignmentRuns } from './dispatch/assignment-layout.mjs';
 
 // Non-enumerable stamp the cross-pass scan attaches to a consumed runResult:
 // the dispatched member dir the result was physically read from. Evidence
@@ -2317,8 +2317,11 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
       // Where the caller already runs this step: the item worktree, or where its plan lives.
       ...(opts.cwd ? { worktree: opts.cwd } : {}),
     });
+    // A caller ref joins the Unit inputs only as a plain repo-relative name; anything else is
+    // dropped here rather than failing the whole step in validateUnit.
     const callerRefs = (Array.isArray(choice.contextRefs) ? choice.contextRefs : [])
-      .filter((ref) => typeof ref === 'string' && ref.trim() && !ref.startsWith('/') && !ref.split('/').includes('..'));
+      .filter((ref) => typeof ref === 'string' && ref.trim() && !ref.startsWith('/')
+        && !ref.includes('\\') && !ref.includes('\0') && !ref.split('/').includes('..'));
     const unitData = { ...built.unitData, inputs: [...new Set([...callerRefs, ...built.unitData.inputs])] };
 
     const unitRun = await runUnit({
@@ -2349,7 +2352,8 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
     }
     let assignment = null;
     try {
-      assignment = JSON.parse(fs.readFileSync(path.join(stateRoot, '.fgos', 'assignments', ...runResult.assignmentId.split('/'), 'assignment.json'), 'utf8'));
+      const dir = assignmentDir(path.join(stateRoot, '.fgos'), runResult.assignmentId);
+      assignment = dir ? JSON.parse(fs.readFileSync(path.join(dir, 'assignment.json'), 'utf8')) : null;
     } catch {
       assignment = null;
     }
@@ -2362,6 +2366,22 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
         runResult,
         reason: 'unit-assignment-unreadable',
         canAdvanceEdge: false,
+        stop: true,
+      };
+    }
+    // The worker's round may have passed, but its work counts only once the runner committed it.
+    if (producer.commit?.status === 'failed') {
+      return {
+        executed: true,
+        dispatchType: 'assignment',
+        operation: choice.operation,
+        unitRunId: unitRun.unitRunId,
+        assignment,
+        runResult,
+        commit: producer.commit,
+        reason: 'unit-commit-failed',
+        canAdvanceEdge: false,
+        canProceed: false,
         stop: true,
       };
     }
@@ -2417,7 +2437,7 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
       runResult,
       verdictPayload,
       unitRunId: unitRun.unitRunId,
-      ...(unitRun.results?.find((r) => r?.commit) ? { commit: unitRun.results.find((r) => r?.commit).commit } : {}),
+      ...(producer.commit ? { commit: producer.commit } : {}),
       ...interpreted,
     };
   }
