@@ -7526,21 +7526,39 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
       "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+      "reviewMode": "ordinary",
+      "reviewNote": "deep: machine re-pin proven by script, both spans of plan.mjs byte-identical (80-93 to 91-104, 444-461 to 455-472, unique match), shown text equals unit lines 172-177, digest 2f26ef79 recomputed, pending, original author and class kept; the candidate prose still says plan.mjs:444-461 which is stale as a line number but is a preserved byte, truth deferred to promotion"
     },
     {
       "claimId": "claim_fa99f4d5cfcd0ea169efdf450e007955",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
       "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+      "reviewMode": "ordinary",
+      "reviewNote": "mechanical: same two spans of plan.mjs byte-identical and uniquely located, unit digest 008c98d9 recomputed from lines 179-181 and equals shownText, anchor unheaded-block-40 ok, receipt pending with original authorship; this is machine equivalence only"
     },
     {
       "claimId": "claim_ad38a91ec63db8a175d99078bcf6e158",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
       "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+      "reviewMode": "ordinary",
+      "reviewNote": "mechanical: same two spans byte-identical and unique, unit digest 4097ad34 recomputed from lines 189-193 and equals shownText, anchor unheaded-block-43 ok, pending, original authorship kept; machine equivalence only"
     },
     {
       "claimId": "claim_17840b1a73bbd8e2b8a87ed9a3a29b97",
@@ -7555,7 +7573,13 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
       "receiptCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+      "reviewMode": "ordinary",
+      "reviewNote": "mechanical: same two spans byte-identical and unique, unit digest 1e2dd90c recomputed from lines 210-213 and equals shownText, anchor unheaded-block-47 ok, pending, original authorship kept; machine equivalence only"
     },
     {
       "claimId": "claim_a37fa3033d1de5c1b45a25ba03e53944",

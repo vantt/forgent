@@ -20,3 +20,7 @@ Source pin: `fd6c9ab9e8aac12f99462a1d4f1bf78448d6e9f7`. Placement design only; n
 ## Retiring and retained roots
 
 Legacy source paths stay intact until the reviewed atomic cutover. This map authorizes no deletion.
+
+## Accepted portal carriage correction (Lead, 48da12f2b)
+
+The docs/architect/README.md source row above now conserves its complete snapshot at `docs/platform/system-architecture/history/architect-readme.md`, kind history, non-canonical. This supersedes only that row’s placement into the Accepted platform portal. The canonical portal retains its pre-carriage bytes and already reviewed routing. All eleven affected source decisions return to pending under A22; independent acceptance and native identity accounting remain owed.

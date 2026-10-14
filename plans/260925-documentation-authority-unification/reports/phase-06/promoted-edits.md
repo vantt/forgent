@@ -37,3 +37,7 @@ Candidate metadata correction: the three V1 contract documents (activation-bindi
 ## Whole-system candidate carriage — 2026-10-15
 
 Assignment `unit-run-1792013490296-c08d7894/producer/1` authorizes Step 6 file-only authoring. The frozen map routes `docs/architect/README.md` to the existing `docs/platform/README.md`; append its complete source as an `Added in candidate` subdivision, with original headings nested to keep one H1 and relative links rebased to the same physical source destinations. Existing portal content/header/status/current-source routing remains the input-HEAD bytes. This appendix is pending conservation review, not new current authority. Full source/target/line/digest witnesses are in `plans/260925-documentation-authority-unification/reports/phase-06/accounting-261015-0434-whole-system-authoring.md.json`; show its diff at the independent Step 6 checkpoint. Existing component-boundary and architecture-map anchors receive similarly labelled full-source subdivisions without a system design change. No component-boundary change.
+
+## Accepted portal carriage relocation — 2026-10-15
+
+Lead instruction at `48da12f2b5dedd6d9dd047ffb9c96f9259e20930`: remove the labelled README source carriage appendix from `docs/platform/README.md` and preserve it in `docs/platform/system-architecture/history/architect-readme.md`. Portal prefix restored byte-for-byte; existing reviewed routing retained. Eleven source target bindings pending under A22. No portal authority, design status or implementation statement changed.

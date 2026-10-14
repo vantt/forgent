@@ -122,19 +122,6 @@
       "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
-      "claimId": "claim_0416642260519cf992931a4968e80c03",
-      "sourceUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
-      "claimKind": "contract",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:37@2026-10-15",
-      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
-      "targetAnchor": "file-block",
-      "rationale": "A31: Lead merge 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 adds run-timeout.mjs as kernel and unit-sync.mjs as infra. Recarry the complete main manifest byte-for-byte into its existing Step 5 contract owner, file-block. This historical predecessor keeps its original source identity/digest; the full new candidate is its supersede target. Independent review is restricted to main’s diff and conservation/native binding consequences, not code truth. Prior approval is retained only in merge accounting; native current source identity/gaps are owed next turn. No promotion or retired-ID guess.",
-      "targetUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
-      "targetAncestry": []
-    },
-    {
       "claimId": "claim_e5e2846158bbd249d1ebbd70161f02a0",
       "sourceUnitDigest": "06606edc018d149151d695b556303fa30fc664064737645cc57d1dce43711b67",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
@@ -459,6 +446,27 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
+    },
+    {
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceAnchor": "file-block",
+      "sourceUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "rationale": "A31 new upstream source file-block: complete main manifest recarried exactly. Pending native current identity allocation; no synthetic claim ID. Next turn promotes this proposal into a native-ID decision after carry, with historical predecessors pending independently. Main-only diff is the conservation witness, no truth claim.",
+      "claimId": "claim_cdb2776a59ac6a8bbc129754ffc7380f",
+      "reviewNote": "deep: new current source file-block proposal (docs/architecture-manifest.json) whose source and target digests are both 5a7e, exact diff empty, native ID and identity 97a2225a verified in the working registry; only a proposal, not yet a shard row, so the author must write the decision from it without carrying any approval",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
+      "targetAncestry": [],
+      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
     }
   ],
   "registryGaps": [
@@ -1095,8 +1103,8 @@
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:37@2026-10-15",
-      "rationale": "A31: Lead merge 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 adds run-timeout.mjs as kernel and unit-sync.mjs as infra. Recarry the complete main manifest byte-for-byte into its existing Step 5 contract owner, file-block. This historical predecessor keeps its original source identity/digest; the full new candidate is its supersede target. Independent review is restricted to main’s diff and conservation/native binding consequences, not code truth. Prior approval is retained only in merge accounting; native current source identity/gaps are owed next turn. No promotion or retired-ID guess.",
+      "authoredBy": "codex-session:39@2026-10-15",
+      "rationale": "A31 / A22: historical c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85 to current 5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657 differs in exactly ten manifest entries: (1) remove src/runner/dispatch-log.mjs (infra); add (2) src/runner/dispatch/write-scope.mjs (kernel), (3) src/util/git-paths.mjs (kernel), (4) src/runner/execution/account-pin.mjs (infra), (5) src/runner/execution/partial-writes.mjs (infra), (6) src/workflow/units-source.mjs (infra), (7) src/runner/dispatch/run-timeout.mjs (kernel), (8) src/runner/execution/unit-sync.mjs (infra); (9) src/runner/fanout-batch.mjs and (10) src/runner/work-dispatch.mjs change from infra to use-case. Entries 7 and 8 are this merge 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539's two added lines; entries 1–6 and 9–10 preserve the earlier source-to-target difference. The complete target is byte-identical to main. Preserve original predecessor identity and digest; no ID graft, truth approval or promotion. Corrected rationale pending independent review; no approval carry.",
       "targetUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
       "targetAncestry": []
     },
@@ -1376,6 +1384,48 @@
         "Data Dictionary"
       ],
       "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+    },
+    {
+      "claimId": "claim_6f9769825ad867b974bc2f69118c2261",
+      "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+      "sourceAnchor": "file-block",
+      "sourceUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+      "claimKind": "contract",
+      "authoredBy": "codex-session:39@2026-10-15",
+      "disposition": "supersede",
+      "reviewStatus": "reviewed",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "rationale": "A31 actual native target predecessor, superseded by full main manifest with run-timeout.mjs kernel and unit-sync.mjs infra; real current target claim_2cae83233f2c9f4038e573bc0f50ae5d.",
+      "reviewNote": "deep: native identity gap for the old copy (0eab at the contract path) with same-file carrier claim_2cae83233f2c9f4038e573bc0f50ae5d (5a7e, identity 97a2225a, both in the registry); the diff is exactly main's two lines; no decision row exists yet, its rationale must state the two-line difference when authored",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
+      "targetAncestry": [],
+      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+    },
+    {
+      "claimId": "claim_0416642260519cf992931a4968e80c03",
+      "sourceUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:37@2026-10-15",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "rationale": "A31: Lead merge 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 adds run-timeout.mjs as kernel and unit-sync.mjs as infra. Recarry the complete main manifest byte-for-byte into its existing Step 5 contract owner, file-block. This historical predecessor keeps its original source identity/digest; the full new candidate is its supersede target. Independent review is restricted to main’s diff and conservation/native binding consequences, not code truth. Prior approval is retained only in merge accounting; native current source identity/gaps are owed next turn. No promotion or retired-ID guess.",
+      "reviewNote": "deep: source 0eab (old main manifest) to target 5a7e differs by exactly the two lines main added, rationale states exactly those two additions and truthfully; pending, review fields removed; owed (named in request, D red until then) is moving this binding from claims to registryGaps since it is now an identity gap",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0451-whole-system-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
+      "targetAncestry": [],
+      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceAnchor": "file-block"
     }
   ]
 }

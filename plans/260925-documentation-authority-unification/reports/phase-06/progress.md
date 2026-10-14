@@ -1,3 +1,24 @@
+# Verdicts and bounded corrections — authored; native follow-up and two stale receipts open
+
+Date: 2026-10-15. Executor: codex-session:39@2026-10-15. Assignment: unit-run-1792017942424-523062fe/producer/1. Session counter: 39.
+Step 6 open. Input/report pin: `48da12f2b5dedd6d9dd047ffb9c96f9259e20930`. Native registry stays at a8a10abc1; no current native/D/E certification. Runner output commit pending settlement.
+
+Progress read first and written early. All owner answers requested and 19 full committed reports including Notes read. Applied 826 source ok (brief's 776 corrected against the 16 tables), seven merge ok, one native-gap ok and 62 candidate eligibility ok; notes verbatim, ordinary reports pinned to full input SHA. Unchanged applier used for 834 decisions/machine projections; eligible list acceptance is explicit metadata, not a fabricated source/truth decision.
+
+Two manifest rework rationales restored all ten exact entry differences and this merge's two added lines; pending under A22. claim_04166422 moved to registryGaps; actual native current manifest source and target-gap proposals instantiated. claim_0cc5fd49 supersede names successor claim_49dc8dc0 with accepted prefix/main-line evidence. README full source carriage moved to Candidate non-canonical History carrier `docs/platform/system-architecture/history/architect-readme.md`; eleven rebound source decisions pending, canonical portal pre-carriage prefix byte-identical. Current source 815 reviewed / 11 pending. Thirteen old carriage identities retained in explicit next-native accounting.
+
+Fifteen pending portal receipts authored (2 structural-frame, 5 navigation, 8 content). Six content receipts true-and-current; two honestly stale: old “Phases 03–09 remain unauthorized” conflicts with owner authorization. Task forbids changing pre-carriage canonical prose; correction/independent acceptance still needed, no false receipt supplied. The 17 Accepted-portal candidate tuples are removed into accounting; eligible whole list now 62, native equality not claimed. Four ordinary A31 machine refs accepted; interim Coordination tuples cleaned to 568, original evidence retained in accounting. Separate formal classification-table/header acceptance remains a next-pass protocol debt; machine equivalence is not new truth review.
+
+Two contextual identical-unit exception records proposed in established shape, pending independent review; prior memberships unchanged. No promotion, push, Step 7, git write, workspace .fgos mutation, secret read, checker/gate/extractor/vocabulary/baseline edit, native sync or review pack. Scratch only /tmp/fgos-work/. External required result is the explicit exception.
+
+Proof: 54/54 unchanged tests, env -u CLAUDE_CODE_SESSION_ID; candidate status zero findings; placement 536/535/one existing exception plus separate new-carrier check. Full receipt/moved-target/portal/carriage bindings, 819 current-pin reviewed rows and 6,717 unaffected prior reviewed objects verified. All protected artifacts/native registry unchanged; git diff --check clean. No full-suite or current D/E/native-green claim. Existing runner ratchet blocker remains outside scope at scripts/check-legacy-docs-ratchet.exceptions.json; Lead owes separately authorized correction.
+
+**Next turn MUST run native sync once from this runner-produced commit**, carry directly from persisted registry, reconcile actual identities and receipt pins; run both-prior D/E and full native/list tuple equality; persist registry; package **one bounded re-review of every changed row, receipt, exception and actual native consequence**. Expose the two stale receipts and four machine-ref classification protocol debts, never carry an unsupported approval. Then Step 6 closure owes 30-unit truth sample, red-team, 50-block sample, fresh readers, checkpoint review with reviewer-held sensitivity pack, consumer/alias preview and batch report. Preserve all Rings holds, A34 residuals and remaining obligations.
+
+Evidence: [accounting-261015-0547-whole-system-verdict-corrections.md](accounting-261015-0547-whole-system-verdict-corrections.md), [accounting-261015-0547-whole-system-verdict-corrections.md.json](accounting-261015-0547-whole-system-verdict-corrections.md.json). Markdown preview unavailable within scope.
+
+---
+
 # Native sync and bounded review handoff — ready for review, closure open
 
 Date: 2026-10-15. Executor: codex-session:38@2026-10-15. Session counter: 38. Assignment: unit-run-1792014456508-358dc876/producer/1.

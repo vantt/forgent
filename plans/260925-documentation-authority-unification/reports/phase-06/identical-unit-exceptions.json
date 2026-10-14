@@ -11775,6 +11775,106 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-identical-exceptions.md",
       "reviewReportCommit": "8e2fc315f45da800bf11076f539d3bd44a1dcde3",
       "reviewNote": "2 byte-identical evidence file(s) of 22 bytes (blob 1b30ed20, e.g. git-status-mdview-after.txt), each bound to its own same-relative-path platform copy; I checked path equality and equal blobs at the source pin and the review tree for every member. They are non-authority evidence-payload carriers under owner decision A10, not competing owners, and the reason explicitly claims no independent corroboration."
+    },
+    {
+      "digest": "6a940230eb3172ac0cd44665b6d492a11ff8d99fe92c0f3b5c5eff8ae521ae54",
+      "representativeClaimId": "claim_d5004a0febfecda8b898076cf021700d",
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:39@2026-10-15",
+      "reason": "The identical Outside hard / Inside soft diagram repeats the same retained design principle in the architecture-intent and whole-system vision documents. Each physical occurrence is paired positionally to its own complete candidate source carriage, not competing implementation authority. Pending independent contextual exception review; no gate waiver or promotion.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_d5004a0febfecda8b898076cf021700d",
+          "source": "docs/architect/architecture-intent.md#unheaded-block-8",
+          "owner": "docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-10",
+          "ancestry": [
+            "Architecture Intent",
+            "0.1 System-Wide Vision"
+          ],
+          "text": "```txt\nOutside hard:\n  contract, state, capability, topology, proof, audit\n\nInside soft:\n  soul, prose, skill, judgment, collaboration, domain intelligence\n```",
+          "sourceBlob": "e72b0e930345e01bca1b97c81fd7a528092cd098",
+          "targetBlob": "89b4114375ac1d7acc7fe1a998aa904fc2efd38e"
+        },
+        {
+          "claimId": "claim_4b3408bc120b2ab7f05bdcdca3a78dab",
+          "source": "docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-8",
+          "owner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-10",
+          "ancestry": [
+            "System Vision: Trong Mem Ngoai Cung",
+            "1. Vision"
+          ],
+          "text": "```txt\nOutside hard:\n  contract, state, capability, topology, proof, audit\n\nInside soft:\n  soul, prose, skill, judgment, collaboration, domain intelligence\n```",
+          "sourceBlob": "473dd8f1f28f4573194c47ca787973c52cc65756",
+          "targetBlob": "ca5348222462ce67cbc98c1080b818f8fb79b41c"
+        }
+      ]
+    },
+    {
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "representativeClaimId": "claim_f7e282b47557154231f0565bd30e5d7d",
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:39@2026-10-15",
+      "reason": "The identical closing decision sentence refers to four distinct decision contexts in architecture-map and system-overview. Each occurrence is paired positionally to its own corresponding decision narrative and ancestry; collapsing them would detach their local decision subject. Pending independent contextual exception review; no gate waiver or promotion.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_f7e282b47557154231f0565bd30e5d7d",
+          "source": "docs/architecture-map.md#unheaded-block-77",
+          "owner": "docs/platform/architecture-map.md#unheaded-block-91",
+          "ancestry": [
+            "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "sourceBlob": "01f2a21eebba99c2b237be650b631168232bcd5e",
+          "targetBlob": "cf4cb69459d749e1d4e258a2ef1846ef66c9d567"
+        },
+        {
+          "claimId": "claim_15a3179944bc76f990fe1b965e40a9da",
+          "source": "docs/architecture-map.md#unheaded-block-83",
+          "owner": "docs/platform/architecture-map.md#unheaded-block-97",
+          "ancestry": [
+            "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0017 — Đóng audit hệ id/tên gọi (STR47)",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "sourceBlob": "01f2a21eebba99c2b237be650b631168232bcd5e",
+          "targetBlob": "cf4cb69459d749e1d4e258a2ef1846ef66c9d567"
+        },
+        {
+          "claimId": "claim_e4b03884bb0c50d641f173b8a74c6501",
+          "source": "docs/specs/system-overview.md#unheaded-block-25",
+          "owner": "docs/platform/system-overview/spec.md#unheaded-block-28",
+          "ancestry": [
+            "Spec: System Overview",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0016 — Mốc MVP của fgOS",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "sourceBlob": "c24c5561dc60cce7e53d0a0c5e34ff97414845ac",
+          "targetBlob": "ebd433bee5dcf0a79ad1daaa3cb3e9b30c802020"
+        },
+        {
+          "claimId": "claim_ba26d5145625a6a74f3d1f4801c35407",
+          "source": "docs/specs/system-overview.md#unheaded-block-34",
+          "owner": "docs/platform/system-overview/spec.md#unheaded-block-37",
+          "ancestry": [
+            "Spec: System Overview",
+            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "0018 — Mốc MVP2 của fgOS",
+            "Hệ quả"
+          ],
+          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "sourceBlob": "c24c5561dc60cce7e53d0a0c5e34ff97414845ac",
+          "targetBlob": "ebd433bee5dcf0a79ad1daaa3cb3e9b30c802020"
+        }
+      ]
     }
   ]
 }
