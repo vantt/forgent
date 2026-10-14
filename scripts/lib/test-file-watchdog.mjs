@@ -18,6 +18,12 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
+// ps prints whole seconds from a clock sampled per process, so a child may
+// read a little older than its parent; the ceiling applies when the parent is
+// not in the snapshot.
+const ELAPSED_SLACK_MS = 60_000;
+const MAX_ELAPSED_MS = 7 * 24 * 60 * 60 * 1000;
+
 /** `[[dd-]hh:]mm:ss` as printed by `ps -o etime=`, to milliseconds. */
 export function parseEtime(etime) {
   const m = /^(?:(?:(\d+)-)?(\d+):)?(\d+):(\d+)$/.exec(String(etime).trim());
@@ -61,9 +67,14 @@ export function treeOf(procs, pid) {
  */
 export function findOverdue(procs, rootPid, limits) {
   const inTree = new Set(treeOf(procs, rootPid));
+  // A descendant cannot be older than the run that spawned it. `ps` can print a
+  // garbage start time for a process caught mid-fork (an etime of hundreds of
+  // millions of days); such an elapsed value is unknown, never a timeout.
+  const root = procs.find((p) => p.pid === rootPid);
+  const maxPlausibleMs = Number.isFinite(root?.elapsedMs) ? root.elapsedMs + ELAPSED_SLACK_MS : MAX_ELAPSED_MS;
   const overdue = [];
   for (const p of procs) {
-    if (p.pid === rootPid || !inTree.has(p.pid) || !Number.isFinite(p.elapsedMs) || /\s--test\s/.test(p.args)) continue;
+    if (p.pid === rootPid || !inTree.has(p.pid) || !Number.isFinite(p.elapsedMs) || p.elapsedMs > maxPlausibleMs || /\s--test\s/.test(p.args)) continue;
     for (const [file, limitMs] of Object.entries(limits)) {
       if (p.args.endsWith(` ${file}`) && p.elapsedMs >= limitMs) {
         overdue.push({ pid: p.pid, file, elapsedMs: p.elapsedMs, limitMs });
