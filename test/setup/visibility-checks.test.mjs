@@ -9,6 +9,7 @@ import {
   checkExecutorConfinement,
   checkInvocationGitWriteGrants,
   checkConfinedPaneAccounts,
+  DOCTOR_CHECKS,
   checkHerdrExecutorKinds,
   readHerdrAgentKinds,
   readHerdrIntegrationStatus,
@@ -314,6 +315,76 @@ test('checkConfinedPaneAccounts has nothing to say when no herdr invocation bind
   const r = checkConfinedPaneAccounts({ executors: { a: { invocations: [{ id: 'x', adapter: 'herdr-spawn' }] } } });
   assert.equal(r.passed, true);
   assert.match(r.message, /no confined herdr invocation binds a private home/);
+});
+
+// The registered check judges the machine-global inventory whatever directory doctor runs in. Every test here
+// runs under a throwaway HOME, so none can reach the real ~/.fgos.
+function withHome(home, fn) {
+  const saved = process.env.HOME;
+  const cwd = process.cwd();
+  process.env.HOME = home;
+  process.chdir(home);
+  try { return fn(); } finally { process.env.HOME = saved; process.chdir(cwd); }
+}
+
+function writeGlobalConfig(home, content) {
+  fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(home, '.fgos', 'config.json'), typeof content === 'string' ? content : JSON.stringify(content));
+}
+
+test('the registered confined-pane-accounts check reads the global inventory from a directory with no project config', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-accounts-home-'));
+  try {
+    const creds = path.join(home, 'creds');
+    fs.mkdirSync(creds);
+    const entry = DOCTOR_CHECKS.find((c) => c.id === 'confined-pane-accounts');
+    const runner = (accounts) => ({ ...paneExecutors(), providers: { openai: { accounts } } });
+    writeGlobalConfig(home, { runner: runner({ acct: { credentialSource: { kind: 'codex-home', home: creds } } }) });
+    const missing = withHome(home, () => entry.check(home));
+    assert.equal(missing.passed, false, missing.message);
+    assert.match(missing.message, /account "acct" is missing auth\.json/);
+    fs.writeFileSync(path.join(creds, 'auth.json'), '{}');
+    const ok = withHome(home, () => entry.check(home));
+    assert.equal(ok.passed, true, ok.message);
+    assert.match(ok.message, /account "acct" has its 1 credential file/);
+  } finally { fs.rmSync(home, { recursive: true, force: true }); }
+});
+
+test('the registered confined-pane-accounts check fails with the reason when the global config is unreadable, and never echoes the file', () => {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'confined-pane-accounts');
+  for (const [label, content, wantReason] of [
+    ['not json', '{ "runner": { "x": "LOOKS-LIKE-A-SECRET-VALUE" } oops', /global config unreadable \(not valid JSON or not readable\)/],
+    ['refused by the validator', JSON.stringify({ runner: { providers: { openai: { accounts: { acct: { unknownKey: true } } } } } }), /global config refused by the provider inventory validator/],
+  ]) {
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-accounts-home-'));
+    try {
+      writeGlobalConfig(home, content);
+      const result = withHome(home, () => entry.check(home));
+      assert.equal(result.passed, false, label);
+      assert.match(result.message, wantReason, label);
+      assert.ok(result.message.includes(path.join(home, '.fgos', 'config.json')), 'the config path is named');
+      assert.equal(result.message.includes('LOOKS-LIKE-A-SECRET-VALUE'), false, label);
+      assert.equal(/position|Expected|Unexpected|unknown key/i.test(result.message), false, `no parser or validator text (${label}): ${result.message}`);
+    } finally { fs.rmSync(home, { recursive: true, force: true }); }
+  }
+});
+
+test('checkConfinedPaneAccounts looks providers and accounts up by own property, so prototype names are ordinary ids', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-accounts-home-'));
+  try {
+    fs.writeFileSync(path.join(home, 'auth.json'), '{}');
+    // An account whose id is a prototype member name is a real account.
+    const cfg = { ...paneExecutors(), providers: { openai: { accounts: { constructor: { credentialSource: { kind: 'codex-home', home } } } } } };
+    const r = checkConfinedPaneAccounts(cfg);
+    assert.equal(r.passed, true, r.message);
+    assert.match(r.message, /account "constructor" has its 1 credential file/);
+    // A provider named like a prototype member has no inventory entry: it is reported, never resolved to Object.prototype.
+    for (const name of ['constructor', '__proto__']) {
+      const none = checkConfinedPaneAccounts(paneExecutors(name), { inventory: {} });
+      assert.equal(none.passed, false, name);
+      assert.match(none.message, new RegExp(`no runner\\.providers\\.${name}\\.accounts`), name);
+    }
+  } finally { fs.rmSync(home, { recursive: true, force: true }); }
 });
 
 test('checkInvocationGitWriteGrants passes when no executor or invocation grants git add/commit', () => {
