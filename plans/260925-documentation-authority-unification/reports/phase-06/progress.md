@@ -1,3 +1,21 @@
+# Latest resume state — Packaging batch closure in progress
+
+Date: 2026-10-14
+Executor: codex-session:13@2026-10-14
+Session counter: 13
+Documented Packaging executor sessions: 6 (one interrupted plus five resumes)
+Step: 4 / Packaging-distribution
+State: rework; applying 20 ordinary ok verdicts from review-4-packaging-closure-resolution.md at ff3ec502574afd0e703076c0ea5702d4069d04e0.
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 77830ba77eb05991d95b005919776ee6254e833b
+Last green D/native proof source: 865ffac93c767b862ad9745fef5372dffd9a8158
+Technical blockers: none established. Owner F6/A34 settled; no new text edits for reviewer minor notes.
+Next: apply verbatim review pins, native refresh from persisted working registry, both-prior D/scoped strict E and full native equality; persist and report closure only if exact. Stop at Step 4; no Step 5, promotion, main write, merge or push. Registry stop line: 90 MB.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Packaging closure-resolution ready for review
 
 Date: 2026-10-14
