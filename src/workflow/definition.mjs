@@ -1,11 +1,12 @@
 // src/workflow/definition.mjs — Workflow definition contract and schema validator
-// Architecture guard: MUST NOT import src/state/** or src/runner/** (kernel layer)
+// Architecture guard: MUST NOT import src/state/** or src/runner/** (kernel layer). The one exception is
+// src/runner/dispatch/write-scope.mjs, an import-free leaf, so a workflow and a unit read writes one way.
 
 import path from 'node:path';
 import { canonicalizeWrites } from '../runner/dispatch/write-scope.mjs';
 
-/** Thrown for a malformed Workflow definition. Kept free of runner imports so the
- * Work-lifecycle kernel can read step data without depending on dispatch. */
+/** Thrown for a malformed Workflow definition. Kept free of runner imports (bar the import-free
+ * write-scope leaf) so the Work-lifecycle kernel can read step data without depending on dispatch. */
 export class WorkflowDefinitionError extends Error {
   constructor(message) {
     super(message);

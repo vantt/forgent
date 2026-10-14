@@ -32,7 +32,9 @@ export function canonicalizeWriteEntry(raw) {
   if (trimmed.includes('\\') || trimmed.includes('\0')) {
     throw new WriteScopeError(`write entry must not contain a backslash or NUL byte, got: ${show}.`);
   }
-  const segments = trimmed.split('/').filter((segment) => segment !== '' && segment !== '.');
+  const segments = trimmed.split('/').filter((segment) => segment !== '' && segment !== '.')
+    // Consecutive ** say nothing more than one, and each extra one multiplies matching work.
+    .filter((segment, i, all) => !(segment === '**' && all[i - 1] === '**'));
   if (segments.length === 0) throw new WriteScopeError(`write entry must name a path inside the repo, got: ${show}.`);
   if (segments.includes('..')) throw new WriteScopeError(`write entry must not contain a ".." segment, got: ${show}.`);
   if (segments[0].startsWith(':')) {
@@ -42,7 +44,9 @@ export function canonicalizeWriteEntry(raw) {
   if (looseDoubleStar) {
     throw new WriteScopeError(`"**" must be a whole path segment, got segment ${JSON.stringify(looseDoubleStar)} in ${show}.`);
   }
-  return segments.join('/');
+  const joined = segments.join('/');
+  // `docs /` joins to `docs `; read it again so the canonical form is a fixed point.
+  return joined === joined.trim() ? joined : canonicalizeWriteEntry(joined);
 }
 
 /** Canonicalizes every entry, drops duplicates, keeps first-seen order. */
@@ -100,29 +104,38 @@ function segmentRegex(segment) {
   return new RegExp(`^${body}$`, 'u');
 }
 
+/** Whole-path glob match; memoized by position so stacked ** stay polynomial. */
 function globMatches(patternSegments, pathSegments) {
-  const [head, ...rest] = patternSegments;
-  if (head === undefined) return pathSegments.length === 0;
-  if (head === '**') {
-    for (let skip = 0; skip <= pathSegments.length; skip += 1) {
-      if (globMatches(rest, pathSegments.slice(skip))) return true;
-    }
-    return false;
-  }
-  if (pathSegments.length === 0) return false;
-  return segmentRegex(head).test(pathSegments[0]) && globMatches(rest, pathSegments.slice(1));
+  const regexes = patternSegments.map((segment) => (segment === '**' ? null : segmentRegex(segment)));
+  const memo = new Map();
+  const at = (p, s) => {
+    const key = p * (pathSegments.length + 1) + s;
+    if (memo.has(key)) return memo.get(key);
+    let result;
+    if (p === patternSegments.length) result = s === pathSegments.length;
+    else if (regexes[p] === null) result = at(p + 1, s) || (s < pathSegments.length && at(p, s + 1));
+    else result = s < pathSegments.length && regexes[p].test(pathSegments[s]) && at(p + 1, s + 1);
+    memo.set(key, result);
+    return result;
+  };
+  return at(0, 0);
 }
 
 /**
- * Whether a repo-relative path lies in a canonical scope (output of canonicalizeWrites).
- * A plain entry covers the path itself and everything beneath it; a glob entry must match the
- * whole path. Nothing under `.fgos` ever matches.
+ * Whether a repo-relative path lies in a scope. Scope entries are read canonically (an entry that
+ * cannot be read throws). A plain entry covers the path itself and everything beneath it; a glob
+ * entry must match the whole path. A queried path that is absolute, escapes with `..`, or carries
+ * a backslash or NUL never matches; nothing under `.fgos` ever matches.
  */
 export function matchesWriteScope(relPath, scope) {
-  const pathSegments = String(relPath).split('/').filter((segment) => segment !== '' && segment !== '.');
-  if (pathSegments.length === 0 || pathSegments[0] === STORE_DIR) return false;
+  if (typeof relPath !== 'string' || relPath.startsWith('/') || relPath.includes('\\') || relPath.includes('\0')) {
+    return false;
+  }
+  const pathSegments = relPath.split('/').filter((segment) => segment !== '' && segment !== '.');
+  if (pathSegments.length === 0 || pathSegments.includes('..') || pathSegments[0] === STORE_DIR) return false;
   const normalized = pathSegments.join('/');
-  return scope.some((entry) => {
+  return scope.some((raw) => {
+    const entry = canonicalizeWriteEntry(raw);
     if (!hasGlob(entry)) return normalized === entry || normalized.startsWith(`${entry}/`);
     return globMatches(entry.split('/'), pathSegments);
   });

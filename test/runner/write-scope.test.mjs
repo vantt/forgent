@@ -102,3 +102,35 @@ test('partitionPaths: splits changed paths by scope, .fgos always out', () => {
     { inScope: ['docs/a.md', 'src/b.mjs'], outOfScope: ['.fgos/state.json', 'docs-old/c.md'] },
   );
 });
+
+test('matchesWriteScope: a queried path that escapes or is absolute never matches', () => {
+  assert.equal(matchesWriteScope('docs/../.fgos/state.json', ['docs']), false);
+  assert.equal(matchesWriteScope('docs/../src/a.mjs', ['**']), false);
+  assert.equal(matchesWriteScope('/docs/a.md', ['docs']), false);
+  assert.equal(matchesWriteScope('docs\\a.md', ['docs']), false);
+  assert.equal(matchesWriteScope('docs/a\0.md', ['docs']), false);
+  assert.equal(matchesWriteScope('docs/./a.md', ['docs']), true);
+});
+
+test('matchesWriteScope: scope entries are read canonically, so docs/ and ./docs still cover docs', () => {
+  assert.equal(matchesWriteScope('docs/a.md', ['docs/']), true);
+  assert.equal(matchesWriteScope('docs/a.md', ['./docs']), true);
+  assert.throws(() => matchesWriteScope('docs/a.md', ['../docs']), WriteScopeError);
+});
+
+test('canonicalizeWriteEntry: canonical form is a fixed point', () => {
+  for (const raw of ['docs /', ' ./a/ b ', 'docs/', 'a/**/**/b', 'tài liệu/']) {
+    const once = canonicalizeWriteEntry(raw);
+    assert.equal(canonicalizeWriteEntry(once), once, `raw=${JSON.stringify(raw)}`);
+  }
+  assert.equal(canonicalizeWriteEntry('docs /'), 'docs');
+});
+
+test('repeated ** collapse to one, and matching stays fast on deep paths', () => {
+  assert.equal(canonicalizeWriteEntry('a/**/**/**/b'), 'a/**/b');
+  const deep = Array.from({ length: 60 }, (_, i) => `s${i}`).join('/');
+  const started = Date.now();
+  assert.equal(matchesWriteScope(`${deep}/x`, ['**/*/**/*/**/*/**/*/**/y']), false);
+  assert.equal(matchesWriteScope(`${deep}/y`, ['**/*/**/*/**/*/**/*/**/y']), true);
+  assert.ok(Date.now() - started < 500, `took ${Date.now() - started}ms`);
+});

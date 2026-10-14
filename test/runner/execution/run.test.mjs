@@ -1460,3 +1460,26 @@ test('a resumed unit keeps its recorded write scope even after generatedPaths ch
   await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
   assert.deepEqual(JSON.parse(fs.readFileSync(unitJson, 'utf8')).writeScope, expected);
 });
+
+test('a resumed unit recorded before write scopes existed hands its own writes to the assignment', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  setGeneratedPaths(repoRoot, SKILL_RENDERS);
+  const first = await runUnit({
+    unitData: { id: 'u-old-record', objective: 'Edit a skill', capability: 'docs:write', writes: ['core/skills/z.md'] },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId);
+  const unitJson = path.join(unitDir, 'unit.json');
+  const record = JSON.parse(fs.readFileSync(unitJson, 'utf8'));
+  delete record.writeScope;
+  delete record.settlement;
+  record.execution = { status: 'running' };
+  fs.writeFileSync(unitJson, JSON.stringify(record, null, 2));
+  fs.rmSync(path.join(unitDir, 'producer'), { recursive: true, force: true });
+  await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
+  const assignment = JSON.parse(fs.readFileSync(path.join(unitDir, 'producer', '1', 'assignment.json'), 'utf8'));
+  assert.deepEqual(assignment.writes, ['core/skills/z.md']);
+  assert.equal(JSON.parse(fs.readFileSync(unitJson, 'utf8')).writeScope, undefined);
+});
