@@ -1,3 +1,19 @@
+# Latest resume state — Root authorities resumed from checkpoint
+
+Date: 2026-10-14
+Executor: codex-session:17@2026-10-14
+Session counter: 17
+Step: 5
+State: in progress
+Resume checkpoint: 5a1b26a02; previous session committed progress only, clean tree.
+Scope: apply nine ordinary verdicts at 4f99b9ec9; both-prior D/scoped E/native equality; SC-1; mapped pending source rows and bounded review packs. AGENTS/CLAUDE deferred to Step 10. Compact registry stop line 90,000,000 bytes.
+Next: apply unchanged exact report notes, refresh directly from persisted registry. Cosmetic reviewed rationale wording left unchanged.
+Blockers: none established. No promotion, push, merge, Step 6, protected tool or baseline edits.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Root authorities continuation
 
 Date: 2026-10-14
