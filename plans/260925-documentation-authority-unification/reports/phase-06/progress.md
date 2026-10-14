@@ -1,3 +1,18 @@
+# Latest resume state — Finish Step 5 source work
+
+Date: 2026-10-14
+Executor: codex-session:22@2026-10-14
+Session counter: 22
+Step: 5
+State: resumed / applying committed Lead verdicts
+Starting HEAD: c3895c140; branch and cwd verified, clean tree. B0: dbe5c432852837ea01e6025b35868bcb7271495d. SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4.
+
+Scope: apply committed ordinary ok verdicts pinned to c3895c140 with verbatim notes; prove D/E/native equality and persist compact registry. Correct U8 required flags and U26 RUL60 under A19; rebind six dependent rows under A22. Decide 95 remaining source rows pending per map/Q5/N1, publish bounded full-text/digest packs under A36, extend native candidate list, and prepare final truth population without drawing. AGENTS.md/CLAUDE.md wait for Step 10. No promotion, push, main merge/write, Step 6 or protected-tool edits. No technical blocker identified.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Authorized truth fixes and bounded conservation handoff
 
 Date: 2026-10-14
