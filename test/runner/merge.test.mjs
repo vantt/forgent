@@ -407,8 +407,9 @@ test('isIgnorableStatusPath: a .fgos/ path is always ignorable regardless of own
   assert.equal(isIgnorableStatusPath('.fgos/events.jsonl', '', new Set()), true);
 });
 
-test('isWorkingTreeClean: a staged rename blocks if EITHER half is in ownFileSet', () => {
+test('isWorkingTreeClean: a staged rename blocks if EITHER half is in ownFileSet', (t) => {
   const repoRoot = initRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
   fs.writeFileSync(path.join(repoRoot, 'old-name.txt'), 'x\n');
   git(repoRoot, ['add', 'old-name.txt']);
   git(repoRoot, ['commit', '-q', '-m', 'old']);
@@ -416,7 +417,6 @@ test('isWorkingTreeClean: a staged rename blocks if EITHER half is in ownFileSet
   assert.equal(isWorkingTreeClean(repoRoot, new Set(['new-name.txt'])), false);
   assert.equal(isWorkingTreeClean(repoRoot, new Set(['old-name.txt'])), false);
   assert.equal(isWorkingTreeClean(repoRoot, new Set(['other-new-name.txt'])), true);
-  fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
 test('buildOwnFileSet: unions committed-diff paths and footprint, normalized the same way frozenJudgeHits normalizes footprint', () => {

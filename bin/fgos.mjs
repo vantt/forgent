@@ -76,7 +76,7 @@ import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.m
 import { normalizePath } from '../src/util/normalize-path.mjs';
 import { collectOutcomeEntry } from '../src/report/item-trace.mjs';
 import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet } from '../src/runner/merge.mjs';
-import { nulPaths } from '../src/util/git-paths.mjs';
+import { nulPaths, GIT_LIST_MAX_BUFFER } from '../src/util/git-paths.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { rejectUseCase } from '../src/verbs/merge/reject.mjs';
 import { reviewUseCase } from '../src/verbs/merge/review.mjs';
@@ -164,9 +164,9 @@ function dataDir(overrideDir) {
 // commits yet) is reported as `validation` rather than escaping as an
 // "unexpected" (exit 1) — every other error surface in this file already
 // follows the R4 exit-code contract.
-function gitAt(cwd, args) {
+function gitAt(cwd, args, { maxBuffer } = {}) {
   try {
-    return execFileSync('git', args, { cwd, encoding: 'utf8', shell: false });
+    return execFileSync('git', args, { cwd, encoding: 'utf8', shell: false, ...(maxBuffer ? { maxBuffer } : {}) });
   } catch (err) {
     throw new StoreError('validation', `git ${args.join(' ')} failed in "${cwd}": ${err.message}`);
   }
@@ -201,7 +201,7 @@ function commitsSince(cwd, from, to) {
 // Byte for byte and a rename as both halves, like the clean-tree gate's own
 // status read: a path moved out of the footprint still counts as touched.
 function changedFilesSince(cwd, from, to) {
-  return nulPaths(gitAt(cwd, ['diff', '--name-only', '--no-renames', '-z', from, to]));
+  return nulPaths(gitAt(cwd, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', from, to], { maxBuffer: GIT_LIST_MAX_BUFFER }));
 }
 
 // tsk-4hl: an item's own docs/history/<id>/iron-law-evidence.md is a

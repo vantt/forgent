@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { partitionPaths } from '../dispatch/write-scope.mjs';
-import { nulPaths, statusPaths } from '../../util/git-paths.mjs';
+import { nulPaths, statusPaths, GIT_LIST_MAX_BUFFER } from '../../util/git-paths.mjs';
 
 const STORE_PREFIX = '.fgos/';
 
@@ -92,7 +92,7 @@ function git(ctx, args, { env, input } = {}) {
     cwd: ctx.cwd,
     encoding: 'utf8',
     stdio: [input === undefined ? 'ignore' : 'pipe', 'pipe', 'pipe'],
-    maxBuffer: 64 * 1024 * 1024,
+    maxBuffer: GIT_LIST_MAX_BUFFER,
     ...(input === undefined ? {} : { input }),
     env: cleanEnv(env),
   });
@@ -108,7 +108,7 @@ function hasConfigured(ctx, key) {
 
 /** Paths in the index that differ from HEAD; renames are reported as their two halves. */
 export function stagedPaths(ctx) {
-  return nulPaths(git(ctx, ['diff', '--cached', '--name-only', '--no-renames', '-z']));
+  return nulPaths(git(ctx, ['diff', '--cached', '--name-only', '--no-renames', '--no-relative', '-z']));
 }
 
 /**
@@ -247,7 +247,7 @@ export function commitUnitWork({ worktree, repoRoot, unitId, summary, scope, cha
     const sha = git(ctx, ['rev-parse', 'HEAD']).trim();
 
     // A pre-commit hook can still change the index between the check above and the commit.
-    const inCommit = nulPaths(git(ctx, ['show', '--name-only', '--no-renames', '--format=', '-z', 'HEAD']));
+    const inCommit = nulPaths(git(ctx, ['show', '--name-only', '--no-renames', '--no-relative', '--format=', '-z', 'HEAD']));
     if (!sameSet(inCommit, inScope)) {
       const unexpected = inCommit.filter((p) => !inScope.includes(p));
       const missing = inScope.filter((p) => !inCommit.includes(p));

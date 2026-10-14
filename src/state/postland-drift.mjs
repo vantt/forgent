@@ -8,7 +8,7 @@
 import { execFileSync } from 'node:child_process';
 import { openLeavesSharingTarget } from './graph-harness.mjs';
 import { listSessions } from '../runner/session.mjs';
-import { nulPaths } from '../util/git-paths.mjs';
+import { nulPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
 
 function requireTrunk(fnName, trunk) {
   if (typeof trunk !== 'string' || trunk === '') {
@@ -17,8 +17,8 @@ function requireTrunk(fnName, trunk) {
   return trunk;
 }
 
-function git(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
+function git(repoRoot, args, maxBuffer) {
+  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'], ...(maxBuffer ? { maxBuffer } : {}) });
 }
 
 function branchExists(repoRoot, branch) {
@@ -83,8 +83,8 @@ export function postLandDrift(repoRoot, view, { trunk, sessions } = {}) {
     let targetFiles = [];
     try {
       // Byte for byte, a rename as both halves: one side moving a file the other edits is shared.
-      leafFiles = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-renames', '-z', `${mergeBase}...${leafBranch}`]));
-      targetFiles = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-renames', '-z', `${mergeBase}...${targetBranch}`]));
+      leafFiles = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${mergeBase}...${leafBranch}`], GIT_LIST_MAX_BUFFER));
+      targetFiles = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${mergeBase}...${targetBranch}`], GIT_LIST_MAX_BUFFER));
     } catch {
       continue;
     }

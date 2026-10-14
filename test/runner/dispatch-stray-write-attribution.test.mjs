@@ -112,7 +112,7 @@ test('a file another session writes into the main checkout during a round is not
       level: 'correlated',
       basis: ['pre-post-git-snapshot'],
       repoRoot: root,
-      paths: ['plans'],
+      paths: ['plans/other/reports/code-review.md'],
     }]);
   } finally {
     fs.rmSync(base, { recursive: true, force: true });

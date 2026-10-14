@@ -8,7 +8,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { branchNameFor, findCheckoutPath } from './worktree.mjs';
 import { STALE_DOING_DEFAULTS } from '../state/graph-metrics.mjs';
-import { statusPaths } from '../util/git-paths.mjs';
+import { statusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
@@ -63,7 +63,9 @@ export function lastActivityAt(repoRoot, id) {
     // quotes paths at all (verified empirically: a path with spaces comes
     // through raw, byte-for-byte), so there is no escape/quote format to
     // parse in the first place.
-    statusOutput = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '-z', '--', ':!.fgos']);
+    statusOutput = execFileSync('git', ['-C', worktreePath, 'status', '--porcelain=v1', '-z', '--untracked-files=all', '--', ':!.fgos'], {
+      cwd: repoRoot, encoding: 'utf8', shell: false, maxBuffer: GIT_LIST_MAX_BUFFER,
+    });
   } catch {
     return commitTs ?? null;
   }

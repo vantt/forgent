@@ -49,7 +49,7 @@ import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, with
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
-import { nulPaths, statusPaths, nameStatusPaths } from '../util/git-paths.mjs';
+import { nulPaths, statusPaths, nameStatusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
 import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile, HELD, AMBIGUOUS, DEFAULT_TTL_MS, HOLDER_PID_ENV_VAR, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
@@ -206,10 +206,12 @@ export function buildOwnFileSet(committedDiffPaths, footprint) {
  * `isIgnorableStatusPath` — omitted (`null`, the default), every existing
  * caller keeps today's exact whole-tree-blocks-on-anything behavior. */
 export function isWorkingTreeClean(repoRoot, ownFileSet = null, { scope = 'whole-repo' } = {}) {
-  const prefix = git(repoRoot, ['rev-parse', '--show-prefix']).trim();
+  // Only the newline goes: a subdirectory name may itself start or end with a space.
+  const prefix = git(repoRoot, ['rev-parse', '--show-prefix']).replace(/\n$/, '');
   // Untracked files one by one: a collapsed `dir/` would never match an own path inside it.
   const statusArgs = ['status', '--porcelain=v1', '-z', '--untracked-files=all', ...(scope === 'subtree' ? ['--', '.'] : [])];
-  return statusPaths(git(repoRoot, statusArgs)).every((p) => isIgnorableStatusPath(p, prefix, ownFileSet));
+  return statusPaths(git(repoRoot, statusArgs, { maxBuffer: GIT_LIST_MAX_BUFFER }))
+    .every((p) => isIgnorableStatusPath(p, prefix, ownFileSet));
 }
 
 /**
@@ -382,7 +384,7 @@ export function changedFiles(repoRoot, item, opts = {}) {
   const branch = branchNameFor(item.id);
   let out;
   try {
-    out = git(repoRoot, ['diff', '--name-only', '--no-renames', '-z', `${trunk}...${branch}`]);
+    out = git(repoRoot, ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${trunk}...${branch}`], { maxBuffer: GIT_LIST_MAX_BUFFER });
   } catch (err) {
     throw new MergeError(`computing changed files for branch "${branch}" failed: ${err.message}`, { branch });
   }
@@ -468,7 +470,7 @@ export function splitConflictSegments(text) {
  * only choice on `null` is the pre-existing abort-and-report path.
  */
 export function classifyDecisionIndexCollision(repoRoot) {
-  const paths = nulPaths(git(repoRoot, ['diff', '--name-only', '--diff-filter=U', '-z']));
+  const paths = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-relative', '--diff-filter=U', '-z']));
   if (paths.length !== 1 || paths[0] !== DECISION_INDEX_PATH) {
     return null;
   }
@@ -1030,8 +1032,8 @@ function mergedTreeAlreadyVerified(repoRoot, item, branch) {
   try {
     const mergeBase = git(repoRoot, ['merge-base', branch, 'HEAD']).trim();
     if (!mergeBase) return false;
-    const introducedPaths = nameStatusPaths(git(repoRoot, ['diff', '--name-status', '-z', `${mergeBase}..${item.branchHeadAtReturn}`]));
-    const mainAdvancedPaths = nameStatusPaths(git(repoRoot, ['diff', '--name-status', '-z', `${mergeBase}..HEAD`]));
+    const introducedPaths = nameStatusPaths(git(repoRoot, ['diff', '--name-status', '--no-relative', '-z', `${mergeBase}..${item.branchHeadAtReturn}`], { maxBuffer: GIT_LIST_MAX_BUFFER }));
+    const mainAdvancedPaths = nameStatusPaths(git(repoRoot, ['diff', '--name-status', '--no-relative', '-z', `${mergeBase}..HEAD`], { maxBuffer: GIT_LIST_MAX_BUFFER }));
     for (const path of introducedPaths) {
       if (mainAdvancedPaths.has(path)) {
         return false;
@@ -1088,7 +1090,10 @@ function branchContentMismatch(repoRoot, branch, ref) {
   // docs/how-to/fix-fgos-write-rejected-merge-block.md: restoring .fgos/
   // paths to the branch's own frozen pre-merge versions) is never real
   // discarded content, just an expected, permanent divergence from HEAD.
-  const introducedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-renames', '-z', `${base}..${branch}`]))
+  // Rename detection stays on here (a rename names only its new path): a branch that renamed
+  // `a -> b` after main already deleted `a` leaves the merge no change to make on `a`, and the
+  // source half would read as discarded content. Pathspecs are literal: a name may hold `*` or `[`.
+  const introducedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-relative', '-z', `${base}..${branch}`], { maxBuffer: GIT_LIST_MAX_BUFFER }))
     .filter((p) => p !== '.fgos' && !p.startsWith('.fgos/'));
   if (introducedPaths.length === 0) {
     return [];
@@ -1102,7 +1107,7 @@ function branchContentMismatch(repoRoot, branch, ref) {
   // that path relative to its own first parent, even though branch's diff
   // touched it.
   const changedByMerge = new Set(
-    nulPaths(git(repoRoot, ['diff', '--name-only', '--no-renames', '-z', `${firstMerge}^1`, firstMerge, '--', ...introducedPaths])),
+    nulPaths(git(repoRoot, ['--literal-pathspecs', 'diff', '--name-only', '--no-relative', '-z', `${firstMerge}^1`, firstMerge, '--', ...introducedPaths], { maxBuffer: GIT_LIST_MAX_BUFFER })),
   );
   return introducedPaths.filter((p) => !changedByMerge.has(p));
 }
@@ -1211,7 +1216,7 @@ function isUnchangedSinceBranchHeadAtTake(repoRoot, branch, relPath, branchHeadA
 // `isMergeUnionPath`'s own gate above, for the identical reason: never
 // silently discard a real, non-append-only `.fgos/` write).
 function resolveFgosOnlyConflict(repoRoot, keepRef) {
-  const conflictedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--diff-filter=U', '-z']));
+  const conflictedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-relative', '--diff-filter=U', '-z']));
   if (conflictedPaths.length === 0) {
     return false;
   }
@@ -1232,7 +1237,7 @@ function resolveFgosOnlyConflict(repoRoot, keepRef) {
       }
     }
   }
-  const stillUnmerged = nulPaths(git(repoRoot, ['diff', '--name-only', '--diff-filter=U', '-z']));
+  const stillUnmerged = nulPaths(git(repoRoot, ['diff', '--name-only', '--no-relative', '--diff-filter=U', '-z']));
   return stillUnmerged.length === 0;
 }
 
@@ -1396,7 +1401,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
   // already know about) — left staged as-is on a failed checkout, it still
   // falls through to the reject/abort path below exactly as before this
   // fix.
-  let stagedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--cached', '--no-renames', '-z']));
+  let stagedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--cached', '--no-renames', '--no-relative', '-z'], { maxBuffer: GIT_LIST_MAX_BUFFER }));
   let fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
   if (fgosPaths.length > 0) {
     // tsk-28x: prefer `item.lastAttempt.branchHeadAtTake` over the
@@ -1452,7 +1457,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
         }
       }
     }
-    stagedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--cached', '--no-renames', '-z']));
+    stagedPaths = nulPaths(git(repoRoot, ['diff', '--name-only', '--cached', '--no-renames', '--no-relative', '-z'], { maxBuffer: GIT_LIST_MAX_BUFFER }));
     fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
   }
   if (fgosPaths.length > 0) {
@@ -1721,7 +1726,7 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
     if (conflicted) {
       let conflictedFiles = [];
       try {
-        conflictedFiles = nulPaths(execFileSync('git', ['diff', '--name-only', '--diff-filter=U', '-z'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }));
+        conflictedFiles = nulPaths(execFileSync('git', ['diff', '--name-only', '--no-relative', '--diff-filter=U', '-z'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }));
       } catch {
         // best-effort — the outcome below still reports the conflict even
         // if listing the conflicted files itself fails.

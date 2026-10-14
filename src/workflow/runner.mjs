@@ -31,6 +31,7 @@ import { seatProviders } from './seat-providers.mjs';
 import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
 import { RunnerConfigError, assertReasoningEffort } from '../runner/dispatch/config.mjs';
 import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
+import { nulPaths } from '../util/git-paths.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
 import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 
@@ -268,7 +269,7 @@ function outOfScopeWrites(mainRoot, { unitRunId, writes, results, branch, baseSh
     scope = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8')).writeScope ?? writes;
   } catch { /* the template's writes are the scope the run started from */ }
   const changed = branch && baseSha
-    ? (gitOut(mainRoot, ['diff', '-z', '--no-renames', '--name-only', baseSha, branch, '--']) ?? '').split('\0').filter(Boolean)
+    ? nulPaths(gitOut(mainRoot, ['diff', '-z', '--no-renames', '--no-relative', '--name-only', baseSha, branch, '--']) ?? '')
     : results.flatMap((result) => result?.commit?.files ?? []);
   // What the branch itself carries outside the scope: the part a writer built on it inherits.
   const onBranch = changed.filter((file) => !matchesWriteScope(file, scope));
@@ -321,7 +322,7 @@ function settleUnitWorktrees({ mainRoot, state, workflow }) {
         continue;
       } else if (unit.branch && !gitOk(mainRoot, ['merge-base', '--is-ancestor', unit.branch, integrationTarget])) {
         reason = 'branch not integrated';
-      } else if ((gitOut(unit.worktreePath, ['status', '--porcelain']) ?? 'unknown').trim() !== '') {
+      } else if ((gitOut(unit.worktreePath, ['status', '--porcelain', '--untracked-files=normal']) ?? 'unknown').trim() !== '') {
         reason = 'worktree has uncommitted changes';
       }
       if (reason) {

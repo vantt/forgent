@@ -59,7 +59,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { StoreError } from '../state/store.mjs';
 import { readWorktreeSetupCommands } from '../config/shared-config-file.mjs';
-import { statusPaths } from '../util/git-paths.mjs';
+import { statusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
  * reuses the vocabulary declared in `recovery.mjs`'s `ERROR_CLASSES` (per
@@ -390,7 +390,8 @@ export function findCheckoutPath(porcelainOutput, branch) {
 export function isCheckoutDirty(repoRoot, worktreePath) {
   let status;
   try {
-    status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--', ':!.fgos']);
+    // Explicit untracked mode: a user's status.showUntrackedFiles=no would hide new files.
+    status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--untracked-files=normal', '--', ':!.fgos']);
   } catch {
     return true;
   }
@@ -401,9 +402,8 @@ export function isCheckoutDirty(repoRoot, worktreePath) {
  * Return an array of relative file paths that are currently dirty (uncommitted
  * or untracked) in `worktreePath`, excluding `.fgos` artifacts (reusing the
  * exact `:!.fgos` pathspec exclusion from `isCheckoutDirty`). Read through
- * `statusPaths`: byte for byte, a rename as both halves, a collapsed untracked
- * directory without its trailing slash. Fails open (returns empty array) on
- * git error.
+ * `statusPaths`: byte for byte, a rename as both halves, untracked files one
+ * by one. Fails open (returns empty array) on git error.
  *
  * Exported (tsk-3bh): `executeExecutorCli` (src/runner/dispatch/cli.mjs)
  * uses this to detect uncommitted paths lost across an out-of-process dispatch.
@@ -411,7 +411,11 @@ export function isCheckoutDirty(repoRoot, worktreePath) {
 export function checkoutDirtyPaths(repoRoot, worktreePath) {
   let statusOutput;
   try {
-    statusOutput = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '-z', '--', ':!.fgos']);
+    // Untracked files one by one, whatever status.showUntrackedFiles says: a new file inside an
+    // already-untracked directory is a new path, not the same collapsed `dir`.
+    statusOutput = execFileSync('git', ['-C', worktreePath, 'status', '--porcelain=v1', '-z', '--untracked-files=all', '--', ':!.fgos'], {
+      cwd: repoRoot, encoding: 'utf8', shell: false, maxBuffer: GIT_LIST_MAX_BUFFER,
+    });
   } catch {
     return [];
   }
@@ -891,7 +895,7 @@ function isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced) {
   }
   let status;
   try {
-    status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--', ':!.fgos']);
+    status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--untracked-files=normal', '--', ':!.fgos']);
   } catch {
     return true;
   }

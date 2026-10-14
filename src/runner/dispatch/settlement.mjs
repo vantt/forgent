@@ -39,7 +39,7 @@ import {
   quarantineProviderAccount,
 } from './provider-capacity.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
-import { nulPaths, statusPaths } from '../../util/git-paths.mjs';
+import { nulPaths, statusPaths, GIT_LIST_MAX_BUFFER } from '../../util/git-paths.mjs';
 
 /**
  * Safely resolve root path without failing if not in a git repository.
@@ -164,6 +164,7 @@ export function safeGitStatusFiles(dir) {
     const output = execFileSync('git', ['status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignore-submodules=dirty'], {
       cwd: dir,
       encoding: 'utf8',
+      maxBuffer: GIT_LIST_MAX_BUFFER,
       shell: false,
       stdio: ['ignore', 'pipe', 'ignore'],
     });
@@ -180,9 +181,10 @@ export function safeGitStatusFiles(dir) {
 export function safeGitCommittedDiffFiles(dir, gitBefore, gitAfter) {
   if (!dir || !gitBefore || !gitAfter || gitBefore === gitAfter) return [];
   try {
-    const output = execFileSync('git', ['diff', '--name-only', '--no-renames', '-z', `${gitBefore}..${gitAfter}`], {
+    const output = execFileSync('git', ['diff', '--name-only', '--no-renames', '--no-relative', '-z', `${gitBefore}..${gitAfter}`], {
       cwd: dir,
       encoding: 'utf8',
+      maxBuffer: GIT_LIST_MAX_BUFFER,
       shell: false,
       stdio: ['ignore', 'pipe', 'ignore'],
     });

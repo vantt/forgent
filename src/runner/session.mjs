@@ -644,7 +644,8 @@ export function reclaimOrphanedSessions(repoRoot) {
         // or a tracked dir replaced by one) regardless of the actual session.
         let dirty = true;
         try {
-          dirty = gitAt(entry.worktreePath, ['status', '--porcelain', '--', ':!.fgos']).trim().length > 0;
+          // Explicit untracked mode: a user's status.showUntrackedFiles=no would hide new files.
+          dirty = gitAt(entry.worktreePath, ['status', '--porcelain', '--untracked-files=normal', '--', ':!.fgos']).trim().length > 0;
         } catch {
           dirty = true;
         }

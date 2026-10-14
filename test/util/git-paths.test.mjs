@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { nulPaths, statusPaths, nameStatusPaths } from '../../src/util/git-paths.mjs';
-import { checkoutDirtyPaths } from '../../src/runner/worktree.mjs';
+import { checkoutDirtyPaths, isCheckoutDirty } from '../../src/runner/worktree.mjs';
 
 const VIET = 'tài liệu/ghi chú.md';
 const EDGE = ' lề .md';
@@ -82,5 +82,32 @@ test('checkoutDirtyPaths reads Vietnamese, edge-space and tab names, a staged re
   const repoRoot = initRepo(t);
   dirty(repoRoot);
 
-  assert.deepEqual(checkoutDirtyPaths(repoRoot, repoRoot).sort(), [EDGE, 'a b.md', 'cũ.md', 'mới.md', TAB, 'tài liệu'].sort());
+  assert.deepEqual(checkoutDirtyPaths(repoRoot, repoRoot).sort(), [EDGE, 'a b.md', 'cũ.md', 'mới.md', TAB, VIET].sort());
+});
+
+test('checkoutDirtyPaths names a new file inside an already-untracked directory', (t) => {
+  const repoRoot = initRepo(t);
+  write(repoRoot, 'scratch/old.txt', 'old\n');
+  const before = checkoutDirtyPaths(repoRoot, repoRoot);
+  write(repoRoot, 'scratch/stray.txt', 'stray\n');
+  const after = checkoutDirtyPaths(repoRoot, repoRoot);
+
+  assert.deepEqual(after.filter((p) => !before.includes(p)), ['scratch/stray.txt']);
+});
+
+test('checkoutDirtyPaths sees untracked files when status.showUntrackedFiles is no', (t) => {
+  const repoRoot = initRepo(t);
+  git(repoRoot, ['config', 'status.showUntrackedFiles', 'no']);
+  write(repoRoot, 'new.md', 'new\n');
+
+  assert.deepEqual(checkoutDirtyPaths(repoRoot, repoRoot), ['new.md']);
+});
+
+test('isCheckoutDirty sees an untracked file when status.showUntrackedFiles is no', (t) => {
+  const repoRoot = initRepo(t);
+  git(repoRoot, ['config', 'status.showUntrackedFiles', 'no']);
+  assert.equal(isCheckoutDirty(repoRoot, repoRoot), false);
+  write(repoRoot, 'new.md', 'new\n');
+
+  assert.equal(isCheckoutDirty(repoRoot, repoRoot), true);
 });

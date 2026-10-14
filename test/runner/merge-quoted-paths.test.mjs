@@ -10,9 +10,11 @@ import {
   changedFiles,
   isWorkingTreeClean,
   buildOwnFileSet,
+  isIgnorableStatusPath,
   nextFreeDecisionId,
 } from '../../src/runner/merge.mjs';
 import { postLandDrift } from '../../src/state/postland-drift.mjs';
+import { safeGitStatusFiles } from '../../src/runner/dispatch/settlement.mjs';
 
 const VIET = 'tài liệu/ghi chú.md';
 const EDGE = ' lề .md';
@@ -122,4 +124,48 @@ test('postLandDrift names a shared Vietnamese path and a path one side renamed a
   const view = { work: { landed1: { id: 'landed1', status: 'done' }, leaf1: { id: 'leaf1', status: 'doing' } } };
   const result = postLandDrift(repoRoot, view, { trunk: 'main', sessions: [{ sessionId: 's1', itemId: 'leaf1' }] });
   assert.deepEqual(result.leaf1?.shared, ['cũ.md', VIET].sort());
+});
+
+test('isWorkingTreeClean and settlement answer on an untracked tree listing over 1 MiB', (t) => {
+  const repoRoot = initRepo(t);
+  const dir = path.join(repoRoot, 'cache');
+  fs.mkdirSync(dir);
+  const stem = 'x'.repeat(230);
+  for (let i = 0; i < 5000; i += 1) fs.writeFileSync(path.join(dir, `${stem}-${i}`), '');
+
+  assert.equal(isWorkingTreeClean(repoRoot, buildOwnFileSet(['seed.txt'], [])), true);
+  write(repoRoot, 'seed.txt', 'changed\n');
+  assert.equal(isWorkingTreeClean(repoRoot, buildOwnFileSet(['seed.txt'], [])), false);
+  assert.ok(safeGitStatusFiles(repoRoot).includes('seed.txt'));
+});
+
+test('a dirty own file in a subdirectory blocks the subtree gate even with diff.relative set', (t) => {
+  const repoRoot = initRepo(t);
+  const sub = path.join(repoRoot, 'sub');
+  write(repoRoot, 'sub/x.js', '1\n');
+  commitAll(repoRoot, 'take');
+  git(repoRoot, ['checkout', '-q', '-b', 'fgw/demo-item']);
+  write(repoRoot, 'sub/x.js', '2\n');
+  commitAll(repoRoot, 'work');
+  git(repoRoot, ['config', 'diff.relative', 'true']);
+  write(repoRoot, 'sub/x.js', '3\n');
+
+  const own = changedFiles(sub, { id: 'demo-item' }, { trunk: 'main' });
+  assert.deepEqual(own, ['sub/x.js']);
+  assert.equal(isWorkingTreeClean(sub, buildOwnFileSet(own, []), { scope: 'subtree' }), false);
+});
+
+test('isWorkingTreeClean exempts .fgos under a subdirectory whose name starts with a space', (t) => {
+  const repoRoot = initRepo(t);
+  const sub = path.join(repoRoot, ' sub');
+  write(repoRoot, ' sub/.fgos/events.jsonl', '{}\n');
+
+  assert.equal(isWorkingTreeClean(sub, null, { scope: 'subtree' }), true);
+});
+
+test('isIgnorableStatusPath counts a status path as own when it normalizes to an own path (fails closed)', () => {
+  const own = buildOwnFileSet([], [EDGE]);
+  assert.equal(isIgnorableStatusPath(EDGE, '', own), false);
+  assert.equal(isIgnorableStatusPath('lề .md', '', own), false, 'differs only in edge spaces: blocks rather than passes');
+  assert.equal(isIgnorableStatusPath('a\\b.md', '', buildOwnFileSet([], ['a/b.md'])), false);
 });
