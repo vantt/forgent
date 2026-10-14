@@ -1,3 +1,73 @@
+# Latest resume state — Root closure and alias previews packaged for independent review
+
+Date: 2026-10-14
+Executor: codex-session:24@2026-10-14
+Session counter: 24
+Assignment: unit-run-1791986358726-6d4b5589/producer/1
+Step: 5
+State: ready-for-review / file-only packaging awaiting runner-produced commit
+Content commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Last green D/native/preservation proof inventory: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+
+This turn completed exactly the previous handoff's steps 1–4. Resume confirmed a clean tree, exact HEAD a125b4ec0 and ancestry from 9f087f37d. All source, target, decision and proposal content in the new review packs is pinned to a125b4ec0, with explicit older commit/blob pins for historical predecessors. Only plan proof/packaging and this progress changed. No docs bytes, decision/proposal content, truth draw/report/population, active alias/conflict resolution, checker, gate, vocabulary, extractor, frozen map or baseline changed. No git write, promotion, push, main merge or Step 6 work. The runner owns the packaging commit; its request commit is not a replacement content pin.
+
+## Proof at the content commit
+
+Evidence: [verification-261014-2105-root-closure-alias-packaging.json](verification-261014-2105-root-closure-alias-packaging.json); complete rechecked binding text: [bindings-261014-2105-root-closure-current-content.json](bindings-261014-2105-root-closure-current-content.json); refreshed native preview, all additions/removals and complete per-pack edge partitions: [preview-261014-2105-root-alias-consumer-edges.json](preview-261014-2105-root-alias-consumer-edges.json). Proof includes real commands, parsed gate outputs, test log, helper sources, artifact naming calls and preservation checks. Temporary refresh files are removed after recording this evidence.
+
+- Both-prior D: exit 0, zero fatal findings, entire parsed outputs equal.
+- Both-prior full Root-map scoped E: exit 1 with exactly two expected strict categories, claims-not-reviewed 5 and candidate-blocks-unreferenced 830; entire parsed outputs equal. All 830 full claim/path/anchor/digest tuples equal the unchanged committed candidate list. No Root unknown/hold or identical-unit multiple-owner group. Six pending historical-gap proposals are overlaid by the native gate and still owe independent review; their absence from the open-gap category is not acceptance.
+- All 94,865 known native IDs/full tuples retained, active inventory/registry tuples equal, zero new gaps/retired units and zero identity graft. Source population stays 1,072 decided, 1,067 reviewed / five pending / zero undecided.
+- Registry copied directly from persisted working-identity-registry.json and natively refreshed at a125b4ec0, never rebuilt from a seed. Actual native output remains byte-equal to the persisted registry, so it was not written. Compact one-line form: 59,723,017 bytes, SHA256 7b7e8645cf9609688ae83d43ac821d5f0c093755845bcf712102d3c210b04ec0, below the 90 MB stop line. Native registry metadata still names cd82746a8 because its content is unchanged; the proof inventory is a125b4ec0.
+- Preservation A/B/C/F/G/H/I passes, same seven exact prior A exemptions. Extractor, frozen root files, witness/payload trees, authority statuses and reader links unchanged. Ratchet 995/25/1; placement 529/528/one existing exception; H zero findings.
+- Relevant unmodified tests: env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs — 39/39 pass, zero fail/cancel/skip/todo.
+
+## Closure bindings and packs
+
+All 11 pending source/gap decisions were checked against the real full historical/current text and exact anchors at the content commit; their decision JSON is unchanged. Three historical contract dispositions remain targetless retain-as-evidence; current owners are separately labelled informational successors. The historical generated backlog predecessor and five current generated rows are also targetless. Two historical I/O decisions name real successor targets. Full native/shown digests are 64 hex throughout the review evidence; old short digest fields in quoted previously accepted evidence decisions stay verbatim and are checked against their actual anchor/full digest, without rewriting decision content.
+
+Closure pack: six historical gaps, five generated rows, two pending duplicate-group projections and zero-group identical-resolution accounting = 14 entries. Ordinary rows have the existing Claim | Verdict | Note | Source digest | Target digest contract, with literal none for an absent target. Group/zero-group entries use separate accounting labels, without fabricated claim IDs. Full duplicate membership, both complete payloads, sole mapped owners, rationales and done conditions are shown. All entries remain pending.
+
+Alias packs: 347 unchanged alias proposals split 75/75/75/75/47; the seven retained-path/no-alias proposals join the final pack (54). Native/browser anchors, complete source/destination text, all supporting source decisions, full digests and diffs are shown. Each request names Content commit a125b4ec0, its differing-digest deep-read set and absent-target entries. A36 mechanical checks cover every entry; the independent reviewer draws/records the seeded deep sample, adds every differing row, and reads the whole pack if more than 3% of deep rows need rework. Neither the decision author nor packaging author may review these packs.
+
+| Pack | Entries | Ordinary decisions | Accounting proposals | Edges | Mandatory differing rows | Pack file | Review request |
+|---|---:|---:|---:|---:|---:|---|---|
+| root-closure | 14 | 11 | 3 | 0 | 2 | [review-pack-261014-2105-root-closure.md](review-pack-261014-2105-root-closure.md) | [review-request-261014-2105-root-closure.md](review-request-261014-2105-root-closure.md) |
+| root-alias-01 | 75 | 0 | 75 | 12158 | 44 | [review-pack-261014-2105-root-alias-01.md](review-pack-261014-2105-root-alias-01.md) | [review-request-261014-2105-root-alias-01.md](review-request-261014-2105-root-alias-01.md) |
+| root-alias-02 | 75 | 0 | 75 | 0 | 75 | [review-pack-261014-2105-root-alias-02.md](review-pack-261014-2105-root-alias-02.md) | [review-request-261014-2105-root-alias-02.md](review-request-261014-2105-root-alias-02.md) |
+| root-alias-03 | 75 | 0 | 75 | 746 | 50 | [review-pack-261014-2105-root-alias-03.md](review-pack-261014-2105-root-alias-03.md) | [review-request-261014-2105-root-alias-03.md](review-request-261014-2105-root-alias-03.md) |
+| root-alias-04 | 75 | 0 | 75 | 2057 | 23 | [review-pack-261014-2105-root-alias-04.md](review-pack-261014-2105-root-alias-04.md) | [review-request-261014-2105-root-alias-04.md](review-request-261014-2105-root-alias-04.md) |
+| root-alias-05 | 54 | 0 | 54 | 11329 | 20 | [review-pack-261014-2105-root-alias-05.md](review-pack-261014-2105-root-alias-05.md) | [review-request-261014-2105-root-alias-05.md](review-request-261014-2105-root-alias-05.md) |
+
+Each pack has a .md.json sidecar and full Markdown SHA256 in its request. Reports are requested under the matching review-261014-2105-root-closure.md / review-261014-2105-root-alias-01 through -05.md names; no verdict is authored here.
+
+## Consumer lineage
+
+Refreshed native Root inbound population: 26,290 unique edges. Compared with the 25,081 prior pinned input edges: 24,982 byte-identical native tuples retained, 1,308 additions and 99 removals explicitly listed, with old/current artifact tree entries and per-artifact explanations. The 97 removed source-completion-shard edge identities and two removed progress edge identities are from changed plan artifacts; there is no removed docs/source edge. Previous tuples remain in the unchanged prior preview and the new delta; no lineage is silently replaced.
+
+All 26,290 current edges occur once across the five full appendices (12,158 / 0 / 746 / 2,057 / 11,329), with exact native identity fields, unique native edge IDs, full SHA256, counts and action/rationale. The partition uses exact fragment proposal membership when available, otherwise the pack with the source bare-path proposal; sources spanning packs do not duplicate edges. Retained and generated-index sources belong to the final pack. Union equality has zero missing/duplicate edges. Every executable/data edge explicitly retains pending contract-aware review and denies documentation-alias certification of executable compatibility. Immutable bytes stay preserved; mutable docs/code/data rewrites remain authorized-cutover obligations. No consumer or active alias changed.
+
+The inventory is pinned to a125b4ec0, so this turn's newly generated packs/requests/proof are intentionally outside that input edge population. The next native refresh must account for their outgoing edges; do not silently call this a refresh of the future runner commit.
+
+## Owner blocker and exact next turn
+
+The owner question on review-5-root-truth-final.md is still open: eight false units of 30 (26.7%, 13 reported false sentences). Its draw, report and population are unchanged. A35 authorized the earlier escalation only and supplies no correction scope for this later failed draw. This blocks eventual Step 5 truth closure, not the completed proof/packaging assignment. No new question or owner-queue edit was made.
+
+After the runner commits this handoff:
+
+1. Independent reviewer(s), started by the owner, consume the six bounded requests above against Content commit a125b4ec0. Use the runner commit as the request pin only; historical predecessors retain their separate pins. Return ordinary verdicts for all 11 native decisions, labelled accounting verdicts for the three closure entries and all 354 alias/retained proposals, plus explicit appendix population/action accounting. No source approval is fabricated from an alias/group verdict.
+2. Await the owner's committed direction on the final truth draw. Corrections, if authorized, follow only that scope, preserve before/after evidence, rebind under A22 without approval carry, and receive independent truth re-review. Conservation acceptance does not close the >10% truth failure.
+3. Apply independently committed source/gap notes verbatim with the existing applier and preserve separate accounting acceptances; then copy the persisted registry, refresh natively at the relevant new commit and rerun both-prior D/E/full native equality and preservation. Persist compact registry bytes only if changed, below 90 MB. Account every new/removed native consumer edge, including this packaging turn's artifacts. No seed reconstruction or checker change.
+4. Remaining Step 5 obligations still owed: independent 50-block invented-claim sample and hostile pass; committed fresh-reader key, two independent readers and three scenarios; owner-approved batch-boundary sync/accounting under A31; final batch report with prior holds/exceptions/A34 residuals, pending cutover consumers and owner effort checkpoint. Step 5 cannot close before these, the six independent pack reviews and the owner's truth disposition are complete. Step 6 is not authorized here.
+
+Technical proof blockers: none. MDView preview was attempted through the available CLI and failed because its SQLite database is readonly (Error code 8); changing that database is outside this file-only scope. The Markdown review artifacts remain directly readable. No full-suite, installed-release, gateway or full truth certification is claimed.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Completion verdicts applied; pending closure dispositions authored
 
 Date: 2026-10-14

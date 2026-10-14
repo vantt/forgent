@@ -1,0 +1,7311 @@
+# Committed-content conservation review: root-closure
+
+Author session: codex-session:24@2026-10-14
+Decision author: codex-session:23@2026-10-14
+Content commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Entries: 14
+Review status: pending
+
+All shown source, target and decision bytes are bound to Content commit above, except explicitly pinned historical predecessors. This is a review of pending dispositions/navigation/accounting, without truth certification or authority promotion. Existing accepted source decisions are evidence only. Historical short digest fields in quoted accepted decision JSON stay verbatim; the full independently recomputed 64-hex native and shown digests accompany every unit. Each stored target prefix is checked for a unique native match in its owner, with the actual anchor checked separately.
+
+## claim_56ee14864e75c42f80dc9903aa1c53e9
+
+Entry kind: registry-gap-decision
+Class: Judgment
+Source digest: 5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664
+Target digest: absent
+
+Shard: plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json
+
+```json
+{
+  "claimId": "claim_56ee14864e75c42f80dc9903aa1c53e9",
+  "sourcePath": "docs/architecture-manifest.json",
+  "sourceAnchor": "file-block",
+  "sourceUnitDigest": "5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664",
+  "disposition": "retain-as-evidence",
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:23@2026-10-14",
+  "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/architecture-manifest.json at e63a17b8ec87ec6b29671d00a0111dc84b3eb848 (blob c530841eb23f1ac0b2acd46a32cf9ff9da4ba9a3, full unit SHA256 5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/contracts/architecture-manifest.json, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed."
+}
+```
+
+Complete source/predecessor: `docs/architecture-manifest.json#file-block`
+Commit: e63a17b8ec87ec6b29671d00a0111dc84b3eb848
+Native unit SHA256: 5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664
+Shown text SHA256: 8940235990f86fd699b9b338ebfa850fa915615748c394ee98d798b11f852e84
+
+```text
+{
+  "contract": "architecture-manifest.v1",
+  "map": "docs/architecture-map.md",
+  "layers": [
+    "entry",
+    "use-case",
+    "infra",
+    "domain",
+    "kernel"
+  ],
+  "rules": [
+    "one-directional-layer",
+    "domain-siloing"
+  ],
+  "components": [
+    "packaging-distribution"
+  ],
+  "domains": [
+    "coding",
+    "marketing"
+  ],
+  "files": {
+    "bin/fgos.mjs": "entry",
+    "bin/fgos-runner.mjs": "entry",
+    "src/runner/loop.mjs": "use-case",
+    "src/runner/paths.mjs": "infra",
+    "src/runner/dispatch.mjs": "infra",
+    "src/runner/operation-capability.mjs": "domain",
+    "src/runner/rigor.mjs": "kernel",
+    "src/runner/dispatch-log.mjs": "infra",
+    "src/runner/fanout-batch.mjs": "infra",
+    "src/runner/work-compat.mjs": "infra",
+    "src/runner/dispatch/adapters.mjs": "infra",
+    "src/runner/dispatch/config.mjs": "infra",
+    "src/runner/dispatch/confinement/policies.mjs": "infra",
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
+    "src/runner/dispatch/confinement/backend-registry.mjs": "infra",
+    "src/runner/dispatch/confinement/authority.mjs": "infra",
+    "src/runner/dispatch/confinement/request.mjs": "infra",
+    "src/runner/dispatch/confinement/resources.mjs": "infra",
+    "src/runner/dispatch/confinement/cleanup.mjs": "infra",
+    "src/runner/dispatch/confinement/attestation-store.mjs": "infra",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "infra",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "infra",
+    "src/runner/dispatch/resolve.mjs": "infra",
+    "src/runner/dispatch/mechanism.mjs": "infra",
+    "src/runner/dispatch/plan.mjs": "infra",
+    "src/runner/dispatch/transport.mjs": "infra",
+    "src/runner/dispatch/prepare.mjs": "infra",
+    "src/runner/dispatch/result-ladder.mjs": "infra",
+    "src/runner/dispatch/assignment.mjs": "infra",
+    "src/runner/dispatch/assignment-layout.mjs": "infra",
+    "src/runner/dispatch/assignment-normalizer.mjs": "infra",
+    "src/runner/dispatch/execution-contract.mjs": "infra",
+    "src/runner/dispatch/effective-execution-contract.mjs": "infra",
+    "src/runner/dispatch/agent-result-claim-contract.mjs": "infra",
+    "src/runner/dispatch/evidence-attribution.mjs": "infra",
+    "src/runner/dispatch/run-result.mjs": "infra",
+    "src/runner/dispatch/usage-parsers.mjs": "infra",
+    "src/runner/dispatch/runtime-inspection.mjs": "infra",
+    "src/runner/dispatch/reconciliation-planner.mjs": "infra",
+    "src/runner/dispatch/assignment-policy.mjs": "infra",
+    "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
+    "src/runner/dispatch/provider-adapter.mjs": "infra",
+    "src/runner/dispatch/provider-capacity.mjs": "infra",
+    "src/runner/dispatch/provider-auth-failure.mjs": "infra",
+    "src/runner/dispatch/assignment-runner.mjs": "infra",
+    "src/runner/dispatch/settlement.mjs": "infra",
+    "src/runner/dispatch/reconcile-cli-spawn.mjs": "infra",
+    "src/runner/dispatch/cli.mjs": "infra",
+    "src/runner/dispatch/detached-run-supervisor.mjs": "infra",
+    "src/runner/prompt-templates.mjs": "infra",
+    "src/runner/worker-log.mjs": "infra",
+    "src/runner/agent-roster.mjs": "infra",
+    "src/runner/worktree.mjs": "infra",
+    "src/runner/promote-preflight.mjs": "infra",
+    "src/runner/promote-engine.mjs": "infra",
+    "src/runner/session.mjs": "infra",
+    "src/runner/gateway-control.mjs": "infra",
+    "src/runner/goal-check.mjs": "infra",
+    "src/runner/iron-law-gate.mjs": "infra",
+    "src/runner/frozen-judge.mjs": "domain",
+    "src/runner/merge.mjs": "infra",
+    "src/runner/main-checkout-lock.mjs": "infra",
+    "src/runner/main-checkout-reset-guard.mjs": "infra",
+    "src/runner/github-adapter.mjs": "infra",
+    "src/state/drift-status.mjs": "infra",
+    "src/state/postland-drift.mjs": "infra",
+    "src/state/store.mjs": "infra",
+    "src/state/gate-bypass.mjs": "infra",
+    "src/state/cursor.mjs": "use-case",
+    "src/state/porting-store.mjs": "infra",
+    "src/state/tool-registry.mjs": "domain",
+    "src/install/coexist.mjs": "infra",
+    "src/runner/recovery.mjs": "domain",
+    "src/runner/anti-loop.mjs": "domain",
+    "src/runner/attestation-guard.mjs": "domain",
+    "src/runner/claim-port.mjs": "infra",
+    "src/runner/claim-liveness.mjs": "infra",
+    "src/runner/lock-wait.mjs": "infra",
+    "src/runner/write-queue.mjs": "domain",
+    "src/runner/root-affinity.mjs": "domain",
+    "src/state/status-fsm.mjs": "domain",
+    "src/state/handoff.mjs": "domain",
+    "src/state/porting.mjs": "domain",
+    "src/state/frontier.mjs": "domain",
+    "src/state/impact.mjs": "domain",
+    "src/state/priority-formula.mjs": "domain",
+    "src/state/replay.mjs": "domain",
+    "src/state/events-compaction.mjs": "domain",
+    "src/state/dep-graph.mjs": "domain",
+    "src/state/graph-harness.mjs": "domain",
+    "src/state/graph-metrics.mjs": "domain",
+    "src/state/awaiting-context.mjs": "domain",
+    "src/state/cleanup-harness.mjs": "domain",
+    "src/state/cleanup-pool.mjs": "domain",
+    "src/state/discover-pool.mjs": "domain",
+    "src/state/plan-pool.mjs": "domain",
+    "src/state/retro-pool.mjs": "domain",
+    "src/state/retrospective-doors.mjs": "domain",
+    "src/state/worker-slots.mjs": "domain",
+    "src/intake/discovery.mjs": "use-case",
+    "src/intake/plan.mjs": "use-case",
+    "src/intake/plan-verdict-from-plan-md.mjs": "use-case",
+    "src/intake/verify-pattern-check.mjs": "kernel",
+    "src/cli/command-registry.mjs": "kernel",
+    "src/cli/deprecation.mjs": "kernel",
+    "src/cli/version.mjs": "kernel",
+    "src/cli/invocation-fault-log.mjs": "infra",
+    "src/cli/approve-fault-log.mjs": "infra",
+    "src/report/enduser-index.mjs": "domain",
+    "src/report/enduser-index-generate.mjs": "infra",
+    "src/report/decision-index.mjs": "infra",
+    "src/report/capability-plan-lint.mjs": "infra",
+    "src/report/context-render.mjs": "domain",
+    "src/report/frontmatter.mjs": "domain",
+    "src/report/authoritative-match.mjs": "domain",
+    "src/evolve/iron-law.mjs": "domain",
+    "src/state/events.mjs": "kernel",
+    "src/state/events-jsonl-truncation-guard.mjs": "kernel",
+    "src/state/main-checkout-guard-warnings.mjs": "kernel",
+    "src/state/work.mjs": "kernel",
+    "src/state/envelope.mjs": "kernel",
+    "src/intake/risk-keywords.mjs": "kernel",
+    "src/verbs/merge/merge.mjs": "use-case",
+    "src/verbs/merge/iron-law-level.mjs": "use-case",
+    "src/verbs/merge/approve.mjs": "use-case",
+    "src/verbs/merge/review.mjs": "use-case",
+    "src/verbs/merge/sync-root.mjs": "use-case",
+    "src/verbs/merge/catchup.mjs": "use-case",
+    "src/verbs/merge/reject.mjs": "use-case",
+    "src/verbs/merge/promote-to-component.mjs": "use-case",
+    "src/verbs/state/edit.mjs": "use-case",
+    "src/verbs/state/move.mjs": "use-case",
+    "src/verbs/state/read.mjs": "use-case",
+    "src/verbs/dispatch/show-run.mjs": "use-case",
+    "src/verbs/dispatch/inspect.mjs": "use-case",
+    "src/verbs/dispatch/reconcile.mjs": "use-case",
+    "src/verbs/dispatch/watch.mjs": "use-case",
+    "src/verbs/dispatch/recover.mjs": "use-case",
+    "src/report/item-trace.mjs": "domain",
+    "src/util/format-bytes.mjs": "kernel",
+    "src/util/format-duration.mjs": "kernel",
+    "src/util/normalize-path.mjs": "kernel",
+    "src/util/release-binary-path.mjs": "kernel",
+    "src/util/session-identity.mjs": "kernel",
+    "src/util/unique-tmp-tag.mjs": "kernel",
+    "src/util/host-bin.mjs": "infra",
+    "src/observe/friction-client.mjs": "infra",
+    "src/intake/classify.mjs": "use-case",
+    "src/setup/ansi.mjs": "domain",
+    "src/setup/config-merge.mjs": "domain",
+    "src/setup/shell-rc.mjs": "infra",
+    "src/setup/bin-discovery.mjs": "infra",
+    "src/setup/skill-wrappers.mjs": "infra",
+    "src/setup/instruction-registry.mjs": "infra",
+    "src/setup/git-hooks.mjs": "infra",
+    "src/setup/claude-code-hooks.mjs": "infra",
+    "src/setup/agy-permissions.mjs": "infra",
+    "src/setup/agent-cli-trust.mjs": "infra",
+    "src/setup/blind-steps-proven-pools.mjs": "use-case",
+    "src/setup/workflow-pool-independence.mjs": "use-case",
+    "src/setup/checks.mjs": "use-case",
+    "src/setup/executor-profile-warnings.mjs": "infra",
+    "src/config/global-config.mjs": "infra",
+    "src/setup/registrations.mjs": "use-case",
+    "src/config/shared-config-file.mjs": "domain",
+    "src/state/knowledge-registry.mjs": "domain",
+    "src/report/knowledge-resolver.mjs": "domain",
+    "src/report/knowledge-projection.mjs": "domain",
+    "src/state/fgos-file-registry.mjs": "kernel",
+    "src/state/runtime-coordination.mjs": "infra",
+    "src/runner/dispatch/brief.mjs": "infra",
+    "src/runner/dispatch/dispatch-error.mjs": "infra",
+    "src/runner/dispatch/proof-helpers.mjs": "infra",
+    "src/runner/dispatch/herdr-agent.mjs": "infra",
+    "src/runner/dispatch/herdr-diagnosis.mjs": "infra",
+    "src/runner/dispatch/herdr-round.mjs": "infra",
+    "src/runner/dispatch/herdr-reconcile.mjs": "infra",
+    "src/runner/dispatch/worker-artifacts.mjs": "infra",
+    "src/runner/dispatch/liveness.mjs": "infra",
+    "src/runner/dispatch/visibility-session.mjs": "infra",
+    "src/runner/dispatch/recovery-planner.mjs": "infra",
+    "src/runner/dispatch/run-lock.mjs": "infra",
+    "src/runner/dispatch/process-identity.mjs": "infra",
+    "src/runner/dispatch/trust-store.mjs": "infra",
+    "src/runner/dispatch/worker-home.mjs": "infra",
+    "src/runner/dispatch/stop-processes-inside.mjs": "infra",
+    "src/runner/dispatch/worker-session.mjs": "infra",
+    "src/runner/dispatch/worker-session-boot.mjs": "infra",
+    "src/runner/dispatch/recovery.mjs": "infra",
+    "src/setup/instruction-composition.mjs": "infra",
+    "src/setup/instruction-projections.mjs": "infra",
+    "src/runner/execution/unit.mjs": "infra",
+    "src/runner/execution/bind.mjs": "infra",
+    "src/runner/execution/dry-bind.mjs": "infra",
+    "src/runner/execution/role-ledger.mjs": "infra",
+    "src/runner/execution/commit-unit-work.mjs": "infra",
+    "src/runner/execution/handoff-refs.mjs": "infra",
+    "src/runner/execution/unit-run-history.mjs": "infra",
+    "src/runner/execution/unit-summary.mjs": "infra",
+    "src/runner/execution/run.mjs": "use-case",
+    "src/runner/execution/patterns/index.mjs": "domain",
+    "src/runner/execution/patterns/panel.mjs": "domain",
+    "src/runner/execution/patterns/presets.mjs": "domain",
+    "src/runner/execution/patterns/reviewed.mjs": "domain",
+    "src/runner/execution/patterns/role-tasks.mjs": "domain",
+    "src/runner/execution/patterns/solo.mjs": "domain",
+    "src/workflow/definition.mjs": "kernel",
+    "src/workflow/dir-guard.mjs": "infra",
+    "src/workflow/loader.mjs": "infra",
+    "src/workflow/store.mjs": "infra",
+    "src/workflow/integrate.mjs": "infra",
+    "src/workflow/plan-source.mjs": "infra",
+    "src/workflow/runner.mjs": "use-case",
+    "src/workflow/index.mjs": "use-case",
+    "src/workflow/checked.mjs": "infra",
+    "src/workflow/steps.mjs": "kernel",
+    "src/state/domain-registry.mjs": "kernel",
+    "src/state/step-fsm.mjs": "domain",
+    "src/verbs/state/step.mjs": "use-case",
+    "src/runner/operation-choice.mjs": "use-case",
+    "src/runner/work-dispatch.mjs": "infra"
+  }
+}
+```
+Historical/current source git blob: c530841eb23f1ac0b2acd46a32cf9ff9da4ba9a3
+
+Complete current source: `docs/architecture-manifest.json#file-block`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85
+Shown text SHA256: fb5b4a5569bf3ce3083f23a4af40b856b6a469a6ef9043c6c87fc7513c9bbfff
+
+```text
+{
+  "contract": "architecture-manifest.v1",
+  "map": "docs/architecture-map.md",
+  "layers": [
+    "entry",
+    "use-case",
+    "infra",
+    "domain",
+    "kernel"
+  ],
+  "rules": [
+    "one-directional-layer",
+    "domain-siloing"
+  ],
+  "components": [
+    "packaging-distribution"
+  ],
+  "domains": [
+    "coding",
+    "marketing"
+  ],
+  "files": {
+    "bin/fgos.mjs": "entry",
+    "bin/fgos-runner.mjs": "entry",
+    "src/runner/loop.mjs": "use-case",
+    "src/runner/paths.mjs": "infra",
+    "src/runner/dispatch.mjs": "infra",
+    "src/runner/operation-capability.mjs": "domain",
+    "src/runner/rigor.mjs": "kernel",
+    "src/runner/dispatch-log.mjs": "infra",
+    "src/runner/fanout-batch.mjs": "infra",
+    "src/runner/work-compat.mjs": "infra",
+    "src/runner/dispatch/adapters.mjs": "infra",
+    "src/runner/dispatch/config.mjs": "infra",
+    "src/runner/dispatch/confinement/policies.mjs": "infra",
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
+    "src/runner/dispatch/confinement/backend-registry.mjs": "infra",
+    "src/runner/dispatch/confinement/authority.mjs": "infra",
+    "src/runner/dispatch/confinement/request.mjs": "infra",
+    "src/runner/dispatch/confinement/resources.mjs": "infra",
+    "src/runner/dispatch/confinement/cleanup.mjs": "infra",
+    "src/runner/dispatch/confinement/attestation-store.mjs": "infra",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "infra",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "infra",
+    "src/runner/dispatch/resolve.mjs": "infra",
+    "src/runner/dispatch/mechanism.mjs": "infra",
+    "src/runner/dispatch/plan.mjs": "infra",
+    "src/runner/dispatch/transport.mjs": "infra",
+    "src/runner/dispatch/prepare.mjs": "infra",
+    "src/runner/dispatch/result-ladder.mjs": "infra",
+    "src/runner/dispatch/assignment.mjs": "infra",
+    "src/runner/dispatch/assignment-layout.mjs": "infra",
+    "src/runner/dispatch/assignment-normalizer.mjs": "infra",
+    "src/runner/dispatch/execution-contract.mjs": "infra",
+    "src/runner/dispatch/effective-execution-contract.mjs": "infra",
+    "src/runner/dispatch/agent-result-claim-contract.mjs": "infra",
+    "src/runner/dispatch/evidence-attribution.mjs": "infra",
+    "src/runner/dispatch/run-result.mjs": "infra",
+    "src/runner/dispatch/usage-parsers.mjs": "infra",
+    "src/runner/dispatch/runtime-inspection.mjs": "infra",
+    "src/runner/dispatch/reconciliation-planner.mjs": "infra",
+    "src/runner/dispatch/assignment-policy.mjs": "infra",
+    "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
+    "src/runner/dispatch/provider-adapter.mjs": "infra",
+    "src/runner/dispatch/provider-capacity.mjs": "infra",
+    "src/runner/dispatch/provider-auth-failure.mjs": "infra",
+    "src/runner/dispatch/provider-credential-probe.mjs": "infra",
+    "src/runner/dispatch/provider-account-probe.mjs": "infra",
+    "src/runner/dispatch/provider-credential-renewal.mjs": "infra",
+    "src/runner/dispatch/assignment-runner.mjs": "infra",
+    "src/runner/dispatch/settlement.mjs": "infra",
+    "src/runner/dispatch/reconcile-cli-spawn.mjs": "infra",
+    "src/runner/dispatch/cli.mjs": "infra",
+    "src/runner/dispatch/detached-run-supervisor.mjs": "infra",
+    "src/runner/prompt-templates.mjs": "infra",
+    "src/runner/worker-log.mjs": "infra",
+    "src/runner/agent-roster.mjs": "infra",
+    "src/runner/agent-definitions.mjs": "infra",
+    "src/runner/agent-listing.mjs": "infra",
+    "src/runner/worktree.mjs": "infra",
+    "src/runner/promote-preflight.mjs": "infra",
+    "src/runner/promote-engine.mjs": "infra",
+    "src/runner/session.mjs": "infra",
+    "src/runner/gateway-control.mjs": "infra",
+    "src/runner/goal-check.mjs": "infra",
+    "src/runner/iron-law-gate.mjs": "infra",
+    "src/runner/frozen-judge.mjs": "domain",
+    "src/runner/merge.mjs": "infra",
+    "src/runner/main-checkout-lock.mjs": "infra",
+    "src/runner/main-checkout-reset-guard.mjs": "infra",
+    "src/runner/github-adapter.mjs": "infra",
+    "src/state/drift-status.mjs": "infra",
+    "src/state/postland-drift.mjs": "infra",
+    "src/state/store.mjs": "infra",
+    "src/state/gate-bypass.mjs": "infra",
+    "src/state/cursor.mjs": "use-case",
+    "src/state/porting-store.mjs": "infra",
+    "src/state/tool-registry.mjs": "domain",
+    "src/install/coexist.mjs": "infra",
+    "src/runner/recovery.mjs": "domain",
+    "src/runner/anti-loop.mjs": "domain",
+    "src/runner/attestation-guard.mjs": "domain",
+    "src/runner/claim-port.mjs": "infra",
+    "src/runner/claim-liveness.mjs": "infra",
+    "src/runner/lock-wait.mjs": "infra",
+    "src/runner/write-queue.mjs": "domain",
+    "src/runner/root-affinity.mjs": "domain",
+    "src/state/status-fsm.mjs": "domain",
+    "src/state/decision-question.mjs": "domain",
+    "src/state/handoff.mjs": "domain",
+    "src/state/porting.mjs": "domain",
+    "src/state/frontier.mjs": "domain",
+    "src/state/impact.mjs": "domain",
+    "src/state/priority-formula.mjs": "domain",
+    "src/state/replay.mjs": "domain",
+    "src/state/events-compaction.mjs": "domain",
+    "src/state/dep-graph.mjs": "domain",
+    "src/state/graph-harness.mjs": "domain",
+    "src/state/graph-metrics.mjs": "domain",
+    "src/state/awaiting-context.mjs": "domain",
+    "src/state/cleanup-harness.mjs": "domain",
+    "src/state/cleanup-pool.mjs": "domain",
+    "src/state/discover-pool.mjs": "domain",
+    "src/state/plan-pool.mjs": "domain",
+    "src/state/retro-pool.mjs": "domain",
+    "src/state/retrospective-doors.mjs": "domain",
+    "src/state/worker-slots.mjs": "domain",
+    "src/intake/discovery.mjs": "use-case",
+    "src/intake/plan.mjs": "use-case",
+    "src/intake/plan-verdict-from-plan-md.mjs": "use-case",
+    "src/intake/verify-pattern-check.mjs": "kernel",
+    "src/cli/command-registry.mjs": "kernel",
+    "src/cli/deprecation.mjs": "kernel",
+    "src/cli/version.mjs": "kernel",
+    "src/cli/invocation-fault-log.mjs": "infra",
+    "src/cli/approve-fault-log.mjs": "infra",
+    "src/report/enduser-index.mjs": "domain",
+    "src/report/enduser-index-generate.mjs": "infra",
+    "src/report/decision-index.mjs": "infra",
+    "src/report/capability-plan-lint.mjs": "infra",
+    "src/report/context-render.mjs": "domain",
+    "src/report/frontmatter.mjs": "domain",
+    "src/report/authoritative-match.mjs": "domain",
+    "src/evolve/iron-law.mjs": "domain",
+    "src/state/events.mjs": "kernel",
+    "src/state/events-jsonl-truncation-guard.mjs": "kernel",
+    "src/state/main-checkout-guard-warnings.mjs": "kernel",
+    "src/state/work.mjs": "kernel",
+    "src/state/envelope.mjs": "kernel",
+    "src/intake/risk-keywords.mjs": "kernel",
+    "src/verbs/merge/merge.mjs": "use-case",
+    "src/verbs/merge/iron-law-level.mjs": "use-case",
+    "src/verbs/merge/approve.mjs": "use-case",
+    "src/verbs/merge/review.mjs": "use-case",
+    "src/verbs/merge/sync-root.mjs": "use-case",
+    "src/verbs/merge/catchup.mjs": "use-case",
+    "src/verbs/merge/reject.mjs": "use-case",
+    "src/verbs/merge/promote-to-component.mjs": "use-case",
+    "src/verbs/state/edit.mjs": "use-case",
+    "src/verbs/state/move.mjs": "use-case",
+    "src/verbs/state/read.mjs": "use-case",
+    "src/verbs/dispatch/show-run.mjs": "use-case",
+    "src/verbs/dispatch/inspect.mjs": "use-case",
+    "src/verbs/dispatch/reconcile.mjs": "use-case",
+    "src/verbs/dispatch/watch.mjs": "use-case",
+    "src/verbs/dispatch/recover.mjs": "use-case",
+    "src/report/item-trace.mjs": "domain",
+    "src/util/format-bytes.mjs": "kernel",
+    "src/util/format-duration.mjs": "kernel",
+    "src/util/normalize-path.mjs": "kernel",
+    "src/util/release-binary-path.mjs": "kernel",
+    "src/util/release-targets.mjs": "kernel",
+    "src/util/session-identity.mjs": "kernel",
+    "src/util/unique-tmp-tag.mjs": "kernel",
+    "src/util/host-bin.mjs": "infra",
+    "src/convention/convention-client.mjs": "infra",
+    "src/observe/friction-client.mjs": "infra",
+    "src/intake/classify.mjs": "use-case",
+    "src/setup/ansi.mjs": "domain",
+    "src/setup/config-merge.mjs": "domain",
+    "src/setup/shell-rc.mjs": "infra",
+    "src/setup/project-launcher.mjs": "infra",
+    "src/setup/bin-discovery.mjs": "infra",
+    "src/setup/skill-wrappers.mjs": "infra",
+    "src/setup/instruction-registry.mjs": "infra",
+    "src/setup/git-hooks.mjs": "infra",
+    "src/setup/claude-code-hooks.mjs": "infra",
+    "src/setup/agent-hooks.mjs": "infra",
+    "src/setup/agy-permissions.mjs": "infra",
+    "src/setup/agent-cli-trust.mjs": "infra",
+    "src/setup/blind-steps-proven-pools.mjs": "use-case",
+    "src/setup/workflow-pool-independence.mjs": "use-case",
+    "src/setup/checks.mjs": "use-case",
+    "src/setup/executor-profile-warnings.mjs": "infra",
+    "src/config/global-config.mjs": "infra",
+    "src/setup/registrations.mjs": "use-case",
+    "src/config/shared-config-file.mjs": "domain",
+    "src/state/knowledge-registry.mjs": "domain",
+    "src/report/knowledge-resolver.mjs": "domain",
+    "src/report/knowledge-projection.mjs": "domain",
+    "src/state/fgos-file-registry.mjs": "kernel",
+    "src/state/runtime-coordination.mjs": "infra",
+    "src/runner/dispatch/brief.mjs": "infra",
+    "src/runner/dispatch/dispatch-error.mjs": "infra",
+    "src/runner/dispatch/proof-helpers.mjs": "infra",
+    "src/runner/dispatch/herdr-agent.mjs": "infra",
+    "src/runner/dispatch/herdr-diagnosis.mjs": "infra",
+    "src/runner/dispatch/herdr-round.mjs": "infra",
+    "src/runner/dispatch/herdr-reconcile.mjs": "infra",
+    "src/runner/dispatch/worker-artifacts.mjs": "infra",
+    "src/runner/dispatch/liveness.mjs": "infra",
+    "src/runner/dispatch/visibility-session.mjs": "infra",
+    "src/runner/dispatch/recovery-planner.mjs": "infra",
+    "src/runner/dispatch/run-lock.mjs": "infra",
+    "src/runner/dispatch/process-identity.mjs": "infra",
+    "src/runner/dispatch/trust-store.mjs": "infra",
+    "src/runner/dispatch/worker-home.mjs": "infra",
+    "src/runner/dispatch/stop-processes-inside.mjs": "infra",
+    "src/runner/dispatch/worker-session.mjs": "infra",
+    "src/runner/dispatch/worker-session-boot.mjs": "infra",
+    "src/runner/dispatch/recovery.mjs": "infra",
+    "src/setup/instruction-composition.mjs": "infra",
+    "src/setup/instruction-projections.mjs": "infra",
+    "src/runner/execution/unit.mjs": "infra",
+    "src/runner/execution/bind.mjs": "infra",
+    "src/runner/execution/account-rotation.mjs": "infra",
+    "src/runner/execution/dry-bind.mjs": "infra",
+    "src/runner/execution/role-ledger.mjs": "infra",
+    "src/runner/execution/commit-unit-work.mjs": "infra",
+    "src/runner/execution/handoff-refs.mjs": "infra",
+    "src/runner/execution/unit-run-history.mjs": "infra",
+    "src/runner/execution/unit-summary.mjs": "infra",
+    "src/runner/execution/run.mjs": "use-case",
+    "src/runner/execution/patterns/index.mjs": "domain",
+    "src/runner/execution/patterns/panel.mjs": "domain",
+    "src/runner/execution/patterns/presets.mjs": "domain",
+    "src/runner/execution/patterns/reviewed.mjs": "domain",
+    "src/runner/execution/patterns/role-tasks.mjs": "domain",
+    "src/runner/execution/patterns/solo.mjs": "domain",
+    "src/workflow/definition.mjs": "kernel",
+    "src/workflow/dir-guard.mjs": "infra",
+    "src/workflow/loader.mjs": "infra",
+    "src/workflow/store.mjs": "infra",
+    "src/workflow/integrate.mjs": "infra",
+    "src/workflow/plan-source.mjs": "infra",
+    "src/workflow/runner.mjs": "use-case",
+    "src/workflow/index.mjs": "use-case",
+    "src/workflow/checked.mjs": "infra",
+    "src/workflow/ref-digests.mjs": "infra",
+    "src/workflow/seat-providers.mjs": "infra",
+    "src/workflow/seats.mjs": "infra",
+    "src/workflow/steps.mjs": "kernel",
+    "src/state/domain-registry.mjs": "kernel",
+    "src/state/step-fsm.mjs": "domain",
+    "src/verbs/state/step.mjs": "use-case",
+    "src/runner/operation-choice.mjs": "use-case",
+    "src/runner/work-dispatch.mjs": "infra"
+  }
+}
+```
+
+Actual disposition target: absent. No target or same-unit digest is invented.
+
+Informational successor (not a target for retain-as-evidence): `docs/platform/contracts/architecture-manifest.json#file-block`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85
+Shown text SHA256: fb5b4a5569bf3ce3083f23a4af40b856b6a469a6ef9043c6c87fc7513c9bbfff
+
+```text
+{
+  "contract": "architecture-manifest.v1",
+  "map": "docs/architecture-map.md",
+  "layers": [
+    "entry",
+    "use-case",
+    "infra",
+    "domain",
+    "kernel"
+  ],
+  "rules": [
+    "one-directional-layer",
+    "domain-siloing"
+  ],
+  "components": [
+    "packaging-distribution"
+  ],
+  "domains": [
+    "coding",
+    "marketing"
+  ],
+  "files": {
+    "bin/fgos.mjs": "entry",
+    "bin/fgos-runner.mjs": "entry",
+    "src/runner/loop.mjs": "use-case",
+    "src/runner/paths.mjs": "infra",
+    "src/runner/dispatch.mjs": "infra",
+    "src/runner/operation-capability.mjs": "domain",
+    "src/runner/rigor.mjs": "kernel",
+    "src/runner/dispatch-log.mjs": "infra",
+    "src/runner/fanout-batch.mjs": "infra",
+    "src/runner/work-compat.mjs": "infra",
+    "src/runner/dispatch/adapters.mjs": "infra",
+    "src/runner/dispatch/config.mjs": "infra",
+    "src/runner/dispatch/confinement/policies.mjs": "infra",
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
+    "src/runner/dispatch/confinement/backend-registry.mjs": "infra",
+    "src/runner/dispatch/confinement/authority.mjs": "infra",
+    "src/runner/dispatch/confinement/request.mjs": "infra",
+    "src/runner/dispatch/confinement/resources.mjs": "infra",
+    "src/runner/dispatch/confinement/cleanup.mjs": "infra",
+    "src/runner/dispatch/confinement/attestation-store.mjs": "infra",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "infra",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "infra",
+    "src/runner/dispatch/resolve.mjs": "infra",
+    "src/runner/dispatch/mechanism.mjs": "infra",
+    "src/runner/dispatch/plan.mjs": "infra",
+    "src/runner/dispatch/transport.mjs": "infra",
+    "src/runner/dispatch/prepare.mjs": "infra",
+    "src/runner/dispatch/result-ladder.mjs": "infra",
+    "src/runner/dispatch/assignment.mjs": "infra",
+    "src/runner/dispatch/assignment-layout.mjs": "infra",
+    "src/runner/dispatch/assignment-normalizer.mjs": "infra",
+    "src/runner/dispatch/execution-contract.mjs": "infra",
+    "src/runner/dispatch/effective-execution-contract.mjs": "infra",
+    "src/runner/dispatch/agent-result-claim-contract.mjs": "infra",
+    "src/runner/dispatch/evidence-attribution.mjs": "infra",
+    "src/runner/dispatch/run-result.mjs": "infra",
+    "src/runner/dispatch/usage-parsers.mjs": "infra",
+    "src/runner/dispatch/runtime-inspection.mjs": "infra",
+    "src/runner/dispatch/reconciliation-planner.mjs": "infra",
+    "src/runner/dispatch/assignment-policy.mjs": "infra",
+    "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
+    "src/runner/dispatch/provider-adapter.mjs": "infra",
+    "src/runner/dispatch/provider-capacity.mjs": "infra",
+    "src/runner/dispatch/provider-auth-failure.mjs": "infra",
+    "src/runner/dispatch/provider-credential-probe.mjs": "infra",
+    "src/runner/dispatch/provider-account-probe.mjs": "infra",
+    "src/runner/dispatch/provider-credential-renewal.mjs": "infra",
+    "src/runner/dispatch/assignment-runner.mjs": "infra",
+    "src/runner/dispatch/settlement.mjs": "infra",
+    "src/runner/dispatch/reconcile-cli-spawn.mjs": "infra",
+    "src/runner/dispatch/cli.mjs": "infra",
+    "src/runner/dispatch/detached-run-supervisor.mjs": "infra",
+    "src/runner/prompt-templates.mjs": "infra",
+    "src/runner/worker-log.mjs": "infra",
+    "src/runner/agent-roster.mjs": "infra",
+    "src/runner/agent-definitions.mjs": "infra",
+    "src/runner/agent-listing.mjs": "infra",
+    "src/runner/worktree.mjs": "infra",
+    "src/runner/promote-preflight.mjs": "infra",
+    "src/runner/promote-engine.mjs": "infra",
+    "src/runner/session.mjs": "infra",
+    "src/runner/gateway-control.mjs": "infra",
+    "src/runner/goal-check.mjs": "infra",
+    "src/runner/iron-law-gate.mjs": "infra",
+    "src/runner/frozen-judge.mjs": "domain",
+    "src/runner/merge.mjs": "infra",
+    "src/runner/main-checkout-lock.mjs": "infra",
+    "src/runner/main-checkout-reset-guard.mjs": "infra",
+    "src/runner/github-adapter.mjs": "infra",
+    "src/state/drift-status.mjs": "infra",
+    "src/state/postland-drift.mjs": "infra",
+    "src/state/store.mjs": "infra",
+    "src/state/gate-bypass.mjs": "infra",
+    "src/state/cursor.mjs": "use-case",
+    "src/state/porting-store.mjs": "infra",
+    "src/state/tool-registry.mjs": "domain",
+    "src/install/coexist.mjs": "infra",
+    "src/runner/recovery.mjs": "domain",
+    "src/runner/anti-loop.mjs": "domain",
+    "src/runner/attestation-guard.mjs": "domain",
+    "src/runner/claim-port.mjs": "infra",
+    "src/runner/claim-liveness.mjs": "infra",
+    "src/runner/lock-wait.mjs": "infra",
+    "src/runner/write-queue.mjs": "domain",
+    "src/runner/root-affinity.mjs": "domain",
+    "src/state/status-fsm.mjs": "domain",
+    "src/state/decision-question.mjs": "domain",
+    "src/state/handoff.mjs": "domain",
+    "src/state/porting.mjs": "domain",
+    "src/state/frontier.mjs": "domain",
+    "src/state/impact.mjs": "domain",
+    "src/state/priority-formula.mjs": "domain",
+    "src/state/replay.mjs": "domain",
+    "src/state/events-compaction.mjs": "domain",
+    "src/state/dep-graph.mjs": "domain",
+    "src/state/graph-harness.mjs": "domain",
+    "src/state/graph-metrics.mjs": "domain",
+    "src/state/awaiting-context.mjs": "domain",
+    "src/state/cleanup-harness.mjs": "domain",
+    "src/state/cleanup-pool.mjs": "domain",
+    "src/state/discover-pool.mjs": "domain",
+    "src/state/plan-pool.mjs": "domain",
+    "src/state/retro-pool.mjs": "domain",
+    "src/state/retrospective-doors.mjs": "domain",
+    "src/state/worker-slots.mjs": "domain",
+    "src/intake/discovery.mjs": "use-case",
+    "src/intake/plan.mjs": "use-case",
+    "src/intake/plan-verdict-from-plan-md.mjs": "use-case",
+    "src/intake/verify-pattern-check.mjs": "kernel",
+    "src/cli/command-registry.mjs": "kernel",
+    "src/cli/deprecation.mjs": "kernel",
+    "src/cli/version.mjs": "kernel",
+    "src/cli/invocation-fault-log.mjs": "infra",
+    "src/cli/approve-fault-log.mjs": "infra",
+    "src/report/enduser-index.mjs": "domain",
+    "src/report/enduser-index-generate.mjs": "infra",
+    "src/report/decision-index.mjs": "infra",
+    "src/report/capability-plan-lint.mjs": "infra",
+    "src/report/context-render.mjs": "domain",
+    "src/report/frontmatter.mjs": "domain",
+    "src/report/authoritative-match.mjs": "domain",
+    "src/evolve/iron-law.mjs": "domain",
+    "src/state/events.mjs": "kernel",
+    "src/state/events-jsonl-truncation-guard.mjs": "kernel",
+    "src/state/main-checkout-guard-warnings.mjs": "kernel",
+    "src/state/work.mjs": "kernel",
+    "src/state/envelope.mjs": "kernel",
+    "src/intake/risk-keywords.mjs": "kernel",
+    "src/verbs/merge/merge.mjs": "use-case",
+    "src/verbs/merge/iron-law-level.mjs": "use-case",
+    "src/verbs/merge/approve.mjs": "use-case",
+    "src/verbs/merge/review.mjs": "use-case",
+    "src/verbs/merge/sync-root.mjs": "use-case",
+    "src/verbs/merge/catchup.mjs": "use-case",
+    "src/verbs/merge/reject.mjs": "use-case",
+    "src/verbs/merge/promote-to-component.mjs": "use-case",
+    "src/verbs/state/edit.mjs": "use-case",
+    "src/verbs/state/move.mjs": "use-case",
+    "src/verbs/state/read.mjs": "use-case",
+    "src/verbs/dispatch/show-run.mjs": "use-case",
+    "src/verbs/dispatch/inspect.mjs": "use-case",
+    "src/verbs/dispatch/reconcile.mjs": "use-case",
+    "src/verbs/dispatch/watch.mjs": "use-case",
+    "src/verbs/dispatch/recover.mjs": "use-case",
+    "src/report/item-trace.mjs": "domain",
+    "src/util/format-bytes.mjs": "kernel",
+    "src/util/format-duration.mjs": "kernel",
+    "src/util/normalize-path.mjs": "kernel",
+    "src/util/release-binary-path.mjs": "kernel",
+    "src/util/release-targets.mjs": "kernel",
+    "src/util/session-identity.mjs": "kernel",
+    "src/util/unique-tmp-tag.mjs": "kernel",
+    "src/util/host-bin.mjs": "infra",
+    "src/convention/convention-client.mjs": "infra",
+    "src/observe/friction-client.mjs": "infra",
+    "src/intake/classify.mjs": "use-case",
+    "src/setup/ansi.mjs": "domain",
+    "src/setup/config-merge.mjs": "domain",
+    "src/setup/shell-rc.mjs": "infra",
+    "src/setup/project-launcher.mjs": "infra",
+    "src/setup/bin-discovery.mjs": "infra",
+    "src/setup/skill-wrappers.mjs": "infra",
+    "src/setup/instruction-registry.mjs": "infra",
+    "src/setup/git-hooks.mjs": "infra",
+    "src/setup/claude-code-hooks.mjs": "infra",
+    "src/setup/agent-hooks.mjs": "infra",
+    "src/setup/agy-permissions.mjs": "infra",
+    "src/setup/agent-cli-trust.mjs": "infra",
+    "src/setup/blind-steps-proven-pools.mjs": "use-case",
+    "src/setup/workflow-pool-independence.mjs": "use-case",
+    "src/setup/checks.mjs": "use-case",
+    "src/setup/executor-profile-warnings.mjs": "infra",
+    "src/config/global-config.mjs": "infra",
+    "src/setup/registrations.mjs": "use-case",
+    "src/config/shared-config-file.mjs": "domain",
+    "src/state/knowledge-registry.mjs": "domain",
+    "src/report/knowledge-resolver.mjs": "domain",
+    "src/report/knowledge-projection.mjs": "domain",
+    "src/state/fgos-file-registry.mjs": "kernel",
+    "src/state/runtime-coordination.mjs": "infra",
+    "src/runner/dispatch/brief.mjs": "infra",
+    "src/runner/dispatch/dispatch-error.mjs": "infra",
+    "src/runner/dispatch/proof-helpers.mjs": "infra",
+    "src/runner/dispatch/herdr-agent.mjs": "infra",
+    "src/runner/dispatch/herdr-diagnosis.mjs": "infra",
+    "src/runner/dispatch/herdr-round.mjs": "infra",
+    "src/runner/dispatch/herdr-reconcile.mjs": "infra",
+    "src/runner/dispatch/worker-artifacts.mjs": "infra",
+    "src/runner/dispatch/liveness.mjs": "infra",
+    "src/runner/dispatch/visibility-session.mjs": "infra",
+    "src/runner/dispatch/recovery-planner.mjs": "infra",
+    "src/runner/dispatch/run-lock.mjs": "infra",
+    "src/runner/dispatch/process-identity.mjs": "infra",
+    "src/runner/dispatch/trust-store.mjs": "infra",
+    "src/runner/dispatch/worker-home.mjs": "infra",
+    "src/runner/dispatch/stop-processes-inside.mjs": "infra",
+    "src/runner/dispatch/worker-session.mjs": "infra",
+    "src/runner/dispatch/worker-session-boot.mjs": "infra",
+    "src/runner/dispatch/recovery.mjs": "infra",
+    "src/setup/instruction-composition.mjs": "infra",
+    "src/setup/instruction-projections.mjs": "infra",
+    "src/runner/execution/unit.mjs": "infra",
+    "src/runner/execution/bind.mjs": "infra",
+    "src/runner/execution/account-rotation.mjs": "infra",
+    "src/runner/execution/dry-bind.mjs": "infra",
+    "src/runner/execution/role-ledger.mjs": "infra",
+    "src/runner/execution/commit-unit-work.mjs": "infra",
+    "src/runner/execution/handoff-refs.mjs": "infra",
+    "src/runner/execution/unit-run-history.mjs": "infra",
+    "src/runner/execution/unit-summary.mjs": "infra",
+    "src/runner/execution/run.mjs": "use-case",
+    "src/runner/execution/patterns/index.mjs": "domain",
+    "src/runner/execution/patterns/panel.mjs": "domain",
+    "src/runner/execution/patterns/presets.mjs": "domain",
+    "src/runner/execution/patterns/reviewed.mjs": "domain",
+    "src/runner/execution/patterns/role-tasks.mjs": "domain",
+    "src/runner/execution/patterns/solo.mjs": "domain",
+    "src/workflow/definition.mjs": "kernel",
+    "src/workflow/dir-guard.mjs": "infra",
+    "src/workflow/loader.mjs": "infra",
+    "src/workflow/store.mjs": "infra",
+    "src/workflow/integrate.mjs": "infra",
+    "src/workflow/plan-source.mjs": "infra",
+    "src/workflow/runner.mjs": "use-case",
+    "src/workflow/index.mjs": "use-case",
+    "src/workflow/checked.mjs": "infra",
+    "src/workflow/ref-digests.mjs": "infra",
+    "src/workflow/seat-providers.mjs": "infra",
+    "src/workflow/seats.mjs": "infra",
+    "src/workflow/steps.mjs": "kernel",
+    "src/state/domain-registry.mjs": "kernel",
+    "src/state/step-fsm.mjs": "domain",
+    "src/verbs/state/step.mjs": "use-case",
+    "src/runner/operation-choice.mjs": "use-case",
+    "src/runner/work-dispatch.mjs": "infra"
+  }
+}
+```
+
+Complete source-to-target diff (absent target shown as absent, not deletion):
+No target comparison; inspect the complete historical/current text and the disposition rationale.
+## claim_b6f28092c03285c2745234912da0f2ab
+
+Entry kind: registry-gap-decision
+Class: Judgment
+Source digest: 6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e
+Target digest: absent
+
+Shard: plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json
+
+```json
+{
+  "claimId": "claim_b6f28092c03285c2745234912da0f2ab",
+  "sourcePath": "docs/architecture-manifest.json",
+  "sourceAnchor": "file-block",
+  "sourceUnitDigest": "6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e",
+  "disposition": "retain-as-evidence",
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:23@2026-10-14",
+  "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/architecture-manifest.json at e2fc7754259747ea70b23f1bab72ba5671b2cf87 (blob f8daa37e065f3b1178a1929a874ed5d2f83c5c82, full unit SHA256 6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/contracts/architecture-manifest.json, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed."
+}
+```
+
+Complete source/predecessor: `docs/architecture-manifest.json#file-block`
+Commit: e2fc7754259747ea70b23f1bab72ba5671b2cf87
+Native unit SHA256: 6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e
+Shown text SHA256: 8724848cf8c313eb60bd694e6368faaa16ba791db9688b0b540650f6de3af83c
+
+```text
+{
+  "contract": "architecture-manifest.v1",
+  "map": "docs/architecture-map.md",
+  "layers": [
+    "entry",
+    "use-case",
+    "infra",
+    "domain",
+    "kernel"
+  ],
+  "rules": [
+    "one-directional-layer",
+    "domain-siloing"
+  ],
+  "components": [
+    "packaging-distribution"
+  ],
+  "domains": [
+    "coding",
+    "marketing"
+  ],
+  "files": {
+    "bin/fgos.mjs": "entry",
+    "bin/fgos-runner.mjs": "entry",
+    "src/runner/loop.mjs": "use-case",
+    "src/runner/paths.mjs": "infra",
+    "src/runner/dispatch.mjs": "infra",
+    "src/runner/dispatch/adapters.mjs": "infra",
+    "src/runner/dispatch/config.mjs": "infra",
+    "src/runner/dispatch/placement-policy.mjs": "infra",
+    "src/runner/dispatch/confinement/policies.mjs": "infra",
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
+    "src/runner/dispatch/confinement/backend-registry.mjs": "infra",
+    "src/runner/dispatch/confinement/authority.mjs": "infra",
+    "src/runner/dispatch/confinement/request.mjs": "infra",
+    "src/runner/dispatch/confinement/resources.mjs": "infra",
+    "src/runner/dispatch/confinement/cleanup.mjs": "infra",
+    "src/runner/dispatch/confinement/attestation-store.mjs": "infra",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "infra",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "infra",
+    "src/runner/dispatch/resolve.mjs": "infra",
+    "src/runner/dispatch/mechanism.mjs": "infra",
+    "src/runner/dispatch/plan.mjs": "infra",
+    "src/runner/dispatch/transport.mjs": "infra",
+    "src/runner/dispatch/prepare.mjs": "infra",
+    "src/runner/dispatch/result-ladder.mjs": "infra",
+    "src/runner/dispatch/assignment.mjs": "infra",
+    "src/runner/dispatch/assignment-normalizer.mjs": "infra",
+    "src/runner/dispatch/execution-contract.mjs": "infra",
+    "src/runner/dispatch/effective-execution-contract.mjs": "infra",
+    "src/runner/dispatch/agent-result-claim-contract.mjs": "infra",
+    "src/runner/dispatch/evidence-attribution.mjs": "infra",
+    "src/runner/dispatch/run-result.mjs": "infra",
+    "src/runner/dispatch/runtime-inspection.mjs": "infra",
+    "src/runner/dispatch/reconciliation-planner.mjs": "infra",
+    "src/runner/dispatch/assignment-policy.mjs": "infra",
+    "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
+    "src/runner/dispatch/provider-adapter.mjs": "infra",
+    "src/runner/dispatch/provider-capacity.mjs": "infra",
+    "src/runner/dispatch/assignment-runner.mjs": "infra",
+    "src/runner/dispatch/cli.mjs": "infra",
+    "src/runner/dispatch/operation-choice.mjs": "use-case",
+    "src/runner/dispatch/cli-spawn-supervisor.mjs": "infra",
+    "src/runner/coordination/dag-declaration.mjs": "infra",
+    "src/runner/coordination/schema.mjs": "infra",
+    "src/runner/coordination/store.mjs": "use-case",
+    "src/runner/coordination/replay.mjs": "use-case",
+    "src/runner/coordination/session-engine.mjs": "use-case",
+    "src/runner/coordination/cohort-planner.mjs": "use-case",
+    "src/runner/coordination/read-evaluators.mjs": "use-case",
+    "src/runner/coordination/recovery-planner.mjs": "use-case",
+    "src/runner/coordination/action-precondition.mjs": "use-case",
+    "src/runner/coordination/actions-projector.mjs": "use-case",
+    "src/runner/coordination/legality-facts.mjs": "use-case",
+    "src/runner/coordination/fan-out-payload.mjs": "use-case",
+    "src/verbs/coordination/recover.mjs": "use-case",
+    "src/runner/team-cognition/schema.mjs": "infra",
+    "src/runner/deliberation/schema.mjs": "infra",
+    "src/runner/team-cognition/aggregation-evaluator.mjs": "use-case",
+    "src/runner/definitions/schema.mjs": "infra",
+    "src/runner/definitions/workflow-adapter.mjs": "infra",
+    "src/runner/definitions/protocol-loader.mjs": "infra",
+    "src/runner/prompt-templates.mjs": "infra",
+    "src/runner/worker-log.mjs": "infra",
+    "src/runner/agent-roster.mjs": "infra",
+    "src/runner/worktree.mjs": "infra",
+    "src/runner/promote-preflight.mjs": "infra",
+    "src/runner/promote-engine.mjs": "infra",
+    "src/runner/session.mjs": "infra",
+    "src/runner/gateway-control.mjs": "infra",
+    "src/runner/goal-check.mjs": "infra",
+    "src/runner/iron-law-gate.mjs": "infra",
+    "src/runner/frozen-judge.mjs": "domain",
+    "src/runner/merge.mjs": "infra",
+    "src/runner/main-checkout-lock.mjs": "infra",
+    "src/runner/main-checkout-reset-guard.mjs": "infra",
+    "src/runner/github-adapter.mjs": "infra",
+    "src/state/drift-status.mjs": "infra",
+    "src/state/postland-drift.mjs": "infra",
+    "src/state/store.mjs": "infra",
+    "src/state/gate-bypass.mjs": "infra",
+    "src/state/cursor.mjs": "use-case",
+    "src/state/porting-store.mjs": "infra",
+    "src/state/tool-registry.mjs": "domain",
+    "src/install/coexist.mjs": "infra",
+    "src/runner/recovery.mjs": "domain",
+    "src/runner/anti-loop.mjs": "domain",
+    "src/runner/attestation-guard.mjs": "domain",
+    "src/runner/claim-port.mjs": "infra",
+    "src/runner/claim-liveness.mjs": "infra",
+    "src/runner/lock-wait.mjs": "infra",
+    "src/runner/write-queue.mjs": "domain",
+    "src/runner/root-affinity.mjs": "domain",
+    "src/state/status-fsm.mjs": "domain",
+    "src/state/handoff.mjs": "domain",
+    "src/state/porting.mjs": "domain",
+    "src/state/frontier.mjs": "domain",
+    "src/state/impact.mjs": "domain",
+    "src/state/priority-formula.mjs": "domain",
+    "src/state/stage-fsm.mjs": "domain",
+    "src/state/replay.mjs": "domain",
+    "src/state/events-compaction.mjs": "domain",
+    "src/state/dep-graph.mjs": "domain",
+    "src/state/graph-harness.mjs": "domain",
+    "src/state/graph-metrics.mjs": "domain",
+    "src/state/awaiting-context.mjs": "domain",
+    "src/state/cleanup-harness.mjs": "domain",
+    "src/state/cleanup-pool.mjs": "domain",
+    "src/state/discover-pool.mjs": "domain",
+    "src/state/plan-pool.mjs": "domain",
+    "src/state/retro-pool.mjs": "domain",
+    "src/state/retrospective-doors.mjs": "domain",
+    "src/state/worker-slots.mjs": "domain",
+    "src/intake/discovery.mjs": "use-case",
+    "src/intake/plan.mjs": "use-case",
+    "src/intake/plan-verdict-from-plan-md.mjs": "use-case",
+    "src/intake/verify-pattern-check.mjs": "kernel",
+    "src/cli/command-registry.mjs": "kernel",
+    "src/cli/deprecation.mjs": "kernel",
+    "src/cli/version.mjs": "kernel",
+    "src/cli/invocation-fault-log.mjs": "infra",
+    "src/cli/approve-fault-log.mjs": "infra",
+    "src/report/entropy.mjs": "domain",
+    "src/report/enduser-index.mjs": "domain",
+    "src/report/enduser-index-generate.mjs": "infra",
+    "src/report/decision-index.mjs": "infra",
+    "src/report/dispatch-confidence.mjs": "infra",
+    "src/report/capability-plan-lint.mjs": "infra",
+    "src/report/context-render.mjs": "domain",
+    "src/report/frontmatter.mjs": "domain",
+    "src/report/authoritative-match.mjs": "domain",
+    "src/evolve/candidates.mjs": "domain",
+    "src/evolve/iron-law.mjs": "domain",
+    "src/state/events.mjs": "kernel",
+    "src/state/events-jsonl-truncation-guard.mjs": "kernel",
+    "src/state/main-checkout-guard-warnings.mjs": "kernel",
+    "src/state/work.mjs": "kernel",
+    "src/state/envelope.mjs": "kernel",
+    "src/state/workflow-stage-graphs.mjs": "kernel",
+    "src/intake/risk-keywords.mjs": "kernel",
+    "src/verbs/merge/merge.mjs": "use-case",
+    "src/verbs/merge/iron-law-level.mjs": "use-case",
+    "src/verbs/merge/approve.mjs": "use-case",
+    "src/verbs/merge/review.mjs": "use-case",
+    "src/verbs/merge/sync-root.mjs": "use-case",
+    "src/verbs/merge/catchup.mjs": "use-case",
+    "src/verbs/merge/reject.mjs": "use-case",
+    "src/verbs/merge/promote-to-component.mjs": "use-case",
+    "src/verbs/state/edit.mjs": "use-case",
+    "src/verbs/state/move.mjs": "use-case",
+    "src/verbs/state/read.mjs": "use-case",
+    "src/verbs/state/stage.mjs": "use-case",
+    "src/verbs/coordination/schema-fault-log.mjs": "use-case",
+    "src/verbs/coordination/dag-request-compiler.mjs": "use-case",
+    "src/verbs/coordination/dag-scheduler.mjs": "use-case",
+    "src/verbs/coordination/schema.mjs": "use-case",
+    "src/verbs/coordination/close.mjs": "use-case",
+    "src/verbs/coordination/run.mjs": "use-case",
+    "src/verbs/coordination/show.mjs": "use-case",
+    "src/verbs/coordination/actions.mjs": "use-case",
+    "src/verbs/coordination/composers.mjs": "use-case",
+    "src/verbs/coordination/start.mjs": "use-case",
+    "src/verbs/coordination/status.mjs": "use-case",
+    "src/verbs/dispatch/show-run.mjs": "use-case",
+    "src/verbs/dispatch/inspect.mjs": "use-case",
+    "src/verbs/dispatch/reconcile.mjs": "use-case",
+    "src/verbs/dispatch/watch.mjs": "use-case",
+    "src/verbs/dispatch/recover.mjs": "use-case",
+    "src/verbs/coordination/launch-master-loop.mjs": "use-case",
+    "src/verbs/coordination/group-thinking-pack.mjs": "use-case",
+    "src/verbs/coordination/chain.mjs": "use-case",
+    "src/runner/coordination/headless-adapter.mjs": "use-case",
+    "src/report/item-trace.mjs": "domain",
+    "src/util/format-bytes.mjs": "kernel",
+    "src/util/format-duration.mjs": "kernel",
+    "src/util/normalize-path.mjs": "kernel",
+    "src/util/release-binary-path.mjs": "kernel",
+    "src/util/session-identity.mjs": "kernel",
+    "src/util/unique-tmp-tag.mjs": "kernel",
+    "src/intake/classify.mjs": "use-case",
+    "src/setup/ansi.mjs": "domain",
+    "src/setup/config-merge.mjs": "domain",
+    "src/setup/shell-rc.mjs": "infra",
+    "src/setup/bin-discovery.mjs": "infra",
+    "src/setup/skill-wrappers.mjs": "infra",
+    "src/setup/instruction-registry.mjs": "infra",
+    "src/setup/git-hooks.mjs": "infra",
+    "src/setup/claude-code-hooks.mjs": "infra",
+    "src/setup/agy-permissions.mjs": "infra",
+    "src/setup/checks.mjs": "use-case",
+    "src/setup/executor-profile-warnings.mjs": "infra",
+    "src/config/global-config.mjs": "infra",
+    "src/setup/registrations.mjs": "use-case",
+    "src/config/shared-config-file.mjs": "domain",
+    "src/state/knowledge-registry.mjs": "domain",
+    "src/report/knowledge-resolver.mjs": "domain",
+    "src/report/knowledge-projection.mjs": "domain",
+    "src/state/fgos-file-registry.mjs": "kernel",
+    "src/state/runtime-coordination.mjs": "infra",
+    "src/runner/dispatch/brief.mjs": "infra",
+    "src/runner/dispatch/dispatch-error.mjs": "infra",
+    "src/runner/dispatch/herdr-agent.mjs": "infra",
+    "src/runner/dispatch/herdr-round.mjs": "infra",
+    "src/runner/dispatch/worker-artifacts.mjs": "infra",
+    "src/runner/dispatch/liveness.mjs": "infra",
+    "src/runner/dispatch/visibility-session.mjs": "infra",
+    "src/runner/dispatch/recovery-planner.mjs": "infra",
+    "src/runner/dispatch/run-lock.mjs": "infra",
+    "src/runner/dispatch/process-identity.mjs": "infra",
+    "src/runner/dispatch/trust-store.mjs": "infra",
+    "src/runner/dispatch/worker-home.mjs": "infra",
+    "src/runner/dispatch/worker-session.mjs": "infra",
+    "src/runner/dispatch/worker-session-boot.mjs": "infra",
+    "src/runner/dispatch/cli-spawn-supervisor.mjs": "infra",
+    "src/runner/dispatch/recovery.mjs": "infra",
+    "src/runner/dispatch/run-lock.mjs": "infra",
+    "src/setup/instruction-composition.mjs": "infra",
+    "src/setup/instruction-projections.mjs": "infra"
+  }
+}
+```
+Historical/current source git blob: f8daa37e065f3b1178a1929a874ed5d2f83c5c82
+
+Complete current source: `docs/architecture-manifest.json#file-block`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85
+Shown text SHA256: fb5b4a5569bf3ce3083f23a4af40b856b6a469a6ef9043c6c87fc7513c9bbfff
+
+```text
+{
+  "contract": "architecture-manifest.v1",
+  "map": "docs/architecture-map.md",
+  "layers": [
+    "entry",
+    "use-case",
+    "infra",
+    "domain",
+    "kernel"
+  ],
+  "rules": [
+    "one-directional-layer",
+    "domain-siloing"
+  ],
+  "components": [
+    "packaging-distribution"
+  ],
+  "domains": [
+    "coding",
+    "marketing"
+  ],
+  "files": {
+    "bin/fgos.mjs": "entry",
+    "bin/fgos-runner.mjs": "entry",
+    "src/runner/loop.mjs": "use-case",
+    "src/runner/paths.mjs": "infra",
+    "src/runner/dispatch.mjs": "infra",
+    "src/runner/operation-capability.mjs": "domain",
+    "src/runner/rigor.mjs": "kernel",
+    "src/runner/dispatch-log.mjs": "infra",
+    "src/runner/fanout-batch.mjs": "infra",
+    "src/runner/work-compat.mjs": "infra",
+    "src/runner/dispatch/adapters.mjs": "infra",
+    "src/runner/dispatch/config.mjs": "infra",
+    "src/runner/dispatch/confinement/policies.mjs": "infra",
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
+    "src/runner/dispatch/confinement/backend-registry.mjs": "infra",
+    "src/runner/dispatch/confinement/authority.mjs": "infra",
+    "src/runner/dispatch/confinement/request.mjs": "infra",
+    "src/runner/dispatch/confinement/resources.mjs": "infra",
+    "src/runner/dispatch/confinement/cleanup.mjs": "infra",
+    "src/runner/dispatch/confinement/attestation-store.mjs": "infra",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "infra",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "infra",
+    "src/runner/dispatch/resolve.mjs": "infra",
+    "src/runner/dispatch/mechanism.mjs": "infra",
+    "src/runner/dispatch/plan.mjs": "infra",
+    "src/runner/dispatch/transport.mjs": "infra",
+    "src/runner/dispatch/prepare.mjs": "infra",
+    "src/runner/dispatch/result-ladder.mjs": "infra",
+    "src/runner/dispatch/assignment.mjs": "infra",
+    "src/runner/dispatch/assignment-layout.mjs": "infra",
+    "src/runner/dispatch/assignment-normalizer.mjs": "infra",
+    "src/runner/dispatch/execution-contract.mjs": "infra",
+    "src/runner/dispatch/effective-execution-contract.mjs": "infra",
+    "src/runner/dispatch/agent-result-claim-contract.mjs": "infra",
+    "src/runner/dispatch/evidence-attribution.mjs": "infra",
+    "src/runner/dispatch/run-result.mjs": "infra",
+    "src/runner/dispatch/usage-parsers.mjs": "infra",
+    "src/runner/dispatch/runtime-inspection.mjs": "infra",
+    "src/runner/dispatch/reconciliation-planner.mjs": "infra",
+    "src/runner/dispatch/assignment-policy.mjs": "infra",
+    "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
+    "src/runner/dispatch/provider-adapter.mjs": "infra",
+    "src/runner/dispatch/provider-capacity.mjs": "infra",
+    "src/runner/dispatch/provider-auth-failure.mjs": "infra",
+    "src/runner/dispatch/provider-credential-probe.mjs": "infra",
+    "src/runner/dispatch/provider-account-probe.mjs": "infra",
+    "src/runner/dispatch/provider-credential-renewal.mjs": "infra",
+    "src/runner/dispatch/assignment-runner.mjs": "infra",
+    "src/runner/dispatch/settlement.mjs": "infra",
+    "src/runner/dispatch/reconcile-cli-spawn.mjs": "infra",
+    "src/runner/dispatch/cli.mjs": "infra",
+    "src/runner/dispatch/detached-run-supervisor.mjs": "infra",
+    "src/runner/prompt-templates.mjs": "infra",
+    "src/runner/worker-log.mjs": "infra",
+    "src/runner/agent-roster.mjs": "infra",
+    "src/runner/agent-definitions.mjs": "infra",
+    "src/runner/agent-listing.mjs": "infra",
+    "src/runner/worktree.mjs": "infra",
+    "src/runner/promote-preflight.mjs": "infra",
+    "src/runner/promote-engine.mjs": "infra",
+    "src/runner/session.mjs": "infra",
+    "src/runner/gateway-control.mjs": "infra",
+    "src/runner/goal-check.mjs": "infra",
+    "src/runner/iron-law-gate.mjs": "infra",
+    "src/runner/frozen-judge.mjs": "domain",
+    "src/runner/merge.mjs": "infra",
+    "src/runner/main-checkout-lock.mjs": "infra",
+    "src/runner/main-checkout-reset-guard.mjs": "infra",
+    "src/runner/github-adapter.mjs": "infra",
+    "src/state/drift-status.mjs": "infra",
+    "src/state/postland-drift.mjs": "infra",
+    "src/state/store.mjs": "infra",
+    "src/state/gate-bypass.mjs": "infra",
+    "src/state/cursor.mjs": "use-case",
+    "src/state/porting-store.mjs": "infra",
+    "src/state/tool-registry.mjs": "domain",
+    "src/install/coexist.mjs": "infra",
+    "src/runner/recovery.mjs": "domain",
+    "src/runner/anti-loop.mjs": "domain",
+    "src/runner/attestation-guard.mjs": "domain",
+    "src/runner/claim-port.mjs": "infra",
+    "src/runner/claim-liveness.mjs": "infra",
+    "src/runner/lock-wait.mjs": "infra",
+    "src/runner/write-queue.mjs": "domain",
+    "src/runner/root-affinity.mjs": "domain",
+    "src/state/status-fsm.mjs": "domain",
+    "src/state/decision-question.mjs": "domain",
+    "src/state/handoff.mjs": "domain",
+    "src/state/porting.mjs": "domain",
+    "src/state/frontier.mjs": "domain",
+    "src/state/impact.mjs": "domain",
+    "src/state/priority-formula.mjs": "domain",
+    "src/state/replay.mjs": "domain",
+    "src/state/events-compaction.mjs": "domain",
+    "src/state/dep-graph.mjs": "domain",
+    "src/state/graph-harness.mjs": "domain",
+    "src/state/graph-metrics.mjs": "domain",
+    "src/state/awaiting-context.mjs": "domain",
+    "src/state/cleanup-harness.mjs": "domain",
+    "src/state/cleanup-pool.mjs": "domain",
+    "src/state/discover-pool.mjs": "domain",
+    "src/state/plan-pool.mjs": "domain",
+    "src/state/retro-pool.mjs": "domain",
+    "src/state/retrospective-doors.mjs": "domain",
+    "src/state/worker-slots.mjs": "domain",
+    "src/intake/discovery.mjs": "use-case",
+    "src/intake/plan.mjs": "use-case",
+    "src/intake/plan-verdict-from-plan-md.mjs": "use-case",
+    "src/intake/verify-pattern-check.mjs": "kernel",
+    "src/cli/command-registry.mjs": "kernel",
+    "src/cli/deprecation.mjs": "kernel",
+    "src/cli/version.mjs": "kernel",
+    "src/cli/invocation-fault-log.mjs": "infra",
+    "src/cli/approve-fault-log.mjs": "infra",
+    "src/report/enduser-index.mjs": "domain",
+    "src/report/enduser-index-generate.mjs": "infra",
+    "src/report/decision-index.mjs": "infra",
+    "src/report/capability-plan-lint.mjs": "infra",
+    "src/report/context-render.mjs": "domain",
+    "src/report/frontmatter.mjs": "domain",
+    "src/report/authoritative-match.mjs": "domain",
+    "src/evolve/iron-law.mjs": "domain",
+    "src/state/events.mjs": "kernel",
+    "src/state/events-jsonl-truncation-guard.mjs": "kernel",
+    "src/state/main-checkout-guard-warnings.mjs": "kernel",
+    "src/state/work.mjs": "kernel",
+    "src/state/envelope.mjs": "kernel",
+    "src/intake/risk-keywords.mjs": "kernel",
+    "src/verbs/merge/merge.mjs": "use-case",
+    "src/verbs/merge/iron-law-level.mjs": "use-case",
+    "src/verbs/merge/approve.mjs": "use-case",
+    "src/verbs/merge/review.mjs": "use-case",
+    "src/verbs/merge/sync-root.mjs": "use-case",
+    "src/verbs/merge/catchup.mjs": "use-case",
+    "src/verbs/merge/reject.mjs": "use-case",
+    "src/verbs/merge/promote-to-component.mjs": "use-case",
+    "src/verbs/state/edit.mjs": "use-case",
+    "src/verbs/state/move.mjs": "use-case",
+    "src/verbs/state/read.mjs": "use-case",
+    "src/verbs/dispatch/show-run.mjs": "use-case",
+    "src/verbs/dispatch/inspect.mjs": "use-case",
+    "src/verbs/dispatch/reconcile.mjs": "use-case",
+    "src/verbs/dispatch/watch.mjs": "use-case",
+    "src/verbs/dispatch/recover.mjs": "use-case",
+    "src/report/item-trace.mjs": "domain",
+    "src/util/format-bytes.mjs": "kernel",
+    "src/util/format-duration.mjs": "kernel",
+    "src/util/normalize-path.mjs": "kernel",
+    "src/util/release-binary-path.mjs": "kernel",
+    "src/util/release-targets.mjs": "kernel",
+    "src/util/session-identity.mjs": "kernel",
+    "src/util/unique-tmp-tag.mjs": "kernel",
+    "src/util/host-bin.mjs": "infra",
+    "src/convention/convention-client.mjs": "infra",
+    "src/observe/friction-client.mjs": "infra",
+    "src/intake/classify.mjs": "use-case",
+    "src/setup/ansi.mjs": "domain",
+    "src/setup/config-merge.mjs": "domain",
+    "src/setup/shell-rc.mjs": "infra",
+    "src/setup/project-launcher.mjs": "infra",
+    "src/setup/bin-discovery.mjs": "infra",
+    "src/setup/skill-wrappers.mjs": "infra",
+    "src/setup/instruction-registry.mjs": "infra",
+    "src/setup/git-hooks.mjs": "infra",
+    "src/setup/claude-code-hooks.mjs": "infra",
+    "src/setup/agent-hooks.mjs": "infra",
+    "src/setup/agy-permissions.mjs": "infra",
+    "src/setup/agent-cli-trust.mjs": "infra",
+    "src/setup/blind-steps-proven-pools.mjs": "use-case",
+    "src/setup/workflow-pool-independence.mjs": "use-case",
+    "src/setup/checks.mjs": "use-case",
+    "src/setup/executor-profile-warnings.mjs": "infra",
+    "src/config/global-config.mjs": "infra",
+    "src/setup/registrations.mjs": "use-case",
+    "src/config/shared-config-file.mjs": "domain",
+    "src/state/knowledge-registry.mjs": "domain",
+    "src/report/knowledge-resolver.mjs": "domain",
+    "src/report/knowledge-projection.mjs": "domain",
+    "src/state/fgos-file-registry.mjs": "kernel",
+    "src/state/runtime-coordination.mjs": "infra",
+    "src/runner/dispatch/brief.mjs": "infra",
+    "src/runner/dispatch/dispatch-error.mjs": "infra",
+    "src/runner/dispatch/proof-helpers.mjs": "infra",
+    "src/runner/dispatch/herdr-agent.mjs": "infra",
+    "src/runner/dispatch/herdr-diagnosis.mjs": "infra",
+    "src/runner/dispatch/herdr-round.mjs": "infra",
+    "src/runner/dispatch/herdr-reconcile.mjs": "infra",
+    "src/runner/dispatch/worker-artifacts.mjs": "infra",
+    "src/runner/dispatch/liveness.mjs": "infra",
+    "src/runner/dispatch/visibility-session.mjs": "infra",
+    "src/runner/dispatch/recovery-planner.mjs": "infra",
+    "src/runner/dispatch/run-lock.mjs": "infra",
+    "src/runner/dispatch/process-identity.mjs": "infra",
+    "src/runner/dispatch/trust-store.mjs": "infra",
+    "src/runner/dispatch/worker-home.mjs": "infra",
+    "src/runner/dispatch/stop-processes-inside.mjs": "infra",
+    "src/runner/dispatch/worker-session.mjs": "infra",
+    "src/runner/dispatch/worker-session-boot.mjs": "infra",
+    "src/runner/dispatch/recovery.mjs": "infra",
+    "src/setup/instruction-composition.mjs": "infra",
+    "src/setup/instruction-projections.mjs": "infra",
+    "src/runner/execution/unit.mjs": "infra",
+    "src/runner/execution/bind.mjs": "infra",
+    "src/runner/execution/account-rotation.mjs": "infra",
+    "src/runner/execution/dry-bind.mjs": "infra",
+    "src/runner/execution/role-ledger.mjs": "infra",
+    "src/runner/execution/commit-unit-work.mjs": "infra",
+    "src/runner/execution/handoff-refs.mjs": "infra",
+    "src/runner/execution/unit-run-history.mjs": "infra",
+    "src/runner/execution/unit-summary.mjs": "infra",
+    "src/runner/execution/run.mjs": "use-case",
+    "src/runner/execution/patterns/index.mjs": "domain",
+    "src/runner/execution/patterns/panel.mjs": "domain",
+    "src/runner/execution/patterns/presets.mjs": "domain",
+    "src/runner/execution/patterns/reviewed.mjs": "domain",
+    "src/runner/execution/patterns/role-tasks.mjs": "domain",
+    "src/runner/execution/patterns/solo.mjs": "domain",
+    "src/workflow/definition.mjs": "kernel",
+    "src/workflow/dir-guard.mjs": "infra",
+    "src/workflow/loader.mjs": "infra",
+    "src/workflow/store.mjs": "infra",
+    "src/workflow/integrate.mjs": "infra",
+    "src/workflow/plan-source.mjs": "infra",
+    "src/workflow/runner.mjs": "use-case",
+    "src/workflow/index.mjs": "use-case",
+    "src/workflow/checked.mjs": "infra",
+    "src/workflow/ref-digests.mjs": "infra",
+    "src/workflow/seat-providers.mjs": "infra",
+    "src/workflow/seats.mjs": "infra",
+    "src/workflow/steps.mjs": "kernel",
+    "src/state/domain-registry.mjs": "kernel",
+    "src/state/step-fsm.mjs": "domain",
+    "src/verbs/state/step.mjs": "use-case",
+    "src/runner/operation-choice.mjs": "use-case",
+    "src/runner/work-dispatch.mjs": "infra"
+  }
+}
+```
+
+Actual disposition target: absent. No target or same-unit digest is invented.
+
+Informational successor (not a target for retain-as-evidence): `docs/platform/contracts/architecture-manifest.json#file-block`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85
+Shown text SHA256: fb5b4a5569bf3ce3083f23a4af40b856b6a469a6ef9043c6c87fc7513c9bbfff
+
+```text
+{
+  "contract": "architecture-manifest.v1",
+  "map": "docs/architecture-map.md",
+  "layers": [
+    "entry",
+    "use-case",
+    "infra",
+    "domain",
+    "kernel"
+  ],
+  "rules": [
+    "one-directional-layer",
+    "domain-siloing"
+  ],
+  "components": [
+    "packaging-distribution"
+  ],
+  "domains": [
+    "coding",
+    "marketing"
+  ],
+  "files": {
+    "bin/fgos.mjs": "entry",
+    "bin/fgos-runner.mjs": "entry",
+    "src/runner/loop.mjs": "use-case",
+    "src/runner/paths.mjs": "infra",
+    "src/runner/dispatch.mjs": "infra",
+    "src/runner/operation-capability.mjs": "domain",
+    "src/runner/rigor.mjs": "kernel",
+    "src/runner/dispatch-log.mjs": "infra",
+    "src/runner/fanout-batch.mjs": "infra",
+    "src/runner/work-compat.mjs": "infra",
+    "src/runner/dispatch/adapters.mjs": "infra",
+    "src/runner/dispatch/config.mjs": "infra",
+    "src/runner/dispatch/confinement/policies.mjs": "infra",
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
+    "src/runner/dispatch/confinement/backend-registry.mjs": "infra",
+    "src/runner/dispatch/confinement/authority.mjs": "infra",
+    "src/runner/dispatch/confinement/request.mjs": "infra",
+    "src/runner/dispatch/confinement/resources.mjs": "infra",
+    "src/runner/dispatch/confinement/cleanup.mjs": "infra",
+    "src/runner/dispatch/confinement/attestation-store.mjs": "infra",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "infra",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "infra",
+    "src/runner/dispatch/resolve.mjs": "infra",
+    "src/runner/dispatch/mechanism.mjs": "infra",
+    "src/runner/dispatch/plan.mjs": "infra",
+    "src/runner/dispatch/transport.mjs": "infra",
+    "src/runner/dispatch/prepare.mjs": "infra",
+    "src/runner/dispatch/result-ladder.mjs": "infra",
+    "src/runner/dispatch/assignment.mjs": "infra",
+    "src/runner/dispatch/assignment-layout.mjs": "infra",
+    "src/runner/dispatch/assignment-normalizer.mjs": "infra",
+    "src/runner/dispatch/execution-contract.mjs": "infra",
+    "src/runner/dispatch/effective-execution-contract.mjs": "infra",
+    "src/runner/dispatch/agent-result-claim-contract.mjs": "infra",
+    "src/runner/dispatch/evidence-attribution.mjs": "infra",
+    "src/runner/dispatch/run-result.mjs": "infra",
+    "src/runner/dispatch/usage-parsers.mjs": "infra",
+    "src/runner/dispatch/runtime-inspection.mjs": "infra",
+    "src/runner/dispatch/reconciliation-planner.mjs": "infra",
+    "src/runner/dispatch/assignment-policy.mjs": "infra",
+    "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
+    "src/runner/dispatch/provider-adapter.mjs": "infra",
+    "src/runner/dispatch/provider-capacity.mjs": "infra",
+    "src/runner/dispatch/provider-auth-failure.mjs": "infra",
+    "src/runner/dispatch/provider-credential-probe.mjs": "infra",
+    "src/runner/dispatch/provider-account-probe.mjs": "infra",
+    "src/runner/dispatch/provider-credential-renewal.mjs": "infra",
+    "src/runner/dispatch/assignment-runner.mjs": "infra",
+    "src/runner/dispatch/settlement.mjs": "infra",
+    "src/runner/dispatch/reconcile-cli-spawn.mjs": "infra",
+    "src/runner/dispatch/cli.mjs": "infra",
+    "src/runner/dispatch/detached-run-supervisor.mjs": "infra",
+    "src/runner/prompt-templates.mjs": "infra",
+    "src/runner/worker-log.mjs": "infra",
+    "src/runner/agent-roster.mjs": "infra",
+    "src/runner/agent-definitions.mjs": "infra",
+    "src/runner/agent-listing.mjs": "infra",
+    "src/runner/worktree.mjs": "infra",
+    "src/runner/promote-preflight.mjs": "infra",
+    "src/runner/promote-engine.mjs": "infra",
+    "src/runner/session.mjs": "infra",
+    "src/runner/gateway-control.mjs": "infra",
+    "src/runner/goal-check.mjs": "infra",
+    "src/runner/iron-law-gate.mjs": "infra",
+    "src/runner/frozen-judge.mjs": "domain",
+    "src/runner/merge.mjs": "infra",
+    "src/runner/main-checkout-lock.mjs": "infra",
+    "src/runner/main-checkout-reset-guard.mjs": "infra",
+    "src/runner/github-adapter.mjs": "infra",
+    "src/state/drift-status.mjs": "infra",
+    "src/state/postland-drift.mjs": "infra",
+    "src/state/store.mjs": "infra",
+    "src/state/gate-bypass.mjs": "infra",
+    "src/state/cursor.mjs": "use-case",
+    "src/state/porting-store.mjs": "infra",
+    "src/state/tool-registry.mjs": "domain",
+    "src/install/coexist.mjs": "infra",
+    "src/runner/recovery.mjs": "domain",
+    "src/runner/anti-loop.mjs": "domain",
+    "src/runner/attestation-guard.mjs": "domain",
+    "src/runner/claim-port.mjs": "infra",
+    "src/runner/claim-liveness.mjs": "infra",
+    "src/runner/lock-wait.mjs": "infra",
+    "src/runner/write-queue.mjs": "domain",
+    "src/runner/root-affinity.mjs": "domain",
+    "src/state/status-fsm.mjs": "domain",
+    "src/state/decision-question.mjs": "domain",
+    "src/state/handoff.mjs": "domain",
+    "src/state/porting.mjs": "domain",
+    "src/state/frontier.mjs": "domain",
+    "src/state/impact.mjs": "domain",
+    "src/state/priority-formula.mjs": "domain",
+    "src/state/replay.mjs": "domain",
+    "src/state/events-compaction.mjs": "domain",
+    "src/state/dep-graph.mjs": "domain",
+    "src/state/graph-harness.mjs": "domain",
+    "src/state/graph-metrics.mjs": "domain",
+    "src/state/awaiting-context.mjs": "domain",
+    "src/state/cleanup-harness.mjs": "domain",
+    "src/state/cleanup-pool.mjs": "domain",
+    "src/state/discover-pool.mjs": "domain",
+    "src/state/plan-pool.mjs": "domain",
+    "src/state/retro-pool.mjs": "domain",
+    "src/state/retrospective-doors.mjs": "domain",
+    "src/state/worker-slots.mjs": "domain",
+    "src/intake/discovery.mjs": "use-case",
+    "src/intake/plan.mjs": "use-case",
+    "src/intake/plan-verdict-from-plan-md.mjs": "use-case",
+    "src/intake/verify-pattern-check.mjs": "kernel",
+    "src/cli/command-registry.mjs": "kernel",
+    "src/cli/deprecation.mjs": "kernel",
+    "src/cli/version.mjs": "kernel",
+    "src/cli/invocation-fault-log.mjs": "infra",
+    "src/cli/approve-fault-log.mjs": "infra",
+    "src/report/enduser-index.mjs": "domain",
+    "src/report/enduser-index-generate.mjs": "infra",
+    "src/report/decision-index.mjs": "infra",
+    "src/report/capability-plan-lint.mjs": "infra",
+    "src/report/context-render.mjs": "domain",
+    "src/report/frontmatter.mjs": "domain",
+    "src/report/authoritative-match.mjs": "domain",
+    "src/evolve/iron-law.mjs": "domain",
+    "src/state/events.mjs": "kernel",
+    "src/state/events-jsonl-truncation-guard.mjs": "kernel",
+    "src/state/main-checkout-guard-warnings.mjs": "kernel",
+    "src/state/work.mjs": "kernel",
+    "src/state/envelope.mjs": "kernel",
+    "src/intake/risk-keywords.mjs": "kernel",
+    "src/verbs/merge/merge.mjs": "use-case",
+    "src/verbs/merge/iron-law-level.mjs": "use-case",
+    "src/verbs/merge/approve.mjs": "use-case",
+    "src/verbs/merge/review.mjs": "use-case",
+    "src/verbs/merge/sync-root.mjs": "use-case",
+    "src/verbs/merge/catchup.mjs": "use-case",
+    "src/verbs/merge/reject.mjs": "use-case",
+    "src/verbs/merge/promote-to-component.mjs": "use-case",
+    "src/verbs/state/edit.mjs": "use-case",
+    "src/verbs/state/move.mjs": "use-case",
+    "src/verbs/state/read.mjs": "use-case",
+    "src/verbs/dispatch/show-run.mjs": "use-case",
+    "src/verbs/dispatch/inspect.mjs": "use-case",
+    "src/verbs/dispatch/reconcile.mjs": "use-case",
+    "src/verbs/dispatch/watch.mjs": "use-case",
+    "src/verbs/dispatch/recover.mjs": "use-case",
+    "src/report/item-trace.mjs": "domain",
+    "src/util/format-bytes.mjs": "kernel",
+    "src/util/format-duration.mjs": "kernel",
+    "src/util/normalize-path.mjs": "kernel",
+    "src/util/release-binary-path.mjs": "kernel",
+    "src/util/release-targets.mjs": "kernel",
+    "src/util/session-identity.mjs": "kernel",
+    "src/util/unique-tmp-tag.mjs": "kernel",
+    "src/util/host-bin.mjs": "infra",
+    "src/convention/convention-client.mjs": "infra",
+    "src/observe/friction-client.mjs": "infra",
+    "src/intake/classify.mjs": "use-case",
+    "src/setup/ansi.mjs": "domain",
+    "src/setup/config-merge.mjs": "domain",
+    "src/setup/shell-rc.mjs": "infra",
+    "src/setup/project-launcher.mjs": "infra",
+    "src/setup/bin-discovery.mjs": "infra",
+    "src/setup/skill-wrappers.mjs": "infra",
+    "src/setup/instruction-registry.mjs": "infra",
+    "src/setup/git-hooks.mjs": "infra",
+    "src/setup/claude-code-hooks.mjs": "infra",
+    "src/setup/agent-hooks.mjs": "infra",
+    "src/setup/agy-permissions.mjs": "infra",
+    "src/setup/agent-cli-trust.mjs": "infra",
+    "src/setup/blind-steps-proven-pools.mjs": "use-case",
+    "src/setup/workflow-pool-independence.mjs": "use-case",
+    "src/setup/checks.mjs": "use-case",
+    "src/setup/executor-profile-warnings.mjs": "infra",
+    "src/config/global-config.mjs": "infra",
+    "src/setup/registrations.mjs": "use-case",
+    "src/config/shared-config-file.mjs": "domain",
+    "src/state/knowledge-registry.mjs": "domain",
+    "src/report/knowledge-resolver.mjs": "domain",
+    "src/report/knowledge-projection.mjs": "domain",
+    "src/state/fgos-file-registry.mjs": "kernel",
+    "src/state/runtime-coordination.mjs": "infra",
+    "src/runner/dispatch/brief.mjs": "infra",
+    "src/runner/dispatch/dispatch-error.mjs": "infra",
+    "src/runner/dispatch/proof-helpers.mjs": "infra",
+    "src/runner/dispatch/herdr-agent.mjs": "infra",
+    "src/runner/dispatch/herdr-diagnosis.mjs": "infra",
+    "src/runner/dispatch/herdr-round.mjs": "infra",
+    "src/runner/dispatch/herdr-reconcile.mjs": "infra",
+    "src/runner/dispatch/worker-artifacts.mjs": "infra",
+    "src/runner/dispatch/liveness.mjs": "infra",
+    "src/runner/dispatch/visibility-session.mjs": "infra",
+    "src/runner/dispatch/recovery-planner.mjs": "infra",
+    "src/runner/dispatch/run-lock.mjs": "infra",
+    "src/runner/dispatch/process-identity.mjs": "infra",
+    "src/runner/dispatch/trust-store.mjs": "infra",
+    "src/runner/dispatch/worker-home.mjs": "infra",
+    "src/runner/dispatch/stop-processes-inside.mjs": "infra",
+    "src/runner/dispatch/worker-session.mjs": "infra",
+    "src/runner/dispatch/worker-session-boot.mjs": "infra",
+    "src/runner/dispatch/recovery.mjs": "infra",
+    "src/setup/instruction-composition.mjs": "infra",
+    "src/setup/instruction-projections.mjs": "infra",
+    "src/runner/execution/unit.mjs": "infra",
+    "src/runner/execution/bind.mjs": "infra",
+    "src/runner/execution/account-rotation.mjs": "infra",
+    "src/runner/execution/dry-bind.mjs": "infra",
+    "src/runner/execution/role-ledger.mjs": "infra",
+    "src/runner/execution/commit-unit-work.mjs": "infra",
+    "src/runner/execution/handoff-refs.mjs": "infra",
+    "src/runner/execution/unit-run-history.mjs": "infra",
+    "src/runner/execution/unit-summary.mjs": "infra",
+    "src/runner/execution/run.mjs": "use-case",
+    "src/runner/execution/patterns/index.mjs": "domain",
+    "src/runner/execution/patterns/panel.mjs": "domain",
+    "src/runner/execution/patterns/presets.mjs": "domain",
+    "src/runner/execution/patterns/reviewed.mjs": "domain",
+    "src/runner/execution/patterns/role-tasks.mjs": "domain",
+    "src/runner/execution/patterns/solo.mjs": "domain",
+    "src/workflow/definition.mjs": "kernel",
+    "src/workflow/dir-guard.mjs": "infra",
+    "src/workflow/loader.mjs": "infra",
+    "src/workflow/store.mjs": "infra",
+    "src/workflow/integrate.mjs": "infra",
+    "src/workflow/plan-source.mjs": "infra",
+    "src/workflow/runner.mjs": "use-case",
+    "src/workflow/index.mjs": "use-case",
+    "src/workflow/checked.mjs": "infra",
+    "src/workflow/ref-digests.mjs": "infra",
+    "src/workflow/seat-providers.mjs": "infra",
+    "src/workflow/seats.mjs": "infra",
+    "src/workflow/steps.mjs": "kernel",
+    "src/state/domain-registry.mjs": "kernel",
+    "src/state/step-fsm.mjs": "domain",
+    "src/verbs/state/step.mjs": "use-case",
+    "src/runner/operation-choice.mjs": "use-case",
+    "src/runner/work-dispatch.mjs": "infra"
+  }
+}
+```
+
+Complete source-to-target diff (absent target shown as absent, not deletion):
+No target comparison; inspect the complete historical/current text and the disposition rationale.
+## claim_0956ea2eadf0a32787b7fd0e51d693a6
+
+Entry kind: registry-gap-decision
+Class: Judgment
+Source digest: 8af4c326a8034fa8b4584cb6795459a32d8e9c0afbc616540092a7d8400382c1
+Target digest: absent
+
+Shard: plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json
+
+```json
+{
+  "claimId": "claim_0956ea2eadf0a32787b7fd0e51d693a6",
+  "sourcePath": "docs/backlog.md",
+  "sourceAnchor": "unheaded-block-2",
+  "sourceUnitDigest": "8af4c326a8034fa8b4584cb6795459a32d8e9c0afbc616540092a7d8400382c1",
+  "disposition": "regenerate-from-source",
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:23@2026-10-14",
+  "rationale": "This identity is a historical version of the generated active PBI block, not an unaccounted maintained platform claim. The source header explicitly labels the backlog GENERATED FILE and names bee backlog render from event-sourced PBI records. Preserve the exact old projection in its immutable source blob and the supplied full-text evidence; the five current backlog units remain pending regenerate-from-source decisions outside platform authority under the frozen product-backlog exception. No historical status is asserted current, no PBI is deleted or archived here, and regeneration or source-store availability is not claimed."
+}
+```
+
+Complete source/predecessor: `docs/backlog.md#unheaded-block-2`
+Commit: 9fe599733f359b3d32a9fe0ceb255cec8dc2f090
+Native unit SHA256: 8af4c326a8034fa8b4584cb6795459a32d8e9c0afbc616540092a7d8400382c1
+Shown text SHA256: 8af4c326a8034fa8b4584cb6795459a32d8e9c0afbc616540092a7d8400382c1
+
+```text
+| ID | Story | CoS | Status | Feature |
+|----|-------|-----|--------|---------|
+| tsk-p7-shadow-binders | Retire the two remaining self-verifying shadow binders in `src/runner/dispatch/placement-policy.mjs` (`resolveVerifiedPlacementModel`) and `src/runner/dispatch/provider-adapter.mjs` (`resolveVerifiedProviderArgs`) — dispatch-engine-liveness-hardening Phase 7 (C1) investigated both and found real, if now near-zero, historical production divergence (not near-zero for two OTHER shadow binders in the same audit finding, which Phase 7 already deleted outright since their own two sides always called the identical primitive with identical inputs). Kept these two in shadow mode rather than retiring, with durable local telemetry added (`recordShadowBinderDivergence`, `.fgos/dispatch/shadow-binder-divergence.jsonl`, surfaced by the `shadow-binder-divergence` doctor check) so a future retirement decision has real evidence instead of the ephemeral-stderr-only visibility this phase found (had to manually grep ~800 historical `.fgos/assignments/*/runs/*/stderr.log` files to find the one real divergence window this phase traced). Target: 2026-10-31, or sooner once enough durable telemetry accumulates to re-evaluate. Enumerated divergence classes still open, each needing a decided winner + a matrix test in `test/runner/placement-policy-matrix-coverage.test.mjs`/`test/runner/provider-adapter.test.mjs` before flipping: (a) `resolveVerifiedPlacementModel` — an executor with no declared `providerModel` defaults to `claude`'s model table on the legacy side (`resolve.mjs`'s `modelForTier`) but derives its real family via `deriveProviderFamily` on the PlacementPolicy side; (b) `resolveVerifiedPlacementModel` — an `executors.<id>.model` literal is read by PlacementPolicy's `buildPlacementPolicyCandidate` but ignored by the legacy `modelForTier` formula (masked today only because `cli.mjs`'s `executeExecutorCli` re-applies `executor?.model` as an explicit override after the binder returns; NOT masked in `spawnWorker`, a real live gap); (d) `resolveVerifiedPlacementModel`/C3's `cfg.models` dual-keying — with no `cfg.modelPolicies` table present, the legacy path reads `cfg.models` keyed by WORK tier (light/standard/heavy) while `resolvePolicyTierModel` reads the SAME field keyed by POLICY tier (lightweight/standard/.../critical); real production config always declares `modelPolicies` today (confirmed: `.fgos/config.json` has both `modelPolicies` and a flat `models` key), so this is dormant for this repo's own dispatch but live for any consuming project whose config omits `modelPolicies`; (i) `resolveVerifiedProviderArgs` — an executor's args template with no `{model}` placeholder and no literal `--model` gets `--model <resolved>` appended by `ClaudeProviderAdapter.render()` but nothing appended by the legacy string-substitution path (the ONLY class with real historical production evidence: 126 confirmed real divergences, all dated 2026-09-18, root-caused to a since-fixed `.fgos/config.json` args-template gap — re-verified empirically against every currently-registered production claude-family executor invocation on 2026-09-29: 0/5 diverge today); (ii) `resolveVerifiedProviderArgs` — a combined `--model=value` argv form (not the separate `'--model', 'value'` token pair every currently-registered executor actually uses) would not be detected by the adapter's `renderedArgs.includes('--model')` check, causing a spurious double `--model` append; unexercised by any currently-registered executor, but a real gap the adapter's own check needs a `startsWith('--model=')` branch to close before that specific binder could ever be made unconditionally authoritative. | Each of the 5 enumerated classes above has a decided winner (legacy or PlacementPolicy/ProviderAdapter) backed by a real matrix test, OR the `cfg.models` dual-keying gap (class d) is fixed directly; once all classes are closed, `resolveVerifiedPlacementModel`/`resolveVerifiedProviderArgs` retire the same way the other two shadow binders already did in this same phase (call the target function directly, delete the legacy fallback computation) | proposed | dispatch-engine-liveness-hardening |
+| STR73 | **Done-flip của PBI phải KIỂM từng mệnh đề CoS thực-giao, không chỉ "feature tham chiếu đã đóng" — nếu không, PBI có CoS rộng hơn scope feature bị mark `done` NON (premature)** (đào tận gốc 2026-07-21 từ ca STR64). **Bằng chứng cơ chế:** luật done-flip của bee trigger theo FEATURE-đóng + khớp-row, KHÔNG theo CoS-thỏa: `bee-scribing/SKILL.md:94` — *"when this scribing run closes a feature that matches a backlog row, flip that row to `done`"*; `bee-compounding/SKILL.md:81` — *"backlog done-flip specifically remains prose-ruled"*. Cột `CoS` (định nghĩa `scribing-reference.md:297` = "the one-line acceptance signal") **tồn tại nhưng KHÔNG bao giờ được đối chiếu** với artifact thực-giao trước khi flip. **Hệ quả cụ thể:** STR64 CoS đòi 3 mệnh đề (taxonomy + tag capture-time + *"≥1 tài liệu end-user tích luỹ qua ĐÚNG skill export"*); feature `compound-learn-enduser-docs` chỉ giao acceptance HẸP của CONTEXT ("≥1 doc tại capture-time") — một SUBSET; done-flip đánh đồng "feature tham chiếu PBI đã xong" = "PBI thỏa CoS" và mark `done` khi bước 3 (export skill) + bước 4 (backfill) chưa có. **Anh em STR72:** cùng lỗi gốc — tin tín hiệu cục bộ (feature-close) mà không reconcile ngược về nguồn thẩm quyền (PBI-CoS). **Áp fgOS y hệt:** cổng `done` fgOS (FSM compound-learn) ép item qua stage nhưng KHÔNG kiểm acceptance/CoS của chính item; một parent có thể `done` khi mới thỏa một phần con/CoS → cùng bug premature-done. **Đề xuất (bee-exploring shape chi tiết):** (1) done-flip đối chiếu TỪNG mệnh đề CoS với artifact thực-giao (evidence-linked), chỉ flip `done` khi mọi mệnh đề thỏa; thỏa một phần → giữ `in-flight` + liệt kê mệnh đề còn thiếu; (2) khi feature-acceptance (CONTEXT) HẸP hơn PBI-CoS, buộc khai rõ "feature này giao slice X của PBI", cấm auto-equate feature-done = PBI-done; (3) trong fgOS: cổng `done` của item kiểm acceptance/CoS của chính item, không chỉ FSM-stage. | Một PBI chỉ được flip `done` khi mọi mệnh đề CoS có evidence thực-giao; CoS thỏa một phần giữ `in-flight` và liệt kê phần thiếu; feature giao subset của PBI phải khai rõ slice, không đóng cả PBI. Dogfood: STR64 không tự flip `done` khi bước 3/4 chưa có | in-flight | — |
+| p-09351985 | **Tách core verb-logic thành lib gọi được độc lập CLI** — prerequisite móng mà decision 0014 nêu ("tách core (verb-logic) thành lib gọi được độc lập CLI — hôm nay logic nằm trong CLI thì kéo ra, CLI thành client mỏng"). Refactor nội bộ thuần, KHÔNG đổi hành vi; đường ghi single-door (CTR002) và lock giữ nguyên. Tách khỏi STR46 khi mở exploring 2026-07-27 vì verify của nó khác hẳn phần hợp đồng in/out (tương đương hành vi, không phải hình dạng contract). Đứng dưới mọi consumer sau: daemon (STR48) không link lib theo 0014, nhưng TUI local và code cùng-tiến-trình thì có. | Verb-logic gọi được từ code Node mà không spawn CLI; CLI trở thành client mỏng của chính lib đó; toàn bộ test hiện có xanh không sửa một assertion nào (chứng minh không đổi hành vi) | proposed | — |
+| p-28dd950c | Multi-focus: support more than one simultaneously active goal, each with its own goal-scoped ranking | A user can declare 2+ active goals (e.g. per-epic milestones) at once and get separate (or explicitly merged) goal-scoped rankings per goal, building on STR67's single-focus design | proposed | — |
+| p-2a39f940 | Neither fgOS trigger path (interactive pick, headless runner) reaches an MVP2-equivalent outcome on its own terms — different failure shapes, not equivalent | Case 1 (interactive /fgOS:pick, tsk-57u, docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md) reaches all three literal artifacts -- green verify (23 pass/0 fail), a real commit (4f501f1) on the item's own fgw/tsk-57u branch, and a clean worktree teardown -- but fgos return's fresh-claim path measures only the ORIGINAL checkout's HEAD, never the fgw/<id> branch pick itself created, so return structurally refuses to register the completed work and the item is stuck at awaiting-human instead of proposed/done. Case 2 (headless fgos-runner --once, docs/history/mvp2-scope-test-infra/reports/case-2-headless.md) never reaches ANY of the three artifacts: fgos-runner.mjs resolves repoRoot via git rev-parse --show-toplevel with no override flag/env, dogfood-fixture is not its own git repo, so a real --once invocation would claim and dispatch real forgent work off the live repo/.fgos/state.json (8 real items) -- confirmed unsafe twice, never invoked for real. Fix scope: (a) fgos return's branch-aware path (bin/fgos.mjs:1306) must also accept a first, ordinary interactive pick's fgw/<id> branch, not only a re-claimed already-blocked item's branchHeadAtTake; (b) fgos-runner needs a cwd-rooted root override (e.g. --root/FGOS_ROOT) parallel to the fgos.mjs verbs' existing process.cwd()-derived isolation, so the headless trigger can be pointed at a testbed instead of always resolving through git toplevel. Done when both cases can independently reach green verify + commit on own branch + clean teardown AND the engine registers completion (proposed/done), proven by re-running this feature's two live cases. | proposed | mvp2-scope-test-infra |
+| p-51f4eb7e | **Bù version token cho CTR006 (routing-handoff)** — decision 0011 bắt mọi contract mang `<name>/v<N>`; CTR006 khai "designed — spec đầy đủ, chưa có code implement" (architecture-map.md:350) và `routing-handoff-contract.md` không mang field version nào. Để NGOÀI biên STR46 khi chốt exploring 2026-07-27: dán version lên thứ chưa chạy là đóng dấu cho giả định, không phải cho hành vi. Làm khi CTR006 có code thật, cùng lượt với lần implement đầu tiên. | CTR006 mang version token đúng khuôn 0011, và token đó đối chiếu được với code đang chạy chứ không chỉ với spec | proposed | — |
+| p-782e25aa | STR46 buoc merge: viet lai kho fgos-test-drive tu ngoai worktree str46 | Kho /home/vantt/projects/fgos-test-drive/.fgos KHONG viet duoc tu worktree str46: write guard tu choi moi duong dan khong nam gon trong worktree vat ly (da do bang probe that, khong phai suy doan). Vi vay no roi khoi lat 1 cung ly do da doi kho song ra. Pham vi: events.jsonl 26 dong, 12 dong mang ten cu, 0 dang predicted long, tat ca deu mang truong version. Kho la mot repo git nhung .fgos KHONG duoc theo doi nen khong co nghia vu commit. Dung script scripts/migrate-actor-to-role.mjs (cell str46-io-contract-r3-6), chay --dry-run truoc, backup ra ngoai thu muc kho. Sau do chay lai ban chieu bang cach dat thu muc lam viec VAO chinh kho do roi goi bin/fgos.mjs rebuild - fgos lay kho tu process.cwd() va KHONG co co --dir nao, nen goi tu cho khac se nham vao kho sai. Xong: log khong con ten cu, khong con dong khai version 2, moi dong parse duoc, 26 dong, seq lien tuc. Chay cung dip voi PBI p-b822cf9f (kho song), tu mot noi co quyen ghi ca hai. | proposed | str46-io-contract |
+| p-88b4ae1e | Audit every reservations release / releaseHolds call site for the same missing-session-filter gap xwh-3 fixed at one call site | Every call site that scopes a cross-worktree hold release derives and passes session (or documents why it legitimately cannot), not just cell -- confirmed via code read across the whole .bee/bin tree, not just handleReservationsRelease | proposed | — |
+| p-99592f2a | anti-loop suy ra co-nguoi-can-thiep tu su-kien-mang-vai-nguoi, va dai dien do suy thoai dan | anti-loop.mjs:88-93 dung dieu kien vai la human VA co answer hoac reason lam dai dien cho cau hoi that su la co nguoi can thiep khong. Dai dien do chi dung khi gia tri human chi xuat hien o cho nguoi that su quyet dinh. STR46 lam human xuat hien o nhung canh ma nguoi chi go lenh con may moi la thu quyet dinh (park tu dong trong return va approve), va STR46 phai them mot gia tri vai thu tu (system) chi de tranh dai dien nay. Moi lan gan vai len nhieu canh hon thi dai dien lai suy thoai them. Viec can lam: thay dai dien bang mot dau hieu tuong minh tren chinh su kien (vi du mot co human-intervention) thay vi suy ra tu vai. CHAM RUL29 (cong chong-lap reset theo can thiep nguoi cuoi cung, per-item, executing-phase-only) nen phai co quyet dinh rieng, khong sua qua cua sau tu mot feature khac. | proposed | str46-io-contract |
+| p-b822cf9f | STR46 buoc merge: viet lai kho .fgos song tu checkout chinh, cung luc ma moi dap xuong main | Chay tu /home/vantt/projects/forgent/repo (checkout chinh), KHONG tu worktree str46 - o day .fgos la symlink va cac file cua no bao la da xoa. Dieu kien tien quyet: khong phien nao khac dang ghi (kiem .fgos/sessions.json va .fgos/events.lock truoc khi bat dau). Dung script scripts/migrate-actor-to-role.mjs do cell str46-io-contract-r3-6 tao ra, chay --dry-run truoc. Pham vi mot kho: chi events.jsonl (111 dong, 54 mang ten cu, 5 trong so do la dang predicted long); state.json dung lai bang fgos rebuild, khong sua tay; coexistence.json va entropy-history.jsonl mang 0 ten cu nen ngoai pham vi. Sau khi xong: log khong con ten cu, khong con dong khai version 2, moi dong parse duoc, so dong van la 111, seq lien tuc. Ba file duoc theo doi trong checkout chinh (coexistence.json, entropy-history.jsonl, events.jsonl) nam trong dung mot commit voi lan merge. TUYET DOI khong cham repo/test/fixtures/phase1-events.jsonl. Can mien tru pre-release cua ban ghi 0017 (cell str46-io-contract-r3-1) da ton tai truoc khi chay. | proposed | str46-io-contract |
+| p-bb89e653 | resolveHoldTopology ignores its own root argument, always resolves holder from process.cwd() -- candidate mechanism for cross-worktree holder collisions | resolveHoldTopology(root) resolves holder identity from the passed root, not unconditionally process.cwd() -- fixes every caller of the function, not just reservations release; a regression test proves a call with root != process.cwd() resolves the correct worktree-specific holder | proposed | — |
+| p-dc785743 | bee write-guard's control-root resolution races against concurrent sessions for git/write checks in a worktree | A worktree session's own git add/commit/Edit calls resolve the intake-gate phase check against ITS OWN .bee store consistently -- never transiently against another concurrent session's control-root state (observed: two independent str92 swarming workers, and the orchestrator itself, each hit a spurious 'phase: compounding-complete' / 'phase: idle' denial while this worktree's own bee.mjs status correctly showed phase=swarming; retrying, or invoking git via a node subprocess instead of a literal git Bash command, worked around it every time without disabling any guard). Root-caused during str92 (2026-07-26): likely a resolveContext/controlRoot race under concurrent multi-session load, not a cwd-pin bug (ruled out by at least one worker whose pwd/bee status were confirmed correct at the moment of the false denial). | proposed | str92 |
+| STR27 | Orchestrator service tầng fleet: registry worker + heartbeat + push assignment + lease/liveness + capacity + giao thức/auth cho worker từ xa — đắp TRÊN cùng event log (per stage-decompose: pull là móng, không đập lại) | Chỉ mở khi có nhu cầu fleet thật (worker từ xa/luôn-bật); thiết kế đứng trên log + claim sẵn có | proposed | — |
+| STR36 | Metric riêng cho từng fix của vòng evolving (per STR13), chỉ mở khi entropy-trend chứng minh không đủ nhạy ở quy mô 1 fix/lần | Có điểm số đo được trước/sau một fix đơn lẻ, độc lập với entropy-trend tổng | proposed | — |
+| STR38 | Human-UI listener (web/chat) trên đất Host Adapter (D b2d18cc7): translator nhận transport (HTTP/chat) → dịch sang verb → spawn `fgos <verb>` → đọc envelope + exit code; kèm identity gate "ai được nói verb nào" trước khi dịch xuống CTR001 (trust invariant dispatch.mjs: `verify` chạy như shell — intake nguồn chưa kiểm là injection vector); KHÔNG fgos-serve in-process khi CTR002 một-cửa-ghi còn per-process; chiều ra tạm poll list/catchup + so data_hash, CTR008 attention envelope chờ lực kéo thật. Đứng trên STR37. **Chốt qua thảo luận RUL42 (STANCE trí-tuệ-giao-việc — picker luôn cơ học, trí tuệ chỉ vào qua field ghi sẵn hoặc cửa pull take/return) (runner) (per bàn STR42, 2026-07-17):** STR38 bao gồm một verb chat cho người GỢI Ý priority/intent (phục vụ STR7/STR8) — verb này ghi một field GỢI Ý, KHÔNG PHẢI field cuối cùng; bộ não thông minh ở giai đoạn planning/scoring (clarify/decompose hôm nay, STR7/STR8 mai sau) đọc gợi ý này làm một tín hiệu đầu vào rồi TỰ quyết field cuối qua cửa ghi chuẩn — có thể theo đúng gợi ý hoặc đổi khác nếu thấy hợp lý hơn, nhưng gợi ý luôn được cân nhắc, không bao giờ bị bỏ qua và không bao giờ tự nó là giá trị cuối. Giữ đúng RUL42 (runner: STANCE trí-tuệ-giao-việc — đúng một actor ghi field cuối, picker vẫn cơ học) | Một người dùng qua web/chat submit được vấn đề, trả lời ask, duyệt approve/reject, VÀ gợi ý priority/intent cho một item — tất cả qua verb CTR001, không đường ghi riêng; caller chưa xác danh không gọi được verb mutation; gợi ý priority/intent của người được planning-stage đọc và cân nhắc (không tự động trở thành field cuối) | proposed | — |
+| STR48 | **Kênh attention/push ("cần bạn") như một subsystem có delivery-semantics** — tách từ STR46 vì chiều-ra chủ động KHÔNG phải bolt-on mà là hệ con riêng, đòn bẩy UX cao nhất + rủi ro cao nhất. Phải chốt 5 thuộc tính: **at-least-once** (item chờ lâu chắc chắn người được ping, không rơi), **dedup** (một gate không ping N lần), **routing** (người/thiết bị/kênh nào), **ack** (đã xem chưa), **escalation** (không đáp trong ngưỡng → ping lại / đổi kênh / đổi người). Sống ở **CONSUMER daemon** (poll data_hash STR37 / tail log STR39 + giữ kênh outbound), **core fgOS vẫn passive** — đây là chỗ hiện thực hoá "không bị động" mà lõi KHÔNG mọc organ push nội tại. Đứng trên STR46 (contract in/out), STR39 (log substrate), STR37 (poll rẻ). Reference pattern: airemote notify (at-least-once, watcher-fed) trên herdr-gateway; herdr `notification.show`. | Một spec kênh attention nêu rõ 5 thuộc tính (at-least-once/dedup/routing/ack/escalation); một "cần bạn" thật của item chờ-người được giao ĐÚNG-MỘT-LẦN tới người, có ack, không đáp trong ngưỡng thì escalate đúng — chứng minh trên item thật, core không thêm trạng thái push nội tại | proposed | — |
+| STR52 | **Domain thứ hai THẬT: marketing** (nêu ra 2026-07-18 trong lúc bàn STR50) — invalidate tiền đề trước đó ("hiện chỉ có 1 domain thực"): người dùng có sẵn workflow marketing ở MỘT PROJECT KHÁC và muốn điều phối marketing qua fgOS. Hạ tầng kernel đã chứng minh đa-domain chạy được về nguyên tắc (domain `synthetic` sống song song `coding` hôm nay, STR18 base-workflow+domain-extension đã done), nhưng marketing THẬT còn thiếu: (a) registry entry riêng trong `domains.mjs` (stages/stepMap/transitions cho chu trình marketing, khác `clarify/decompose/executing`), (b) retrofit `discovery.mjs`/`decompose.mjs` — hai module này đang hardcode literal stage-name của coding, domain khác vào `clarify`/`decompose` sẽ bị ghi đè sai (cảnh báo đã có sẵn trong comment `domains.mjs:29-34`), (c) bộ skill nội dung riêng cho domain-extension "marketing" (song song bộ STR50 đang trích cho coding, KHÔNG phải `fgos-routing` — module đó domain-agnostic, không cần đổi), (d) STR51 mở rộng thêm field `domain` vào output classify (chỗ nối tự nhiên — cùng cơ chế, chỉ thêm 1 field). **CÂU HỎI SCOPE CHƯA TRẢ LỜI (quan trọng, quyết định đây là 1 feature hay 2):** project marketing kia dùng CHUNG một store/event-log với fgOS hiện tại (khác domain field trên cùng một hệ), hay là một CÀI ĐẶT fgOS RIÊNG cho project đó? Khuyến nghị: không gộp vào STR50 đang chạy (đã khoá scope hẹp cho coding, mode standard, đang thực thi) — mở feature riêng qua bee-hive/bee-exploring khi câu hỏi scope trên có câu trả lời. | Một decision record trả lời rõ câu hỏi scope (chung store hay cài đặt riêng); nếu chung store: registry entry `marketing` thật + retrofit discovery/decompose + bộ skill marketing chạy được một case study thật, domain `coding` không bị ảnh hưởng | proposed | — |
+| STR62 | **Sibling-aware / agent-driven on-demand cross-item context** (deferred idea từ STR61 exploring, 2026-07-19): hai option bị loại ở STR61's own parent-only decision — (a) tự động kèm cả sibling (không chỉ parent) khi trả lời gate người, (b) agent tự quyết kéo thêm bối cảnh cha/sibling động thay vì cố định. Cả hai cần khái niệm "sibling" mới trong data model (hiện chỉ có `parent`/`deps`/`blocks`, `work-state.md:864`) — không xây bây giờ, chỉ mở lại nếu baseline "parent-only" của STR61 chứng minh không đủ trong thực tế | Chưa xác định — chờ bằng chứng thiếu-bối-cảnh thật từ STR61 chạy production trước khi chốt CoS | proposed | — |
+| STR69b | **Vệt event gần nhất + diff giàu hơn khi người quay lại gate (cần chốt lại STR61's own "material" decision trước)** — nửa còn lại của STR69. Khác STR69a ở chỗ có thiết kế thật cần chốt: nới `MATERIAL_FIELDS` (`repo/src/state/awaiting-context.mjs:15`, hiện chỉ `title`/`status`) và chọn bao nhiêu event chạm TRỰC TIẾP vào STR61's own "material" decision ("chỉ báo khi thay đổi ảnh hưởng câu hỏi/trả lời gốc, im lặng nếu không") — nới bộ trường = nới định nghĩa "material" mà quyết định đó cố tình giữ hẹp. Cũng là lớp validity-check cho STR70a (changed-since làm lộ leaning stale). Vẫn thuần read-projection, không lật STR46's own foundational decision; scope đợt đầu KHÔNG gồm sibling (trần parent-only). | Người mở lại item awaiting-human phiên mới thấy vệt event gần nhất + diff parent giàu hơn; quyết định nới/không-nới `MATERIAL_FIELDS` ghi lại có lý do đối chiếu STR61's own "material" decision | proposed | — |
+| STR70a | **Checkpoint distillate + record chốt 3-phần lên gate (fgOS core, KHÔNG bị chặn)** — nửa không-vướng của STR70 (tách 2026-07-21, per `docs/history/gate-dialogue-continuity/CONTEXT.md`'s locked decisions). Verb non-transitioning ghi distillate {câu hỏi diễn giải lại, options + trục so sánh, leaning + lý do quote nguyên văn người, đã-loại, còn-treo} lên `gates[id]`, LWW, chiếu qua `awaitingContext`; verb DÙNG CHUNG người/agent — nhưng ĐIỀU KIỆN TIÊN QUYẾT là fold `actor` vào gate record (hiện `gates[id]` chỉ giữ `ask`/`answer`/`parentSnapshotAtAsk`, KHÔNG actor — `repo/src/state/replay.mjs:126-134`) để phân biệt note-người vs tóm-tắt-agent. Record bền lúc chốt nở thành CẤU TRÚC 3 phần: vì-sao / mốc-trao-đổi / đánh-đổi (không còn `reason` một dòng). Tiền lệ verb non-transitioning đã có: `decision`/`outcome` (`repo/docs/specs/work-state.md:647-675`). Đều là fact bền hợp core, KHÔNG lật STR46's own foundational decision. | `awaitingContext` mang distillate + record 3-phần; `actor` chiếu vào gate phân biệt được nguồn; distillate human-overridable, chỉ `answer` authoritative | proposed | — |
+| STR70b | **Raw backstop cho cuộc bàn ở gate — CHỜ Q1 (chưa có nhà hợp lệ)** — nửa bị-chặn của STR70. Giữ lượt thô để khi người phủ định distillate thì đưa lại nguyên văn, drop khi chốt. Đào 2026-07-21 (`CONTEXT.md` Q1) LOẠI O1 (raw thành event core): log fgOS append-only bất khả xâm phạm (L3 `platform-foundations.md:73-74`; RUL11 (tiến hóa schema) `work-state.md`; KHÔNG cơ chế redact/prune/TTL nào trong `repo/src`) → "drop khi chốt" bất khả thi. Còn lại: O2 (kho phụ trong core, không phải log) vướng L1 (`platform-foundations.md:17-20` — mọi dữ liệu bền phải là log HOẶC state; raw không thuộc ô nào) ⇒ phải mở L1; O3 (daemon-consumer) đúng nhà theo decision `0014` nhưng lớp đó CHƯA TỒN TẠI (không file daemon/consumer trong `repo/src`\|`repo/bin`; STR46/STR48 còn proposed). HOÃN có chủ đích: quyết bằng số đo thật (người phủ định distillate bao nhiêu lần) chứ không suy luận; luồng phủ định không gãy khi thiếu raw vì distillate vốn không-authoritative. | Q1 chốt được nhà cho raw (O2 mở L1 / O3 chờ consumer) dựa trên tần suất phủ định thực tế; tới lúc đó STR70b nằm chờ, không chặn STR70a | proposed | — |
+| STR71 | **Chất lượng câu hỏi gate (ask self-sufficiency, phòng ngừa — bổ trợ STR70a)** — người trả lời gate thường "không rõ nó đang hỏi gì", phải mở một vòng chat chỉ-để-hiểu-câu-hỏi trước khi bàn nội dung. Giải phòng-ngừa: cell viết `ask` đủ tự-đứng (kèm context để câu hỏi hiểu được ngay). KHÔNG thay STR70a (tư vấn/so sánh vẫn cần chat dù câu hỏi rõ); chỉ cắt phần vòng exploring bị đốt để giải mã câu hỏi. Chưa ưu tiên đợt đầu. | Một gate mới mang câu hỏi người đọc-hiểu-ngay, không phải hỏi lại "đang hỏi gì"; đo bằng giảm số lượt làm-rõ-câu-hỏi trước khi vào nội dung | proposed | — |
+| STR80 | **Trang trí thêm quy ước OKF cho enduser-docs-index: `index.md` mỗi ngăn (progressive disclosure) + `log.md` lịch sử đổi theo ngày** (nêu ra 2026-07-22 lúc bàn str64-backfill, deferred idea của CONTEXT.md area này) — hiện chỉ mục máy-đọc (`docs/enduser-docs-index.json`) là bảng tra duy nhất; một `index.md` per-thư-mục cho người/agent duyệt nhẹ một ngăn mà không cần load cả manifest. Chưa cần ngay — chỉ đáng làm khi số tài liệu mỗi ngăn tăng thật (hiện `explanation` mới 23 mục, `how-to` 1 mục) | Mỗi thư mục `docs/<quadrant>/` có `index.md` liệt kê + mô tả ngắn các tài liệu trong đó; không đổi hành vi chỉ mục JSON hiện có | proposed | — |
+| STR81 | **Kiểm tra lệch giữa đầu-mô-tả (frontmatter) và log cho `enduser-docs-index`** (nêu ra 2026-07-22, deferred idea của str64-backfill) — `móc-liên-kết-nguồn` trong đầu-mô-tả mỗi tài liệu là bản sao ghi-lúc-soạn, không phải nguồn thẩm quyền (log qua `fgos doc-sources` mới là nguồn thật); nếu một tài liệu được liên kết lại sau khi đầu-mô-tả đã ghi, hai bên có thể lệch mà không ai biết. Chưa xây — ưu tiên thấp, chỉ cần khi quan sát thấy lệch thật | Một lượt kiểm (khả dĩ trong bee-grooming) phát hiện tài liệu có `móc-liên-kết-nguồn` khác với kết quả `fgos doc-sources` cho cùng đường dẫn, báo cáo rõ ràng — không tự sửa | proposed | — |
+| p-4b7dd2ed | `fgos-coding-exploring/SKILL.md` đòi commit CONTEXT.md lên nhánh `fgw/<id>` trước khi gọi `fgos discover` ("uncommitted CONTEXT.md invisible tới phiên re-claim sau"), nhưng `.gitignore:45` loại trừ TOÀN BỘ `/docs/history/` — CONTEXT.md không bao giờ commit được như luật đòi. Phát hiện dogfood thật (decision 0018, scenario `expr-eval-chain`, item `tsk-1wd`, 2026-07-28) khi chạy làm-rõ thật lần đầu qua `fgos-coding-exploring`. **Đã fix tại `fgw/tsk-1wd` (commit `ffd211a`)** — un-ignore `/docs/history/` (+3 path liên đới cùng gốc). **Đã xác minh lại + đóng vòng qua fgOS (tsk-2gw, 2026-08-21)**: `.gitignore` hiện tại (main) xác nhận không còn loại trừ `docs/history/` (`git check-ignore` sạch trên `docs/history/*/CONTEXT.md`/`plan.md`/`RESEARCH.md`, tự động hoá tại `test/setup/gitignore-docs-history-not-excluded.test.mjs`); bằng chứng sống thêm cùng đêm: `tsk-1i3`'s own `CONTEXT.md`/`plan.md`/`RESEARCH.md` commit sạch lên `fgw/tsk-1i3` không trở ngại gì. | `.gitignore` và luật commit của `fgos-coding-exploring` nhất quán với nhau — hoặc bỏ `/docs/history/` khỏi `.gitignore` (cho phép commit CONTEXT.md thật), hoặc sửa luật skill để không đòi commit (đổi nơi lưu / chấp nhận local-only tường minh); chọn một, áp dụng, dogfood xác nhận CONTEXT.md sống sót qua một lượt re-claim — **ĐÃ ĐẠT, xem tsk-2gw** | proposed | — |
+| p-af05e742 | `fgos discover`'s context-discovery judgment (`buildDiscoveryPrompt`, `src/intake/discovery.mjs:113-137`) đòi model "đề xuất một lệnh `verify` chạy được thật" nhưng KHÔNG đưa bất kỳ thông tin cwd/cấu trúc thư mục repo nào vào prompt (chỉ title/description/refs/deps/graph-context/QA history) — model không thể biết verify chạy từ đâu (`goal-check.mjs`: `spawn(item.verify, {cwd: repoRoot của worktree})`) hay một feature nằm trong nested package (vd `dogfood-fixture/`, có `test/` + `package.json` riêng) cần prefix path. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`, 2026-07-28, `fgos-coding-validating`): verdict `clear=true` gắn `verify: "node --test test/expr/*.test.mjs"`, chạy từ cwd thật ra `no matches found` (exit 1) vì thiếu prefix `dogfood-fixture/`. Systemic — tái diễn cho BẤT KỲ item nào có file trong subdirectory/nested package, không riêng cách diễn đạt item này. | `buildDiscoveryPrompt` (và anh em split-work judgment tương tự nếu có) đưa vào prompt đủ ngữ cảnh cwd/layout để model đề xuất `verify` đúng path chạy-được — vd cây thư mục top-level + package.json con nào tồn tại; test dogfood chứng minh một item nested-package nhận `verify` đúng ngay từ discover, không cần sửa tay sau ở `fgos-coding-validating` | proposed | — |
+| p-4c81ca74 | `fgos plan`'s split-work judgment (`buildDecomposePrompt`, `src/intake/plan.mjs`, cơ chế LLM thật qua nested `claude -p` — không phải mechanical) chỉ nhận title/kind/risk/verify/refs/deps — KHÔNG BAO GIỜ đọc `work.description` (đầy đủ, không cắt) VÀ KHÔNG BAO GIỜ đọc `docsRef`-trỏ CONTEXT.md/plan.md mà `fgos-coding-exploring`/`fgos-coding-planning` vừa khoá. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`, 2026-07-28): `title` bị cắt giữa câu lúc submit (dừng ngay trước phần evaluate/evaluateExpr/precedence); split-work model chỉ thấy tiêu đề cụt, tự bịa kiến trúc AST (`parse(tokens)` → `evaluate(ast)`) hoàn toàn khác 3 hàm đã khoá trong CONTEXT.md (`tokenize`→`evaluate(tokens)`→`evaluateExpr(string)`, không AST). `discovery.mjs` (stage `discovery`) có cùng lỗ hổng gốc (không đọc docsRef), CHƯA sửa ở đây — chỉ split-work judgment được reproduce+fix trực tiếp. **Đã fix tại `fgw/tsk-1wd`**: `buildDecomposePrompt` giờ nhận thêm `description` đầy đủ + nội dung CONTEXT.md/plan.md (đọc best-effort qua `docsRef`, không lỗi nếu thiếu); test suite 1463/1463 xanh sau sửa. 3 con sai (`tsk-1wd-1/2/3`, đã tạo trước khi phát hiện) được sửa tay qua `fgos edit` để khớp lại plan đã khoá. | `buildDecomposePrompt` (đã fix) + xét áp cùng pattern cho `buildDiscoveryPrompt`/`discovery.mjs` (chưa fix, cùng lỗ hổng); dogfood xác nhận một item nested-decision (CONTEXT.md/plan.md có nội dung khác title) nhận split-work verdict khớp quyết định đã khoá, không tự bịa kiến trúc khác | proposed | — |
+| p-810b034e | Ý tưởng nêu ra lúc điều tra `p-4c81ca74` (2026-07-28, dogfood `tsk-1wd`): `bin/fgos.mjs` là cửa CLI duy nhất cho mọi verb, nhưng KHÔNG có tầng kiểm cú pháp/đầu vào chung nào ghi lại NƠI GỌI SAI khi một lời gọi verb bị sai (thiếu flag bắt buộc, id không hợp lệ, cwd sai khiến verb đọc nhầm store — như `p-af05e742`/`p-4c81ca74` từng gặp) — lỗi hiện chỉ trồi lên như StoreError/exit-code tại điểm gọi, KHÔNG có provenance (session nào, skill nào, lệnh gốc nào) được ghi lại để soi lại sau. Khác root cause với `p-af05e742` (đó là thiếu ngữ cảnh TRONG prompt gửi model, không phải cú pháp gọi binary sai) — tách riêng theo đúng ranh giới root cause. Chưa rõ hình dạng cụ thể (guard wrapper quanh spawn? log riêng caller-id vào `.fgos/`? convention đặt tên session/skill để tự khai báo?) — cần `fgos-coding-exploring` thật cho item này trước khi thi công, không tự quyết kiến trúc ở đây. | Một quyết định rõ hình dạng cơ chế kiểm-đầu-vào (nếu làm) + bằng chứng dogfood: một lời gọi verb sai cú pháp/cwd được ghi lại kèm nơi gọi (session/skill/lệnh gốc), không chỉ lỗi exit-code trần tại điểm gọi | proposed | — |
+| p-58f890f3 | Case A (phiên tương tác, `/fgOS:pick` + `EnterWorktree`) không có hướng dẫn cho trường hợp root decompose ra children, mỗi con cần worktree/nhánh RIÊNG (`fgw/<child-id>`), NGAY TRONG CÙNG một phiên đang đứng sẵn trong worktree của root. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`→`tsk-1wd-1`, 2026-07-28): phiên đã `EnterWorktree` vào `fgw/tsk-1wd` (root, lần 1, OK); `pick tsk-1wd-1` tạo tree con `fgw/tsk-1wd-1` thành công (fgOS-side, không lỗi), nhưng `EnterWorktree` LẦN 2 vào tree đó bị harness từ chối — "`/home/vantt/projects/forgentX/.claude/worktrees` does not exist, so `<path>` cannot be a worktree managed by Claude Code" (khác thông báo STR83 "refuses to chain" đã biết cho root-pick, đây là root cause riêng: fgOS tạo worktree ở `/tmp/fgos-worktrees/`, không phải dưới `.claude/worktrees/` mà harness đòi cho một lần switch THỨ HAI trở đi). Scenario doc + `pick`/`fgos-routing` skill chỉ cảnh báo về giới hạn 1-lớp (root không được nested sẵn trong tree khác) — KHÔNG hề nhắc gì tới việc chính root TỰ decompose ra children cần tree riêng trong lúc phiên đang sống. Case B (headless `fgos-runner --once`) không dính lỗi này — mỗi item dispatch ở tiến trình riêng, không có khái niệm phiên-đang-đứng-trong-tree-nào. Workaround dùng tạm: thao tác trực tiếp qua Bash/absolute-path vào tree con thay vì `EnterWorktree`, không dùng cơ chế switch của harness. | Case A's skill doc (pick/fgos-routing/hoặc scenario doc riêng) nói rõ: khi root decompose ra children, phiên hiện tại làm gì tiếp — mở phiên mới mỗi con (đúng chuẩn), hay có đường chính thức nào khác (di chuyển bằng path trực tiếp, hay `.claude/worktrees`-hoá worktree của fgOS); dogfood xác nhận một item multi-child chạy hết Case A mà không cần workaround thủ công | proposed | — |
+| p-26c4a4fd | `pick` (`bin/fgos.mjs`, case `'pick'`, ~dòng 1248-1303) tạo worktree mới cho MỌI item (root lẫn leaf) luôn fork từ `currentHead(repoRoot)` (main) — KHÔNG có phân biệt leaf-vs-root base-branch như `review`/`approve` đã có sẵn: `approve` cho leaf (`resolveRoot(id) !== id`) merge branch con vào `fgw/<rootId>` qua ephemeral worktree đứng trên `fgw/<rootId>`, KHÔNG BAO GIỜ main trực tiếp (`bin/fgos.mjs:1704-1721`); `review` cũng diff leaf so với `branchNameFor(rootId)`, không phải trunk (`bin/fgos.mjs:1525-1532`, comment tự ghi "leaf-vs-root split"). `pick` không áp cùng pattern này. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`→`tsk-1wd-3`, 2026-07-28): `tsk-1wd-3` (`evaluateExpr`, `deps: ["tsk-1wd-2"]`, `parent: tsk-1wd`) cần `import` cả `tokenize.mjs` (từ `tsk-1wd-1`) lẫn `evaluate.mjs` (từ `tsk-1wd-2`), nhưng nhánh `fgw/tsk-1wd-3` (fork từ main) không có file nào của hai anh em — vì cả hai còn ở `fgw/tsk-1wd-1`/`fgw/tsk-1wd-2` riêng, CHƯA approve/merge vào `fgw/tsk-1wd`, và dù có approve rồi thì `pick` vẫn fork `tsk-1wd-3` từ main chứ không phải từ `fgw/tsk-1wd`. Đúng model đã có ở `approve`/`review`: integration LUÔN đi qua cha (`fgw/<rootId>`), không bao giờ sibling-to-sibling, không bao giờ main cho tới khi root tự merge. Workaround thủ công: `approve` từng con xong theo `deps` order rồi `git merge fgw/<rootId>` vào worktree con tiếp theo trước khi code. | `pick` áp cùng leaf-vs-root logic `resolveRoot`/`branchNameFor(rootId)` đã có ở `review`/`approve`: fork worktree của một leaf từ `fgw/<rootId>` (branch cha) thay vì main; dogfood xác nhận một chain nhiều con phụ thuộc nhau (`deps`) build được liên tục qua `pick` mà không cần merge tay | proposed | — |
+| p-73d99989 | **[NGHIÊM TRỌNG — rủi ro mất dữ liệu thật]** `reclaimOrphanedCheckout` (`src/runner/worktree.mjs:130-161`) force-remove (`git worktree remove --force`) BẤT KỲ checkout nào đang tồn tại của một branch, không hề kiểm tra checkout đó có thật sự "orphaned" (bị bỏ hoang) hay đang là một session/worktree SỐNG đang được dùng. `createWorktree` gọi hàm này bất cứ khi nào `branchExists(...)===true` (nhánh "reused"). `approve` cho một leaf item tạo ephemeral worktree đứng trên `fgw/<rootId>` để merge (`createWorktree(repoRoot, rootId, {})`, `bin/fgos.mjs:1721`) — NẾU `fgw/<rootId>` đã có checkout sống (chính là worktree người/phiên đang đứng làm việc thật), lệnh `approve` một CON sẽ ÂM THẦM XOÁ SẠCH worktree của CHA đang sống, không cảnh báo, không hỏi. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`, 2026-07-28): chạy `approve tsk-1wd-1` (một leaf), worktree gốc `/tmp/fgos-worktrees/tsk-1wd-lVclki` — nơi cả phiên này đang đứng làm việc `tsk-1wd` từ đầu — biến mất ngay sau lệnh, phát hiện tình cờ lúc `ls /tmp/fgos-worktrees/` để tìm file khác. May mắn: mọi commit đã nằm trên `fgw/tsk-1wd` (8 commit, xác nhận nguyên vẹn qua `git log`) nên không mất code thật, chỉ mất thư mục checkout (khôi phục ngay bằng `git worktree add` mới). Nếu phiên CHƯA commit tại thời điểm đó, đây sẽ là mất trắng thật. | `reclaimOrphanedCheckout` phải phân biệt được checkout thật-sự-orphan (không tiến trình nào sống trong đó, ví dụ tra registry phiên như `approve`'s multi-session guard đã làm ở chỗ khác, `bin/fgos.mjs:1591-1617`) với checkout đang có phiên/session sống — chỉ force-remove trường hợp đầu; dogfood xác nhận `approve` một leaf KHÔNG xoá worktree gốc đang có phiên sống, kể cả khi branch cha đó "reused" | proposed | — |
+| p-b91d487a | `mergeRunnerItem` (`src/runner/merge.mjs:293-322`) không có kiểm "đã merge sẵn rồi" trước khi thử `git commit --no-edit` sau `git merge --no-commit --no-ff`: nếu nhánh con ĐÃ được merge vào nhánh cha từ một lượt `approve` trước (thành công tới bước merge nhưng lỗi ở bước SAU đó — vd `p-73d99989`'s tình huống, hoặc bất kỳ lỗi nào khác xảy ra sau merge-commit nhưng trước status-move `done`), `git merge --no-commit --no-ff` lần sau là no-op (không gì để merge), verify vẫn chạy qua vì code đã có sẵn, nhưng `git commit --no-edit` chết vì "nothing to commit" — approve ném lỗi `MergeError` mập mờ ("verify passed but git commit failed") thay vì nhận ra merge đã xong và tiến thẳng qua bước status-move. Phát hiện dogfood thật (decision 0018, item `tsk-1wd-1`, 2026-07-28): lượt `approve` đầu tiên merge THÀNH CÔNG (`c90c5bb` lên `fgw/tsk-1wd`, xác nhận qua `git log`) nhưng chết ở bước status-move `done` vì thiếu stage `compound-learn` (lỗi độc lập, xem chú thích); chạy `fgos compound tsk-1wd-1` xong rồi approve LẦN 2 thì dính đúng lỗi này — không có đường retry sạch, phải tự tay `fgos move` qua trạng thái `done` để gỡ. Hệ quả chung: BẤT KỲ lỗi nào xảy ra sau khi merge-commit đã landed nhưng trước status-move hoàn tất đều khiến item kẹt vĩnh viễn ở retry — không riêng tình huống compound-learn cụ thể này. | `mergeRunnerItem` kiểm nhánh con đã w-merged-vào-cha chưa (vd `git merge-base --is-ancestor <branch> HEAD`) trước khi thử merge; nếu đã merge sẵn, coi như `outcome: 'merged'` luôn (idempotent), không thử commit lại; dogfood xác nhận `approve` retry sau một lỗi hậu-merge (bất kỳ nguyên nhân nào) tự phục hồi sạch, không cần `fgos move` tay | proposed | — |
+| p-e6425aa9 | 5 follow-up đặt tên lúc đóng track `dispatch-engine-liveness-hardening` (2026-09-29, plan.md's "Explicitly deferred" list, mục 2-6 — mục 1/shadow-binders đã có row riêng `tsk-p7-shadow-binders`): (a) `--force-new-attempt` chưa từng được wire vào một CLI flag thật; (b) chưa có test SIGKILL-probe riêng cho `isHerdrSpawnRunStillWorking` (bộ test herdr hiện có chỉ chứng minh không regression, không tái hiện đúng lớp bug đó); (c) `providerCapacityIsRunWorkerAlive` (lease reclaim) có cùng điểm mù cli-spawn-only cho herdr-spawn mà M1 từng có trước Phase 8a — cùng lớp gap, chỗ gọi khác, chưa sửa; (d) một race có sẵn, không liên quan, trong cơ chế tự-heal "assignment-created event has no assignmentRefs entry" của `replay.mjs`, phát hiện lúc stress-test Phase 5 (tái hiện y hệt trên main trước Phase 5, xác nhận không phải regression của track này); (e) tài liệu/CLI-help còn trỏ tới action `clear-assignment-claim` đã bị retire (Phase 5), chưa quét sạch. | Mỗi mục trong 5 mục có quyết định sửa thật hoặc ghi rõ won't-fix: `--force-new-attempt` có CLI flag thật; có test SIGKILL-probe cho `isHerdrSpawnRunStillWorking`; điểm mù herdr-spawn của `providerCapacityIsRunWorkerAlive` được đóng (hoặc ghi rõ vì sao ngoài scope); race của `replay.mjs` được sửa hoặc tách file riêng; hết tham chiếu `clear-assignment-claim` còn sót | proposed | dispatch-engine-liveness-hardening |
+| p-3c7681b8 | Test rò rỉ fixture directory phiên coordination thật vào `.fgos/coordination/sessions/` sống của repo thay vì một tmp dir cô lập (quan sát 2026-09-29 lúc điều tra doctor check `coordination-sessions-closed`: 506 phiên "active" quá 7 ngày, một phần lớn là rác test). Một số trace về code đã fix từ 2026-09-05; một phiên khác trace về code CHƯA TỪNG commit vào git (chạy tay/WIP) — root cause tản mát, không phải một bug đơn sửa được một lần. Đã thảo luận mục tiêu với user (2026-09-29) nhưng CHƯA chốt: ưu tiên (1) chặn rò rỉ tương lai bằng test-isolation guard hay (2) dọn rác lịch sử trước — câu hỏi còn treo, chưa trả lời. | Quyết định scope (guard / dọn / cả hai) + phần đã chọn được làm: fixture phiên coordination mới của test không bao giờ đụng `.fgos/coordination/sessions/` thật, và/hoặc rác phiên lịch sử được dọn an toàn | proposed | dispatch-engine-liveness-hardening |
+| p-36af7086 | `research-260929-1203-herdr-cook-plan-vs-fgos-dispatch-coordination.md` đề xuất chạy thật một plan 3-4 phase qua cả `thieung/herdr-cook-plan` lẫn engine dispatch/coordination riêng của fgOS trên MỘT PROJECT NGOÀI repo này (đúng mission #1/#2, D-ADR0035 (ranh giới sứ mệnh fgOS) trong `docs/platform-foundations.md` — fgOS tồn tại để phát triển project khác, không phải tự phát triển chính nó), để so sánh throughput/friction thật thay vì chỉ so code tĩnh. Chưa bắt đầu. | Một plan thật (3-4 phase) chạy xong trọn vẹn một lượt qua `herdr-cook-plan` và một lượt qua chính engine fgOS, trên cùng một project ngoài; có ghi chú so sánh friction/throughput cụ thể, không chỉ lý thuyết | proposed | — |
+```
+Historical/current source git blob: bb642bf5469d7f86ced4e0bac6c65acf124d271d
+
+Complete current source: `docs/backlog.md#unheaded-block-2`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: 57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86
+Shown text SHA256: 57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86
+
+```text
+| ID | Story | CoS | Status | Feature |
+|----|-------|-----|--------|---------|
+| tsk-p7-shadow-binders | Retire the two remaining self-verifying shadow binders in `src/runner/dispatch/placement-policy.mjs` (`resolveVerifiedPlacementModel`) and `src/runner/dispatch/provider-adapter.mjs` (`resolveVerifiedProviderArgs`) — dispatch-engine-liveness-hardening Phase 7 (C1) investigated both and found real, if now near-zero, historical production divergence (not near-zero for two OTHER shadow binders in the same audit finding, which Phase 7 already deleted outright since their own two sides always called the identical primitive with identical inputs). Kept these two in shadow mode rather than retiring, with durable local telemetry added (`recordShadowBinderDivergence`, `.fgos/dispatch/shadow-binder-divergence.jsonl`, surfaced by the `shadow-binder-divergence` doctor check) so a future retirement decision has real evidence instead of the ephemeral-stderr-only visibility this phase found (had to manually grep ~800 historical `.fgos/assignments/*/runs/*/stderr.log` files to find the one real divergence window this phase traced). Target: 2026-10-31, or sooner once enough durable telemetry accumulates to re-evaluate. Enumerated divergence classes still open, each needing a decided winner + a matrix test in `test/runner/placement-policy-matrix-coverage.test.mjs`/`test/runner/provider-adapter.test.mjs` before flipping: (a) `resolveVerifiedPlacementModel` — an executor with no declared `providerModel` defaults to `claude`'s model table on the legacy side (`resolve.mjs`'s `modelForTier`) but derives its real family via `deriveProviderFamily` on the PlacementPolicy side; (b) `resolveVerifiedPlacementModel` — an `executors.<id>.model` literal is read by PlacementPolicy's `buildPlacementPolicyCandidate` but ignored by the legacy `modelForTier` formula (masked today only because `cli.mjs`'s `executeExecutorCli` re-applies `executor?.model` as an explicit override after the binder returns; NOT masked in `spawnWorker`, a real live gap); (d) `resolveVerifiedPlacementModel`/C3's `cfg.models` dual-keying — with no `cfg.modelPolicies` table present, the legacy path reads `cfg.models` keyed by WORK tier (light/standard/heavy) while `resolvePolicyTierModel` reads the SAME field keyed by POLICY tier (lightweight/standard/.../critical); real production config always declares `modelPolicies` today (confirmed: `.fgos/config.json` has both `modelPolicies` and a flat `models` key), so this is dormant for this repo's own dispatch but live for any consuming project whose config omits `modelPolicies`; (i) `resolveVerifiedProviderArgs` — an executor's args template with no `{model}` placeholder and no literal `--model` gets `--model <resolved>` appended by `ClaudeProviderAdapter.render()` but nothing appended by the legacy string-substitution path (the ONLY class with real historical production evidence: 126 confirmed real divergences, all dated 2026-09-18, root-caused to a since-fixed `.fgos/config.json` args-template gap — re-verified empirically against every currently-registered production claude-family executor invocation on 2026-09-29: 0/5 diverge today); (ii) `resolveVerifiedProviderArgs` — a combined `--model=value` argv form (not the separate `'--model', 'value'` token pair every currently-registered executor actually uses) would not be detected by the adapter's `renderedArgs.includes('--model')` check, causing a spurious double `--model` append; unexercised by any currently-registered executor, but a real gap the adapter's own check needs a `startsWith('--model=')` branch to close before that specific binder could ever be made unconditionally authoritative. | Each of the 5 enumerated classes above has a decided winner (legacy or PlacementPolicy/ProviderAdapter) backed by a real matrix test, OR the `cfg.models` dual-keying gap (class d) is fixed directly; once all classes are closed, `resolveVerifiedPlacementModel`/`resolveVerifiedProviderArgs` retire the same way the other two shadow binders already did in this same phase (call the target function directly, delete the legacy fallback computation) | proposed | dispatch-engine-liveness-hardening |
+| STR73 | **Done-flip của PBI phải KIỂM từng mệnh đề CoS thực-giao, không chỉ "feature tham chiếu đã đóng" — nếu không, PBI có CoS rộng hơn scope feature bị mark `done` NON (premature)** (đào tận gốc 2026-07-21 từ ca STR64). **Bằng chứng cơ chế:** luật done-flip của bee trigger theo FEATURE-đóng + khớp-row, KHÔNG theo CoS-thỏa: `bee-scribing/SKILL.md:94` — *"when this scribing run closes a feature that matches a backlog row, flip that row to `done`"*; `bee-compounding/SKILL.md:81` — *"backlog done-flip specifically remains prose-ruled"*. Cột `CoS` (định nghĩa `scribing-reference.md:297` = "the one-line acceptance signal") **tồn tại nhưng KHÔNG bao giờ được đối chiếu** với artifact thực-giao trước khi flip. **Hệ quả cụ thể:** STR64 CoS đòi 3 mệnh đề (taxonomy + tag capture-time + *"≥1 tài liệu end-user tích luỹ qua ĐÚNG skill export"*); feature `compound-learn-enduser-docs` chỉ giao acceptance HẸP của CONTEXT ("≥1 doc tại capture-time") — một SUBSET; done-flip đánh đồng "feature tham chiếu PBI đã xong" = "PBI thỏa CoS" và mark `done` khi bước 3 (export skill) + bước 4 (backfill) chưa có. **Anh em STR72:** cùng lỗi gốc — tin tín hiệu cục bộ (feature-close) mà không reconcile ngược về nguồn thẩm quyền (PBI-CoS). **Áp fgOS y hệt:** cổng `done` fgOS (FSM compound-learn) ép item qua stage nhưng KHÔNG kiểm acceptance/CoS của chính item; một parent có thể `done` khi mới thỏa một phần con/CoS → cùng bug premature-done. **Đề xuất (bee-exploring shape chi tiết):** (1) done-flip đối chiếu TỪNG mệnh đề CoS với artifact thực-giao (evidence-linked), chỉ flip `done` khi mọi mệnh đề thỏa; thỏa một phần → giữ `in-flight` + liệt kê mệnh đề còn thiếu; (2) khi feature-acceptance (CONTEXT) HẸP hơn PBI-CoS, buộc khai rõ "feature này giao slice X của PBI", cấm auto-equate feature-done = PBI-done; (3) trong fgOS: cổng `done` của item kiểm acceptance/CoS của chính item, không chỉ FSM-stage. | Một PBI chỉ được flip `done` khi mọi mệnh đề CoS có evidence thực-giao; CoS thỏa một phần giữ `in-flight` và liệt kê phần thiếu; feature giao subset của PBI phải khai rõ slice, không đóng cả PBI. Dogfood: STR64 không tự flip `done` khi bước 3/4 chưa có | in-flight | — |
+| p-09351985 | **Tách core verb-logic thành lib gọi được độc lập CLI** — prerequisite móng mà decision 0014 nêu ("tách core (verb-logic) thành lib gọi được độc lập CLI — hôm nay logic nằm trong CLI thì kéo ra, CLI thành client mỏng"). Refactor nội bộ thuần, KHÔNG đổi hành vi; đường ghi single-door (CTR002) và lock giữ nguyên. Tách khỏi STR46 khi mở exploring 2026-07-27 vì verify của nó khác hẳn phần hợp đồng in/out (tương đương hành vi, không phải hình dạng contract). Đứng dưới mọi consumer sau: daemon (STR48) không link lib theo 0014, nhưng TUI local và code cùng-tiến-trình thì có. | Verb-logic gọi được từ code Node mà không spawn CLI; CLI trở thành client mỏng của chính lib đó; toàn bộ test hiện có xanh không sửa một assertion nào (chứng minh không đổi hành vi) | proposed | — |
+| p-28dd950c | Multi-focus: support more than one simultaneously active goal, each with its own goal-scoped ranking | A user can declare 2+ active goals (e.g. per-epic milestones) at once and get separate (or explicitly merged) goal-scoped rankings per goal, building on STR67's single-focus design | proposed | — |
+| p-2a39f940 | Neither fgOS trigger path (interactive pick, headless runner) reaches an MVP2-equivalent outcome on its own terms — different failure shapes, not equivalent | Case 1 (interactive /fgOS:pick, tsk-57u, docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md) reaches all three literal artifacts -- green verify (23 pass/0 fail), a real commit (4f501f1) on the item's own fgw/tsk-57u branch, and a clean worktree teardown -- but fgos return's fresh-claim path measures only the ORIGINAL checkout's HEAD, never the fgw/<id> branch pick itself created, so return structurally refuses to register the completed work and the item is stuck at awaiting-human instead of proposed/done. Case 2 (headless fgos-runner --once, docs/history/mvp2-scope-test-infra/reports/case-2-headless.md) never reaches ANY of the three artifacts: fgos-runner.mjs resolves repoRoot via git rev-parse --show-toplevel with no override flag/env, dogfood-fixture is not its own git repo, so a real --once invocation would claim and dispatch real forgent work off the live repo/.fgos/state.json (8 real items) -- confirmed unsafe twice, never invoked for real. Fix scope: (a) fgos return's branch-aware path (bin/fgos.mjs:1306) must also accept a first, ordinary interactive pick's fgw/<id> branch, not only a re-claimed already-blocked item's branchHeadAtTake; (b) fgos-runner needs a cwd-rooted root override (e.g. --root/FGOS_ROOT) parallel to the fgos.mjs verbs' existing process.cwd()-derived isolation, so the headless trigger can be pointed at a testbed instead of always resolving through git toplevel. Done when both cases can independently reach green verify + commit on own branch + clean teardown AND the engine registers completion (proposed/done), proven by re-running this feature's two live cases. | proposed | mvp2-scope-test-infra |
+| p-51f4eb7e | **Bù version token cho CTR006 (routing-handoff)** — decision 0011 bắt mọi contract mang `<name>/v<N>`; CTR006 khai "designed — spec đầy đủ, chưa có code implement" (architecture-map.md:350) và `routing-handoff-contract.md` không mang field version nào. Để NGOÀI biên STR46 khi chốt exploring 2026-07-27: dán version lên thứ chưa chạy là đóng dấu cho giả định, không phải cho hành vi. Làm khi CTR006 có code thật, cùng lượt với lần implement đầu tiên. | CTR006 mang version token đúng khuôn 0011, và token đó đối chiếu được với code đang chạy chứ không chỉ với spec | proposed | — |
+| p-782e25aa | STR46 buoc merge: viet lai kho fgos-test-drive tu ngoai worktree str46 | Kho /home/vantt/projects/fgos-test-drive/.fgos KHONG viet duoc tu worktree str46: write guard tu choi moi duong dan khong nam gon trong worktree vat ly (da do bang probe that, khong phai suy doan). Vi vay no roi khoi lat 1 cung ly do da doi kho song ra. Pham vi: events.jsonl 26 dong, 12 dong mang ten cu, 0 dang predicted long, tat ca deu mang truong version. Kho la mot repo git nhung .fgos KHONG duoc theo doi nen khong co nghia vu commit. Dung script scripts/migrate-actor-to-role.mjs (cell str46-io-contract-r3-6), chay --dry-run truoc, backup ra ngoai thu muc kho. Sau do chay lai ban chieu bang cach dat thu muc lam viec VAO chinh kho do roi goi bin/fgos.mjs rebuild - fgos lay kho tu process.cwd() va KHONG co co --dir nao, nen goi tu cho khac se nham vao kho sai. Xong: log khong con ten cu, khong con dong khai version 2, moi dong parse duoc, 26 dong, seq lien tuc. Chay cung dip voi PBI p-b822cf9f (kho song), tu mot noi co quyen ghi ca hai. | proposed | str46-io-contract |
+| p-88b4ae1e | Audit every reservations release / releaseHolds call site for the same missing-session-filter gap xwh-3 fixed at one call site | Every call site that scopes a cross-worktree hold release derives and passes session (or documents why it legitimately cannot), not just cell -- confirmed via code read across the whole .bee/bin tree, not just handleReservationsRelease | proposed | — |
+| p-99592f2a | anti-loop suy ra co-nguoi-can-thiep tu su-kien-mang-vai-nguoi, va dai dien do suy thoai dan | anti-loop.mjs:88-93 dung dieu kien vai la human VA co answer hoac reason lam dai dien cho cau hoi that su la co nguoi can thiep khong. Dai dien do chi dung khi gia tri human chi xuat hien o cho nguoi that su quyet dinh. STR46 lam human xuat hien o nhung canh ma nguoi chi go lenh con may moi la thu quyet dinh (park tu dong trong return va approve), va STR46 phai them mot gia tri vai thu tu (system) chi de tranh dai dien nay. Moi lan gan vai len nhieu canh hon thi dai dien lai suy thoai them. Viec can lam: thay dai dien bang mot dau hieu tuong minh tren chinh su kien (vi du mot co human-intervention) thay vi suy ra tu vai. CHAM RUL29 (cong chong-lap reset theo can thiep nguoi cuoi cung, per-item, executing-phase-only) nen phai co quyet dinh rieng, khong sua qua cua sau tu mot feature khac. | proposed | str46-io-contract |
+| p-b822cf9f | STR46 buoc merge: viet lai kho .fgos song tu checkout chinh, cung luc ma moi dap xuong main | Chay tu /home/vantt/projects/forgent/repo (checkout chinh), KHONG tu worktree str46 - o day .fgos la symlink va cac file cua no bao la da xoa. Dieu kien tien quyet: khong phien nao khac dang ghi (kiem .fgos/sessions.json va .fgos/events.lock truoc khi bat dau). Dung script scripts/migrate-actor-to-role.mjs do cell str46-io-contract-r3-6 tao ra, chay --dry-run truoc. Pham vi mot kho: chi events.jsonl (111 dong, 54 mang ten cu, 5 trong so do la dang predicted long); state.json dung lai bang fgos rebuild, khong sua tay; coexistence.json va entropy-history.jsonl mang 0 ten cu nen ngoai pham vi. Sau khi xong: log khong con ten cu, khong con dong khai version 2, moi dong parse duoc, so dong van la 111, seq lien tuc. Ba file duoc theo doi trong checkout chinh (coexistence.json, entropy-history.jsonl, events.jsonl) nam trong dung mot commit voi lan merge. TUYET DOI khong cham repo/test/fixtures/phase1-events.jsonl. Can mien tru pre-release cua ban ghi 0017 (cell str46-io-contract-r3-1) da ton tai truoc khi chay. | proposed | str46-io-contract |
+| p-bb89e653 | resolveHoldTopology ignores its own root argument, always resolves holder from process.cwd() -- candidate mechanism for cross-worktree holder collisions | resolveHoldTopology(root) resolves holder identity from the passed root, not unconditionally process.cwd() -- fixes every caller of the function, not just reservations release; a regression test proves a call with root != process.cwd() resolves the correct worktree-specific holder | proposed | — |
+| p-c3a41d07 | Bind the confinement ownership marker to its herdr pane when the pane is created, not only on failure. Today the marker gets `paneId` and `herdrSession` late (`src/runner/dispatch/confinement/cleanup.mjs:72-81`, `confinement/authority.mjs:1172`), so a controller that dies between pane creation and the late write leaves a live worker's private home looking like an orphan to the reaper. Left out of dispatch-worker-hygiene-and-recovery phase 03 under its descope rule (more than 25 lines of plumbing to reach the bind handle from the round). Open it when a reaper deletion of a live worker's home is observed, or when that plumbing is touched anyway. | A worker's ownership marker carries its pane and session from the moment the pane exists; a test kills the controller after the split and shows the reaper keeps the home until the pane closes | proposed | dispatch-worker-hygiene-and-recovery |
+| p-c7e90b52 | OMP and Pi extension hook commands still resolve from the session cwd. The codex and agy hook files were moved to an absolute shim path; a relative hook command run from a directory without `.fgos/installation` exits 127 and the worker's tools are blocked. Open it when an OMP or Pi worker is seen blocked by a failing hook, or when those hook files are next generated by `fgos setup`. | OMP and Pi hook commands are written with the absolute shim path like the codex and agy ones, and a test runs the hook from an unrelated cwd without exit 127 | proposed | dispatch-worker-hygiene-and-recovery |
+| p-cf1280a6 | A codex council seat in a worktree without project hooks stopped at `Continue anyway? [y/N]` once (council-lite, 2026-10-09); not reproduced, cause unknown. A failed round that closes its pane now keeps the last 40 screen lines in its failure record, so the next occurrence has evidence. Open it when it recurs: read the `screen` field of the failure record, find what asked, then decide the fix. | The dialog's full text is captured from a real recurrence and the seat no longer stops on it, proven by one named run | proposed | dispatch-worker-hygiene-and-recovery |
+| p-dc785743 | bee write-guard's control-root resolution races against concurrent sessions for git/write checks in a worktree | A worktree session's own git add/commit/Edit calls resolve the intake-gate phase check against ITS OWN .bee store consistently -- never transiently against another concurrent session's control-root state (observed: two independent str92 swarming workers, and the orchestrator itself, each hit a spurious 'phase: compounding-complete' / 'phase: idle' denial while this worktree's own bee.mjs status correctly showed phase=swarming; retrying, or invoking git via a node subprocess instead of a literal git Bash command, worked around it every time without disabling any guard). Root-caused during str92 (2026-07-26): likely a resolveContext/controlRoot race under concurrent multi-session load, not a cwd-pin bug (ruled out by at least one worker whose pwd/bee status were confirmed correct at the moment of the false denial). | proposed | str92 |
+| STR27 | Orchestrator service tầng fleet: registry worker + heartbeat + push assignment + lease/liveness + capacity + giao thức/auth cho worker từ xa — đắp TRÊN cùng event log (per stage-decompose: pull là móng, không đập lại) | Chỉ mở khi có nhu cầu fleet thật (worker từ xa/luôn-bật); thiết kế đứng trên log + claim sẵn có | proposed | — |
+| STR36 | Metric riêng cho từng fix của vòng evolving (per STR13), chỉ mở khi entropy-trend chứng minh không đủ nhạy ở quy mô 1 fix/lần | Có điểm số đo được trước/sau một fix đơn lẻ, độc lập với entropy-trend tổng | proposed | — |
+| STR38 | Human-UI listener (web/chat) trên đất Host Adapter (D b2d18cc7): translator nhận transport (HTTP/chat) → dịch sang verb → spawn `fgos <verb>` → đọc envelope + exit code; kèm identity gate "ai được nói verb nào" trước khi dịch xuống CTR001 (trust invariant dispatch.mjs: `verify` chạy như shell — intake nguồn chưa kiểm là injection vector); KHÔNG fgos-serve in-process khi CTR002 một-cửa-ghi còn per-process; chiều ra tạm poll list/catchup + so data_hash, CTR008 attention envelope chờ lực kéo thật. Đứng trên STR37. **Chốt qua thảo luận RUL42 (STANCE trí-tuệ-giao-việc — picker luôn cơ học, trí tuệ chỉ vào qua field ghi sẵn hoặc cửa pull take/return) (runner) (per bàn STR42, 2026-07-17):** STR38 bao gồm một verb chat cho người GỢI Ý priority/intent (phục vụ STR7/STR8) — verb này ghi một field GỢI Ý, KHÔNG PHẢI field cuối cùng; bộ não thông minh ở giai đoạn planning/scoring (clarify/decompose hôm nay, STR7/STR8 mai sau) đọc gợi ý này làm một tín hiệu đầu vào rồi TỰ quyết field cuối qua cửa ghi chuẩn — có thể theo đúng gợi ý hoặc đổi khác nếu thấy hợp lý hơn, nhưng gợi ý luôn được cân nhắc, không bao giờ bị bỏ qua và không bao giờ tự nó là giá trị cuối. Giữ đúng RUL42 (runner: STANCE trí-tuệ-giao-việc — đúng một actor ghi field cuối, picker vẫn cơ học) | Một người dùng qua web/chat submit được vấn đề, trả lời ask, duyệt approve/reject, VÀ gợi ý priority/intent cho một item — tất cả qua verb CTR001, không đường ghi riêng; caller chưa xác danh không gọi được verb mutation; gợi ý priority/intent của người được planning-stage đọc và cân nhắc (không tự động trở thành field cuối) | proposed | — |
+| STR48 | **Kênh attention/push ("cần bạn") như một subsystem có delivery-semantics** — tách từ STR46 vì chiều-ra chủ động KHÔNG phải bolt-on mà là hệ con riêng, đòn bẩy UX cao nhất + rủi ro cao nhất. Phải chốt 5 thuộc tính: **at-least-once** (item chờ lâu chắc chắn người được ping, không rơi), **dedup** (một gate không ping N lần), **routing** (người/thiết bị/kênh nào), **ack** (đã xem chưa), **escalation** (không đáp trong ngưỡng → ping lại / đổi kênh / đổi người). Sống ở **CONSUMER daemon** (poll data_hash STR37 / tail log STR39 + giữ kênh outbound), **core fgOS vẫn passive** — đây là chỗ hiện thực hoá "không bị động" mà lõi KHÔNG mọc organ push nội tại. Đứng trên STR46 (contract in/out), STR39 (log substrate), STR37 (poll rẻ). Reference pattern: airemote notify (at-least-once, watcher-fed) trên herdr-gateway; herdr `notification.show`. | Một spec kênh attention nêu rõ 5 thuộc tính (at-least-once/dedup/routing/ack/escalation); một "cần bạn" thật của item chờ-người được giao ĐÚNG-MỘT-LẦN tới người, có ack, không đáp trong ngưỡng thì escalate đúng — chứng minh trên item thật, core không thêm trạng thái push nội tại | proposed | — |
+| STR52 | **Domain thứ hai THẬT: marketing** (nêu ra 2026-07-18 trong lúc bàn STR50) — invalidate tiền đề trước đó ("hiện chỉ có 1 domain thực"): người dùng có sẵn workflow marketing ở MỘT PROJECT KHÁC và muốn điều phối marketing qua fgOS. Hạ tầng kernel đã chứng minh đa-domain chạy được về nguyên tắc (domain `synthetic` sống song song `coding` hôm nay, STR18 base-workflow+domain-extension đã done), nhưng marketing THẬT còn thiếu: (a) registry entry riêng trong `domains.mjs` (stages/stepMap/transitions cho chu trình marketing, khác `clarify/decompose/executing`), (b) retrofit `discovery.mjs`/`decompose.mjs` — hai module này đang hardcode literal stage-name của coding, domain khác vào `clarify`/`decompose` sẽ bị ghi đè sai (cảnh báo đã có sẵn trong comment `domains.mjs:29-34`), (c) bộ skill nội dung riêng cho domain-extension "marketing" (song song bộ STR50 đang trích cho coding, KHÔNG phải `fgos-routing` — module đó domain-agnostic, không cần đổi), (d) STR51 mở rộng thêm field `domain` vào output classify (chỗ nối tự nhiên — cùng cơ chế, chỉ thêm 1 field). **CÂU HỎI SCOPE CHƯA TRẢ LỜI (quan trọng, quyết định đây là 1 feature hay 2):** project marketing kia dùng CHUNG một store/event-log với fgOS hiện tại (khác domain field trên cùng một hệ), hay là một CÀI ĐẶT fgOS RIÊNG cho project đó? Khuyến nghị: không gộp vào STR50 đang chạy (đã khoá scope hẹp cho coding, mode standard, đang thực thi) — mở feature riêng qua bee-hive/bee-exploring khi câu hỏi scope trên có câu trả lời. | Một decision record trả lời rõ câu hỏi scope (chung store hay cài đặt riêng); nếu chung store: registry entry `marketing` thật + retrofit discovery/decompose + bộ skill marketing chạy được một case study thật, domain `coding` không bị ảnh hưởng | proposed | — |
+| STR62 | **Sibling-aware / agent-driven on-demand cross-item context** (deferred idea từ STR61 exploring, 2026-07-19): hai option bị loại ở STR61's own parent-only decision — (a) tự động kèm cả sibling (không chỉ parent) khi trả lời gate người, (b) agent tự quyết kéo thêm bối cảnh cha/sibling động thay vì cố định. Cả hai cần khái niệm "sibling" mới trong data model (hiện chỉ có `parent`/`deps`/`blocks`, `work-state.md:864`) — không xây bây giờ, chỉ mở lại nếu baseline "parent-only" của STR61 chứng minh không đủ trong thực tế | Chưa xác định — chờ bằng chứng thiếu-bối-cảnh thật từ STR61 chạy production trước khi chốt CoS | proposed | — |
+| STR69b | **Vệt event gần nhất + diff giàu hơn khi người quay lại gate (cần chốt lại STR61's own "material" decision trước)** — nửa còn lại của STR69. Khác STR69a ở chỗ có thiết kế thật cần chốt: nới `MATERIAL_FIELDS` (`repo/src/state/awaiting-context.mjs:15`, hiện chỉ `title`/`status`) và chọn bao nhiêu event chạm TRỰC TIẾP vào STR61's own "material" decision ("chỉ báo khi thay đổi ảnh hưởng câu hỏi/trả lời gốc, im lặng nếu không") — nới bộ trường = nới định nghĩa "material" mà quyết định đó cố tình giữ hẹp. Cũng là lớp validity-check cho STR70a (changed-since làm lộ leaning stale). Vẫn thuần read-projection, không lật STR46's own foundational decision; scope đợt đầu KHÔNG gồm sibling (trần parent-only). | Người mở lại item awaiting-human phiên mới thấy vệt event gần nhất + diff parent giàu hơn; quyết định nới/không-nới `MATERIAL_FIELDS` ghi lại có lý do đối chiếu STR61's own "material" decision | proposed | — |
+| STR70a | **Checkpoint distillate + record chốt 3-phần lên gate (fgOS core, KHÔNG bị chặn)** — nửa không-vướng của STR70 (tách 2026-07-21, per `docs/history/gate-dialogue-continuity/CONTEXT.md`'s locked decisions). Verb non-transitioning ghi distillate {câu hỏi diễn giải lại, options + trục so sánh, leaning + lý do quote nguyên văn người, đã-loại, còn-treo} lên `gates[id]`, LWW, chiếu qua `awaitingContext`; verb DÙNG CHUNG người/agent — nhưng ĐIỀU KIỆN TIÊN QUYẾT là fold `actor` vào gate record (hiện `gates[id]` chỉ giữ `ask`/`answer`/`parentSnapshotAtAsk`, KHÔNG actor — `repo/src/state/replay.mjs:126-134`) để phân biệt note-người vs tóm-tắt-agent. Record bền lúc chốt nở thành CẤU TRÚC 3 phần: vì-sao / mốc-trao-đổi / đánh-đổi (không còn `reason` một dòng). Tiền lệ verb non-transitioning đã có: `decision`/`outcome` (`repo/docs/specs/work-state.md:647-675`). Đều là fact bền hợp core, KHÔNG lật STR46's own foundational decision. | `awaitingContext` mang distillate + record 3-phần; `actor` chiếu vào gate phân biệt được nguồn; distillate human-overridable, chỉ `answer` authoritative | proposed | — |
+| STR70b | **Raw backstop cho cuộc bàn ở gate — CHỜ Q1 (chưa có nhà hợp lệ)** — nửa bị-chặn của STR70. Giữ lượt thô để khi người phủ định distillate thì đưa lại nguyên văn, drop khi chốt. Đào 2026-07-21 (`CONTEXT.md` Q1) LOẠI O1 (raw thành event core): log fgOS append-only bất khả xâm phạm (L3 `platform-foundations.md:73-74`; RUL11 (tiến hóa schema) `work-state.md`; KHÔNG cơ chế redact/prune/TTL nào trong `repo/src`) → "drop khi chốt" bất khả thi. Còn lại: O2 (kho phụ trong core, không phải log) vướng L1 (`platform-foundations.md:17-20` — mọi dữ liệu bền phải là log HOẶC state; raw không thuộc ô nào) ⇒ phải mở L1; O3 (daemon-consumer) đúng nhà theo decision `0014` nhưng lớp đó CHƯA TỒN TẠI (không file daemon/consumer trong `repo/src`\|`repo/bin`; STR46/STR48 còn proposed). HOÃN có chủ đích: quyết bằng số đo thật (người phủ định distillate bao nhiêu lần) chứ không suy luận; luồng phủ định không gãy khi thiếu raw vì distillate vốn không-authoritative. | Q1 chốt được nhà cho raw (O2 mở L1 / O3 chờ consumer) dựa trên tần suất phủ định thực tế; tới lúc đó STR70b nằm chờ, không chặn STR70a | proposed | — |
+| STR71 | **Chất lượng câu hỏi gate (ask self-sufficiency, phòng ngừa — bổ trợ STR70a)** — người trả lời gate thường "không rõ nó đang hỏi gì", phải mở một vòng chat chỉ-để-hiểu-câu-hỏi trước khi bàn nội dung. Giải phòng-ngừa: cell viết `ask` đủ tự-đứng (kèm context để câu hỏi hiểu được ngay). KHÔNG thay STR70a (tư vấn/so sánh vẫn cần chat dù câu hỏi rõ); chỉ cắt phần vòng exploring bị đốt để giải mã câu hỏi. Chưa ưu tiên đợt đầu. | Một gate mới mang câu hỏi người đọc-hiểu-ngay, không phải hỏi lại "đang hỏi gì"; đo bằng giảm số lượt làm-rõ-câu-hỏi trước khi vào nội dung | proposed | — |
+| STR80 | **Trang trí thêm quy ước OKF cho enduser-docs-index: `index.md` mỗi ngăn (progressive disclosure) + `log.md` lịch sử đổi theo ngày** (nêu ra 2026-07-22 lúc bàn str64-backfill, deferred idea của CONTEXT.md area này) — hiện chỉ mục máy-đọc (`docs/enduser-docs-index.json`) là bảng tra duy nhất; một `index.md` per-thư-mục cho người/agent duyệt nhẹ một ngăn mà không cần load cả manifest. Chưa cần ngay — chỉ đáng làm khi số tài liệu mỗi ngăn tăng thật (hiện `explanation` mới 23 mục, `how-to` 1 mục) | Mỗi thư mục `docs/<quadrant>/` có `index.md` liệt kê + mô tả ngắn các tài liệu trong đó; không đổi hành vi chỉ mục JSON hiện có | proposed | — |
+| STR81 | **Kiểm tra lệch giữa đầu-mô-tả (frontmatter) và log cho `enduser-docs-index`** (nêu ra 2026-07-22, deferred idea của str64-backfill) — `móc-liên-kết-nguồn` trong đầu-mô-tả mỗi tài liệu là bản sao ghi-lúc-soạn, không phải nguồn thẩm quyền (log qua `fgos doc-sources` mới là nguồn thật); nếu một tài liệu được liên kết lại sau khi đầu-mô-tả đã ghi, hai bên có thể lệch mà không ai biết. Chưa xây — ưu tiên thấp, chỉ cần khi quan sát thấy lệch thật | Một lượt kiểm (khả dĩ trong bee-grooming) phát hiện tài liệu có `móc-liên-kết-nguồn` khác với kết quả `fgos doc-sources` cho cùng đường dẫn, báo cáo rõ ràng — không tự sửa | proposed | — |
+| p-4b7dd2ed | `fgos-coding-exploring/SKILL.md` đòi commit CONTEXT.md lên nhánh `fgw/<id>` trước khi gọi `fgos discover` ("uncommitted CONTEXT.md invisible tới phiên re-claim sau"), nhưng `.gitignore:45` loại trừ TOÀN BỘ `/docs/history/` — CONTEXT.md không bao giờ commit được như luật đòi. Phát hiện dogfood thật (decision 0018, scenario `expr-eval-chain`, item `tsk-1wd`, 2026-07-28) khi chạy làm-rõ thật lần đầu qua `fgos-coding-exploring`. **Đã fix tại `fgw/tsk-1wd` (commit `ffd211a`)** — un-ignore `/docs/history/` (+3 path liên đới cùng gốc). **Đã xác minh lại + đóng vòng qua fgOS (tsk-2gw, 2026-08-21)**: `.gitignore` hiện tại (main) xác nhận không còn loại trừ `docs/history/` (`git check-ignore` sạch trên `docs/history/*/CONTEXT.md`/`plan.md`/`RESEARCH.md`, tự động hoá tại `test/setup/gitignore-docs-history-not-excluded.test.mjs`); bằng chứng sống thêm cùng đêm: `tsk-1i3`'s own `CONTEXT.md`/`plan.md`/`RESEARCH.md` commit sạch lên `fgw/tsk-1i3` không trở ngại gì. | `.gitignore` và luật commit của `fgos-coding-exploring` nhất quán với nhau — hoặc bỏ `/docs/history/` khỏi `.gitignore` (cho phép commit CONTEXT.md thật), hoặc sửa luật skill để không đòi commit (đổi nơi lưu / chấp nhận local-only tường minh); chọn một, áp dụng, dogfood xác nhận CONTEXT.md sống sót qua một lượt re-claim — **ĐÃ ĐẠT, xem tsk-2gw** | proposed | — |
+| p-af05e742 | `fgos discover`'s context-discovery judgment (`buildDiscoveryPrompt`, `src/intake/discovery.mjs:113-137`) đòi model "đề xuất một lệnh `verify` chạy được thật" nhưng KHÔNG đưa bất kỳ thông tin cwd/cấu trúc thư mục repo nào vào prompt (chỉ title/description/refs/deps/graph-context/QA history) — model không thể biết verify chạy từ đâu (`goal-check.mjs`: `spawn(item.verify, {cwd: repoRoot của worktree})`) hay một feature nằm trong nested package (vd `dogfood-fixture/`, có `test/` + `package.json` riêng) cần prefix path. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`, 2026-07-28, `fgos-coding-validating`): verdict `clear=true` gắn `verify: "node --test test/expr/*.test.mjs"`, chạy từ cwd thật ra `no matches found` (exit 1) vì thiếu prefix `dogfood-fixture/`. Systemic — tái diễn cho BẤT KỲ item nào có file trong subdirectory/nested package, không riêng cách diễn đạt item này. | `buildDiscoveryPrompt` (và anh em split-work judgment tương tự nếu có) đưa vào prompt đủ ngữ cảnh cwd/layout để model đề xuất `verify` đúng path chạy-được — vd cây thư mục top-level + package.json con nào tồn tại; test dogfood chứng minh một item nested-package nhận `verify` đúng ngay từ discover, không cần sửa tay sau ở `fgos-coding-validating` | proposed | — |
+| p-4c81ca74 | `fgos plan`'s split-work judgment (`buildDecomposePrompt`, `src/intake/plan.mjs`, cơ chế LLM thật qua nested `claude -p` — không phải mechanical) chỉ nhận title/kind/risk/verify/refs/deps — KHÔNG BAO GIỜ đọc `work.description` (đầy đủ, không cắt) VÀ KHÔNG BAO GIỜ đọc `docsRef`-trỏ CONTEXT.md/plan.md mà `fgos-coding-exploring`/`fgos-coding-planning` vừa khoá. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`, 2026-07-28): `title` bị cắt giữa câu lúc submit (dừng ngay trước phần evaluate/evaluateExpr/precedence); split-work model chỉ thấy tiêu đề cụt, tự bịa kiến trúc AST (`parse(tokens)` → `evaluate(ast)`) hoàn toàn khác 3 hàm đã khoá trong CONTEXT.md (`tokenize`→`evaluate(tokens)`→`evaluateExpr(string)`, không AST). `discovery.mjs` (stage `discovery`) có cùng lỗ hổng gốc (không đọc docsRef), CHƯA sửa ở đây — chỉ split-work judgment được reproduce+fix trực tiếp. **Đã fix tại `fgw/tsk-1wd`**: `buildDecomposePrompt` giờ nhận thêm `description` đầy đủ + nội dung CONTEXT.md/plan.md (đọc best-effort qua `docsRef`, không lỗi nếu thiếu); test suite 1463/1463 xanh sau sửa. 3 con sai (`tsk-1wd-1/2/3`, đã tạo trước khi phát hiện) được sửa tay qua `fgos edit` để khớp lại plan đã khoá. | `buildDecomposePrompt` (đã fix) + xét áp cùng pattern cho `buildDiscoveryPrompt`/`discovery.mjs` (chưa fix, cùng lỗ hổng); dogfood xác nhận một item nested-decision (CONTEXT.md/plan.md có nội dung khác title) nhận split-work verdict khớp quyết định đã khoá, không tự bịa kiến trúc khác | proposed | — |
+| p-810b034e | Ý tưởng nêu ra lúc điều tra `p-4c81ca74` (2026-07-28, dogfood `tsk-1wd`): `bin/fgos.mjs` là cửa CLI duy nhất cho mọi verb, nhưng KHÔNG có tầng kiểm cú pháp/đầu vào chung nào ghi lại NƠI GỌI SAI khi một lời gọi verb bị sai (thiếu flag bắt buộc, id không hợp lệ, cwd sai khiến verb đọc nhầm store — như `p-af05e742`/`p-4c81ca74` từng gặp) — lỗi hiện chỉ trồi lên như StoreError/exit-code tại điểm gọi, KHÔNG có provenance (session nào, skill nào, lệnh gốc nào) được ghi lại để soi lại sau. Khác root cause với `p-af05e742` (đó là thiếu ngữ cảnh TRONG prompt gửi model, không phải cú pháp gọi binary sai) — tách riêng theo đúng ranh giới root cause. Chưa rõ hình dạng cụ thể (guard wrapper quanh spawn? log riêng caller-id vào `.fgos/`? convention đặt tên session/skill để tự khai báo?) — cần `fgos-coding-exploring` thật cho item này trước khi thi công, không tự quyết kiến trúc ở đây. | Một quyết định rõ hình dạng cơ chế kiểm-đầu-vào (nếu làm) + bằng chứng dogfood: một lời gọi verb sai cú pháp/cwd được ghi lại kèm nơi gọi (session/skill/lệnh gốc), không chỉ lỗi exit-code trần tại điểm gọi | proposed | — |
+| p-58f890f3 | Case A (phiên tương tác, `/fgOS:pick` + `EnterWorktree`) không có hướng dẫn cho trường hợp root decompose ra children, mỗi con cần worktree/nhánh RIÊNG (`fgw/<child-id>`), NGAY TRONG CÙNG một phiên đang đứng sẵn trong worktree của root. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`→`tsk-1wd-1`, 2026-07-28): phiên đã `EnterWorktree` vào `fgw/tsk-1wd` (root, lần 1, OK); `pick tsk-1wd-1` tạo tree con `fgw/tsk-1wd-1` thành công (fgOS-side, không lỗi), nhưng `EnterWorktree` LẦN 2 vào tree đó bị harness từ chối — "`/home/vantt/projects/forgentX/.claude/worktrees` does not exist, so `<path>` cannot be a worktree managed by Claude Code" (khác thông báo STR83 "refuses to chain" đã biết cho root-pick, đây là root cause riêng: fgOS tạo worktree ở `/tmp/fgos-worktrees/`, không phải dưới `.claude/worktrees/` mà harness đòi cho một lần switch THỨ HAI trở đi). Scenario doc + `pick`/`fgos-routing` skill chỉ cảnh báo về giới hạn 1-lớp (root không được nested sẵn trong tree khác) — KHÔNG hề nhắc gì tới việc chính root TỰ decompose ra children cần tree riêng trong lúc phiên đang sống. Case B (headless `fgos-runner --once`) không dính lỗi này — mỗi item dispatch ở tiến trình riêng, không có khái niệm phiên-đang-đứng-trong-tree-nào. Workaround dùng tạm: thao tác trực tiếp qua Bash/absolute-path vào tree con thay vì `EnterWorktree`, không dùng cơ chế switch của harness. | Case A's skill doc (pick/fgos-routing/hoặc scenario doc riêng) nói rõ: khi root decompose ra children, phiên hiện tại làm gì tiếp — mở phiên mới mỗi con (đúng chuẩn), hay có đường chính thức nào khác (di chuyển bằng path trực tiếp, hay `.claude/worktrees`-hoá worktree của fgOS); dogfood xác nhận một item multi-child chạy hết Case A mà không cần workaround thủ công | proposed | — |
+| p-26c4a4fd | `pick` (`bin/fgos.mjs`, case `'pick'`, ~dòng 1248-1303) tạo worktree mới cho MỌI item (root lẫn leaf) luôn fork từ `currentHead(repoRoot)` (main) — KHÔNG có phân biệt leaf-vs-root base-branch như `review`/`approve` đã có sẵn: `approve` cho leaf (`resolveRoot(id) !== id`) merge branch con vào `fgw/<rootId>` qua ephemeral worktree đứng trên `fgw/<rootId>`, KHÔNG BAO GIỜ main trực tiếp (`bin/fgos.mjs:1704-1721`); `review` cũng diff leaf so với `branchNameFor(rootId)`, không phải trunk (`bin/fgos.mjs:1525-1532`, comment tự ghi "leaf-vs-root split"). `pick` không áp cùng pattern này. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`→`tsk-1wd-3`, 2026-07-28): `tsk-1wd-3` (`evaluateExpr`, `deps: ["tsk-1wd-2"]`, `parent: tsk-1wd`) cần `import` cả `tokenize.mjs` (từ `tsk-1wd-1`) lẫn `evaluate.mjs` (từ `tsk-1wd-2`), nhưng nhánh `fgw/tsk-1wd-3` (fork từ main) không có file nào của hai anh em — vì cả hai còn ở `fgw/tsk-1wd-1`/`fgw/tsk-1wd-2` riêng, CHƯA approve/merge vào `fgw/tsk-1wd`, và dù có approve rồi thì `pick` vẫn fork `tsk-1wd-3` từ main chứ không phải từ `fgw/tsk-1wd`. Đúng model đã có ở `approve`/`review`: integration LUÔN đi qua cha (`fgw/<rootId>`), không bao giờ sibling-to-sibling, không bao giờ main cho tới khi root tự merge. Workaround thủ công: `approve` từng con xong theo `deps` order rồi `git merge fgw/<rootId>` vào worktree con tiếp theo trước khi code. | `pick` áp cùng leaf-vs-root logic `resolveRoot`/`branchNameFor(rootId)` đã có ở `review`/`approve`: fork worktree của một leaf từ `fgw/<rootId>` (branch cha) thay vì main; dogfood xác nhận một chain nhiều con phụ thuộc nhau (`deps`) build được liên tục qua `pick` mà không cần merge tay | proposed | — |
+| p-73d99989 | **[NGHIÊM TRỌNG — rủi ro mất dữ liệu thật]** `reclaimOrphanedCheckout` (`src/runner/worktree.mjs:130-161`) force-remove (`git worktree remove --force`) BẤT KỲ checkout nào đang tồn tại của một branch, không hề kiểm tra checkout đó có thật sự "orphaned" (bị bỏ hoang) hay đang là một session/worktree SỐNG đang được dùng. `createWorktree` gọi hàm này bất cứ khi nào `branchExists(...)===true` (nhánh "reused"). `approve` cho một leaf item tạo ephemeral worktree đứng trên `fgw/<rootId>` để merge (`createWorktree(repoRoot, rootId, {})`, `bin/fgos.mjs:1721`) — NẾU `fgw/<rootId>` đã có checkout sống (chính là worktree người/phiên đang đứng làm việc thật), lệnh `approve` một CON sẽ ÂM THẦM XOÁ SẠCH worktree của CHA đang sống, không cảnh báo, không hỏi. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`, 2026-07-28): chạy `approve tsk-1wd-1` (một leaf), worktree gốc `/tmp/fgos-worktrees/tsk-1wd-lVclki` — nơi cả phiên này đang đứng làm việc `tsk-1wd` từ đầu — biến mất ngay sau lệnh, phát hiện tình cờ lúc `ls /tmp/fgos-worktrees/` để tìm file khác. May mắn: mọi commit đã nằm trên `fgw/tsk-1wd` (8 commit, xác nhận nguyên vẹn qua `git log`) nên không mất code thật, chỉ mất thư mục checkout (khôi phục ngay bằng `git worktree add` mới). Nếu phiên CHƯA commit tại thời điểm đó, đây sẽ là mất trắng thật. | `reclaimOrphanedCheckout` phải phân biệt được checkout thật-sự-orphan (không tiến trình nào sống trong đó, ví dụ tra registry phiên như `approve`'s multi-session guard đã làm ở chỗ khác, `bin/fgos.mjs:1591-1617`) với checkout đang có phiên/session sống — chỉ force-remove trường hợp đầu; dogfood xác nhận `approve` một leaf KHÔNG xoá worktree gốc đang có phiên sống, kể cả khi branch cha đó "reused" | proposed | — |
+| p-b91d487a | `mergeRunnerItem` (`src/runner/merge.mjs:293-322`) không có kiểm "đã merge sẵn rồi" trước khi thử `git commit --no-edit` sau `git merge --no-commit --no-ff`: nếu nhánh con ĐÃ được merge vào nhánh cha từ một lượt `approve` trước (thành công tới bước merge nhưng lỗi ở bước SAU đó — vd `p-73d99989`'s tình huống, hoặc bất kỳ lỗi nào khác xảy ra sau merge-commit nhưng trước status-move `done`), `git merge --no-commit --no-ff` lần sau là no-op (không gì để merge), verify vẫn chạy qua vì code đã có sẵn, nhưng `git commit --no-edit` chết vì "nothing to commit" — approve ném lỗi `MergeError` mập mờ ("verify passed but git commit failed") thay vì nhận ra merge đã xong và tiến thẳng qua bước status-move. Phát hiện dogfood thật (decision 0018, item `tsk-1wd-1`, 2026-07-28): lượt `approve` đầu tiên merge THÀNH CÔNG (`c90c5bb` lên `fgw/tsk-1wd`, xác nhận qua `git log`) nhưng chết ở bước status-move `done` vì thiếu stage `compound-learn` (lỗi độc lập, xem chú thích); chạy `fgos compound tsk-1wd-1` xong rồi approve LẦN 2 thì dính đúng lỗi này — không có đường retry sạch, phải tự tay `fgos move` qua trạng thái `done` để gỡ. Hệ quả chung: BẤT KỲ lỗi nào xảy ra sau khi merge-commit đã landed nhưng trước status-move hoàn tất đều khiến item kẹt vĩnh viễn ở retry — không riêng tình huống compound-learn cụ thể này. | `mergeRunnerItem` kiểm nhánh con đã w-merged-vào-cha chưa (vd `git merge-base --is-ancestor <branch> HEAD`) trước khi thử merge; nếu đã merge sẵn, coi như `outcome: 'merged'` luôn (idempotent), không thử commit lại; dogfood xác nhận `approve` retry sau một lỗi hậu-merge (bất kỳ nguyên nhân nào) tự phục hồi sạch, không cần `fgos move` tay | proposed | — |
+| p-e6425aa9 | 5 follow-up đặt tên lúc đóng track `dispatch-engine-liveness-hardening` (2026-09-29, plan.md's "Explicitly deferred" list, mục 2-6 — mục 1/shadow-binders đã có row riêng `tsk-p7-shadow-binders`): (a) `--force-new-attempt` chưa từng được wire vào một CLI flag thật; (b) chưa có test SIGKILL-probe riêng cho `isHerdrSpawnRunStillWorking` (bộ test herdr hiện có chỉ chứng minh không regression, không tái hiện đúng lớp bug đó); (c) `providerCapacityIsRunWorkerAlive` (lease reclaim) có cùng điểm mù cli-spawn-only cho herdr-spawn mà M1 từng có trước Phase 8a — cùng lớp gap, chỗ gọi khác, chưa sửa; (d) một race có sẵn, không liên quan, trong cơ chế tự-heal "assignment-created event has no assignmentRefs entry" của `replay.mjs`, phát hiện lúc stress-test Phase 5 (tái hiện y hệt trên main trước Phase 5, xác nhận không phải regression của track này); (e) tài liệu/CLI-help còn trỏ tới action `clear-assignment-claim` đã bị retire (Phase 5), chưa quét sạch. | Mỗi mục trong 5 mục có quyết định sửa thật hoặc ghi rõ won't-fix: `--force-new-attempt` có CLI flag thật; có test SIGKILL-probe cho `isHerdrSpawnRunStillWorking`; điểm mù herdr-spawn của `providerCapacityIsRunWorkerAlive` được đóng (hoặc ghi rõ vì sao ngoài scope); race của `replay.mjs` được sửa hoặc tách file riêng; hết tham chiếu `clear-assignment-claim` còn sót | proposed | dispatch-engine-liveness-hardening |
+| p-3c7681b8 | Test rò rỉ fixture directory phiên coordination thật vào `.fgos/coordination/sessions/` sống của repo thay vì một tmp dir cô lập (quan sát 2026-09-29 lúc điều tra doctor check `coordination-sessions-closed`: 506 phiên "active" quá 7 ngày, một phần lớn là rác test). Một số trace về code đã fix từ 2026-09-05; một phiên khác trace về code CHƯA TỪNG commit vào git (chạy tay/WIP) — root cause tản mát, không phải một bug đơn sửa được một lần. Đã thảo luận mục tiêu với user (2026-09-29) nhưng CHƯA chốt: ưu tiên (1) chặn rò rỉ tương lai bằng test-isolation guard hay (2) dọn rác lịch sử trước — câu hỏi còn treo, chưa trả lời. | Quyết định scope (guard / dọn / cả hai) + phần đã chọn được làm: fixture phiên coordination mới của test không bao giờ đụng `.fgos/coordination/sessions/` thật, và/hoặc rác phiên lịch sử được dọn an toàn | proposed | dispatch-engine-liveness-hardening |
+| p-36af7086 | `research-260929-1203-herdr-cook-plan-vs-fgos-dispatch-coordination.md` đề xuất chạy thật một plan 3-4 phase qua cả `thieung/herdr-cook-plan` lẫn engine dispatch/coordination riêng của fgOS trên MỘT PROJECT NGOÀI repo này (đúng mission #1/#2, D-ADR0035 (ranh giới sứ mệnh fgOS) trong `docs/platform-foundations.md` — fgOS tồn tại để phát triển project khác, không phải tự phát triển chính nó), để so sánh throughput/friction thật thay vì chỉ so code tĩnh. Chưa bắt đầu. | Một plan thật (3-4 phase) chạy xong trọn vẹn một lượt qua `herdr-cook-plan` và một lượt qua chính engine fgOS, trên cùng một project ngoài; có ghi chú so sánh friction/throughput cụ thể, không chỉ lý thuyết | proposed | — |
+```
+
+Actual disposition target: absent. No target or same-unit digest is invented.
+
+Complete source-to-target diff (absent target shown as absent, not deletion):
+No target comparison; inspect the complete historical/current text and the disposition rationale.
+## claim_53b01784413095d74305b7367e9054fb
+
+Entry kind: registry-gap-decision
+Class: Judgment
+Source digest: 9d2bbd0b5bf3c812c67c3ac860daf4a91f6505e7ccf8a1a8e2a5ce36d25213d3
+Target digest: absent
+
+Shard: plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json
+
+```json
+{
+  "claimId": "claim_53b01784413095d74305b7367e9054fb",
+  "sourcePath": "docs/contracts/fgos-gateway-api-v1.yaml",
+  "sourceAnchor": "file-block",
+  "sourceUnitDigest": "9d2bbd0b5bf3c812c67c3ac860daf4a91f6505e7ccf8a1a8e2a5ce36d25213d3",
+  "disposition": "retain-as-evidence",
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:23@2026-10-14",
+  "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/contracts/fgos-gateway-api-v1.yaml at 07bd0c594eff78b7214cfa5f43e9cc859e13ceb8 (blob 8818e5724b9cd12daceaed17ffc2b3e873e1330e, full unit SHA256 9d2bbd0b5bf3c812c67c3ac860daf4a91f6505e7ccf8a1a8e2a5ce36d25213d3). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed."
+}
+```
+
+Complete source/predecessor: `docs/contracts/fgos-gateway-api-v1.yaml#file-block`
+Commit: 07bd0c594eff78b7214cfa5f43e9cc859e13ceb8
+Native unit SHA256: 9d2bbd0b5bf3c812c67c3ac860daf4a91f6505e7ccf8a1a8e2a5ce36d25213d3
+Shown text SHA256: cfc0a8b2b47b9197b4fe6e788b4ce36f76f2d63598337bcfcbf88351c3f4f9e1
+
+```text
+openapi: 3.1.0
+x-contract: "CTR010 · fgos-gateway.v1"
+info:
+  title: fgOS Gateway API
+  version: 1.0.0
+  description: |
+    HTTP+JSON surface of the fgOS interface daemon (tsk-7l9, decision 0014
+    "Kien truc giao tiep nguoi <-> fgOS", model 3: core-library + thin
+    adapters). Written before the daemon is implemented, per this
+    contract's own action: a stable spec for D9's future MCP search tool
+    and any client (web dashboard, desktop) to build against, not
+    reverse-engineered documentation of routes that already exist.
+
+    Scope, locked by 0014:
+      - The daemon is a CONSUMER of fgOS core, never a co-writer. Every
+        write in this API is a thin wrapper over `spawn fgos <verb>`
+        (CTR001/CTR002 one-door-write); every read is a wrapper over
+        `fgos list` / `fgos rollup` / `fgos show` plus the `data_hash`
+        cheap-poll field already on every envelope. This gateway invents
+        no new write path into `.fgos/`.
+      - The daemon becomes the one control-plane that can drive BOTH
+        interactive session workflows (what herdr/TUI panes do today via
+        `fgos session start/end`) and the headless runner
+        (`fgos-runner --once`) — see `/v1/sessions` and `/v1/runner/tick`.
+      - The attention/push channel (STR48, contract CTR008, status
+        `idea`) is explicitly OUT of scope for v1 — 0014 point 6 keeps it
+        a separate subsystem with its own delivery-semantics record.
+        Clients poll `data_hash` on read endpoints until CTR008 lands.
+      - Identity here is ATTRIBUTION, not authentication (same non-goal
+        CTR001 already states for the CLI's own `writer` field): every
+        route below other than `/contract` itself requires the shared
+        per-machine bearer token (D4, `securitySchemes.bearerAuth`) — that
+        token gates ACCESS to the gateway, not per-caller IDENTITY. Who a
+        caller claims to be beyond holding that one shared token is STR38,
+        explicitly out of scope of 0014 itself.
+
+    Envelope reuse: every successful response body is the SAME `fgos.v1`
+    envelope (CTR001) the CLI already emits on stdout — `{contract,
+    generated_at, data_hash, data}` — carried unmodified inside the HTTP
+    body. This mirrors the precedent `fgos-runner.mjs` already set
+    (str46-io-contract D6): reuse CTR001's envelope as the version token
+    across a new transport rather than minting a second, parallel one.
+    HTTP status code + this envelope's `contract` field together answer
+    "did the call succeed"; never branch on message text (docs/io-contract.md).
+
+  contact:
+    name: fgOS
+    url: https://github.com
+  x-decisions:
+    - docs/decisions/0011-version-tuong-minh-cho-moi-contract.md
+    - docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md
+  x-specs:
+    - docs/io-contract.md
+    - docs/specs/work-state.md
+    - docs/specs/runner.md
+
+servers:
+  - url: http://localhost:{port}/v1
+    description: Local daemon (default deployment shape per 0014 point 3-4 — standalone adapter, not always-on by default)
+    variables:
+      port:
+        default: "4170"
+
+# tsk-4qf: every operation inherits this (D4's real, already-enforced
+# require_token gate) unless it overrides with its own `security: []` --
+# today only `/contract` does, since a client has to read the contract
+# before it can know a token is even required.
+security:
+  - bearerAuth: []
+
+tags:
+  - name: work
+    description: Work-item lifecycle (read + write), one-to-one with `fgos list/show/submit/move/ask/answer` etc.
+  - name: frontier
+    description: Read-only frontier/rollup/graph views used for dashboards.
+  - name: orchestration
+    description: The two process families the daemon controls per 0014 — interactive sessions and the headless runner.
+  - name: meta
+    description: Self-description of the gateway's own API surface — lets a client discover the contract instead of hand-tracking a separate doc.
+
+paths:
+  /contract:
+    get:
+      operationId: getContract
+      tags: [meta]
+      summary: The gateway's own OpenAPI spec, verbatim (this document)
+      description: |
+        Serves this exact spec file so an agent (or any other client) can
+        read the full route/schema surface and self-implement a client
+        against it, rather than needing this doc handed to it out of band.
+        The one route NOT behind the auth gate below — a client has to be
+        able to read the contract before it can know a token is even
+        required (D4). Never wrapped in the `fgos.v1` envelope: this is the
+        spec document itself, not a poll of fgOS state.
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/yaml:
+              schema:
+                type: string
+                description: This same OpenAPI document, byte-for-byte.
+
+  /work:
+    get:
+      operationId: listWork
+      tags: [work]
+      summary: List work items (wraps `fgos list`)
+      description: |
+        Read-only, no write side effect. Defaults to open-only (status not
+        `done`/`wontfix`/`retrospective`/`cleanup`), same default as the
+        CLI. Supports the CLI's own opaque-cursor pagination — pass
+        neither `cursor` nor `limit` for the full set.
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+          description: Filter by exact status value.
+        - name: step
+          in: query
+          schema: { type: string }
+        - name: all
+          in: query
+          schema: { type: boolean, default: false }
+          description: Include done/wontfix/retrospective/cleanup items.
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              work:
+                                type: object
+                                additionalProperties: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+    post:
+      operationId: submitWork
+      tags: [work]
+      summary: Intake free-text work (wraps `fgos submit`)
+      description: |
+        Derives title/tier/kind/risk and auto-classifies domain. This is
+        the one gateway-side write that creates state that did not exist
+        before — every other write endpoint below acts on an existing id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                  description: Untrusted free text (RUL45) — passed through as a single argv element, never spliced into a shell command.
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: showWork
+      tags: [work]
+      summary: Full detail of one item (wraps `fgos show`)
+      description: The work record plus every log scoped to just this id (discovery/decisions/gates/outcome/friction/settlement/learning).
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      # tsk-4id: corrected from `WorkItem` -- this endpoint's
+                      # own description already said "plus every log scoped
+                      # to just this id", but the schema reference never
+                      # matched it. Confirmed via a real `fgos show` run
+                      # (docs/history/tsk-4id-task-detail-screen/RESEARCH.md):
+                      # `data` is `{work, discovery, decisions, gates,
+                      # outcome, friction, settlement, learning}`, never a
+                      # bare `WorkItem`.
+                      data: { $ref: '#/components/schemas/WorkDetail' }
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: editWork
+      tags: [work]
+      summary: Partial update of an existing item's editable fields (wraps `fgos edit`)
+      description: |
+        PATCH, not PUT: only fields present in the body change (tsk-41h,
+        D1 of docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md)
+        -- this is `fgos edit`'s own partial-update semantics, never a
+        full-resource replace. Every field is optional; the request body
+        is `EditableWorkFields` (a strict subset of `WorkItem`'s own
+        properties -- `id`/`status`/`domain` are never editable through
+        this route). A field this route does not recognize is silently
+        dropped, same as an unrecognized flag on the CLI's own `edit`
+        command -- this route translates to `fgos edit`, it does not
+        re-validate what the engine already validates (area spec R2).
+        `fgos edit` itself refuses when no field actually changes; that
+        refusal reaches the caller verbatim as the same `ErrorEnvelope`
+        every other write route already uses, never swallowed or
+        replaced with a client-side check.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EditableWorkFields' }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/docs:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: getWorkDocs
+      tags: [work]
+      summary: An item's docsRef narrative -- CONTEXT.md/plan.md raw content (tsk-4id)
+      description: |
+        The task-detail screen's own primary content source for "what the
+        agent did" (D3 of docs/history/herdr-web-dashboard/CONTEXT.md:
+        CONTEXT.md/plan.md is the human narrative, the primary account --
+        `decisions[]` on `GET /work/{id}` is expandable detail only, never
+        the default). Did not exist before this item: a browser client
+        has no filesystem access, and no other route reads an arbitrary
+        repo file. `docsRef` is canonicalized and checked to resolve
+        inside `docs/history/` before any read -- a value that escapes it
+        is refused (`category: validation`), never followed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          docsRef: { type: string, nullable: true }
+                          contextMd: { type: string, nullable: true, description: "Raw CONTEXT.md content, or null if absent/unreadable." }
+                          planMd: { type: string, nullable: true, description: "Raw plan.md content, or null if absent/unreadable." }
+                          narrativeMissing:
+                            type: boolean
+                            description: "Present and true only when docsRef names a directory that does not exist on this machine (area spec Edge Cases: shown without its narrative, never a failure)."
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/move:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: moveWork
+      tags: [work]
+      summary: Move a work item through the status FSM (wraps `fgos move`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties:
+                to: { type: string, description: Target status. }
+                expect: { type: string, description: Optional CAS guard — current status expected before the move. }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/ask:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: askWork
+      tags: [work]
+      summary: Park an item in awaiting-human with a question (wraps `fgos ask`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/answer:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: answerWork
+      tags: [work]
+      summary: Answer a parked question and resume the item (wraps `fgos answer`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/take:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: takeWork
+      tags: [work]
+      summary: Claim an item through the pull door (wraps `fgos take`/`fgos pick`)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [human, session]
+                  default: session
+                  description: |
+                    take --role's real, deliberately-scoped vocabulary
+                    (bin/fgos.mjs's own S2-pull D1) — the pull door
+                    excludes the runner role by design, not by omission.
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/return:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: returnWork
+      tags: [work]
+      summary: Complete a take — run verify, advance to awaiting-approval (wraps `fgos return`)
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/approve:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: approveWork
+      tags: [work]
+      summary: Merge an awaiting-approval item and move it to delivered (wraps `fgos approve`)
+      description: "Carries `externalEffect: true` in the CLI's own verb registry (may open/merge a real PR) — same meaning here."
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/reject:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: rejectWork
+      tags: [work]
+      summary: Reject an awaiting-approval item back to todo (wraps `fgos reject`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /ready:
+    get:
+      operationId: listReady
+      tags: [frontier]
+      summary: The frontier — items ready to be taken right now (wraps `fgos ready`)
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /rollup/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: rollupWork
+      tags: [frontier]
+      summary: Progress rollup of one root/goalTier item's children (wraps `fgos rollup`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Rollup shape, opaque to this contract — see docs/specs/work-state.md. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /graph:
+    get:
+      operationId: workGraph
+      tags: [frontier]
+      summary: Work-graph metrics — connected components, critical path (wraps `fgos graph`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Graph metrics shape, opaque to this contract. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /state/digest:
+    get:
+      operationId: stateDigest
+      tags: [frontier]
+      summary: Cheap-poll digest — `data_hash` + `generated_at` only, no `data` body
+      description: |
+        The poll-driven half of 0014's "poll `fgos list`/`rollup` +
+        `data_hash`" pattern: a client holds the last `data_hash` it saw
+        and calls this endpoint on an interval; a changed hash is the
+        only signal needed to decide whether to re-fetch a full read
+        endpoint. This is a genuinely new route (no CLI verb returns only
+        the digest today) — it exists so a client never has to pay the
+        cost of a full `fgos list` just to learn nothing changed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [contract, generated_at, data_hash]
+                properties:
+                  contract: { type: string, const: fgos.v1 }
+                  generated_at: { type: string, format: date-time }
+                  data_hash: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions:
+    post:
+      operationId: startSession
+      tags: [orchestration]
+      summary: Open an interactive session worktree (wraps `fgos session start`)
+      description: |
+        Interactive-session half of 0014's orchestration scope — what a
+        herdr/TUI pane does today by shelling out directly. A future
+        web/desktop client drives the same lifecycle through this route
+        instead of spawning its own git worktree.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item: { type: string, description: Optional work item id to open the session against. }
+      responses:
+        '200':
+          description: Session opened
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Session' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: endSession
+      tags: [orchestration]
+      summary: Close an interactive session worktree (wraps `fgos session end`)
+      parameters:
+        - name: force
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Session closed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}/slots:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: sessionSlots
+      tags: [orchestration]
+      summary: Worker-slot occupancy for one session (wraps `fgos slots`, session-scoped)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          execution:
+                            type: object
+                            properties:
+                              occupied: { type: integer }
+                              items:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id: { type: string }
+                                    sessionId: { type: string }
+                                    claimRole: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /runner/tick:
+    post:
+      operationId: runnerTick
+      tags: [orchestration]
+      summary: Drive one headless-runner cycle (wraps `fgos-runner --once`)
+      description: |
+        Headless half of 0014's orchestration scope: gather-back, find
+        work, dispatch it through its full "One vong --once" lifecycle
+        (docs/specs/runner.md), and return once that cycle's own outcome
+        is settled. A `--watch`-equivalent continuous mode is deliberately
+        NOT exposed here in v1 — a long-lived HTTP request modeling a
+        long-lived poll loop is a scope decision for the daemon
+        implementation item, not something this contract should force by
+        assuming a streaming transport (SSE/WebSocket) that 0014 never
+        locked.
+      responses:
+        '200':
+          description: Cycle completed (including "nothing to do")
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          dispatched: { type: array, items: { type: string }, description: Work item ids touched this cycle. }
+        '429':
+          description: Runner busy (mirrors CLI `EXIT_BUSY`, category `busy`).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    # tsk-4qf: matches require_token's own real enforcement (D4) -- one
+    # shared token per machine, read from ~/.fgos/config.json's
+    # gateway.token, checked as a plain Bearer header (not a per-user
+    # credential; see this document's own top-level "Identity here is
+    # ATTRIBUTION, not authentication" note).
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        The one shared per-machine token (D4). Every route below this
+        component list requires it except `/contract`, which overrides
+        with its own `security: []`.
+  parameters:
+    WorkId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+      description: Work item id.
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+      description: Opaque cursor from a prior page's `nextCursor`. Never hand-constructed by a client.
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1 }
+  responses:
+    WorkOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data: { $ref: '#/components/schemas/WorkItem' }
+    Error:
+      description: |
+        Any non-2xx. Never bodied by the plain `fgos.v1` envelope — branch
+        on HTTP status + this body's `category`, never on `message` text
+        (docs/io-contract.md: "Consumer re nhanh theo ma thoat pham tru,
+        khong bao gio theo thong diep" — the same rule, ported to HTTP).
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  schemas:
+    Envelope:
+      type: object
+      required: [contract, generated_at, data_hash, data]
+      properties:
+        contract: { type: string, const: fgos.v1 }
+        generated_at: { type: string, format: date-time }
+        data_hash: { type: string }
+        data: {}
+      description: CTR001's envelope, reused verbatim as the HTTP body (see this contract's top-level description).
+
+    Page:
+      type: object
+      properties:
+        nextCursor:
+          type: string
+          nullable: true
+          description: Opaque; null once the set is exhausted. Only present when `cursor`/`limit` was passed.
+
+    WorkItem:
+      type: object
+      description: |
+        Subset of the work-item shape stable enough to publish here; the
+        authoritative shape is docs/specs/work-state.md (schema version
+        carried in the event log per decision 0007, not duplicated here
+        per 0011's own rule against re-deriving a schema this contract
+        does not own).
+      required: [id, title, kind, status]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        status: { type: string }
+        workflowStep: { type: string }
+        tier: { type: string }
+        risk: { type: string }
+        domain: { type: string }
+        parent: { type: string, nullable: true }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        verify: { type: string }
+        docsRef: { type: string, nullable: true, description: "Path under docs/history/ -- content readable via GET /work/{id}/docs (tsk-4id)." }
+
+    WorkDetail:
+      type: object
+      description: |
+        `GET /work/{id}`'s real `data` shape (tsk-4id, corrected from a
+        stale `WorkItem`-only reference -- this endpoint's own summary
+        already said "plus every log scoped to just this id"). Every
+        sub-shape below is `type: object` with `additionalProperties: true`
+        rather than fully enumerated: these are the raw work-state logs
+        (`docs/specs/work-state.md` is their authoritative shape per
+        0011's own rule against re-deriving a schema this contract does
+        not own), and the task-detail screen (tsk-4id) reads only a named
+        few real keys from each (documented per-property below) rather
+        than this contract asserting an exhaustive shape it would then
+        have to keep in lockstep with every future log field.
+      required: [work]
+      properties:
+        work: { $ref: '#/components/schemas/WorkItem' }
+        discovery: { type: array, items: { type: object }, description: Verdict history for this item's discovery stage. }
+        decisions:
+          type: array
+          description: The machine decision log -- NOT the primary "what the agent did" account (that is GET /work/{id}/docs's CONTEXT.md/plan.md); shown collapsed behind a disclosure, per its own count.
+          items: { type: object }
+        gates:
+          type: object
+          description: |
+            Keyed by gate name (`contextApprove`/`planApprove`/
+            `validateApprove`, each `{actor, at, verify}` when present)
+            PLUS the ask/answer-parking fields on the SAME object:
+            `ask` (string, most recent question), `askHistory` (string
+            array, oldest-first, every question this item was ever
+            parked with), `answer` (string, most recent answer),
+            `statusAtAsk` (string, the status the item was in when most
+            recently parked).
+          additionalProperties: true
+        outcome: { type: object }
+        friction: { type: object }
+        settlement:
+          type: object
+          description: |
+            `count` (integer, the TRUE total) and `recent` (array, capped
+            at 5 most-recent-first entries across every settlement kind --
+            `SETTLEMENT_DISPLAY_CAP`. Each entry: `{kind, role, ts,
+            detail, id}`; `kind: "answer"` entries are what pairs
+            positionally with `gates.askHistory`, oldest-available-first
+            after reversing `recent`'s own newest-first order). A round
+            older than the 5-answer window has no entry here at all --
+            this is a real, load-bearing cap, not a client-side choice.
+          properties:
+            count: { type: integer }
+            recent: { type: array, items: { type: object } }
+        learning: { type: object, nullable: true }
+
+    EditableWorkFields:
+      type: object
+      description: |
+        tsk-41h: `PATCH /work/{id}`'s request body -- every field
+        `src/state/store.mjs`'s `EDITABLE_FIELDS` allows `fgos edit` to
+        change (25 entries, read directly from that constant, never
+        re-guessed). All optional; only fields present in the body are
+        patched. `id`/`status`/`domain`/`workflowStep` are never editable through
+        this route (`status` moves only through `/work/{id}/move`,
+        `workflowStep`/`domain` only through the engine's own step
+        transitions -- neither is in `EDITABLE_FIELDS`).
+      properties:
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        risk: { type: string }
+        verify: { type: string }
+        tier: { type: string }
+        refs: { type: array, items: { type: string } }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        acceptance:
+          type: array
+          description: Replaces the whole array (latest-wins), never a deep merge. Each clause is `{text, evidence}`.
+          items: { type: object }
+        priority: { type: integer }
+        intent: { type: integer }
+        docsRef: { type: string, description: "Non-empty path, or omit to leave unchanged. There is no clear-to-empty form on this route." }
+        parent: { type: string, nullable: true, description: "Empty string clears (un-parents) the item." }
+        urgent:
+          type: string
+          enum: [low, medium, high, critical]
+          description: "Despite the name, a string enum (confirmed via a live `fgos edit --urgent` smoke test: the literal boolean `true` is rejected by the engine), not a boolean flag."
+        impact: { type: number }
+        effort: { type: number }
+        action: { type: string, description: "Action directive prose." }
+        mergeAfter: { type: array, items: { type: string } }
+        supersededBy: { type: string, nullable: true, description: "Empty string clears." }
+        duplicates: { type: array, items: { type: string } }
+        domainFields:
+          type: object
+          description: Replaces the whole object (latest-wins) for the item's `domain`, never a deep merge of nested keys.
+        goalTier: { type: string, description: "'mvp' or 'milestone'." }
+        nextOperation: { type: string, nullable: true, description: "Next recommended stage operation or fix operation. Empty string or null clears." }
+        secondaryOperation: { type: string, nullable: true, description: "Active secondary consult/review operation. Empty string or null clears." }
+
+    Session:
+      type: object
+      required: [sessionId, worktree, branch]
+      properties:
+        sessionId: { type: string }
+        worktree: { type: string }
+        branch: { type: string }
+        item: { type: string, nullable: true }
+
+    ErrorEnvelope:
+      type: object
+      required: [category]
+      properties:
+        category:
+          type: string
+          description: |
+            The one CLOSED taxonomy CTR001 already defines
+            (src/state/store.mjs's EXIT_CODES + loop.mjs's EXIT_BUSY) —
+            this gateway adds no categories of its own:
+          enum:
+            - precondition
+            - conflict
+            - validation
+            - corrupt-log
+            - lock-timeout
+            - session-fail
+            - merge-fail
+            - busy
+            - unexpected
+        message:
+          type: string
+          description: Human-readable diagnostic. Never machine-branched on — `category` is the only field a client should switch on.
+        exitCode:
+          type: integer
+          description: The underlying CLI exit code this category maps from, carried through for parity with docs/io-contract.md.
+```
+Historical/current source git blob: 8818e5724b9cd12daceaed17ffc2b3e873e1330e
+
+Complete current source: `docs/contracts/fgos-gateway-api-v1.yaml#file-block`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: 9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f
+Shown text SHA256: 445be31f29f8480854aa28c3c3661363e80c0d60aabc21efa6790e9c8ba287b1
+
+```text
+openapi: 3.1.0
+x-contract: "CTR010 · fgos-gateway.v1"
+info:
+  title: fgOS Gateway API
+  version: 1.0.0
+  description: |
+    HTTP+JSON surface of the fgOS interface daemon (tsk-7l9, decision 0014
+    "Kien truc giao tiep nguoi <-> fgOS", model 3: core-library + thin
+    adapters). Written before the daemon is implemented, per this
+    contract's own action: a stable spec for D9's future MCP search tool
+    and any client (web dashboard, desktop) to build against, not
+    reverse-engineered documentation of routes that already exist.
+
+    Scope, locked by 0014:
+      - The daemon is a CONSUMER of fgOS core, never a co-writer. Every
+        write in this API is a thin wrapper over `spawn fgos <verb>`
+        (CTR001/CTR002 one-door-write); every read is a wrapper over
+        `fgos list` / `fgos rollup` / `fgos show` plus the `data_hash`
+        cheap-poll field already on every envelope. This gateway invents
+        no new write path into `.fgos/`.
+      - The daemon becomes the one control-plane that can drive BOTH
+        interactive session workflows (what herdr/TUI panes do today via
+        `fgos session start/end`) and the headless runner
+        (`fgos-runner --once`) — see `/v1/sessions` and `/v1/runner/tick`.
+      - The attention/push channel (STR48, contract CTR008, status
+        `idea`) is explicitly OUT of scope for v1 — 0014 point 6 keeps it
+        a separate subsystem with its own delivery-semantics record.
+        Clients poll `data_hash` on read endpoints until CTR008 lands.
+      - Identity here is ATTRIBUTION, not authentication (same non-goal
+        CTR001 already states for the CLI's own `writer` field): every
+        route below other than `/contract` itself requires the shared
+        per-machine bearer token (D4, `securitySchemes.bearerAuth`) — that
+        token gates ACCESS to the gateway, not per-caller IDENTITY. Who a
+        caller claims to be beyond holding that one shared token is STR38,
+        explicitly out of scope of 0014 itself.
+
+    Envelope reuse: every successful response body is the SAME `fgos.v1`
+    envelope (CTR001) the CLI already emits on stdout — `{contract,
+    generated_at, data_hash, data}` — carried unmodified inside the HTTP
+    body. This mirrors the precedent `fgos-runner.mjs` already set
+    (str46-io-contract D6): reuse CTR001's envelope as the version token
+    across a new transport rather than minting a second, parallel one.
+    HTTP status code + this envelope's `contract` field together answer
+    "did the call succeed"; never branch on message text (docs/io-contract.md).
+
+  contact:
+    name: fgOS
+    url: https://github.com
+  x-decisions:
+    - docs/decisions/0011-version-tuong-minh-cho-moi-contract.md
+    - docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md
+  x-specs:
+    - docs/io-contract.md
+    - docs/specs/work-state.md
+    - docs/specs/runner.md
+
+servers:
+  - url: http://localhost:{port}/v1
+    description: Local daemon (default deployment shape per 0014 point 3-4 — standalone adapter, not always-on by default)
+    variables:
+      port:
+        default: "4170"
+
+# tsk-4qf: every operation inherits this (D4's real, already-enforced
+# require_token gate) unless it overrides with its own `security: []` --
+# today only `/contract` does, since a client has to read the contract
+# before it can know a token is even required.
+security:
+  - bearerAuth: []
+
+tags:
+  - name: work
+    description: Work-item lifecycle (read + write), one-to-one with `fgos list/show/submit/move/ask/answer` etc.
+  - name: frontier
+    description: Read-only frontier/rollup/graph views used for dashboards.
+  - name: orchestration
+    description: The two process families the daemon controls per 0014 — interactive sessions and the headless runner.
+  - name: meta
+    description: Self-description of the gateway's own API surface — lets a client discover the contract instead of hand-tracking a separate doc.
+
+paths:
+  /contract:
+    get:
+      operationId: getContract
+      tags: [meta]
+      summary: The gateway's own OpenAPI spec, verbatim (this document)
+      description: |
+        Serves this exact spec file so an agent (or any other client) can
+        read the full route/schema surface and self-implement a client
+        against it, rather than needing this doc handed to it out of band.
+        The one route NOT behind the auth gate below — a client has to be
+        able to read the contract before it can know a token is even
+        required (D4). Never wrapped in the `fgos.v1` envelope: this is the
+        spec document itself, not a poll of fgOS state.
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/yaml:
+              schema:
+                type: string
+                description: This same OpenAPI document, byte-for-byte.
+
+  /work:
+    get:
+      operationId: listWork
+      tags: [work]
+      summary: List work items (wraps `fgos list`)
+      description: |
+        Read-only, no write side effect. Defaults to open-only (status not
+        `done`/`wontfix`/`retrospective`/`cleanup`), same default as the
+        CLI. Supports the CLI's own opaque-cursor pagination — pass
+        neither `cursor` nor `limit` for the full set.
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+          description: Filter by exact status value.
+        - name: step
+          in: query
+          schema: { type: string }
+        - name: all
+          in: query
+          schema: { type: boolean, default: false }
+          description: Include done/wontfix/retrospective/cleanup items.
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              work:
+                                type: object
+                                additionalProperties: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+    post:
+      operationId: submitWork
+      tags: [work]
+      summary: Intake free-text work (wraps `fgos submit`)
+      description: |
+        Derives title/tier/kind/risk and auto-classifies domain. This is
+        the one gateway-side write that creates state that did not exist
+        before — every other write endpoint below acts on an existing id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                  description: Untrusted free text (RUL45) — passed through as a single argv element, never spliced into a shell command.
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: showWork
+      tags: [work]
+      summary: Full detail of one item (wraps `fgos show`)
+      description: The work record plus every log scoped to just this id (discovery/decisions/gates/outcome/friction/settlement/learning).
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      # tsk-4id: corrected from `WorkItem` -- this endpoint's
+                      # own description already said "plus every log scoped
+                      # to just this id", but the schema reference never
+                      # matched it. Confirmed via a real `fgos show` run
+                      # (docs/history/tsk-4id-task-detail-screen/RESEARCH.md):
+                      # `data` is `{work, discovery, decisions, gates,
+                      # outcome, friction, settlement, learning}`, never a
+                      # bare `WorkItem`.
+                      data: { $ref: '#/components/schemas/WorkDetail' }
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: editWork
+      tags: [work]
+      summary: Partial update of an existing item's editable fields (wraps `fgos edit`)
+      description: |
+        PATCH, not PUT: only fields present in the body change (tsk-41h,
+        D1 of docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md)
+        -- this is `fgos edit`'s own partial-update semantics, never a
+        full-resource replace. Every field is optional; the request body
+        is `EditableWorkFields` (a strict subset of `WorkItem`'s own
+        properties -- `id`/`status`/`domain` are never editable through
+        this route). A field this route does not recognize is silently
+        dropped, same as an unrecognized flag on the CLI's own `edit`
+        command -- this route translates to `fgos edit`, it does not
+        re-validate what the engine already validates (area spec R2).
+        `fgos edit` itself refuses when no field actually changes; that
+        refusal reaches the caller verbatim as the same `ErrorEnvelope`
+        every other write route already uses, never swallowed or
+        replaced with a client-side check.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EditableWorkFields' }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/docs:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: getWorkDocs
+      tags: [work]
+      summary: An item's docsRef narrative -- CONTEXT.md/plan.md raw content (tsk-4id)
+      description: |
+        The task-detail screen's own primary content source for "what the
+        agent did" (D3 of docs/history/herdr-web-dashboard/CONTEXT.md:
+        CONTEXT.md/plan.md is the human narrative, the primary account --
+        `decisions[]` on `GET /work/{id}` is expandable detail only, never
+        the default). Did not exist before this item: a browser client
+        has no filesystem access, and no other route reads an arbitrary
+        repo file. `docsRef` is canonicalized and checked to resolve
+        inside `docs/history/` before any read -- a value that escapes it
+        is refused (`category: validation`), never followed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          docsRef: { type: string, nullable: true }
+                          contextMd: { type: string, nullable: true, description: "Raw CONTEXT.md content, or null if absent/unreadable." }
+                          planMd: { type: string, nullable: true, description: "Raw plan.md content, or null if absent/unreadable." }
+                          narrativeMissing:
+                            type: boolean
+                            description: "Present and true only when docsRef names a directory that does not exist on this machine (area spec Edge Cases: shown without its narrative, never a failure)."
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/move:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: moveWork
+      tags: [work]
+      summary: Move a work item through the status FSM (wraps `fgos move`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties:
+                to: { type: string, description: Target status. }
+                expect: { type: string, description: Optional CAS guard — current status expected before the move. }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/ask:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: askWork
+      tags: [work]
+      summary: Park an item in awaiting-human with a question (wraps `fgos ask`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/answer:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: answerWork
+      tags: [work]
+      summary: Answer a parked question and resume the item (wraps `fgos answer`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+                approve: { type: boolean, description: "Explicit approval signal for consent gates. When true, forwards --approve to fgos answer." }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/take:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: takeWork
+      tags: [work]
+      summary: Claim an item through the pull door (wraps `fgos take`/`fgos pick`)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [human, session]
+                  default: session
+                  description: |
+                    take --role's real, deliberately-scoped vocabulary
+                    (bin/fgos.mjs's own S2-pull D1) — the pull door
+                    excludes the runner role by design, not by omission.
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/return:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: returnWork
+      tags: [work]
+      summary: Complete a take — run verify, advance to awaiting-approval (wraps `fgos return`)
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/approve:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: approveWork
+      tags: [work]
+      summary: Merge an awaiting-approval item and move it to delivered (wraps `fgos approve`)
+      description: "Carries `externalEffect: true` in the CLI's own verb registry (may open/merge a real PR) — same meaning here."
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/reject:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: rejectWork
+      tags: [work]
+      summary: Reject an awaiting-approval item back to todo (wraps `fgos reject`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /ready:
+    get:
+      operationId: listReady
+      tags: [frontier]
+      summary: The frontier — items ready to be taken right now (wraps `fgos ready`)
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /rollup/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: rollupWork
+      tags: [frontier]
+      summary: Progress rollup of one root/goalTier item's children (wraps `fgos rollup`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Rollup shape, opaque to this contract — see docs/specs/work-state.md. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /graph:
+    get:
+      operationId: workGraph
+      tags: [frontier]
+      summary: Work-graph metrics — connected components, critical path (wraps `fgos graph`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Graph metrics shape, opaque to this contract. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /state/digest:
+    get:
+      operationId: stateDigest
+      tags: [frontier]
+      summary: Cheap-poll digest — `data_hash` + `generated_at` only, no `data` body
+      description: |
+        The poll-driven half of 0014's "poll `fgos list`/`rollup` +
+        `data_hash`" pattern: a client holds the last `data_hash` it saw
+        and calls this endpoint on an interval; a changed hash is the
+        only signal needed to decide whether to re-fetch a full read
+        endpoint. This is a genuinely new route (no CLI verb returns only
+        the digest today) — it exists so a client never has to pay the
+        cost of a full `fgos list` just to learn nothing changed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [contract, generated_at, data_hash]
+                properties:
+                  contract: { type: string, const: fgos.v1 }
+                  generated_at: { type: string, format: date-time }
+                  data_hash: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions:
+    post:
+      operationId: startSession
+      tags: [orchestration]
+      summary: Open an interactive session worktree (wraps `fgos session start`)
+      description: |
+        Interactive-session half of 0014's orchestration scope — what a
+        herdr/TUI pane does today by shelling out directly. A future
+        web/desktop client drives the same lifecycle through this route
+        instead of spawning its own git worktree.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item: { type: string, description: Optional work item id to open the session against. }
+      responses:
+        '200':
+          description: Session opened
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Session' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: endSession
+      tags: [orchestration]
+      summary: Close an interactive session worktree (wraps `fgos session end`)
+      parameters:
+        - name: force
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Session closed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}/slots:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: sessionSlots
+      tags: [orchestration]
+      summary: Worker-slot occupancy for one session (wraps `fgos slots`, session-scoped)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          execution:
+                            type: object
+                            properties:
+                              occupied: { type: integer }
+                              items:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id: { type: string }
+                                    sessionId: { type: string }
+                                    claimRole: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /runner/tick:
+    post:
+      operationId: runnerTick
+      tags: [orchestration]
+      summary: Drive one headless-runner cycle (wraps `fgos-runner --once`)
+      description: |
+        Headless half of 0014's orchestration scope: gather-back, find
+        work, dispatch it through its full "One vong --once" lifecycle
+        (docs/specs/runner.md), and return once that cycle's own outcome
+        is settled. A `--watch`-equivalent continuous mode is deliberately
+        NOT exposed here in v1 — a long-lived HTTP request modeling a
+        long-lived poll loop is a scope decision for the daemon
+        implementation item, not something this contract should force by
+        assuming a streaming transport (SSE/WebSocket) that 0014 never
+        locked.
+      responses:
+        '200':
+          description: Cycle completed (including "nothing to do")
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          dispatched: { type: array, items: { type: string }, description: Work item ids touched this cycle. }
+        '429':
+          description: Runner busy (mirrors CLI `EXIT_BUSY`, category `busy`).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    # tsk-4qf: matches require_token's own real enforcement (D4) -- one
+    # shared token per machine, read from ~/.fgos/config.json's
+    # gateway.token, checked as a plain Bearer header (not a per-user
+    # credential; see this document's own top-level "Identity here is
+    # ATTRIBUTION, not authentication" note).
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        The one shared per-machine token (D4). Every route below this
+        component list requires it except `/contract`, which overrides
+        with its own `security: []`.
+  parameters:
+    WorkId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+      description: Work item id.
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+      description: Opaque cursor from a prior page's `nextCursor`. Never hand-constructed by a client.
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1 }
+  responses:
+    WorkOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data: { $ref: '#/components/schemas/WorkItem' }
+    Error:
+      description: |
+        Any non-2xx. Never bodied by the plain `fgos.v1` envelope — branch
+        on HTTP status + this body's `category`, never on `message` text
+        (docs/io-contract.md: "Consumer re nhanh theo ma thoat pham tru,
+        khong bao gio theo thong diep" — the same rule, ported to HTTP).
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  schemas:
+    Envelope:
+      type: object
+      required: [contract, generated_at, data_hash, data]
+      properties:
+        contract: { type: string, const: fgos.v1 }
+        generated_at: { type: string, format: date-time }
+        data_hash: { type: string }
+        data: {}
+      description: CTR001's envelope, reused verbatim as the HTTP body (see this contract's top-level description).
+
+    Page:
+      type: object
+      properties:
+        nextCursor:
+          type: string
+          nullable: true
+          description: Opaque; null once the set is exhausted. Only present when `cursor`/`limit` was passed.
+
+    WorkItem:
+      type: object
+      description: |
+        Subset of the work-item shape stable enough to publish here; the
+        authoritative shape is docs/specs/work-state.md (schema version
+        carried in the event log per decision 0007, not duplicated here
+        per 0011's own rule against re-deriving a schema this contract
+        does not own).
+      required: [id, title, kind, status]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        status: { type: string }
+        workflowStep: { type: string }
+        tier: { type: string }
+        risk: { type: string }
+        domain: { type: string }
+        parent: { type: string, nullable: true }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        verify: { type: string }
+        docsRef: { type: string, nullable: true, description: "Path under docs/history/ -- content readable via GET /work/{id}/docs (tsk-4id)." }
+
+    WorkDetail:
+      type: object
+      description: |
+        `GET /work/{id}`'s real `data` shape (tsk-4id, corrected from a
+        stale `WorkItem`-only reference -- this endpoint's own summary
+        already said "plus every log scoped to just this id"). Every
+        sub-shape below is `type: object` with `additionalProperties: true`
+        rather than fully enumerated: these are the raw work-state logs
+        (`docs/specs/work-state.md` is their authoritative shape per
+        0011's own rule against re-deriving a schema this contract does
+        not own), and the task-detail screen (tsk-4id) reads only a named
+        few real keys from each (documented per-property below) rather
+        than this contract asserting an exhaustive shape it would then
+        have to keep in lockstep with every future log field.
+      required: [work]
+      properties:
+        work: { $ref: '#/components/schemas/WorkItem' }
+        discovery: { type: array, items: { type: object }, description: Verdict history for this item's discovery stage. }
+        decisions:
+          type: array
+          description: The machine decision log -- NOT the primary "what the agent did" account (that is GET /work/{id}/docs's CONTEXT.md/plan.md); shown collapsed behind a disclosure, per its own count.
+          items: { type: object }
+        gates:
+          type: object
+          description: |
+            Keyed by gate name (`contextApprove`/`planApprove`/
+            `validateApprove`, each `{actor, at, verify}` when present)
+            PLUS the ask/answer-parking fields on the SAME object:
+            `ask` (string, most recent question), `askHistory` (string
+            array, oldest-first, every question this item was ever
+            parked with), `answer` (string, most recent answer),
+            `statusAtAsk` (string, the status the item was in when most
+            recently parked).
+          additionalProperties: true
+        outcome: { type: object }
+        friction: { type: object }
+        settlement:
+          type: object
+          description: |
+            `count` (integer, the TRUE total) and `recent` (array, capped
+            at 5 most-recent-first entries across every settlement kind --
+            `SETTLEMENT_DISPLAY_CAP`. Each entry: `{kind, role, ts,
+            detail, id}`; `kind: "answer"` entries are what pairs
+            positionally with `gates.askHistory`, oldest-available-first
+            after reversing `recent`'s own newest-first order). A round
+            older than the 5-answer window has no entry here at all --
+            this is a real, load-bearing cap, not a client-side choice.
+          properties:
+            count: { type: integer }
+            recent: { type: array, items: { type: object } }
+        learning: { type: object, nullable: true }
+
+    EditableWorkFields:
+      type: object
+      description: |
+        tsk-41h: `PATCH /work/{id}`'s request body -- every field
+        `src/state/store.mjs`'s `EDITABLE_FIELDS` allows `fgos edit` to
+        change (25 entries, read directly from that constant, never
+        re-guessed). All optional; only fields present in the body are
+        patched. `id`/`status`/`domain`/`workflowStep` are never editable through
+        this route (`status` moves only through `/work/{id}/move`,
+        `workflowStep`/`domain` only through the engine's own step
+        transitions -- neither is in `EDITABLE_FIELDS`).
+      properties:
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        risk: { type: string }
+        verify: { type: string }
+        tier: { type: string }
+        refs: { type: array, items: { type: string } }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        acceptance:
+          type: array
+          description: Replaces the whole array (latest-wins), never a deep merge. Each clause is `{text, evidence}`.
+          items: { type: object }
+        priority: { type: integer }
+        intent: { type: integer }
+        docsRef: { type: string, description: "Non-empty path, or omit to leave unchanged. There is no clear-to-empty form on this route." }
+        parent: { type: string, nullable: true, description: "Empty string clears (un-parents) the item." }
+        urgent:
+          type: string
+          enum: [low, medium, high, critical]
+          description: "Despite the name, a string enum (confirmed via a live `fgos edit --urgent` smoke test: the literal boolean `true` is rejected by the engine), not a boolean flag."
+        impact: { type: number }
+        effort: { type: number }
+        action: { type: string, description: "Action directive prose." }
+        mergeAfter: { type: array, items: { type: string } }
+        supersededBy: { type: string, nullable: true, description: "Empty string clears." }
+        duplicates: { type: array, items: { type: string } }
+        domainFields:
+          type: object
+          description: Replaces the whole object (latest-wins) for the item's `domain`, never a deep merge of nested keys.
+        goalTier: { type: string, description: "'mvp' or 'milestone'." }
+        nextOperation: { type: string, nullable: true, description: "Next recommended stage operation or fix operation. Empty string or null clears." }
+        secondaryOperation: { type: string, nullable: true, description: "Active secondary consult/review operation. Empty string or null clears." }
+
+    Session:
+      type: object
+      required: [sessionId, worktree, branch]
+      properties:
+        sessionId: { type: string }
+        worktree: { type: string }
+        branch: { type: string }
+        item: { type: string, nullable: true }
+
+    ErrorEnvelope:
+      type: object
+      required: [category]
+      properties:
+        category:
+          type: string
+          description: |
+            The one CLOSED taxonomy CTR001 already defines
+            (src/state/store.mjs's EXIT_CODES + loop.mjs's EXIT_BUSY) —
+            this gateway adds no categories of its own:
+          enum:
+            - precondition
+            - conflict
+            - validation
+            - corrupt-log
+            - lock-timeout
+            - session-fail
+            - merge-fail
+            - busy
+            - unexpected
+        message:
+          type: string
+          description: Human-readable diagnostic. Never machine-branched on — `category` is the only field a client should switch on.
+        exitCode:
+          type: integer
+          description: The underlying CLI exit code this category maps from, carried through for parity with docs/io-contract.md.
+```
+
+Actual disposition target: absent. No target or same-unit digest is invented.
+
+Informational successor (not a target for retain-as-evidence): `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml#file-block`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: 9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f
+Shown text SHA256: 445be31f29f8480854aa28c3c3661363e80c0d60aabc21efa6790e9c8ba287b1
+
+```text
+openapi: 3.1.0
+x-contract: "CTR010 · fgos-gateway.v1"
+info:
+  title: fgOS Gateway API
+  version: 1.0.0
+  description: |
+    HTTP+JSON surface of the fgOS interface daemon (tsk-7l9, decision 0014
+    "Kien truc giao tiep nguoi <-> fgOS", model 3: core-library + thin
+    adapters). Written before the daemon is implemented, per this
+    contract's own action: a stable spec for D9's future MCP search tool
+    and any client (web dashboard, desktop) to build against, not
+    reverse-engineered documentation of routes that already exist.
+
+    Scope, locked by 0014:
+      - The daemon is a CONSUMER of fgOS core, never a co-writer. Every
+        write in this API is a thin wrapper over `spawn fgos <verb>`
+        (CTR001/CTR002 one-door-write); every read is a wrapper over
+        `fgos list` / `fgos rollup` / `fgos show` plus the `data_hash`
+        cheap-poll field already on every envelope. This gateway invents
+        no new write path into `.fgos/`.
+      - The daemon becomes the one control-plane that can drive BOTH
+        interactive session workflows (what herdr/TUI panes do today via
+        `fgos session start/end`) and the headless runner
+        (`fgos-runner --once`) — see `/v1/sessions` and `/v1/runner/tick`.
+      - The attention/push channel (STR48, contract CTR008, status
+        `idea`) is explicitly OUT of scope for v1 — 0014 point 6 keeps it
+        a separate subsystem with its own delivery-semantics record.
+        Clients poll `data_hash` on read endpoints until CTR008 lands.
+      - Identity here is ATTRIBUTION, not authentication (same non-goal
+        CTR001 already states for the CLI's own `writer` field): every
+        route below other than `/contract` itself requires the shared
+        per-machine bearer token (D4, `securitySchemes.bearerAuth`) — that
+        token gates ACCESS to the gateway, not per-caller IDENTITY. Who a
+        caller claims to be beyond holding that one shared token is STR38,
+        explicitly out of scope of 0014 itself.
+
+    Envelope reuse: every successful response body is the SAME `fgos.v1`
+    envelope (CTR001) the CLI already emits on stdout — `{contract,
+    generated_at, data_hash, data}` — carried unmodified inside the HTTP
+    body. This mirrors the precedent `fgos-runner.mjs` already set
+    (str46-io-contract D6): reuse CTR001's envelope as the version token
+    across a new transport rather than minting a second, parallel one.
+    HTTP status code + this envelope's `contract` field together answer
+    "did the call succeed"; never branch on message text (docs/io-contract.md).
+
+  contact:
+    name: fgOS
+    url: https://github.com
+  x-decisions:
+    - docs/decisions/0011-version-tuong-minh-cho-moi-contract.md
+    - docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md
+  x-specs:
+    - docs/io-contract.md
+    - docs/specs/work-state.md
+    - docs/specs/runner.md
+
+servers:
+  - url: http://localhost:{port}/v1
+    description: Local daemon (default deployment shape per 0014 point 3-4 — standalone adapter, not always-on by default)
+    variables:
+      port:
+        default: "4170"
+
+# tsk-4qf: every operation inherits this (D4's real, already-enforced
+# require_token gate) unless it overrides with its own `security: []` --
+# today only `/contract` does, since a client has to read the contract
+# before it can know a token is even required.
+security:
+  - bearerAuth: []
+
+tags:
+  - name: work
+    description: Work-item lifecycle (read + write), one-to-one with `fgos list/show/submit/move/ask/answer` etc.
+  - name: frontier
+    description: Read-only frontier/rollup/graph views used for dashboards.
+  - name: orchestration
+    description: The two process families the daemon controls per 0014 — interactive sessions and the headless runner.
+  - name: meta
+    description: Self-description of the gateway's own API surface — lets a client discover the contract instead of hand-tracking a separate doc.
+
+paths:
+  /contract:
+    get:
+      operationId: getContract
+      tags: [meta]
+      summary: The gateway's own OpenAPI spec, verbatim (this document)
+      description: |
+        Serves this exact spec file so an agent (or any other client) can
+        read the full route/schema surface and self-implement a client
+        against it, rather than needing this doc handed to it out of band.
+        The one route NOT behind the auth gate below — a client has to be
+        able to read the contract before it can know a token is even
+        required (D4). Never wrapped in the `fgos.v1` envelope: this is the
+        spec document itself, not a poll of fgOS state.
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/yaml:
+              schema:
+                type: string
+                description: This same OpenAPI document, byte-for-byte.
+
+  /work:
+    get:
+      operationId: listWork
+      tags: [work]
+      summary: List work items (wraps `fgos list`)
+      description: |
+        Read-only, no write side effect. Defaults to open-only (status not
+        `done`/`wontfix`/`retrospective`/`cleanup`), same default as the
+        CLI. Supports the CLI's own opaque-cursor pagination — pass
+        neither `cursor` nor `limit` for the full set.
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+          description: Filter by exact status value.
+        - name: step
+          in: query
+          schema: { type: string }
+        - name: all
+          in: query
+          schema: { type: boolean, default: false }
+          description: Include done/wontfix/retrospective/cleanup items.
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              work:
+                                type: object
+                                additionalProperties: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+    post:
+      operationId: submitWork
+      tags: [work]
+      summary: Intake free-text work (wraps `fgos submit`)
+      description: |
+        Derives title/tier/kind/risk and auto-classifies domain. This is
+        the one gateway-side write that creates state that did not exist
+        before — every other write endpoint below acts on an existing id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                  description: Untrusted free text (RUL45) — passed through as a single argv element, never spliced into a shell command.
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: showWork
+      tags: [work]
+      summary: Full detail of one item (wraps `fgos show`)
+      description: The work record plus every log scoped to just this id (discovery/decisions/gates/outcome/friction/settlement/learning).
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      # tsk-4id: corrected from `WorkItem` -- this endpoint's
+                      # own description already said "plus every log scoped
+                      # to just this id", but the schema reference never
+                      # matched it. Confirmed via a real `fgos show` run
+                      # (docs/history/tsk-4id-task-detail-screen/RESEARCH.md):
+                      # `data` is `{work, discovery, decisions, gates,
+                      # outcome, friction, settlement, learning}`, never a
+                      # bare `WorkItem`.
+                      data: { $ref: '#/components/schemas/WorkDetail' }
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: editWork
+      tags: [work]
+      summary: Partial update of an existing item's editable fields (wraps `fgos edit`)
+      description: |
+        PATCH, not PUT: only fields present in the body change (tsk-41h,
+        D1 of docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md)
+        -- this is `fgos edit`'s own partial-update semantics, never a
+        full-resource replace. Every field is optional; the request body
+        is `EditableWorkFields` (a strict subset of `WorkItem`'s own
+        properties -- `id`/`status`/`domain` are never editable through
+        this route). A field this route does not recognize is silently
+        dropped, same as an unrecognized flag on the CLI's own `edit`
+        command -- this route translates to `fgos edit`, it does not
+        re-validate what the engine already validates (area spec R2).
+        `fgos edit` itself refuses when no field actually changes; that
+        refusal reaches the caller verbatim as the same `ErrorEnvelope`
+        every other write route already uses, never swallowed or
+        replaced with a client-side check.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EditableWorkFields' }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/docs:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: getWorkDocs
+      tags: [work]
+      summary: An item's docsRef narrative -- CONTEXT.md/plan.md raw content (tsk-4id)
+      description: |
+        The task-detail screen's own primary content source for "what the
+        agent did" (D3 of docs/history/herdr-web-dashboard/CONTEXT.md:
+        CONTEXT.md/plan.md is the human narrative, the primary account --
+        `decisions[]` on `GET /work/{id}` is expandable detail only, never
+        the default). Did not exist before this item: a browser client
+        has no filesystem access, and no other route reads an arbitrary
+        repo file. `docsRef` is canonicalized and checked to resolve
+        inside `docs/history/` before any read -- a value that escapes it
+        is refused (`category: validation`), never followed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          docsRef: { type: string, nullable: true }
+                          contextMd: { type: string, nullable: true, description: "Raw CONTEXT.md content, or null if absent/unreadable." }
+                          planMd: { type: string, nullable: true, description: "Raw plan.md content, or null if absent/unreadable." }
+                          narrativeMissing:
+                            type: boolean
+                            description: "Present and true only when docsRef names a directory that does not exist on this machine (area spec Edge Cases: shown without its narrative, never a failure)."
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/move:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: moveWork
+      tags: [work]
+      summary: Move a work item through the status FSM (wraps `fgos move`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties:
+                to: { type: string, description: Target status. }
+                expect: { type: string, description: Optional CAS guard — current status expected before the move. }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/ask:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: askWork
+      tags: [work]
+      summary: Park an item in awaiting-human with a question (wraps `fgos ask`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/answer:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: answerWork
+      tags: [work]
+      summary: Answer a parked question and resume the item (wraps `fgos answer`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+                approve: { type: boolean, description: "Explicit approval signal for consent gates. When true, forwards --approve to fgos answer." }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/take:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: takeWork
+      tags: [work]
+      summary: Claim an item through the pull door (wraps `fgos take`/`fgos pick`)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [human, session]
+                  default: session
+                  description: |
+                    take --role's real, deliberately-scoped vocabulary
+                    (bin/fgos.mjs's own S2-pull D1) — the pull door
+                    excludes the runner role by design, not by omission.
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/return:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: returnWork
+      tags: [work]
+      summary: Complete a take — run verify, advance to awaiting-approval (wraps `fgos return`)
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/approve:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: approveWork
+      tags: [work]
+      summary: Merge an awaiting-approval item and move it to delivered (wraps `fgos approve`)
+      description: "Carries `externalEffect: true` in the CLI's own verb registry (may open/merge a real PR) — same meaning here."
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/reject:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: rejectWork
+      tags: [work]
+      summary: Reject an awaiting-approval item back to todo (wraps `fgos reject`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /ready:
+    get:
+      operationId: listReady
+      tags: [frontier]
+      summary: The frontier — items ready to be taken right now (wraps `fgos ready`)
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /rollup/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: rollupWork
+      tags: [frontier]
+      summary: Progress rollup of one root/goalTier item's children (wraps `fgos rollup`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Rollup shape, opaque to this contract — see docs/specs/work-state.md. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /graph:
+    get:
+      operationId: workGraph
+      tags: [frontier]
+      summary: Work-graph metrics — connected components, critical path (wraps `fgos graph`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Graph metrics shape, opaque to this contract. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /state/digest:
+    get:
+      operationId: stateDigest
+      tags: [frontier]
+      summary: Cheap-poll digest — `data_hash` + `generated_at` only, no `data` body
+      description: |
+        The poll-driven half of 0014's "poll `fgos list`/`rollup` +
+        `data_hash`" pattern: a client holds the last `data_hash` it saw
+        and calls this endpoint on an interval; a changed hash is the
+        only signal needed to decide whether to re-fetch a full read
+        endpoint. This is a genuinely new route (no CLI verb returns only
+        the digest today) — it exists so a client never has to pay the
+        cost of a full `fgos list` just to learn nothing changed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [contract, generated_at, data_hash]
+                properties:
+                  contract: { type: string, const: fgos.v1 }
+                  generated_at: { type: string, format: date-time }
+                  data_hash: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions:
+    post:
+      operationId: startSession
+      tags: [orchestration]
+      summary: Open an interactive session worktree (wraps `fgos session start`)
+      description: |
+        Interactive-session half of 0014's orchestration scope — what a
+        herdr/TUI pane does today by shelling out directly. A future
+        web/desktop client drives the same lifecycle through this route
+        instead of spawning its own git worktree.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item: { type: string, description: Optional work item id to open the session against. }
+      responses:
+        '200':
+          description: Session opened
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Session' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: endSession
+      tags: [orchestration]
+      summary: Close an interactive session worktree (wraps `fgos session end`)
+      parameters:
+        - name: force
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Session closed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}/slots:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: sessionSlots
+      tags: [orchestration]
+      summary: Worker-slot occupancy for one session (wraps `fgos slots`, session-scoped)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          execution:
+                            type: object
+                            properties:
+                              occupied: { type: integer }
+                              items:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id: { type: string }
+                                    sessionId: { type: string }
+                                    claimRole: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /runner/tick:
+    post:
+      operationId: runnerTick
+      tags: [orchestration]
+      summary: Drive one headless-runner cycle (wraps `fgos-runner --once`)
+      description: |
+        Headless half of 0014's orchestration scope: gather-back, find
+        work, dispatch it through its full "One vong --once" lifecycle
+        (docs/specs/runner.md), and return once that cycle's own outcome
+        is settled. A `--watch`-equivalent continuous mode is deliberately
+        NOT exposed here in v1 — a long-lived HTTP request modeling a
+        long-lived poll loop is a scope decision for the daemon
+        implementation item, not something this contract should force by
+        assuming a streaming transport (SSE/WebSocket) that 0014 never
+        locked.
+      responses:
+        '200':
+          description: Cycle completed (including "nothing to do")
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          dispatched: { type: array, items: { type: string }, description: Work item ids touched this cycle. }
+        '429':
+          description: Runner busy (mirrors CLI `EXIT_BUSY`, category `busy`).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    # tsk-4qf: matches require_token's own real enforcement (D4) -- one
+    # shared token per machine, read from ~/.fgos/config.json's
+    # gateway.token, checked as a plain Bearer header (not a per-user
+    # credential; see this document's own top-level "Identity here is
+    # ATTRIBUTION, not authentication" note).
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        The one shared per-machine token (D4). Every route below this
+        component list requires it except `/contract`, which overrides
+        with its own `security: []`.
+  parameters:
+    WorkId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+      description: Work item id.
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+      description: Opaque cursor from a prior page's `nextCursor`. Never hand-constructed by a client.
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1 }
+  responses:
+    WorkOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data: { $ref: '#/components/schemas/WorkItem' }
+    Error:
+      description: |
+        Any non-2xx. Never bodied by the plain `fgos.v1` envelope — branch
+        on HTTP status + this body's `category`, never on `message` text
+        (docs/io-contract.md: "Consumer re nhanh theo ma thoat pham tru,
+        khong bao gio theo thong diep" — the same rule, ported to HTTP).
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  schemas:
+    Envelope:
+      type: object
+      required: [contract, generated_at, data_hash, data]
+      properties:
+        contract: { type: string, const: fgos.v1 }
+        generated_at: { type: string, format: date-time }
+        data_hash: { type: string }
+        data: {}
+      description: CTR001's envelope, reused verbatim as the HTTP body (see this contract's top-level description).
+
+    Page:
+      type: object
+      properties:
+        nextCursor:
+          type: string
+          nullable: true
+          description: Opaque; null once the set is exhausted. Only present when `cursor`/`limit` was passed.
+
+    WorkItem:
+      type: object
+      description: |
+        Subset of the work-item shape stable enough to publish here; the
+        authoritative shape is docs/specs/work-state.md (schema version
+        carried in the event log per decision 0007, not duplicated here
+        per 0011's own rule against re-deriving a schema this contract
+        does not own).
+      required: [id, title, kind, status]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        status: { type: string }
+        workflowStep: { type: string }
+        tier: { type: string }
+        risk: { type: string }
+        domain: { type: string }
+        parent: { type: string, nullable: true }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        verify: { type: string }
+        docsRef: { type: string, nullable: true, description: "Path under docs/history/ -- content readable via GET /work/{id}/docs (tsk-4id)." }
+
+    WorkDetail:
+      type: object
+      description: |
+        `GET /work/{id}`'s real `data` shape (tsk-4id, corrected from a
+        stale `WorkItem`-only reference -- this endpoint's own summary
+        already said "plus every log scoped to just this id"). Every
+        sub-shape below is `type: object` with `additionalProperties: true`
+        rather than fully enumerated: these are the raw work-state logs
+        (`docs/specs/work-state.md` is their authoritative shape per
+        0011's own rule against re-deriving a schema this contract does
+        not own), and the task-detail screen (tsk-4id) reads only a named
+        few real keys from each (documented per-property below) rather
+        than this contract asserting an exhaustive shape it would then
+        have to keep in lockstep with every future log field.
+      required: [work]
+      properties:
+        work: { $ref: '#/components/schemas/WorkItem' }
+        discovery: { type: array, items: { type: object }, description: Verdict history for this item's discovery stage. }
+        decisions:
+          type: array
+          description: The machine decision log -- NOT the primary "what the agent did" account (that is GET /work/{id}/docs's CONTEXT.md/plan.md); shown collapsed behind a disclosure, per its own count.
+          items: { type: object }
+        gates:
+          type: object
+          description: |
+            Keyed by gate name (`contextApprove`/`planApprove`/
+            `validateApprove`, each `{actor, at, verify}` when present)
+            PLUS the ask/answer-parking fields on the SAME object:
+            `ask` (string, most recent question), `askHistory` (string
+            array, oldest-first, every question this item was ever
+            parked with), `answer` (string, most recent answer),
+            `statusAtAsk` (string, the status the item was in when most
+            recently parked).
+          additionalProperties: true
+        outcome: { type: object }
+        friction: { type: object }
+        settlement:
+          type: object
+          description: |
+            `count` (integer, the TRUE total) and `recent` (array, capped
+            at 5 most-recent-first entries across every settlement kind --
+            `SETTLEMENT_DISPLAY_CAP`. Each entry: `{kind, role, ts,
+            detail, id}`; `kind: "answer"` entries are what pairs
+            positionally with `gates.askHistory`, oldest-available-first
+            after reversing `recent`'s own newest-first order). A round
+            older than the 5-answer window has no entry here at all --
+            this is a real, load-bearing cap, not a client-side choice.
+          properties:
+            count: { type: integer }
+            recent: { type: array, items: { type: object } }
+        learning: { type: object, nullable: true }
+
+    EditableWorkFields:
+      type: object
+      description: |
+        tsk-41h: `PATCH /work/{id}`'s request body -- every field
+        `src/state/store.mjs`'s `EDITABLE_FIELDS` allows `fgos edit` to
+        change (25 entries, read directly from that constant, never
+        re-guessed). All optional; only fields present in the body are
+        patched. `id`/`status`/`domain`/`workflowStep` are never editable through
+        this route (`status` moves only through `/work/{id}/move`,
+        `workflowStep`/`domain` only through the engine's own step
+        transitions -- neither is in `EDITABLE_FIELDS`).
+      properties:
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        risk: { type: string }
+        verify: { type: string }
+        tier: { type: string }
+        refs: { type: array, items: { type: string } }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        acceptance:
+          type: array
+          description: Replaces the whole array (latest-wins), never a deep merge. Each clause is `{text, evidence}`.
+          items: { type: object }
+        priority: { type: integer }
+        intent: { type: integer }
+        docsRef: { type: string, description: "Non-empty path, or omit to leave unchanged. There is no clear-to-empty form on this route." }
+        parent: { type: string, nullable: true, description: "Empty string clears (un-parents) the item." }
+        urgent:
+          type: string
+          enum: [low, medium, high, critical]
+          description: "Despite the name, a string enum (confirmed via a live `fgos edit --urgent` smoke test: the literal boolean `true` is rejected by the engine), not a boolean flag."
+        impact: { type: number }
+        effort: { type: number }
+        action: { type: string, description: "Action directive prose." }
+        mergeAfter: { type: array, items: { type: string } }
+        supersededBy: { type: string, nullable: true, description: "Empty string clears." }
+        duplicates: { type: array, items: { type: string } }
+        domainFields:
+          type: object
+          description: Replaces the whole object (latest-wins) for the item's `domain`, never a deep merge of nested keys.
+        goalTier: { type: string, description: "'mvp' or 'milestone'." }
+        nextOperation: { type: string, nullable: true, description: "Next recommended stage operation or fix operation. Empty string or null clears." }
+        secondaryOperation: { type: string, nullable: true, description: "Active secondary consult/review operation. Empty string or null clears." }
+
+    Session:
+      type: object
+      required: [sessionId, worktree, branch]
+      properties:
+        sessionId: { type: string }
+        worktree: { type: string }
+        branch: { type: string }
+        item: { type: string, nullable: true }
+
+    ErrorEnvelope:
+      type: object
+      required: [category]
+      properties:
+        category:
+          type: string
+          description: |
+            The one CLOSED taxonomy CTR001 already defines
+            (src/state/store.mjs's EXIT_CODES + loop.mjs's EXIT_BUSY) —
+            this gateway adds no categories of its own:
+          enum:
+            - precondition
+            - conflict
+            - validation
+            - corrupt-log
+            - lock-timeout
+            - session-fail
+            - merge-fail
+            - busy
+            - unexpected
+        message:
+          type: string
+          description: Human-readable diagnostic. Never machine-branched on — `category` is the only field a client should switch on.
+        exitCode:
+          type: integer
+          description: The underlying CLI exit code this category maps from, carried through for parity with docs/io-contract.md.
+```
+
+Complete source-to-target diff (absent target shown as absent, not deletion):
+No target comparison; inspect the complete historical/current text and the disposition rationale.
+## claim_b92ac199356ff830e5554647ab143a90
+
+Entry kind: registry-gap-decision
+Class: Judgment
+Source digest: e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5
+Target digest: cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8
+
+Shard: plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json
+
+```json
+{
+  "claimId": "claim_b92ac199356ff830e5554647ab143a90",
+  "sourcePath": "docs/io-contract.md",
+  "sourceAnchor": "unheaded-block-14",
+  "sourceUnitDigest": "e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5",
+  "disposition": "supersede",
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:23@2026-10-14",
+  "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+  "targetAnchor": "unheaded-block-23",
+  "targetUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
+  "targetAncestry": [
+    "CLI I/O Contract",
+    "5. Reasoned Envelope Exceptions"
+  ],
+  "rationale": "The historical four-stream introduction is replaced by the already-reviewed current five-stream introduction in the mapped CLI I/O contract. All four original exception categories remain in the adjoining complete successor list; merged upstream explicitly adds the agent hook transport as the fifth category. This is historical-count supersession with full old/current text and immutable source provenance, not deletion inferred from absence or truth correction. The native predecessor identity stays intact, and independent acceptance of this gap disposition is still required."
+}
+```
+
+Complete source/predecessor: `docs/io-contract.md#unheaded-block-14`
+Commit: 05d6fc7ca8d48aa18c030908ec8165cb784cac10
+Native unit SHA256: e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5
+Shown text SHA256: e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5
+
+```text
+Bốn luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung
+đúng một chữ, "ngoại lệ có lý do", không gọi tuỳ hứng theo từng chỗ:
+```
+Historical/current source git blob: 3e4f527d520255f8f89fcd8ad9f0daaaa6ae465e
+
+Complete current source: `docs/io-contract.md#unheaded-block-14`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8
+Shown text SHA256: cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8
+
+```text
+Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung
+đúng một chữ, "ngoại lệ có lý do", không gọi tuỳ hứng theo từng chỗ:
+```
+
+Actual disposition target: `docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-23`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8
+Shown text SHA256: cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8
+
+```text
+Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung
+đúng một chữ, "ngoại lệ có lý do", không gọi tuỳ hứng theo từng chỗ:
+```
+
+Informational successor (not a target for retain-as-evidence): `docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-23`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8
+Shown text SHA256: cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8
+
+```text
+Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung
+đúng một chữ, "ngoại lệ có lý do", không gọi tuỳ hứng theo từng chỗ:
+```
+
+Complete source-to-target diff (absent target shown as absent, not deletion):
+```diff
+--- source
++++ target
+@@ -1,2 +1,2 @@
+-Bốn luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung
++Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung
+ đúng một chữ, "ngoại lệ có lý do", không gọi tuỳ hứng theo từng chỗ:
+\ No newline at end of file
+```
+## claim_6a8087a3f502f37f9c7b729e871bee9c
+
+Entry kind: registry-gap-decision
+Class: Judgment
+Source digest: 74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6
+Target digest: 4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a
+
+Shard: plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json
+
+```json
+{
+  "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
+  "sourcePath": "docs/io-contract.md",
+  "sourceAnchor": "unheaded-block-15",
+  "sourceUnitDigest": "74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6",
+  "disposition": "supersede",
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:23@2026-10-14",
+  "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+  "targetAnchor": "unheaded-block-24",
+  "targetUnitDigest": "4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a",
+  "targetAncestry": [
+    "CLI I/O Contract",
+    "5. Reasoned Envelope Exceptions"
+  ],
+  "rationale": "The complete historical four-item exception list remains word-for-word at the beginning of the already-reviewed current five-item list. The merged upstream addition is the agent-hook exception only; the four original rationales, progress trace and stop lifecycle clause are conserved. The historical native predecessor is superseded by this exact mapped current unit, with real digest/ancestry and no identity graft, approval carry or truth certification."
+}
+```
+
+Complete source/predecessor: `docs/io-contract.md#unheaded-block-15`
+Commit: 05d6fc7ca8d48aa18c030908ec8165cb784cac10
+Native unit SHA256: 74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6
+Shown text SHA256: 74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6
+
+```text
+1. **Sổ verb máy-đọc** (`--help`/`--help --json`, kể cả `<verb> --help`) —
+   siêu dữ liệu về CLI, không phải payload của một verb.
+2. **`setup`/`doctor --pretty`** — lối thoát hiển-thị-cho-người tường minh
+   qua cờ `--pretty`, không phải payload mặc định.
+3. **Log worker** (`.fgos/logs/<id>.log`) — text trần CỐ Ý, để `tail -f`
+   thấy được ngay; bọc phong bì sẽ phá đúng công dụng đó.
+4. **Luồng progress-trace của `fgos-runner`** (gặt-lại, nhận việc, phán
+   làm-rõ/chia-việc, đuôi kết quả proof, thử lại, dừng — cộng dòng lifecycle
+   "watch mode stopped" khi nhận tín hiệu dừng) — in console y nguyên như
+   trước, một tính năng KHÁC (đã khoá) với hợp đồng này, không đụng.
+```
+Historical/current source git blob: 3e4f527d520255f8f89fcd8ad9f0daaaa6ae465e
+
+Complete current source: `docs/io-contract.md#unheaded-block-15`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: 8b0c15df567594f067a267c8afb4414b290877d5f086aff68d1aab192ad5e908
+Shown text SHA256: 8b0c15df567594f067a267c8afb4414b290877d5f086aff68d1aab192ad5e908
+
+```text
+1. **Sổ verb máy-đọc** (`--help`/`--help --json`, kể cả `<verb> --help`) —
+   siêu dữ liệu về CLI, không phải payload của một verb.
+2. **`setup`/`doctor --pretty`** — lối thoát hiển-thị-cho-người tường minh
+   qua cờ `--pretty`, không phải payload mặc định.
+3. **Log worker** (`.fgos/logs/<id>.log`) — text trần CỐ Ý, để `tail -f`
+   thấy được ngay; bọc phong bì sẽ phá đúng công dụng đó.
+4. **Luồng progress-trace của `fgos-runner`** (gặt-lại, nhận việc, phán
+   làm-rõ/chia-việc, đuôi kết quả proof, thử lại, dừng — cộng dòng lifecycle
+   "watch mode stopped" khi nhận tín hiệu dừng) — in console y nguyên như
+   trước, một tính năng KHÁC (đã khoá) với hợp đồng này, không đụng.
+5. **Cửa hook thực thi agent** (`fgos hook <dispatch-decide|decision-question>`) —
+   bypass phong bì CLI và kiểm tra store admission để giữ nguyên vẹn luồng `stdin`,
+   `stdout`, `stderr` và exit code `0`/`2` cho các công cụ như Claude Code và Codex,
+   hoặc xuất JSON stdout trực tiếp cho AGY. Bọc phong bì sẽ phá vỡ giao thức chặn công cụ của agent host.
+**Khối `fgos-discovered`** (worker phát cho runner nêu việc mới phát hiện)
+NẰM NGOÀI hợp đồng này — nó là giao thức worker→runner của CTR003, không
+phải cửa ra tới người.
+```
+
+Actual disposition target: `docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-24`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: 4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a
+Shown text SHA256: 4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a
+
+```text
+1. **Sổ verb máy-đọc** (`--help`/`--help --json`, kể cả `<verb> --help`) —
+   siêu dữ liệu về CLI, không phải payload của một verb.
+2. **`setup`/`doctor --pretty`** — lối thoát hiển-thị-cho-người tường minh
+   qua cờ `--pretty`, không phải payload mặc định.
+3. **Log worker** (`.fgos/logs/<id>.log`) — text trần CỐ Ý, để `tail -f`
+   thấy được ngay; bọc phong bì sẽ phá đúng công dụng đó.
+4. **Luồng progress-trace của `fgos-runner`** (gặt-lại, nhận việc, phán
+   làm-rõ/chia-việc, đuôi kết quả proof, thử lại, dừng — cộng dòng lifecycle
+   "watch mode stopped" khi nhận tín hiệu dừng) — in console y nguyên như
+   trước, một tính năng KHÁC (đã khoá) với hợp đồng này, không đụng.
+5. **Cửa hook thực thi agent** (`fgos hook <dispatch-decide|decision-question>`) —
+   bypass phong bì CLI và kiểm tra store admission để giữ nguyên vẹn luồng `stdin`,
+   `stdout`, `stderr` và exit code `0`/`2` cho các công cụ như Claude Code và Codex,
+   hoặc xuất JSON stdout trực tiếp cho AGY. Bọc phong bì sẽ phá vỡ giao thức chặn công cụ của agent host.
+```
+
+Informational successor (not a target for retain-as-evidence): `docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-24`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: 4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a
+Shown text SHA256: 4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a
+
+```text
+1. **Sổ verb máy-đọc** (`--help`/`--help --json`, kể cả `<verb> --help`) —
+   siêu dữ liệu về CLI, không phải payload của một verb.
+2. **`setup`/`doctor --pretty`** — lối thoát hiển-thị-cho-người tường minh
+   qua cờ `--pretty`, không phải payload mặc định.
+3. **Log worker** (`.fgos/logs/<id>.log`) — text trần CỐ Ý, để `tail -f`
+   thấy được ngay; bọc phong bì sẽ phá đúng công dụng đó.
+4. **Luồng progress-trace của `fgos-runner`** (gặt-lại, nhận việc, phán
+   làm-rõ/chia-việc, đuôi kết quả proof, thử lại, dừng — cộng dòng lifecycle
+   "watch mode stopped" khi nhận tín hiệu dừng) — in console y nguyên như
+   trước, một tính năng KHÁC (đã khoá) với hợp đồng này, không đụng.
+5. **Cửa hook thực thi agent** (`fgos hook <dispatch-decide|decision-question>`) —
+   bypass phong bì CLI và kiểm tra store admission để giữ nguyên vẹn luồng `stdin`,
+   `stdout`, `stderr` và exit code `0`/`2` cho các công cụ như Claude Code và Codex,
+   hoặc xuất JSON stdout trực tiếp cho AGY. Bọc phong bì sẽ phá vỡ giao thức chặn công cụ của agent host.
+```
+
+Complete source-to-target diff (absent target shown as absent, not deletion):
+```diff
+--- source
++++ target
+@@ -7,4 +7,8 @@
+ 4. **Luồng progress-trace của `fgos-runner`** (gặt-lại, nhận việc, phán
+    làm-rõ/chia-việc, đuôi kết quả proof, thử lại, dừng — cộng dòng lifecycle
+    "watch mode stopped" khi nhận tín hiệu dừng) — in console y nguyên như
+-   trước, một tính năng KHÁC (đã khoá) với hợp đồng này, không đụng.
+\ No newline at end of file
++   trước, một tính năng KHÁC (đã khoá) với hợp đồng này, không đụng.
++5. **Cửa hook thực thi agent** (`fgos hook <dispatch-decide|decision-question>`) —
++   bypass phong bì CLI và kiểm tra store admission để giữ nguyên vẹn luồng `stdin`,
++   `stdout`, `stderr` và exit code `0`/`2` cho các công cụ như Claude Code và Codex,
++   hoặc xuất JSON stdout trực tiếp cho AGY. Bọc phong bì sẽ phá vỡ giao thức chặn công cụ của agent host.
+\ No newline at end of file
+```
+## claim_f0b2a4079764d68b1102ddddb08776ce
+
+Entry kind: source-decision
+Class: Judgment
+Source digest: 800732106a25d1de145c1e71fdda4347cf26f60d8625771d1f42c540228cfc0a
+Target digest: absent
+
+Shard: plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json
+
+```json
+{
+  "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+  "sourceUnitDigest": "800732106a25d1de145c1e71fdda4347cf26f60d8625771d1f42c540228cfc0a",
+  "claimKind": "navigation",
+  "disposition": "regenerate-from-source",
+  "targetOwner": null,
+  "targetAnchor": null,
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:23@2026-10-14",
+  "rationale": "The complete product-backlog unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+}
+```
+
+Complete source/predecessor: `docs/backlog.md#product-backlog`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: 800732106a25d1de145c1e71fdda4347cf26f60d8625771d1f42c540228cfc0a
+Shown text SHA256: 6e13c64dc30c3b9b902c77b16a2aeddf27b522cde936f7b957f9730024bef3f8
+
+```text
+# Product Backlog
+```
+Historical/current source git blob: 62aaf1a547aca2e9819e0165098edbf51eaf3d5e
+
+Actual disposition target: absent. No target or same-unit digest is invented.
+
+Complete source-to-target diff (absent target shown as absent, not deletion):
+No target comparison; inspect the complete historical/current text and the disposition rationale.
+## claim_c295c4c899afa37544bda841421c92e4
+
+Entry kind: source-decision
+Class: Judgment
+Source digest: 8311fcb74e3e13baa695bd62a6077eaba69a7a78ecf0448414e4f240a345188a
+Target digest: absent
+
+Shard: plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json
+
+```json
+{
+  "claimId": "claim_c295c4c899afa37544bda841421c92e4",
+  "sourceUnitDigest": "8311fcb74e3e13baa695bd62a6077eaba69a7a78ecf0448414e4f240a345188a",
+  "claimKind": "procedure",
+  "disposition": "regenerate-from-source",
+  "targetOwner": null,
+  "targetAnchor": null,
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:23@2026-10-14",
+  "rationale": "The complete unheaded-block-1 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+}
+```
+
+Complete source/predecessor: `docs/backlog.md#unheaded-block-1`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: 8311fcb74e3e13baa695bd62a6077eaba69a7a78ecf0448414e4f240a345188a
+Shown text SHA256: 8311fcb74e3e13baa695bd62a6077eaba69a7a78ecf0448414e4f240a345188a
+
+```text
+<!--
+GENERATED FILE — do not hand-edit.
+Rendered by `bee backlog render` from event-sourced PBI records in .bee/backlog.jsonl (per backlog-unification).
+Regenerate: `bee backlog render --write`. Check freshness: `bee backlog render --check`.
+Deterministic: byte-identical for the same backlog.jsonl contents — status-grouped, id-sorted entries, LF endings,
+never a generation timestamp or any other wall-clock value.
+-->
+```
+Historical/current source git blob: 62aaf1a547aca2e9819e0165098edbf51eaf3d5e
+
+Actual disposition target: absent. No target or same-unit digest is invented.
+
+Complete source-to-target diff (absent target shown as absent, not deletion):
+No target comparison; inspect the complete historical/current text and the disposition rationale.
+## claim_d7660c15ae6c2d2e7d610c1aa571101c
+
+Entry kind: source-decision
+Class: Judgment
+Source digest: 57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86
+Target digest: absent
+
+Shard: plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json
+
+```json
+{
+  "claimId": "claim_d7660c15ae6c2d2e7d610c1aa571101c",
+  "sourceUnitDigest": "57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86",
+  "claimKind": "historical-context",
+  "disposition": "regenerate-from-source",
+  "targetOwner": null,
+  "targetAnchor": null,
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:23@2026-10-14",
+  "rationale": "The complete unheaded-block-2 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+}
+```
+
+Complete source/predecessor: `docs/backlog.md#unheaded-block-2`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: 57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86
+Shown text SHA256: 57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86
+
+```text
+| ID | Story | CoS | Status | Feature |
+|----|-------|-----|--------|---------|
+| tsk-p7-shadow-binders | Retire the two remaining self-verifying shadow binders in `src/runner/dispatch/placement-policy.mjs` (`resolveVerifiedPlacementModel`) and `src/runner/dispatch/provider-adapter.mjs` (`resolveVerifiedProviderArgs`) — dispatch-engine-liveness-hardening Phase 7 (C1) investigated both and found real, if now near-zero, historical production divergence (not near-zero for two OTHER shadow binders in the same audit finding, which Phase 7 already deleted outright since their own two sides always called the identical primitive with identical inputs). Kept these two in shadow mode rather than retiring, with durable local telemetry added (`recordShadowBinderDivergence`, `.fgos/dispatch/shadow-binder-divergence.jsonl`, surfaced by the `shadow-binder-divergence` doctor check) so a future retirement decision has real evidence instead of the ephemeral-stderr-only visibility this phase found (had to manually grep ~800 historical `.fgos/assignments/*/runs/*/stderr.log` files to find the one real divergence window this phase traced). Target: 2026-10-31, or sooner once enough durable telemetry accumulates to re-evaluate. Enumerated divergence classes still open, each needing a decided winner + a matrix test in `test/runner/placement-policy-matrix-coverage.test.mjs`/`test/runner/provider-adapter.test.mjs` before flipping: (a) `resolveVerifiedPlacementModel` — an executor with no declared `providerModel` defaults to `claude`'s model table on the legacy side (`resolve.mjs`'s `modelForTier`) but derives its real family via `deriveProviderFamily` on the PlacementPolicy side; (b) `resolveVerifiedPlacementModel` — an `executors.<id>.model` literal is read by PlacementPolicy's `buildPlacementPolicyCandidate` but ignored by the legacy `modelForTier` formula (masked today only because `cli.mjs`'s `executeExecutorCli` re-applies `executor?.model` as an explicit override after the binder returns; NOT masked in `spawnWorker`, a real live gap); (d) `resolveVerifiedPlacementModel`/C3's `cfg.models` dual-keying — with no `cfg.modelPolicies` table present, the legacy path reads `cfg.models` keyed by WORK tier (light/standard/heavy) while `resolvePolicyTierModel` reads the SAME field keyed by POLICY tier (lightweight/standard/.../critical); real production config always declares `modelPolicies` today (confirmed: `.fgos/config.json` has both `modelPolicies` and a flat `models` key), so this is dormant for this repo's own dispatch but live for any consuming project whose config omits `modelPolicies`; (i) `resolveVerifiedProviderArgs` — an executor's args template with no `{model}` placeholder and no literal `--model` gets `--model <resolved>` appended by `ClaudeProviderAdapter.render()` but nothing appended by the legacy string-substitution path (the ONLY class with real historical production evidence: 126 confirmed real divergences, all dated 2026-09-18, root-caused to a since-fixed `.fgos/config.json` args-template gap — re-verified empirically against every currently-registered production claude-family executor invocation on 2026-09-29: 0/5 diverge today); (ii) `resolveVerifiedProviderArgs` — a combined `--model=value` argv form (not the separate `'--model', 'value'` token pair every currently-registered executor actually uses) would not be detected by the adapter's `renderedArgs.includes('--model')` check, causing a spurious double `--model` append; unexercised by any currently-registered executor, but a real gap the adapter's own check needs a `startsWith('--model=')` branch to close before that specific binder could ever be made unconditionally authoritative. | Each of the 5 enumerated classes above has a decided winner (legacy or PlacementPolicy/ProviderAdapter) backed by a real matrix test, OR the `cfg.models` dual-keying gap (class d) is fixed directly; once all classes are closed, `resolveVerifiedPlacementModel`/`resolveVerifiedProviderArgs` retire the same way the other two shadow binders already did in this same phase (call the target function directly, delete the legacy fallback computation) | proposed | dispatch-engine-liveness-hardening |
+| STR73 | **Done-flip của PBI phải KIỂM từng mệnh đề CoS thực-giao, không chỉ "feature tham chiếu đã đóng" — nếu không, PBI có CoS rộng hơn scope feature bị mark `done` NON (premature)** (đào tận gốc 2026-07-21 từ ca STR64). **Bằng chứng cơ chế:** luật done-flip của bee trigger theo FEATURE-đóng + khớp-row, KHÔNG theo CoS-thỏa: `bee-scribing/SKILL.md:94` — *"when this scribing run closes a feature that matches a backlog row, flip that row to `done`"*; `bee-compounding/SKILL.md:81` — *"backlog done-flip specifically remains prose-ruled"*. Cột `CoS` (định nghĩa `scribing-reference.md:297` = "the one-line acceptance signal") **tồn tại nhưng KHÔNG bao giờ được đối chiếu** với artifact thực-giao trước khi flip. **Hệ quả cụ thể:** STR64 CoS đòi 3 mệnh đề (taxonomy + tag capture-time + *"≥1 tài liệu end-user tích luỹ qua ĐÚNG skill export"*); feature `compound-learn-enduser-docs` chỉ giao acceptance HẸP của CONTEXT ("≥1 doc tại capture-time") — một SUBSET; done-flip đánh đồng "feature tham chiếu PBI đã xong" = "PBI thỏa CoS" và mark `done` khi bước 3 (export skill) + bước 4 (backfill) chưa có. **Anh em STR72:** cùng lỗi gốc — tin tín hiệu cục bộ (feature-close) mà không reconcile ngược về nguồn thẩm quyền (PBI-CoS). **Áp fgOS y hệt:** cổng `done` fgOS (FSM compound-learn) ép item qua stage nhưng KHÔNG kiểm acceptance/CoS của chính item; một parent có thể `done` khi mới thỏa một phần con/CoS → cùng bug premature-done. **Đề xuất (bee-exploring shape chi tiết):** (1) done-flip đối chiếu TỪNG mệnh đề CoS với artifact thực-giao (evidence-linked), chỉ flip `done` khi mọi mệnh đề thỏa; thỏa một phần → giữ `in-flight` + liệt kê mệnh đề còn thiếu; (2) khi feature-acceptance (CONTEXT) HẸP hơn PBI-CoS, buộc khai rõ "feature này giao slice X của PBI", cấm auto-equate feature-done = PBI-done; (3) trong fgOS: cổng `done` của item kiểm acceptance/CoS của chính item, không chỉ FSM-stage. | Một PBI chỉ được flip `done` khi mọi mệnh đề CoS có evidence thực-giao; CoS thỏa một phần giữ `in-flight` và liệt kê phần thiếu; feature giao subset của PBI phải khai rõ slice, không đóng cả PBI. Dogfood: STR64 không tự flip `done` khi bước 3/4 chưa có | in-flight | — |
+| p-09351985 | **Tách core verb-logic thành lib gọi được độc lập CLI** — prerequisite móng mà decision 0014 nêu ("tách core (verb-logic) thành lib gọi được độc lập CLI — hôm nay logic nằm trong CLI thì kéo ra, CLI thành client mỏng"). Refactor nội bộ thuần, KHÔNG đổi hành vi; đường ghi single-door (CTR002) và lock giữ nguyên. Tách khỏi STR46 khi mở exploring 2026-07-27 vì verify của nó khác hẳn phần hợp đồng in/out (tương đương hành vi, không phải hình dạng contract). Đứng dưới mọi consumer sau: daemon (STR48) không link lib theo 0014, nhưng TUI local và code cùng-tiến-trình thì có. | Verb-logic gọi được từ code Node mà không spawn CLI; CLI trở thành client mỏng của chính lib đó; toàn bộ test hiện có xanh không sửa một assertion nào (chứng minh không đổi hành vi) | proposed | — |
+| p-28dd950c | Multi-focus: support more than one simultaneously active goal, each with its own goal-scoped ranking | A user can declare 2+ active goals (e.g. per-epic milestones) at once and get separate (or explicitly merged) goal-scoped rankings per goal, building on STR67's single-focus design | proposed | — |
+| p-2a39f940 | Neither fgOS trigger path (interactive pick, headless runner) reaches an MVP2-equivalent outcome on its own terms — different failure shapes, not equivalent | Case 1 (interactive /fgOS:pick, tsk-57u, docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md) reaches all three literal artifacts -- green verify (23 pass/0 fail), a real commit (4f501f1) on the item's own fgw/tsk-57u branch, and a clean worktree teardown -- but fgos return's fresh-claim path measures only the ORIGINAL checkout's HEAD, never the fgw/<id> branch pick itself created, so return structurally refuses to register the completed work and the item is stuck at awaiting-human instead of proposed/done. Case 2 (headless fgos-runner --once, docs/history/mvp2-scope-test-infra/reports/case-2-headless.md) never reaches ANY of the three artifacts: fgos-runner.mjs resolves repoRoot via git rev-parse --show-toplevel with no override flag/env, dogfood-fixture is not its own git repo, so a real --once invocation would claim and dispatch real forgent work off the live repo/.fgos/state.json (8 real items) -- confirmed unsafe twice, never invoked for real. Fix scope: (a) fgos return's branch-aware path (bin/fgos.mjs:1306) must also accept a first, ordinary interactive pick's fgw/<id> branch, not only a re-claimed already-blocked item's branchHeadAtTake; (b) fgos-runner needs a cwd-rooted root override (e.g. --root/FGOS_ROOT) parallel to the fgos.mjs verbs' existing process.cwd()-derived isolation, so the headless trigger can be pointed at a testbed instead of always resolving through git toplevel. Done when both cases can independently reach green verify + commit on own branch + clean teardown AND the engine registers completion (proposed/done), proven by re-running this feature's two live cases. | proposed | mvp2-scope-test-infra |
+| p-51f4eb7e | **Bù version token cho CTR006 (routing-handoff)** — decision 0011 bắt mọi contract mang `<name>/v<N>`; CTR006 khai "designed — spec đầy đủ, chưa có code implement" (architecture-map.md:350) và `routing-handoff-contract.md` không mang field version nào. Để NGOÀI biên STR46 khi chốt exploring 2026-07-27: dán version lên thứ chưa chạy là đóng dấu cho giả định, không phải cho hành vi. Làm khi CTR006 có code thật, cùng lượt với lần implement đầu tiên. | CTR006 mang version token đúng khuôn 0011, và token đó đối chiếu được với code đang chạy chứ không chỉ với spec | proposed | — |
+| p-782e25aa | STR46 buoc merge: viet lai kho fgos-test-drive tu ngoai worktree str46 | Kho /home/vantt/projects/fgos-test-drive/.fgos KHONG viet duoc tu worktree str46: write guard tu choi moi duong dan khong nam gon trong worktree vat ly (da do bang probe that, khong phai suy doan). Vi vay no roi khoi lat 1 cung ly do da doi kho song ra. Pham vi: events.jsonl 26 dong, 12 dong mang ten cu, 0 dang predicted long, tat ca deu mang truong version. Kho la mot repo git nhung .fgos KHONG duoc theo doi nen khong co nghia vu commit. Dung script scripts/migrate-actor-to-role.mjs (cell str46-io-contract-r3-6), chay --dry-run truoc, backup ra ngoai thu muc kho. Sau do chay lai ban chieu bang cach dat thu muc lam viec VAO chinh kho do roi goi bin/fgos.mjs rebuild - fgos lay kho tu process.cwd() va KHONG co co --dir nao, nen goi tu cho khac se nham vao kho sai. Xong: log khong con ten cu, khong con dong khai version 2, moi dong parse duoc, 26 dong, seq lien tuc. Chay cung dip voi PBI p-b822cf9f (kho song), tu mot noi co quyen ghi ca hai. | proposed | str46-io-contract |
+| p-88b4ae1e | Audit every reservations release / releaseHolds call site for the same missing-session-filter gap xwh-3 fixed at one call site | Every call site that scopes a cross-worktree hold release derives and passes session (or documents why it legitimately cannot), not just cell -- confirmed via code read across the whole .bee/bin tree, not just handleReservationsRelease | proposed | — |
+| p-99592f2a | anti-loop suy ra co-nguoi-can-thiep tu su-kien-mang-vai-nguoi, va dai dien do suy thoai dan | anti-loop.mjs:88-93 dung dieu kien vai la human VA co answer hoac reason lam dai dien cho cau hoi that su la co nguoi can thiep khong. Dai dien do chi dung khi gia tri human chi xuat hien o cho nguoi that su quyet dinh. STR46 lam human xuat hien o nhung canh ma nguoi chi go lenh con may moi la thu quyet dinh (park tu dong trong return va approve), va STR46 phai them mot gia tri vai thu tu (system) chi de tranh dai dien nay. Moi lan gan vai len nhieu canh hon thi dai dien lai suy thoai them. Viec can lam: thay dai dien bang mot dau hieu tuong minh tren chinh su kien (vi du mot co human-intervention) thay vi suy ra tu vai. CHAM RUL29 (cong chong-lap reset theo can thiep nguoi cuoi cung, per-item, executing-phase-only) nen phai co quyet dinh rieng, khong sua qua cua sau tu mot feature khac. | proposed | str46-io-contract |
+| p-b822cf9f | STR46 buoc merge: viet lai kho .fgos song tu checkout chinh, cung luc ma moi dap xuong main | Chay tu /home/vantt/projects/forgent/repo (checkout chinh), KHONG tu worktree str46 - o day .fgos la symlink va cac file cua no bao la da xoa. Dieu kien tien quyet: khong phien nao khac dang ghi (kiem .fgos/sessions.json va .fgos/events.lock truoc khi bat dau). Dung script scripts/migrate-actor-to-role.mjs do cell str46-io-contract-r3-6 tao ra, chay --dry-run truoc. Pham vi mot kho: chi events.jsonl (111 dong, 54 mang ten cu, 5 trong so do la dang predicted long); state.json dung lai bang fgos rebuild, khong sua tay; coexistence.json va entropy-history.jsonl mang 0 ten cu nen ngoai pham vi. Sau khi xong: log khong con ten cu, khong con dong khai version 2, moi dong parse duoc, so dong van la 111, seq lien tuc. Ba file duoc theo doi trong checkout chinh (coexistence.json, entropy-history.jsonl, events.jsonl) nam trong dung mot commit voi lan merge. TUYET DOI khong cham repo/test/fixtures/phase1-events.jsonl. Can mien tru pre-release cua ban ghi 0017 (cell str46-io-contract-r3-1) da ton tai truoc khi chay. | proposed | str46-io-contract |
+| p-bb89e653 | resolveHoldTopology ignores its own root argument, always resolves holder from process.cwd() -- candidate mechanism for cross-worktree holder collisions | resolveHoldTopology(root) resolves holder identity from the passed root, not unconditionally process.cwd() -- fixes every caller of the function, not just reservations release; a regression test proves a call with root != process.cwd() resolves the correct worktree-specific holder | proposed | — |
+| p-c3a41d07 | Bind the confinement ownership marker to its herdr pane when the pane is created, not only on failure. Today the marker gets `paneId` and `herdrSession` late (`src/runner/dispatch/confinement/cleanup.mjs:72-81`, `confinement/authority.mjs:1172`), so a controller that dies between pane creation and the late write leaves a live worker's private home looking like an orphan to the reaper. Left out of dispatch-worker-hygiene-and-recovery phase 03 under its descope rule (more than 25 lines of plumbing to reach the bind handle from the round). Open it when a reaper deletion of a live worker's home is observed, or when that plumbing is touched anyway. | A worker's ownership marker carries its pane and session from the moment the pane exists; a test kills the controller after the split and shows the reaper keeps the home until the pane closes | proposed | dispatch-worker-hygiene-and-recovery |
+| p-c7e90b52 | OMP and Pi extension hook commands still resolve from the session cwd. The codex and agy hook files were moved to an absolute shim path; a relative hook command run from a directory without `.fgos/installation` exits 127 and the worker's tools are blocked. Open it when an OMP or Pi worker is seen blocked by a failing hook, or when those hook files are next generated by `fgos setup`. | OMP and Pi hook commands are written with the absolute shim path like the codex and agy ones, and a test runs the hook from an unrelated cwd without exit 127 | proposed | dispatch-worker-hygiene-and-recovery |
+| p-cf1280a6 | A codex council seat in a worktree without project hooks stopped at `Continue anyway? [y/N]` once (council-lite, 2026-10-09); not reproduced, cause unknown. A failed round that closes its pane now keeps the last 40 screen lines in its failure record, so the next occurrence has evidence. Open it when it recurs: read the `screen` field of the failure record, find what asked, then decide the fix. | The dialog's full text is captured from a real recurrence and the seat no longer stops on it, proven by one named run | proposed | dispatch-worker-hygiene-and-recovery |
+| p-dc785743 | bee write-guard's control-root resolution races against concurrent sessions for git/write checks in a worktree | A worktree session's own git add/commit/Edit calls resolve the intake-gate phase check against ITS OWN .bee store consistently -- never transiently against another concurrent session's control-root state (observed: two independent str92 swarming workers, and the orchestrator itself, each hit a spurious 'phase: compounding-complete' / 'phase: idle' denial while this worktree's own bee.mjs status correctly showed phase=swarming; retrying, or invoking git via a node subprocess instead of a literal git Bash command, worked around it every time without disabling any guard). Root-caused during str92 (2026-07-26): likely a resolveContext/controlRoot race under concurrent multi-session load, not a cwd-pin bug (ruled out by at least one worker whose pwd/bee status were confirmed correct at the moment of the false denial). | proposed | str92 |
+| STR27 | Orchestrator service tầng fleet: registry worker + heartbeat + push assignment + lease/liveness + capacity + giao thức/auth cho worker từ xa — đắp TRÊN cùng event log (per stage-decompose: pull là móng, không đập lại) | Chỉ mở khi có nhu cầu fleet thật (worker từ xa/luôn-bật); thiết kế đứng trên log + claim sẵn có | proposed | — |
+| STR36 | Metric riêng cho từng fix của vòng evolving (per STR13), chỉ mở khi entropy-trend chứng minh không đủ nhạy ở quy mô 1 fix/lần | Có điểm số đo được trước/sau một fix đơn lẻ, độc lập với entropy-trend tổng | proposed | — |
+| STR38 | Human-UI listener (web/chat) trên đất Host Adapter (D b2d18cc7): translator nhận transport (HTTP/chat) → dịch sang verb → spawn `fgos <verb>` → đọc envelope + exit code; kèm identity gate "ai được nói verb nào" trước khi dịch xuống CTR001 (trust invariant dispatch.mjs: `verify` chạy như shell — intake nguồn chưa kiểm là injection vector); KHÔNG fgos-serve in-process khi CTR002 một-cửa-ghi còn per-process; chiều ra tạm poll list/catchup + so data_hash, CTR008 attention envelope chờ lực kéo thật. Đứng trên STR37. **Chốt qua thảo luận RUL42 (STANCE trí-tuệ-giao-việc — picker luôn cơ học, trí tuệ chỉ vào qua field ghi sẵn hoặc cửa pull take/return) (runner) (per bàn STR42, 2026-07-17):** STR38 bao gồm một verb chat cho người GỢI Ý priority/intent (phục vụ STR7/STR8) — verb này ghi một field GỢI Ý, KHÔNG PHẢI field cuối cùng; bộ não thông minh ở giai đoạn planning/scoring (clarify/decompose hôm nay, STR7/STR8 mai sau) đọc gợi ý này làm một tín hiệu đầu vào rồi TỰ quyết field cuối qua cửa ghi chuẩn — có thể theo đúng gợi ý hoặc đổi khác nếu thấy hợp lý hơn, nhưng gợi ý luôn được cân nhắc, không bao giờ bị bỏ qua và không bao giờ tự nó là giá trị cuối. Giữ đúng RUL42 (runner: STANCE trí-tuệ-giao-việc — đúng một actor ghi field cuối, picker vẫn cơ học) | Một người dùng qua web/chat submit được vấn đề, trả lời ask, duyệt approve/reject, VÀ gợi ý priority/intent cho một item — tất cả qua verb CTR001, không đường ghi riêng; caller chưa xác danh không gọi được verb mutation; gợi ý priority/intent của người được planning-stage đọc và cân nhắc (không tự động trở thành field cuối) | proposed | — |
+| STR48 | **Kênh attention/push ("cần bạn") như một subsystem có delivery-semantics** — tách từ STR46 vì chiều-ra chủ động KHÔNG phải bolt-on mà là hệ con riêng, đòn bẩy UX cao nhất + rủi ro cao nhất. Phải chốt 5 thuộc tính: **at-least-once** (item chờ lâu chắc chắn người được ping, không rơi), **dedup** (một gate không ping N lần), **routing** (người/thiết bị/kênh nào), **ack** (đã xem chưa), **escalation** (không đáp trong ngưỡng → ping lại / đổi kênh / đổi người). Sống ở **CONSUMER daemon** (poll data_hash STR37 / tail log STR39 + giữ kênh outbound), **core fgOS vẫn passive** — đây là chỗ hiện thực hoá "không bị động" mà lõi KHÔNG mọc organ push nội tại. Đứng trên STR46 (contract in/out), STR39 (log substrate), STR37 (poll rẻ). Reference pattern: airemote notify (at-least-once, watcher-fed) trên herdr-gateway; herdr `notification.show`. | Một spec kênh attention nêu rõ 5 thuộc tính (at-least-once/dedup/routing/ack/escalation); một "cần bạn" thật của item chờ-người được giao ĐÚNG-MỘT-LẦN tới người, có ack, không đáp trong ngưỡng thì escalate đúng — chứng minh trên item thật, core không thêm trạng thái push nội tại | proposed | — |
+| STR52 | **Domain thứ hai THẬT: marketing** (nêu ra 2026-07-18 trong lúc bàn STR50) — invalidate tiền đề trước đó ("hiện chỉ có 1 domain thực"): người dùng có sẵn workflow marketing ở MỘT PROJECT KHÁC và muốn điều phối marketing qua fgOS. Hạ tầng kernel đã chứng minh đa-domain chạy được về nguyên tắc (domain `synthetic` sống song song `coding` hôm nay, STR18 base-workflow+domain-extension đã done), nhưng marketing THẬT còn thiếu: (a) registry entry riêng trong `domains.mjs` (stages/stepMap/transitions cho chu trình marketing, khác `clarify/decompose/executing`), (b) retrofit `discovery.mjs`/`decompose.mjs` — hai module này đang hardcode literal stage-name của coding, domain khác vào `clarify`/`decompose` sẽ bị ghi đè sai (cảnh báo đã có sẵn trong comment `domains.mjs:29-34`), (c) bộ skill nội dung riêng cho domain-extension "marketing" (song song bộ STR50 đang trích cho coding, KHÔNG phải `fgos-routing` — module đó domain-agnostic, không cần đổi), (d) STR51 mở rộng thêm field `domain` vào output classify (chỗ nối tự nhiên — cùng cơ chế, chỉ thêm 1 field). **CÂU HỎI SCOPE CHƯA TRẢ LỜI (quan trọng, quyết định đây là 1 feature hay 2):** project marketing kia dùng CHUNG một store/event-log với fgOS hiện tại (khác domain field trên cùng một hệ), hay là một CÀI ĐẶT fgOS RIÊNG cho project đó? Khuyến nghị: không gộp vào STR50 đang chạy (đã khoá scope hẹp cho coding, mode standard, đang thực thi) — mở feature riêng qua bee-hive/bee-exploring khi câu hỏi scope trên có câu trả lời. | Một decision record trả lời rõ câu hỏi scope (chung store hay cài đặt riêng); nếu chung store: registry entry `marketing` thật + retrofit discovery/decompose + bộ skill marketing chạy được một case study thật, domain `coding` không bị ảnh hưởng | proposed | — |
+| STR62 | **Sibling-aware / agent-driven on-demand cross-item context** (deferred idea từ STR61 exploring, 2026-07-19): hai option bị loại ở STR61's own parent-only decision — (a) tự động kèm cả sibling (không chỉ parent) khi trả lời gate người, (b) agent tự quyết kéo thêm bối cảnh cha/sibling động thay vì cố định. Cả hai cần khái niệm "sibling" mới trong data model (hiện chỉ có `parent`/`deps`/`blocks`, `work-state.md:864`) — không xây bây giờ, chỉ mở lại nếu baseline "parent-only" của STR61 chứng minh không đủ trong thực tế | Chưa xác định — chờ bằng chứng thiếu-bối-cảnh thật từ STR61 chạy production trước khi chốt CoS | proposed | — |
+| STR69b | **Vệt event gần nhất + diff giàu hơn khi người quay lại gate (cần chốt lại STR61's own "material" decision trước)** — nửa còn lại của STR69. Khác STR69a ở chỗ có thiết kế thật cần chốt: nới `MATERIAL_FIELDS` (`repo/src/state/awaiting-context.mjs:15`, hiện chỉ `title`/`status`) và chọn bao nhiêu event chạm TRỰC TIẾP vào STR61's own "material" decision ("chỉ báo khi thay đổi ảnh hưởng câu hỏi/trả lời gốc, im lặng nếu không") — nới bộ trường = nới định nghĩa "material" mà quyết định đó cố tình giữ hẹp. Cũng là lớp validity-check cho STR70a (changed-since làm lộ leaning stale). Vẫn thuần read-projection, không lật STR46's own foundational decision; scope đợt đầu KHÔNG gồm sibling (trần parent-only). | Người mở lại item awaiting-human phiên mới thấy vệt event gần nhất + diff parent giàu hơn; quyết định nới/không-nới `MATERIAL_FIELDS` ghi lại có lý do đối chiếu STR61's own "material" decision | proposed | — |
+| STR70a | **Checkpoint distillate + record chốt 3-phần lên gate (fgOS core, KHÔNG bị chặn)** — nửa không-vướng của STR70 (tách 2026-07-21, per `docs/history/gate-dialogue-continuity/CONTEXT.md`'s locked decisions). Verb non-transitioning ghi distillate {câu hỏi diễn giải lại, options + trục so sánh, leaning + lý do quote nguyên văn người, đã-loại, còn-treo} lên `gates[id]`, LWW, chiếu qua `awaitingContext`; verb DÙNG CHUNG người/agent — nhưng ĐIỀU KIỆN TIÊN QUYẾT là fold `actor` vào gate record (hiện `gates[id]` chỉ giữ `ask`/`answer`/`parentSnapshotAtAsk`, KHÔNG actor — `repo/src/state/replay.mjs:126-134`) để phân biệt note-người vs tóm-tắt-agent. Record bền lúc chốt nở thành CẤU TRÚC 3 phần: vì-sao / mốc-trao-đổi / đánh-đổi (không còn `reason` một dòng). Tiền lệ verb non-transitioning đã có: `decision`/`outcome` (`repo/docs/specs/work-state.md:647-675`). Đều là fact bền hợp core, KHÔNG lật STR46's own foundational decision. | `awaitingContext` mang distillate + record 3-phần; `actor` chiếu vào gate phân biệt được nguồn; distillate human-overridable, chỉ `answer` authoritative | proposed | — |
+| STR70b | **Raw backstop cho cuộc bàn ở gate — CHỜ Q1 (chưa có nhà hợp lệ)** — nửa bị-chặn của STR70. Giữ lượt thô để khi người phủ định distillate thì đưa lại nguyên văn, drop khi chốt. Đào 2026-07-21 (`CONTEXT.md` Q1) LOẠI O1 (raw thành event core): log fgOS append-only bất khả xâm phạm (L3 `platform-foundations.md:73-74`; RUL11 (tiến hóa schema) `work-state.md`; KHÔNG cơ chế redact/prune/TTL nào trong `repo/src`) → "drop khi chốt" bất khả thi. Còn lại: O2 (kho phụ trong core, không phải log) vướng L1 (`platform-foundations.md:17-20` — mọi dữ liệu bền phải là log HOẶC state; raw không thuộc ô nào) ⇒ phải mở L1; O3 (daemon-consumer) đúng nhà theo decision `0014` nhưng lớp đó CHƯA TỒN TẠI (không file daemon/consumer trong `repo/src`\|`repo/bin`; STR46/STR48 còn proposed). HOÃN có chủ đích: quyết bằng số đo thật (người phủ định distillate bao nhiêu lần) chứ không suy luận; luồng phủ định không gãy khi thiếu raw vì distillate vốn không-authoritative. | Q1 chốt được nhà cho raw (O2 mở L1 / O3 chờ consumer) dựa trên tần suất phủ định thực tế; tới lúc đó STR70b nằm chờ, không chặn STR70a | proposed | — |
+| STR71 | **Chất lượng câu hỏi gate (ask self-sufficiency, phòng ngừa — bổ trợ STR70a)** — người trả lời gate thường "không rõ nó đang hỏi gì", phải mở một vòng chat chỉ-để-hiểu-câu-hỏi trước khi bàn nội dung. Giải phòng-ngừa: cell viết `ask` đủ tự-đứng (kèm context để câu hỏi hiểu được ngay). KHÔNG thay STR70a (tư vấn/so sánh vẫn cần chat dù câu hỏi rõ); chỉ cắt phần vòng exploring bị đốt để giải mã câu hỏi. Chưa ưu tiên đợt đầu. | Một gate mới mang câu hỏi người đọc-hiểu-ngay, không phải hỏi lại "đang hỏi gì"; đo bằng giảm số lượt làm-rõ-câu-hỏi trước khi vào nội dung | proposed | — |
+| STR80 | **Trang trí thêm quy ước OKF cho enduser-docs-index: `index.md` mỗi ngăn (progressive disclosure) + `log.md` lịch sử đổi theo ngày** (nêu ra 2026-07-22 lúc bàn str64-backfill, deferred idea của CONTEXT.md area này) — hiện chỉ mục máy-đọc (`docs/enduser-docs-index.json`) là bảng tra duy nhất; một `index.md` per-thư-mục cho người/agent duyệt nhẹ một ngăn mà không cần load cả manifest. Chưa cần ngay — chỉ đáng làm khi số tài liệu mỗi ngăn tăng thật (hiện `explanation` mới 23 mục, `how-to` 1 mục) | Mỗi thư mục `docs/<quadrant>/` có `index.md` liệt kê + mô tả ngắn các tài liệu trong đó; không đổi hành vi chỉ mục JSON hiện có | proposed | — |
+| STR81 | **Kiểm tra lệch giữa đầu-mô-tả (frontmatter) và log cho `enduser-docs-index`** (nêu ra 2026-07-22, deferred idea của str64-backfill) — `móc-liên-kết-nguồn` trong đầu-mô-tả mỗi tài liệu là bản sao ghi-lúc-soạn, không phải nguồn thẩm quyền (log qua `fgos doc-sources` mới là nguồn thật); nếu một tài liệu được liên kết lại sau khi đầu-mô-tả đã ghi, hai bên có thể lệch mà không ai biết. Chưa xây — ưu tiên thấp, chỉ cần khi quan sát thấy lệch thật | Một lượt kiểm (khả dĩ trong bee-grooming) phát hiện tài liệu có `móc-liên-kết-nguồn` khác với kết quả `fgos doc-sources` cho cùng đường dẫn, báo cáo rõ ràng — không tự sửa | proposed | — |
+| p-4b7dd2ed | `fgos-coding-exploring/SKILL.md` đòi commit CONTEXT.md lên nhánh `fgw/<id>` trước khi gọi `fgos discover` ("uncommitted CONTEXT.md invisible tới phiên re-claim sau"), nhưng `.gitignore:45` loại trừ TOÀN BỘ `/docs/history/` — CONTEXT.md không bao giờ commit được như luật đòi. Phát hiện dogfood thật (decision 0018, scenario `expr-eval-chain`, item `tsk-1wd`, 2026-07-28) khi chạy làm-rõ thật lần đầu qua `fgos-coding-exploring`. **Đã fix tại `fgw/tsk-1wd` (commit `ffd211a`)** — un-ignore `/docs/history/` (+3 path liên đới cùng gốc). **Đã xác minh lại + đóng vòng qua fgOS (tsk-2gw, 2026-08-21)**: `.gitignore` hiện tại (main) xác nhận không còn loại trừ `docs/history/` (`git check-ignore` sạch trên `docs/history/*/CONTEXT.md`/`plan.md`/`RESEARCH.md`, tự động hoá tại `test/setup/gitignore-docs-history-not-excluded.test.mjs`); bằng chứng sống thêm cùng đêm: `tsk-1i3`'s own `CONTEXT.md`/`plan.md`/`RESEARCH.md` commit sạch lên `fgw/tsk-1i3` không trở ngại gì. | `.gitignore` và luật commit của `fgos-coding-exploring` nhất quán với nhau — hoặc bỏ `/docs/history/` khỏi `.gitignore` (cho phép commit CONTEXT.md thật), hoặc sửa luật skill để không đòi commit (đổi nơi lưu / chấp nhận local-only tường minh); chọn một, áp dụng, dogfood xác nhận CONTEXT.md sống sót qua một lượt re-claim — **ĐÃ ĐẠT, xem tsk-2gw** | proposed | — |
+| p-af05e742 | `fgos discover`'s context-discovery judgment (`buildDiscoveryPrompt`, `src/intake/discovery.mjs:113-137`) đòi model "đề xuất một lệnh `verify` chạy được thật" nhưng KHÔNG đưa bất kỳ thông tin cwd/cấu trúc thư mục repo nào vào prompt (chỉ title/description/refs/deps/graph-context/QA history) — model không thể biết verify chạy từ đâu (`goal-check.mjs`: `spawn(item.verify, {cwd: repoRoot của worktree})`) hay một feature nằm trong nested package (vd `dogfood-fixture/`, có `test/` + `package.json` riêng) cần prefix path. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`, 2026-07-28, `fgos-coding-validating`): verdict `clear=true` gắn `verify: "node --test test/expr/*.test.mjs"`, chạy từ cwd thật ra `no matches found` (exit 1) vì thiếu prefix `dogfood-fixture/`. Systemic — tái diễn cho BẤT KỲ item nào có file trong subdirectory/nested package, không riêng cách diễn đạt item này. | `buildDiscoveryPrompt` (và anh em split-work judgment tương tự nếu có) đưa vào prompt đủ ngữ cảnh cwd/layout để model đề xuất `verify` đúng path chạy-được — vd cây thư mục top-level + package.json con nào tồn tại; test dogfood chứng minh một item nested-package nhận `verify` đúng ngay từ discover, không cần sửa tay sau ở `fgos-coding-validating` | proposed | — |
+| p-4c81ca74 | `fgos plan`'s split-work judgment (`buildDecomposePrompt`, `src/intake/plan.mjs`, cơ chế LLM thật qua nested `claude -p` — không phải mechanical) chỉ nhận title/kind/risk/verify/refs/deps — KHÔNG BAO GIỜ đọc `work.description` (đầy đủ, không cắt) VÀ KHÔNG BAO GIỜ đọc `docsRef`-trỏ CONTEXT.md/plan.md mà `fgos-coding-exploring`/`fgos-coding-planning` vừa khoá. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`, 2026-07-28): `title` bị cắt giữa câu lúc submit (dừng ngay trước phần evaluate/evaluateExpr/precedence); split-work model chỉ thấy tiêu đề cụt, tự bịa kiến trúc AST (`parse(tokens)` → `evaluate(ast)`) hoàn toàn khác 3 hàm đã khoá trong CONTEXT.md (`tokenize`→`evaluate(tokens)`→`evaluateExpr(string)`, không AST). `discovery.mjs` (stage `discovery`) có cùng lỗ hổng gốc (không đọc docsRef), CHƯA sửa ở đây — chỉ split-work judgment được reproduce+fix trực tiếp. **Đã fix tại `fgw/tsk-1wd`**: `buildDecomposePrompt` giờ nhận thêm `description` đầy đủ + nội dung CONTEXT.md/plan.md (đọc best-effort qua `docsRef`, không lỗi nếu thiếu); test suite 1463/1463 xanh sau sửa. 3 con sai (`tsk-1wd-1/2/3`, đã tạo trước khi phát hiện) được sửa tay qua `fgos edit` để khớp lại plan đã khoá. | `buildDecomposePrompt` (đã fix) + xét áp cùng pattern cho `buildDiscoveryPrompt`/`discovery.mjs` (chưa fix, cùng lỗ hổng); dogfood xác nhận một item nested-decision (CONTEXT.md/plan.md có nội dung khác title) nhận split-work verdict khớp quyết định đã khoá, không tự bịa kiến trúc khác | proposed | — |
+| p-810b034e | Ý tưởng nêu ra lúc điều tra `p-4c81ca74` (2026-07-28, dogfood `tsk-1wd`): `bin/fgos.mjs` là cửa CLI duy nhất cho mọi verb, nhưng KHÔNG có tầng kiểm cú pháp/đầu vào chung nào ghi lại NƠI GỌI SAI khi một lời gọi verb bị sai (thiếu flag bắt buộc, id không hợp lệ, cwd sai khiến verb đọc nhầm store — như `p-af05e742`/`p-4c81ca74` từng gặp) — lỗi hiện chỉ trồi lên như StoreError/exit-code tại điểm gọi, KHÔNG có provenance (session nào, skill nào, lệnh gốc nào) được ghi lại để soi lại sau. Khác root cause với `p-af05e742` (đó là thiếu ngữ cảnh TRONG prompt gửi model, không phải cú pháp gọi binary sai) — tách riêng theo đúng ranh giới root cause. Chưa rõ hình dạng cụ thể (guard wrapper quanh spawn? log riêng caller-id vào `.fgos/`? convention đặt tên session/skill để tự khai báo?) — cần `fgos-coding-exploring` thật cho item này trước khi thi công, không tự quyết kiến trúc ở đây. | Một quyết định rõ hình dạng cơ chế kiểm-đầu-vào (nếu làm) + bằng chứng dogfood: một lời gọi verb sai cú pháp/cwd được ghi lại kèm nơi gọi (session/skill/lệnh gốc), không chỉ lỗi exit-code trần tại điểm gọi | proposed | — |
+| p-58f890f3 | Case A (phiên tương tác, `/fgOS:pick` + `EnterWorktree`) không có hướng dẫn cho trường hợp root decompose ra children, mỗi con cần worktree/nhánh RIÊNG (`fgw/<child-id>`), NGAY TRONG CÙNG một phiên đang đứng sẵn trong worktree của root. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`→`tsk-1wd-1`, 2026-07-28): phiên đã `EnterWorktree` vào `fgw/tsk-1wd` (root, lần 1, OK); `pick tsk-1wd-1` tạo tree con `fgw/tsk-1wd-1` thành công (fgOS-side, không lỗi), nhưng `EnterWorktree` LẦN 2 vào tree đó bị harness từ chối — "`/home/vantt/projects/forgentX/.claude/worktrees` does not exist, so `<path>` cannot be a worktree managed by Claude Code" (khác thông báo STR83 "refuses to chain" đã biết cho root-pick, đây là root cause riêng: fgOS tạo worktree ở `/tmp/fgos-worktrees/`, không phải dưới `.claude/worktrees/` mà harness đòi cho một lần switch THỨ HAI trở đi). Scenario doc + `pick`/`fgos-routing` skill chỉ cảnh báo về giới hạn 1-lớp (root không được nested sẵn trong tree khác) — KHÔNG hề nhắc gì tới việc chính root TỰ decompose ra children cần tree riêng trong lúc phiên đang sống. Case B (headless `fgos-runner --once`) không dính lỗi này — mỗi item dispatch ở tiến trình riêng, không có khái niệm phiên-đang-đứng-trong-tree-nào. Workaround dùng tạm: thao tác trực tiếp qua Bash/absolute-path vào tree con thay vì `EnterWorktree`, không dùng cơ chế switch của harness. | Case A's skill doc (pick/fgos-routing/hoặc scenario doc riêng) nói rõ: khi root decompose ra children, phiên hiện tại làm gì tiếp — mở phiên mới mỗi con (đúng chuẩn), hay có đường chính thức nào khác (di chuyển bằng path trực tiếp, hay `.claude/worktrees`-hoá worktree của fgOS); dogfood xác nhận một item multi-child chạy hết Case A mà không cần workaround thủ công | proposed | — |
+| p-26c4a4fd | `pick` (`bin/fgos.mjs`, case `'pick'`, ~dòng 1248-1303) tạo worktree mới cho MỌI item (root lẫn leaf) luôn fork từ `currentHead(repoRoot)` (main) — KHÔNG có phân biệt leaf-vs-root base-branch như `review`/`approve` đã có sẵn: `approve` cho leaf (`resolveRoot(id) !== id`) merge branch con vào `fgw/<rootId>` qua ephemeral worktree đứng trên `fgw/<rootId>`, KHÔNG BAO GIỜ main trực tiếp (`bin/fgos.mjs:1704-1721`); `review` cũng diff leaf so với `branchNameFor(rootId)`, không phải trunk (`bin/fgos.mjs:1525-1532`, comment tự ghi "leaf-vs-root split"). `pick` không áp cùng pattern này. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`→`tsk-1wd-3`, 2026-07-28): `tsk-1wd-3` (`evaluateExpr`, `deps: ["tsk-1wd-2"]`, `parent: tsk-1wd`) cần `import` cả `tokenize.mjs` (từ `tsk-1wd-1`) lẫn `evaluate.mjs` (từ `tsk-1wd-2`), nhưng nhánh `fgw/tsk-1wd-3` (fork từ main) không có file nào của hai anh em — vì cả hai còn ở `fgw/tsk-1wd-1`/`fgw/tsk-1wd-2` riêng, CHƯA approve/merge vào `fgw/tsk-1wd`, và dù có approve rồi thì `pick` vẫn fork `tsk-1wd-3` từ main chứ không phải từ `fgw/tsk-1wd`. Đúng model đã có ở `approve`/`review`: integration LUÔN đi qua cha (`fgw/<rootId>`), không bao giờ sibling-to-sibling, không bao giờ main cho tới khi root tự merge. Workaround thủ công: `approve` từng con xong theo `deps` order rồi `git merge fgw/<rootId>` vào worktree con tiếp theo trước khi code. | `pick` áp cùng leaf-vs-root logic `resolveRoot`/`branchNameFor(rootId)` đã có ở `review`/`approve`: fork worktree của một leaf từ `fgw/<rootId>` (branch cha) thay vì main; dogfood xác nhận một chain nhiều con phụ thuộc nhau (`deps`) build được liên tục qua `pick` mà không cần merge tay | proposed | — |
+| p-73d99989 | **[NGHIÊM TRỌNG — rủi ro mất dữ liệu thật]** `reclaimOrphanedCheckout` (`src/runner/worktree.mjs:130-161`) force-remove (`git worktree remove --force`) BẤT KỲ checkout nào đang tồn tại của một branch, không hề kiểm tra checkout đó có thật sự "orphaned" (bị bỏ hoang) hay đang là một session/worktree SỐNG đang được dùng. `createWorktree` gọi hàm này bất cứ khi nào `branchExists(...)===true` (nhánh "reused"). `approve` cho một leaf item tạo ephemeral worktree đứng trên `fgw/<rootId>` để merge (`createWorktree(repoRoot, rootId, {})`, `bin/fgos.mjs:1721`) — NẾU `fgw/<rootId>` đã có checkout sống (chính là worktree người/phiên đang đứng làm việc thật), lệnh `approve` một CON sẽ ÂM THẦM XOÁ SẠCH worktree của CHA đang sống, không cảnh báo, không hỏi. Phát hiện dogfood thật (decision 0018, item `tsk-1wd`, 2026-07-28): chạy `approve tsk-1wd-1` (một leaf), worktree gốc `/tmp/fgos-worktrees/tsk-1wd-lVclki` — nơi cả phiên này đang đứng làm việc `tsk-1wd` từ đầu — biến mất ngay sau lệnh, phát hiện tình cờ lúc `ls /tmp/fgos-worktrees/` để tìm file khác. May mắn: mọi commit đã nằm trên `fgw/tsk-1wd` (8 commit, xác nhận nguyên vẹn qua `git log`) nên không mất code thật, chỉ mất thư mục checkout (khôi phục ngay bằng `git worktree add` mới). Nếu phiên CHƯA commit tại thời điểm đó, đây sẽ là mất trắng thật. | `reclaimOrphanedCheckout` phải phân biệt được checkout thật-sự-orphan (không tiến trình nào sống trong đó, ví dụ tra registry phiên như `approve`'s multi-session guard đã làm ở chỗ khác, `bin/fgos.mjs:1591-1617`) với checkout đang có phiên/session sống — chỉ force-remove trường hợp đầu; dogfood xác nhận `approve` một leaf KHÔNG xoá worktree gốc đang có phiên sống, kể cả khi branch cha đó "reused" | proposed | — |
+| p-b91d487a | `mergeRunnerItem` (`src/runner/merge.mjs:293-322`) không có kiểm "đã merge sẵn rồi" trước khi thử `git commit --no-edit` sau `git merge --no-commit --no-ff`: nếu nhánh con ĐÃ được merge vào nhánh cha từ một lượt `approve` trước (thành công tới bước merge nhưng lỗi ở bước SAU đó — vd `p-73d99989`'s tình huống, hoặc bất kỳ lỗi nào khác xảy ra sau merge-commit nhưng trước status-move `done`), `git merge --no-commit --no-ff` lần sau là no-op (không gì để merge), verify vẫn chạy qua vì code đã có sẵn, nhưng `git commit --no-edit` chết vì "nothing to commit" — approve ném lỗi `MergeError` mập mờ ("verify passed but git commit failed") thay vì nhận ra merge đã xong và tiến thẳng qua bước status-move. Phát hiện dogfood thật (decision 0018, item `tsk-1wd-1`, 2026-07-28): lượt `approve` đầu tiên merge THÀNH CÔNG (`c90c5bb` lên `fgw/tsk-1wd`, xác nhận qua `git log`) nhưng chết ở bước status-move `done` vì thiếu stage `compound-learn` (lỗi độc lập, xem chú thích); chạy `fgos compound tsk-1wd-1` xong rồi approve LẦN 2 thì dính đúng lỗi này — không có đường retry sạch, phải tự tay `fgos move` qua trạng thái `done` để gỡ. Hệ quả chung: BẤT KỲ lỗi nào xảy ra sau khi merge-commit đã landed nhưng trước status-move hoàn tất đều khiến item kẹt vĩnh viễn ở retry — không riêng tình huống compound-learn cụ thể này. | `mergeRunnerItem` kiểm nhánh con đã w-merged-vào-cha chưa (vd `git merge-base --is-ancestor <branch> HEAD`) trước khi thử merge; nếu đã merge sẵn, coi như `outcome: 'merged'` luôn (idempotent), không thử commit lại; dogfood xác nhận `approve` retry sau một lỗi hậu-merge (bất kỳ nguyên nhân nào) tự phục hồi sạch, không cần `fgos move` tay | proposed | — |
+| p-e6425aa9 | 5 follow-up đặt tên lúc đóng track `dispatch-engine-liveness-hardening` (2026-09-29, plan.md's "Explicitly deferred" list, mục 2-6 — mục 1/shadow-binders đã có row riêng `tsk-p7-shadow-binders`): (a) `--force-new-attempt` chưa từng được wire vào một CLI flag thật; (b) chưa có test SIGKILL-probe riêng cho `isHerdrSpawnRunStillWorking` (bộ test herdr hiện có chỉ chứng minh không regression, không tái hiện đúng lớp bug đó); (c) `providerCapacityIsRunWorkerAlive` (lease reclaim) có cùng điểm mù cli-spawn-only cho herdr-spawn mà M1 từng có trước Phase 8a — cùng lớp gap, chỗ gọi khác, chưa sửa; (d) một race có sẵn, không liên quan, trong cơ chế tự-heal "assignment-created event has no assignmentRefs entry" của `replay.mjs`, phát hiện lúc stress-test Phase 5 (tái hiện y hệt trên main trước Phase 5, xác nhận không phải regression của track này); (e) tài liệu/CLI-help còn trỏ tới action `clear-assignment-claim` đã bị retire (Phase 5), chưa quét sạch. | Mỗi mục trong 5 mục có quyết định sửa thật hoặc ghi rõ won't-fix: `--force-new-attempt` có CLI flag thật; có test SIGKILL-probe cho `isHerdrSpawnRunStillWorking`; điểm mù herdr-spawn của `providerCapacityIsRunWorkerAlive` được đóng (hoặc ghi rõ vì sao ngoài scope); race của `replay.mjs` được sửa hoặc tách file riêng; hết tham chiếu `clear-assignment-claim` còn sót | proposed | dispatch-engine-liveness-hardening |
+| p-3c7681b8 | Test rò rỉ fixture directory phiên coordination thật vào `.fgos/coordination/sessions/` sống của repo thay vì một tmp dir cô lập (quan sát 2026-09-29 lúc điều tra doctor check `coordination-sessions-closed`: 506 phiên "active" quá 7 ngày, một phần lớn là rác test). Một số trace về code đã fix từ 2026-09-05; một phiên khác trace về code CHƯA TỪNG commit vào git (chạy tay/WIP) — root cause tản mát, không phải một bug đơn sửa được một lần. Đã thảo luận mục tiêu với user (2026-09-29) nhưng CHƯA chốt: ưu tiên (1) chặn rò rỉ tương lai bằng test-isolation guard hay (2) dọn rác lịch sử trước — câu hỏi còn treo, chưa trả lời. | Quyết định scope (guard / dọn / cả hai) + phần đã chọn được làm: fixture phiên coordination mới của test không bao giờ đụng `.fgos/coordination/sessions/` thật, và/hoặc rác phiên lịch sử được dọn an toàn | proposed | dispatch-engine-liveness-hardening |
+| p-36af7086 | `research-260929-1203-herdr-cook-plan-vs-fgos-dispatch-coordination.md` đề xuất chạy thật một plan 3-4 phase qua cả `thieung/herdr-cook-plan` lẫn engine dispatch/coordination riêng của fgOS trên MỘT PROJECT NGOÀI repo này (đúng mission #1/#2, D-ADR0035 (ranh giới sứ mệnh fgOS) trong `docs/platform-foundations.md` — fgOS tồn tại để phát triển project khác, không phải tự phát triển chính nó), để so sánh throughput/friction thật thay vì chỉ so code tĩnh. Chưa bắt đầu. | Một plan thật (3-4 phase) chạy xong trọn vẹn một lượt qua `herdr-cook-plan` và một lượt qua chính engine fgOS, trên cùng một project ngoài; có ghi chú so sánh friction/throughput cụ thể, không chỉ lý thuyết | proposed | — |
+```
+Historical/current source git blob: 62aaf1a547aca2e9819e0165098edbf51eaf3d5e
+
+Actual disposition target: absent. No target or same-unit digest is invented.
+
+Complete source-to-target diff (absent target shown as absent, not deletion):
+No target comparison; inspect the complete historical/current text and the disposition rationale.
+## claim_743cde02b9562c5f8e4724512ee6fc8f
+
+Entry kind: source-decision
+Class: Judgment
+Source digest: 10c0d318f58b298007a8542c4f027f45383236691ef788a521c249c3a49f398c
+Target digest: absent
+
+Shard: plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json
+
+```json
+{
+  "claimId": "claim_743cde02b9562c5f8e4724512ee6fc8f",
+  "sourceUnitDigest": "10c0d318f58b298007a8542c4f027f45383236691ef788a521c249c3a49f398c",
+  "claimKind": "navigation",
+  "disposition": "regenerate-from-source",
+  "targetOwner": null,
+  "targetAnchor": null,
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:23@2026-10-14",
+  "rationale": "The complete done-declined unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+}
+```
+
+Complete source/predecessor: `docs/backlog.md#done-declined`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: 10c0d318f58b298007a8542c4f027f45383236691ef788a521c249c3a49f398c
+Shown text SHA256: 11155086138d3d4435b3dea010808d59f800d09c9c373f841e19161f05e09800
+
+```text
+## Done / Declined
+```
+Historical/current source git blob: 62aaf1a547aca2e9819e0165098edbf51eaf3d5e
+
+Actual disposition target: absent. No target or same-unit digest is invented.
+
+Complete source-to-target diff (absent target shown as absent, not deletion):
+No target comparison; inspect the complete historical/current text and the disposition rationale.
+## claim_56db2b3b7a6258289e1ab13f5c69d47f
+
+Entry kind: source-decision
+Class: Judgment
+Source digest: 2d178e51f8fe1a5c85ac2d34c157fbfda0cf33be4f71ddd9edcf39898e154861
+Target digest: absent
+
+Shard: plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json
+
+```json
+{
+  "claimId": "claim_56db2b3b7a6258289e1ab13f5c69d47f",
+  "sourceUnitDigest": "2d178e51f8fe1a5c85ac2d34c157fbfda0cf33be4f71ddd9edcf39898e154861",
+  "claimKind": "historical-context",
+  "disposition": "regenerate-from-source",
+  "targetOwner": null,
+  "targetAnchor": null,
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:23@2026-10-14",
+  "rationale": "The complete unheaded-block-3 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+}
+```
+
+Complete source/predecessor: `docs/backlog.md#unheaded-block-3`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: 2d178e51f8fe1a5c85ac2d34c157fbfda0cf33be4f71ddd9edcf39898e154861
+Shown text SHA256: 2d178e51f8fe1a5c85ac2d34c157fbfda0cf33be4f71ddd9edcf39898e154861
+
+```text
+- [p-2d71dfc3] fgOS: detect backlog-row/spec citing a since-superseded decision (STR72 CoS clause 2 -- not covered by p-9fb81485) — done
+- [p-52601a01] Chuẩn bị điều kiện (scope + hạ tầng test) để chạy real test cho cột mốc MVP2 của fgOS, mở rộng sau decision 0016 — done
+- [p-9fb81485] fgOS: build automated detection check for supersede-without-backward-pointer (follow-up to STR72) — done
+- [p-aa00ed92] Fix false version-drift failure in bee upgrade verification when bee and plugin versions already match — done
+- [p-f86134a0] fgOS split-children creation has no footprint carry-through (decompose.mjs verdict.children / bin/fgos.mjs add both lack a footprint slot for parent-linked items) — done
+- [p-fgos-session-gc] fgos session pool has no PID-liveness check, letting dead sessions accumulate and false-positive-trip repo/'s pre-commit concurrency guard — done
+- [STR1] forgent tự quản work-state của chính nó qua tầng state/FSM (Phase 1: store zero-dep, transition có precondition, single-door, CAS, decisions event-sourced) — done
+- [STR10] Install/coexistence story của fgOS: cài vào project/global không giao thoa tiến trình với harness khác (doctrine scope lãnh địa, hook gate theo path, một-nhạc-trưởng-mỗi-phiên, phát hiện marker harness khác lúc cài) — done
+- [STR11] Ly khai bee (xưởng, gốc) ↔ forgent (sản phẩm, ./repo): artifacts hai bên tách tuyệt đối, release sạch không rác — done
+- [STR12] Export chưng cất sử ký sản phẩm: sinh decision-records/changelog vào docs/decisions/ của forgent từ hồ sơ xưởng (per repo-divorce) — done
+- [STR13] Evolving loop human-gated (F5): tự-sửa 2-gate (Gate A chọn / Gate B duyệt diff), explicit-accept-per-item, Iron Law cho skill sửa hệ, push never automatic — done
+- [STR14] Stage Intake: người submit vấn đề, 2 chế độ (a) un-attended rồi bỏ đi / (b) collaborate-now; hệ ghi nhận + auto-classify work-item (per work-item-lifecycle-vision.md §3-4 bước 1-2) — done
+- [STR15] Stage Làm-rõ: runner sơ khởi chạy phân loại + context-discovery; task đơn giản → `ready`, task phức tạp → `need-exploring` rồi kích hoạt exploring trong-sản-phẩm (lifecycle §4 bước 3,5,6) — done
+- [STR16] Stage Chia-việc: auto làm giàu context + planning, decompose thành n item nhỏ độc lập (dependency rõ) đẩy vào queue (lifecycle §4 bước 7; câu hỏi mở: có cổng-người ở planning không). Ràng buộc đã khóa từ stage-clarify: item con mang field `parent` (lineage, không field `origin` riêng); item gốc là mỏ neo chú ý người, không dispatch khi con dang dở; deps giữ nguyên nghĩa chặn, tách khỏi parent; id con dùng chung generateId — done
+- [STR17] Stage PR lifecycle: tạo PR từ nhánh đề xuất, cổng review người, auto-merge khi duyệt sạch (lifecycle §4 bước 9-11; gồm STR9). Câu hỏi mở: worktree-mỗi-item vs chung, PR-mỗi-item vs gom-theo-human-submit — done
+- [STR18] Mô hình base-workflow + domain-extension: một chu trình chung nền tảng (init→làm rõ→chia việc→thực thi→compound-learn) mà coding/marketing/HR/finance kế thừa và thêm stage riêng (work-item-lifecycle-vision.md §2) — done
+- [STR19] Async human-gate primitive: work-item đậu chờ người quyết (state `awaiting-human`), ghi 'chờ gì', resume khi người trả lời — bất đồng bộ, không chặn; spine dùng lại cho mọi cổng-người của lifecycle (work-item-lifecycle-vision.md). Không làm intake/exploring stage — chỉ primitive — done
+- [STR2] Routing trên state (Phase 2): frontier sẵn-sàng thành lệnh, chain handoff, recovery matrix + anti-loop, runner tuần tự — done
+- [STR20] Registry-manifest máy-đọc cho architecture-map + script 2 phép kiểm trong verify: (a) chiều import một-chiều-xuống theo nhà đã khai, (b) đủ sổ — mọi file src/** bin/** có row (architecture-map §9.3, record ADR0010 (bản đồ kiến trúc là bản chuẩn); đứng trước S2-friction) — done
+- [STR21] Backlog-triage (cửa 2 của triage, phân biệt với STR14 intake-triage = cửa 1): forgent cần một cửa quyết "việc nào nổi lên chú ý" (impact/value ranking) tách bạch khỏi "việc này rủi ro/lane gì" — hiện chưa có (per deep-dive work-item-management.md:106, đúc kết từ beads-viewer-rust ranking) — done
+- [STR22] Số phận verb `add`: đã hạ cấp khỏi câu chuyện public (per stage-clarify — submit là cửa công khai duy nhất; id tự đặt phá nhất quán id tự sinh); quyết xóa hẳn hay giữ làm bề mặt nội bộ cho test/tooling — done
+- [STR23] Verb update/edit field công khai cho work-item (ghi đè kind/risk do classify gợi ý, sửa verify tay...) — "luôn ghi đè được" (per stage-intake) hiện chưa có bề mặt CLI nào thực hiện được — done
+- [STR24] Rollup view theo "bộ" (per stage-clarify): human hỏi "việc tôi nộp tới đâu rồi" — xem item gốc + tiến độ hậu duệ (n/m xong), dựa trên field parent (STR16 dựng) — done
+- [STR25] Mốc dogfood tự-phát-triển: dùng fgos tại xưởng điều phối phát triển chính fgos sản phẩm (thay vai bee hiện tại — xưởng điều phối, `./repo` là đối tượng). Điều kiện tối thiểu: STR16 + STR17 khép kín vòng giao việc→nghiệm thu; STR10 coexistence trước khi chạy thật trong xưởng đang có bee. Bee chủ động báo người dùng khi đủ điều kiện (standing request 2026-07-16, kiểm tại mỗi feature close) — done
+- [STR26] Cửa pull giao–nhận việc (take/return): tác nhân ngoài runner (người/phiên/runner khác) nhận đúng một item từ queue qua claim CAS, trả kết quả qua cửa event; runner vẫn tự dispatch khi không ai cầm — mô hình hóa attend/unattend (per stage-decompose) — done
+- [STR28] GitHub adapter cho PR lifecycle: transport remote (tạo PR thật, duyệt trên web, auto-merge qua API) đứng trên CÙNG cổng duyệt nội bộ của STR17 (per pr-lifecycle — local-first, adapter chỉ đổi transport) — done
+- [STR29] Packaging/install thật của fgOS (npm/global/copy-bin): câu chuyện phân phối đứng trên nền coexistence STR10 (per install-coexistence — đợt STR10 chỉ chạy-tại-chỗ) — done
+- [STR3] Compound-learning trên routing (Phase 3): vòng predicted→actual, capture 2 kênh, entropy-trend, evolving human-gated — done
+- [STR30] Discovery prompt đủ ngữ cảnh: buildDiscoveryPrompt (src/intake/discovery.mjs) hiện chỉ đưa title-cắt/kind/risk/refs/deps — THIẾU description đầy đủ + toàn bộ ask/answer history (gates) + discovery history → vòng làm-rõ không hội tụ, hỏi lặp rồi fail-safe park (dogfood STR25 run-1 phát hiện, 2026-07-16) — done
+- [STR31] Worker execution thật cho dogfood: run-2 (2026-07-17) worker được dispatch nhưng nhánh fgw rỗng (aheadCount 0, verify-miss ×2 → parked đúng luật) — điều tra executor config/worker prompt của dispatch cho task implementation thật (model nào, prompt đủ chưa, timeout, làm sao thấy log worker) — done
+- [STR32] Persist log worker dispatch (observability): hiện output worker chỉ console-tail per luật security-panel (loop.mjs output-discipline — KHÔNG persist vào path committed); muốn log file .fgos/logs cần SUPERSEDE quyết định đó tường minh + gitignore + một cửa ghi (single-door .fgos) + đính stdout vào DispatchError cho timeout/spawn-fail (plan-checker STR31 B1/W1/W2 đã map đủ ràng buộc) — done
+- [STR33] Feedback người tới worker: prompt worker (buildPrompt) thiếu answer từ gates + lý do reject mới nhất → vòng reject không hội tụ (run-3: reject kèm yêu cầu test, worker round-2 no-op vì không thấy lý do); kiểm fold `reason` trên work.move (đường destructure — critical pattern fold-allowlist) — done
+- [STR34] Anti-loop vs vòng người: (a) reject/answer của NGƯỜI hiện ăn cùng ngân sách visit với vòng lỗi → item bị park 3/3 TRƯỚC khi worker kịp thấy lý do reject (run-4); (b) item nhánh-runner bị anti-loop park xong thì KHÔNG còn cửa công khai nào cho người hoàn tất đề xuất (pull-door đo main, không hợp việc trên nhánh; classifier cũng chặn đẩy tay — đúng tinh thần). Thiết kế: can thiệp người (answer/reject) làm mới/mở rộng ngân sách visit? verb người-tiếp-quản-nhánh? — done
+- [STR35] fgos multi-session trên CÙNG checkout (dogfood run-6, 2026-07-17, phiên khác đang chạy STR32 song song lần đầu tiên): (a) `isWorkingTreeClean` của `approve`/`return` không phân biệt "bẩn của phiên nào" — một phiên khác merge song song có thể chặn approve của phiên này 2 lần liền; (b) soát diff nhánh runner trước khi hỏi người approve mà diff thẳng với ref `main` đang di chuyển (thay vì `git merge-base`) tạo báo động giả khi có phiên khác merge song song — run-6 tự gây 1 reject oan vì lỗi này — done
+- [STR37] Chuẩn hóa entry cho multi-surface (D b2d18cc7): (a) envelope fgos.v1 trên MỌI verb — hoàn tất vế envelope của CTR001 (hiện chỉ submit/discover có; các verb còn lại in chữ thường, UI nào bám vào cũng là bám regex); (b) verb manifest máy-đọc `fgos --help --json` trả `{verb, params, mô tả, read/mutation}` để listener/UI sinh form-lệnh thay vì hard-code (tiền lệ: bee.mjs --help --json) — done
+- [STR39] Xem live output worker (D 644916a4): (a) tee stdout/stderr của worker TỪNG CHUNK vào `.fgos/logs/<id>.log` ngay khi đến — qua đúng cửa worker-log (một-cửa của worker-dispatch-log), giữ nguyên khối kết-cục cuối (timeout/hỏng-spawn vẫn bắt được, resolve trên exit không đổi) → `tail -f` thành cửa sổ xem live per-item, N worker song song không giẫm dòng nhau; (b) tùy chọn stream-json qua executor args trong config runner — thuần Host Adapter, zero code. File log live là chất nền cho chiều-ra của STR38 (UI tail + đẩy) — done
+- [STR4] Distillery lên state layer làm consumer thứ hai (porting lifecycle thành FSM) — done
+- [STR40] Chế độ vận hành qua herdr (D d3dbe7f5, supersedes ef6ed305 — chốt 2026-07-18, user xác nhận đổi tmux→herdr vì operator thật đã dùng sẵn herdr): phiên herdr chuẩn 4 pane — (1) runner loop `while … fgos-runner --once … sleep` (đứng trên runner.lock + idempotent, không cần flag mới), (2) `tail -F` log live per-item (đứng trên STR39), (3) cửa người submit/answer/review/approve/reject, (4) dashboard poll `fgos list` + chuông chờ-người gộp một pane (`herdr notification show` native, đúng một lần mỗi lượt việc mới vào `awaiting-human`). **LUẬT CỨNG:** herdr chỉ làm chrome — không bao giờ gọi `agent start`/đọc `agent_status` làm tín hiệu quyết định. Đa pane chung checkout đòi STR35 đóng (đã đóng) — done
+- [STR41] Per-tier executor + executor port hexagonal-lite (D a4fe4c2b): (a) config runner cho MỖI TIER khai executor riêng `{command, args}` — light/standard/heavy cắm CLI khác nhau trong CÙNG một lượt drain; tier không khai riêng rơi về executor chung (config cũ chạy nguyên, backward-compat); (b) dispatch nâng CTR009 từ "mẫu spawn" thành interface executor CÓ TÊN (CTR009 v2) với adapter — hôm nay đúng một adapter `cli-spawn` (argv, shell:false, hành xử giữ nguyên); adapter `rpc/app-server` (vd codex app-server giao tiếp RPC, không phải CLI) chỉ xây khi có nhu cầu cắm thật — mua cái TÊN của bậc trừu tượng, chưa mua bậc — done
+- [STR42] Kiểm định "sự thông minh của giao việc nằm ở đâu": audit ranh giới planner-vs-orchestrator và chốt bằng decision record — hiện loop là cỗ máy CƠ HỌC (FIFO theo seq, tier→model tra bảng, ngân sách visit, ma trận recovery — không gọi LLM nào trong vòng chọn-giao), trí tuệ nằm ở BIÊN stage (clarify/discovery + decompose gọi model, classify intake cơ học); quyết giữ đạo lý "orchestrator ngu — trí tuệ ở biên" hay cho phép thông minh vào vòng chọn việc, và nếu vào thì qua cửa nào — done
+- [STR43] Work-graph metrics surface (D f176c18a, dưới stance RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học vĩnh viễn) (runner)): một verb đọc-thuần trả metrics graph CƠ HỌC fold từ event log — unblock-set transitive, critical path/depth, connected-components (mấy mũi song song độc lập), chuỗi kẹt/stale-blocked — qua envelope; consumer KÉP: khóa sort tương lai của picker (STR7, vẫn tra bảng — không phạm RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học vĩnh viễn) (runner)) + digest cho planner-brain (STR8, LLM hết phải đếm cạnh). Chất liệu distillery ĐÃ ĐÀO, tham khảo bắt buộc khi planning: bvr transparent-triage 8 thành phần giải trình được + greedy-submodular top-k-unblock + what-if + connected-components=parallel-tracks (`docs/distillery/sources/beads-viewer-rust.md` xưởng); beads 10-loại dependency + unified cycle detection (`docs/distillery/sources/beads.md`); graph-drift 6 trục làm health gate; five-tier eligibility stack (`docs/distillery/deep-dives/work-item-management.md` §4 — fgOS đang tier 1-2, STR43+STR7+STR8 leo tier 3-4) — done
+- [STR44] Approve session-nesting guard (STR35 Epic 2) chỉ nhận diện worktree đăng ký qua `fgos session start` — một `git worktree add` thủ công, không qua registry, vẫn lọt đúng nguy cơ pull/legacy false-verification (goal-check chạy trên code cũ, báo "verified on main") một cách âm thầm — done
+- [STR45] `.fgos/events.lock` (STR35 Epic 3) chỉ đóng đua trùng-seq tại chính `appendEvent` — không làm các thao tác đọc-sửa-ghi cấp cao ở `store.mjs` (kiểm id-đã-tồn-tại của `addWork`, CAS `expectedStatus` của `moveWork`) nguyên tử liên-tiến-trình; hai lệnh `fgos` tương tác song song trên CÙNG một id vẫn có thể mỗi bên qua tiền-kiểm cũ rồi ghi hai sự kiện hợp-lệ-nhưng-mâu-thuẫn — done
+- [STR46] **Hợp đồng giao tiếp VÀO/RA của fgOS như một bề mặt I/O hạng nhất** — review chặt + hợp nhất các mảnh in/out đang rải rác theo từng stage thành MỘT hợp đồng mạch lạc, để bất kỳ transport nào (terminal, pane, chat, web, thứ chưa nghĩ ra) cắm vào đồng nhất và fgOS **chủ động được cả chiều ra**, không chỉ bị poll (chống "bị động"). Hiện trạng cần soát: chiều VÀO đã có cửa chuẩn (verb/CTR001, Host Adapter `b2d18cc7`, listener STR38) nhưng đường vào rải theo stage (submit STR14, answer/async-human-gate STR19, pull-door take/return STR26); chiều RA đang **bị động** — envelope + poll list/catchup + data_hash (STR37), log worker STR39, còn **đẩy/khởi-xướng (attention-envelope CTR008) thì deferred "chờ lực kéo"**. Việc: kiểm toàn bộ điểm in/out, chốt một hợp đồng in-out **tự-mô-tả** (vào=verb/CTR001 + identity gate; ra=envelope + attention/CTR008 push + self-description để thêm surface là dịch-transport→verb + đọc-envelope, không đường ghi riêng), và **nâng chiều-ra/khởi-xướng thành hạng nhất** thay vì phần phụ. **Câu hỏi CỬA-CHUẨN (escalate 2026-07-18, trong scope review):** bản thân "cửa chuẩn giao tiếp với người" CHƯA CHẮC là CLI-verb-spawn hôm nay — spawn-rồi-chết về bản chất không giữ kết nối để đẩy, nên "bị động" là hệ quả TẤT YẾU của model này, không phải bug. Ba mô hình phải cân: (1) CLI-spawn = cửa (b2d18cc7 hiện tại); (2) một **daemon nuôi MỘT cửa protocol chuẩn máy-đọc — không phải UI** (socket/JSON-RPC/MCP) để CLI+UI+remote đều là client, push/stream/remote thành bản chất — đây đúng là kiến trúc INTERFACE của herdr (không phải runtime của nó); (3) core-library + adapter mỏng (hợp STR41 executor-port), daemon chỉ bật khi cần remote/push. **CHỐT hướng 2026-07-18: model (3), Ở MỨC INTERFACE.** Contract chuẩn = **SCHEMA event-log + giao thức append/read/subscribe** (fgOS đã event-sourced), **KHÔNG phải một lib link được**. **Lib chỉ là CLIENT tham chiếu (Node) của contract đó**, không phải bản thân contract → daemon/UI-backend có thể viết bằng ngôn ngữ khác miễn nói đúng log-format (chống Node-monoculture, hợp mục tiêu substrate đa-app). CLI = adapter local dùng lib; daemon = consumer (xem chốt dưới); CLI standalone chạy đủ. **Chỉ code CÙNG-TIẾN-TRÌNH (CLI, TUI local) mới gọi lib TRỰC TIẾP; mọi UI web/mobile/remote KHÔNG chạm lib — chúng là client của CỬA MẠNG do daemon phơi ra → daemon là điều kiện CẦN cho bất kỳ UI ngoài terminal.** **Prerequisite móng:** tách core (verb-logic) thành lib gọi được độc lập CLI — refactor nội bộ, không đổi hành vi. **Phạm vi quyết định này CHỈ là interface (hình dạng cửa); tầng OWNER — ai ghi, đồng thời, lock CTR002, nguyên-tử STR45 — là layer RIÊNG, CHƯA xét ở đây.** **CHỐT thêm 2026-07-18: daemon RA KHỎI core — là CONSUMER giao tiếp QUA CLI** (`spawn fgos <verb>` cho ghi + poll `fgos list`/`rollup` + data_hash cho chiều-ra), KHÔNG link lib. Hệ quả: daemon thừa hưởng identity-gate + validation + single-door-lock của CLI miễn phí, không chế được đường ghi mới → **b2d18cc7 (Host-Adapter) được GIỮ + FULFILL, KHÔNG bị siêu-việt** (daemon chính là "lực kéo" mà CTR008 chờ) → **không cần decision-record-phá-luật.** Push nằm ở consumer sống-lâu (poll rẻ + giữ kênh outbound); core fgOS vẫn passive (chỉ CLI+log). Đây là **airemote tổng quát hoá** (consumer spawn-verb + poll + bridge remote). Sub-choice deferrable: poll-qua-CLI (đơn giản, một đường — nghiêng cái này trước) vs tail-event-log (push tức thì nhưng khoá log-format). CHỈ nếu sau muốn daemon **link-lib in-process** (3b) mới đụng b2d18cc7 → khi đó mới cần record. Kèm: **CLI tự nó phải chuẩn hoá lại** (verb surface + envelope + exit-code + self-describing schema) dù chọn model nào. Reference kiến trúc cửa đã có trong distill: `herdr:socket-api-control-surface`, `herdr:self-describing-protocol-schema`, `herdr:session-snapshot-bootstrap-rpc`. **Trước mắt (increment đầu, không chờ contract xong):** giao tiếp trực tiếp qua terminal/agent + vài pane thiết kế riêng show trạng thái work-item; nói với terminal-agent "vào tiến trình trả lời item X" / "vào exploring item X" rồi chat tiếp — chat modal item-scoped là client ĐẦU TIÊN của cổng. Là móng nằm DƯỚI STR38/STR39/STR40 và mọi UI sau; đứng trên STR37. Chất liệu distill tham khảo: `docs/distillery/deep-dives/herdr-vs-tmux-observation.md` (xưởng — vì sao surface là client của cổng, không phải runtime), airemote (path-allowlist/send-confirm cho bề mặt chat-untrusted) — done
+- [STR47] Audit thống nhất **loại-hình công việc** + **hệ đặt tên/đánh mã** đang chạy song song trong hệ thống — chưa có review nào gộp chung: (a) `kind` work-item (`classify.mjs`: bug/feature/chore/docs, mặc định `task`) — đủ chưa, thiếu loại nào (vd spike, review); (b) nhiều hệ mã số tách biệt cùng sống mà chưa giải thích ranh giới ở một chỗ: P# tuần tự (docs/backlog.md, PBI sản phẩm), D-hex (decision record, per-feature CONTEXT.md + `.bee/decisions.jsonl`), R# (rule trong docs/specs/runner.md), C1-C9 (contract trong architecture-map.md), cell-id `<feature>-N` (bee); (c) tên feature kebab-case tự đặt tay, không qua cửa sinh id nào — dễ trùng/lệch nghĩa khi hai việc đặt tên gần nhau — done
+- [STR49] **Tách prompt worker thành file template riêng + registry agent-type** (thảo luận 2026-07-18): `buildPrompt` (dispatch.mjs) hiện hard-code chuỗi trong code — tune câu chữ phải sửa code; tách ra file template versioned trong repo để review/diff/tune prompt như tài liệu. Chọn template qua **bảng tra cơ học** kind/tier/domain → file (cùng họ bảng tra tier→model, hợp RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học vĩnh viễn) (runner) — không LLM trong vòng chọn; cùng hướng STR41 per-tier executor + STR18 domain registry). Prompt mỏng thành: định danh vai (agent type) + trỏ skill cần dùng + data item — worker chạy trong worktree của repo nên **tự nạp được skill** từ thư mục skill của repo. **Hai điều kiện giữ từ thiết kế hiện tại:** (1) substitution vẫn `{placeholder}` string-replace thuần, KHÔNG template engine có logic — giữ guarantee `shell:false` + prompt đoán-trước-được; (2) template là artifact có golden-file test (item mẫu → prompt kỳ vọng). Log dispatch (STR32/STR39) ghi kèm tên + hash template đã dùng để trace "worker sai vì prompt version nào" — done
+- [STR5] Xem xét thay bee bằng state layer của forgent — chỉ mở khi forgent đạt F3 (ngưỡng tên, per phase-1-state-layer) — done
+- [STR50] **Extract/induct bộ skill-workflow kiểu bee vào fgOS — bee gốc GIỮ NGUYÊN, không modify** (thảo luận 2026-07-18; là STR5 mở lại đúng hẹn — per bee-fgos-decision: "mở lại khi STR35 đóng", STR35 đã đóng): fgOS có xương sống cơ học mạnh (event-sourced, single-door, CAS, goal-check không-tin-lời, anti-loop, session worktree) nhưng trí tuệ workflow mỏng (3 điểm biên headless one-shot); bee có workflow trí-tuệ-giàu (exploring/planning/validating/reviewing nhiều vòng, gate) trên nền JSON + kỷ luật. Việc: **trích/chưng cất bộ skill workflow vào fgOS như một layer sản phẩm** (induct vào repo fgOS, KHÔNG sửa bee đang chạy ở xưởng), bản inducted đi qua cửa chính danh: phiên skill-based `take`/`return` (STR26 — RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học vĩnh viễn) (runner) ghi rõ cửa pull là ngoại lệ chính danh cho trí tuệ vào hệ) làm bề mặt nhận-trả việc; gate-người map vào `awaiting-human` + ask/answer (STR19); cell ≈ work-item con mang `parent` (STR16); goal-check vẫn tự verify. **Một cửa ghi duy nhất:** bản inducted KHÔNG mang sổ state song song kiểu `.bee/` — work-item state chỉ qua verb CTR001/CTR002. **Kèm vòng học liên tục:** đăng ký bee làm **reference source của distillery** (delta scan theo cursor) — theo dõi bee tiến hóa ở xưởng để bản inducted học tiếp từ nó, không phải chép-một-lần-rồi-lệch — done
+- [STR51] Skill LLM-assist trước `submit`: nhận text tự do kiểu "thêm vào backlog: làm X", chạy một LLM đơn giản để gợi ý phân loại (tier/kind/domain/risk) rồi mới gọi `fgos submit`/`add` với field đã điền — thay vì chỉ có `classify.mjs` cơ học (đếm từ khoá) và `--domain` thủ công (fold-về-coding nếu bỏ qua, `domains.mjs:81-90`) như hiện nay. Không phạm RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học vĩnh viễn) (runner) (stance STR42, decision `f69951df`): đi qua đúng cửa field-trên-item — skill TỰ GHI field đã suy luận qua verb chuẩn, giống hệt một người tự tay truyền `--domain`/`--risk`, không phải orchestrator/picker gọi LLM trong vòng chọn-giao. Cân nhắc khi thiết kế: `submit` hôm nay không có flag override cho tier/kind/risk (chỉ `add` có) — có thể cần thêm override flags cho `submit`, hoặc skill route qua `add`. Khác STR8 (intent-scoring — chấm priority SAU khi item đã tồn tại, dùng graph metrics) và khác p50-workflow-induct's own domain-classifier decision (domain-classifier thông minh, deferred tới khi có domain thứ hai thật) — STR51 rộng hơn decision đó (gồm cả tier/kind/risk, không chỉ domain) và là một SKILL client-side, không phải thay đổi trong picker/orchestrator. Nêu ra 2026-07-18 trong lúc bàn p50-workflow-induct; không thuộc scope STR50. **Chốt 2026-07-18 (bàn cùng ngày với STR50): gộp vào Phase 2 (skill authoring) của p50-workflow-induct thay vì tách phase riêng — thiết kế đúng (skill ở tầng gọi trước submit, không sửa lõi) không đụng external-provider vào core code nên không đổi mode `standard` của STR50.** — done
+- [STR53] **`work.id` bỏ slug-title, đổi sang `TSK<hash>`** (chốt tại `docs/id-systems-audit.md` §1/§2, thảo luận 2026-07-18, làm ĐẦU TIÊN trong nhóm STR53-STR58 — độc lập kỹ thuật, không phụ thuộc STR54-STR58): `generateId()` (`classify.mjs:124`) hiện sinh `slugify(title,≤40 ký tự)+hash` — dài, gần như chép nguyên title (ví dụ thật 44 ký tự trong `.fgos/events.jsonl`). Đổi thành hash-only ngắn (base36 6-8 ký tự), giữ nguyên cơ chế chống trùng đã có. Con (sinh qua `decompose.mjs:245`) dùng `<parentId>-<n>` (n = thứ tự trong lứa con, đệ quy theo `parent` — an toàn tuyệt đối vì `parent` KHÔNG nằm trong `EDITABLE_FIELDS`, `store.mjs:184,232`, không bao giờ đổi sau khi tạo). `TSK` dùng CHUNG cho mọi `kind` — KHÔNG mã hoá kind vào tiền tố, vì `kind` CÓ trong `EDITABLE_FIELDS` (sửa được qua `fgos edit`), mã hoá vào id bất biến sẽ khiến id nói dối sau khi edit; cũng khớp decision ADR0002 (flat work-item model — one item kind, one FSM, loại việc là field, không phải shape id riêng). id CŨ trong log giữ nguyên, không backfill (bất biến). Muốn hiển thị dễ hiểu (đọc nhanh là việc gì) thì ghép slug(title) lúc RENDER (CLI list/trích dẫn), không lưu vào id. — done
+- [STR54] **`C1`-`C9` contract → `CTR<n>`** (chốt tại `docs/id-systems-audit.md`, làm SỚM trong nhóm docs-rename — rẻ nhất, dùng để validate mẫu tiền tố trước khi làm STR56/STR57 tốn hơn): đổi bảng registry `architecture-map.md` §7 (`:330-340`) + mermaid diagram liên quan + mọi chỗ trích (`reading-map.md`, các spec) từ `C1..C9` sang `CTR1..CTR9`, qua decision record + version bump theo đúng luật riêng của map (`architecture-map.md:436-437`) — done
+- [STR55] **Chuẩn hoá trích dẫn rút gọn ADR → `ADR<n>`** (chốt tại `docs/id-systems-audit.md`, làm cùng đợt rẻ với STR54): tên file đầy đủ `NNNN-slug.md` giữ nguyên, không đổi; mọi trích dẫn RÚT GỌN trong văn xuôi (hiện có chỗ viết bare số, ví dụ "0013") đổi thành ADR0013 (kênh báo-cáo-không-ghi cho discovered-from). `docs/decisions/0000-index.md` ghi rõ quy ước trích dẫn mới — done
+- [STR56] **`R#` business rule → `RUL<n>`** (chốt tại `docs/id-systems-audit.md`, làm SAU STR54/STR55 để mẫu tiền tố đã chạy trơn): `runner.md` (R1-R43) + 4 spec khác đang có `R#` riêng (`platform-foundations.md`, `distribution.md`, `work-state.md`, và spec còn lại) đều đổi tiền tố. Bước đầu BẮT BUỘC: liệt kê ĐỦ mọi chỗ `R[0-9]+` xuất hiện (định nghĩa lẫn trích dẫn) trước khi đổi, không chỉ sửa định nghĩa gốc — đây là migration có quy mô, không phải rename 1 chỗ. `R#` vẫn KHÔNG unique toàn cục sau đổi tên (mỗi spec tự đếm riêng) — trích dẫn NGOÀI spec gốc phải kèm tên area (vd `RUL42 (STANCE trí-tuệ-giao-việc) (runner)`) — done
+- [STR57] **Story (đổi tên khỏi "PBI") `P<n>` → `STR<n>`** (chốt tại `docs/id-systems-audit.md`, làm SAU CÙNG trong nhóm docs-rename — rủi ro/chi phí cao nhất, đụng ID đang SỐNG): đổi ID mọi dòng `docs/backlog.md` hiện có (P1..P52) sang `STR<n>` giữ nguyên số, cập nhật quy ước sinh id tại `.claude/skills/bee-scribing/references/scribing-reference.md:297,303`, quét mọi trích dẫn "P<n>" trong `docs/specs/*.md`, `docs/architecture-map.md`, `docs/history/*/CONTEXT.md` đổi theo. Giải quyết dứt điểm va chạm ký tự với severity `P1/P2/P3` (không cần đổi severity, xem `docs/id-systems-audit.md` #11) — done
+- [STR58] **Script `next-doc-id` cho họ "next free integer thủ công"** (Story/Rule/ADR — chốt tại `docs/id-systems-audit.md`, mục gen-id; KHÔNG chặn STR53-STR57, làm sau hoặc song song): tránh trùng khi 2 phiên cùng tự tay chọn số kế tiếp. Đặt trong `repo/scripts/` (fgOS tự sở hữu, không đặt trong bee — theo khung "fgOS tự vận hành" trong `docs/id-systems-audit.md` §Bối cảnh, decision ADR0004 (phạm vi & non-goal — domain đầu là work-state của chính forgent) + STR50), 1 script tham số hoá đọc 1 file + pattern, trả số free kế tiếp; KHÔNG áp dụng cho CTR001-CTR009 (chỉ 9 slot cố định, không cần) — done
+- [STR59] **Sample project nhỏ để test khả năng vận hành thật của fgOS** (nêu ra 2026-07-18, trước khi tiếp tục STR50) — STR25 đã dogfood một lần bằng chính backlog/repo forgent làm test subject (2 item thật đi trọn vòng, `docs/history/dogfood-p25-run1/`); STR50 Phase 3 cũng cần một case-study thật nhưng đang deferred tới khi Phase 1+2 của STR50 xong (`docs/history/p50-workflow-induct/plan.md` Gate 2 #3). Việc: chốt qua bee-exploring xem sample project này target cái gì (fgOS hiện tại đã ship, hay layer skill-induction STR50 tương lai, hay cả hai), sống ở đâu (fixture trong `repo/`, repo riêng disposable, hay tái dùng chính repo forgent kiểu STR25), và có phải regression fixture bền hay chỉ chứng minh một lần. **Chốt 2026-07-18 (bee-exploring, `docs/history/fgos-sample-testbed/CONTEXT.md`):** cả hai target tuần tự (fgOS hôm nay trước, layer skill STR50 sau khi ship); fixture riêng trong `repo/`, không tái dùng backlog thật; regression fixture bền, giữ lại; Pass 2 của fixture này CHÍNH LÀ case-study STR50 Phase 3 đang deferred (một fixture, hai CoS) — done
+- [STR6] Fan-out song song N worker trên frontier — done
+- [STR60] **Bug thật: `fgos return`'s working-tree-cleanliness check (`isFgosOnlyStatusLine`, `bin/fgos.mjs`/`src/runner/merge.mjs`) chỉ loại trừ status line có tiền tố `.fgos/` literal** — tìm ra qua dogfood STR59 (cell `fgos-sample-testbed-2`, 2026-07-18): khi cwd nằm trong một thư mục con của repo git thật (vd `repo/dogfood-fixture/`, không phải root), `git status` báo path theo dạng `<subdir>/.fgos/...` (tương đối với git top-level thật), không phải `.fgos/...` — nên exclusion không bao giờ khớp, và `return` liên tục từ chối "working tree not clean" dù state store của chính nó vừa tự sinh ra. Workaround đã dùng (không sửa source fgOS): commit kèm luôn các file `.fgos/*` tự sinh của fixture trong cùng commit với code change. **Mở rộng phát hiện (cell `fgos-sample-testbed-5`, item `divide`, cùng ngày):** gate này KHÔNG chỉ vướng bởi leftover `.fgos/*` — `isWorkingTreeClean` scan `git status` của TOÀN BỘ repo thật (`repo/`), không giới hạn trong cwd/subdirectory đang chạy, nên BẤT KỲ file nào khác trong `repo/` đang uncommitted (ví dụ `docs/backlog.md` do orchestrator sửa song song) cũng chặn `return` y hệt. Phạm vi bug rộng hơn ban đầu: không phải riêng `.fgos/` path-prefix, mà là toàn bộ cleanliness-check chưa cwd-scope đúng cho một fixture nằm trong subdirectory — done
+- [STR61] **Context continuity cho chat-in-the-middle & ngắt quãng dài khi item bị chia async** (nêu ra 2026-07-19, kèm 2 câu hỏi mở của người dùng khi cung cấp thêm input cho STR38/STR46): (1) work item bị chia nhỏ thành task con độc lập (async) — bối cảnh trao đổi người-hệ thống có bị giới hạn theo từng task con, không gộp được bối cảnh parent/sibling khi cần hỏi-đáp người; (2) trao đổi ngắt quãng dài (người trả lời rồi vắng nhiều giờ mới quay lại) — giữ session/bối cảnh trọn vẹn thế nào để chất lượng trao đổi không giảm. Người dùng tự nhận KHÔNG vướng ở cổng giao tiếp/transport (STR46/STR38 — cho là không phức tạp), CHỈ vướng ở lớp NỘI DUNG bối cảnh chảy QUA cổng đó — STR61 tách riêng đúng ranh giới này. Liên quan STR19 (async-human-gate: item đậu `awaiting-human`, câu hỏi/trả lời là một cặp ghi log, không timeout, không có khái niệm session/transcript) và STR48 (attention channel sống ở daemon-consumer, core vẫn passive). Chưa có khái niệm "sibling" trong data model hiện tại (`work-state.md:864` chỉ có `parent`/`deps`/`blocks`) — cần chốt qua exploring. **Chốt qua bee-exploring 2026-07-19 (`docs/history/str61-chat-context-continuity/CONTEXT.md`):** bối cảnh dựng lại từ state/log mỗi lần đọc, không lưu transcript; tự động kèm đúng 1 cấp cha (không sibling); chỉ báo "đã đổi" khi thay đổi ảnh hưởng câu hỏi/trả lời gốc, im lặng nếu không — done
+- [STR63] **Frozen-judge tương đương cho fgOS** (nêu ra 2026-07-20, lúc so sánh kiến trúc bee↔fgOS) — fgOS đã có `footprintOverlap`/`footprintConflicts` (work-graph-intelligence S9, `graph-metrics.mjs:371`, `store.mjs:587`) ngừa xung đột GIỮA 2 work-item TRƯỚC dispatch (so `footprint` tự khai của item A với item B, gợi ý sequence/hoist/re-slice). Bee's frozen-judge (`cells.mjs:679-750`) giải bài toán KHÁC, bổ sung chứ không trùng: kiểm SAU khi return xong, MỘT item có tự ý đụng nhóm file nhạy cảm (test/CI/lockfile/manifest) NGOÀI phạm vi `footprint` đã khai của CHÍNH nó không — fgOS hiện chưa có lớp này — done
+- [STR64] **[fgOS work — per decision `df90b761`, KHÔNG phải bee-tooling; mọi tham chiếu `bee-*`/`scribing`/`compounding`/`docs-manager` dưới đây là NGUỒN DISTILL, không phải đích sửa — xem compound-learn-enduser-docs's own decision on this]** **Reconcile map:** "scribing+compounding" → khâu compound-learn của fgOS; "skill export/docs-manager/documentation-management.md" → skill export/tích luỹ đọc-theo-tag của fgOS (CHƯA xây). **Đã giao (feature compound-learn-enduser-docs, ~slice 1-2, reviewed):** bước (1) taxonomy Diataxis + bước (2) tag `docType` capture-time + 1 doc how-to thật. **CÒN LẠI (lý do reopen từ `done`, per STR73 premature-done + decision `f5f7f6d3`):** bước (3) skill export/tích luỹ đọc-theo-tag (soát `docs-manager`/`documentation-management.md` trước khi viết mới, YAGNI) + bước (4) backfill; mới 1/4 quadrant (how-to). **[bước-3 shape locked 2026-07-21, decision `1d336d8a` / CONTEXT's locked decisions]:** bước-3 giao **INDEX đọc-theo-tag** (machine-readable, key theo quadrant + purpose/audience + source-capture linkage), KHÔNG gộp/viết lại doc; docs-manager/ck:docs/documentation-management.md đã soát — không tái dùng được, build skill fgOS mới. CoS bậc-3 diễn giải lại + **user-accepted**: index đóng bước-3, phần gộp tài liệu ("gộp sống") là slice sau. **Row KHÔNG flip `done` chỉ vì xong bước-3** (per STR73). — nguyên văn ticket gốc (design reference): **Compound-learn embodiment (p50-workflow-induct slice 2) + tài liệu hướng end-user** — p50-workflow-induct's own decision đã defer "compound-learn" sang slice 2 từ đầu. Đào sâu `bee-compounding`/`bee-scribing`/`feedback.mjs` (2026-07-20) cho thấy bee có input cơ học ổn (CONTEXT/plan/report/cell-trace) và output "spec hiện trạng" ổn (`docs/specs/`, việc của scribing), nhưng **thiếu hẳn trục tài liệu HƯỚNG END-USER** (installation guide/runbook/usage/domain-knowledge/workflow-guide/Q&A) — bee chỉ phân loại theo trục kỹ sư (`pattern/decision/failure`). Đề xuất, người dùng đã đồng ý toàn bộ 2026-07-20, xếp theo impact: (1) chốt taxonomy trước — map vào khung **Diataxis** (Tutorial/How-to/Reference/Explanation) thay vì bịa danh sách riêng; (2) gắn tag phân loại NGAY tại khâu `scribing`+`compounding` lúc ghi nhận (field nhỏ thêm vào, không xây cơ chế mới) — tránh dồn nợ raw-chưa-phân-loại; (3) SAU ĐÓ mới xây skill export/tích luỹ đọc theo tag — soát lại `docs-manager` agent + skill `docs`/`documentation-management.md` đã có trước khi viết mới (YAGNI); (4) backfill nội dung cũ (critical-patterns.md, docs/decisions/) ưu tiên thấp nhất — done
+- [STR65] **Worktree isolation cho phiên bee song song trong cùng checkout** (điều tra tận gốc 2026-07-20, xuất phát từ 3 lần commit lạ `"worker: output.txt"` đè mất dòng `docsRef` trong `bin/fgos.mjs` giữa lúc p50-workflow-induct Phase 2 thi công) — xác nhận bằng transcript trực tiếp (`~/.claude/projects/.../d728e552-....jsonl`, 2026-07-19 17:41:46): KHÔNG phải bee tự động (bee không có cơ chế tự git-commit), KHÔNG phải bug test suite (`test/runner/loop.test.mjs:29` cô lập đúng qua `fs.mkdtempSync`), KHÔNG phải tiến trình lạ trên máy (ps/cron/systemd đã kiểm, không có gì chạm checkout) — là **3 phiên bee ĐỘC LẬP chạy thật, song song, trong CÙNG một checkout**: `fgos-sample-testbed` (dispatch `fixture-worker-multiply`/`builder-fgos-sample-testbed-1`), `str60-fgos-return-cleanliness-fix`, `p50-workflow-induct`. Cơ chế: race trên `.git/index` dùng chung — đúng critical-pattern đã ghi ngày 20260718 ("git-add-scope": broad add/commit quét nhầm thay đổi chưa commit của phiên khác). AGENTS.md rule 14 đã có paved road (`bee worktree new --feature <slug>`) nhưng không phiên nào trong 3 phiên trên dùng. **Thêm bằng chứng (2026-07-20, grooming p50-workflow-induct):** một occurrence khác cùng nguyên nhân gốc, filed riêng làm review-finding #1 của p50-workflow-induct's review (đóng làm duplicate của STR65 này, không fix riêng) — 2 sự cố cụ thể có SHA: commit `b63c530` âm thầm nuốt một sửa test của cell này vào commit đã amend của phiên khác; commit `d2fd615` xoá mất 7 dòng vừa commit (docsRef wiring trong `bin/fgos.mjs`), gây regression 2 test CLI. Chi tiết đầy đủ: `.bee/backlog.jsonl` (title "worker: output.txt" auto-commits, 2026-07-19T10:40:40Z). **Escalation count (grooming failure-analysis, 2026-07-20):** đây KHÔNG phải sự cố hiếm — đếm được 12 occurrence riêng biệt trong `.bee/backlog.jsonl`, leo thang P3→P2→P1 trải dài 2026-07-17 tới 2026-07-19 (reservation bị giữ bởi phiên khác, `state.json` bị race, `git add -A`/`git commit -- <pathspec>` quét nhầm 487 file của phiên khác, subagent tự commit dù được dặn để nguyên, v.v.). Nghi vấn thêm: test flaky lặp lại ở `test/state/events.test.mjs`'s concurrent-OS-process seq test (thấy lại 2026-07-20 trong groom-cleanup-1, "pass khi chạy riêng/pass lại lần 2" — ĐÃ bị kết luận là flaky nhưng KHÔNG được đối chiếu với STR65) có thể là canary của chính race này, không phải flaky thuần. Cơ chế fix đã tồn tại từ 2026-07-17 (`fgos-multi-session-checkout`, `bee worktree new --feature <slug>`) — vấn đề còn lại là KHÔNG CÓ GÌ ép buộc dùng nó, không phải thiếu cơ chế. **Scope quyết định 2026-07-23:** cả 3 sự cố có SHA đều là race trên `repo/`'s `.git/index` (decision `af7d1dc1`, `scope: "repo"`), không phải workshop's `.git` — nên fix vòng này scope vào fgOS side (`bin/fgos.mjs`/runner: phát hiện phiên khác đang live cùng `repo/` checkout, chặn/guard commit trần); bee-core enforcement (`bee worktree new` ép `--with-companion` khi đụng `repo/`) tách thành backlog item riêng, không block STR65 — done
+- [STR66] **Rename `src/state/domains.mjs` → `workflow-stage-graphs.mjs`** (nêu ra 2026-07-20, lúc bạn đọc thấy naming "domain" dễ nhầm với domain nghiệp vụ) — file thực chất là registry stage+transition-graph theo loại việc (`coding`/`synthetic`), không phải "domain" theo nghĩa DDD. Đã cân nhắc `workflow-shapes.mjs` vs `workflow-stage-graphs.mjs`, chọn vế sau vì cạnh chuyển-trạng-thái (transitions) là phần chính, không chỉ danh sách stage — tên phải nói rõ có "graph". Việc rename thật đụng mọi nơi import (`work.mjs`, `frontier.mjs`, `loop.mjs`, `stage.mjs`) — refactor thật, chưa làm, chỉ ghi nhận — done
+- [STR67] **Goal-directed planning: người dùng khai MVP/milestone, fgOS tự sắp xếp việc hướng tới nó nhanh nhất** (nêu ra + escalate 2026-07-20, trong lúc bàn P50 và soạn câu MVP nháp cho chính fgOS) — KHÔNG phải thói quen roadmap nội bộ của team fgOS, mà là **tính năng sản phẩm cấp cho người dùng cuối**: một người dùng fgOS xây agent app của họ tự khai mục tiêu (MVP/milestone) của dự án HỌ, và fgOS tự sắp xếp/ưu tiên backlog hướng tới mục tiêu đó nhanh nhất — câu MVP nháp của chính fgOS (`docs/history/p50-workflow-induct/reports/...` artifact 2026-07-20) trở thành ca dogfood ĐẦU TIÊN của chính tính năng này, không phải một quyết định nội bộ rời rạc. **Đã có building block liên quan** trong `work-graph-intelligence` (`src/state/graph-metrics.mjs`): `criticalPath(view)` (chuỗi phụ thuộc dài nhất, số bước tối thiểu) và `greedyTopUnblock(view, k)` (greedy xếp hạng việc chưa xong theo mức mở-khoá, thuật toán submodular-cover) — cả hai hiện tính trên TOÀN BỘ graph ("mở khoá mọi thứ"); tính năng mới cần biến thể SCOPED THEO GOAL (chỉ xếp hạng việc nằm trên đường tới một target đã khai, không phải mọi thứ). Cần bee-exploring riêng trước khi shape — còn gray-area thật: "goal" là work-item hay entity mới? liên hệ thế nào với dep-graph/parent hiện có? — done
+- [STR68] **`discovery.mjs`'s judge call can return prose instead of JSON when nested inside an already-running dispatched worker session, causing a spurious `awaiting-human` fail-safe park** (phát hiện 2026-07-20, trong p50-workflow-induct Phase 3 case-study, item `tsk-5gc` trong `dogfood-fixture`) — `judgeDiscovery` (`src/intake/discovery.mjs`) spawn `claude -p {prompt} --model {model} ...` (theo `.fgos-runner.json`) và bắt buộc stdout `JSON.parse` được thành `{clear: boolean, ...}`; bất kỳ lỗi nào (exit khác 0, timeout, stdout không parse được) đều gộp vào cùng fail-safe `{clear:false, question: DEFAULT_UNCLEAR_QUESTION}` — đúng thiết kế "không bao giờ coi phán đoán không chắc là pass" (module's own fail-safe comment). Nhưng khi lệnh `claude -p` này được gọi TỪ BÊN TRONG một phiên Claude subagent đã đang chạy (dispatched worker), model con đôi khi trả lời bằng văn xuôi thay vì JSON thuần (tái hiện thủ công, read-only: `claude -p "Reply with exactly this JSON..." --model sonnet ...` trả về văn xuôi từ chối, không phải JSON) — item hoàn toàn rõ ràng (`power(base, exponent)`, linear, không mơ hồ) vẫn bị park `awaiting-human` oan, không phải vì item thật sự mơ hồ mà vì lớp gọi lồng-nhau không ổn định. Full evidence: `docs/history/p50-workflow-induct/reports/p50-workflow-induct-6.md` §6 (Root-cause diagnostic) — done
+- [STR69a] **Chiếu nguyên văn `ask` vào `awaitingContext` (gần như free, dọn đường STR70a)** — tách từ STR69 (2026-07-21, per `docs/history/gate-dialogue-continuity/CONTEXT.md`'s locked decisions). Dữ liệu ĐÃ lưu sẵn: `gates[id].ask` (`repo/src/state/replay.mjs:130-132`), và `computeAwaitingContext` (`repo/src/state/awaiting-context.mjs:49-73`) đã đọc đúng `view.gates[id]` để tính `changedSinceAsk` nhưng bỏ qua `ask` nằm ngay cạnh. Không dữ liệu mới, không verb/event/contract mới, KHÔNG đụng STR61's own "material" decision. Bước đầu tiên của cụm, làm trước STR70a. — done
+- [STR7] Trường priority cho frontier ordering. **Chốt qua thảo luận RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học vĩnh viễn) (runner) (per STR38, 2026-07-17):** khi STR38 tồn tại, priority có thể nhận một GỢI Ý từ người qua chat — STR7's thiết kế đọc gợi ý đó làm một tín hiệu đầu vào (không phải field cuối áp thẳng) khi tính field priority thật — done
+- [STR72] **Decision-supersession phải đồng bộ NGƯỢC về artifact nguồn (ticket/backlog/spec/CONTEXT), không chỉ ghi decision-log — nếu không, framing đã-bị-supersede tái xuất và tái sinh kết luận sai** (đào tận gốc 2026-07-21 từ hiện tượng "mọi phiên đọc STR64 là bee-tooling dù đã chốt fgOS"). **Root cause:** khi một quyết định đổi chiều (supersede), thay đổi rơi vào decision-log NHƯNG không lan về artifact nguồn đã gieo quyết định gốc — dòng STR64 trong `backlog.md` vẫn viết như bee-tooling, nên mọi phiên vào bằng entry-point tự nhiên (ticket ở mặt chữ) tái-suy kết luận cũ; bản sửa (`df90b761`) nằm ở artifact RIÊNG (log) họ không đối chiếu, và ban đầu còn chỉ "narrated in prose", chưa gọi CLI verb → chuỗi decision máy-đọc còn không thấy supersession một thời gian (phải tới `27052dd7` mới formal). Source cũ là attractor mạnh hơn một correction chôn trong log. **Áp cho fgOS y hệt:** một work-item đổi framing mà ticket/`docs/specs` không cập nhật → phiên fgOS tái-suy kết luận cũ; đây là năng lực compound-engineering fgOS phải có, không chỉ vá bee. **Đề xuất (cần bee-exploring shape chi tiết):** (1) supersede kèm bước bắt buộc "reconcile source artifacts" — cập nhật/đánh dấu ticket/backlog/spec/CONTEXT mà decision-bị-supersede đã trích; (2) hoặc backlog-row/spec mang con trỏ tới decision cai-quản, để người đọc thấy inline "framing dòng này đã bị supersede bởi X"; (3) consistency-check (grooming) phát hiện row/spec mâu thuẫn với một active decision đã supersede framing gốc; (4) supersede LUÔN qua CLI verb máy-đọc, không chỉ prose. — done
+- [STR74] **Lưới an toàn chặn test-leak artifact bị commit (belt cho STR75, cắt cơ chế clobber STR65 nhanh)** (2026-07-21). Bổ sung `repo/.gitignore`: `output.txt`, `*-output.txt` (bọc họ fixture `worker-output.txt`/`synth-output.txt`/`coding-output.txt`), `.fgos/sessions.json` (ephemeral runtime, cùng lớp `.fgos/state.json` đã ignore); và `git rm --cached output.txt` (rác đang tracked từ `595db87`, không xoá logic). Chỉ là lưới — KHÔNG thay STR75 (fix gốc cô lập cwd); và không chặn được nếu code `git add` đúng tên file, chỉ chặn kiểu quét rộng `git add -A` (đúng cơ chế clobber STR65). — done
+- [STR76] **[MVP-BLOCKER · P1, DONE] Sau khi cài bản shipped, KHÔNG có đường discoverable-qua-PATH để khởi động vòng tự hành — người mới submit 1 request KHÔNG BAO GIỜ nhận lại code merge được (autonomous loop never starts)** (tìm ra 2026-07-21 qua đo gap MVP 0016; cả desk-audit lẫn live dry-run npm-install-thật đâm CÙNG bức tường). Cụ thể: `package.json` `bin` chỉ map `fgos` (KHÔNG có entry `fgos-runner`); `fgos init` KHÔNG sinh `.fgos-runner.json`; bước doc chỉ dẫn `fgos discover <id>` chết `ENOENT .fgos-runner.json`, không có hướng khắc phục nào được doc (`bin/fgos.mjs:530-542,633-634`; `docs/history/mvp-gap-measure/reports/dry-run-findings.md:129-156`). KHÔNG phải "loop kẹt cần người gỡ" — tệ hơn: loop KHÔNG TỚI ĐƯỢC chỗ con người có thể can thiệp. — done
+- [STR77] **[MVP doc gap · P2] `fgos submit --help` mâu thuẫn hành vi shipped** (đo gap MVP 2026-07-21) — help ghi `required: --text` (một flag) nhưng arg thật là POSITIONAL (`fgos submit "<description>"`) — `src/cli/command-registry.mjs:69,74`, `bin/fgos.mjs:610,1897`. Người mới tự sửa qua error string, nhưng doc-shipped vẫn sai. — done
+- [STR78] **[MVP doc gap · P2] Link "Documentation" trong README CHẾT trong gói npm shipped** (đo gap MVP 2026-07-21, live dry-run bắt — desk-audit không thấy vì đọc in-repo chứ không phải tarball) — `package.json` `files` allowlist (`bin`,`src`,`README.md`,`LICENSE`) loại `docs/` + `.agents/`, nên mọi doc README trỏ tới KHÔNG ship (`docs/history/mvp-gap-measure/reports/dry-run-findings.md:166-170`). Người lạ mở link → không có file. — done
+- [STR79] **[MVP doc gap · P2] `--help` không nhất quán theo subcommand** (đo gap MVP 2026-07-21) — `submit`/`discover`/`take --help` exit 4 + báo lỗi một dòng thay vì help thật; `init --help` lặng lẽ bỏ qua flag và rerun init (exit 0) (`dry-run-findings.md:160-165`). `--help` không phải đường khám phá đáng tin cho người mới. — done
+- [STR8] Intent-scoring + signal-driven chaining (hướng đã chốt từ consult). **Chốt qua thảo luận RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học vĩnh viễn) (runner) (per STR38, 2026-07-17):** khi STR38 tồn tại, intent có thể nhận một GỢI Ý từ người qua chat — STR8's thiết kế đọc gợi ý đó làm một tín hiệu đầu vào (không phải field cuối áp thẳng) khi tính intent-score thật — done
+- [STR82] **Auto-detect CLI trợ lý có sẵn trên máy làm executor mặc định cho `.fgos-runner.json` tự sinh, thay vì luôn giả định `claude`** (nêu ra 2026-07-22, deferred idea của str76-runner-bootstrap) — str76-runner-bootstrap's own decision khoá `claude` làm executor mặc định vì thiếu bằng chứng thật về người dùng không-Claude; ý tưởng auto-detect (`command -v claude`/`command -v codex`/... rồi điền template tương ứng, rơi về placeholder báo-lỗi-rõ nếu không tìm thấy CLI nào) đã bị loại ở vòng explore đầu vì thêm logic detect cần bảo trì danh sách CLI biết trước, và MVP giả định đối tượng dùng đã có sẵn Claude Code. Chỉ đáng làm khi có bằng chứng dogfood thật cho thấy người dùng thật đang chạy trên CLI khác `claude` và chạm lỗi "command not found" ở bước dispatch — done
+- [STR83] **Slash-command surface (`/fgOS:submit`, `/fgOS:pick`) cho người ngồi trong AI terminal (Claude Code)** (nêu ra 2026-07-23, người dùng chỉ ra hôm nay phải tự gõ `fgos submit "..."` như một shell comment) — thay vì tay gõ CLI, `/fgOS:submit <text>` dịch xuống đúng verb `submit` sẵn có (`src/cli/command-registry.mjs:64`, tự phân loại tier/kind/risk + sinh id, per CTR001 một-cửa-ghi) KHÔNG mở đường ghi riêng; điểm MỚI so với `submit` hôm nay: trước khi gọi verb, đối chiếu text với các item đang có trong view (`fgos list`/`.fgos` state) để GỢI Ý `deps` khi mô tả rõ ràng phụ thuộc một item đã tồn tại — người xác nhận gợi ý trước khi ghi (rủi ro suy luận sai; không tự động áp, cùng nguyên tắc RUL42 (STANCE trí-tuệ-giao-việc) "gợi ý là input, không phải field cuối" mà STR7/STR8/STR38 đã chốt). `/fgOS:pick [id]` claim một item `ready` (frontier.mjs hoặc `fgos take`), rồi tự `createWorktree` (`src/runner/worktree.mjs`, hạ tầng ĐÃ CÓ cho runner) và chuyển phiên làm việc sang path đó, chạy tới khi item xong — cùng pattern dispatch-vào-worktree-mới mà `bee-herding` đã chứng minh cho backlog nội bộ của bee, áp lại cho backlog `.fgos` của người dùng cuối fgOS. **Liên quan trực tiếp STR38** (Human-UI listener: "increment đầu, không chờ contract xong — giao tiếp trực tiếp qua terminal/agent... chat modal item-scoped là client ĐẦU TIÊN của cổng") — feature này CHÍNH LÀ một hiện-thực cụ thể của increment đó, không phải ý mới; và **STR46** (hợp đồng in/out hạng nhất mọi transport cắm vào) là tầng trên nếu contract đó xong trước — cả hai vẫn `proposed`, chưa xây, nên feature này có thể đứng độc lập trước, không bắt buộc chờ. Cần bee-exploring riêng trước khi shape — gray-area thật: "chạy tới khi xong" của `/fgOS:pick` nghĩa là gì (một cell hay nhiều? review/approve gate ở đâu, ai là actor ghi field cuối khi agent trong worktree tự gọi verb — giữ đúng-một-actor theo RUL42 (STANCE trí-tuệ-giao-việc)?); và gợi-ý-dep tự động cần UX xác nhận cụ thể ra sao trước khi ghi `deps` — done
+- [STR84] **bee-core: ép `bee worktree new` dùng `--with-companion` (hoặc từ chối) khi phiên sắp đụng `repo/`** (tách ra 2026-07-23 từ STR65 — scope quyết định: STR65 vòng này chỉ sửa fgOS side; phần bee-core `isConcurrentMode()` (`.bee/bin/lib/claims.mjs`) đã có tín hiệu phiên-khác-đang-live nhưng `bee-write-guard.mjs` chưa dùng nó để chặn ghi trần vào `repo/` dùng chung — cần beegog (bee-core), không phải file vendored/hash-tracked trong workshop này) — done
+- [STR85] **`worktree-companion` mount (symlink `repo` + `.bee/companion-session.json`, backed bởi fgOS session dưới `/tmp/fgos-sessions/<id>/`) tự biến mất giữa phiên, không có `rm` nào trong transcript** (ghi nhận 2026-07-23 từ 2 friction độc lập trong `.bee/backlog.jsonl`: str77-79-doc-gap-fixes 2026-07-22T14:58 — symlink+marker mất, dữ liệu `/tmp` còn nguyên; str76-runner-bootstrap-e5 2026-07-23T05:42 — nặng hơn, cả target `/tmp/fgos-sessions/<id>/` cũng mất) — root cause CHƯA xác định (nghi: `/tmp` TTL/cleanup sweep, race với phiên worktree khác, hoặc lifecycle của chính cơ chế `fgos session`/`src/runner/worktree.mjs`). Đi kèm 2 friction phụ tái hiện cùng mount (bounded, có thể tách cell riêng khi ai đó nhận việc): `commands.verify`'s distill-check step vỡ vì `../` relative từ trong symlink leo lên `/tmp/fgos-sessions/` thay vì workshop root; workshop `.gitignore`'s `repo/` (dir-only) không match symlink tên `repo` (`git check-ignore -v repo` xác nhận exit 1). (Friction thứ 3 — bee-write-guard.mjs thiếu companion-marker awareness — đã fix ở commit `0c30cf4`, rút khỏi scope item này.) Cùng họ scope-split với STR65/STR84: có thể là bee-core (beegog) hoặc fgOS runner session lifecycle (`repo/src/runner/`), chưa biết trước khi root-cause. Context đầy đủ: `docs/history/worktree-companion-mount-ephemeral/CONTEXT.md` — done
+- [STR86] **`fgos-runner` crash ngay lần chạy đầu trên project mới: `git worktree add` chết vì repo chưa có commit nào (`HEAD` không resolve)** (ghi nhận 2026-07-23 từ friction `.bee/backlog.jsonl` ts `2026-07-23T07:12:51.773Z`, layer `runner`) — người dùng báo: trong một project fresh-init, `fgos-runner --once` lỗi ngay: `git worktree add -b fgw/<id> <path>` trả `fatal: Not a valid object name: 'HEAD'`. Root cause: repo chưa từng commit nên `HEAD` không resolve, mà `git worktree add -b <branch> <path>` cần một start-point hợp lệ. **Bằng chứng thật (2026-07-23, task `tsk-2rl5`):** claim `todo -> doing` thành công, nhưng cả 2 lần thử đều fail y hệt (`worktree-fail` attempt 1 và attempt 2, kể cả sau khi retry với worktree/branch mới) — chứng minh retry KHÔNG tự hồi phục được điều kiện này (branch reuse không đổi việc `HEAD` vẫn không resolve) — runner đốt 2 attempt rồi `parked` item thay vì phát hiện sớm. Chưa có message hướng dẫn rõ nguyên nhân, người dùng phải tự đoán "chạy `git commit` trước". **Cần quyết định trước khi shape:** fgos-runner nên tự tạo initial commit (nếu quy ước project cho phép) hay chỉ fail sớm với message rõ "cần `git commit` trước khi chạy runner" — gray-area thật, cần chốt trước khi vào planning. **Hướng thêm (2026-07-23, người dùng gợi ý khi review item này):** thay vì (chỉ) chặn ở runner lúc fail, cân nhắc chặn SỚM HƠN ở `fgos init` — sau khi init xong, chủ động báo người dùng tự `git commit` nếu repo còn HEAD-less, thay vì để runner mới phát hiện ở lần chạy đầu. Hai hướng (init-time nudge vs runner-time detect-and-fail vs runner auto-commit) không loại trừ nhau, cần cân nhắc chung khi shape. — done
+- [STR87] **fgOS install/setup chưa thuận tiện & thiếu chuyên nghiệp** (đề xuất người dùng 2026-07-23, ghi nhận từ proposal `.bee/backlog.jsonl` ts `2026-07-23T13:56:59.000Z`, layer `install`) — hiện chưa có install script tập trung xử lý tốt custom settings đa dạng, merge default settings mới vào settings hiện có của user, hay tự chẩn đoán môi trường (`doctor`). **Cần quyết định trước khi shape:** có nên viết lại install script bằng Rust hoặc Go để có UX tốt hơn và dễ handle nhiều platform/shell (bash/zsh) hơn shell script thuần — gray-area thật, ngôn ngữ cuối CHƯA chốt, cần cân nhắc ở bee-exploring/bee-planning. **First slice (không chờ quyết Rust/Go):** cập nhật phần bash để TỰ TÍNH ra path của fgos bin bằng đúng logic `git rev-parse --path-format=absolute --git-common-dir` (bee.mjs đã dùng logic này) để chạy đúng dù đứng ở đâu trong repo, kể cả trong worktree; ví dụ tham chiếu (zsh function) người dùng đưa ra: `bee() { local common_dir; if ! common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null); then return 1; fi; node "$(dirname "$common_dir")/.bee/bin/bee.mjs" "$@"; }`. — done
+- [STR88] **Bộ plugin `/fgOS:*` mới bọc 2/31 verb (`submit`, `pick`) — thêm vài verb wrapper mới cho tiện thao tác/theo dõi/kiểm tra, không cần phủ hết** (đề xuất người dùng 2026-07-23) — quét `node repo/bin/fgos.mjs --help` ra đủ 31 verb CLI, nhóm theo chức năng: **thao tác/mutation (20):** `init, add, submit✓, discover, move, compound, edit, ask, answer, decision, rebuild, repair, take, pick✓, return, review, approve, reject, catchup, evolve, session`; **theo dõi/read (5):** `list, ready, stale, rollup, triage`; **kiểm tra/read (6):** `check, graph, conflicts, docs-index, doc-sources`. Chỉ `submit` và `pick` có wrapper `/fgOS:*` hiện nay (`repo/plugins/fgOS/skills/{submit,pick}/SKILL.md`) — mọi verb khác người dùng phải tự gõ `node repo/bin/fgos.mjs <verb>` trần, không qua plugin. **Yêu cầu người dùng:** thêm verb wrapper mới, giới hạn ở 3 nhóm chức năng thao tác/theo dõi/kiểm tra — KHÔNG cần bao phủ đầy đủ 31 verb. **Danh sách verb cần làm (đã chốt với người dùng 2026-07-23, 10 verb):** thao tác — `move, return, ask, answer`; theo dõi — `ready, stale, rollup`; kiểm tra — `check, graph, conflicts`. — done
+- [STR89] **Foundation-core skill (`fgos-routing` + chuỗi con) chưa domain-pluggable; ô `executing` hoàn toàn chưa có skill** (thảo luận 2026-07-23, tiếp nối STR50/STR18/STR52) — `fgos-routing` (`.claude/skills/fgos-routing/SKILL.md:79-83`) tự thú nhận "never decides which domain an item belongs to... the only domain this induction targets [is coding]"; bảng route-by-stage của nó (`:62-68`) bỏ trống đúng ô `executing`: "no skill to load here — mechanical build/verify/return path". Trong khi đó `src/state/workflow-stage-graphs.mjs` (STR18, done) đã chứng minh hạ tầng FSM đa-domain chạy được (`coding` 4-stage + `synthetic` minh hoạ song song) — chỉ thiếu tầng SKILL tương ứng theo domain, đúng cái STR52 (marketing domain thật) sẽ cần. Việc: (1) domain-pluggable hoá `fgos-routing` — đọc `item.domain`, tra `DOMAINS` registry, chọn đúng bộ skill theo domain thay vì hardcode coding; (2) xây skill mới lấp ô `executing` cho domain `coding`/software-dev trước (nội dung distill TAY — không tự động — từ kỷ luật implement→verify→cap của `bee-executing`, qua skill `distill` đã có); (3) domain `marketing` làm SAU, cùng khuôn, khi STR52's câu hỏi scope (chung store hay cài riêng) đã trả lời — không chặn slice software-dev. Người dùng xác nhận thứ tự: software-dev trước, marketing sau; và xác nhận cách distill: chủ động làm tay qua skill `distill`, chưa cần tự động hoá. **Ghi nhận thêm (audit 2026-07-23, finding #2):** `fgos-validating/SKILL.md` diễn đạt cạnh `decompose`→`executing` như một quy luật phổ quát, không check `transitions` registry của domain đang xử lý — an toàn hôm nay vì CAS (`stage.mjs`) chặn move bất hợp lệ ở tầng engine và domain `synthetic` (transitions rỗng) không có stage `decompose` nên chưa reachable, nhưng khi domain `marketing` (việc (3) trên) có `decompose` với transitions khác, `fgos-validating` cần cập nhật để không còn giả định cạnh này là phổ quát — đưa vào scope khi shape việc (3). — done
+- [STR9] Merge tự động đề xuất của worker khi review sạch — done
+- [STR90] **`/fgOS:pick` (plugin, STR88) chỉ shell thẳng `fgos.mjs pick`, không mang trí tuệ của `fgos-routing`** (thảo luận 2026-07-23, refine STR83) — `plugins/fgOS/skills/pick/SKILL.md:27-31` action step là đúng một dòng `node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs pick $ARGUMENTS`, không nạp `fgos-routing`/`fgos-exploring`/`fgos-planning`/`fgos-validating` — trong khi `.claude/skills/fgos-routing/SKILL.md` (STR50 induction) đã là đúng chuỗi orient→claim→route-by-stage→work→return mà một phiên dev-fgOS nội bộ dùng hôm nay. Kết quả: người ngồi trong project khác (dùng plugin `/fgOS:*` đã ship) claim xong bị bỏ lại tự improvise, không theo cùng kịch bản mà `fgos-runner` (headless) hay một phiên dev-fgOS nội bộ nhận được. Việc: đổi `/fgOS:pick` để nạp `fgos-routing` (bản domain-pluggable hoá ở STR89) ngay sau khi claim, thay vì dừng lại sau dòng shell CLI — giải luôn gray-area STR83 tự flag ("chạy tới khi xong nghĩa là gì? review/gate ở đâu?"): trả lời là "chạy đúng theo state machine mà `fgos-routing`+chuỗi stage-skill định nghĩa, dừng đúng gate mà skill đang tải quy định", không phải một vòng lặp mới. Không cần đổi tên verb — giữ `/fgOS:pick`, không thêm `/fgOS:claim` (một việc, một tên, theo DRY). — done
+- [STR91] **Runner headless (`fgos-runner`) chưa trỏ vào cùng nguồn skill với phiên tương tác — hoàn thiện phần "agent-type + tự nạp skill" mà STR49 để treo** (thảo luận 2026-07-23) — `dispatch.mjs`/`prompt-templates.mjs` (STR49, done) đã tách prompt thành template + bảng tra kind/tier/domain→file, nhưng dòng backlog STR49 tự ghi: "Agent-type + tự nạp skill" trong Story vẫn là hướng tương lai, chưa nằm trong CoS đã chốt vòng này. Prompt runner hôm nay (`worker-prompt-default.txt`) vẫn nhồi toàn văn Goal/Description/Worktree/Verify, không trỏ tới skill file nào. Việc: mở rộng bảng tra của `prompt-templates.mjs` để render prompt MỎNG ("bạn là agent-type X, load skill tại `repo/skills/<stage>/SKILL.md`" — cùng skill file mà STR89/STR90 dùng cho domain/stage đó), subprocess `claude -p` tự đọc skill trong chính worktree nó đang đứng (đã có checkout). Giữ nguyên 2 điều kiện khoá của STR49 (substitution thuần `{placeholder}`, không template-engine có logic; golden-file test). Kết quả cuối: `fgos-runner` (headless, spawn subprocess) và `/fgOS:pick` (interactive, STR90) HỘI TỤ vào đúng MỘT nguồn skill — khác nhau đúng một chỗ: ai nạp prompt (subprocess mới hay chính phiên đang mở). — done
+- [STR92] **Audit 2026-07-23: 6 skill `.claude/skills/*` + 12 plugin `plugins/fgOS/skills/*` chưa tận dụng hết năng lực cơ học fgOS đã có sẵn** (quét thật `node bin/fgos.mjs --help` (31 verb) + đọc toàn bộ 18 SKILL.md, đối chiếu). **Load-bearing nhất:** (1) `fgos-planning` (`SKILL.md:69-96`, bước "Approach" + "Decide the split") không hề gọi `fgos graph` — `src/state/graph-metrics.mjs`'s `criticalPath`/`greedyTopUnblock` tính sẵn thứ tự phụ thuộc dài nhất + xếp hạng unblock, nhưng skill tự đoán thứ tự bằng judgment thuần thay vì đọc từ graph. (2) Bước split (`SKILL.md:82-90`) tạo item con qua `parent` nhưng KHÔNG set `--footprint` — item vừa tách là cặp dễ đụng file nhau nhất, nhưng thiếu footprint thì `fgos conflicts` không có gì để so. (3) `fgos-exploring` khoá quyết định chỉ ghi vào `CONTEXT.md`, không bao giờ gọi `fgos decision --text "..."` (verb log-native, `bin/fgos.mjs:816-819`) — quyết định khoá ở đây KHÔNG xuất hiện trong `view.decisions`/`fgos list` cho bất kỳ ai đọc máy thay vì grep doc. **Nhẹ hơn:** (4) `plugins/fgOS/skills/graph/SKILL.md:4-9,48-53` mô tả thiếu — `graphMetrics()` trả về cả `criticalPath`/`topUnblock`/`staleBlocked` nhưng wrapper chỉ nhắc tới component/what-if, khiến agent theo skill này báo cáo thiếu đúng JSON nó vừa lấy về. (5) `fgos-routing`'s Orient (`SKILL.md:19-27`) chỉ đọc `list`/`ready`, chưa nhắc `triage`/`stale`/`rollup` dù mô tả skill có nhận câu hỏi "what should I work on next" mà `triage` trả lời trực tiếp. **Sạch, không cần sửa:** `fgos-validating`, `fgos-compounding`, `fgos-indexing`, cả 12 plugin verb-wrapper (verb/flag khớp đúng, không lệch tên). **Không phải gap (informational):** `init/discover/edit/rebuild/repair/review/approve/reject/catchup/evolve/session` chưa được skill nào nhắc tới — đây là verb admin/engine-internal hoặc dành cho người, không phải lỗ hổng. — done
+- [STR93] **`fgos-exploring` không đọc lại phán quyết đã lưu của `judgeDiscovery` trước khi tự phán lại clarity; nhãn "decompose early/late" của `fgos-routing` trùng tên ngẫu nhiên với `judgeDecompose`, nên đổi cho rõ** (audit 2026-07-23, tiếp nối STR50/induction). **Việc chính (load-bearing):** `judgeDiscovery` (`src/intake/discovery.mjs:129-157`) trả `{clear, question?, verify?}`, lưu vào `view.discovery[id]` qua `addDiscovery` (`:187`) — nhưng `fgos-exploring/SKILL.md` không hề đọc lại discovery record này trước khi tự đặt câu hỏi Socratic từ đầu; `fgos-routing`'s "Precedence" (`:85-95`) chỉ coi judge là trọng tài khi TRANH CHẤP, không phải input đầu vào cho suy luận — hệ quả: skill có thể tự sinh câu hỏi khác, mâu thuẫn với câu hỏi máy đã hỏi, tốn vòng hỏi-người thừa. **Việc phụ (naming, bounded, không đổi hành vi/FSM):** `fgos-routing`'s routing table dùng nhãn "decompose, early" / "decompose, late" — trùng tên ngẫu nhiên với `judgeDecompose` (khác trục hoàn toàn: routing table quyết route tới `fgos-planning` hay `fgos-validating`; `judgeDecompose` quyết pass-through/split/need-human/invalid — xác nhận không phải cùng một giá trị tính ra, chỉ trùng chữ). **Người dùng chốt 2026-07-23:** đổi nhãn thành **"decompose — shaping"** (→ `fgos-planning`) / **"decompose — proving"** (→ `fgos-validating`), khớp cách STR50's case-study đã mô tả (decompose(planning→validating)), không đổi stage data value `decompose`. — done
+- [STR94] **`pnpm add -g github:vantt/forgent` fails: `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`** (renumbered from STR88 -- ID collision found at merge time: main's own STR88, from a separate unpushed session, is an unrelated fgOS-plugin verb-wrapper feature. Feature slug `str88-fgos-pnpm-lifecycle` in `docs/history/` and bee decisions is unchanged, internal-only.) (ghi nhận 2026-07-23 từ friction `.bee/backlog.jsonl`, layer `install`, người dùng báo lỗi thật + đồng chốt root cause với một phiên agent khác) — `package.json`'s `scripts.prepare` chạy `node scripts/install-git-hooks.mjs`; script này đã no-op an toàn khi không có thư mục git metadata (`repo/scripts/install-git-hooks.mjs:8-20`, đã xác nhận đúng) — **lỗi không nằm ở logic script**. pnpm 10+ (qua `allowBuilds`) chặn CHẠY bất kỳ lifecycle script nào của một git-hosted dependency trước khi chạy nó, bất kể script đó làm gì — nên mọi user dùng `pnpm add -g github:vantt/forgent` đều dính `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`, phải tự sửa `allowBuilds` trong `pnpm-workspace.yaml` mới cài được. Tái diễn với MỌI lần cài qua pnpm, không phải lỗi môi trường một lần; nhiều khả năng cũng ảnh hưởng các package manager strict khác (vd yarn PnP sau này) theo cùng cơ chế. **Fix đề xuất (đã thống nhất, per `str88-fgos-pnpm-lifecycle`):** bỏ `prepare` khỏi lifecycle tự động trong `package.json`; thêm `scripts.setup:hooks` (cùng lệnh) làm việc dev thủ công chạy 1 lần sau khi clone; thêm test chống-hồi-quy khẳng định `package.json` không còn `prepare` — loại bỏ hẳn trigger cho MỌI package manager, không riêng pnpm. Trade-off: contributor phải tự nhớ chạy lệnh setup 1 lần sau clone, đổi lại loại bỏ hoàn toàn friction cài đặt cho mọi người dùng cài qua git. Liên quan trực tiếp STR87 (cùng vùng install/setup) nhưng tách riêng vì đây là bug thật đang chặn cài đặt, cần fix độc lập, không chờ câu hỏi Rust-vs-Go của STR87. — done
+- [p-22c1a345] bee-core (beegog): reorder companion-mount teardown in 'bee worktree merge' to run after its dirty-tree checks, and add a liveness/occupancy check before destroying a companion mount — declined
+- [p-52815b3f] Extend fgos-runner startup preflight gate with clean-worktree, git-version, and disk-space checks — declined
+- [p-6a7ef170] bee write-guard's idle-gate phase check reads readConfig(root) instead of readConfig(controlRoot) for companion-mounted paths (guards.mjs ~line 1041) — declined
+- [STR75] **Cô lập cwd của test e2e/runner để fixture không rò rỉ vào working tree repo thật (FIX GỐC của STR65 "worker: output.txt")** (truy ra 2026-07-21 khi test `fgos session`). **Root cause đã xác định:** các test dựng "worker giả" ghi `output.txt`="produced by worker" rồi runner commit nó — `test/e2e/{runner-loop,pr-gate,self-improve-loop,synthetic-domain}.test.mjs` + `test/runner/{loop,worktree}.test.mjs` (`writeCommittingExecutor`/`commitOnWorktree`, đường dẫn tương đối theo cwd). Khi cwd không cô lập chặt, artifact rơi vào `repo/` thật; lịch sử `git log -- output.txt` chứng minh tái diễn: `30a9277 worker: output.txt` → `87c8a39 chore: remove ... accidental e2e-fixture artifact` → `595db87 worker: output.txt` (thêm lại). Đây là nguồn "worker: output.txt" auto-commit mà STR65 từng ghi "source chưa xác định". **Đề xuất (bee-exploring/small shape):** mọi test tạo artifact/commit trong temp/throwaway checkout riêng (mkdtemp) và tự dọn; hoặc runner-trong-test bị chặn commit ra ngoài worktree được cấp. — declined
+```
+Historical/current source git blob: 62aaf1a547aca2e9819e0165098edbf51eaf3d5e
+
+Actual disposition target: absent. No target or same-unit digest is invented.
+
+Complete source-to-target diff (absent target shown as absent, not deletion):
+No target comparison; inspect the complete historical/current text and the disposition rationale.
+## duplicate-group-1
+
+Entry kind: group-accounting
+Class: Judgment
+Source digest: 9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f
+Target digest: 9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f
+
+```json
+{
+  "blobSha": "11684583c2ac84357168e237f3ac045201377712",
+  "paths": [
+    "docs/contracts/fgos-gateway-api-v1.yaml",
+    "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+  ],
+  "authoredBy": "codex-session:23@2026-10-14",
+  "reviewStatus": "pending",
+  "resolution": "One mapped platform owner; preserve the legacy source until atomic cutover.",
+  "rule": "Whole-file byte equality establishes one payload; the frozen root map and accepted source decision establish its sole platform owner. Consumer rewrite and historical lookup use that owner; no second authority is inferred from a retained source copy.",
+  "owner": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+  "sourceClaimId": "claim_f0f4828229b64bd6cc8959111c824e24",
+  "sourceUnitDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+  "targetUnitDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-source-completion-02.md",
+  "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3",
+  "rationale": "Existing independent review accepted exact group membership and payload carriage. This pending resolution projection records the sole owner and a cutover done condition; no source deletion or authority switch occurs.",
+  "doneCondition": "Independent acceptance of this projection, all inbound mutable consumers rewritten or explicitly queued, immutable references covered by reviewed aliases, and atomic cutover retirement of the legacy source."
+}
+```
+```json
+{
+  "blobSha": "11684583c2ac84357168e237f3ac045201377712",
+  "paths": [
+    "docs/contracts/fgos-gateway-api-v1.yaml",
+    "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+  ]
+}
+```
+
+Complete duplicate member: `docs/contracts/fgos-gateway-api-v1.yaml#(whole file)`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: not a native unit; full-file hash below
+Shown text SHA256: 9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f
+Git blob: 11684583c2ac84357168e237f3ac045201377712
+
+```text
+openapi: 3.1.0
+x-contract: "CTR010 · fgos-gateway.v1"
+info:
+  title: fgOS Gateway API
+  version: 1.0.0
+  description: |
+    HTTP+JSON surface of the fgOS interface daemon (tsk-7l9, decision 0014
+    "Kien truc giao tiep nguoi <-> fgOS", model 3: core-library + thin
+    adapters). Written before the daemon is implemented, per this
+    contract's own action: a stable spec for D9's future MCP search tool
+    and any client (web dashboard, desktop) to build against, not
+    reverse-engineered documentation of routes that already exist.
+
+    Scope, locked by 0014:
+      - The daemon is a CONSUMER of fgOS core, never a co-writer. Every
+        write in this API is a thin wrapper over `spawn fgos <verb>`
+        (CTR001/CTR002 one-door-write); every read is a wrapper over
+        `fgos list` / `fgos rollup` / `fgos show` plus the `data_hash`
+        cheap-poll field already on every envelope. This gateway invents
+        no new write path into `.fgos/`.
+      - The daemon becomes the one control-plane that can drive BOTH
+        interactive session workflows (what herdr/TUI panes do today via
+        `fgos session start/end`) and the headless runner
+        (`fgos-runner --once`) — see `/v1/sessions` and `/v1/runner/tick`.
+      - The attention/push channel (STR48, contract CTR008, status
+        `idea`) is explicitly OUT of scope for v1 — 0014 point 6 keeps it
+        a separate subsystem with its own delivery-semantics record.
+        Clients poll `data_hash` on read endpoints until CTR008 lands.
+      - Identity here is ATTRIBUTION, not authentication (same non-goal
+        CTR001 already states for the CLI's own `writer` field): every
+        route below other than `/contract` itself requires the shared
+        per-machine bearer token (D4, `securitySchemes.bearerAuth`) — that
+        token gates ACCESS to the gateway, not per-caller IDENTITY. Who a
+        caller claims to be beyond holding that one shared token is STR38,
+        explicitly out of scope of 0014 itself.
+
+    Envelope reuse: every successful response body is the SAME `fgos.v1`
+    envelope (CTR001) the CLI already emits on stdout — `{contract,
+    generated_at, data_hash, data}` — carried unmodified inside the HTTP
+    body. This mirrors the precedent `fgos-runner.mjs` already set
+    (str46-io-contract D6): reuse CTR001's envelope as the version token
+    across a new transport rather than minting a second, parallel one.
+    HTTP status code + this envelope's `contract` field together answer
+    "did the call succeed"; never branch on message text (docs/io-contract.md).
+
+  contact:
+    name: fgOS
+    url: https://github.com
+  x-decisions:
+    - docs/decisions/0011-version-tuong-minh-cho-moi-contract.md
+    - docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md
+  x-specs:
+    - docs/io-contract.md
+    - docs/specs/work-state.md
+    - docs/specs/runner.md
+
+servers:
+  - url: http://localhost:{port}/v1
+    description: Local daemon (default deployment shape per 0014 point 3-4 — standalone adapter, not always-on by default)
+    variables:
+      port:
+        default: "4170"
+
+# tsk-4qf: every operation inherits this (D4's real, already-enforced
+# require_token gate) unless it overrides with its own `security: []` --
+# today only `/contract` does, since a client has to read the contract
+# before it can know a token is even required.
+security:
+  - bearerAuth: []
+
+tags:
+  - name: work
+    description: Work-item lifecycle (read + write), one-to-one with `fgos list/show/submit/move/ask/answer` etc.
+  - name: frontier
+    description: Read-only frontier/rollup/graph views used for dashboards.
+  - name: orchestration
+    description: The two process families the daemon controls per 0014 — interactive sessions and the headless runner.
+  - name: meta
+    description: Self-description of the gateway's own API surface — lets a client discover the contract instead of hand-tracking a separate doc.
+
+paths:
+  /contract:
+    get:
+      operationId: getContract
+      tags: [meta]
+      summary: The gateway's own OpenAPI spec, verbatim (this document)
+      description: |
+        Serves this exact spec file so an agent (or any other client) can
+        read the full route/schema surface and self-implement a client
+        against it, rather than needing this doc handed to it out of band.
+        The one route NOT behind the auth gate below — a client has to be
+        able to read the contract before it can know a token is even
+        required (D4). Never wrapped in the `fgos.v1` envelope: this is the
+        spec document itself, not a poll of fgOS state.
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/yaml:
+              schema:
+                type: string
+                description: This same OpenAPI document, byte-for-byte.
+
+  /work:
+    get:
+      operationId: listWork
+      tags: [work]
+      summary: List work items (wraps `fgos list`)
+      description: |
+        Read-only, no write side effect. Defaults to open-only (status not
+        `done`/`wontfix`/`retrospective`/`cleanup`), same default as the
+        CLI. Supports the CLI's own opaque-cursor pagination — pass
+        neither `cursor` nor `limit` for the full set.
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+          description: Filter by exact status value.
+        - name: step
+          in: query
+          schema: { type: string }
+        - name: all
+          in: query
+          schema: { type: boolean, default: false }
+          description: Include done/wontfix/retrospective/cleanup items.
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              work:
+                                type: object
+                                additionalProperties: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+    post:
+      operationId: submitWork
+      tags: [work]
+      summary: Intake free-text work (wraps `fgos submit`)
+      description: |
+        Derives title/tier/kind/risk and auto-classifies domain. This is
+        the one gateway-side write that creates state that did not exist
+        before — every other write endpoint below acts on an existing id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                  description: Untrusted free text (RUL45) — passed through as a single argv element, never spliced into a shell command.
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: showWork
+      tags: [work]
+      summary: Full detail of one item (wraps `fgos show`)
+      description: The work record plus every log scoped to just this id (discovery/decisions/gates/outcome/friction/settlement/learning).
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      # tsk-4id: corrected from `WorkItem` -- this endpoint's
+                      # own description already said "plus every log scoped
+                      # to just this id", but the schema reference never
+                      # matched it. Confirmed via a real `fgos show` run
+                      # (docs/history/tsk-4id-task-detail-screen/RESEARCH.md):
+                      # `data` is `{work, discovery, decisions, gates,
+                      # outcome, friction, settlement, learning}`, never a
+                      # bare `WorkItem`.
+                      data: { $ref: '#/components/schemas/WorkDetail' }
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: editWork
+      tags: [work]
+      summary: Partial update of an existing item's editable fields (wraps `fgos edit`)
+      description: |
+        PATCH, not PUT: only fields present in the body change (tsk-41h,
+        D1 of docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md)
+        -- this is `fgos edit`'s own partial-update semantics, never a
+        full-resource replace. Every field is optional; the request body
+        is `EditableWorkFields` (a strict subset of `WorkItem`'s own
+        properties -- `id`/`status`/`domain` are never editable through
+        this route). A field this route does not recognize is silently
+        dropped, same as an unrecognized flag on the CLI's own `edit`
+        command -- this route translates to `fgos edit`, it does not
+        re-validate what the engine already validates (area spec R2).
+        `fgos edit` itself refuses when no field actually changes; that
+        refusal reaches the caller verbatim as the same `ErrorEnvelope`
+        every other write route already uses, never swallowed or
+        replaced with a client-side check.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EditableWorkFields' }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/docs:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: getWorkDocs
+      tags: [work]
+      summary: An item's docsRef narrative -- CONTEXT.md/plan.md raw content (tsk-4id)
+      description: |
+        The task-detail screen's own primary content source for "what the
+        agent did" (D3 of docs/history/herdr-web-dashboard/CONTEXT.md:
+        CONTEXT.md/plan.md is the human narrative, the primary account --
+        `decisions[]` on `GET /work/{id}` is expandable detail only, never
+        the default). Did not exist before this item: a browser client
+        has no filesystem access, and no other route reads an arbitrary
+        repo file. `docsRef` is canonicalized and checked to resolve
+        inside `docs/history/` before any read -- a value that escapes it
+        is refused (`category: validation`), never followed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          docsRef: { type: string, nullable: true }
+                          contextMd: { type: string, nullable: true, description: "Raw CONTEXT.md content, or null if absent/unreadable." }
+                          planMd: { type: string, nullable: true, description: "Raw plan.md content, or null if absent/unreadable." }
+                          narrativeMissing:
+                            type: boolean
+                            description: "Present and true only when docsRef names a directory that does not exist on this machine (area spec Edge Cases: shown without its narrative, never a failure)."
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/move:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: moveWork
+      tags: [work]
+      summary: Move a work item through the status FSM (wraps `fgos move`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties:
+                to: { type: string, description: Target status. }
+                expect: { type: string, description: Optional CAS guard — current status expected before the move. }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/ask:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: askWork
+      tags: [work]
+      summary: Park an item in awaiting-human with a question (wraps `fgos ask`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/answer:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: answerWork
+      tags: [work]
+      summary: Answer a parked question and resume the item (wraps `fgos answer`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+                approve: { type: boolean, description: "Explicit approval signal for consent gates. When true, forwards --approve to fgos answer." }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/take:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: takeWork
+      tags: [work]
+      summary: Claim an item through the pull door (wraps `fgos take`/`fgos pick`)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [human, session]
+                  default: session
+                  description: |
+                    take --role's real, deliberately-scoped vocabulary
+                    (bin/fgos.mjs's own S2-pull D1) — the pull door
+                    excludes the runner role by design, not by omission.
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/return:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: returnWork
+      tags: [work]
+      summary: Complete a take — run verify, advance to awaiting-approval (wraps `fgos return`)
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/approve:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: approveWork
+      tags: [work]
+      summary: Merge an awaiting-approval item and move it to delivered (wraps `fgos approve`)
+      description: "Carries `externalEffect: true` in the CLI's own verb registry (may open/merge a real PR) — same meaning here."
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/reject:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: rejectWork
+      tags: [work]
+      summary: Reject an awaiting-approval item back to todo (wraps `fgos reject`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /ready:
+    get:
+      operationId: listReady
+      tags: [frontier]
+      summary: The frontier — items ready to be taken right now (wraps `fgos ready`)
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /rollup/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: rollupWork
+      tags: [frontier]
+      summary: Progress rollup of one root/goalTier item's children (wraps `fgos rollup`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Rollup shape, opaque to this contract — see docs/specs/work-state.md. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /graph:
+    get:
+      operationId: workGraph
+      tags: [frontier]
+      summary: Work-graph metrics — connected components, critical path (wraps `fgos graph`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Graph metrics shape, opaque to this contract. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /state/digest:
+    get:
+      operationId: stateDigest
+      tags: [frontier]
+      summary: Cheap-poll digest — `data_hash` + `generated_at` only, no `data` body
+      description: |
+        The poll-driven half of 0014's "poll `fgos list`/`rollup` +
+        `data_hash`" pattern: a client holds the last `data_hash` it saw
+        and calls this endpoint on an interval; a changed hash is the
+        only signal needed to decide whether to re-fetch a full read
+        endpoint. This is a genuinely new route (no CLI verb returns only
+        the digest today) — it exists so a client never has to pay the
+        cost of a full `fgos list` just to learn nothing changed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [contract, generated_at, data_hash]
+                properties:
+                  contract: { type: string, const: fgos.v1 }
+                  generated_at: { type: string, format: date-time }
+                  data_hash: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions:
+    post:
+      operationId: startSession
+      tags: [orchestration]
+      summary: Open an interactive session worktree (wraps `fgos session start`)
+      description: |
+        Interactive-session half of 0014's orchestration scope — what a
+        herdr/TUI pane does today by shelling out directly. A future
+        web/desktop client drives the same lifecycle through this route
+        instead of spawning its own git worktree.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item: { type: string, description: Optional work item id to open the session against. }
+      responses:
+        '200':
+          description: Session opened
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Session' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: endSession
+      tags: [orchestration]
+      summary: Close an interactive session worktree (wraps `fgos session end`)
+      parameters:
+        - name: force
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Session closed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}/slots:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: sessionSlots
+      tags: [orchestration]
+      summary: Worker-slot occupancy for one session (wraps `fgos slots`, session-scoped)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          execution:
+                            type: object
+                            properties:
+                              occupied: { type: integer }
+                              items:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id: { type: string }
+                                    sessionId: { type: string }
+                                    claimRole: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /runner/tick:
+    post:
+      operationId: runnerTick
+      tags: [orchestration]
+      summary: Drive one headless-runner cycle (wraps `fgos-runner --once`)
+      description: |
+        Headless half of 0014's orchestration scope: gather-back, find
+        work, dispatch it through its full "One vong --once" lifecycle
+        (docs/specs/runner.md), and return once that cycle's own outcome
+        is settled. A `--watch`-equivalent continuous mode is deliberately
+        NOT exposed here in v1 — a long-lived HTTP request modeling a
+        long-lived poll loop is a scope decision for the daemon
+        implementation item, not something this contract should force by
+        assuming a streaming transport (SSE/WebSocket) that 0014 never
+        locked.
+      responses:
+        '200':
+          description: Cycle completed (including "nothing to do")
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          dispatched: { type: array, items: { type: string }, description: Work item ids touched this cycle. }
+        '429':
+          description: Runner busy (mirrors CLI `EXIT_BUSY`, category `busy`).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    # tsk-4qf: matches require_token's own real enforcement (D4) -- one
+    # shared token per machine, read from ~/.fgos/config.json's
+    # gateway.token, checked as a plain Bearer header (not a per-user
+    # credential; see this document's own top-level "Identity here is
+    # ATTRIBUTION, not authentication" note).
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        The one shared per-machine token (D4). Every route below this
+        component list requires it except `/contract`, which overrides
+        with its own `security: []`.
+  parameters:
+    WorkId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+      description: Work item id.
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+      description: Opaque cursor from a prior page's `nextCursor`. Never hand-constructed by a client.
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1 }
+  responses:
+    WorkOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data: { $ref: '#/components/schemas/WorkItem' }
+    Error:
+      description: |
+        Any non-2xx. Never bodied by the plain `fgos.v1` envelope — branch
+        on HTTP status + this body's `category`, never on `message` text
+        (docs/io-contract.md: "Consumer re nhanh theo ma thoat pham tru,
+        khong bao gio theo thong diep" — the same rule, ported to HTTP).
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  schemas:
+    Envelope:
+      type: object
+      required: [contract, generated_at, data_hash, data]
+      properties:
+        contract: { type: string, const: fgos.v1 }
+        generated_at: { type: string, format: date-time }
+        data_hash: { type: string }
+        data: {}
+      description: CTR001's envelope, reused verbatim as the HTTP body (see this contract's top-level description).
+
+    Page:
+      type: object
+      properties:
+        nextCursor:
+          type: string
+          nullable: true
+          description: Opaque; null once the set is exhausted. Only present when `cursor`/`limit` was passed.
+
+    WorkItem:
+      type: object
+      description: |
+        Subset of the work-item shape stable enough to publish here; the
+        authoritative shape is docs/specs/work-state.md (schema version
+        carried in the event log per decision 0007, not duplicated here
+        per 0011's own rule against re-deriving a schema this contract
+        does not own).
+      required: [id, title, kind, status]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        status: { type: string }
+        workflowStep: { type: string }
+        tier: { type: string }
+        risk: { type: string }
+        domain: { type: string }
+        parent: { type: string, nullable: true }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        verify: { type: string }
+        docsRef: { type: string, nullable: true, description: "Path under docs/history/ -- content readable via GET /work/{id}/docs (tsk-4id)." }
+
+    WorkDetail:
+      type: object
+      description: |
+        `GET /work/{id}`'s real `data` shape (tsk-4id, corrected from a
+        stale `WorkItem`-only reference -- this endpoint's own summary
+        already said "plus every log scoped to just this id"). Every
+        sub-shape below is `type: object` with `additionalProperties: true`
+        rather than fully enumerated: these are the raw work-state logs
+        (`docs/specs/work-state.md` is their authoritative shape per
+        0011's own rule against re-deriving a schema this contract does
+        not own), and the task-detail screen (tsk-4id) reads only a named
+        few real keys from each (documented per-property below) rather
+        than this contract asserting an exhaustive shape it would then
+        have to keep in lockstep with every future log field.
+      required: [work]
+      properties:
+        work: { $ref: '#/components/schemas/WorkItem' }
+        discovery: { type: array, items: { type: object }, description: Verdict history for this item's discovery stage. }
+        decisions:
+          type: array
+          description: The machine decision log -- NOT the primary "what the agent did" account (that is GET /work/{id}/docs's CONTEXT.md/plan.md); shown collapsed behind a disclosure, per its own count.
+          items: { type: object }
+        gates:
+          type: object
+          description: |
+            Keyed by gate name (`contextApprove`/`planApprove`/
+            `validateApprove`, each `{actor, at, verify}` when present)
+            PLUS the ask/answer-parking fields on the SAME object:
+            `ask` (string, most recent question), `askHistory` (string
+            array, oldest-first, every question this item was ever
+            parked with), `answer` (string, most recent answer),
+            `statusAtAsk` (string, the status the item was in when most
+            recently parked).
+          additionalProperties: true
+        outcome: { type: object }
+        friction: { type: object }
+        settlement:
+          type: object
+          description: |
+            `count` (integer, the TRUE total) and `recent` (array, capped
+            at 5 most-recent-first entries across every settlement kind --
+            `SETTLEMENT_DISPLAY_CAP`. Each entry: `{kind, role, ts,
+            detail, id}`; `kind: "answer"` entries are what pairs
+            positionally with `gates.askHistory`, oldest-available-first
+            after reversing `recent`'s own newest-first order). A round
+            older than the 5-answer window has no entry here at all --
+            this is a real, load-bearing cap, not a client-side choice.
+          properties:
+            count: { type: integer }
+            recent: { type: array, items: { type: object } }
+        learning: { type: object, nullable: true }
+
+    EditableWorkFields:
+      type: object
+      description: |
+        tsk-41h: `PATCH /work/{id}`'s request body -- every field
+        `src/state/store.mjs`'s `EDITABLE_FIELDS` allows `fgos edit` to
+        change (25 entries, read directly from that constant, never
+        re-guessed). All optional; only fields present in the body are
+        patched. `id`/`status`/`domain`/`workflowStep` are never editable through
+        this route (`status` moves only through `/work/{id}/move`,
+        `workflowStep`/`domain` only through the engine's own step
+        transitions -- neither is in `EDITABLE_FIELDS`).
+      properties:
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        risk: { type: string }
+        verify: { type: string }
+        tier: { type: string }
+        refs: { type: array, items: { type: string } }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        acceptance:
+          type: array
+          description: Replaces the whole array (latest-wins), never a deep merge. Each clause is `{text, evidence}`.
+          items: { type: object }
+        priority: { type: integer }
+        intent: { type: integer }
+        docsRef: { type: string, description: "Non-empty path, or omit to leave unchanged. There is no clear-to-empty form on this route." }
+        parent: { type: string, nullable: true, description: "Empty string clears (un-parents) the item." }
+        urgent:
+          type: string
+          enum: [low, medium, high, critical]
+          description: "Despite the name, a string enum (confirmed via a live `fgos edit --urgent` smoke test: the literal boolean `true` is rejected by the engine), not a boolean flag."
+        impact: { type: number }
+        effort: { type: number }
+        action: { type: string, description: "Action directive prose." }
+        mergeAfter: { type: array, items: { type: string } }
+        supersededBy: { type: string, nullable: true, description: "Empty string clears." }
+        duplicates: { type: array, items: { type: string } }
+        domainFields:
+          type: object
+          description: Replaces the whole object (latest-wins) for the item's `domain`, never a deep merge of nested keys.
+        goalTier: { type: string, description: "'mvp' or 'milestone'." }
+        nextOperation: { type: string, nullable: true, description: "Next recommended stage operation or fix operation. Empty string or null clears." }
+        secondaryOperation: { type: string, nullable: true, description: "Active secondary consult/review operation. Empty string or null clears." }
+
+    Session:
+      type: object
+      required: [sessionId, worktree, branch]
+      properties:
+        sessionId: { type: string }
+        worktree: { type: string }
+        branch: { type: string }
+        item: { type: string, nullable: true }
+
+    ErrorEnvelope:
+      type: object
+      required: [category]
+      properties:
+        category:
+          type: string
+          description: |
+            The one CLOSED taxonomy CTR001 already defines
+            (src/state/store.mjs's EXIT_CODES + loop.mjs's EXIT_BUSY) —
+            this gateway adds no categories of its own:
+          enum:
+            - precondition
+            - conflict
+            - validation
+            - corrupt-log
+            - lock-timeout
+            - session-fail
+            - merge-fail
+            - busy
+            - unexpected
+        message:
+          type: string
+          description: Human-readable diagnostic. Never machine-branched on — `category` is the only field a client should switch on.
+        exitCode:
+          type: integer
+          description: The underlying CLI exit code this category maps from, carried through for parity with docs/io-contract.md.
+```
+
+Complete duplicate member: `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml#(whole file)`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: not a native unit; full-file hash below
+Shown text SHA256: 9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f
+Git blob: 11684583c2ac84357168e237f3ac045201377712
+
+```text
+openapi: 3.1.0
+x-contract: "CTR010 · fgos-gateway.v1"
+info:
+  title: fgOS Gateway API
+  version: 1.0.0
+  description: |
+    HTTP+JSON surface of the fgOS interface daemon (tsk-7l9, decision 0014
+    "Kien truc giao tiep nguoi <-> fgOS", model 3: core-library + thin
+    adapters). Written before the daemon is implemented, per this
+    contract's own action: a stable spec for D9's future MCP search tool
+    and any client (web dashboard, desktop) to build against, not
+    reverse-engineered documentation of routes that already exist.
+
+    Scope, locked by 0014:
+      - The daemon is a CONSUMER of fgOS core, never a co-writer. Every
+        write in this API is a thin wrapper over `spawn fgos <verb>`
+        (CTR001/CTR002 one-door-write); every read is a wrapper over
+        `fgos list` / `fgos rollup` / `fgos show` plus the `data_hash`
+        cheap-poll field already on every envelope. This gateway invents
+        no new write path into `.fgos/`.
+      - The daemon becomes the one control-plane that can drive BOTH
+        interactive session workflows (what herdr/TUI panes do today via
+        `fgos session start/end`) and the headless runner
+        (`fgos-runner --once`) — see `/v1/sessions` and `/v1/runner/tick`.
+      - The attention/push channel (STR48, contract CTR008, status
+        `idea`) is explicitly OUT of scope for v1 — 0014 point 6 keeps it
+        a separate subsystem with its own delivery-semantics record.
+        Clients poll `data_hash` on read endpoints until CTR008 lands.
+      - Identity here is ATTRIBUTION, not authentication (same non-goal
+        CTR001 already states for the CLI's own `writer` field): every
+        route below other than `/contract` itself requires the shared
+        per-machine bearer token (D4, `securitySchemes.bearerAuth`) — that
+        token gates ACCESS to the gateway, not per-caller IDENTITY. Who a
+        caller claims to be beyond holding that one shared token is STR38,
+        explicitly out of scope of 0014 itself.
+
+    Envelope reuse: every successful response body is the SAME `fgos.v1`
+    envelope (CTR001) the CLI already emits on stdout — `{contract,
+    generated_at, data_hash, data}` — carried unmodified inside the HTTP
+    body. This mirrors the precedent `fgos-runner.mjs` already set
+    (str46-io-contract D6): reuse CTR001's envelope as the version token
+    across a new transport rather than minting a second, parallel one.
+    HTTP status code + this envelope's `contract` field together answer
+    "did the call succeed"; never branch on message text (docs/io-contract.md).
+
+  contact:
+    name: fgOS
+    url: https://github.com
+  x-decisions:
+    - docs/decisions/0011-version-tuong-minh-cho-moi-contract.md
+    - docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md
+  x-specs:
+    - docs/io-contract.md
+    - docs/specs/work-state.md
+    - docs/specs/runner.md
+
+servers:
+  - url: http://localhost:{port}/v1
+    description: Local daemon (default deployment shape per 0014 point 3-4 — standalone adapter, not always-on by default)
+    variables:
+      port:
+        default: "4170"
+
+# tsk-4qf: every operation inherits this (D4's real, already-enforced
+# require_token gate) unless it overrides with its own `security: []` --
+# today only `/contract` does, since a client has to read the contract
+# before it can know a token is even required.
+security:
+  - bearerAuth: []
+
+tags:
+  - name: work
+    description: Work-item lifecycle (read + write), one-to-one with `fgos list/show/submit/move/ask/answer` etc.
+  - name: frontier
+    description: Read-only frontier/rollup/graph views used for dashboards.
+  - name: orchestration
+    description: The two process families the daemon controls per 0014 — interactive sessions and the headless runner.
+  - name: meta
+    description: Self-description of the gateway's own API surface — lets a client discover the contract instead of hand-tracking a separate doc.
+
+paths:
+  /contract:
+    get:
+      operationId: getContract
+      tags: [meta]
+      summary: The gateway's own OpenAPI spec, verbatim (this document)
+      description: |
+        Serves this exact spec file so an agent (or any other client) can
+        read the full route/schema surface and self-implement a client
+        against it, rather than needing this doc handed to it out of band.
+        The one route NOT behind the auth gate below — a client has to be
+        able to read the contract before it can know a token is even
+        required (D4). Never wrapped in the `fgos.v1` envelope: this is the
+        spec document itself, not a poll of fgOS state.
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/yaml:
+              schema:
+                type: string
+                description: This same OpenAPI document, byte-for-byte.
+
+  /work:
+    get:
+      operationId: listWork
+      tags: [work]
+      summary: List work items (wraps `fgos list`)
+      description: |
+        Read-only, no write side effect. Defaults to open-only (status not
+        `done`/`wontfix`/`retrospective`/`cleanup`), same default as the
+        CLI. Supports the CLI's own opaque-cursor pagination — pass
+        neither `cursor` nor `limit` for the full set.
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+          description: Filter by exact status value.
+        - name: step
+          in: query
+          schema: { type: string }
+        - name: all
+          in: query
+          schema: { type: boolean, default: false }
+          description: Include done/wontfix/retrospective/cleanup items.
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              work:
+                                type: object
+                                additionalProperties: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+    post:
+      operationId: submitWork
+      tags: [work]
+      summary: Intake free-text work (wraps `fgos submit`)
+      description: |
+        Derives title/tier/kind/risk and auto-classifies domain. This is
+        the one gateway-side write that creates state that did not exist
+        before — every other write endpoint below acts on an existing id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                  description: Untrusted free text (RUL45) — passed through as a single argv element, never spliced into a shell command.
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: showWork
+      tags: [work]
+      summary: Full detail of one item (wraps `fgos show`)
+      description: The work record plus every log scoped to just this id (discovery/decisions/gates/outcome/friction/settlement/learning).
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      # tsk-4id: corrected from `WorkItem` -- this endpoint's
+                      # own description already said "plus every log scoped
+                      # to just this id", but the schema reference never
+                      # matched it. Confirmed via a real `fgos show` run
+                      # (docs/history/tsk-4id-task-detail-screen/RESEARCH.md):
+                      # `data` is `{work, discovery, decisions, gates,
+                      # outcome, friction, settlement, learning}`, never a
+                      # bare `WorkItem`.
+                      data: { $ref: '#/components/schemas/WorkDetail' }
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: editWork
+      tags: [work]
+      summary: Partial update of an existing item's editable fields (wraps `fgos edit`)
+      description: |
+        PATCH, not PUT: only fields present in the body change (tsk-41h,
+        D1 of docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md)
+        -- this is `fgos edit`'s own partial-update semantics, never a
+        full-resource replace. Every field is optional; the request body
+        is `EditableWorkFields` (a strict subset of `WorkItem`'s own
+        properties -- `id`/`status`/`domain` are never editable through
+        this route). A field this route does not recognize is silently
+        dropped, same as an unrecognized flag on the CLI's own `edit`
+        command -- this route translates to `fgos edit`, it does not
+        re-validate what the engine already validates (area spec R2).
+        `fgos edit` itself refuses when no field actually changes; that
+        refusal reaches the caller verbatim as the same `ErrorEnvelope`
+        every other write route already uses, never swallowed or
+        replaced with a client-side check.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EditableWorkFields' }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/docs:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: getWorkDocs
+      tags: [work]
+      summary: An item's docsRef narrative -- CONTEXT.md/plan.md raw content (tsk-4id)
+      description: |
+        The task-detail screen's own primary content source for "what the
+        agent did" (D3 of docs/history/herdr-web-dashboard/CONTEXT.md:
+        CONTEXT.md/plan.md is the human narrative, the primary account --
+        `decisions[]` on `GET /work/{id}` is expandable detail only, never
+        the default). Did not exist before this item: a browser client
+        has no filesystem access, and no other route reads an arbitrary
+        repo file. `docsRef` is canonicalized and checked to resolve
+        inside `docs/history/` before any read -- a value that escapes it
+        is refused (`category: validation`), never followed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          docsRef: { type: string, nullable: true }
+                          contextMd: { type: string, nullable: true, description: "Raw CONTEXT.md content, or null if absent/unreadable." }
+                          planMd: { type: string, nullable: true, description: "Raw plan.md content, or null if absent/unreadable." }
+                          narrativeMissing:
+                            type: boolean
+                            description: "Present and true only when docsRef names a directory that does not exist on this machine (area spec Edge Cases: shown without its narrative, never a failure)."
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/move:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: moveWork
+      tags: [work]
+      summary: Move a work item through the status FSM (wraps `fgos move`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties:
+                to: { type: string, description: Target status. }
+                expect: { type: string, description: Optional CAS guard — current status expected before the move. }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/ask:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: askWork
+      tags: [work]
+      summary: Park an item in awaiting-human with a question (wraps `fgos ask`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/answer:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: answerWork
+      tags: [work]
+      summary: Answer a parked question and resume the item (wraps `fgos answer`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+                approve: { type: boolean, description: "Explicit approval signal for consent gates. When true, forwards --approve to fgos answer." }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/take:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: takeWork
+      tags: [work]
+      summary: Claim an item through the pull door (wraps `fgos take`/`fgos pick`)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [human, session]
+                  default: session
+                  description: |
+                    take --role's real, deliberately-scoped vocabulary
+                    (bin/fgos.mjs's own S2-pull D1) — the pull door
+                    excludes the runner role by design, not by omission.
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/return:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: returnWork
+      tags: [work]
+      summary: Complete a take — run verify, advance to awaiting-approval (wraps `fgos return`)
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/approve:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: approveWork
+      tags: [work]
+      summary: Merge an awaiting-approval item and move it to delivered (wraps `fgos approve`)
+      description: "Carries `externalEffect: true` in the CLI's own verb registry (may open/merge a real PR) — same meaning here."
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/reject:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: rejectWork
+      tags: [work]
+      summary: Reject an awaiting-approval item back to todo (wraps `fgos reject`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /ready:
+    get:
+      operationId: listReady
+      tags: [frontier]
+      summary: The frontier — items ready to be taken right now (wraps `fgos ready`)
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /rollup/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: rollupWork
+      tags: [frontier]
+      summary: Progress rollup of one root/goalTier item's children (wraps `fgos rollup`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Rollup shape, opaque to this contract — see docs/specs/work-state.md. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /graph:
+    get:
+      operationId: workGraph
+      tags: [frontier]
+      summary: Work-graph metrics — connected components, critical path (wraps `fgos graph`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Graph metrics shape, opaque to this contract. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /state/digest:
+    get:
+      operationId: stateDigest
+      tags: [frontier]
+      summary: Cheap-poll digest — `data_hash` + `generated_at` only, no `data` body
+      description: |
+        The poll-driven half of 0014's "poll `fgos list`/`rollup` +
+        `data_hash`" pattern: a client holds the last `data_hash` it saw
+        and calls this endpoint on an interval; a changed hash is the
+        only signal needed to decide whether to re-fetch a full read
+        endpoint. This is a genuinely new route (no CLI verb returns only
+        the digest today) — it exists so a client never has to pay the
+        cost of a full `fgos list` just to learn nothing changed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [contract, generated_at, data_hash]
+                properties:
+                  contract: { type: string, const: fgos.v1 }
+                  generated_at: { type: string, format: date-time }
+                  data_hash: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions:
+    post:
+      operationId: startSession
+      tags: [orchestration]
+      summary: Open an interactive session worktree (wraps `fgos session start`)
+      description: |
+        Interactive-session half of 0014's orchestration scope — what a
+        herdr/TUI pane does today by shelling out directly. A future
+        web/desktop client drives the same lifecycle through this route
+        instead of spawning its own git worktree.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item: { type: string, description: Optional work item id to open the session against. }
+      responses:
+        '200':
+          description: Session opened
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Session' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: endSession
+      tags: [orchestration]
+      summary: Close an interactive session worktree (wraps `fgos session end`)
+      parameters:
+        - name: force
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Session closed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}/slots:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: sessionSlots
+      tags: [orchestration]
+      summary: Worker-slot occupancy for one session (wraps `fgos slots`, session-scoped)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          execution:
+                            type: object
+                            properties:
+                              occupied: { type: integer }
+                              items:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id: { type: string }
+                                    sessionId: { type: string }
+                                    claimRole: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /runner/tick:
+    post:
+      operationId: runnerTick
+      tags: [orchestration]
+      summary: Drive one headless-runner cycle (wraps `fgos-runner --once`)
+      description: |
+        Headless half of 0014's orchestration scope: gather-back, find
+        work, dispatch it through its full "One vong --once" lifecycle
+        (docs/specs/runner.md), and return once that cycle's own outcome
+        is settled. A `--watch`-equivalent continuous mode is deliberately
+        NOT exposed here in v1 — a long-lived HTTP request modeling a
+        long-lived poll loop is a scope decision for the daemon
+        implementation item, not something this contract should force by
+        assuming a streaming transport (SSE/WebSocket) that 0014 never
+        locked.
+      responses:
+        '200':
+          description: Cycle completed (including "nothing to do")
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          dispatched: { type: array, items: { type: string }, description: Work item ids touched this cycle. }
+        '429':
+          description: Runner busy (mirrors CLI `EXIT_BUSY`, category `busy`).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    # tsk-4qf: matches require_token's own real enforcement (D4) -- one
+    # shared token per machine, read from ~/.fgos/config.json's
+    # gateway.token, checked as a plain Bearer header (not a per-user
+    # credential; see this document's own top-level "Identity here is
+    # ATTRIBUTION, not authentication" note).
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        The one shared per-machine token (D4). Every route below this
+        component list requires it except `/contract`, which overrides
+        with its own `security: []`.
+  parameters:
+    WorkId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+      description: Work item id.
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+      description: Opaque cursor from a prior page's `nextCursor`. Never hand-constructed by a client.
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1 }
+  responses:
+    WorkOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data: { $ref: '#/components/schemas/WorkItem' }
+    Error:
+      description: |
+        Any non-2xx. Never bodied by the plain `fgos.v1` envelope — branch
+        on HTTP status + this body's `category`, never on `message` text
+        (docs/io-contract.md: "Consumer re nhanh theo ma thoat pham tru,
+        khong bao gio theo thong diep" — the same rule, ported to HTTP).
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  schemas:
+    Envelope:
+      type: object
+      required: [contract, generated_at, data_hash, data]
+      properties:
+        contract: { type: string, const: fgos.v1 }
+        generated_at: { type: string, format: date-time }
+        data_hash: { type: string }
+        data: {}
+      description: CTR001's envelope, reused verbatim as the HTTP body (see this contract's top-level description).
+
+    Page:
+      type: object
+      properties:
+        nextCursor:
+          type: string
+          nullable: true
+          description: Opaque; null once the set is exhausted. Only present when `cursor`/`limit` was passed.
+
+    WorkItem:
+      type: object
+      description: |
+        Subset of the work-item shape stable enough to publish here; the
+        authoritative shape is docs/specs/work-state.md (schema version
+        carried in the event log per decision 0007, not duplicated here
+        per 0011's own rule against re-deriving a schema this contract
+        does not own).
+      required: [id, title, kind, status]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        status: { type: string }
+        workflowStep: { type: string }
+        tier: { type: string }
+        risk: { type: string }
+        domain: { type: string }
+        parent: { type: string, nullable: true }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        verify: { type: string }
+        docsRef: { type: string, nullable: true, description: "Path under docs/history/ -- content readable via GET /work/{id}/docs (tsk-4id)." }
+
+    WorkDetail:
+      type: object
+      description: |
+        `GET /work/{id}`'s real `data` shape (tsk-4id, corrected from a
+        stale `WorkItem`-only reference -- this endpoint's own summary
+        already said "plus every log scoped to just this id"). Every
+        sub-shape below is `type: object` with `additionalProperties: true`
+        rather than fully enumerated: these are the raw work-state logs
+        (`docs/specs/work-state.md` is their authoritative shape per
+        0011's own rule against re-deriving a schema this contract does
+        not own), and the task-detail screen (tsk-4id) reads only a named
+        few real keys from each (documented per-property below) rather
+        than this contract asserting an exhaustive shape it would then
+        have to keep in lockstep with every future log field.
+      required: [work]
+      properties:
+        work: { $ref: '#/components/schemas/WorkItem' }
+        discovery: { type: array, items: { type: object }, description: Verdict history for this item's discovery stage. }
+        decisions:
+          type: array
+          description: The machine decision log -- NOT the primary "what the agent did" account (that is GET /work/{id}/docs's CONTEXT.md/plan.md); shown collapsed behind a disclosure, per its own count.
+          items: { type: object }
+        gates:
+          type: object
+          description: |
+            Keyed by gate name (`contextApprove`/`planApprove`/
+            `validateApprove`, each `{actor, at, verify}` when present)
+            PLUS the ask/answer-parking fields on the SAME object:
+            `ask` (string, most recent question), `askHistory` (string
+            array, oldest-first, every question this item was ever
+            parked with), `answer` (string, most recent answer),
+            `statusAtAsk` (string, the status the item was in when most
+            recently parked).
+          additionalProperties: true
+        outcome: { type: object }
+        friction: { type: object }
+        settlement:
+          type: object
+          description: |
+            `count` (integer, the TRUE total) and `recent` (array, capped
+            at 5 most-recent-first entries across every settlement kind --
+            `SETTLEMENT_DISPLAY_CAP`. Each entry: `{kind, role, ts,
+            detail, id}`; `kind: "answer"` entries are what pairs
+            positionally with `gates.askHistory`, oldest-available-first
+            after reversing `recent`'s own newest-first order). A round
+            older than the 5-answer window has no entry here at all --
+            this is a real, load-bearing cap, not a client-side choice.
+          properties:
+            count: { type: integer }
+            recent: { type: array, items: { type: object } }
+        learning: { type: object, nullable: true }
+
+    EditableWorkFields:
+      type: object
+      description: |
+        tsk-41h: `PATCH /work/{id}`'s request body -- every field
+        `src/state/store.mjs`'s `EDITABLE_FIELDS` allows `fgos edit` to
+        change (25 entries, read directly from that constant, never
+        re-guessed). All optional; only fields present in the body are
+        patched. `id`/`status`/`domain`/`workflowStep` are never editable through
+        this route (`status` moves only through `/work/{id}/move`,
+        `workflowStep`/`domain` only through the engine's own step
+        transitions -- neither is in `EDITABLE_FIELDS`).
+      properties:
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        risk: { type: string }
+        verify: { type: string }
+        tier: { type: string }
+        refs: { type: array, items: { type: string } }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        acceptance:
+          type: array
+          description: Replaces the whole array (latest-wins), never a deep merge. Each clause is `{text, evidence}`.
+          items: { type: object }
+        priority: { type: integer }
+        intent: { type: integer }
+        docsRef: { type: string, description: "Non-empty path, or omit to leave unchanged. There is no clear-to-empty form on this route." }
+        parent: { type: string, nullable: true, description: "Empty string clears (un-parents) the item." }
+        urgent:
+          type: string
+          enum: [low, medium, high, critical]
+          description: "Despite the name, a string enum (confirmed via a live `fgos edit --urgent` smoke test: the literal boolean `true` is rejected by the engine), not a boolean flag."
+        impact: { type: number }
+        effort: { type: number }
+        action: { type: string, description: "Action directive prose." }
+        mergeAfter: { type: array, items: { type: string } }
+        supersededBy: { type: string, nullable: true, description: "Empty string clears." }
+        duplicates: { type: array, items: { type: string } }
+        domainFields:
+          type: object
+          description: Replaces the whole object (latest-wins) for the item's `domain`, never a deep merge of nested keys.
+        goalTier: { type: string, description: "'mvp' or 'milestone'." }
+        nextOperation: { type: string, nullable: true, description: "Next recommended stage operation or fix operation. Empty string or null clears." }
+        secondaryOperation: { type: string, nullable: true, description: "Active secondary consult/review operation. Empty string or null clears." }
+
+    Session:
+      type: object
+      required: [sessionId, worktree, branch]
+      properties:
+        sessionId: { type: string }
+        worktree: { type: string }
+        branch: { type: string }
+        item: { type: string, nullable: true }
+
+    ErrorEnvelope:
+      type: object
+      required: [category]
+      properties:
+        category:
+          type: string
+          description: |
+            The one CLOSED taxonomy CTR001 already defines
+            (src/state/store.mjs's EXIT_CODES + loop.mjs's EXIT_BUSY) —
+            this gateway adds no categories of its own:
+          enum:
+            - precondition
+            - conflict
+            - validation
+            - corrupt-log
+            - lock-timeout
+            - session-fail
+            - merge-fail
+            - busy
+            - unexpected
+        message:
+          type: string
+          description: Human-readable diagnostic. Never machine-branched on — `category` is the only field a client should switch on.
+        exitCode:
+          type: integer
+          description: The underlying CLI exit code this category maps from, carried through for parity with docs/io-contract.md.
+```
+
+Group accounting only: no source claim is being approved by this entry.
+## duplicate-group-2
+
+Entry kind: group-accounting
+Class: Judgment
+Source digest: c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85
+Target digest: c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85
+
+```json
+{
+  "blobSha": "e923fa822dadf885952546d50b29fa88f352147e",
+  "paths": [
+    "docs/architecture-manifest.json",
+    "docs/platform/contracts/architecture-manifest.json"
+  ],
+  "authoredBy": "codex-session:23@2026-10-14",
+  "reviewStatus": "pending",
+  "resolution": "One mapped platform owner; preserve the legacy source until atomic cutover.",
+  "rule": "Whole-file byte equality establishes one payload; the frozen root map and accepted source decision establish its sole platform owner. Consumer rewrite and historical lookup use that owner; no second authority is inferred from a retained source copy.",
+  "owner": "docs/platform/contracts/architecture-manifest.json",
+  "sourceClaimId": "claim_4b96f4f42ea417623dcc794155fa17ce",
+  "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+  "targetUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-source-completion-02.md",
+  "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3",
+  "rationale": "Existing independent review accepted exact group membership and payload carriage. This pending resolution projection records the sole owner and a cutover done condition; no source deletion or authority switch occurs.",
+  "doneCondition": "Independent acceptance of this projection, all inbound mutable consumers rewritten or explicitly queued, immutable references covered by reviewed aliases, and atomic cutover retirement of the legacy source."
+}
+```
+```json
+{
+  "blobSha": "e923fa822dadf885952546d50b29fa88f352147e",
+  "paths": [
+    "docs/architecture-manifest.json",
+    "docs/platform/contracts/architecture-manifest.json"
+  ]
+}
+```
+
+Complete duplicate member: `docs/architecture-manifest.json#(whole file)`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: not a native unit; full-file hash below
+Shown text SHA256: c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85
+Git blob: e923fa822dadf885952546d50b29fa88f352147e
+
+```text
+{
+  "contract": "architecture-manifest.v1",
+  "map": "docs/architecture-map.md",
+  "layers": [
+    "entry",
+    "use-case",
+    "infra",
+    "domain",
+    "kernel"
+  ],
+  "rules": [
+    "one-directional-layer",
+    "domain-siloing"
+  ],
+  "components": [
+    "packaging-distribution"
+  ],
+  "domains": [
+    "coding",
+    "marketing"
+  ],
+  "files": {
+    "bin/fgos.mjs": "entry",
+    "bin/fgos-runner.mjs": "entry",
+    "src/runner/loop.mjs": "use-case",
+    "src/runner/paths.mjs": "infra",
+    "src/runner/dispatch.mjs": "infra",
+    "src/runner/operation-capability.mjs": "domain",
+    "src/runner/rigor.mjs": "kernel",
+    "src/runner/dispatch-log.mjs": "infra",
+    "src/runner/fanout-batch.mjs": "infra",
+    "src/runner/work-compat.mjs": "infra",
+    "src/runner/dispatch/adapters.mjs": "infra",
+    "src/runner/dispatch/config.mjs": "infra",
+    "src/runner/dispatch/confinement/policies.mjs": "infra",
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
+    "src/runner/dispatch/confinement/backend-registry.mjs": "infra",
+    "src/runner/dispatch/confinement/authority.mjs": "infra",
+    "src/runner/dispatch/confinement/request.mjs": "infra",
+    "src/runner/dispatch/confinement/resources.mjs": "infra",
+    "src/runner/dispatch/confinement/cleanup.mjs": "infra",
+    "src/runner/dispatch/confinement/attestation-store.mjs": "infra",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "infra",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "infra",
+    "src/runner/dispatch/resolve.mjs": "infra",
+    "src/runner/dispatch/mechanism.mjs": "infra",
+    "src/runner/dispatch/plan.mjs": "infra",
+    "src/runner/dispatch/transport.mjs": "infra",
+    "src/runner/dispatch/prepare.mjs": "infra",
+    "src/runner/dispatch/result-ladder.mjs": "infra",
+    "src/runner/dispatch/assignment.mjs": "infra",
+    "src/runner/dispatch/assignment-layout.mjs": "infra",
+    "src/runner/dispatch/assignment-normalizer.mjs": "infra",
+    "src/runner/dispatch/execution-contract.mjs": "infra",
+    "src/runner/dispatch/effective-execution-contract.mjs": "infra",
+    "src/runner/dispatch/agent-result-claim-contract.mjs": "infra",
+    "src/runner/dispatch/evidence-attribution.mjs": "infra",
+    "src/runner/dispatch/run-result.mjs": "infra",
+    "src/runner/dispatch/usage-parsers.mjs": "infra",
+    "src/runner/dispatch/runtime-inspection.mjs": "infra",
+    "src/runner/dispatch/reconciliation-planner.mjs": "infra",
+    "src/runner/dispatch/assignment-policy.mjs": "infra",
+    "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
+    "src/runner/dispatch/provider-adapter.mjs": "infra",
+    "src/runner/dispatch/provider-capacity.mjs": "infra",
+    "src/runner/dispatch/provider-auth-failure.mjs": "infra",
+    "src/runner/dispatch/provider-credential-probe.mjs": "infra",
+    "src/runner/dispatch/provider-account-probe.mjs": "infra",
+    "src/runner/dispatch/provider-credential-renewal.mjs": "infra",
+    "src/runner/dispatch/assignment-runner.mjs": "infra",
+    "src/runner/dispatch/settlement.mjs": "infra",
+    "src/runner/dispatch/reconcile-cli-spawn.mjs": "infra",
+    "src/runner/dispatch/cli.mjs": "infra",
+    "src/runner/dispatch/detached-run-supervisor.mjs": "infra",
+    "src/runner/prompt-templates.mjs": "infra",
+    "src/runner/worker-log.mjs": "infra",
+    "src/runner/agent-roster.mjs": "infra",
+    "src/runner/agent-definitions.mjs": "infra",
+    "src/runner/agent-listing.mjs": "infra",
+    "src/runner/worktree.mjs": "infra",
+    "src/runner/promote-preflight.mjs": "infra",
+    "src/runner/promote-engine.mjs": "infra",
+    "src/runner/session.mjs": "infra",
+    "src/runner/gateway-control.mjs": "infra",
+    "src/runner/goal-check.mjs": "infra",
+    "src/runner/iron-law-gate.mjs": "infra",
+    "src/runner/frozen-judge.mjs": "domain",
+    "src/runner/merge.mjs": "infra",
+    "src/runner/main-checkout-lock.mjs": "infra",
+    "src/runner/main-checkout-reset-guard.mjs": "infra",
+    "src/runner/github-adapter.mjs": "infra",
+    "src/state/drift-status.mjs": "infra",
+    "src/state/postland-drift.mjs": "infra",
+    "src/state/store.mjs": "infra",
+    "src/state/gate-bypass.mjs": "infra",
+    "src/state/cursor.mjs": "use-case",
+    "src/state/porting-store.mjs": "infra",
+    "src/state/tool-registry.mjs": "domain",
+    "src/install/coexist.mjs": "infra",
+    "src/runner/recovery.mjs": "domain",
+    "src/runner/anti-loop.mjs": "domain",
+    "src/runner/attestation-guard.mjs": "domain",
+    "src/runner/claim-port.mjs": "infra",
+    "src/runner/claim-liveness.mjs": "infra",
+    "src/runner/lock-wait.mjs": "infra",
+    "src/runner/write-queue.mjs": "domain",
+    "src/runner/root-affinity.mjs": "domain",
+    "src/state/status-fsm.mjs": "domain",
+    "src/state/decision-question.mjs": "domain",
+    "src/state/handoff.mjs": "domain",
+    "src/state/porting.mjs": "domain",
+    "src/state/frontier.mjs": "domain",
+    "src/state/impact.mjs": "domain",
+    "src/state/priority-formula.mjs": "domain",
+    "src/state/replay.mjs": "domain",
+    "src/state/events-compaction.mjs": "domain",
+    "src/state/dep-graph.mjs": "domain",
+    "src/state/graph-harness.mjs": "domain",
+    "src/state/graph-metrics.mjs": "domain",
+    "src/state/awaiting-context.mjs": "domain",
+    "src/state/cleanup-harness.mjs": "domain",
+    "src/state/cleanup-pool.mjs": "domain",
+    "src/state/discover-pool.mjs": "domain",
+    "src/state/plan-pool.mjs": "domain",
+    "src/state/retro-pool.mjs": "domain",
+    "src/state/retrospective-doors.mjs": "domain",
+    "src/state/worker-slots.mjs": "domain",
+    "src/intake/discovery.mjs": "use-case",
+    "src/intake/plan.mjs": "use-case",
+    "src/intake/plan-verdict-from-plan-md.mjs": "use-case",
+    "src/intake/verify-pattern-check.mjs": "kernel",
+    "src/cli/command-registry.mjs": "kernel",
+    "src/cli/deprecation.mjs": "kernel",
+    "src/cli/version.mjs": "kernel",
+    "src/cli/invocation-fault-log.mjs": "infra",
+    "src/cli/approve-fault-log.mjs": "infra",
+    "src/report/enduser-index.mjs": "domain",
+    "src/report/enduser-index-generate.mjs": "infra",
+    "src/report/decision-index.mjs": "infra",
+    "src/report/capability-plan-lint.mjs": "infra",
+    "src/report/context-render.mjs": "domain",
+    "src/report/frontmatter.mjs": "domain",
+    "src/report/authoritative-match.mjs": "domain",
+    "src/evolve/iron-law.mjs": "domain",
+    "src/state/events.mjs": "kernel",
+    "src/state/events-jsonl-truncation-guard.mjs": "kernel",
+    "src/state/main-checkout-guard-warnings.mjs": "kernel",
+    "src/state/work.mjs": "kernel",
+    "src/state/envelope.mjs": "kernel",
+    "src/intake/risk-keywords.mjs": "kernel",
+    "src/verbs/merge/merge.mjs": "use-case",
+    "src/verbs/merge/iron-law-level.mjs": "use-case",
+    "src/verbs/merge/approve.mjs": "use-case",
+    "src/verbs/merge/review.mjs": "use-case",
+    "src/verbs/merge/sync-root.mjs": "use-case",
+    "src/verbs/merge/catchup.mjs": "use-case",
+    "src/verbs/merge/reject.mjs": "use-case",
+    "src/verbs/merge/promote-to-component.mjs": "use-case",
+    "src/verbs/state/edit.mjs": "use-case",
+    "src/verbs/state/move.mjs": "use-case",
+    "src/verbs/state/read.mjs": "use-case",
+    "src/verbs/dispatch/show-run.mjs": "use-case",
+    "src/verbs/dispatch/inspect.mjs": "use-case",
+    "src/verbs/dispatch/reconcile.mjs": "use-case",
+    "src/verbs/dispatch/watch.mjs": "use-case",
+    "src/verbs/dispatch/recover.mjs": "use-case",
+    "src/report/item-trace.mjs": "domain",
+    "src/util/format-bytes.mjs": "kernel",
+    "src/util/format-duration.mjs": "kernel",
+    "src/util/normalize-path.mjs": "kernel",
+    "src/util/release-binary-path.mjs": "kernel",
+    "src/util/release-targets.mjs": "kernel",
+    "src/util/session-identity.mjs": "kernel",
+    "src/util/unique-tmp-tag.mjs": "kernel",
+    "src/util/host-bin.mjs": "infra",
+    "src/convention/convention-client.mjs": "infra",
+    "src/observe/friction-client.mjs": "infra",
+    "src/intake/classify.mjs": "use-case",
+    "src/setup/ansi.mjs": "domain",
+    "src/setup/config-merge.mjs": "domain",
+    "src/setup/shell-rc.mjs": "infra",
+    "src/setup/project-launcher.mjs": "infra",
+    "src/setup/bin-discovery.mjs": "infra",
+    "src/setup/skill-wrappers.mjs": "infra",
+    "src/setup/instruction-registry.mjs": "infra",
+    "src/setup/git-hooks.mjs": "infra",
+    "src/setup/claude-code-hooks.mjs": "infra",
+    "src/setup/agent-hooks.mjs": "infra",
+    "src/setup/agy-permissions.mjs": "infra",
+    "src/setup/agent-cli-trust.mjs": "infra",
+    "src/setup/blind-steps-proven-pools.mjs": "use-case",
+    "src/setup/workflow-pool-independence.mjs": "use-case",
+    "src/setup/checks.mjs": "use-case",
+    "src/setup/executor-profile-warnings.mjs": "infra",
+    "src/config/global-config.mjs": "infra",
+    "src/setup/registrations.mjs": "use-case",
+    "src/config/shared-config-file.mjs": "domain",
+    "src/state/knowledge-registry.mjs": "domain",
+    "src/report/knowledge-resolver.mjs": "domain",
+    "src/report/knowledge-projection.mjs": "domain",
+    "src/state/fgos-file-registry.mjs": "kernel",
+    "src/state/runtime-coordination.mjs": "infra",
+    "src/runner/dispatch/brief.mjs": "infra",
+    "src/runner/dispatch/dispatch-error.mjs": "infra",
+    "src/runner/dispatch/proof-helpers.mjs": "infra",
+    "src/runner/dispatch/herdr-agent.mjs": "infra",
+    "src/runner/dispatch/herdr-diagnosis.mjs": "infra",
+    "src/runner/dispatch/herdr-round.mjs": "infra",
+    "src/runner/dispatch/herdr-reconcile.mjs": "infra",
+    "src/runner/dispatch/worker-artifacts.mjs": "infra",
+    "src/runner/dispatch/liveness.mjs": "infra",
+    "src/runner/dispatch/visibility-session.mjs": "infra",
+    "src/runner/dispatch/recovery-planner.mjs": "infra",
+    "src/runner/dispatch/run-lock.mjs": "infra",
+    "src/runner/dispatch/process-identity.mjs": "infra",
+    "src/runner/dispatch/trust-store.mjs": "infra",
+    "src/runner/dispatch/worker-home.mjs": "infra",
+    "src/runner/dispatch/stop-processes-inside.mjs": "infra",
+    "src/runner/dispatch/worker-session.mjs": "infra",
+    "src/runner/dispatch/worker-session-boot.mjs": "infra",
+    "src/runner/dispatch/recovery.mjs": "infra",
+    "src/setup/instruction-composition.mjs": "infra",
+    "src/setup/instruction-projections.mjs": "infra",
+    "src/runner/execution/unit.mjs": "infra",
+    "src/runner/execution/bind.mjs": "infra",
+    "src/runner/execution/account-rotation.mjs": "infra",
+    "src/runner/execution/dry-bind.mjs": "infra",
+    "src/runner/execution/role-ledger.mjs": "infra",
+    "src/runner/execution/commit-unit-work.mjs": "infra",
+    "src/runner/execution/handoff-refs.mjs": "infra",
+    "src/runner/execution/unit-run-history.mjs": "infra",
+    "src/runner/execution/unit-summary.mjs": "infra",
+    "src/runner/execution/run.mjs": "use-case",
+    "src/runner/execution/patterns/index.mjs": "domain",
+    "src/runner/execution/patterns/panel.mjs": "domain",
+    "src/runner/execution/patterns/presets.mjs": "domain",
+    "src/runner/execution/patterns/reviewed.mjs": "domain",
+    "src/runner/execution/patterns/role-tasks.mjs": "domain",
+    "src/runner/execution/patterns/solo.mjs": "domain",
+    "src/workflow/definition.mjs": "kernel",
+    "src/workflow/dir-guard.mjs": "infra",
+    "src/workflow/loader.mjs": "infra",
+    "src/workflow/store.mjs": "infra",
+    "src/workflow/integrate.mjs": "infra",
+    "src/workflow/plan-source.mjs": "infra",
+    "src/workflow/runner.mjs": "use-case",
+    "src/workflow/index.mjs": "use-case",
+    "src/workflow/checked.mjs": "infra",
+    "src/workflow/ref-digests.mjs": "infra",
+    "src/workflow/seat-providers.mjs": "infra",
+    "src/workflow/seats.mjs": "infra",
+    "src/workflow/steps.mjs": "kernel",
+    "src/state/domain-registry.mjs": "kernel",
+    "src/state/step-fsm.mjs": "domain",
+    "src/verbs/state/step.mjs": "use-case",
+    "src/runner/operation-choice.mjs": "use-case",
+    "src/runner/work-dispatch.mjs": "infra"
+  }
+}
+```
+
+Complete duplicate member: `docs/platform/contracts/architecture-manifest.json#(whole file)`
+Commit: a125b4ec0ab4dc4717488c60f0dd305054c6f022
+Native unit SHA256: not a native unit; full-file hash below
+Shown text SHA256: c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85
+Git blob: e923fa822dadf885952546d50b29fa88f352147e
+
+```text
+{
+  "contract": "architecture-manifest.v1",
+  "map": "docs/architecture-map.md",
+  "layers": [
+    "entry",
+    "use-case",
+    "infra",
+    "domain",
+    "kernel"
+  ],
+  "rules": [
+    "one-directional-layer",
+    "domain-siloing"
+  ],
+  "components": [
+    "packaging-distribution"
+  ],
+  "domains": [
+    "coding",
+    "marketing"
+  ],
+  "files": {
+    "bin/fgos.mjs": "entry",
+    "bin/fgos-runner.mjs": "entry",
+    "src/runner/loop.mjs": "use-case",
+    "src/runner/paths.mjs": "infra",
+    "src/runner/dispatch.mjs": "infra",
+    "src/runner/operation-capability.mjs": "domain",
+    "src/runner/rigor.mjs": "kernel",
+    "src/runner/dispatch-log.mjs": "infra",
+    "src/runner/fanout-batch.mjs": "infra",
+    "src/runner/work-compat.mjs": "infra",
+    "src/runner/dispatch/adapters.mjs": "infra",
+    "src/runner/dispatch/config.mjs": "infra",
+    "src/runner/dispatch/confinement/policies.mjs": "infra",
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
+    "src/runner/dispatch/confinement/backend-registry.mjs": "infra",
+    "src/runner/dispatch/confinement/authority.mjs": "infra",
+    "src/runner/dispatch/confinement/request.mjs": "infra",
+    "src/runner/dispatch/confinement/resources.mjs": "infra",
+    "src/runner/dispatch/confinement/cleanup.mjs": "infra",
+    "src/runner/dispatch/confinement/attestation-store.mjs": "infra",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "infra",
+    "src/runner/dispatch/confinement/probes/harness.mjs": "infra",
+    "src/runner/dispatch/resolve.mjs": "infra",
+    "src/runner/dispatch/mechanism.mjs": "infra",
+    "src/runner/dispatch/plan.mjs": "infra",
+    "src/runner/dispatch/transport.mjs": "infra",
+    "src/runner/dispatch/prepare.mjs": "infra",
+    "src/runner/dispatch/result-ladder.mjs": "infra",
+    "src/runner/dispatch/assignment.mjs": "infra",
+    "src/runner/dispatch/assignment-layout.mjs": "infra",
+    "src/runner/dispatch/assignment-normalizer.mjs": "infra",
+    "src/runner/dispatch/execution-contract.mjs": "infra",
+    "src/runner/dispatch/effective-execution-contract.mjs": "infra",
+    "src/runner/dispatch/agent-result-claim-contract.mjs": "infra",
+    "src/runner/dispatch/evidence-attribution.mjs": "infra",
+    "src/runner/dispatch/run-result.mjs": "infra",
+    "src/runner/dispatch/usage-parsers.mjs": "infra",
+    "src/runner/dispatch/runtime-inspection.mjs": "infra",
+    "src/runner/dispatch/reconciliation-planner.mjs": "infra",
+    "src/runner/dispatch/assignment-policy.mjs": "infra",
+    "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
+    "src/runner/dispatch/provider-adapter.mjs": "infra",
+    "src/runner/dispatch/provider-capacity.mjs": "infra",
+    "src/runner/dispatch/provider-auth-failure.mjs": "infra",
+    "src/runner/dispatch/provider-credential-probe.mjs": "infra",
+    "src/runner/dispatch/provider-account-probe.mjs": "infra",
+    "src/runner/dispatch/provider-credential-renewal.mjs": "infra",
+    "src/runner/dispatch/assignment-runner.mjs": "infra",
+    "src/runner/dispatch/settlement.mjs": "infra",
+    "src/runner/dispatch/reconcile-cli-spawn.mjs": "infra",
+    "src/runner/dispatch/cli.mjs": "infra",
+    "src/runner/dispatch/detached-run-supervisor.mjs": "infra",
+    "src/runner/prompt-templates.mjs": "infra",
+    "src/runner/worker-log.mjs": "infra",
+    "src/runner/agent-roster.mjs": "infra",
+    "src/runner/agent-definitions.mjs": "infra",
+    "src/runner/agent-listing.mjs": "infra",
+    "src/runner/worktree.mjs": "infra",
+    "src/runner/promote-preflight.mjs": "infra",
+    "src/runner/promote-engine.mjs": "infra",
+    "src/runner/session.mjs": "infra",
+    "src/runner/gateway-control.mjs": "infra",
+    "src/runner/goal-check.mjs": "infra",
+    "src/runner/iron-law-gate.mjs": "infra",
+    "src/runner/frozen-judge.mjs": "domain",
+    "src/runner/merge.mjs": "infra",
+    "src/runner/main-checkout-lock.mjs": "infra",
+    "src/runner/main-checkout-reset-guard.mjs": "infra",
+    "src/runner/github-adapter.mjs": "infra",
+    "src/state/drift-status.mjs": "infra",
+    "src/state/postland-drift.mjs": "infra",
+    "src/state/store.mjs": "infra",
+    "src/state/gate-bypass.mjs": "infra",
+    "src/state/cursor.mjs": "use-case",
+    "src/state/porting-store.mjs": "infra",
+    "src/state/tool-registry.mjs": "domain",
+    "src/install/coexist.mjs": "infra",
+    "src/runner/recovery.mjs": "domain",
+    "src/runner/anti-loop.mjs": "domain",
+    "src/runner/attestation-guard.mjs": "domain",
+    "src/runner/claim-port.mjs": "infra",
+    "src/runner/claim-liveness.mjs": "infra",
+    "src/runner/lock-wait.mjs": "infra",
+    "src/runner/write-queue.mjs": "domain",
+    "src/runner/root-affinity.mjs": "domain",
+    "src/state/status-fsm.mjs": "domain",
+    "src/state/decision-question.mjs": "domain",
+    "src/state/handoff.mjs": "domain",
+    "src/state/porting.mjs": "domain",
+    "src/state/frontier.mjs": "domain",
+    "src/state/impact.mjs": "domain",
+    "src/state/priority-formula.mjs": "domain",
+    "src/state/replay.mjs": "domain",
+    "src/state/events-compaction.mjs": "domain",
+    "src/state/dep-graph.mjs": "domain",
+    "src/state/graph-harness.mjs": "domain",
+    "src/state/graph-metrics.mjs": "domain",
+    "src/state/awaiting-context.mjs": "domain",
+    "src/state/cleanup-harness.mjs": "domain",
+    "src/state/cleanup-pool.mjs": "domain",
+    "src/state/discover-pool.mjs": "domain",
+    "src/state/plan-pool.mjs": "domain",
+    "src/state/retro-pool.mjs": "domain",
+    "src/state/retrospective-doors.mjs": "domain",
+    "src/state/worker-slots.mjs": "domain",
+    "src/intake/discovery.mjs": "use-case",
+    "src/intake/plan.mjs": "use-case",
+    "src/intake/plan-verdict-from-plan-md.mjs": "use-case",
+    "src/intake/verify-pattern-check.mjs": "kernel",
+    "src/cli/command-registry.mjs": "kernel",
+    "src/cli/deprecation.mjs": "kernel",
+    "src/cli/version.mjs": "kernel",
+    "src/cli/invocation-fault-log.mjs": "infra",
+    "src/cli/approve-fault-log.mjs": "infra",
+    "src/report/enduser-index.mjs": "domain",
+    "src/report/enduser-index-generate.mjs": "infra",
+    "src/report/decision-index.mjs": "infra",
+    "src/report/capability-plan-lint.mjs": "infra",
+    "src/report/context-render.mjs": "domain",
+    "src/report/frontmatter.mjs": "domain",
+    "src/report/authoritative-match.mjs": "domain",
+    "src/evolve/iron-law.mjs": "domain",
+    "src/state/events.mjs": "kernel",
+    "src/state/events-jsonl-truncation-guard.mjs": "kernel",
+    "src/state/main-checkout-guard-warnings.mjs": "kernel",
+    "src/state/work.mjs": "kernel",
+    "src/state/envelope.mjs": "kernel",
+    "src/intake/risk-keywords.mjs": "kernel",
+    "src/verbs/merge/merge.mjs": "use-case",
+    "src/verbs/merge/iron-law-level.mjs": "use-case",
+    "src/verbs/merge/approve.mjs": "use-case",
+    "src/verbs/merge/review.mjs": "use-case",
+    "src/verbs/merge/sync-root.mjs": "use-case",
+    "src/verbs/merge/catchup.mjs": "use-case",
+    "src/verbs/merge/reject.mjs": "use-case",
+    "src/verbs/merge/promote-to-component.mjs": "use-case",
+    "src/verbs/state/edit.mjs": "use-case",
+    "src/verbs/state/move.mjs": "use-case",
+    "src/verbs/state/read.mjs": "use-case",
+    "src/verbs/dispatch/show-run.mjs": "use-case",
+    "src/verbs/dispatch/inspect.mjs": "use-case",
+    "src/verbs/dispatch/reconcile.mjs": "use-case",
+    "src/verbs/dispatch/watch.mjs": "use-case",
+    "src/verbs/dispatch/recover.mjs": "use-case",
+    "src/report/item-trace.mjs": "domain",
+    "src/util/format-bytes.mjs": "kernel",
+    "src/util/format-duration.mjs": "kernel",
+    "src/util/normalize-path.mjs": "kernel",
+    "src/util/release-binary-path.mjs": "kernel",
+    "src/util/release-targets.mjs": "kernel",
+    "src/util/session-identity.mjs": "kernel",
+    "src/util/unique-tmp-tag.mjs": "kernel",
+    "src/util/host-bin.mjs": "infra",
+    "src/convention/convention-client.mjs": "infra",
+    "src/observe/friction-client.mjs": "infra",
+    "src/intake/classify.mjs": "use-case",
+    "src/setup/ansi.mjs": "domain",
+    "src/setup/config-merge.mjs": "domain",
+    "src/setup/shell-rc.mjs": "infra",
+    "src/setup/project-launcher.mjs": "infra",
+    "src/setup/bin-discovery.mjs": "infra",
+    "src/setup/skill-wrappers.mjs": "infra",
+    "src/setup/instruction-registry.mjs": "infra",
+    "src/setup/git-hooks.mjs": "infra",
+    "src/setup/claude-code-hooks.mjs": "infra",
+    "src/setup/agent-hooks.mjs": "infra",
+    "src/setup/agy-permissions.mjs": "infra",
+    "src/setup/agent-cli-trust.mjs": "infra",
+    "src/setup/blind-steps-proven-pools.mjs": "use-case",
+    "src/setup/workflow-pool-independence.mjs": "use-case",
+    "src/setup/checks.mjs": "use-case",
+    "src/setup/executor-profile-warnings.mjs": "infra",
+    "src/config/global-config.mjs": "infra",
+    "src/setup/registrations.mjs": "use-case",
+    "src/config/shared-config-file.mjs": "domain",
+    "src/state/knowledge-registry.mjs": "domain",
+    "src/report/knowledge-resolver.mjs": "domain",
+    "src/report/knowledge-projection.mjs": "domain",
+    "src/state/fgos-file-registry.mjs": "kernel",
+    "src/state/runtime-coordination.mjs": "infra",
+    "src/runner/dispatch/brief.mjs": "infra",
+    "src/runner/dispatch/dispatch-error.mjs": "infra",
+    "src/runner/dispatch/proof-helpers.mjs": "infra",
+    "src/runner/dispatch/herdr-agent.mjs": "infra",
+    "src/runner/dispatch/herdr-diagnosis.mjs": "infra",
+    "src/runner/dispatch/herdr-round.mjs": "infra",
+    "src/runner/dispatch/herdr-reconcile.mjs": "infra",
+    "src/runner/dispatch/worker-artifacts.mjs": "infra",
+    "src/runner/dispatch/liveness.mjs": "infra",
+    "src/runner/dispatch/visibility-session.mjs": "infra",
+    "src/runner/dispatch/recovery-planner.mjs": "infra",
+    "src/runner/dispatch/run-lock.mjs": "infra",
+    "src/runner/dispatch/process-identity.mjs": "infra",
+    "src/runner/dispatch/trust-store.mjs": "infra",
+    "src/runner/dispatch/worker-home.mjs": "infra",
+    "src/runner/dispatch/stop-processes-inside.mjs": "infra",
+    "src/runner/dispatch/worker-session.mjs": "infra",
+    "src/runner/dispatch/worker-session-boot.mjs": "infra",
+    "src/runner/dispatch/recovery.mjs": "infra",
+    "src/setup/instruction-composition.mjs": "infra",
+    "src/setup/instruction-projections.mjs": "infra",
+    "src/runner/execution/unit.mjs": "infra",
+    "src/runner/execution/bind.mjs": "infra",
+    "src/runner/execution/account-rotation.mjs": "infra",
+    "src/runner/execution/dry-bind.mjs": "infra",
+    "src/runner/execution/role-ledger.mjs": "infra",
+    "src/runner/execution/commit-unit-work.mjs": "infra",
+    "src/runner/execution/handoff-refs.mjs": "infra",
+    "src/runner/execution/unit-run-history.mjs": "infra",
+    "src/runner/execution/unit-summary.mjs": "infra",
+    "src/runner/execution/run.mjs": "use-case",
+    "src/runner/execution/patterns/index.mjs": "domain",
+    "src/runner/execution/patterns/panel.mjs": "domain",
+    "src/runner/execution/patterns/presets.mjs": "domain",
+    "src/runner/execution/patterns/reviewed.mjs": "domain",
+    "src/runner/execution/patterns/role-tasks.mjs": "domain",
+    "src/runner/execution/patterns/solo.mjs": "domain",
+    "src/workflow/definition.mjs": "kernel",
+    "src/workflow/dir-guard.mjs": "infra",
+    "src/workflow/loader.mjs": "infra",
+    "src/workflow/store.mjs": "infra",
+    "src/workflow/integrate.mjs": "infra",
+    "src/workflow/plan-source.mjs": "infra",
+    "src/workflow/runner.mjs": "use-case",
+    "src/workflow/index.mjs": "use-case",
+    "src/workflow/checked.mjs": "infra",
+    "src/workflow/ref-digests.mjs": "infra",
+    "src/workflow/seat-providers.mjs": "infra",
+    "src/workflow/seats.mjs": "infra",
+    "src/workflow/steps.mjs": "kernel",
+    "src/state/domain-registry.mjs": "kernel",
+    "src/state/step-fsm.mjs": "domain",
+    "src/verbs/state/step.mjs": "use-case",
+    "src/runner/operation-choice.mjs": "use-case",
+    "src/runner/work-dispatch.mjs": "infra"
+  }
+}
+```
+
+Group accounting only: no source claim is being approved by this entry.
+## identical-unit-zero-groups
+
+Entry kind: zero-group-accounting
+Class: Judgment
+Source digest: absent (zero-group accounting)
+Target digest: absent
+
+```json
+{
+  "id": "identical-unit-zero-groups",
+  "entryKind": "zero-group-accounting",
+  "class": "Judgment",
+  "projection": {
+    "reviewStatus": "pending",
+    "rationale": "The final scoped strict E reports no Root identical-units-multiple-owners group. Preserve all earlier area exceptions unchanged, introduce no root exception and choose no competing owner. Follow-up at the new content commit must reconfirm native scoped membership before requesting acceptance.",
+    "expectedRootGroups": 0,
+    "reviewPackOwed": true
+  },
+  "sourceDigest": null,
+  "targetDigest": null,
+  "expectedRootGroups": 0,
+  "doneCondition": "Independent confirmation of zero scoped Root multiple-owner groups at the content commit, with all earlier exceptions preserved unchanged. No claim identity or exception is created."
+}
+```
+
+No fabricated claim ID. Native scoped E is the population evidence; see verification file.
