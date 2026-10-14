@@ -1,8 +1,8 @@
 # Lane B — `--effort` và cảnh báo model
 
 - Worktree: `/home/vantt/projects/forgentX-worktrees/dispatch-effort-model`
-- Nhánh: `feat/dispatch-effort-model` (từ main `88315d5de`)
-- Commit code: `09b1608e6` feat(dispatch): set reasoning effort per dispatch and warn when the model that ran differs
+- Nhánh: `feat/dispatch-effort-model`, rebase lên main `b0d9fa192` (2026-10-14 12:26, không xung đột)
+- Commit code: `3b3486234` (trước rebase `09b1608e6`) feat(dispatch): set reasoning effort per dispatch and warn when the model that ran differs
 - Chưa merge, chưa push.
 - Ràng buộc Lead (10:45): logic đặt ở tầng chung (`provider-adapter.mjs`, `resolveExecutorCommand`/`resolve.mjs`), cửa chỉ parse cờ — đã làm theo (xem "Thiết kế").
 
@@ -56,8 +56,9 @@ Unit cho `checkLaunchedModel`/`collectModelWarnings` dùng chính chuỗi lỗi 
 
 ## Kiểm tra
 
+- Sau rebase lên `b0d9fa192`: `npm test` toàn bộ tests 7379, pass 7304, fail 0, skipped 10, todo 65 (rc=0). Test lane + bộ dispatch lân cận + test Việc 1/3 mới vào main: 668/668.
 - Test lane mới: 16/16 xanh. Bộ lân cận (`provider-adapter`, `dispatch-policy-baseline-snapshot`, `dispatch`, `assignment-dispatch`, `dispatch-execute-for-capability`): 586/586 xanh.
-- `npm test` toàn bộ (worktree, `env -u CLAUDE_CODE_SESSION_ID`, trên `09b1608e6`): tests 7371, pass 7296, fail 1, skipped 9, todo 65. Lỗi duy nhất: `test/rust-host/fgctl-init.test.mjs` bị watchdog 600s/file giết — vấn đề đã biết, có follow-up trên main (`44287a09c`: file chạy riêng mất ~635s vì mỗi test build Rust), không đụng dispatch. Lần chạy riêng file này trên nhánh: tests 33, pass 32, fail 0, skipped 1 (vượt 600s khi chạy chung, khớp follow-up).
+- `npm test` toàn bộ trước rebase (worktree, `env -u CLAUDE_CODE_SESSION_ID`, trên `09b1608e6`): tests 7371, pass 7296, fail 1, skipped 9, todo 65. Lỗi duy nhất: `test/rust-host/fgctl-init.test.mjs` bị watchdog 600s/file giết — vấn đề đã biết, có follow-up trên main (`44287a09c`: file chạy riêng mất ~635s vì mỗi test build Rust), không đụng dispatch. Lần chạy riêng file này trên nhánh: tests 33, pass 32, fail 0, skipped 1 (vượt 600s khi chạy chung, khớp follow-up).
 - GitNexus impact: `resolveExecutorCommand`, `executeExecutorCli`, `normalizeRunResultV3` đều **CRITICAL** (hub: 3 caller trực tiếp, 8–10 luồng: executeAssignment, dispatchBound, spawnWorker, runDispatchCli). Thay đổi chỉ thêm: tham số tuỳ chọn, field kết quả có điều kiện, argv không đổi khi không có `--effort`. Lưu ý: impact chạy sau khi sửa, không phải trước như luật yêu cầu; `detect_changes` (compare main) chạy sau commit — phạm vi khớp dự kiến, index đang stale.
 - Test viết trước code nhưng không chạy để thấy đỏ trước khi sửa (vi phạm nhẹ quy trình "đỏ trước").
 - Hai đề xuất gộp một commit: chung một đường nối (`resolveExecutorCommand` trả cả effort lẫn `modelCheck`; cùng field kết quả trong settlement/run-result), tách ra sẽ thành commit trung gian giả.
