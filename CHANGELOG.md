@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- `fgos dispatch execute` is gone, together with its `--contract` and `--assignment` forms and the `node src/runner/dispatch.mjs execute` alias. Run one task with `fgos run "<prompt>" --provider <executor>` (add `--writes <paths> --worktree <linked-worktree>` for work that changes files; the runner commits them), or a Unit file with `fgos run --unit <file>`; planned work goes through `fgos workflow start`. Calling the old door returns an error naming the replacement.
+- `fgos dispatch execute` is gone, together with its `--contract` and `--assignment` forms and the `node src/runner/dispatch.mjs execute` alias. Run one task with `fgos run "<prompt>" --provider <executor>` (`--provider` takes an agent executor; a `kind: "tool"` executor is called directly) (add `--writes <paths> --worktree <linked-worktree>` for work that changes files; the runner commits them), or a Unit file with `fgos run --unit <file>`; planned work goes through `fgos workflow start`. Calling the old door returns an error naming the replacement, and the dispatch-decide hook's BLOCKED message names the same `fgos run` form.
 - `fgos dispatch log` is gone: every `fgos run` already records its Unit, binding, results and commit under `.fgos/assignments/<unitRunId>/`.
 - `dispatch fanout-batch` is gone. Fanout runs from `node src/runner/fanout-batch.mjs "<ids>" [--has-live-task-access]`, with the same output keys (`fired`, `mechanismChanged`, `unavailable`, `deferred`, and `slotsFull: true` when no slot is free).
 - `decide --work` runs only as `fgos dispatch decide --work <id>`; `node src/runner/dispatch.mjs decide --work` is refused with a pointer to it.
