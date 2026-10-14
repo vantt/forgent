@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `fgos run --resume` after a failed runner commit only commits again; the agent does not run a second time. A stray commit holding files outside the write scope blocks the resume until it is taken off the branch (`git reset HEAD~1`).
 - Config key `runner.generatedPaths` and doctor check `runner-generated-paths`: a Unit that edits a generated source (for example `core/skills/**`) gets the rendered copies in its write scope too.
 - `agent-result.json` takes an optional `needsWrites`: paths the worker needed outside its write scope and did not write.
+- `fgos run --account <id>` (or `"account"` in `--override`) pins the provider account: each seat whose bound executor's provider lists that account runs on it, through the normal lease. A pin no seat can take, or an account that is quarantined (the message says until when), is refused before anything runs, and a resume is refused while the pinned account is quarantined. A provider limit on a pinned account ends the seat instead of switching account or executor. Pair it with `--provider` to choose the executor.
+- A writing seat that already changed the worktree when it hit a provider limit is no longer run again on another account or executor on top of that half-done work: the unit stops as `provider-limit` with `fallbackExhausted.reason: "partial-writes"` and the changed paths. Read-only seats, and seats that changed nothing, rotate as before.
 
 ### Changed
 

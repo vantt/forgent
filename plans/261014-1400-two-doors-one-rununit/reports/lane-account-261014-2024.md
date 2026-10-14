@@ -1,6 +1,6 @@
 # Lane account — ghim account cho `fgos run` + chặn chạy lại chồng sau provider-limit
 
-Lane ngoài phase (owner yêu cầu, không work item). Nhánh `feat/rununit-account`, worktree `/home/vantt/projects/forgentX-worktrees/rununit-account`, rebase trên main `ee4671ad9`.
+Lane ngoài phase (owner yêu cầu, không work item). Nhánh `feat/rununit-account`, worktree `/home/vantt/projects/forgentX-worktrees/rununit-account`, rebase trên main `3bfc12b90` (sau cut 06 + docs-b 07b).
 
 ## Động cơ
 
@@ -92,27 +92,28 @@ Test mới: `account-pin.test.mjs` (bind thuần, 9), `partial-writes.test.mjs` 
 ## `npm test`
 
 Lượt 1 bị dừng (code đổi giữa chừng). Lượt 2 trên HEAD `6ae51505d` (rebase trên main `ee4671ad9`), `env -u CLAUDE_CODE_SESSION_ID npm test`: **exit=0**, tests 7615, pass 7540, fail 0, skipped 10, ~7 phút. Log ngoài `.fgos` (scratchpad phiên).
+Lượt 3, sau rebase lên main `3bfc12b90` + áp spec/CHANGELOG (HEAD `abe1851f8` + docs chưa commit lúc chạy, nay là commit docs kế tiếp): **exit=0**, tests 7594, pass 7519, fail 0, skipped 10.
 
-## Spec delta (`docs/specs/runner.md`, đề xuất RUL90/RUL91 — Lead cấp số)
+## Spec delta — đã áp (`docs/specs/runner.md`)
 
-- **RUL90 (a person may pin the provider account of a unit run; the pin is hard and never bypasses the lease, 2026-10-14).** `fgos run --account <id>`, or an `account` key on an `--override` object (one shape; a Unit carries no account), pins a provider account. `bind()` pins it on each seat its override reaches whose bound executor's provider (normalized as the lease does) lists it in `providers.<provider>.accounts`: `binding.account = { provider, id }`, `provenance.account = { value, source: override:<origin> }`. A seat on another provider, an executor without an account list, and a tool or inline binding bind unpinned with `provenance.account.skipped`; the pin never chooses the executor (pair it with `--provider`); a malformed id is refused (`account-pin-invalid`). Before the unit run exists the seats are dry-bound as the run would bind them: a pin no seat takes, or a quarantined account (message names `until`), is refused. A pinned seat is dispatched with the inventory narrowed to its account (`configPinnedToAccount`, as RUL79 (`fgos dispatch probe-account`)), so the lease, quarantine and governance apply unchanged. A provider limit on a pinned seat ends it (`fallbackExhausted.reason: account-pinned`, `retryStopped` on the attempt): no account rotation, no executor failover. `--account` is refused with `--resume`; a resumed run keeps its bindings' account and is refused while that account is quarantined. Open: the login store per CLI (RUL80 (an account is chosen first, then a CLI)) is checked only by the lease at dispatch; `workflow start` has no `--account`.
-- **RUL91 (a writing seat is not run again over its own partial writes after a provider limit, 2026-10-14).** At every launch of a seat that writes (a resumed launch included), the runner records the worktree's HEAD and the content of every path `git status` sees as changed (`writeBaseline` on the attempt; `.fgos/` left out, an unreadable file recorded by size and mtime). When the seat stops on a provider limit and the worktree differs (a write, rename, delete, a further change to a file already dirty, a moved HEAD), it is not rotated to another account nor walked to another candidate: the seat ends `provider-limit` with `fallbackExhausted: { reason: partial-writes, paths, headMoved }` and `retryStopped` on the attempt, for a person to keep, finish or undo and resume. This check runs before the pinned stop. A read-only seat records no baseline and rotates as before (its sandbox keeps the worktree; a concurrent `verify` write never stops it), as does a writing seat that left the worktree as it was; a baseline git could not take stops the retry. Not seen: gitignored paths, `.fgos/`, changes inside a nested repository or a dirty submodule, a mode-only change to a file already dirty — none of them reaches the runner's commit.
-- Reading map / Shared Entities: `src/runner/execution/account-pin.mjs` — account pin (`resolveAccountPin`, `runnerConfigForBinding`, `assertPinnedAccountsUsable`, `capacityProviderOf`); `src/runner/execution/partial-writes.mjs` — `worktreeSnapshot`, `writesSince`.
+RUL90 đã thuộc lane docs-b (decision 0062), nên lane này lấy hai số kế tiếp còn trống trên main `3bfc12b90` (`rg 'RUL9[0-9]'`: chỉ RUL90):
+- **RUL91** (a person may pin the provider account of a unit run; the pin is hard and never bypasses the lease) — chèn ngay sau RUL90; ghi luôn L4/L5 và việc `workflow start` chưa có `--account` vào phần "Left open" của rule.
+- **RUL92** (a writing seat is not run again over its own partial writes after a provider limit) — kèm danh sách điểm mù snapshot.
+- Reading map trong runner.md: 2 dòng cho `src/runner/execution/account-pin.mjs` và `partial-writes.mjs`.
 
-## CHANGELOG delta (`## [Unreleased]` → `### Added`)
+## CHANGELOG delta — đã áp (`## [Unreleased]` → `### Added`, 2 dòng)
 
-- `fgos run --account <id>` (or `"account"` in `--override`) pins the provider account: each seat whose bound executor's provider lists that account runs on it, through the normal lease. A pin no seat can take, or an account that is quarantined (the message says until when), is refused before anything runs, and a resume is refused while the pinned account is quarantined. A provider limit on a pinned account ends the seat instead of switching account or executor. Pair it with `--provider` to choose the executor.
-- A writing seat that already changed the worktree when it hit a provider limit is no longer run again on another account or executor on top of that half-done work: the unit stops as `provider-limit` with `fallbackExhausted.reason: "partial-writes"` and the changed paths. Read-only seats, and seats that changed nothing, rotate as before.
+- `fgos run --account <id>` (or `"account"` in `--override`) pins the provider account …
+- A writing seat that already changed the worktree when it hit a provider limit is no longer run again … `partial-writes` …
 
 ## Để ngỏ
 
-1. RUL90/RUL91 số hiệu + áp spec/CHANGELOG (Lead / lane docs).
-2. L4: kiểm login store theo CLI ngay trong pin pre-check (hiện lease từ chối lúc dispatch, sau khi unit run đã tạo).
-3. L5: `capacityProviderOf` có thể lệch provider so với lease cho executor không khai `providerModel` (code cũ; config hiện tại không dính).
-4. `workflow start --account` chưa có.
-5. Điểm mù snapshot (gitignore, `.fgos/` trong worktree, repo lồng) — chấp nhận, ghi trong RUL91.
-6. Khi cut/driver merge cần rebase; xung đột dự kiến ở run.mjs (dòng đầu `dispatchBound`, khối tạo unit) và bin case `run`.
+1. L4: kiểm login store theo CLI ngay trong pin pre-check (hiện lease từ chối lúc dispatch, sau khi unit run đã tạo).
+2. L5: `capacityProviderOf` có thể lệch provider so với lease cho executor không khai `providerModel` (code cũ; config hiện tại không dính).
+3. `workflow start --account` chưa có.
+4. Điểm mù snapshot (gitignore, `.fgos/` trong worktree, repo lồng) — chấp nhận, ghi trong RUL92. L4/L5/`workflow start` ghi trong phần "Left open" của RUL91 (Lead quyết: không mở rộng phạm vi).
+5. Đã rebase lên main `3bfc12b90` (cut 06 + docs-b 07b), không xung đột. Khi driver (10) merge cần rebase lại; xung đột dự kiến ở run.mjs (dòng đầu `dispatchBound`, khối tạo unit).
 
 Status: DONE_WITH_CONCERNS
 Summary: `fgos run --account` (= `account` trên `--override`) ghim account cho các seat có provider sở hữu nó, kiểm trước khi tạo unit run (quarantine nêu until), lease vẫn qua provider-capacity với inventory thu hẹp, limit trên account ghim dừng seat; seat ghi đã đổi worktree trước provider-limit dừng với `partial-writes` + paths thay vì rotate/failover chạy chồng. Đỏ→xanh, review 4 MEDIUM + red-team 3 HIT đã sửa, `npm test` xanh.
-Concerns: spec/CHANGELOG delta chưa áp (RUL90/91 chờ Lead cấp số); điểm mù snapshot (gitignore, `.fgos/` trong worktree, repo lồng) chấp nhận và ghi trong RUL91; L4/L5 để ngỏ; run.mjs đụng ngoài khối rotation (dòng đầu `dispatchBound`, khối tạo unit, resume) — cần rebase khi driver/cut merge.
+Concerns: điểm mù snapshot (gitignore, `.fgos/` trong worktree, repo lồng) chấp nhận và ghi trong RUL92; L4/L5 để ngỏ; run.mjs đụng ngoài khối rotation (dòng đầu `dispatchBound`, khối tạo unit, resume) — cần rebase khi driver/cut merge.
