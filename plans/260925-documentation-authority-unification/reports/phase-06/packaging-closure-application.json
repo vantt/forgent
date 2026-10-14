@@ -259,7 +259,7 @@
     "finding": "decision-review-report-missing",
     "newIndependentReviewRowRequired": false
   },
-  "batchClosed": false,
+  "batchClosed": true,
   "exactCellBinding": {
     "claimId": "claim_6a37273a0a45d24c53e344928c3edf22",
     "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-row-binding.md",
@@ -272,5 +272,6 @@
     "targetDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17",
     "noteAndDigestsEqualClosureResolution": true,
     "allOtherHostSourceObjectsUnchanged": true
-  }
+  },
+  "closureProofCommit": "798daa37b1aa616d110588da8ebb7b832eb7c8d0"
 }

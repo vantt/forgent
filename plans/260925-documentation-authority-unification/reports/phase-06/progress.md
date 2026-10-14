@@ -1,3 +1,38 @@
+# Latest resume state — Packaging-distribution closed
+
+Date: 2026-10-14
+Executor: codex-session:14@2026-10-14
+Session counter: 14
+Documented Packaging executor sessions: 7 (one interrupted plus six resumes)
+Step: 4 complete; next Step 5
+State: closed for Phase 6 conservation under A28/A34; STOP
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 77830ba77eb05991d95b005919776ee6254e833b
+Last green D/native proof source: 798daa37b1aa616d110588da8ebb7b832eb7c8d0
+This turn commits: 798daa37b (ordinary exact-cell review and compact registry); final explicit-path report/evidence/progress commit seals this checkpoint.
+Report: step-04-report.md
+Verification: verification-261014-1830-packaging-batch-close.md.json
+
+Applied claim_6a37273a0a45d24c53e344928c3edf22 through the unchanged ordinary --apply-review door, exact first cell, note/digests identical to the closure-resolution row; pinned to review-4-packaging-row-binding.md at 962968338c8dca06edb6d1437b791c14359fe7e2. All other 430 Host source objects remain equal to resume HEAD. No document text changed this session. Prior 20 accepted verdicts remain verbatim.
+
+Both-prior D: exit 0, zero fatal. Packaging scoped strict E against both: expected exit 1, exactly 1 A34 partial carry + 2 independently reviewed contextual identical-unit exception groups + 693 candidate-unverified units. Full identity/membership/digest comparison exact; zero Packaging holds, pending source rows or dropped-register opens. All 407 source rows reviewed: Mirror 0 / Unit-exact 0 / Weak-exact 293 / Judgment 114; dispositions 399 move / 7 defer-with-owner / 1 partial-carry.
+
+Native equality: all 94,333 pre-resolution known IDs retained, 94,338 current; active registry/inventory tuples equal; historical and immediate-prior known tuple sets equal with the exact reviewed deltas. This session changes zero identity tuple or parsed registry object. Candidate lists native-equal both priors: Agent 488 / Host 588 / Packaging 693; current headers eligible. Exact exception and partial-carry IDs equal. Packaging residual and renewed Host A34 residual digest-valid; other 11 Host residuals unchanged. No reconstruction or graft.
+
+Before refresh, parsed equality with b842eb2c8 passed. Persisted compact one-line registry is native-byte-equal: 59,454,311 bytes, SHA256 0c11bae87d3b196763a42d4da8e89846a245017ce11a736d19ab9ce82cbd9af8; below 90 MB. The native refresh reads the persisted working registry; no carry-forward needed.
+
+Preservation passes: extractor, authority status, reader links, 74 witnesses, 867 payloads, five frozen files and eight prior allowlist exemptions unchanged; no own allowlist violations; Agent tree unchanged; Host text remains exactly the earlier F6 status line. Ratchet clean 995 files/25 edits/1 addition; placement 509/508/one exception, zero gaps; candidate findings zero. Review/apply tests: 29/29 pass with env -u CLAUDE_CODE_SESSION_ID, zero fail/cancel/skip/todo. GitNexus own scope low risk, zero affected execution processes. No full-suite/release/gateway claim.
+
+Truth sample remains historical 3/30 false (10%, 65 assertions: 62 true/3 false); all three status notes independently ok; exact 629-unit population digest remains unverified. No new draw. Effort: 7 documented Packaging sessions; 407/7 = 58.14 initial rows/session; 422 source review instances over three rounds; zero new source rows this session, one accepted source verdict applied.
+
+dropped-001 remains reviewed defer-with-owner with original Plan C owner/stub. dropped-010 is reviewed superseded by decision under F6: 2026-09-15 coordinator 30-day window successor, earliest removal 2026-10-18; removal/redirect remains owed to Packaging-distribution (release-owner decision). No removal now; original clause, runner mapping and header retained. The Packaging partial carry and 12 Host partial carries remain cutover obligations. Strict E remains red.
+
+Blockers: none. No pending Packaging review or new owner question. Next action: start Step 5 only in a later authorized turn, refresh from this persisted compact registry, preserve A28/A34 lists and reviewed residual bindings. STOP now: no Step 5 work, promotion, cutover, push, rebase, main write/merge, gate/checker/vocabulary/extractor/baseline edit.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Packaging final binding and closure proofs
 
 Date: 2026-10-14
