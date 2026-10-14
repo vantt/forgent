@@ -1418,3 +1418,45 @@ test('a failed settlement write never replaces the execution error that caused i
   assert.equal(fixture.readRecord().settlement, undefined);
   assert.deepEqual(fs.readdirSync(fixture.unitDir).filter((name) => name.endsWith('.tmp')), [], 'no partial record is left behind');
 });
+
+function setGeneratedPaths(repoRoot, generatedPaths) {
+  const configPath = path.join(repoRoot, '.fgos', 'config.json');
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  config.runner.generatedPaths = generatedPaths;
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+}
+
+const SKILL_RENDERS = [{ from: 'core/skills/**', also: ['.agents/skills/**', 'plugins/fgOS/skills/**'] }];
+
+test('runUnit records the write scope widened by generatedPaths and hands it to the assignment', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  setGeneratedPaths(repoRoot, SKILL_RENDERS);
+  const res = await runUnit({
+    unitData: { id: 'u-skill', objective: 'Edit a skill', capability: 'docs:write', writes: ['./core/skills/x/SKILL.md', 'docs/'] },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);
+  const record = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
+  const expected = ['core/skills/x/SKILL.md', 'docs', '.agents/skills/**', 'plugins/fgOS/skills/**'];
+  assert.deepEqual(record.unit.writes, ['core/skills/x/SKILL.md', 'docs']);
+  assert.deepEqual(record.writeScope, expected);
+  const assignment = JSON.parse(fs.readFileSync(path.join(unitDir, 'producer', '1', 'assignment.json'), 'utf8'));
+  assert.deepEqual(assignment.writes, expected);
+});
+
+test('a resumed unit keeps its recorded write scope even after generatedPaths changes', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  setGeneratedPaths(repoRoot, SKILL_RENDERS);
+  const unitData = { id: 'u-resume-scope', objective: 'Edit a skill', capability: 'not-configured:answer', writes: ['core/skills/y.md'] };
+  const first = await runUnit({ unitData, repoRoot, cwd: worktreeDir });
+  const unitJson = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId, 'unit.json');
+  const expected = ['core/skills/y.md', '.agents/skills/**', 'plugins/fgOS/skills/**'];
+  assert.deepEqual(JSON.parse(fs.readFileSync(unitJson, 'utf8')).writeScope, expected);
+  setGeneratedPaths(repoRoot, []);
+  await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
+  assert.deepEqual(JSON.parse(fs.readFileSync(unitJson, 'utf8')).writeScope, expected);
+});

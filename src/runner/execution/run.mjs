@@ -7,6 +7,7 @@ import crypto from 'node:crypto';
 import { execFileSync, execSync } from 'node:child_process';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
+import { expandGenerated } from '../dispatch/write-scope.mjs';
 import { bind, nextCandidate, retrySameCandidate, getProviderFamily } from './bind.mjs';
 import { credentialFaultFamilies, inspectAccountRotation, mayRotateAccount } from './account-rotation.mjs';
 import { createRoleExecutorLedger } from './role-ledger.mjs';
@@ -256,6 +257,9 @@ export async function runUnit(options = {}) {
       pattern: options.pattern ?? unit.pattern ?? 'solo',
       overrides: options.overrides || [],
       configSnapshot,
+      // The scope this run may write, widened once to the render targets of generated sources it
+      // touches. A resumed run reads it back and never recomputes it against a changed config.
+      writeScope: expandGenerated(unit.writes, configSnapshot.runner.generatedPaths ?? []),
       resolvedInputs: resolved.refs,
       // Which input each neutral name stands for; only the owner reads this, never a role.
       ...(unit.anonymizeInputs || unit.blind ? { inputMap: resolved.inputMap } : {}),
@@ -358,7 +362,7 @@ export async function runUnit(options = {}) {
       },
       expectedOutputs: unit.expectedOutputs || [],
       contextRefs,
-      writes: unit.writes || [],
+      writes: unitRecord.writeScope ?? unit.writes ?? [],
       policy: {
         tier: bound.tier,
         preferExecutor: bound.executor,
