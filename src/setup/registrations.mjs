@@ -2509,11 +2509,19 @@ function workflowCapabilityUses(root) {
   return uses;
 }
 
+// Capabilities the runner loop's worker asks for that no Workflow unit names. A coding item's
+// executing step runs as a Unit of `code:implement` (work-compat.mjs's curated mapping); its other
+// steps ask for `<domain>:<verb>`, the names the domain's Workflow units already use.
+const RUNNER_LOOP_CAPABILITY_USES = Object.freeze([['code:implement', 'runner loop: coding executing step']]);
+
 function checkWorkflowCapabilitiesConfigured(cwd) {
   const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
   const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
   const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
   const uses = workflowCapabilityUses(packageRoot);
+  for (const [capability, id] of RUNNER_LOOP_CAPABILITY_USES) {
+    uses.set(capability, new Set([...(uses.get(capability) ?? []), id]));
+  }
   if (path.resolve(cwd) !== packageRoot) {
     for (const [capability, ids] of workflowCapabilityUses(cwd)) {
       uses.set(capability, new Set([...(uses.get(capability) ?? []), ...ids]));
