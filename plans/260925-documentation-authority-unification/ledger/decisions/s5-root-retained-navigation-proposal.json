@@ -2029,8 +2029,8 @@
   "files": [
     {
       "path": "docs/platform/proposals/documentation-system-unification.md",
-      "disposition": "retain-as-evidence",
-      "rationale": "Frozen-map already-in-topology non-canonical proposal, retained unchanged as evidence; no acceptance or new carrier.",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "Frozen-map recorded non-platform exception: the already-in-topology, non-authority proposal is retained unchanged as design evidence outside maintained platform authority. File class retained-source requires this existing file-level disposition; individual source units remain retain-as-evidence. No file move, source-to-itself proof, acceptance or authority change.",
       "targets": []
     },
     {
