@@ -68,7 +68,7 @@ import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, validateGeneratedPathsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
@@ -497,6 +497,21 @@ function checkRunnerRigorConfig(cwd) {
   return problems.length > 0
     ? { passed: false, message: problems.join('; ') }
     : { passed: true, message: 'runner rigor maps and capability floors are valid at every configured level' };
+}
+
+export function checkRunnerGeneratedPathsConfig(cwd) {
+  const projectRunner = readSharedConfig(cwd)?.runner;
+  const globalRunner = loadGlobalConfig()?.runner;
+  const [level, runner] = projectRunner ? ['project', projectRunner] : globalRunner ? ['global', globalRunner] : [];
+  if (!runner || runner.generatedPaths === undefined) {
+    return { passed: true, message: 'warning: runner.generatedPaths missing -- write scopes are not widened to generated trees; run fgos setup' };
+  }
+  try {
+    validateGeneratedPathsShape(runner.generatedPaths, `${level} runner`);
+  } catch (err) {
+    return { passed: false, message: `${level} ${err.message}` };
+  }
+  return { passed: true, message: `${level} runner.generatedPaths is valid (${runner.generatedPaths.length} mapping(s))` };
 }
 
 export function checkRunnerPatternsConfig(cwd) {
@@ -1424,6 +1439,12 @@ registerCheck({
   id: 'runner-rigor-config',
   description: 'project and global runner rigorToTier maps are complete and capabilities declare only rigor floors',
   check: (cwd) => checkRunnerRigorConfig(cwd),
+});
+
+registerCheck({
+  id: 'runner-generated-paths',
+  description: 'runner.generatedPaths maps generated sources to render targets with well-formed write-scope entries',
+  check: (cwd) => checkRunnerGeneratedPathsConfig(cwd),
 });
 
 registerCheck({

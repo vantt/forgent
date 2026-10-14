@@ -163,6 +163,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'operation-capability-resolves',
       'runner-coordination-orgPolicy-shape',
       'runner-patterns-config',
+      'runner-generated-paths',
       'runner-rigor-config',
       'mutating-assignment-binding-snapshot',
       'shadow-binder-divergence',
