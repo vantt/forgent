@@ -11,6 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `fgos run --effort low|medium|high|max` (or `"reasoningEffort"` in `--override`) sets how hard the worker reasons for one run, without editing the provider's own config; `fgos dispatch execute --effort` does the same on the compatibility door. claude and agy get `--effort`, pi and omp `--thinking`, Codex `-c model_reasoning_effort=` (`max` becomes `xhigh`). A level outside that list, or one the bound executor's `supports.reasoningEffort` does not declare, is refused before the worker starts (`fgos run` reports a `policy-refusal` with reason `reasoning-effort`). Until now a derived effort was recorded in the policy but never reached the CLI; that is unchanged when no effort is given.
 - A run's result records where the model that ran differs from the one bound, under `policy.provenance.modelDrift`: replaced by policy before launch (`model-overridden`), not passed on the command line (`model-not-passed`), refused or unknown to the provider CLI (`model-unsupported`), or reported differently by the CLI (`model-reported-different`). `fgos dispatch execute` returns the same list as `modelWarnings`.
+- `fgos run "<prompt>"` runs a one-line task as a Unit. The flags are `--provider` (soft preference), `--persona`, `--writes` (needs a linked worktree), `--capability` (default `execute`), `--rigor`, `--effort` and `--override`. Without `--writes` the Unit is read-only. A wrong provider, a wrong persona, or writes from the main checkout fail before anything runs.
+- `fgos workflow start --units <file>` (a YAML/JSON list of Units) runs the list as a one-off Workflow, one step per Unit. A Unit may carry `prefer` (soft preference) and `persona`; `--units` does not combine with `--seats`.
+- `fgos workflow start --effort <level>` asks the same reasoning effort for every unit of the run, kept across resume.
+- A Unit may declare `prefer` (a soft executor preference) and `persona`. Its `prefer` goes ahead of the capability's pool, passing the same filters and failing over into the pool; its `persona` binds unless an override names one. Binding provenance records `unit-prefer` / `unit` as the source.
+- `fgos run --resume` after a failed runner commit only commits again; the agent does not run a second time. A stray commit holding files outside the write scope blocks the resume until it is taken off the branch (`git reset HEAD~1`).
+- Config key `runner.generatedPaths` and doctor check `runner-generated-paths`: a Unit that edits a generated source (for example `core/skills/**`) gets the rendered copies in its write scope too.
+- `agent-result.json` takes an optional `needsWrites`: paths the worker needed outside its write scope and did not write.
+
+### Changed
+
+- `fgos run` (and a Workflow unit) commits only files inside the Unit's `writes`. Files outside it are left in place and reported in `commit.outOfScope`; files you were already editing inside the scope are left as they are (`preExistingInScope`).
+- The runner refuses to start a writing Unit while the index already holds staged changes (`foreign-staged-index`); unstage or commit them and run again.
+- Runner commits use a conventional subject: the first line of the worker's `summary`, or `chore(<unitId>): …` when that is not conventional.
+- Unit `writes` are normalized to one spelling and `.`, absolute paths, `..` and pathspec magic `:` are refused; only `*` and `**` are globs.
+- A Workflow definition's `writes` must be a list: an empty `writes:` in YAML (null) or any other non-list value is refused instead of silently becoming `[]`.
+- A writing seat of a unit run is told its write scope, that the runner (not the agent) commits, that the commit subject comes from the first line of `summary`, and to declare `needsWrites` when it needs a path outside the scope.
+- A unit run's evidence marks files inside the declared `writes` (`coverageMatched`) and warns about files outside them.
+- A `persona` in a workflow unit template travels on the Unit (provenance `unit`) instead of becoming an `origin: workflow` override.
+- A writing workflow unit that depends on another writing unit now starts from that unit's branch instead of HEAD; `workflow status` lists `writeBranches`.
+- A writing unit that changed files outside its `writes` ends as `findings`; an integrate step that meets such a unit fails and merges nothing (it used to skip it silently).
+- A writing unit that cannot get a worktree of its own now fails instead of running in the shared checkout.
 
 ### Fixed
 
@@ -18,6 +39,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A dispatch round is no longer refused because files changed in a shared checkout while it ran (`wrote-outside-workspace`, `read-only-mutation`, `mutated-dirty-before-files`). A before/after snapshot cannot tell the worker's writes from another session's, so the round is accepted and the paths are reported in its result as `warnings` (`stray-write-correlated`, `read-only-mutation-correlated`, `mutated-dirty-before-correlated`) and on stderr. A write proven to be the run's own would still be refused; nothing proves one yet.
 - An Assignment run's `result.json` now names the sandbox it really ran under in `confinement` (`bwrap`), read from the launch the Confinement Authority prepared or the dispatch's enforced attestation; it was always `null` before, even for sandboxed seats.
 - A Work item stopped on a read-only round whose checkout changed while it ran now says so: the round is accepted with its `warnings`, and the driver stops with `assignment-<operation>-correlated-mutation` (at planning `validation-correlated-mutation-do-not-advance-work`) instead of a generic failed or no-evidence reason. A round launched through the executor CLI door now keeps that door's `stray-write-correlated` warning in its `result.json` instead of only printing it.
+- `fgos run --resume` is refused while a live dispatch still holds the worktree's lock, so a second worker is never started in the same worktree; the old guard read a lock name no dispatch writes and never refused.
+- A Unit's `persona` is resolved and its text pinned when the unit run starts, so a persona defined only in the workspace (`fgos/agents/`) is rendered with its definition instead of its bare name.
+
+### Security
+
+- The runner commit no longer trusts a worktree's `.git` file, a relative hooks path or fsmonitor: its git runs against the main repository's gitdir with the caller's `GIT_*` variables dropped, and a worktree outside the main repository is refused.
 
 ## [v0.2.0-rc.5] - 2026-10-14
 
