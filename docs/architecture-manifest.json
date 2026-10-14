@@ -229,6 +229,7 @@
     "src/runner/execution/dry-bind.mjs": "infra",
     "src/runner/execution/role-ledger.mjs": "infra",
     "src/runner/execution/commit-unit-work.mjs": "infra",
+    "src/runner/execution/partial-writes.mjs": "infra",
     "src/runner/execution/handoff-refs.mjs": "infra",
     "src/runner/execution/unit-run-history.mjs": "infra",
     "src/runner/execution/unit-summary.mjs": "infra",

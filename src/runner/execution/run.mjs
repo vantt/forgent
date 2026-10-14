@@ -12,6 +12,7 @@ import { bind, nextCandidate, retrySameCandidate, getProviderFamily } from './bi
 import { credentialFaultFamilies, inspectAccountRotation, mayRotateAccount } from './account-rotation.mjs';
 import { assertPinnedAccountsUsable, runnerConfigForBinding } from './account-pin.mjs';
 import { simulateUnitBindings } from './dry-bind.mjs';
+import { worktreeSnapshot, writesSince } from './partial-writes.mjs';
 import { createRoleExecutorLedger } from './role-ledger.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
@@ -649,6 +650,12 @@ export async function runUnit(options = {}) {
         });
         persistUnitRecord();
       }
+      // What the worktree of a writing unit looked like when this attempt first launched, so a
+      // provider limit can tell whether the seat already changed it (partial-writes.mjs).
+      if (writeScope.length > 0 && !attempts[attemptNo].writeBaseline) {
+        attempts[attemptNo].writeBaseline = worktreeSnapshot({ worktree: unitRecord.worktree, repoRoot: mainRoot });
+        persistUnitRecord();
+      }
 
       const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs, objective: (rUnit || unit).objective });
 
@@ -676,7 +683,9 @@ export async function runUnit(options = {}) {
       // accounts (never a loop on one account), and only then does the walk leave the provider.
       let rotationsSpent = 0;
       for (let at = attemptNo; at > 0 && attempts[at]?.fallbackFrom?.kind === 'account-rotation'; at -= 1) rotationsSpent += 1;
-      // A pinned account is hard: its limit is never answered with another account or executor.
+      // Two cases end the seat here and leave the decision to a person. A pinned account is hard:
+      // its limit is never answered with another account or executor. And a seat of a writing unit
+      // that already changed the worktree is never run again on top of its own half-done work.
       const stopRetry = (reason, detail, extra = {}) => {
         attempts[attemptNo].retryStopped = { reason, ...extra };
         persistUnitRecord();
@@ -693,6 +702,19 @@ export async function runUnit(options = {}) {
       };
       if (bound.account) {
         return stopRetry('account-pinned', `account "${bound.account.id}" of provider "${bound.account.provider}" was pinned, so the seat is not moved to another account or executor; pin another account or wait for this one`);
+      }
+      const baseline = attempts[attemptNo].writeBaseline;
+      if (baseline) {
+        let changed;
+        try {
+          changed = writesSince(baseline, { worktree: unitRecord.worktree, repoRoot: mainRoot });
+        } catch (error) {
+          return stopRetry('partial-writes', `could not tell whether the seat changed the worktree (${error.message}), so it is not run again by itself`, { paths: [] });
+        }
+        if (changed.paths.length > 0 || changed.headMoved) {
+          const what = [changed.paths.join(', '), changed.headMoved ? 'HEAD moved' : ''].filter(Boolean).join('; ');
+          return stopRetry('partial-writes', `the seat changed the worktree before its provider limit (${what}); it is not run again on top of that work: keep, finish or undo the changes, then resume`, { paths: changed.paths, headMoved: changed.headMoved });
+        }
       }
       const rotation = inspectAccountRotation({ runnerConfig, executorId: bound.executor, runtimeDir: options.providerCapacityRuntimeDir });
       if (mayRotateAccount(rotation, rotationsSpent)) {

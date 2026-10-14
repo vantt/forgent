@@ -50,7 +50,15 @@ if (login.startsWith('dead')) {
   process.stderr.write('No API key found for ' + process.argv[2] + '.\\n\\nUse /login to log into a provider via OAuth or API key.\\n');
   process.exit(1);
 }
-if (login.startsWith('quota') || process.argv[2].startsWith('spentquota')) {
+if (login.startsWith('partial')) {
+  // Work cut off half way: the worker already wrote, renamed or appended before the limit hit. A
+  // read-only posture refuses each change, which is what a read-only seat must leave behind.
+  const changes = login.startsWith('partialtouch')
+    ? [() => fs.appendFileSync('notes.txt', ' and more')]
+    : [() => fs.writeFileSync('notes.txt', 'half'), () => fs.renameSync('README.md', 'README.old')];
+  for (const change of changes) { try { change(); } catch { /* read-only */ } }
+}
+if (login.startsWith('quota') || login.startsWith('partial') || process.argv[2].startsWith('spentquota')) {
   // The real codex ending of a round cut off by the account's usage limit (2026-10-13): the error
   // twice, then the token tally codex always prints last.
   const line = 'ERROR: You\u2019ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:39 PM.';
@@ -452,4 +460,46 @@ test('an account of another provider is refused before any unit run exists', { s
   const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live' } }, beta: { family: 'beta', logins: { b1: 'live' } } });
   await assert.rejects(run(fx, solo('u-pin-other'), pin('b1')), /"b1".*providers\.alpha\.accounts/);
   assert.deepEqual(unitRuns(fx), []);
+});
+
+// A writing seat that already changed the worktree before its provider limit is not run again on
+// top of its own half-done work: the seat stops, and the attempt lists what changed.
+test('a writing seat that changed the worktree before a provider limit stops instead of running again', { skip: SKIP }, async () => {
+  const fx = setup(
+    { alpha: { family: 'alpha', logins: { partial1: 'partial', live1: 'live' } }, beta: { family: 'beta' } },
+    { recentlyUsed: { alpha: ['live1'] } },
+  );
+  const res = await run(fx, writer('u-partial'));
+  assert.equal(res.outcome, 'provider-limit', JSON.stringify(res.results[0]).slice(0, 1500));
+  const attempts = attemptsOf(fx.repoRoot, res);
+  assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit']]);
+  const exhausted = res.results[0].fallbackExhausted;
+  assert.equal(exhausted.reason, 'partial-writes');
+  assert.deepEqual(exhausted.paths, ['README.md', 'README.old', 'notes.txt']);
+  assert.deepEqual(attempts[0].retryStopped.paths, exhausted.paths, 'the stop is recorded on the attempt');
+  assert.equal(fs.readFileSync(path.join(fx.worktreeDir, 'notes.txt'), 'utf8'), 'half', 'the half-done work is left as it is');
+});
+
+test('a file already dirty before the launch that the seat changed again also stops the retry', { skip: SKIP }, async () => {
+  const fx = setup(
+    { alpha: { family: 'alpha', logins: { partialtouch1: 'partialtouch', live1: 'live' } }, beta: { family: 'beta' } },
+    { recentlyUsed: { alpha: ['live1'] } },
+  );
+  fs.writeFileSync(path.join(fx.worktreeDir, 'notes.txt'), 'mine');
+  const res = await run(fx, writer('u-partial-touch'));
+  assert.equal(res.outcome, 'provider-limit', JSON.stringify(res.results[0]).slice(0, 1500));
+  assert.equal(res.results[0].fallbackExhausted.reason, 'partial-writes');
+  assert.deepEqual(res.results[0].fallbackExhausted.paths, ['notes.txt']);
+});
+
+test('a read-only seat of a writing unit still rotates: its sandbox kept the worktree as it was', { skip: SKIP }, async () => {
+  const fx = setup(
+    { alpha: { family: 'alpha' }, beta: { family: 'beta', logins: { partial2: 'partial', live2: 'live' } } },
+    { recentlyUsed: { beta: ['live2'] } },
+  );
+  const res = await run(fx, { ...writer('u-reviewer-rotate'), pattern: 'reviewed' }, { pattern: 'reviewed' });
+  const reviewer = attemptsOf(fx.repoRoot, res, 'reviewer/1');
+  assert.deepEqual(reviewer.map((a) => [a.binding.executor, a.outcome]), [['beta', 'provider-limit'], ['beta', 'pass']], JSON.stringify(res.results.map((r) => [r.role, r.outcome, r.fallbackExhausted])));
+  assert.equal(reviewer[1].fallbackFrom.kind, 'account-rotation');
+  assert.equal(res.outcome, 'pass');
 });
