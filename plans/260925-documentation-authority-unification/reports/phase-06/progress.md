@@ -1,3 +1,22 @@
+# Latest resume state — Root conservation review continuation
+
+Date: 2026-10-14
+Executor: codex-session:18@2026-10-14
+Session counter: 18
+Step: 5
+State: rework / authoring
+Last green content pin: c8b2d948d6dd0b408011b294fd67aea59870749b
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Resume: clean worktree on required branch; Lead conservation reports pinned to 563247893.
+Scope: apply ordinary ok notes verbatim, fix seven conservation reworks with A22 pending bindings, continue bounded source packs. AGENTS/CLAUDE wait for Step 10. Truth report and sample remain untouched; owner decision on 5/30 false units is pending and does not block conservation work authorized this turn.
+Next: resume checks, apply committed reports, seven-row re-review request, then remaining mapped source decisions; both-prior D/scoped strict E/native equality and compact persisted registry below 90 MB.
+No promotion, Step 6, push, rebase, main write, protected tool or baseline change.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Root source subset ready for independent review; STOP
 
 Date: 2026-10-14
