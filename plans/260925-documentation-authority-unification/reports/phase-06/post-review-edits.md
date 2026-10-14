@@ -62,3 +62,7 @@ Author: codex-session:18@2026-10-14. Lead conservation report at 563247893 requi
 ## Authorized sampled truth corrections — 2026-10-14
 
 A35 authorizes only the false sentences enumerated under Findings in review-5-root-authorities-truth.md. Candidate docs/platform/work-state/spec.md will correct U3, U8, U19, U20 and the listed parts of U26. Mechanical A22 consequences are rebound to pending with no approval carry. Actual store.mjs:1417 retains a statusAtAsk fallback for legacy gates; corrected prose must preserve that exception and clamp doing to todo. Full before/after fragments, unit texts, digests and code evidence will be published in the bounded truth request. No remainder of work-state is swept.
+
+## Authorized current sentence corrections
+
+Author: codex-session:22@2026-10-14. Pre-edit pin: `f0efa3330a14d117ad89feba91bdb9b61d768339`. Review: `c3895c140` / review-5-root-truth-corrections.md. Only U8 required-field fragment and RUL60 wrapper-order fragment in work-state/spec.md change, under A19/A35; dependent bindings return pending under A22. No other truth sweep.

@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:22@2026-10-14",
+  "beforeCommit": "f0efa3330a14d117ad89feba91bdb9b61d768339",
+  "corrections": [
+    {
+      "finding": "U8 add required flags",
+      "before": "gọi điền `--title` và `--description`; `--id` tùy chọn, khi vắng thì `generateId`",
+      "after": "gọi điền đủ các cờ bắt buộc `--title`, `--description`, `--kind`, `--risk` và `--verify`; `--id` tùy chọn, khi vắng thì `generateId`",
+      "beforeSHA256": "a59df73d4b60aea1d2c28d348e23cec1f25b491d27800a89e8873e4bada70307",
+      "afterSHA256": "e949a57f0cadbc06badec7263dfc0cd607b50f22d5692dd7b7cda872cf25be1d",
+      "evidence": [
+        {
+          "path": "bin/fgos.mjs",
+          "startLine": 933,
+          "endLine": 964,
+          "text": "      // --id is optional (was required): an explicit id is still honored\n      // as-is (e.g. a deliberately chosen or parent-lineage child id like\n      // \"tsk-4vo-1\"), but omitting it now reuses `submit`'s own generateId\n      // (src/intake/classify.mjs) to derive a collision-free \"tsk-<hash>\"\n      // id from --title, instead of forcing the caller to invent one by\n      // hand. This closes the gap that let `add` accept an arbitrarily\n      // long slugified-title id in the first place (docs/explanation/\n      // long-work-item-ids-max-length-guard.md) — generateId is now the\n      // path of least resistance, not a manually-typed guess.\n      const idFlag = optionalField(positional[0] ?? flags.id, 'add --id requires a non-empty value; omit --id entirely to auto-generate one from --title.');\n      if (flags.tier !== undefined) {\n        throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');\n      }\n      const id = idFlag ?? generateId(\n        requireField(flags.title, 'add requires --title (used to derive the id when --id is omitted, and always required as the item\\'s own title regardless)'),\n        Object.keys(listWork(dir).work),\n      );\n      const work = {\n        id,\n        title: flags.title,\n        kind: flags.kind,\n        status: 'todo',\n        deps: parseListFlag(flags.deps),\n        risk: flags.risk,\n        refs: parseListFlag(flags.refs),\n        verify: flags.verify,\n        description: requireField(flags.description, 'add requires --description (the item\\'s own full-text intake description)'),\n        learn: typeof flags.learn === 'string' ? flags.learn : undefined,\n        size: optionalField(flags.size, 'add --size requires a size value (e.g. light/standard/heavy); omit --size entirely to use the default.'),\n        rigor: optionalField(flags.rigor, 'add --rigor requires a rigor value (e.g. low/standard/high/critical); omit --rigor entirely to leave unset.'),\n        // Per base-workflow-model D1-D4/S2: --domain is optional, same\n        // omitted-leaves-undefined shape as --tier just above; omitting it\n",
+          "sha256": "0d9bd42c55a72055e3409e5c8d0f99f097c5bca7559b9796a48769381cc4f1d3",
+          "blob": "99d801a92839b2a7b7202bb9c07bb8fd2277f705"
+        },
+        {
+          "path": "src/state/work.mjs",
+          "startLine": 250,
+          "endLine": 305,
+          "text": "  const allowed = classificationVocabulary(domain, field);\n  if (!allowed) return;\n  if (!allowed.includes(work[field])) {\n    throw new WorkValidationError(\n      `work.${field} must be one of ${JSON.stringify(allowed)} for domain `\n        + `\"${work.domain ?? DEFAULT_DOMAIN}\", got: ${JSON.stringify(work[field])}`,\n    );\n  }\n}\n\n/**\n * Validate the shape of a single work item: required fields, id format, and\n * that deps is an array of non-empty strings with no self-reference. Does\n * NOT check that deps point at ids that actually exist — that is\n * `validateDeps`, which needs the rest of the store to answer.\n *\n * `touchedFields` (optional, tsk-1ne D1/D2): a Set of top-level field names\n * to check — every other field is grandfathered, its already-stored value\n * left unvalidated regardless of whether it would pass today's rules.\n * Omitted (the default, `addWork`'s own call) means \"check everything,\"\n * byte-for-byte the original behavior. `editWork` (store.mjs) is the one\n * caller that ever passes a real Set: an edit patch can only ever contain\n * `EDITABLE_FIELDS` keys (id/status/workflowStep/domain are never among them, so\n * their checks below can never fire for an edit either way), and\n * re-rejecting an UNCHANGED field's pre-existing value on every edit — the\n * bug this parameter fixes — blocked 65/112 items from being edited at all\n * for legacy shape that predates a since-tightened rule (step enum,\n * id-length cap). This never widens what a NEW value in the patch must\n * satisfy — every check below still runs in full for any field actually\n * present in `touchedFields`.\n */\nexport function validateWorkShape(work, touchedFields) {\n  if (!work || typeof work !== 'object' || Array.isArray(work)) {\n    throw new WorkValidationError('work item must be an object.');\n  }\n  const touched = (field) => !touchedFields || touchedFields.has(field);\n\n  if (touched('id')) {\n    if (typeof work.id !== 'string' || !ID_PATTERN.test(work.id)) {\n      throw new WorkValidationError(\n        `work.id must be a stable kebab-case identifier (e.g. \"add-login-form\"), got: ${JSON.stringify(work.id)}`,\n      );\n    }\n    if (work.id.length > MAX_ID_LENGTH) {\n      throw new WorkValidationError(\n        `work.id must be at most ${MAX_ID_LENGTH} characters (got ${work.id.length}): ${JSON.stringify(work.id)} — pick a short descriptive id, not a slugified title.`,\n      );\n    }\n  }\n  if (touched('title')) requireNonEmptyString(work, 'title');\n  if (touched('kind')) {\n    requireNonEmptyString(work, 'kind');\n    requireDeclaredClassification(work, 'kind');\n  }\n  if (touched('status')) {\n    requireNonEmptyString(work, 'status');\n",
+          "sha256": "5080bd93b8486fb30aa1274de02c5dc329f0ddb6d5e8b670bba6b782b7d190dc",
+          "blob": "154507cc747a6e83f3abc215c83f560cb02f459a"
+        },
+        {
+          "path": "src/state/store.mjs",
+          "startLine": 265,
+          "endLine": 281,
+          "text": "    // Per D6/D7b: every NEW work.add event carries `tier` explicitly — the\n    // caller's own value, or work.mjs's declared DEFAULTS.tier when omitted —\n    // so the event log itself (not only replay.mjs's fold) states what tier\n    // was in effect at write time. `??` only fills in when `tier` is missing\n    // or nullish; an explicit (even invalid) value passes through unchanged\n    // so validateWork below still rejects it as validation.\n    //\n    // Per work-item-title-contract D2/D5, the title bound is applied HERE, on\n    // the same normalize step as tier and before validateWork — so the\n    // truncated title is what the appended event carries, and every caller\n    // reaching this door (submit and add in bin/fgos.mjs, decompose's children,\n    // the runner loop) obeys one rule without any of them repeating it.\n    const item = { ...work, size: work?.size ?? DEFAULTS.size, title: truncateTitle(work?.title) };\n    validateWork(item, Object.keys(before.work));\n    // domainFields fieldSchema (decision record 0027, D6): a separate,\n    // narrower check than validateWork's own domainFields shape rule above\n    // (work.mjs) — validates ONLY the namespace matching item's own domain\n",
+          "sha256": "5f3e0960519ecf58457419aae0647e62057190c72d0f5b55cdd010bbfba7c690",
+          "blob": "418f3d688929b78bae26607a8eb624737e0ead25"
+        },
+        {
+          "path": "src/state/work.mjs",
+          "startLine": 375,
+          "endLine": 381,
+          "text": "  }\n  if (touched('risk')) {\n    requireNonEmptyString(work, 'risk');\n    requireDeclaredClassification(work, 'risk');\n  }\n  if (touched('refs')) requireArray(work, 'refs');\n  if (touched('verify')) requireNonEmptyString(work, 'verify');\n",
+          "sha256": "e1a677f7d755187998635a588267c0f337bd9082acfbd37123607747b992ee92",
+          "blob": "154507cc747a6e83f3abc215c83f560cb02f459a"
+        }
+      ]
+    },
+    {
+      "finding": "U26 RUL60 wrapper ordering",
+      "before": "`/fgOS:submit` bước 6 làm clarify/classify trong phiên sống trên mô tả sau clarify.",
+      "after": "Trong phiên tương tác sống, `/fgOS:submit` bước 4 gọi `fgos-clarifying` trên raw text trước khi item tồn tại: helper chỉ phân loại `domain`, có thể trả title/description đã viết lại hoặc câu hỏi làm rõ; không phán lại size/kind/risk. Bước 5 gọi `submit` với text/domain đã chốt; bước 6 chỉ báo kết quả.",
+      "beforeSHA256": "f85b40b3a9603d0c0e2f6708f1e3e92f1040bf42498d0e7a834b8e0e32e0a3d5",
+      "afterSHA256": "ab42ee1930939787897a87904f5515cdec62aa2dc01106fb14c76ea924b8d482",
+      "evidence": [
+        {
+          "path": "plugins/fgOS/skills/submit/SKILL.md",
+          "startLine": 24,
+          "endLine": 45,
+          "text": "This value is only ever a TEMP placeholder now (D12, tsk-2yo): the real\njudgment happens later, once at stage `discovery`, on real research\nevidence — this skill never re-judges `tier`/`kind`/`risk` itself, at any\npoint, for any caller.\n\nWhat changed (tsk-qod D2, supersedes tsk-5wz's own ordering): when this\nskill runs inside a LIVE session, `fgos-clarifying` now runs BEFORE the\nitem is ever created (step 4) — not after, at stage `discovery`, the way\ntsk-5wz originally wired it. `fgos-clarifying`'s own contract changed with\nit (tsk-qod D1/D2, `clarify` retired as a stage entirely): it is now a\npure Init-time, verdict-only helper that reads the raw submitted text and\nreturns `{title?, description?, domain, question?}` straight back to this\nskill — it never touches item state itself, because at this point no item\nexists yet to touch. `submit` (step 5) is called with whatever text/domain\nthat verdict settled on. `tier`/`kind`/`risk` are never re-judged here at\nall (D12, tsk-2yo) — `discovery`'s own skill chủ (`fgos-coding-discovering`)\ndoes that, once, on real research evidence, for every item regardless of\nwhich caller created it.\n\nStep 4 is skipped entirely for the no-soul callers (see its own gate) —\nfor them this skill's behavior stays byte-identical to before, mechanical\nplaceholder values included. A wrong placeholder is cheaply corrected\n",
+          "sha256": "9e46c6af4f4fcba998ac6da8992d26ee7d295a6d4dd9677235341be50aaf7026",
+          "blob": "41a02e4aa78e88182ec91cd141543197487d4e17"
+        },
+        {
+          "path": "plugins/fgOS/skills/submit/SKILL.md",
+          "startLine": 125,
+          "endLine": 163,
+          "text": "   only — it writes no state itself, tsk-qod D1/D2):\n\n   - **`question` present** — the intent itself is unclear. STOP here and\n     ask the person the exact question, directly in this conversation —\n     there is no item and no id to park it against, so this is the ONLY\n     place the question can live (same \"do not proceed until the user has\n     answered in this turn\" discipline step 3 already uses for the\n     dependency confirm). Once the person answers, fold their answer into\n     the text and invoke `fgos-clarifying` again on the combined text\n     before continuing — never skip straight to step 5 on the strength of\n     the conversation alone; the fresh verdict is what actually clears the\n     gate (and still needs a `domain` classification either way).\n   - **`question` absent** — intent is understood. Carry the verdict's\n     `domain` (always present) into step 5's `--domain` flag. If the\n     verdict also included a rewritten `title`/`description`, use that\n     text (and report the one-line rewrite the skill already gave you) in\n     place of the step 1 original for step 5; otherwise use step 1's text\n     unchanged.\n\n5. **Call `submit` (and apply any `supersededBy` edits).**\n   - If the user confirmed (or edited to) one or more dependency ids as `blocked-by` (confirm-as-blocked-by), run:\n\n     Both branches use `../_shared/fgos-cli-fallback.md`, substituting\n     `<verb-cmd>` with:\n\n     ```\n     submit \"<text>\" --deps <confirmed-ids> --domain <domain> --dir \"${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}\"\n     ```\n\n     where `<confirmed-ids>` is a comma-separated list of the confirmed\n     `blocked-by` dependency ids.\n   - If no candidates were confirmed as `blocked-by` (or if all were confirmed as `mark-as-superseded-by` or rejected), or no candidate was found in step 2, run the same fallback with **no `--deps` flag at all**:\n\n     ```\n     submit \"<text>\" --domain <domain> --dir \"${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}\"\n     ```\n\n   `<text>` is the (possibly clarify-rewritten) free-text description from\n   step 4, double-quoted so it survives shell parsing as a single\n",
+          "sha256": "14287d2b371eaf4460be80ec373dca1ac7777e517f4ca1467cf8a99ae26b5fc0",
+          "blob": "41a02e4aa78e88182ec91cd141543197487d4e17"
+        },
+        {
+          "path": "plugins/fgOS/skills/submit/SKILL.md",
+          "startLine": 188,
+          "endLine": 197,
+          "text": "6. **Report the result.** Merge all results into a single report back to the user.\n   Relay `submit`'s own output (the new item's id and derived fields), stating\n   which candidates were attached as `deps` (`blocked-by`) and which candidates received\n   a `superseded-by <new-id>` edit. If any `submit` or `edit` command fails, show\n   the real error — do not retry with a modified/guessed id and do not silently\n   drop the failure. `tier`/`kind`/`risk` on this new item are still the\n   mechanical placeholder\n   (D12, tsk-2yo) — `discovery`'s own skill chủ judges the real values\n   later, not this skill; there is no further step here that touches\n   them.\n",
+          "sha256": "f442dd0ed4683eba29d104b206aa0e12dacdd3d25f76f01e1423f020b7c23267",
+          "blob": "41a02e4aa78e88182ec91cd141543197487d4e17"
+        }
+      ]
+    }
+  ]
+}
