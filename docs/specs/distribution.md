@@ -359,6 +359,15 @@ of it).
   instead of thinning the payload; two installed copies of one name are
   refused. The external-consumer CI step runs a dependency-loading verb for
   this reason, because `version` never imports one.
+- An agent in a project with no `bin/` (only the installed `fgos`) finds how
+  to run anything from `fgos --help --json` and `fgos <verb> [<sub>] --help
+  --json`. The host's route table carries two option selectors, `--help` and
+  `-h`, generated from `HELP_SELECTORS` in `src/cli/command-registry.mjs`
+  like every verb route and sent to the legacy-node payload, which owns the
+  verb manifest; every other leading option still has no route and exits 4.
+  A Rust-native verb given an exact `--help`/`-h` token anywhere after it is
+  sent to the payload too, so it prints its manifest entry instead of
+  running. `fgos version` lists verbs only, never the two help selectors.
 
 ## Open Gaps
 

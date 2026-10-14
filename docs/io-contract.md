@@ -83,8 +83,9 @@ Consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông �
 Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung
 đúng một chữ, "ngoại lệ có lý do", không gọi tuỳ hứng theo từng chỗ:
 
-1. **Sổ verb máy-đọc** (`--help`/`--help --json`, kể cả `<verb> --help`) —
-   siêu dữ liệu về CLI, không phải payload của một verb.
+1. **Sổ verb máy-đọc** (`--help`/`-h`, có hoặc không `--json`, kể cả
+   `<verb> [<sub>] --help`) — siêu dữ liệu về CLI, không phải payload của
+   một verb.
 2. **`setup`/`doctor --pretty`** — lối thoát hiển-thị-cho-người tường minh
    qua cờ `--pretty`, không phải payload mặc định.
 3. **Log worker** (`.fgos/logs/<id>.log`) — text trần CỐ Ý, để `tail -f`
@@ -121,8 +122,12 @@ trên MỌI verb).
 
 `fgos --help --json` trả `{schema_version, commands: […]}` — CLI công bố
 toàn bộ mặt verb để một listener/giao diện **sinh** khung lệnh từ manifest
-thay vì hard-code từng verb. `schema_version` hiện `'2.0'` (tăng từ `'1.0'`
-vì trường `access` bị xoá). Mỗi mục verb mang:
+thay vì hard-code từng verb. `schema_version` hiện `'3.0'` (tăng từ `'2.0'`
+khi cờ của verb có sub-verb dời vào `subcommands`; `'2.0'` từng tăng từ
+`'1.0'` vì trường `access` bị xoá). `fgos <verb> [<sub>] --help --json` trả
+riêng mục của một verb (thu hẹp về một sub-verb khi có), cùng hình dạng một
+phần tử `commands[]`. Cả hai chạy được qua Rust host ở mọi project và không
+bao giờ chạy verb. Mỗi mục verb mang:
 
 - `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`
   (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata
@@ -135,6 +140,9 @@ vì trường `access` bị xoá). Mỗi mục verb mang:
   danh sách hiện hành mang `externalEffect: true` (ví dụ `review`, `approve`,
   `coordination` — dispatch executor thật tính là effect ngoài `.fgos/`).
 - `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng.
+- `subcommands` cho verb có sub-verb ở vị trí đầu: `{<sub>: {description,
+  parameters, examples}}`, mỗi sub-verb chỉ mang cờ nó thật sự đọc;
+  `parameters` cấp verb khi đó chỉ còn `sub`.
 
 Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa
 nối vào điều phối hay xác danh; cổng "ai được nói verb nào" thuộc STR38.

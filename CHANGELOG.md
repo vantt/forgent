@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `agent-result.json` takes an optional `needsWrites`: paths the worker needed outside its write scope and did not write.
 - `fgos run --account <id>` (or `"account"` in `--override`) pins the provider account: each seat whose bound executor's provider lists that account runs on it, through the normal lease. A pin no seat can take, or an account that is quarantined (the message says until when), is refused before anything runs, and a resume is refused while the pinned account is quarantined. A provider limit on a pinned account ends the seat instead of switching account or executor. Pair it with `--provider` to choose the executor.
 - A writing seat that already changed the worktree when it hit a provider limit is no longer run again on another account or executor on top of that half-done work: the unit stops as `provider-limit` with `fallbackExhausted.reason: "partial-writes"` and the changed paths. Read-only seats, and seats that changed nothing, rotate as before.
+- `fgos --help --json` and `fgos <verb> [<sub>] --help --json` work through the installed `fgos` in any project: `--help` and `-h` are routed to the verb manifest, `<verb> <sub> --help --json` narrows to one sub-verb, and a Rust-native verb (`version`, `metrics`, `friction`, `convention`, `gate-bypass`) given `--help` prints its manifest entry instead of running. Verbs with sub-verbs (`dispatch`, `workflow`, `merge`, `session`, `gateway`, `goal`, `tool`, `agents`, `metrics`, `friction`, `convention`) list each sub-verb's flags, required fields and examples under `subcommands`.
 
 ### Changed
 
@@ -34,6 +35,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A writing workflow unit that depends on another writing unit now starts from that unit's branch instead of HEAD; `workflow status` lists `writeBranches`.
 - A writing unit that changed files outside its `writes` ends as `findings`; an integrate step that meets such a unit fails and merges nothing (it used to skip it silently).
 - A writing unit that cannot get a worktree of its own now fails instead of running in the shared checkout.
+- The verb manifest's `schema_version` is `3.0`: a verb with sub-verbs keeps only `sub` in its verb-level `parameters`, and each sub-verb's flags are under `subcommands.<sub>.parameters`.
+- `fgos --help` refuses an unknown verb, sub-verb, extra word or option with exit 4 instead of ignoring it. It still accepts `--dir`, which the `fgos` shell function appends.
+- The `fgos run` and `fgos workflow` help say which door to use: one task → `fgos run "<prompt>"`; planned work → `fgos workflow start <preset>|--units <file>`.
 
 ### Removed
 
@@ -51,6 +55,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A Work item stopped on a read-only round whose checkout changed while it ran now says so: the round is accepted with its `warnings`, and the driver stops with `assignment-<operation>-correlated-mutation` (at planning `validation-correlated-mutation-do-not-advance-work`) instead of a generic failed or no-evidence reason. A round launched through the executor CLI door now keeps that door's `stray-write-correlated` warning in its `result.json` instead of only printing it.
 - `fgos run --resume` is refused while a live dispatch still holds the worktree's lock, so a second worker is never started in the same worktree; the old guard read a lock name no dispatch writes and never refused.
 - A Unit's `persona` is resolved and its text pinned when the unit run starts, so a persona defined only in the workspace (`fgos/agents/`) is rendered with its definition instead of its bare name.
+- A help token never runs the verb: `fgos init --json -h` created a store and `fgos session start --json -h` created a worktree, because the help token was read as the previous flag's value; through the Rust host, `fgos version --help` ran `version` and `fgos metrics runs --help` ran `runs`.
+- Manifest entries now match what the CLI reads: `merge next` lists the flags it forwards to approve/sync-root, `workflow start --stance-options`, `workflow operations --step` (was `--stage`), `tool --config`, `tool check --name` (was a positional), `dispatch decide --assignment`, `run record --result`. AGENTS.md and the dispatch fallback skill say `decide --work <id> [--stage <stage>]` (was `--step`).
 
 ### Security
 
