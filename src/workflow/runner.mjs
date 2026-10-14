@@ -22,13 +22,15 @@ import {
   cleanupWorkflowWorktree,
 } from './integrate.mjs';
 import { translatePlanToWorkflow } from './plan-source.mjs';
+import { translateUnitsToWorkflow } from './units-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } from './seats.mjs';
 import { digestContextRefs } from './ref-digests.mjs';
 import { seatProviders } from './seat-providers.mjs';
 import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
-import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError, assertReasoningEffort } from '../runner/dispatch/config.mjs';
+import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
 import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 
@@ -186,8 +188,12 @@ function unitPatternOf(template) {
  * with the persona text pinned at start. bind() takes the first override whose scope matches, so the
  * seat entries come ahead of the unit-wide one: the named seat keeps its persona, every other role
  * (the synthesizer included) falls through to the unit's own.
+ *
+ * A run started with `--effort` asks every role for that reasoning effort, the way `fgos run --effort`
+ * does: on every entry above, and as a trailing unscoped `human-cli` override that a role no entry
+ * names falls through to.
  */
-function unitOverridesOf(unit, seatPersonas = []) {
+function unitOverridesOf(unit, seatPersonas = [], effort = null) {
   const seatScoped = unit.template.pattern === 'panel'
     ? seatPersonas.map(({ seat, name, digest, text }) => ({
       scope: { unit: unit.id, role: seat },
@@ -197,7 +203,75 @@ function unitOverridesOf(unit, seatPersonas = []) {
     }))
     : [];
   const persona = unit.template.persona;
-  return [...seatScoped, ...(persona ? [{ scope: { unit: unit.id }, persona, origin: 'workflow' }] : [])];
+  const overrides = [...seatScoped, ...(persona ? [{ scope: { unit: unit.id }, persona, origin: 'workflow' }] : [])];
+  if (!effort) return overrides;
+  return [...overrides.map((ov) => ({ ...ov, reasoningEffort: effort })), { origin: 'human-cli', reasoningEffort: effort }];
+}
+
+/**
+ * The writing unit whose branch a writing unit of `stepId` starts from: the nearest writing unit
+ * among the steps it builds on, directly or through read-only steps. An integrate step ends the
+ * walk -- what came before it is on the integration target. Null when it builds on none.
+ * Building on two or more writing units (none built on the other) is refused: nothing here merges.
+ */
+function writeBaseOf(workflow, stepId) {
+  const byId = new Map(workflow.steps.map((s) => [s.id, s]));
+  const ancestorsOf = (id) => {
+    const seen = new Set();
+    const walk = (cur) => {
+      for (const dep of byId.get(cur)?.dependsOn ?? []) {
+        if (seen.has(dep)) continue;
+        seen.add(dep);
+        if (byId.get(dep)?.kind !== 'integrate') walk(dep);
+      }
+    };
+    walk(id);
+    return seen;
+  };
+  const writers = [];
+  for (const id of ancestorsOf(stepId)) {
+    const step = byId.get(id);
+    if (step.kind === 'integrate') continue;
+    for (const unit of step.units) if (unit.template.writes?.length) writers.push({ stepId: id, unitId: unit.id });
+  }
+  // Drop a writer some other writer already builds on: its work is on that writer's branch.
+  const nearest = writers.filter((w) => !writers.some((o) => o.stepId !== w.stepId && ancestorsOf(o.stepId).has(w.stepId)));
+  if (nearest.length > 1) {
+    return { refused: nearest.map((w) => w.unitId) };
+  }
+  return nearest[0] ?? null;
+}
+
+/** Refuse a definition where a writing unit builds on more than one writing unit, before any run exists. */
+function assertWriteChains(workflow) {
+  for (const step of workflow.steps) {
+    if (!step.units.some((u) => u.template.writes?.length)) continue;
+    const base = writeBaseOf(workflow, step.id);
+    if (base?.refused) {
+      const writer = step.units.find((u) => u.template.writes?.length).id;
+      throw new RunnerConfigError(
+        `Workflow "${workflow.id}" unit "${writer}" writes and builds on more than one writing unit (${base.refused.join(', ')}); merge these units into one or add an integrate step between them`,
+      );
+    }
+  }
+}
+
+/**
+ * Paths a unit's producer changed outside the unit's write scope: those its commit reports as out of
+ * scope, and any it committed outside the scope. The scope is the one the Unit run recorded (its
+ * `writes` widened to generated render targets), read back from unit.json.
+ */
+function outOfScopeWrites(mainRoot, unitRunId, writes, results) {
+  let scope = writes;
+  try {
+    scope = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8')).writeScope ?? writes;
+  } catch { /* the template's writes are the scope the run started from */ }
+  const found = new Set();
+  for (const result of results) {
+    for (const file of result?.commit?.outOfScope ?? []) found.add(file);
+    for (const file of result?.commit?.files ?? []) if (!matchesWriteScope(file, scope)) found.add(file);
+  }
+  return [...found].sort();
 }
 
 function gitOk(cwd, args) {
@@ -377,6 +451,8 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           const depStep = workflow.steps.find((s) => s.id === depId);
           if (depStep?.units) {
             for (const u of depStep.units) {
+              // A unit that wrote outside its scope never reaches the target.
+              if (state.steps[depId]?.units[u.id]?.outOfScope?.length) continue;
               const uBranch = `wf/${workflowRunId}/${u.id}`;
               try {
                 mergeWorkflowBranch({
@@ -427,6 +503,8 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             stanceOptions: state.stanceOptions?.length ? state.stanceOptions : u.template.stanceOptions,
             ...(u.template.anonymizeInputs ? { anonymizeInputs: true } : {}),
             ...(u.template.blind ? { blind: true } : {}),
+            ...(u.template.prefer ? { prefer: u.template.prefer } : {}),
+            ...(u.template.persona ? { persona: u.template.persona } : {}),
           };
 
           // A unit left `running` with a recorded Unit run id was started by a controller that died:
@@ -440,16 +518,23 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           let unitWorktree = worktreePath;
           let uBranch = null;
           let ownsWorktree = false;
+          let baseRef = null;
+          let baseSha = null;
           if (resumeUnitRunId) {
             // The seats run in the worktree recorded in the Unit run; never make another one here.
             unitWorktree = uState.worktreePath ?? worktreePath;
             uBranch = uState.branch ?? null;
           } else if (unitData.writes.length > 0) {
             uBranch = `wf/${workflowRunId}/${u.id}`;
+            // A unit that builds on a writing unit starts on that unit's branch, so it sees its work.
+            const base = writeBaseOf(workflow, step.id);
+            baseRef = (base && state.steps[base.stepId]?.units[base.unitId]?.branch) || 'HEAD';
+            baseSha = gitOut(mainRoot, ['rev-parse', '--verify', '--quiet', `${baseRef}^{commit}`])?.trim() || null;
             try {
               const wtInfo = createWorkflowWorktree({
                 repoRoot: mainRoot,
                 branch: uBranch,
+                baseRef: baseSha ?? baseRef,
               });
               unitWorktree = wtInfo.worktreePath;
               ownsWorktree = true;
@@ -468,7 +553,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
                 payload: {
                   stepId: step.id,
                   unitId: u.id,
-                  ...(ownsWorktree ? { worktreePath: unitWorktree, branch: uBranch } : {}),
+                  ...(ownsWorktree ? { worktreePath: unitWorktree, branch: uBranch, baseRef, baseSha } : {}),
                 },
               },
             });
@@ -485,7 +570,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
               cwd: unitWorktree,
               worktree: unitWorktree,
               pattern: unitPatternOf(u.template),
-              overrides: unitOverridesOf(u, state.seats?.personas),
+              overrides: unitOverridesOf(u, state.seats?.personas, state.effort),
               workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
               ...(resumeUnitRunId ? { resumeUnitRunId } : {
                 onUnitRunCreated: (unitRunId) => {
@@ -507,6 +592,12 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             };
           }
 
+          // Writing outside the unit's scope is a finding: the unit does not pass, its branch is not integrated.
+          const outOfScope = unitData.writes.length > 0 && unitRunResult.unitRunId
+            ? outOfScopeWrites(mainRoot, unitRunResult.unitRunId, unitData.writes, unitRunResult.results || [])
+            : [];
+          if (outOfScope.length > 0 && unitRunResult.outcome === 'pass') unitRunResult = { ...unitRunResult, outcome: 'findings' };
+
           recordEvent({
             repoRoot: mainRoot,
             workflowRunId,
@@ -518,6 +609,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
                 unitRunId: unitRunResult.unitRunId,
                 outcome: unitRunResult.outcome,
                 results: unitRunResult.results || [],
+                ...(outOfScope.length > 0 ? { outOfScope } : {}),
               },
             },
           });
@@ -525,7 +617,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           stateChanged = true;
           // Only explicitly accepted semantic outcomes proceed; execution failures never do.
           if (!(u.template.acceptOutcomes ?? ['pass']).includes(unitRunResult.outcome)) {
-            failedUnit = { unitId: u.id, outcome: unitRunResult.outcome, results: unitRunResult.results || [], error: unitRunResult.error };
+            failedUnit = { unitId: u.id, outcome: unitRunResult.outcome, results: unitRunResult.results || [], error: unitRunResult.error, outOfScope };
             break;
           }
         }
@@ -534,7 +626,9 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           const refusal = failedUnit.results.find((r) => r?.refused)?.refused;
           const reason = refusal
             ? `${refusal.reason}: ${refusal.detail}`
-            : failedUnit.error
+            : failedUnit.outOfScope.length > 0
+              ? `unit ${failedUnit.unitId} ended ${failedUnit.outcome}: out-of-scope-writes: ${failedUnit.outOfScope.join(', ')}`
+              : failedUnit.error
               ? `unit ${failedUnit.unitId} could not run: ${failedUnit.error}`
               : `unit ${failedUnit.unitId} ended ${failedUnit.outcome}`;
           recordEvent({
@@ -786,12 +880,17 @@ function resolveStart(params) {
   } else if (params.planPath) {
     workflow = translatePlanToWorkflow(params.planPath);
     workflowId = workflow.id;
+  } else if (params.unitsPath) {
+    workflow = translateUnitsToWorkflow(params.unitsPath);
+    workflowId = workflow.id;
   } else if (params.workflowId) {
     workflow = loadWorkflow(params.workflowId, { packageRoot: mainRoot, cwd });
     workflowId = workflow.id;
   } else {
-    throw new RunnerConfigError('startWorkflow requires workflowId, workflow, or planPath');
+    throw new RunnerConfigError('startWorkflow requires workflowId, workflow, planPath, or unitsPath');
   }
+  assertWriteChains(workflow);
+  const effort = params.effort === undefined || params.effort === null ? null : assertReasoningEffort(params.effort);
 
   const contextRefs = normalizeContextRefs(params.contextRefs);
   let seats;
@@ -811,7 +910,7 @@ function resolveStart(params) {
       && resolveGitRoots(mainRoot).mainCheckoutRoot !== resolveGitRoots(worktreePath).mainCheckoutRoot) {
     throw new RunnerConfigError('Workflow contextRefs cannot use plain paths across repositories; use unit-run:<id>/<role> or gate-answer:<workflowRunId>/<stepId>');
   }
-  return { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats };
+  return { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort };
 }
 
 /**
@@ -849,7 +948,7 @@ export async function preflightWorkflowSeats(params = {}) {
  * handed to a caller before any step executes.
  */
 function prepareWorkflowRun(params) {
-  const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats } = resolveStart(params);
+  const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort } = resolveStart(params);
   const configSnapshot = snapshotRunnerConfig(mainRoot);
   const { workflowRunId, runDir } = createWorkflowRun({
     repoRoot: mainRoot,
@@ -860,6 +959,7 @@ function prepareWorkflowRun(params) {
     stanceOptions: normalizeStanceOptions(params.stanceOptions),
     contextRefs,
     seats,
+    effort,
   });
 
   return { workflowRunId, runDir, workflow, mainRoot, worktreePath };
@@ -895,6 +995,8 @@ export function startWorkflowDetached(params = {}) {
  * @param {string} [params.workflowId] Id of registered workflow
  * @param {object} [params.workflow] In-memory workflow object
  * @param {string} [params.planPath] Path to AgentKit plan.md or plan directory
+ * @param {string} [params.unitsPath] Path to a units file (YAML/JSON list of Units), one step per Unit
+ * @param {string} [params.effort] Reasoning effort every unit asks for (low, medium, high, max)
  * @param {string} [params.request] The owner's request this run serves; given to every unit
  * @param {string[]} [params.seats] Ordered entries (lenses or `@name` personas): rebuild the base with one panel seat per entry (see seats.mjs)
  * @param {string} [params.repoRoot]
