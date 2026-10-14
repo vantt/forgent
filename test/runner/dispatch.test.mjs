@@ -31,7 +31,8 @@ import {
   ProviderCapacityConfigError,
 } from '../../src/runner/dispatch.mjs';
 import { buildPrompt, executorIdForWork } from '../../src/runner/work-compat.mjs';
-import { spawnWorker, resolveAgentTypeForWork, resolveWorkForDispatch } from '../../src/runner/work-dispatch.mjs';
+import { spawnWorker, resolveAgentTypeForWork, resolveWorkForDispatch, workDispatchHint } from '../../src/runner/work-dispatch.mjs';
+import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
 import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
@@ -4564,12 +4565,97 @@ test('decideExecutorCli resolves work-item-based (--work) to the same result a p
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'tsk-fanout-candidate', hasLiveTaskAccess: true });
+  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'tsk-fanout-candidate', hasLiveTaskAccess: true });
   const byName = await decideExecutorCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
   assert.deepEqual(byWork, { mechanism: 'in-process', agentType: 'general-purpose', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.rule-2.live-task-access'] });
   // Positional-id path stays byte-identical (no executorId field) -- every
   // pre-D4 caller/test already asserts this exact shape.
   assert.deepEqual(byName, { mechanism: 'in-process', agentType: 'general-purpose', configured: true, reasonCodes: ['native-first.rule-2.live-task-access'] });
+});
+
+test('resolveWorkForDispatch hands dispatch a generic hint, never the Work item', () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  addWork(fgosDir, { id: 'tsk-hint', title: 'Hint', kind: 'task', status: 'todo', deps: [], risk: 'heavy', refs: ['a.md'], verify: 'npm test', domain: 'coding' });
+  const hint = resolveWorkForDispatch({ workId: 'tsk-hint', fgosDir });
+  assert.deepEqual(Object.keys(hint).sort(), ['agentType', 'domain', 'rigor', 'workExecutorId']);
+  assert.equal(hint.rigor, 'high', 'risk: heavy reaches dispatch as rigor high');
+  assert.equal(hint.domain, 'coding');
+  assert.equal(resolveWorkForDispatch({ workId: 'no-such-item', fgosDir }), null);
+});
+
+test('decide --work: an item with its own agentType resolves the same executor and mechanism as one without', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  const base = { kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test' };
+  addWork(fgosDir, { id: 'tsk-plain', title: 'Plain', ...base });
+  addWork(fgosDir, { id: 'tsk-own-agent', title: 'Own agent', ...base });
+  // agentType is an editable item field that `addWork` does not take; stamp it on the hint the way the Work layer reads it.
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    timeoutMs: 5000,
+  });
+  const resolveWithAgent = (args) => {
+    const hint = resolveWorkForDispatch(args);
+    return hint && args.workId === 'tsk-own-agent' ? { ...hint, agentType: 'code-reviewer' } : hint;
+  };
+  for (const live of [true, false]) {
+    const plain = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWithAgent, workId: 'tsk-plain', hasLiveTaskAccess: live });
+    const own = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWithAgent, workId: 'tsk-own-agent', hasLiveTaskAccess: live });
+    assert.deepEqual(own, plain, `hasLiveTaskAccess=${live}`);
+  }
+  assert.equal(workDispatchHint({ id: 'x', agentType: 'code-reviewer' }).agentType, 'code-reviewer');
+});
+
+test('decide --work keeps the item rigor: a risk-heavy item plans at rigor high, a low item never drops below the capability floor', () => {
+  const cfg = {
+    executors: { 'fgos-coding-implement': { command: 'claude', args: ['{prompt}'] } },
+    capabilities: { 'fgos-coding-implement': { rigor: 'standard' } },
+    modelPolicies: { claude: { standard: 's', flagship: 'f', frontier: 'x', nano: 'n' } },
+  };
+  const heavy = sampleWork({ id: 'tsk-heavy', risk: 'heavy' });
+  const heavyPlan = compileDispatchPlan(cfg, { workId: heavy.id, workHint: workDispatchHint(heavy) });
+  assert.equal(heavyPlan.executorId, 'fgos-coding-implement');
+  assert.equal(heavyPlan.policy.rigor, 'high');
+  const low = sampleWork({ id: 'tsk-low', rigor: 'low' });
+  const lowPlan = compileDispatchPlan(cfg, { workId: low.id, workHint: workDispatchHint(low) });
+  assert.equal(lowPlan.policy.rigor, 'standard', 'the capability floor is not lowered by the item rigor');
+  const critical = sampleWork({ id: 'tsk-critical', rigor: 'critical' });
+  assert.equal(compileDispatchPlan(cfg, { workId: critical.id, workHint: workDispatchHint(critical) }).policy.rigor, 'critical');
+});
+
+test('decide --work: a resolver that still returns the old { workItem, executorId } shape, or no executor identity, is refused, not sent to a default executor', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' } }, timeoutMs: 5000 });
+  const oldShape = () => ({ workItem: { id: 'tsk-old' }, executorId: 'fgos-coding-implement' });
+  await assert.rejects(
+    () => decideExecutorCli(undefined, { repoRoot: root, resolveWork: oldShape, workId: 'tsk-old', hasLiveTaskAccess: true }),
+    /the --work resolver result takes no Work item \(workItem\)/,
+  );
+  await assert.rejects(
+    () => decideExecutorCli(undefined, { repoRoot: root, resolveWork: () => ({ agentType: null }), workId: 'tsk-old', hasLiveTaskAccess: true }),
+    /without the executor identity/,
+  );
+});
+
+test('decide --work: an item with a malformed legacy rigor still resolves its executor, as before the hint', () => {
+  const cfg = {
+    executors: { 'fgos-coding-implement': { command: 'claude', args: ['{prompt}'] } },
+    modelPolicies: { claude: { standard: 's', flagship: 'f', frontier: 'x', nano: 'n' } },
+  };
+  const legacy = sampleWork({ id: 'tsk-legacy-rigor', rigor: 'extreme' });
+  const hint = workDispatchHint(legacy);
+  assert.equal(hint.rigor, 'extreme', 'handed on for dispatch to judge');
+  const plan = compileDispatchPlan(cfg, { workId: legacy.id, workHint: hint });
+  assert.equal(plan.executorId, 'fgos-coding-implement');
+});
+
+test('dispatch doors refuse a Work item instead of ignoring it', async () => {
+  assert.throws(() => compileDispatchPlan({}, { work: 'tsk-x', workItem: { id: 'tsk-x' } }), /compileDispatchPlan\(\) takes no Work item/);
+  await assert.rejects(() => decideExecutorCli(undefined, { repoRoot: mkTempDir(), work: 'tsk-x' }), /decideExecutorCli\(\) takes no Work item \(work\)/);
+  await assert.rejects(() => executeExecutorCli('agy', { work: { id: 'tsk-x' } }), /executeExecutorCli\(\) takes no Work item/);
+  await assert.rejects(() => executeAssignment({ assignmentId: 'a' }, { work: { id: 'tsk-x' } }), /executeAssignment\(\) takes no Work item/);
 });
 
 test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-coding-implement.prefer -- the real tsk-34n/D3 migration shape (no literal executors.fgos-coding-implement entry, only agy declaring "for")', async () => {
@@ -4595,13 +4681,13 @@ test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-
   // hasLiveTaskAccess:true (a live/native session) -- must still resolve
   // out-of-process, since agy is cli-spawn-shaped (tsk-pdg D1): this is
   // the exact real gap tsk-1m8 found live before tsk-pdg fixed it.
-  const withLiveAccess = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: true });
+  const withLiveAccess = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: true });
   assert.deepEqual(withLiveAccess, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
   // hasLiveTaskAccess:false (the real fgos loop headless runner) --
   // byte-identical mechanism/configured shape either way, matching
   // tsk-pdg's own live evidence against the real repo before this item's
   // migration.
-  const headless = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: false });
+  const headless = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: false });
   assert.deepEqual(headless, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
@@ -4626,7 +4712,7 @@ test('decideExecutorCli resolves work-item-based (--work) to "in-process" by def
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'tsk-fanout-unregistered', hasLiveTaskAccess: true });
+  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'tsk-fanout-unregistered', hasLiveTaskAccess: true });
   assert.deepEqual(byWork, { mechanism: 'in-process', executorId: 'fgos-coding-implement', configured: false, reasonCodes: ['native-first.rule-2.live-task-access'] });
   // The SAME unregistered executorId, looked up by NAME (not --work), used
   // to keep its pre-D4 byte-identical "no executor -> out-of-process"
@@ -4658,7 +4744,7 @@ test('decideExecutorCli resolves work-item-based (--work) to "out-of-process" wh
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'tsk-fanout-no-live-access' });
+  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'tsk-fanout-no-live-access' });
   assert.deepEqual(byWork, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: false, reasonCodes: ['native-first.rule-1.no-native-mechanism'] });
 });
 
@@ -4671,7 +4757,7 @@ test('decideExecutorCli throws a RunnerConfigError when --work names a work item
     timeoutMs: 5000,
   });
   await assert.rejects(
-    () => decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'no-such-work-item' }),
+    () => decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'no-such-work-item' }),
     RunnerConfigError,
   );
 });
@@ -4698,7 +4784,7 @@ test('a positional executorId still wins over --work when both are somehow passe
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const decided = await decideExecutorCli('explicit', { repoRoot: root, work: 'tsk-fanout-candidate-2', hasLiveTaskAccess: true });
+  const decided = await decideExecutorCli('explicit', { repoRoot: root, workId: 'tsk-fanout-candidate-2', hasLiveTaskAccess: true });
   assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
@@ -5199,7 +5285,7 @@ test('compileDispatchPlan builds a canonical DispatchPlan for all four selector 
 
   // Form 3: work selector (--work)
   const sample = sampleWork();
-  const plan3 = compileDispatchPlan(cfg, { work: sample.id, workItem: sample, workExecutorId: executorIdForWork(sample) });
+  const plan3 = compileDispatchPlan(cfg, { workId: sample.id, workHint: { workExecutorId: executorIdForWork(sample) } });
   assert.equal(plan3.selector.type, 'work');
   assert.equal(plan3.selector.value, sample.id);
   assert.equal(plan3.mechanism, 'out-of-process');
@@ -5221,7 +5307,7 @@ test('compileDispatchPlan selector precedence matches actual resolution preceden
   // Both executorId AND work are passed -- resolution's own `if (!executorId
   // && workIdArg)` guard means the work item is never even touched, so
   // selector must report 'executor', never 'work'.
-  const plan = compileDispatchPlan(cfg, { executorId: 'agy', work: sample.id, workItem: sample });
+  const plan = compileDispatchPlan(cfg, { executorId: 'agy', workId: sample.id, workHint: { workExecutorId: executorIdForWork(sample) } });
   assert.equal(plan.selector.type, 'executor');
   assert.equal(plan.selector.value, 'agy');
   assert.equal(plan.executorId, 'agy');

@@ -438,10 +438,17 @@ function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
  * unit run behind. A writing unit needs a linked worktree; this never creates one.
  */
 async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }) {
-  if (typeof prompt !== 'string' || !prompt.trim()) {
+  // `--sync <ref>` without a prompt is a sync-only unit: the runner merges the ref and a worker
+  // runs only when the merge stops on conflicts.
+  const syncOnly = prompt === undefined && flags.sync !== undefined;
+  if (!syncOnly && (typeof prompt !== 'string' || !prompt.trim())) {
     throw new StoreError('validation', 'fgos run "<prompt>" needs a non-empty prompt');
   }
+  const syncBase = flags.sync === undefined ? undefined : requireField(flags.sync, '--sync requires a ref to merge (a branch, tag or commit, e.g. main)');
   const writes = parseListFlag(flags.writes);
+  if (syncBase !== undefined && flags.writes === undefined) {
+    throw new StoreError('validation', 'fgos run --sync needs --writes: merging a ref changes the branch, so the unit is a writing unit in a linked worktree (the conflicted paths join the scope by themselves)');
+  }
   if (flags.writes !== undefined && writes.length === 0) {
     throw new StoreError('validation', 'fgos run "<prompt>" --writes needs at least one path; omit it for a read-only unit');
   }
@@ -468,11 +475,12 @@ async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }
   }
   const { randomBytes } = await import('node:crypto');
   // ASCII only, so the id is a safe path segment whatever the prompt's script or punctuation.
-  const slug = prompt.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase()
+  const slug = (syncOnly ? `sync-${syncBase}` : prompt).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase()
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+/, '').slice(0, 40).replace(/-+$/, '') || 'task';
   return {
     id: `adhoc-${slug}-${randomBytes(2).toString('hex')}`,
-    objective: prompt,
+    ...(syncOnly ? {} : { objective: prompt }),
+    ...(syncBase !== undefined ? { syncBase } : {}),
     capability: flags.capability === undefined ? 'execute' : requireField(flags.capability, '--capability requires a capability name'),
     writes,
     ...(flags.rigor !== undefined ? { rigor: requireField(flags.rigor, '--rigor requires a level') } : {}),
@@ -2752,11 +2760,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
 
       const { runUnit, resolveGitRoots } = await import('../src/runner/execution/run.mjs');
+      const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
       const unitPath = flags.unit;
       const resumeUnitRunId = flags.resume;
       const prompt = positional[0];
-      if (!unitPath && !resumeUnitRunId && prompt === undefined) {
-        throw new StoreError('validation', 'fgos run requires --unit <file|-> or --resume <unitRunId>, or a "<prompt>"');
+      if (!unitPath && !resumeUnitRunId && prompt === undefined && flags.sync === undefined) {
+        throw new StoreError('validation', 'fgos run requires --unit <file|-> or --resume <unitRunId>, a "<prompt>", or --sync <ref>');
       }
       if ([unitPath, resumeUnitRunId, prompt].filter((v) => v !== undefined).length > 1) {
         throw new StoreError('validation', 'fgos run takes either a "<prompt>", --unit or --resume, not more than one');
@@ -2765,7 +2774,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         throw new StoreError('validation', `fgos run takes one prompt; quote the prompt ("${positional.join(' ')}")`);
       }
       // The flags that build a unit from a prompt mean nothing to a --unit file or a resume; refused, never dropped.
-      const promptOnlyFlag = prompt === undefined && ['provider', 'persona', 'writes', 'capability', 'rigor'].find((f) => flags[f] !== undefined);
+      // A bare `--sync <ref>` builds a sync-only unit from the same flags (a --unit file names `syncBase`).
+      if (flags.sync !== undefined && (unitPath || resumeUnitRunId)) {
+        throw new StoreError('validation', '--sync only applies to fgos run "<prompt>" or a bare --sync <ref>; a --unit file names syncBase, and a resume keeps the sync it started with');
+      }
+      const buildsUnit = prompt !== undefined || flags.sync !== undefined;
+      const promptOnlyFlag = !buildsUnit && ['provider', 'persona', 'writes', 'capability', 'rigor'].find((f) => flags[f] !== undefined);
       if (promptOnlyFlag) {
         throw new StoreError('validation', `--${promptOnlyFlag} only applies to fgos run "<prompt>"`);
       }
@@ -2793,6 +2807,22 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           if (ov.reasoningEffort === undefined) ov.reasoningEffort = effort;
         }
       }
+      // `--timeout <dur>` (90m, 5400s, 2h) gives the run its own time instead of runner.timeoutMs, the
+      // same way: a `timeoutMs` key on every override that does not name one. It is kept in unit.json,
+      // so a resumed run keeps it and --timeout cannot change it.
+      if (flags.timeout !== undefined) {
+        if (resumeUnitRunId) throw new StoreError('validation', '--timeout cannot change a resumed unit run: it keeps the timeout it was started with');
+        let timeoutMs;
+        try {
+          timeoutMs = parseRunTimeout(requireField(flags.timeout, '--timeout requires a duration, e.g. 90m or 5400s'));
+        } catch (err) {
+          throw new StoreError('validation', err.message);
+        }
+        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({ origin: 'human-cli' });
+        for (const ov of overrides) {
+          if (ov.timeoutMs === undefined) ov.timeoutMs = timeoutMs;
+        }
+      }
       // `--account <id>` pins the provider account the same way: an `account` key on every override
       // that does not name one. runUnit checks it against each seat's bound executor before the unit
       // run exists; a resumed run keeps the account its bindings already carry.
@@ -2808,7 +2838,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const worktree = flags.worktree;
       const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
       // Everything about the one-liner is checked here, before runUnit creates a unit run.
-      const unitData = prompt === undefined ? undefined : await adhocUnitFromPrompt(prompt, flags, {
+      const unitData = !buildsUnit ? undefined : await adhocUnitFromPrompt(prompt, flags, {
         mainRoot: repoRoot ? path.resolve(repoRoot) : resolveGitRoots(process.cwd()).mainCheckoutRoot,
         // Where a writing unit would run: --worktree, else here. Only a linked worktree may be written.
         isLinkedWorktree: () => resolveGitRoots(worktree ? path.resolve(worktree) : process.cwd()).isLinkedWorktree,

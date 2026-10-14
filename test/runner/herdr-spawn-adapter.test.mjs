@@ -9,6 +9,8 @@ import { loadRunnerConfig } from '../../src/runner/dispatch/config.mjs';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { readVisibility } from '../../src/runner/dispatch/visibility-session.mjs';
+import { isDraftStillInComposer, buildLauncherScriptContent } from '../../src/runner/dispatch/herdr-round.mjs';
+import { workerBaseEnv } from '../../src/runner/dispatch/adapters.mjs';
 
 function writeRunnerConfigFixture(root, cfg) {
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
@@ -253,20 +255,21 @@ test('herdr-spawn adapter validates interactiveMode config shape', () => {
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('the prompt travels as a file and only a one-line pointer is ever typed', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+test('file-pointer delivery writes the prompt to disk and types only a one-line pointer', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-brief-file-'));
   const mock = createMockHerdr(tmpDir);
-  const res = await dispatchThroughMock(tmpDir, mock, { prompt: MULTILINE_PROMPT });
+  const res = await dispatchThroughMock(tmpDir, mock, { prompt: MULTILINE_PROMPT, promptDelivery: 'file-pointer' });
 
   const brief = fs.readFileSync(path.join(tmpDir, 'run', 'brief-1.md'), 'utf8');
   assert.ok(brief.includes(MULTILINE_PROMPT), 'the brief carries the real prompt verbatim, newlines and all');
+  assert.match(brief, /Brief file on disk \(re-read after compaction or restart\): .*brief-1\.md/);
 
   const submissions = mock.calls().filter((c) => c[0] === 'agent' && c[1] === 'prompt' && !c[3].startsWith('/'));
   assert.equal(submissions.length, 1);
   const typed = submissions[0][3];
-  assert.ok(!typed.includes('\n'), 'what gets typed at a TUI is a single line');
+  assert.ok(!typed.includes('\n'), 'what gets typed at a TUI in file-pointer mode is a single line');
   assert.match(typed, /^Read .*brief-1\.md and do what it says\.$/);
-  assert.ok(!typed.includes('read the spec'), 'the work itself never goes through the terminal');
+  assert.ok(!typed.includes('read the spec'), 'the work itself never goes through the terminal in file-pointer mode');
   assert.equal(res.status, 0);
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
@@ -754,17 +757,34 @@ test('a brief that landed nowhere is offered again once the agent is back at res
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('inline delivery types the brief itself, and is a declared choice rather than the default', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+test('inline delivery is the default and types the full brief while still writing brief-1.md on disk', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-inline-'));
   const mock = createMockHerdr(tmpDir);
-  const res = await dispatchThroughMock(tmpDir, mock, { prompt: MULTILINE_PROMPT, promptDelivery: 'inline' });
+  const res = await dispatchThroughMock(tmpDir, mock, { prompt: MULTILINE_PROMPT });
 
   assert.equal(res.status, 0);
   const typed = mock.calls().find((c) => c[0] === 'agent' && c[1] === 'prompt' && !c[3].startsWith('/'))[3];
-  assert.ok(typed.includes(MULTILINE_PROMPT), 'inline puts the whole brief through the terminal');
+  assert.ok(typed.includes(MULTILINE_PROMPT), 'inline puts the whole brief through the terminal by default');
   assert.ok(fs.existsSync(path.join(tmpDir, 'run', 'brief-1.md')), 'the brief is still written for the record');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('FGOS_HERDR_PROMPT_DELIVERY=file-pointer overrides the default to file-pointer mode', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-env-delivery-'));
+  const mock = createMockHerdr(tmpDir);
+  const prev = process.env.FGOS_HERDR_PROMPT_DELIVERY;
+  process.env.FGOS_HERDR_PROMPT_DELIVERY = 'file-pointer';
+  try {
+    const res = await dispatchThroughMock(tmpDir, mock, { prompt: MULTILINE_PROMPT });
+    assert.equal(res.status, 0);
+    const typed = mock.calls().find((c) => c[0] === 'agent' && c[1] === 'prompt' && !c[3].startsWith('/'))[3];
+    assert.match(typed, /^Read .*brief-1\.md and do what it says\.$/);
+  } finally {
+    if (prev === undefined) delete process.env.FGOS_HERDR_PROMPT_DELIVERY;
+    else process.env.FGOS_HERDR_PROMPT_DELIVERY = prev;
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 });
 
 test('the exit sequence asks the agent to leave, waits for the pane to be its own again, then closes it', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
@@ -1273,4 +1293,77 @@ test('a herdr that stops answering does not turn a live round into an idle timeo
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
+});
+
+test('isDraftStillInComposer detects TUI paste chips and modal menus in composer while ignoring historical viewport lines', () => {
+  const brief = '# Brief 1\n\n## Your task\n' + Array.from({ length: 40 }, (_, i) => `line ${i}`).join('\n');
+
+  assert.equal(
+    isDraftStillInComposer({ message: brief, promptText: '❯ [Pasted text #1 +42 lines]', visibleScreen: '' }),
+    true,
+    'claude folded paste chip in promptText is detected as unsubmitted draft',
+  );
+  assert.equal(
+    isDraftStillInComposer({ message: brief, promptText: '', visibleScreen: 'header\n[paste #1 +42 lines]\n? for shortcuts' }),
+    true,
+    'pi/omp folded paste chip in bottom composer lines is detected as unsubmitted draft',
+  );
+  assert.equal(
+    isDraftStillInComposer({ message: brief, promptText: '', visibleScreen: 'Pasted 105 lines\nAttach as a wrapped block' }),
+    true,
+    'omp modal paste menu is detected as requiring Enter',
+  );
+
+  const historicalScreen = [
+    '❯ [Pasted text #1 +42 lines]',
+    '● Reading files...',
+    '● Done.',
+    'line 1',
+    'line 2',
+    'line 3',
+    'line 4',
+    'line 5',
+    '❯ ',
+  ].join('\n');
+  assert.equal(
+    isDraftStillInComposer({ message: brief, promptText: '❯ ', visibleScreen: historicalScreen }),
+    false,
+    'a paste chip that scrolled up past the bottom 6 composer lines must not false-positive',
+  );
+});
+
+test('buildLauncherScriptContent and workerBaseEnv preserve pane terminal/session identity and strip parent OMP profile vars', () => {
+  const cleaned = workerBaseEnv({
+    PATH: '/usr/bin',
+    FGOS_RUST_HOST_RECURSION_GUARD: '1',
+    OMPCODE: '1',
+    OMP_PROFILE: 'gemini-tetcu72',
+    PI_PROFILE: 'gemini-tetcu72',
+    PI_CONFIG_FILES: '/tmp/overlay.yml',
+  });
+  assert.equal(cleaned.PATH, '/usr/bin');
+  assert.equal(cleaned.FGOS_RUST_HOST_RECURSION_GUARD, undefined);
+  assert.equal(cleaned.OMPCODE, undefined);
+  assert.equal(cleaned.OMP_PROFILE, undefined);
+  assert.equal(cleaned.PI_PROFILE, undefined);
+  assert.equal(cleaned.PI_CONFIG_FILES, undefined);
+
+  const script = buildLauncherScriptContent({
+    argv0: 'codex',
+    command: '/usr/bin/bwrap',
+    args: ['--ro-bind', '/', '/'],
+    env: {
+      CODEX_HOME: '/tmp/priv',
+      TERM: 'dumb',
+      COLORTERM: 'truecolor',
+      TERM_PROGRAM: 'vscode',
+      HERDR_PANE_ID: 'wS:pCaller',
+      HERDR_TAB_ID: 'wS:tCaller',
+      HERDR_WORKSPACE_ID: 'wS',
+    },
+    workerCommandDigest: 'sha256:test',
+  });
+  assert.match(script, /export CODEX_HOME=\/tmp\/priv/);
+  assert.doesNotMatch(script, /export TERM=/, 'caller TERM=dumb must not clobber the pane terminal type');
+  assert.doesNotMatch(script, /export HERDR_PANE_ID=/, 'caller pane id must not clobber the worker pane id');
 });

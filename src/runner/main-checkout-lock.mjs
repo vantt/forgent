@@ -46,6 +46,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveHolderLiveness as resolveHolderLivenessByIdentity } from './dispatch/process-identity.mjs';
+import { RUN_TIMEOUT_MAX_MS } from './dispatch/run-timeout.mjs';
 
 export const LOCK_FILE = 'main-checkout.lock';
 
@@ -213,10 +214,17 @@ function parseLockContent(raw) {
     return null;
   }
   if (!parsed || typeof parsed !== 'object') return null;
-  const { pid, ts } = parsed;
+  const { pid, ts, ttlMs } = parsed;
   if (!isUsableIdentity(pid)) return null;
   if (!Number.isInteger(ts) || ts <= 0) return null;
-  return { pid, ts };
+  return { pid, ts, ...(Number.isSafeInteger(ttlMs) && ttlMs > 0 ? { ttlMs } : {}) };
+}
+
+/** The lock record a holder writes. A dispatch-lock (composite pid) holder also records the ttlMs it
+ * took: its run timeout, which can be longer than a contender's, and it renews only every ttl/3. */
+function lockRecord(identity, ts, ttlMs) {
+  const ownTtl = parseCompositePidIdentity(identity) !== null && Number.isSafeInteger(ttlMs) && ttlMs > 0 ? { ttlMs } : {};
+  return JSON.stringify({ pid: identity, ts, ...ownTtl });
 }
 
 /** Publishes `content` under `lockPath` as a brand-new file, atomically and
@@ -266,7 +274,7 @@ function writeAtomicReplace(lockPath, content) {
  */
 function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = true) {
   try {
-    writeAtomicCreate(lockPath, JSON.stringify({ pid: identity, ts: now }));
+    writeAtomicCreate(lockPath, lockRecord(identity, now, ttlMs));
     return { status: ACQUIRED };
   } catch (err) {
     if (err.code !== 'EEXIST') throw err;
@@ -296,11 +304,12 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = t
   // lock is always released in the same call that acquired it, so it has
   // no legitimate re-entry to protect.
   if (allowSelfRecognition && record.pid === identity) {
-    writeAtomicReplace(lockPath, JSON.stringify({ pid: identity, ts: now }));
+    writeAtomicReplace(lockPath, lockRecord(identity, now, ttlMs ?? record.ttlMs));
     return { status: ACQUIRED };
   }
 
   let held;
+  let effectiveTtlMs = ttlMs;
   if (typeof record.pid === 'number') {
     // Different numeric identity: unchanged pidLive-AND-ttlMs logic.
     const pidLive = isPidAlive(record.pid);
@@ -334,7 +343,12 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = t
       // never a fabricated remaining-TTL with no ttlMs to compute it from.
       return { status: AMBIGUOUS, lockAgeMs: now - record.ts };
     } else {
-      held = now - record.ts <= ttlMs;
+      // A live dispatch-lock holder is judged by the longer of its own ttl and the contender's: it
+      // renews every ttl/3 of its own run timeout, which may be longer than the contender's.
+      // Held to the run-timeout ceiling: a holder killed without releasing, whose pid was reused,
+      // reads as live, and no record may block a worktree longer than one run may take.
+      if (composite !== null && record.ttlMs !== undefined) effectiveTtlMs = Math.max(ttlMs, Math.min(record.ttlMs, RUN_TIMEOUT_MAX_MS));
+      held = now - record.ts <= effectiveTtlMs;
     }
   }
 
@@ -344,7 +358,7 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = t
       status: HELD,
       holderPid: record.pid,
       lockAgeMs,
-      remainingTtlMs: typeof ttlMs === 'number' ? Math.max(0, ttlMs - lockAgeMs) : null,
+      remainingTtlMs: typeof effectiveTtlMs === 'number' ? Math.max(0, effectiveTtlMs - lockAgeMs) : null,
     };
   }
 
@@ -615,7 +629,7 @@ export function renewMainCheckoutLockIfOwn(dir, identity, { now = Date.now(), lo
   if (recheck === null) return { status: 'ambiguous' };
   if (recheck.pid !== identity) return { status: 'not-owner', holderPid: recheck.pid };
 
-  writeAtomicReplace(lockPath, JSON.stringify({ pid: identity, ts: now }));
+  writeAtomicReplace(lockPath, lockRecord(identity, now, recheck.ttlMs));
   return { status: 'renewed' };
 }
 

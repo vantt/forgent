@@ -525,6 +525,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             ...(u.template.blind ? { blind: true } : {}),
             ...(u.template.prefer ? { prefer: u.template.prefer } : {}),
             ...(u.template.persona ? { persona: u.template.persona } : {}),
+            ...(u.template.timeoutMs !== undefined ? { timeoutMs: u.template.timeoutMs } : {}),
           };
 
           // A unit left `running` with a recorded Unit run id was started by a controller that died:

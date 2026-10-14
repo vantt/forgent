@@ -1220,7 +1220,7 @@
       },
       "xai": {
         "kind": "agent",
-        "description": "xai (Grok) provider via omp CLI (oh-my-pi, a pi fork) with the xai-vantt profile; replaces the pi grok-vantt login that kept needing re-OAuth. omp reads the profile through PI_CODING_AGENT_DIR like pi does. PI_CONFIG_DIR is a path relative to HOME that lands in /tmp, because omp writes a runtime directory under its config root and the confined home is read-only. omp has no ls/find tools (glob instead) and no herdr pane invocation yet. The account files are declared in the user-level ~/.fgos/config.json (providers.xai).",
+        "description": "xai (Grok) provider via omp CLI (oh-my-pi, a pi fork) with the xai-vantt profile; replaces the pi grok-vantt login that kept needing re-OAuth. omp reads the profile through PI_CODING_AGENT_DIR like pi does. PI_CONFIG_DIR is a path relative to HOME that lands in /tmp, because omp writes a runtime directory under its config root and the confined home is read-only. omp uses glob instead of ls/find. The account files are declared in the user-level ~/.fgos/config.json (providers.xai).",
         "allowCrossProvider": true,
         "providerModel": "xai",
         "invocations": [
@@ -1267,6 +1267,41 @@
             ],
             "confinement": {
               "backend": "bwrap"
+            },
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/xai-vantt/agent",
+              "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
+          },
+          {
+            "id": "omp-herdr-vantt",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "command": "omp",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,glob",
+              "--auto-approve"
+            ],
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "omp"
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/xai-vantt/agent",

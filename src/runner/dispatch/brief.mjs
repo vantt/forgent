@@ -95,6 +95,8 @@ export function renderBrief({ prompt, round, runDir, agentName, effectiveContrac
   }
 
   return `# Brief ${round}
+
+- Brief file on disk (re-read after compaction or restart): ${p.briefPath}
 ${contractSection}
 ## Acknowledge first
 

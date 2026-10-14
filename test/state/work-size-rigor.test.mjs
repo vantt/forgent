@@ -14,6 +14,7 @@ import { foldEvents, rebuildView, rebuildViewFromDir } from '../../src/state/rep
 import { initStore, addWork, editWork, currentEffectiveView } from '../../src/state/store.mjs';
 import { parseEditFlags } from '../../src/verbs/state/edit.mjs';
 import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
+import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-size-rigor-test-'));
@@ -153,14 +154,16 @@ test('Work dispatch: rigor: high -> tier flagship (qua rigorToTier)', () => {
     rigor: 'high',
   };
 
+  // The Work layer folds the item's rigor into the assignment; dispatch never reads the item.
+  const rigor = workRigorFor(work);
   const assignment = {
     operation: 'exec',
     policy: {},
+    ...(rigor !== undefined ? { rigor } : {}),
   };
 
   const policy = resolveAssignmentDispatchPolicy({
     assignment,
-    work,
     runnerConfig,
     cliOverride: {},
   });
@@ -196,14 +199,16 @@ test('Work dispatch: không có rigor -> standard, size: heavy không ảnh hư�
     // no rigor declared
   };
 
+  // The Work layer folds the item's rigor into the assignment; dispatch never reads the item.
+  const rigor = workRigorFor(work);
   const assignment = {
     operation: 'exec',
     policy: {},
+    ...(rigor !== undefined ? { rigor } : {}),
   };
 
   const policy = resolveAssignmentDispatchPolicy({
     assignment,
-    work,
     runnerConfig,
     cliOverride: {},
   });

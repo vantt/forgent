@@ -13,7 +13,7 @@ created: 2026-10-14
 
 ## Trạng thái
 
-M1 đóng 2026-10-14 19:30. M2 đang chạy. Lead: phiên điều phối; owner: anh vantt.
+completed 2026-10-15 02:05. M1 đóng 2026-10-14 19:30; M2 đóng với cổng [gate-m2-261015-0205](reports/gate-m2-261015-0205.md) (bước 3 đường Work thật UNPROVEN, có bằng chứng fixture). Thêm ngoài plan, owner duyệt: lane account, help, timeout, sync. Lead: phiên điều phối; owner: anh vantt.
 
 - M1 = đợt A-E, cộng hai lane ngoài phase (gitparse, các fix khoá resume / pin persona / invocation `prefer` của Lead).
 - Cổng G-M1: [gate-m1-261014-1857](reports/gate-m1-261014-1857.md); ca 2 và ca 8 đổi kỳ vọng (mục để ngỏ). Ma trận provider 6/6 sau khi Lead thêm provider `deepseek` vào `~/.fgos/config.json` (owner cho phép; backup `config.json.bak-20261014-deepseek`).
@@ -133,6 +133,15 @@ Người giữ các file dùng chung theo từng bước được ghi ở [proto
   - Có một event `executor.dispatch` giả (`id:"a"`) trong `.fgos/events/3546717-20261014T123543656Z.jsonl` của main checkout. Lead giữ nguyên: log chỉ ghi thêm (L3), và guard chống cắt log đã ghi nhận file này.
   - R4b (guard A4 chưa thấy `import()` động / `createRequire`, ví dụ `dispatch/assignment.mjs:99` nạp harness của domain) chuyển sang phase 11.
   - `node src/runner/dispatch.mjs decide --work` vẫn có thể ghi config mặc định trước khi từ chối. Mức Low, có từ trước.
+
+- Activate sau G-M2 (2026-10-15 02:05), release `sha256:fee5e262…` build từ main `cb0acb254`:
+  - forgentX: `previousArtifactDigest` `0f0d988e…`; qua `fgos` trần: `--help --json` 3.0, `dispatch execute` báo đã xoá, one-liner đọc `unit-run-1792004798347-1422b4d7` pass.
+  - mdview: `fgos setup`, không còn chỗ dạy cửa cũ, doctor 101/108 (đỏ có từ trước), one-liner đọc pass (`unit-run-1792004621503-1eab1147`).
+  - mcp-skill-hub: `fgos setup`, không còn chỗ dạy cửa cũ, doctor 104/108 (đỏ có từ trước). One-liner ban đầu bị `posture-unavailable`, vì config riêng (local, không track) chỉ có `openai` kiểu cũ: không `id`, không confine, và `modelPolicies` thiếu tier. Lead chép bộ executor agent và `modelPolicies` của mdview sang (backup `.fgos/config.json.bak-20261015-before-executors`); one-liner pass (`unit-run-1792004730344-5fb50674`). Rollback cả hai: `fgctl repair` về `bbea6dba…` rồi `fgos setup`.
+- Item riêng, phát hiện khi activate:
+  - `~/.fgos/config.json` chỉ có `openai`/`pi` kiểu cũ (không confine). Project nào không tự khai executor có confine thì `fgos run` không chạy được.
+  - `fgos doctor` chưa có check "không executor nào mang được posture read-only/workspace-write". Lỗi này chỉ lộ khi chạy thật.
+  - Từ lane timeout: `workflow start` chưa có `--timeout`. Từ lane sync: Q2 (`--sync` bắt buộc `--writes`) và Q3 (producer inline).
 
 ## Disposition review
 

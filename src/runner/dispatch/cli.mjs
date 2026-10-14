@@ -24,7 +24,7 @@ import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../pa
 import { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily, resolveCapabilityDetailsFromHints } from './resolve.mjs';
-import { resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
+import { WORK_ITEM_KEYS, refuseWorkItemInput, resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';
 import { executeThroughConfinement, buildConfinementAttestation } from './confinement/authority.mjs';
@@ -196,15 +196,15 @@ export function strayWriteWarning({ repoRoot, strayPaths }) {
   };
 }
 
-export function openRunnerRun({ fgosDir, workId, executorId, cwd }) {
+export function openRunnerRun({ fgosDir, executorId, cwd }) {
   const baseDir = fgosDir || path.join(os.tmpdir(), 'fgos-assignments');
-  const assignmentId = `asgn-${workId || executorId || 'run'}-${Date.now()}`;
+  const assignmentId = `asgn-${executorId || 'run'}-${Date.now()}`;
   const runDir = path.join(baseDir, 'assignments', assignmentId, 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(path.join(runDir, 'run.json'), `${JSON.stringify({
     contract: 'run.v1',
     runId: `${assignmentId}-01`,
-    workId: workId ?? null,
+    workId: null,
     executorId,
     cwd,
     startedAt: new Date().toISOString(),
@@ -394,10 +394,9 @@ export async function executeExecutorCli(
     idleTimeoutMs: idleTimeoutOverride,
     maxBuffer: maxBufferOverride,
     onChunk,
-    // Work-layer inputs, resolved by the caller (dispatch never looks a Work
-    // item's step up): the Work item as plain data, the capability hints its
-    // Workflow step implies, and the agent type its task spec resolves to.
-    work,
+    // Generic inputs the caller resolved (dispatch never looks a Work item's step
+    // up): the capability hints its step implies and the agent type its task spec
+    // resolves to.
     capabilityHints,
     agentType,
     // Where this run's artifacts live. An interactive adapter writes the
@@ -452,6 +451,7 @@ export async function executeExecutorCli(
     sharedCwd = false,
   } = {},
 ) {
+  refuseWorkItemInput(arguments[1], 'executeExecutorCli()');
   const purpose = purposeArg;
   if (!executorIdArg && !purpose) {
     throw new RunnerConfigError(
@@ -518,7 +518,7 @@ export async function executeExecutorCli(
     executorConfigured = resolved.configured;
   } else {
     const resolved = resolveExecutorAndOverrides(cfg, executorId);
-    if (!work && (!resolved.configured || !resolved.executor)) {
+    if (!resolved.configured || !resolved.executor) {
       throw new DispatchError(
         'executor-not-found',
         `no executor registered for id "${executorIdArg}"`,
@@ -788,7 +788,7 @@ export async function executeExecutorCli(
     // and unobservable in practice.
     const opened = runDir
       ? { runDir, closeRun: () => {} }
-      : openRunnerRun({ fgosDir, workId: work?.id, executorId, cwd });
+      : openRunnerRun({ fgosDir, executorId, cwd });
     const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: root, cwd });
 
     let confinementRequest;
@@ -950,8 +950,9 @@ export async function executeExecutorCli(
  * `"out-of-process"` anyway (rule 1/3), so no consumer ever needs
  * `agentType` in that case.
  *
- * `work` (tsk-5tm-6 D4/D12(iii)): a work-item id, resolved to its dispatch
- * executor by the Work layer (`resolveWork`, handed in by the caller) before deciding its mechanism -- the
+ * `workId` (tsk-5tm-6 D4/D12(iii)): a work-item id, resolved by the Work layer (`resolveWork`,
+ * handed in by the caller) to a generic hint -- its dispatch executor, agent type, rigor and
+ * domain -- before deciding its mechanism -- the
  * lookup `fgos-fanout` needs to consult this protocol per-candidate before
  * firing an Agent, instead of assuming native dispatch unconditionally.
  * Lowest precedence of the three selectors (a real `executorIdArg` always
@@ -998,16 +999,17 @@ export async function decideExecutorCli(
     repoRoot,
     hasLiveTaskAccess = false,
     for: purpose,
-    work: workIdArg,
+    workId: workIdArg,
     assignment: assignmentArg,
     stage: stageArg,
     needsSoul = false,
     caller,
-    // Work-layer lookup for `--work`: ({ workId, stage, fgosDir }) -> { workItem,
-    // executorId } | null. Dispatch holds no Work store of its own.
+    // Work-layer lookup for `--work`: ({ workId, stage, fgosDir }) -> { workExecutorId,
+    // agentType, rigor, domain } | null. Dispatch holds no Work store of its own.
     resolveWork,
   } = {},
 ) {
+  refuseWorkItemInput(arguments[1], 'decideExecutorCli()');
   if (!executorIdArg && !purpose && !workIdArg && !assignmentArg && !needsSoul) {
     throw new RunnerConfigError(
       'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
@@ -1026,8 +1028,7 @@ export async function decideExecutorCli(
   }
   const cfg = ensureRunnerConfigForDir(configRoot);
 
-  let workItem;
-  let workExecutorId;
+  let workHint;
   if (!executorIdArg && workIdArg) {
     if (typeof resolveWork !== 'function') {
       throw new RunnerConfigError(
@@ -1035,11 +1036,13 @@ export async function decideExecutorCli(
       );
     }
     const resolved = resolveWork({ workId: workIdArg, stage: stageArg, fgosDir: fgosDirFromRoot(root) });
-    if (!resolved?.workItem) {
+    if (!resolved) {
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
-    workItem = resolved.workItem;
-    workExecutorId = resolved.executorId ?? null;
+    // The executor identity is required (null when the Workflow declares none); a resolver
+    // that leaves it out is refused by the plan instead of falling back to a default executor.
+    refuseWorkItemInput(resolved, 'the --work resolver result', WORK_ITEM_KEYS);
+    workHint = resolved;
   }
 
   let assignmentItem;
@@ -1061,13 +1064,12 @@ export async function decideExecutorCli(
   const plan = compileDispatchPlan(cfg, {
     executorId: executorIdArg,
     for: purpose,
-    work: workIdArg,
+    workId: workIdArg,
     assignment: assignmentArg,
     needsSoul,
     hasLiveTaskAccess,
     caller,
-    workItem,
-    workExecutorId,
+    workHint,
     assignmentItem,
   });
 
@@ -1163,7 +1165,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
           repoRoot: flagValue('--repo-root'),
           hasLiveTaskAccess: rest.includes('--has-live-task-access'),
           for: flagValue('--for'),
-          work: flagValue('--work'),
+          workId: flagValue('--work'),
           assignment: flagValue('--assignment'),
           stage: flagValue('--stage'),
           needsSoul: rest.includes('--needs-soul'),

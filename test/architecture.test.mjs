@@ -12,10 +12,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import YAML from 'yaml';
 import { lexSource } from './helpers/js-source-lexer.mjs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const manifest = JSON.parse(
@@ -53,17 +54,20 @@ export function checkDomainSiloingViolation(file, target) {
   return null;
 }
 
+// Comments are blanked first, so a semicolon or an import inside one is not read; whitespace
+// around `import`, `export` and `from` is optional, as it is in JavaScript.
 function extractImports(source) {
+  const code = lexSource(source).code;
   const imports = [];
   const patterns = [
-    /(?:import|export)\s+[^;]*?from\s+['"]([^'"]+)['"]/gms,
-    /(?:import|export)\s+['"]([^'"]+)['"]/gms,
-    /import\(\s*['"`]([^'"`]+)['"`]\s*\)/gms,
-    /require\(\s*['"`]([^'"`]+)['"`]\s*\)/gms,
+    /\b(?:import|export)\b[^;]*?\bfrom\s*(['"])([^'"]+)\1/gms,
+    /\bimport\s*(['"])([^'"]+)\1/gms,
+    /\bimport\(\s*(['"`])([^'"`]+)\1\s*[,)]/gms,
+    /\brequire\(\s*(['"`])([^'"`]+)\1\s*\)/gms,
   ];
   for (const pattern of patterns) {
-    for (const m of source.matchAll(pattern)) {
-      imports.push(m[1]);
+    for (const m of code.matchAll(pattern)) {
+      imports.push(m[2]);
     }
   }
   return imports;
@@ -283,12 +287,14 @@ export function extractCallStatement(source, startIndex) {
  * the definition and the regex simply never matches the import form at
  * all). Returns the full balanced call text for each. */
 export function findExecuteAssignmentCallTexts(rawSource) {
-  const cleaned = rawSource.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+  // Calls are found where comments and string text are blanked; the call text itself is read
+  // from the comment-free view, so its literal arguments stay visible to the posture check.
+  const { code, shape } = lexSource(rawSource);
   const re = /(?<!function )\bexecuteAssignment\s*\(/g;
   const calls = [];
   let m;
-  while ((m = re.exec(cleaned))) {
-    calls.push(extractCallStatement(cleaned, m.index));
+  while ((m = re.exec(shape))) {
+    calls.push(extractCallStatement(code, m.index));
   }
   return calls;
 }
@@ -333,9 +339,6 @@ const RUN_DOOR_CALLERS = {
   commitUnitWork: ['src/runner/execution/run.mjs'],
   executeThroughConfinement: ['src/runner/dispatch/cli.mjs'],
 };
-// Work-layer callers that still reach these symbols directly until Work runs on runUnit.
-// This list only shrinks: a caller that leaves must leave this list in the same change.
-const R3_PENDING_WORK_CALLERS = {};
 // Where each symbol is defined. Its home and the dispatch barrel may define or re-export it; calling it still counts.
 const RUN_DOOR_HOMES = {
   executeAssignment: 'src/runner/dispatch/assignment-runner.mjs',
@@ -350,23 +353,24 @@ const RUN_DOOR_HOMES = {
  * dynamic import(), a require() or a namespace member call is caught, not just `symbol(`.
  */
 export function usesSymbol(rawSource, symbol) {
-  // Comments and literal text are not uses; a template's ${...} expressions stay code.
-  const code = lexSource(rawSource).shape;
+  // Comments and literal text are not uses; a template's ${...} expressions stay code. A string
+  // that is exactly the symbol's name is a use (`d['executeAssignment'](a)`), and an escaped name
+  // reads as the name.
+  const lexed = lexSource(decodeNameEscapes(rawSource));
+  if (new RegExp(`(['"\`])${symbol}\\1`).test(lexed.code)) return true;
+  const code = lexed.shape;
   const stripped = code
     .replace(new RegExp(`(?:async\\s+)?function\\s+${symbol}\\b`, 'g'), '')
     .replace(/export\s*\{[^}]*\}\s*from\s*['"][^'"]*['"]/g, (stmt) => (new RegExp(`\\b${symbol}\\s+as\\b`).test(stmt) ? stmt : ''));
   return new RegExp(`\\b${symbol}\\b`).test(stripped);
 }
 
-/** Pure check: files using each symbol, against its allowed set plus the R3 allowlist (equality). */
+/** Pure check: files using each symbol, against exactly its named callers. */
 export function checkRunDoorCallers(usesBySymbol) {
   const violations = [];
   for (const [symbol, files] of Object.entries(usesBySymbol)) {
-    const allowed = new Set([...(RUN_DOOR_CALLERS[symbol] ?? []), ...(R3_PENDING_WORK_CALLERS[symbol] ?? [])]);
+    const allowed = new Set(RUN_DOOR_CALLERS[symbol] ?? []);
     for (const file of files) if (!allowed.has(file)) violations.push(`${symbol}: unexpected caller ${file}`);
-    for (const file of R3_PENDING_WORK_CALLERS[symbol] ?? []) {
-      if (!files.includes(file)) violations.push(`${symbol}: ${file} no longer calls it -- drop it from R3_PENDING_WORK_CALLERS`);
-    }
   }
   return violations;
 }
@@ -402,8 +406,11 @@ function runDoorUses() {
   return uses;
 }
 
-test('run-door call sites: executeAssignment, executeExecutorCli, commitUnitWork and executeThroughConfinement are called only from their named files plus R3_PENDING_WORK_CALLERS', () => {
-  assert.deepEqual(checkRunDoorCallers(runDoorUses()), []);
+test('run-door call sites: executeAssignment, executeExecutorCli, commitUnitWork and executeThroughConfinement are called only from their named files', () => {
+  const uses = runDoorUses();
+  assert.deepEqual(checkRunDoorCallers(uses), []);
+  // Each named caller still calls it: a door nobody uses any more leaves this table.
+  for (const [symbol, files] of Object.entries(RUN_DOOR_CALLERS)) assert.deepEqual([...uses[symbol]].sort(), [...files].sort(), symbol);
   const relays = runDoorScanFiles().flatMap((file) => findStarRelaysOfRunDoors(file, fs.readFileSync(path.join(root, file), 'utf8')));
   assert.deepEqual(relays, []);
 });
@@ -425,6 +432,10 @@ test('run-door call-site guard catches an aliased import, a dynamic import(), a 
   assert.equal(usesSymbol("const u = 'https://x'; executeExecutorCli(x);", 'executeExecutorCli'), true);
   assert.equal(usesSymbol("const q = 'a`b';\nexecuteExecutorCli(x);\nconst t = `c`;", 'executeExecutorCli'), true);
   assert.equal(usesSymbol("const r = `${fn({ a: 1 }) + executeAssignment(a)}`;", 'executeAssignment'), true);
+  // A bracket call by the plain name, an escaped name, and code a block-then-regex used to hide.
+  assert.equal(usesSymbol("import * as d from './dispatch.mjs'; d['executeAssignment'](a);", 'executeAssignment'), true);
+  assert.equal(usesSymbol("import * as d from './dispatch.mjs'; d.\\u0065xecuteAssignment(a);", 'executeAssignment'), true);
+  assert.equal(usesSymbol("if (x) {}\n/'/.test(y); executeAssignment(a); //'", 'executeAssignment'), true);
   assert.deepEqual(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * from './dispatch/assignment-runner.mjs';"),
     ['src/runner/relay.mjs: export * from ./dispatch/assignment-runner.mjs']);
   assert.equal(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * as d from './execution/commit-unit-work.mjs';").length, 1);
@@ -774,14 +785,35 @@ const WORK_LAYER_MODULES = [
   /(^|\/)prompt-templates\.mjs$/,
   /\/intake\//,
   /\/verbs\//,
+  // The Work store and the domain registry: the state a Work item lives in.
+  /(^|\/)state\//,
 ];
 
-/** Relative imports of `file` resolved to repo paths (bare and node: specifiers dropped). */
+/**
+ * Imports of `file` that name a file in the repo, as repo paths: relative specifiers, absolute
+ * paths and file: URLs, with any `?query` or `#hash` dropped (bare and node: specifiers dropped).
+ */
 function resolvedRelativeImports(file, source) {
-  return extractImports(source)
-    .filter((spec) => spec.startsWith('.'))
-    .map((spec) => path.posix.normalize(path.posix.join(path.posix.dirname(file), spec)));
+  const toRepo = (abs) => path.relative(root, abs).split(path.sep).join('/');
+  return extractImports(source).flatMap((raw) => {
+    const spec = raw.replace(/[?#].*$/, '');
+    if (spec.startsWith('.')) return [path.posix.normalize(path.posix.join(path.posix.dirname(file), spec))];
+    if (spec.startsWith('file:')) {
+      try { return [toRepo(fileURLToPath(spec))]; } catch { return []; }
+    }
+    if (path.isAbsolute(spec)) return [toRepo(spec)];
+    return [];
+  });
 }
+
+// Edges into the Work layer that shared runner modules take today, each with its reason and the
+// exact names it imports. Nothing else may reach the Work layer from the guarded files.
+const WORK_LAYER_EDGE_ALLOWLIST = {
+  'src/runner/worktree.mjs -> src/state/store.mjs': {
+    reason: 'worktree.mjs throws the StoreError class callers catch; it uses nothing else of the store',
+    imports: 'StoreError',
+  },
+};
 
 /**
  * Work-layer modules `file` reaches through relative imports, followed transitively
@@ -797,6 +829,7 @@ export function findWorkLayerReach(file, readSource) {
     const source = readSource(current);
     if (source === null) return;
     for (const dep of resolvedRelativeImports(current, source)) {
+      if (Object.hasOwn(WORK_LAYER_EDGE_ALLOWLIST, `${current} -> ${dep}`)) continue;
       if (WORK_LAYER_MODULES.some((re) => re.test(dep))) hits.push([...trail, dep].join(' -> '));
       else walk(dep, [...trail, dep]);
     }
@@ -840,6 +873,16 @@ test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workfl
     violations.push(...findWorkLayerReach(file, readRepoSource));
   }
   assert.deepEqual(violations, [], `Expected 0 Work-layer reach from the A4-guarded files, found:\n${violations.join('\n')}`);
+  // Each allowed edge still exists and imports exactly the pinned names, nothing more.
+  for (const [edge, { imports }] of Object.entries(WORK_LAYER_EDGE_ALLOWLIST)) {
+    const [from, to] = edge.split(' -> ');
+    const source = lexSource(fs.readFileSync(path.join(root, from), 'utf8')).code;
+    const named = [...source.matchAll(/\bimport\s*\{([^}]*)\}\s*from\s*(['"])([^'"]+)\2/g)]
+      .filter((m) => path.posix.normalize(path.posix.join(path.posix.dirname(from), m[3])) === to)
+      .map((m) => m[1].split(',').map((x) => x.trim()).filter(Boolean).join(', '));
+    assert.deepEqual(named, [imports], edge);
+    assert.equal((source.match(new RegExp(`['"][^'"]*${path.posix.basename(to)}['"]`, 'g')) ?? []).length, 1, `${edge}: imported once, by name`);
+  }
 });
 
 test('A4 Work-layer guard catches a dynamic import(), a require() and a re-export one hop away', () => {
@@ -858,6 +901,24 @@ test('A4 Work-layer guard catches a dynamic import(), a require() and a re-expor
     'src/runner/dispatch/c.mjs -> src/runner/dispatch/relay.mjs -> src/runner/work-dispatch.mjs',
   ]);
   assert.deepEqual(findWorkLayerReach('src/runner/dispatch/clean.mjs', read), []);
+  // Import syntax with no spaces, a semicolon inside a comment, a query string, an absolute path
+  // and a file: URL all still name the module they load.
+  const more = {
+    'src/runner/dispatch/d.mjs': "import{spawnWorker}from'../work-dispatch.mjs';",
+    'src/runner/dispatch/e.mjs': "export*from'../work-dispatch.mjs';",
+    'src/runner/dispatch/f.mjs': "import { x } /* ; */ from '../work-dispatch.mjs';",
+    'src/runner/dispatch/g.mjs': "import { a, // ;\n b } from '../work-dispatch.mjs';",
+    'src/runner/dispatch/h.mjs': "import { x } from '../work-dispatch.mjs?v=1';",
+    'src/runner/dispatch/i.mjs': `import { x } from '${path.join(root, 'src/runner/work-dispatch.mjs')}';`,
+    'src/runner/dispatch/j.mjs': `await import('${pathToFileURL(path.join(root, 'src/runner/work-dispatch.mjs')).href}');`,
+    // The Work store is Work layer too, reached here through a relay outside the guarded set.
+    'src/runner/dispatch/k.mjs': "import { moveWork } from '../relay-out.mjs';",
+    'src/runner/relay-out.mjs': "export { moveWork } from './../state/store.mjs';",
+  };
+  const readMore = (rel) => more[rel] ?? null;
+  for (const file of Object.keys(more).filter((f) => f.startsWith('src/runner/dispatch/'))) {
+    assert.equal(findWorkLayerReach(file, readMore).length, 1, file);
+  }
 });
 
 test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workflow/** name no domain or Workflow step literal', () => {
@@ -892,4 +953,225 @@ test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workfl
     }
   }
   assert.deepEqual(violations, [], `Expected no domain/step literal in dispatch/execution, found:\n${violations.join('\n')}`);
+});
+
+// Work is only a consumer of dispatch: the A4-guarded files take generic inputs (a rigor, a
+// domain, an executor identity, capability hints, an agent type) and never handle a Work item.
+// Any identifier or property named `work`, `workItem` or `docsRef`, any string that is exactly one
+// of those names (a computed or quoted key, `Reflect.get(o, 'work')`, a key comparison), and
+// resolveContentRoot() (the Work layer's own way of finding its documents) are that item's shape.
+const WORK_SHAPED_TOKEN = /(?<![\w$])(work|workItem|docsRef)(?![\w$])|(?<![\w$])resolveContentRoot\s*\(/g;
+const WORK_SHAPED_LITERAL = /(['"`])(work|workItem|docsRef)\1/g;
+// A string that is exactly one of those names is allowed only where pinned here, one by one.
+const WORK_SHAPED_LITERAL_ALLOWLIST = {
+  'src/runner/dispatch/plan.mjs': { reason: "the `--work` selector's type name in the DispatchPlan output", literals: ["'work'"] },
+  'src/runner/dispatch/assignment-policy.mjs': { reason: 'the option names refuseWorkItemInput refuses', literals: ["'work'", "'workItem'"] },
+};
+
+/**
+ * Identifier escapes (`w`, `\u{77}`, `\x77`) that spell a name character, decoded so an
+ * escaped `work` reads as `work`. Escapes of anything else are left alone.
+ */
+export function decodeNameEscapes(rawSource) {
+  return rawSource.replace(/\\u\{([0-9a-fA-F]+)\}|\\u([0-9a-fA-F]{4})|\\x([0-9a-fA-F]{2})/g, (m, braced, four, two) => {
+    const ch = String.fromCodePoint(parseInt(braced ?? four ?? two, 16));
+    return /[\w$]/.test(ch) ? ch : m;
+  });
+}
+
+/** Lines of `rawSource` that hand a Work-shaped input around, comments and other literal text ignored. */
+export function findWorkShapedInputs(file, rawSource) {
+  const source = decodeNameEscapes(rawSource);
+  const { code, shape } = lexSource(source);
+  const rawLines = rawSource.split('\n');
+  const lineOf = (index) => source.slice(0, index).split('\n').length;
+  const hits = [];
+  const add = (index, what) => {
+    const line = lineOf(index);
+    hits.push(`${file}:${line}: ${what}: ${rawLines[line - 1]?.trim()}`);
+  };
+  for (const m of shape.matchAll(WORK_SHAPED_TOKEN)) add(m.index, 'name');
+  for (const m of code.matchAll(WORK_SHAPED_LITERAL)) add(m.index, m[0].replace(/`/g, "'").replace(/"/g, "'"));
+  return hits;
+}
+
+/** The Work-shaped hits of `file` left once its pinned literals are taken out. */
+export function checkWorkShapedInputs(file, rawSource) {
+  const allowed = [...(WORK_SHAPED_LITERAL_ALLOWLIST[file]?.literals ?? [])];
+  return findWorkShapedInputs(file, rawSource).filter((hit) => {
+    const i = allowed.findIndex((lit) => hit.includes(`: ${lit}: `));
+    if (i < 0) return true;
+    allowed.splice(i, 1);
+    return false;
+  }).concat(allowed.map((lit) => `${file}: pinned ${lit} is no longer used -- drop it from WORK_SHAPED_LITERAL_ALLOWLIST`));
+}
+
+// A dynamic import() or require() whose specifier is not one plain literal, createRequire, and
+// node:module itself load code the import guards above cannot follow. Each file allowed one is
+// named here with the reason; nothing else in the guarded set may load code by a computed name.
+// Each entry pins the exact loads allowed (line numbers dropped), so a new one in the same file fails.
+const DYNAMIC_LOAD_ALLOWLIST = {
+  'src/runner/dispatch/provider-credential-renewal.mjs': {
+    reason: 'createRequire loads the node:sqlite builtin by its literal name, nothing else',
+    loads: ['createRequire', 'createRequire', 'imports node:module'],
+  },
+};
+const LITERAL_SPECIFIER = /^\s*(?:'[^'\\\n]*'|"[^"\\\n]*"|`[^`$\\]*`)\s*[,)]/;
+
+/** Code loads in `rawSource` that name their target only at run time. */
+export function findDynamicLoads(file, rawSource) {
+  const { code, shape } = lexSource(decodeNameEscapes(rawSource));
+  const hits = [];
+  const lineOf = (index) => shape.slice(0, index).split('\n').length;
+  // `require` counts as a member too (`module.require(x)`); `import(` only bare, as `obj.import()` is a method.
+  for (const m of shape.matchAll(/(?<![\w$.])(import)\s*\(|(?<![\w$])(require)\s*\(/g)) {
+    const after = code.slice(m.index + m[0].length);
+    if (!LITERAL_SPECIFIER.test(after)) hits.push(`${file}:${lineOf(m.index)}: ${m[1] ?? m[2]}() of a computed specifier`);
+  }
+  // The Function constructor reached through any function's prototype.
+  for (const m of shape.matchAll(/\.\s*constructor\s*\(/g)) hits.push(`${file}:${lineOf(m.index)}: .constructor()`);
+  for (const m of shape.matchAll(/(?<![\w$])(createRequire|eval)(?![\w$])|(?<![\w$.])(?:new\s+)?Function\s*\(/g)) {
+    hits.push(`${file}:${lineOf(m.index)}: ${m[0].replace(/\s+/g, ' ')}`);
+  }
+  // Modules that load or evaluate code by a name or text given at run time.
+  for (const spec of extractImports(code)) {
+    if (/^(node:)?(module|vm|worker_threads)$/.test(spec)) hits.push(`${file}: imports ${spec}`);
+  }
+  return hits;
+}
+
+/** A violation when `file` loads code dynamically beyond exactly what its allowlist entry pins, else null. */
+export function checkDynamicLoads(file, rawSource) {
+  const allowed = [...(DYNAMIC_LOAD_ALLOWLIST[file]?.loads ?? [])].sort();
+  const loads = findDynamicLoads(file, rawSource).map((h) => h.replace(/^[^:]+:(\d+:)?\s*/, '')).sort();
+  return JSON.stringify(loads) === JSON.stringify(allowed) ? null : `${file}: ${JSON.stringify(loads)} (allowed: ${JSON.stringify(allowed)})`;
+}
+
+test('Work stays a consumer: dispatch, execution, the dispatch barrel and src/workflow/** take no Work-shaped input', () => {
+  const violations = a4GuardedFiles().flatMap((file) => checkWorkShapedInputs(file, fs.readFileSync(path.join(root, file), 'utf8')));
+  assert.deepEqual(violations, [], `Expected no Work-shaped input in the A4-guarded files, found:\n${violations.join('\n')}`);
+});
+
+test('Work-shaped input guard catches each way a Work item can come in, and ignores comments, strings and longer names', () => {
+  const caught = [
+    'function f(opts) { return opts.work.id; }',
+    'const r = opts?.work?.refs;',
+    'const w = opts.work;',
+    "const w = opts['work'];",
+    'const w = opts[`workItem`];',
+    "const { 'work': w } = opts;",
+    'const x = assignment.provenance.work;',
+    'if (work?.rigor) {}',
+    'const { work, stage } = opts;',
+    'const {\n  stage,\n  work: item,\n} = opts;',
+    'function build({ work }) {}',
+    'function build(work) {}',
+    'const f = (work) => work;',
+    'const f = work => 1;',
+    'call({ work });',
+    'const plan = item.docsRef;',
+    'const { workItem } = resolved;',
+    'const root = resolveContentRoot(stateRoot, id, ref);',
+    'const t = `${opts.work.id}`;',
+    "const w = Reflect.get(opts, 'work');",
+    "const w = opts[\n  'work'\n];",
+    'const w = opts.\\u0077ork;',
+    'const w = opts.\\u{77}ork;',
+    "const w = opts['\\u0077ork'];",
+    "const w = opts['\\x77ork'];",
+    "const w = opts[('work')];",
+    "const d = Object.getOwnPropertyDescriptor(opts, 'docsRef');",
+    "if (k === 'workItem') use(v);",
+    "if (x) {}\n/'/.test(y); const w = opts.work; //'",
+    "const selector = { type: 'work', value: id };",
+  ];
+  for (const source of caught) assert.ok(findWorkShapedInputs('x.mjs', source).length >= 1, source);
+  const ignored = [
+    '// opts.work used to arrive here',
+    '/* work.rigor */ const a = 1;',
+    "const msg = 'no work item found';",
+    "import { a } from './commit-unit-work.mjs';",
+    'const id = assignment.workId ?? workIdArg;',
+    'const n = workflow.steps; const k = frameworks;',
+    'const t = `work ${id}`;',
+    "const m = 'the work item';",
+  ];
+  for (const source of ignored) assert.deepEqual(findWorkShapedInputs('x.mjs', source), [], source);
+  // A pinned literal is allowed once where pinned, and only there.
+  assert.deepEqual(checkWorkShapedInputs('src/runner/dispatch/plan.mjs', "const s = { type: 'work' };"), []);
+  assert.equal(checkWorkShapedInputs('src/runner/dispatch/plan.mjs', "const s = { type: 'work' }; const t = o['work'];").length, 1);
+  assert.equal(checkWorkShapedInputs('src/runner/dispatch/cli.mjs', "const s = { type: 'work' };").length, 1);
+});
+
+test('A4 dynamic-load guard: no computed import()/require(), createRequire or eval in the guarded files beyond the named allowlist', () => {
+  const violations = a4GuardedFiles()
+    .map((file) => checkDynamicLoads(file, fs.readFileSync(path.join(root, file), 'utf8')))
+    .filter(Boolean);
+  assert.deepEqual(violations, [], `Expected no computed code load in the A4-guarded files beyond the pinned allowlist, found:\n${violations.join('\n')}`);
+});
+
+test('A4 dynamic-load guard catches a computed specifier, createRequire and eval, and passes literal loads', () => {
+  const caught = [
+    'const m = await import(pathToFileURL(p).href);',
+    'const m = await import(spec);',
+    'const m = await import(`../${name}.mjs`);',
+    "const m = await import('../' + name);",
+    'const m = require(name);',
+    "import { createRequire } from 'node:module';",
+    "import * as nodeModule from 'module';",
+    'const r = nodeModule.createRequire(import.meta.url);',
+    "eval('1');",
+    "const f = new Function('return 1');",
+    "const f = Function('return 1');",
+    "import vm from 'node:vm';",
+    "import { Worker } from 'worker_threads';",
+    "const f = (() => {}).constructor('return 1');",
+    'module.require(name);',
+    'process.mainModule.require(x);',
+    "const e = \\u0065val; e('1');",
+    "if (x) {}\n/'/.test(y); const m = await import(spec); //'",
+  ];
+  for (const source of caught) assert.ok(findDynamicLoads('x.mjs', source).length >= 1, source);
+  const passed = [
+    "const YAML = await import('yaml');",
+    "spawnPromise = import('./herdr-round.mjs').then((m) => m);",
+    'const m = await import(`./fixed.mjs`);',
+    "const url = new URL('./x', import.meta.url);",
+    'const t = `const fs = require(${JSON.stringify(x)});`;',
+    '// await import(spec)',
+    "obj.require('./fixed.mjs'); obj.import(x);",
+  ];
+  for (const source of passed) assert.deepEqual(findDynamicLoads('x.mjs', source), [], source);
+  // The allowlist pins the loads of a file, not the file: one more load there is caught.
+  const renewal = 'src/runner/dispatch/provider-credential-renewal.mjs';
+  const real = fs.readFileSync(path.join(root, renewal), 'utf8');
+  assert.equal(checkDynamicLoads(renewal, real), null);
+  assert.ok(checkDynamicLoads(renewal, `${real}\nconst extra = require(name);\n`));
+  assert.ok(checkDynamicLoads('src/runner/dispatch/other.mjs', "import { createRequire } from 'node:module';"));
+});
+
+/**
+ * Entries under `dir` the A4 guards would not read: a `.js`/`.cjs`/`.ts`-family source (ESM under
+ * this package's "type": "module") or a symlink, which `mjsFilesUnder` skips.
+ */
+export function unguardedSourcesUnder(dir) {
+  const full = path.isAbsolute(dir) ? dir : path.join(root, dir);
+  if (!fs.existsSync(full)) return [];
+  return fs.readdirSync(full, { withFileTypes: true, recursive: true })
+    .filter((e) => e.isSymbolicLink() || (e.isFile() && /\.(c?js|[cm]?ts|jsx|tsx)$/.test(e.name)))
+    .map((e) => path.relative(root, path.join(e.parentPath, e.name)).split(path.sep).join('/'));
+}
+
+test('A4 guarded folders hold only plain .mjs sources, so every guard reads every file', () => {
+  const found = ['src/runner/dispatch', 'src/runner/execution', 'src/workflow'].flatMap(unguardedSourcesUnder);
+  assert.deepEqual(found, [], `Expected only .mjs files in the A4-guarded folders, found:\n${found.join('\n')}`);
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-guard-probe-'));
+  try {
+    fs.writeFileSync(path.join(tmp, 'evil.js'), 'export const f = (o) => o.work;\n');
+    fs.writeFileSync(path.join(tmp, 'ok.mjs'), 'export const g = 1;\n');
+    fs.symlinkSync(path.join(tmp, 'ok.mjs'), path.join(tmp, 'link.mjs'));
+    assert.deepEqual(unguardedSourcesUnder(tmp).map((f) => path.basename(f)).sort(), ['evil.js', 'link.mjs']);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 });

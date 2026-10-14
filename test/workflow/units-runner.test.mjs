@@ -143,6 +143,22 @@ test('a units file runs through startWorkflow, and a unit\'s prefer and persona 
   assert.deepEqual(record.overrides, []);
 });
 
+test('a unit\'s timeoutMs in a units file reaches the Unit and its dispatch; one out of range is refused before any run exists', async () => {
+  const tmp = setupRepo();
+  const file = unitsFile(tmp, [{ id: 'heavy', objective: 'Read the readme', capability: 'docs:write', timeoutMs: 5400000 }]);
+  const state = await startWorkflow({ unitsPath: file, ...opts(tmp) });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  const unitRunId = state.steps.heavy.units.heavy.unitRunId;
+  assert.equal(unitRecordOf(tmp, unitRunId).unit.timeoutMs, 5400000);
+  assert.deepEqual(producerAssignment(tmp, unitRunId).binding.provenance.timeoutMs, { value: 5400000, source: 'unit' });
+  assert.equal(JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'producer', '1', 'runs', '01', 'run.json'), 'utf8')).timeoutMs, 5400000);
+
+  assert.throws(() => validateWorkflow({
+    id: 'too-long',
+    steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read', writes: [], timeoutMs: 99 * 3600000 } }] }],
+  }), /timeoutMs must be at most 4h/);
+});
+
 test('--effort becomes a human-cli reasoningEffort override on every unit, kept in the run for resume', async () => {
   const tmp = setupRepo({ effortCli: true });
   const workflow = validateWorkflow({

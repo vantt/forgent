@@ -31,3 +31,20 @@ test('nested parens inside an if head do not leak the header flag', () => {
   assert.match(shape, /f\(a\) \/ 2 > 1/);
   assert.match(shape, /\(z\) \/ 4/);
 });
+
+test('a slash right after a block closes opens a regular expression, so its quotes never hide the code after it', () => {
+  for (const head of ['if (x) {}', 'function f() {}', 'class A {}', 'else {}', 'try {} finally {}', 'const g = () => {}']) {
+    for (const quote of ["'", '`']) {
+      const shape = shapeOf(`${head}\n/${quote}/.test(y); const w = opts.work;\n//${quote}`);
+      assert.match(shape, /opts\.work/, `${head} ${quote}: code after the regex is still code`);
+    }
+  }
+});
+
+test('a slash after an object literal or a call still divides', () => {
+  const shape = shapeOf("const o = { a: 1 } / 2; const p = f({}) / 3; const q = [{}] / 4; return { b: 2 } / 5; use('s');");
+  assert.match(shape, /\{ a: 1 \} \/ 2/);
+  assert.match(shape, /f\(\{\}\) \/ 3/);
+  assert.match(shape, /\[\{\}\] \/ 4/);
+  assert.match(shape, /\{ b: 2 \} \/ 5/);
+});

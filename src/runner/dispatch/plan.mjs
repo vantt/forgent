@@ -9,7 +9,7 @@
 import { RunnerConfigError } from './config.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorConfig } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
-import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
+import { refuseWorkItemInput, resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 
 // Additive check for the `capability.unknown` reason code (never changes
 // `mechanism`): is `name` a real entry key, or a declared `aliases[]` member,
@@ -24,6 +24,16 @@ function isKnownCapabilityName(cfg, name) {
 }
 
 
+/** The rigor and domain a Work hint demands, as the fields a synthesized assignment carries. */
+function hintDemand(workHint, workIdArg) {
+  if (!workHint) return {};
+  return {
+    ...(workIdArg ? { workId: workIdArg } : {}),
+    ...(workHint.rigor !== undefined ? { rigor: workHint.rigor } : {}),
+    ...(workHint.domain ? { domain: workHint.domain } : {}),
+  };
+}
+
 /**
  * Compiles a canonical DispatchPlan object for a dispatch request.
  *
@@ -31,14 +41,15 @@ function isKnownCapabilityName(cfg, name) {
  * @param {object} [opts] - Dispatch parameters
  * @param {string} [opts.executorId] - Positional executor identifier
  * @param {string} [opts.for] - Purpose identifier
- * @param {string} [opts.work] - Work item identifier
+ * @param {string} [opts.workId] - Work item identifier (the `--work` selector)
  * @param {string|object} [opts.assignment] - Assignment identifier or object
  * @param {boolean} [opts.needsSoul=false] - True if caller needs a soul-bearing agent
  * @param {boolean} [opts.hasLiveTaskAccess=false] - True if caller holds live Task tool access
  * @param {object} [opts.caller] - Caller role descriptors ({ role: 'driver'|'launcher' })
- * @param {object} [opts.workItem] - Pre-resolved work item object (for --work option)
- * @param {string|null} [opts.workExecutorId] - Executor identity the Work layer resolved for that work item
- *   at its step (null when its Workflow declares none); required with `work`
+ * @param {{workExecutorId: string|null, agentType?: string|null, rigor?: string, domain?: string}} [opts.workHint]
+ *   - What the Work layer resolved for `workId` at its step: the executor identity (null when its
+ *   Workflow declares none), the item's agent type, its rigor demand and its domain. Required with
+ *   `workId`; dispatch never reads the Work item itself.
  * @param {object} [opts.assignmentItem] - Pre-resolved assignment object (for --assignment option)
  * @returns {object} DispatchPlan
  */
@@ -47,18 +58,18 @@ export function compileDispatchPlan(
   {
     executorId: executorIdArg,
     for: purpose,
-    work: workIdArg,
+    workId: workIdArg,
     assignment: assignmentArg,
     needsSoul = false,
     hasLiveTaskAccess = false,
     caller = { role: 'driver' },
-    workItem,
-    workExecutorId,
+    workHint,
     assignmentItem,
     cliOverride,
     options,
   } = {},
 ) {
+  refuseWorkItemInput(arguments[1], 'compileDispatchPlan()');
   if (!executorIdArg && !purpose && !workIdArg && !assignmentArg && !needsSoul) {
     throw new RunnerConfigError(
       'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
@@ -116,15 +127,15 @@ export function compileDispatchPlan(
   }
 
   if (!executorId && workIdArg) {
-    if (!workItem) {
+    if (!workHint) {
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
-    if (workExecutorId === undefined) {
+    if (workHint.workExecutorId === undefined) {
       throw new RunnerConfigError(
         `work item "${workIdArg}" was supplied without the executor identity its Workflow step resolves to -- the Work layer must resolve it (dispatch does not look steps up).`,
       );
     }
-    executorId = workExecutorId ?? undefined;
+    executorId = workHint.workExecutorId ?? undefined;
     workResolvedInputId = executorId;
     workResolved = resolveExecutorAndOverrides(cfg, executorId);
     const hasExplicitExecutor = workResolved.configured;
@@ -147,7 +158,7 @@ export function compileDispatchPlan(
       let workGovernance = { providerFamily: null, egress: null };
       let workResolvedForDispatch;
       try {
-        workResolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, workItem?.agentType);
+        workResolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, workHint.agentType ?? undefined);
         workGovernance = workResolvedForDispatch?.governance ?? workGovernance;
       } catch { /* no real config to resolve governance from -- stays null, same as before */ }
       if (workResolvedForDispatch) {
@@ -157,11 +168,11 @@ export function compileDispatchPlan(
           role: undefined,
           policy: workSyntheticPolicy,
           skills: [],
+          ...hintDemand(workHint, workIdArg),
         };
         try {
           resolveAssignmentDispatchPolicy({
             assignment: workAssignmentForPolicy,
-            work: workItem,
             runnerConfig: cfg,
             cliOverride,
             options,
@@ -409,12 +420,12 @@ export function compileDispatchPlan(
     role: undefined,
     policy: syntheticPolicy,
     skills: [],
+    ...hintDemand(workHint, workIdArg),
   };
   let effectivePolicy = null;
   try {
     effectivePolicy = resolveAssignmentDispatchPolicy({
       assignment: assignmentForPolicy,
-      work: workItem,
       runnerConfig: cfg,
       cliOverride,
       options,

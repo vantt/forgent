@@ -277,6 +277,18 @@ test('rotation stops after the accounts the provider has, then the walk leaves t
   assert.deepEqual([selectedAccount(fx.repoRoot, res, '1'), selectedAccount(fx.repoRoot, res, '1-fb1')].sort(), ['dead1', 'dead2']);
 });
 
+test('a unit\'s run timeout rides every attempt: the account-rotation retry and the next candidate keep it', { skip: SKIP }, async () => {
+  const fx = setup({ alpha: { family: 'alpha', logins: { dead1: 'dead', dead2: 'dead' } }, beta: { family: 'beta' } });
+  const res = await run(fx, { ...solo('u-rotation-timeout'), timeoutMs: 5400000 });
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+  const attempts = attemptsOf(fx.repoRoot, res);
+  assert.deepEqual(attempts.map((a) => a.fallbackFrom?.kind ?? null), [null, 'account-rotation', 'next-candidate']);
+  assert.deepEqual(attempts.map((a) => a.binding.timeoutMs), [5400000, 5400000, 5400000]);
+  const subdirs = fs.readdirSync(path.join(unitDirOf(fx.repoRoot, res), 'producer')).sort();
+  assert.equal(subdirs.length, 3);
+  for (const sub of subdirs) assert.equal(runFile(fx.repoRoot, res, sub, 'run.json').timeoutMs, 5400000, sub);
+});
+
 test('a provider whose login just failed is not picked again by the walk, even through another executor of it', { skip: SKIP }, async () => {
   const fx = setup({
     alpha: { family: 'alpha', logins: { dead1: 'dead' } },

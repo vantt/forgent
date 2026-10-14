@@ -26,7 +26,7 @@ test('the domain registry loads with no yaml package resolvable', () => {
   // registry needs next to a compiled domain, in a directory with no node_modules above it.
   const tmp = fs.mkdtempSync(path.join(root, '..', 'fgos-registry-nodeps-'));
   try {
-    for (const rel of ['src/state/domain-registry.mjs', 'src/workflow/definition.mjs', 'src/runner/dispatch/write-scope.mjs', 'src/workflow/steps.mjs', 'domains/coding/compiled.json']) {
+    for (const rel of ['src/state/domain-registry.mjs', 'src/workflow/definition.mjs', 'src/runner/dispatch/write-scope.mjs', 'src/runner/dispatch/run-timeout.mjs', 'src/workflow/steps.mjs', 'domains/coding/compiled.json']) {
       fs.mkdirSync(path.dirname(path.join(tmp, rel)), { recursive: true });
       fs.copyFileSync(path.join(root, rel), path.join(tmp, rel));
     }

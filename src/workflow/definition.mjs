@@ -1,12 +1,14 @@
 // src/workflow/definition.mjs — Workflow definition contract and schema validator
-// Architecture guard: MUST NOT import src/state/** or src/runner/** (kernel layer). The one exception is
-// src/runner/dispatch/write-scope.mjs, an import-free leaf, so a workflow and a unit read writes one way.
+// Architecture guard: MUST NOT import src/state/** or src/runner/** (kernel layer). The exceptions are two
+// import-free leaves: src/runner/dispatch/write-scope.mjs, so a workflow and a unit read writes one way, and
+// src/runner/dispatch/run-timeout.mjs, so they check a unit's timeoutMs one way.
 
 import path from 'node:path';
 import { canonicalizeWrites } from '../runner/dispatch/write-scope.mjs';
+import { runTimeoutProblem } from '../runner/dispatch/run-timeout.mjs';
 
 /** Thrown for a malformed Workflow definition. Kept free of runner imports (bar the import-free
- * write-scope leaf) so the Work-lifecycle kernel can read step data without depending on dispatch. */
+ * write-scope and run-timeout leaves) so the Work-lifecycle kernel can read step data without depending on dispatch. */
 export class WorkflowDefinitionError extends Error {
   constructor(message) {
     super(message);
@@ -286,6 +288,10 @@ export function validateWorkflow(raw, { source } = {}) {
           throw new WorkflowDefinitionError(`${unitLabel} requires "capability" (e.g. domain:verb or verb)`);
         }
 
+        const timeoutMs = template.timeoutMs;
+        const timeoutProblem = timeoutMs === undefined ? null : runTimeoutProblem(timeoutMs, `${unitLabel} timeoutMs`);
+        if (timeoutProblem) throw new WorkflowDefinitionError(timeoutProblem);
+
         const rigor = template.rigor ? String(template.rigor).trim() : undefined;
         if (rigor && !VALID_RIGORS.has(rigor)) {
           throw new WorkflowDefinitionError(`${unitLabel} invalid rigor "${rigor}", must be one of [${[...VALID_RIGORS].join(', ')}]`);
@@ -354,6 +360,7 @@ export function validateWorkflow(raw, { source } = {}) {
               writes,
               taskSpec: typeof template.taskSpec === 'string' ? template.taskSpec.trim() : undefined,
               persona: typeof template.persona === 'string' && template.persona.trim() ? template.persona.trim() : undefined,
+              ...(timeoutMs !== undefined ? { timeoutMs } : {}),
               // Shape is checked by the Unit contract (validateUnit) before a units file gets here and again at run.
               ...(templateAllowsPrefer && template.prefer !== undefined ? { prefer: Object.freeze(structuredClone(template.prefer)) } : {}),
               params: template.params === undefined ? undefined : structuredClone(template.params),

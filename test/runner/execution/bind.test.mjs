@@ -802,3 +802,22 @@ test('bind: an invocation a unit names in its prefer stays bound inside herdr, w
   assert.equal(bare.transport, 'herdr');
   assert.equal(bare.provenance.executor.source, 'unit-prefer');
 });
+
+test('bind: a run timeout comes from an override, else the unit, else nothing (the config default stands)', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: false, headless: true } };
+  const unit = { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'], rigor: 'standard' };
+  const none = bind({ unit, role: 'producer', independentOf: [] }, ctx);
+  assert.equal(none.timeoutMs, null);
+  assert.deepEqual(none.provenance.timeoutMs, { value: null, source: 'none' });
+
+  const fromUnit = bind({ unit: { ...unit, timeoutMs: 5400000 }, role: 'producer', independentOf: [] }, ctx);
+  assert.equal(fromUnit.timeoutMs, 5400000);
+  assert.deepEqual(fromUnit.provenance.timeoutMs, { value: 5400000, source: 'unit' });
+
+  const fromOverride = bind({ unit: { ...unit, timeoutMs: 5400000 }, role: 'producer', independentOf: [], overrides: [{ origin: 'human-cli', timeoutMs: 7200000 }] }, ctx);
+  assert.equal(fromOverride.timeoutMs, 7200000);
+  assert.deepEqual(fromOverride.provenance.timeoutMs, { value: 7200000, source: 'override:human-cli' });
+
+  const refused = bind({ unit, role: 'producer', independentOf: [], overrides: [{ origin: 'human-cli', timeoutMs: 999999999 }] }, ctx);
+  assert.equal(refused.refused?.reason, 'run-timeout');
+});

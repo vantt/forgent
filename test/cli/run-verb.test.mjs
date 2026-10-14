@@ -254,6 +254,32 @@ test('fgos run "<prompt>" --effort reaches the override bind() reads', () => {
   assert.equal(record.unit.objective, 'Check it');
 });
 
+test('fgos run "<prompt>" --timeout gives the run its own time, kept in unit.json and handed to the dispatch', () => {
+  const tmp = setupTestRepo();
+  const stdout = runCli(['Port the parser', '--capability', 'docs:write', '--timeout', '90m', '--dir', tmp], tmp);
+  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
+  const unitRunId = /"unitRunId": "([^"]+)"/.exec(stdout)[1];
+  const record = unitRecordOf(tmp, stdout);
+  assert.deepEqual(record.overrides, [{ origin: 'human-cli', timeoutMs: 5400000 }]);
+  const binding = record.bindings['producer/1'][0].binding;
+  assert.equal(binding.timeoutMs, 5400000);
+  assert.deepEqual(binding.provenance.timeoutMs, { value: 5400000, source: 'override:human-cli' });
+  const runJsons = [];
+  const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (e.name === 'run.json') runJsons.push(p); } };
+  walk(path.join(tmp, '.fgos', 'assignments', unitRunId));
+  assert.ok(runJsons.length > 0);
+  for (const p of runJsons) assert.equal(JSON.parse(fs.readFileSync(p, 'utf8')).timeoutMs, 5400000, p);
+});
+
+test('fgos run --timeout is refused when malformed, out of range, or on a resume, before any unit run exists', () => {
+  const tmp = setupTestRepo();
+  assert.match(failCli(['Check it', '--capability', 'docs:write', '--timeout', '90', '--dir', tmp], tmp), /--timeout/);
+  assert.match(failCli(['Check it', '--capability', 'docs:write', '--timeout', '9h', '--dir', tmp], tmp), /at most 4h/);
+  assert.match(failCli(['Check it', '--capability', 'docs:write', '--override', '{"timeoutMs":5}', '--dir', tmp], tmp), /timeout/);
+  assert.match(failCli(['--resume', 'unit-run-1-x', '--timeout', '90m', '--dir', tmp], tmp), /--timeout cannot change a resumed unit run/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
 test('fgos run "<prompt>" with both --provider and an --override executor: the override pins', () => {
   const tmp = setupTestRepo();
   const stdout = runCli(['Check it', '--capability', 'docs:write', '--provider', 'test-node', '--override', '{"executor":"test-node"}', '--dir', tmp], tmp);
@@ -336,4 +362,23 @@ test('fgos run --account needs an account id', () => {
   const tmp = setupTestRepo();
   const out = failCliHome(['Check it', '--capability', 'docs:write', '--account', '--dir', tmp], tmp, accountHome());
   assert.match(out, /--account requires an account id/);
+});
+
+test('fgos run --sync <ref> without a prompt makes a sync-only unit; with --unit, --resume or no --writes it is refused', () => {
+  const tmp = setupTestRepo();
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: tmp, stdio: 'ignore' });
+  const wt = makeFixtureDir('fgos-cli-run-sync-wt-');
+  fs.rmSync(wt, { recursive: true, force: true });
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: tmp, stdio: 'ignore' });
+  assert.match(failCli(['--unit', 'x.yaml', '--sync', 'main', '--dir', tmp], tmp), /--sync only applies to fgos run "<prompt>" or a bare --sync/);
+  assert.match(failCli(['--sync', 'main', '--capability', 'docs:write', '--dir', tmp], wt), /--sync needs --writes/);
+  assert.match(failCli(['--sync', '--writes', 'docs', '--dir', tmp], wt), /--sync requires a ref/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+  // main is already in the branch: a sync-only unit is up to date and passes without a worker.
+  const stdout = runCli(['--sync', 'main', '--capability', 'docs:write', '--writes', 'docs', '--dir', tmp], wt);
+  const record = unitRecordOf(tmp, stdout);
+  assert.equal(record.unit.syncBase, 'main');
+  assert.equal(record.unit.syncOnly, true);
+  assert.equal(record.sync.status, 'up-to-date');
+  assert.equal(record.settlement.outcome, 'pass');
 });

@@ -91,11 +91,20 @@ export function currentDispatchDepth() {
 
 /**
  * The environment an executor-launched agent starts from: the caller's own, minus the Rust host's
- * recursion guard. The agent's hooks call the project shim, and a nested host refuses (exit 1)
- * whenever that guard is inherited, which would silently disable every hook for dispatched agents.
+ * recursion guard and any parent OMP/Pi profile overrides (`OMPCODE`, `OMP_PROFILE`, `PI_PROFILE`,
+ * `PI_CONFIG_FILES`). The agent's hooks call the project shim, and a nested host refuses (exit 1)
+ * whenever that guard is inherited; an inherited `OMP_PROFILE`/`PI_PROFILE` makes a child `omp`
+ * ignore its own `PI_CODING_AGENT_DIR` (private home), and `OMPCODE=1` disables `herdr-omp-agent-state`.
  */
 export function workerBaseEnv(baseEnv = process.env) {
-  const { FGOS_RUST_HOST_RECURSION_GUARD: _guard, ...rest } = baseEnv;
+  const {
+    FGOS_RUST_HOST_RECURSION_GUARD: _guard,
+    OMPCODE: _ompcode,
+    OMP_PROFILE: _ompProfile,
+    PI_PROFILE: _piProfile,
+    PI_CONFIG_FILES: _piConfigFiles,
+    ...rest
+  } = baseEnv;
   return rest;
 }
 

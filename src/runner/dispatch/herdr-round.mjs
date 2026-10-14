@@ -80,13 +80,17 @@ export function shellEscapeArg(arg) {
 }
 
 /**
- * Variables the shell that runs the launcher rewrites for every program it starts (`bash`
- * bumps SHLVL, sets `_` to the command path). They describe the shell, not the invocation:
- * exporting the fgos process's own values would be overwritten at exec, and comparing the
- * running process against them would call every honest launch an environment tamper.
+ * Variables owned by the target pane's shell and terminal multiplexer rather than the caller's
+ * ambient process (`bash` rewrites `SHLVL`/`_`/`PWD`/`OLDPWD`; Herdr owns the pane's `TERM`,
+ * `COLORTERM`, `TERM_PROGRAM`, `TERM_PROGRAM_VERSION`, `HERDR_PANE_ID`, `HERDR_TAB_ID`, and
+ * `HERDR_WORKSPACE_ID`). Exporting a non-interactive caller's `TERM=dumb` or caller `HERDR_PANE_ID`
+ * into the launcher script clobbers the new pane's terminal type and hook target identity.
  */
-const SHELL_MANAGED_ENV = Object.freeze(['SHLVL', '_', 'PWD', 'OLDPWD']);
-
+const SHELL_MANAGED_ENV = Object.freeze([
+  'SHLVL', '_', 'PWD', 'OLDPWD',
+  'TERM', 'COLORTERM', 'TERM_PROGRAM', 'TERM_PROGRAM_VERSION',
+  'HERDR_PANE_ID', 'HERDR_TAB_ID', 'HERDR_WORKSPACE_ID',
+]);
 /**
  * Generate the launcher script file content for confined launch.
  */
@@ -823,12 +827,12 @@ function startAgent({ client, round, agentKind, agentArgs, readyMs }) {
 }
 
 /**
- * What actually gets typed at the agent. `file-pointer` is the default
- * because one shape works for every agent kind; `inline` is a declared choice
- * with its own evidence, not a fallback taken when something goes wrong.
+ * What actually gets typed at the agent. `inline` is the default so a person
+ * watching the pane sees the full brief in the TUI conversation; `file-pointer`
+ * sends a one-line pointer to `brief-<round>.md` on disk.
  */
-function briefMessage({ delivery, briefText, runDir, roundNumber }) {
-  return delivery === 'inline' ? briefText : renderPointer({ runDir, round: roundNumber });
+function briefMessage({ delivery = 'inline', briefText, runDir, roundNumber }) {
+  return delivery === 'file-pointer' ? renderPointer({ runDir, round: roundNumber }) : briefText;
 }
 
 /**
@@ -1026,20 +1030,60 @@ export function refuseBriefIntoUnreadyPane({ client, round, readiness }) {
     { readiness, ...(readiness === 'blocked' ? { outcome: 'blocked' } : {}), ...(screenLine ? { screen: screenLine } : {}) });
 }
 
+/** Collapsed paste markers and modal paste menus rendered in agent TUI composers. */
+const PASTE_CHIP_RE = /(\[paste #\d+(?: [^\]]+)?\]|\[Pasted text #\d+(?: [^\]]+)?\]|\[Paste\]|#\d+\s*(?:…|\.\.\.)\s*\+\d+\s*lines|Pasted \d+ lines)/i;
+
+/** Active working indicators on the visible bottom lines of an unruled/partially-ruled TUI. */
+const VISIBLE_WORKING_TAIL_RE = /(?:──\s*[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]\s*Working|\bWorking(?:…|\.\.\.)|\besc to (?:interrupt|cancel)\b)/i;
+
 /**
- * After the brief is typed, make sure it was submitted: an unsent draft left in the
- * prompt box is submitted with Enter.
+ * Whether an unsubmitted draft or collapsed paste chip is sitting in the agent's composer box.
+ *
+ * Checks `promptText` (from Herdr's `prompt_box_body` detector rule) first, then falls back to
+ * the bottom 6 non-empty lines of the visible screen so historical turns further up the viewport
+ * never trigger a false-positive `Enter`.
+ */
+export function isDraftStillInComposer({ message, promptText, visibleScreen }) {
+  const tailNeedle = squash(message).slice(-48);
+  const headNeedle = squash(message).slice(0, 48);
+  const box = String(promptText ?? '').trim();
+  if (box) {
+    if (PASTE_CHIP_RE.test(box)) return true;
+    const squashedBox = squash(box);
+    if ((tailNeedle && squashedBox.includes(tailNeedle)) || (headNeedle && squashedBox.includes(headNeedle))) {
+      return true;
+    }
+  }
+  if (visibleScreen) {
+    const bottomLines = String(visibleScreen)
+      .split(/\r?\n/)
+      .filter((line) => line.trim().length > 0)
+      .slice(-6)
+      .join('\n');
+    if (PASTE_CHIP_RE.test(bottomLines)) return true;
+    if (!box) {
+      const squashedBottom = squash(bottomLines);
+      if ((tailNeedle && squashedBottom.includes(tailNeedle)) || (headNeedle && squashedBottom.includes(headNeedle))) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * After the brief is typed, make sure it was submitted: an unsent draft or collapsed paste
+ * chip left in the prompt box is submitted with Enter.
  *
  * `agent prompt` types and returns without waiting for the turn. If the agent's UI
- * drops the submit key, the text stays in the box and the worker never starts -- and
- * because the pane's state is the one fgos reported, nothing else notices. This looks
- * at herdr's detector: working means the brief was taken; idle with the brief still in
- * the prompt box means it was not, and Enter is pressed (bounded, spaced). Stops as
+ * drops the submit key or folds a multi-line paste into a chip, the text stays in the box
+ * and the worker never starts. This looks at herdr's detector and the bottom composer lines
+ * of the visible screen: working means the brief was taken; idle with the brief or paste chip
+ * still in the composer means it was not, and Enter is pressed (bounded, spaced). Stops as
  * soon as the worker's own ack or result file exists, a blocking dialog is up (pressing
  * a key there would answer it), or the window ends. Returns the number of Enters pressed.
  */
 export async function confirmBriefSubmitted({ client, target, message, paths, round, windowMs = SUBMIT_CONFIRM_MS, pollMs = SUBMIT_POLL_MS }) {
-  const needle = squash(message).slice(-48);
   const deadline = Date.now() + windowMs;
   let enters = 0;
   let lastEnterAt = 0;
@@ -1053,7 +1097,23 @@ export async function confirmBriefSubmitted({ client, target, message, paths, ro
     if (seen.state === null) break;
     if (seen.visibleBlocker || seen.state === 'blocked') break;
     if (seen.visibleWorking || seen.state === 'working') break;
-    const draftPresent = seen.state === 'idle' && Boolean(needle) && squash(seen.promptText).includes(needle);
+
+    let visibleScreen = '';
+    if (seen.state === 'idle' && !seen.promptText) {
+      try { visibleScreen = client.agentRead(target, { source: 'visible', lines: 20 }); } catch { visibleScreen = ''; }
+      const bottomTail = String(visibleScreen)
+        .split(/\r?\n/)
+        .filter((line) => line.trim().length > 0)
+        .slice(-6)
+        .join('\n');
+      if (VISIBLE_WORKING_TAIL_RE.test(bottomTail)) break;
+    }
+
+    const draftPresent = seen.state === 'idle' && isDraftStillInComposer({
+      message,
+      promptText: seen.promptText,
+      visibleScreen,
+    });
     noDraftStreak = draftPresent ? 0 : noDraftStreak + 1;
     if (!draftPresent && noDraftStreak >= SUBMIT_NO_DRAFT_POLLS) break;
     if (draftPresent) {

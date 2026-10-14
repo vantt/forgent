@@ -547,6 +547,42 @@ test('acquireMainCheckoutLock still honors ttlMs for a LIVE dispatch-lock compos
   assert.equal(contender.holderPid, composite);
 });
 
+// A dispatch given a long run timeout renews its per-cwd lock every timeout/3; a contender with a
+// shorter timeout of its own must judge that holder by the ttl the holder took, or it takes the lock
+// of a worktree whose worker is still running.
+test('a live dispatch-lock holder is judged by the ttlMs it took, not by a contender\'s shorter one, and keeps it across renewals', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const lockFile = dispatchLockFile('/some/worktree');
+  const H = 3600000;
+  const identity = `${process.pid}:${Date.now()}:longrun`;
+  const t0 = Date.now() - 2 * H;
+  assert.equal(acquireMainCheckoutLock(dir, { identity, ttlMs: 4 * H, now: t0, lockFile }).status, ACQUIRED);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, lockFile), 'utf8')).ttlMs, 4 * H);
+  // Renewed 70 minutes ago (a 4h run renews every 80 minutes).
+  assert.equal(renewMainCheckoutLockIfOwn(dir, identity, { now: Date.now() - 70 * 60000, lockFile }).status, 'renewed');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, lockFile), 'utf8')).ttlMs, 4 * H, 'a renewal keeps the ttl the holder took');
+
+  const contender = acquireMainCheckoutLock(dir, { identity: `${process.pid}:${Date.now()}:shortrun`, ttlMs: 35 * 60000, lockFile });
+  assert.equal(contender.status, HELD, 'a 35-minute contender must not take a 4h holder\'s lock 70 minutes after its last renewal');
+
+  // A holder past its own ttl since its last renewal is reclaimed as before.
+  fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: identity, ts: Date.now() - 5 * H, ttlMs: 4 * H }));
+  assert.equal(acquireMainCheckoutLock(dir, { identity: `${process.pid}:${Date.now()}:nextrun`, ttlMs: 35 * 60000, lockFile }).status, ACQUIRED);
+});
+
+// A pid reused after a holder was killed reads as live; the ttl a record claims is honoured only up to
+// the run-timeout ceiling, so no record blocks a worktree for longer than one run may take.
+test('a dispatch-lock holder\'s recorded ttl is honoured only up to the run-timeout ceiling', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const lockFile = dispatchLockFile('/some/worktree');
+  const H = 3600000;
+  fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: `${process.pid}:${Date.now()}:huge`, ts: Date.now() - 5 * H, ttlMs: 9e15 }));
+  const contender = acquireMainCheckoutLock(dir, { identity: `${process.pid}:${Date.now()}:next`, ttlMs: 15 * 60000, lockFile });
+  assert.equal(contender.status, ACQUIRED);
+});
+
 test('acquireMainCheckoutLock still fails closed (AMBIGUOUS) for a non-composite string identity with no ttlMs supplied -- the S2 fix only special-cases the dispatch lock\'s own pid-embedded shape', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });

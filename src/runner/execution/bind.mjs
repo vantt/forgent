@@ -6,7 +6,7 @@ import { deriveProviderFamily, resolveTierModel } from '../dispatch/resolve.mjs'
 import { checkProviderDisallowed } from '../dispatch/provider-adapter.mjs';
 import { canApplyPosture, resolvePostureInvocation } from '../dispatch/confinement/policies.mjs';
 import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
-import { MODEL_POLICY_TIERS, assertReasoningEffort } from '../dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, assertReasoningEffort, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { resolveStrongerTier, TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
 import { resolveAccountPin } from './account-pin.mjs';
 
@@ -479,6 +479,27 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     reasoningEffortSource = `override:${matchingOverride.origin ?? 'unknown'}`;
   }
 
+  // 7c. Run timeout: an override (`fgos run --timeout`, or a `timeoutMs` key in `--override`), else
+  // the unit's own `timeoutMs`; without either the dispatch uses `runner.timeoutMs`. Checked here so
+  // a value out of range is a refused binding, never a run killed at once or left to hang.
+  let timeoutMs = null;
+  let timeoutMsSource = 'none';
+  if (matchingOverride && matchingOverride.timeoutMs !== undefined) {
+    try {
+      timeoutMs = assertRunTimeoutMs(matchingOverride.timeoutMs, 'override timeoutMs');
+    } catch (err) {
+      return { refused: { reason: 'run-timeout', detail: err.message } };
+    }
+    timeoutMsSource = `override:${matchingOverride.origin ?? 'unknown'}`;
+  } else if (unit?.timeoutMs !== undefined) {
+    try {
+      timeoutMs = assertRunTimeoutMs(unit.timeoutMs, 'unit.timeoutMs');
+    } catch (err) {
+      return { refused: { reason: 'run-timeout', detail: err.message } };
+    }
+    timeoutMsSource = 'unit';
+  }
+
   // 8. Provenance
   const provenance = {
     executor: { value: executorId, source: chosenCandidate.source },
@@ -488,6 +509,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     model: { value: model, source: modelSource },
     persona: { value: persona, source: personaSource },
     reasoningEffort: { value: reasoningEffort, source: reasoningEffortSource },
+    timeoutMs: { value: timeoutMs, source: timeoutMsSource },
     mechanism: { value: mechanism, source: mechanismSource },
     posture: { value: posture, source: isReadOnlyPosture ? 'read-only-ask-or-writes-empty' : 'producer-writes-declared' },
   };
@@ -527,6 +549,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     model,
     persona: persona ?? null,
     reasoningEffort,
+    timeoutMs,
     mechanism,
     posture,
     ...(account ? { account } : {}),

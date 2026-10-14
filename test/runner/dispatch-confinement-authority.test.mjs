@@ -505,6 +505,7 @@ test("MED-2: the loop worker Unit and executeExecutorCli agree on capability ide
           adapter: "cli-spawn",
           args: ["-p", "{prompt}"],
           invocations: [{ via: "cli", command: "agy", args: ["-p", "{prompt}"] }],
+          allowCrossProvider: true,
         },
       },
       executor: {
@@ -527,8 +528,9 @@ test("MED-2: the loop worker Unit and executeExecutorCli agree on capability ide
 
     let cliRefusedCap;
     try {
-      await executeExecutorCli("fgos-coding-implement", {
-        // The Work layer derives the capability hints; dispatch's door takes them as given.
+      // Dispatch's door runs a registered executor; the Work layer derives the capability hints
+      // from the step's own executor identity and dispatch takes them as given.
+      await executeExecutorCli("agy-cli", {
         ...workDispatchContext({ work: researchWork, stage: "executing", cwd: tmpDir, executorId: "fgos-coding-implement" }),
         repoRoot: tmpDir,
         cwd: tmpDir,

@@ -1484,6 +1484,30 @@ test('a resumed unit recorded before write scopes existed hands its own writes t
   assert.equal(JSON.parse(fs.readFileSync(unitJson, 'utf8')).writeScope, undefined);
 });
 
+test('a resumed unit keeps the run timeout it started with; an override passed to the resume does not change it', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  const first = await runUnit({
+    unitData: { id: 'u-resume-timeout', objective: 'Read the docs', capability: 'docs:write', writes: [] },
+    overrides: [{ origin: 'human-cli', timeoutMs: 5400000 }],
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId);
+  const unitJson = path.join(unitDir, 'unit.json');
+  const record = JSON.parse(fs.readFileSync(unitJson, 'utf8'));
+  // As if the run died mid-round: the binding stays recorded, the round's output is gone.
+  delete record.settlement;
+  record.execution = { status: 'running' };
+  for (const attempt of record.bindings['producer/1']) delete attempt.outcome;
+  fs.writeFileSync(unitJson, JSON.stringify(record, null, 2));
+  fs.rmSync(path.join(unitDir, 'producer'), { recursive: true, force: true });
+  await runUnit({ resumeUnitRunId: first.unitRunId, overrides: [{ origin: 'human-cli', timeoutMs: 120000 }], repoRoot, cwd: worktreeDir });
+  const runJson = JSON.parse(fs.readFileSync(path.join(unitDir, 'producer', '1', 'runs', '01', 'run.json'), 'utf8'));
+  assert.equal(runJson.timeoutMs, 5400000);
+  assert.deepEqual(JSON.parse(fs.readFileSync(unitJson, 'utf8')).overrides, [{ origin: 'human-cli', timeoutMs: 5400000 }]);
+});
+
 test('a resume is refused while a live process holds the dispatch lock of the unit worktree, and proceeds once that holder is dead', async (t) => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));

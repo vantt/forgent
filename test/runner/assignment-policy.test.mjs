@@ -9,6 +9,7 @@ import {
 import { RunnerConfigError, supportsPolicyTier } from '../../src/runner/dispatch/config.mjs';
 import { resolveTierModel, deriveProviderFamily, resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveStrongerRigor } from '../../src/runner/rigor.mjs';
+import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
 
 test('resolveStrongerTier correctly orders tiers monotonically', () => {
   assert.equal(resolveStrongerTier('standard', 'nano'), 'standard');
@@ -66,19 +67,21 @@ test('resolveAssignmentDispatchPolicy resolves validate-plan defaults: reviewer/
 });
 
 test('high-risk work raises tier rigor to flagship or frontier without downgrade', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-  });
-
   const heavyWork = {
     id: 'tsk-risk-1',
     risk: 'heavy',
   };
+  // The Work layer folds risk into the assignment's own rigor; dispatch only reads that.
+  const assignment = {
+    ...buildAssignment({
+      stage: 'planning',
+      operation: 'validate-plan',
+    }),
+    rigor: workRigorFor(heavyWork),
+  };
 
   const effective = resolveAssignmentDispatchPolicy({
     assignment,
-    work: heavyWork,
   });
 
   assert.equal(effective.tier, 'flagship');
@@ -241,8 +244,7 @@ test('resolveAssignmentDispatchPolicy resolves an flagship-tier work item agains
   };
 
   const effective = resolveAssignmentDispatchPolicy({
-    assignment,
-    work: { id: 'tsk-b1-1', risk: 'heavy' },
+    assignment: { ...assignment, rigor: workRigorFor({ id: 'tsk-b1-1', risk: 'heavy' }) },
     runnerConfig,
   });
 
@@ -262,8 +264,7 @@ test('resolveAssignmentDispatchPolicy fails closed (throws, never a silent null 
   assert.throws(
     () =>
       resolveAssignmentDispatchPolicy({
-        assignment,
-        work: { id: 'tsk-b1-2', risk: 'heavy' },
+        assignment: { ...assignment, rigor: workRigorFor({ id: 'tsk-b1-2', risk: 'heavy' }) },
         runnerConfig,
       }),
     (err) => err instanceof RunnerConfigError && /flagship/.test(err.message),
@@ -754,8 +755,8 @@ test('resolveAssignmentDispatchPolicy rejects malformed rigor even when a strong
     policy: { rigor: 'critical' },
   });
   assert.throws(
-    () => resolveAssignmentDispatchPolicy({ assignment, work: { id: 'tsk-invalid-rigor', rigor: 'unknown' } }),
-    (err) => err instanceof RunnerConfigError && /work rigor/.test(err.message),
+    () => resolveAssignmentDispatchPolicy({ assignment: { ...assignment, rigor: 'unknown' } }),
+    (err) => err instanceof RunnerConfigError && /assignment rigor/.test(err.message),
   );
 });
 
@@ -822,15 +823,53 @@ test('resolveAssignmentDispatchPolicy rejects malformed assignment policy contai
   }
 });
 
-test('resolveAssignmentDispatchPolicy: Work size never enters dispatch and work.rigor determines policy tier', () => {
-  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
-  const effective = resolveAssignmentDispatchPolicy({
-    assignment,
-    work: { id: 'tsk-work-1', size: 'heavy', rigor: 'high' },
-  });
+test('resolveAssignmentDispatchPolicy: Work size never enters dispatch and the item rigor, carried as assignment.rigor, determines policy tier', () => {
+  const work = { id: 'tsk-work-1', size: 'heavy', rigor: 'high' };
+  const assignment = { ...buildAssignment({ workId: work.id, stage: 'planning', operation: 'validate-plan' }), rigor: workRigorFor(work) };
+  const effective = resolveAssignmentDispatchPolicy({ assignment });
   assert.equal(effective.tier, 'flagship');
   assert.equal(effective.provenance.rigor.value, 'high');
-  assert.equal(effective.provenance.rigor.source.scope, 'work');
+  assert.equal(effective.provenance.rigor.source.scope, 'assignment');
+});
+
+test('resolveAssignmentDispatchPolicy refuses a Work item instead of ignoring it', () => {
+  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
+  for (const key of ['work', 'workItem']) {
+    assert.throws(
+      () => resolveAssignmentDispatchPolicy({ assignment, [key]: { id: 'tsk-x', rigor: 'critical' } }),
+      (err) => err instanceof RunnerConfigError && /takes no Work item/.test(err.message),
+      key,
+    );
+  }
+});
+
+const ALL_TIERS_CONFIG = {
+  executor: { command: 'claude' },
+  modelPolicies: { claude: { nano: 'n', standard: 's', flagship: 'f', frontier: 'x' } },
+};
+
+test('assignment.rigor never lowers a stronger operation rigor or a capability floor', () => {
+  // Operation rigor high, caller demands low: stays high.
+  const opHigh = { ...buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { rigor: 'high' } }), rigor: 'low' };
+  assert.equal(resolveAssignmentDispatchPolicy({ assignment: opHigh }).rigor, 'high');
+  // Capability floor critical, caller demands low first: the floor raises it.
+  const capFloor = { ...buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { capability: 'judge' } }), rigor: 'low' };
+  const effective = resolveAssignmentDispatchPolicy({ assignment: capFloor, runnerConfig: { ...ALL_TIERS_CONFIG, capabilities: { judge: { rigor: 'critical' } } } });
+  assert.equal(effective.rigor, 'critical');
+  assert.equal(effective.provenance.rigor.source.scope, 'capability');
+  // risk: heavy folded by the Work layer reaches dispatch as high and is not lowered by an operation low.
+  const opLow = { ...buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { rigor: 'low' } }), rigor: workRigorFor({ id: 't', risk: 'heavy' }) };
+  assert.equal(resolveAssignmentDispatchPolicy({ assignment: opLow }).rigor, 'high');
+});
+
+test('assignment.domain picks the domain review capability floor, as the Work domain used to', () => {
+  const runnerConfig = { ...ALL_TIERS_CONFIG, capabilities: { 'coding:review': { rigor: 'high' } } };
+  const plain = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
+  const base = resolveAssignmentDispatchPolicy({ assignment: { ...plain, domain: undefined }, runnerConfig });
+  assert.notEqual(base.provenance.rigor.source.id, 'coding:review');
+  const withDomain = resolveAssignmentDispatchPolicy({ assignment: { ...plain, domain: 'coding' }, runnerConfig });
+  assert.equal(withDomain.rigor, 'high');
+  assert.deepEqual(withDomain.provenance.rigor.source, { scope: 'capability', id: 'coding:review' });
 });
 
 test('resolveAssignmentDispatchPolicy: reasoningEffort derives only from rigor and an explicit tier does not raise it', () => {

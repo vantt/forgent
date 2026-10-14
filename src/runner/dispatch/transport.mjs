@@ -860,7 +860,7 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
   const resolvedEnv = resolveExecutorEnv(rawEnv);
   const herdrBin = resolveHerdrBin(optsHerdrBin);
   const fullEnv = { ...workerBaseEnv(), ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) };
-  const delivery = promptDelivery ?? 'file-pointer';
+  const delivery = opts.promptDelivery ?? process.env.FGOS_HERDR_PROMPT_DELIVERY?.trim() ?? promptDelivery ?? 'inline';
 
   return runHerdrRound({
     herdrBin,
