@@ -1445,7 +1445,8 @@
           ]
         }
       }
-    }
+    },
+    "generatedPaths": []
   },
   "gateBypass": {
     "level": "standard"
