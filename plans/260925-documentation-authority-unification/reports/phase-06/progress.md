@@ -1,3 +1,56 @@
+# Latest resume state — Packaging ordinary row binding request
+
+Date: 2026-10-14
+Executor: codex-session:13@2026-10-14
+Session counter: 13
+Documented Packaging executor sessions: 6 (one interrupted plus five resumes)
+Step: 4 / Packaging-distribution
+State: ready-for-review; batch remains open
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 77830ba77eb05991d95b005919776ee6254e833b
+Last green D/native proof source: ef229394cf0b638a39cd0aefafb9c1c7eb01ea81. Previous green source: 865ffac93c767b862ad9745fef5372dffd9a8158. Current data is recorded in packaging-closure-row-binding-verification.json. The final explicit-path commit seals this request and the green data overlay; refresh at that commit on resume.
+This turn commits: 4cd21c132 (early progress), b842eb2c8 (accepted evidence), ef229394c (register reviewer identities); final request/checkpoint commit follows this entry.
+
+All 20 independent ok verdicts from review-4-packaging-closure-resolution.md at ff3ec502574afd0e703076c0ea5702d4069d04e0 recorded verbatim, ordinary mode, with full report pins. No document text changed for minor notes. Three gap successors, one native retired successor, three heading judgments, five new IDs, the exact-digest shift, register and residual/list approvals retained. dropped-001 is reviewed defer-with-owner with the original Plan C owner and stub; dropped-010 is superseded by decision with the dated coordinator successor and owed Packaging-distribution removal/redirect after the window. Nothing removed now.
+
+Blocker: the accepted report uses Host source claim_6a37273a0a45d24c53e344928c3edf22 as its table cell; existing ordinary checker requires the exact claim ID. Initial D against both prior registries reproduced exactly one decision-review-report-missing, no other fatal. The Host source ledger row is restored exactly to its report-commit pending object; its accepted note remains in application evidence. Changing pins or flags cannot fix the immutable first-cell mismatch. Lead must commit one exact-cell ordinary verdict, identical note/digests. No gate/checker edit.
+
+Request: review-request-261014-1800-packaging-review-row-binding.md
+Verification: packaging-closure-row-binding-verification.json
+Application: packaging-closure-application.json
+
+Final D against both prior registries: exit 0, zero fatal. Packaging scoped strict E against both: expected exit 1, exactly one A34 partial carry + two reviewed identical-unit exception groups + 693 candidate-unverified units; zero Packaging holds/pending source rows/dropped register opens. The outstanding Host source machine binding prevents claiming whole consequence closure. All 407 Packaging source rows reviewed: Mirror 0 / Unit-exact 0 / Weak-exact 293 / Judgment 114; dispositions 399 move / seven defer-with-owner / one partial-carry.
+
+Native equality: all 94,333 immediate-prior IDs retained, 94,338 current; active inventory/registry tuples equal; historical and immediate-prior known tuple sets equal with exactly previously reviewed deltas. Candidate lists equal both native outputs: Agent 488, Host 588, Packaging 693. Holds and exception memberships unchanged; renewed Host A34 residual digest-bound, other 11 residuals unchanged. Persisted working registry native-equal: 68262437 bytes, SHA256 319970223482a089d05b4fe27c2bea93b34900e80f0fd1c5341028056285a743; below 90 MB. No identity graft or reconstruction. Registry formatting changed during explicit approval persistence; all unaffected registry objects remain equal.
+
+Preservation checks pass: extractor, authority status, reader links, 74 witnesses, 867 payloads, five frozen files unchanged; Agent tree unchanged; Host content remains exactly the prior one-line F6 status change. 29/29 review/apply tests pass with env -u CLAUDE_CODE_SESSION_ID, zero fail/cancel/skip/todo. No full-suite/installed-release/gateway claim. Historical truth sample remains 3/30 false (10%, 65 assertions: 62 true/three false); all three status-note corrections independently accepted, exact 629-unit population digest remains unverified. No new truth draw. Effort: six documented Packaging executor sessions, 407/6 = 67.83 rows/session (retrospective denominator); this session authors zero new source rows and records 20 accepted verdicts.
+
+STOP. Next action: Lead commits the single exact-cell ordinary row, then Doer applies it verbatim, refreshes from persisted working registry, reruns both-prior D/scoped E/full native equality and writes step-04-report.md only if everything closes. No Step 5, promotion, push, rebase, main merge/write or gate/checker/vocabulary/extractor/baseline edit. No new owner question.
+
+Earlier progress follows intact.
+
+---
+
+# Latest resume state — Packaging exact-cell blocker verification
+
+Date: 2026-10-14
+Executor: codex-session:13@2026-10-14
+Session counter: 13
+Documented Packaging executor sessions: 6
+Step: 4 / Packaging-distribution
+State: rework; finishing green proofs before one bounded Lead request
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 77830ba77eb05991d95b005919776ee6254e833b
+Current commits: 4cd21c132 (progress), b842eb2c8 (accepted evidence), ef229394c (register reviewer identities).
+All 20 ok notes recorded verbatim at ff3ec5025. One Host source approval withheld: immutable first table cell has Host source prefix; ordinary checker requires exact claim ID. Original source row restored exactly to pending. Read-only probe changing only that cell passes. Lead must publish one canonical-cell row; no owner decision or checker change requested.
+Request prepared: review-request-261014-1800-packaging-review-row-binding.md, full shown text and digests.
+Fresh inventory at ef229394c complete. First-prior D passes zero fatal; second-prior D and both scoped E are running serially after one concurrent run returned empty JSON. Native full tuple equality already passes before this metadata-only commit, all unrelated registry objects equal ff3ec5025. Registry 68262437 bytes, below 90 MB; tests 29/29.
+Next: finish serial proofs, save verification/progress, commit the single bounded request, STOP. Batch remains open; no step-04-report.md or Step 5.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Packaging batch closure in progress
 
 Date: 2026-10-14
