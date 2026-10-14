@@ -4,10 +4,10 @@ Date: 2026-10-14
 Executor: codex-session:21@2026-10-14
 Session counter: 21
 Step: 5
-State: resumed / applying committed reviews
+State: authoring / committed verdicts applied
 Review pin: 729bea758; owner authorization A35/A36 at b65e0d23d.
 Required worktree and branch verified; starting tree clean. Read progress first. Apply 240 ok source rows plus list/gap verdicts in ordinary mode with verbatim notes; fix the rescope citation. Then correct only A35 Findings sentences and mechanical A22 consequences, author remaining Step 5 rows in bounded packs under A36, and propose the historical switchboard-gap disposition. AGENTS.md/CLAUDE.md wait for Step 10. Refresh D/E from both priors and native equality, persist compact registry below 90 MB. Prepare final truth population only if all remaining source rows are decided; no author draw.
-No main writes/merge, promotion, push, rebase, Step 6, protected tool edits or secret read. Next: validate and apply committed reviews.
+No main writes/merge, promotion, push, rebase, Step 6, protected tool edits or secret read. Applied all 240 source ok verdicts and two list/gap accounting verdicts pinned to 729bea758, notes verbatim. Both-prior D exit 0/zero fatal at resume inventory; native application equality retains all 94,761 known IDs/full tuples, no new gaps/retired, compact registry unchanged at 59,682,291 bytes. Scoped E running. Rescope citation corrected to review-4-packaging-closure-resolution.md (693 tuples); ten accepted count-nit rationales left unchanged to avoid new review. A35 corrections and 224 retained/navigation rows are authored but not yet published. Remaining undecided: 95. Next: commit bounded truth/rebinding and conservation packs, final proofs and progress; STOP.
 
 Earlier progress follows intact.
 
