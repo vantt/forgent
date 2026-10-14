@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- A headless round that stops because the provider account used up its quota (codex "You've hit your usage limit") now settles as `provider-limit` with `failure.cause: quota` instead of a generic non-zero exit, so a Workflow unit or `execute --contract` moves to another account or candidate, and a leased account waits out the reset time the provider printed.
+
 ## [v0.2.0-rc.5] - 2026-10-14
 
 ### Added

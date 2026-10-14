@@ -1,6 +1,7 @@
-// Screen and stderr wordings that mean a provider credential is dead, kept in a module of its own
-// with no imports so the pane liveness ladder, the provider capacity classifier and the run
-// settlement can share one list without any of them reaching the others.
+// Screen and stderr wordings that mean a provider cannot serve a round -- its credential is dead,
+// or its account has used up its quota -- kept in a module of its own with no imports so the pane
+// liveness ladder, the provider capacity classifier and the run settlement can share one list
+// without any of them reaching the others.
 
 /**
  * Screen text that means "this agent cannot reach its provider because its credential is dead",
@@ -35,8 +36,31 @@ export const AUTH_FAILURE_TAIL_LINES = 5;
  * its last words, while a wording far up a long log is just something the agent said or ran.
  */
 export function matchAuthFailureLine(text, { tailLines = null } = {}) {
+  return firstMatchingLine(text, AUTH_FAILURE_PATTERNS, tailLines);
+}
+
+/**
+ * Stderr lines that mean "this account has used up its quota", as the provider CLI prints them when
+ * it stops. Only wordings seen from a real CLI belong here; the first one was measured on codex
+ * (2026-10-13: "ERROR: You’ve hit your usage limit. ... or try again at 11:39 PM.", printed twice
+ * before codex's closing "tokens used" tally). Each pattern anchors to the line start, optionally
+ * after the CLI's "ERROR:" prefix, because codex streams the agent's whole transcript to stderr and a
+ * line that only quotes the wording inside other text must not end the round.
+ */
+export const QUOTA_LIMIT_PATTERNS = Object.freeze([
+  /^(?:error:?\s*)?you(?:'|’)ve hit your usage limit/i,
+  /^(?:error:?\s*)?usage limit has been reached/i,
+  /^(?:error:?\s*)?individual quota reached/i,
+]);
+
+/** The first line of `text` that reads like a used-up quota, or null; `tailLines` as above. */
+export function matchQuotaLimitLine(text, { tailLines = null } = {}) {
+  return firstMatchingLine(text, QUOTA_LIMIT_PATTERNS, tailLines);
+}
+
+function firstMatchingLine(text, patterns, tailLines) {
   if (typeof text !== 'string' || !text) return null;
   let lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   if (Number.isInteger(tailLines) && tailLines > 0) lines = lines.slice(-tailLines);
-  return lines.find((line) => AUTH_FAILURE_PATTERNS.some((pattern) => pattern.test(line))) ?? null;
+  return lines.find((line) => patterns.some((pattern) => pattern.test(line))) ?? null;
 }

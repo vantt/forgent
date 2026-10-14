@@ -38,7 +38,7 @@ import {
   classifyProviderCapacityFault,
   quarantineProviderAccount,
 } from './provider-capacity.mjs';
-import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine } from './provider-auth-failure.mjs';
+import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
 
 /**
  * Safely resolve root path without failing if not in a git repository.
@@ -584,13 +584,21 @@ export async function settleRunOutcome({
   // found for openrouter.") stopped because the provider cannot serve it, which is a provider limit
   // like any other: the account is quarantined and the caller moves on instead of failing the role.
   // A claim the worker managed to write means the worker did report, so it is judged as reported.
+  // A process that exits the same way with a used-up quota as its last words (codex: "ERROR: You've
+  // hit your usage limit ...") is the same kind of stop, read from the same stderr tail and without
+  // needing an account lease: the walk moves to another account or candidate, and a leased account is
+  // quarantined until the reset time the provider printed.
   const alreadyProviderStop = adapterOutcome === 'provider-limit' || adapterOutcome === 'paused-limit' || adapterOutcome === 'blocked';
-  const exitedOnDeadCredential = !alreadyProviderStop
+  const exitedOnProviderStop = !alreadyProviderStop
     && !isTimeout
     && typeof exitCode === 'number' && exitCode !== 0
-    && !agentClaim
+    && !agentClaim;
+  const exitedOnDeadCredential = exitedOnProviderStop
     && matchAuthFailureLine(stderrText, { tailLines: AUTH_FAILURE_TAIL_LINES }) !== null;
-  const settledAdapterOutcome = exitedOnDeadCredential ? 'provider-limit' : adapterOutcome;
+  const exitedOnQuota = exitedOnProviderStop
+    && !exitedOnDeadCredential
+    && matchQuotaLimitLine(stderrText, { tailLines: AUTH_FAILURE_TAIL_LINES }) !== null;
+  const settledAdapterOutcome = exitedOnDeadCredential || exitedOnQuota ? 'provider-limit' : adapterOutcome;
   // Whether the stop is a dead credential, as opposed to a quota: a caller that walks to another
   // candidate must not land on the provider whose login just failed.
   const credentialFault = (settledAdapterOutcome === 'provider-limit' || settledAdapterOutcome === 'paused-limit')
@@ -712,7 +720,7 @@ export async function settleRunOutcome({
     // next candidate instead of retrying the same provider. One waiting on a prompt only
     // a person can answer is `blocked`: retrying or moving on does not clear it.
     ...(settledAdapterOutcome === 'provider-limit' || settledAdapterOutcome === 'paused-limit' || settledAdapterOutcome === 'blocked'
-      ? { failureOverride: { family: 'provider', code: settledAdapterOutcome, ...(credentialFault ? { cause: 'credential' } : {}) } }
+      ? { failureOverride: { family: 'provider', code: settledAdapterOutcome, ...(credentialFault ? { cause: 'credential' } : exitedOnQuota ? { cause: 'quota' } : {}) } }
       : evidenceFacts.failure ? { failureOverride: evidenceFacts.failure } : {}),
     ...(evidenceFacts.policy ? { policyOverride: evidenceFacts.policy } : {}),
     runtime: {

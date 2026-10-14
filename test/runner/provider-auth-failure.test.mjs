@@ -4,7 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine } from '../../src/runner/dispatch/provider-auth-failure.mjs';
+import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from '../../src/runner/dispatch/provider-auth-failure.mjs';
 import { classifyProviderCapacityFault } from '../../src/runner/dispatch/provider-capacity.mjs';
 
 const PI_STDERR = 'No API key found for openrouter.\n\nUse /login to log into a provider via OAuth or API key.\n';
@@ -44,4 +44,20 @@ test('a round that stopped on a missing key quarantines the account as an auth f
 test('a stop on a quota keeps its quota classification when the text has no dead credential', () => {
   const fault = classifyProviderCapacityFault({ provider: 'openrouter', stderr: 'rate limit reached, try again later', adapterOutcome: 'provider-limit' });
   assert.equal(fault.reasonCode, 'quota-limit');
+});
+
+// Measured 2026-10-13: the end of a codex round cut off by the account's usage limit.
+const CODEX_QUOTA_LINE = 'ERROR: You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:39 PM.';
+const CODEX_QUOTA_STDERR = `exec\nsucceeded in 480ms:\n${CODEX_QUOTA_LINE}\n${CODEX_QUOTA_LINE}\ntokens used\n379,854\n`;
+
+test('the usage-limit line codex prints as its last words is a quota stop', () => {
+  assert.equal(matchQuotaLimitLine(CODEX_QUOTA_STDERR, { tailLines: AUTH_FAILURE_TAIL_LINES }), CODEX_QUOTA_LINE);
+  assert.equal(matchAuthFailureLine(CODEX_QUOTA_STDERR, { tailLines: AUTH_FAILURE_TAIL_LINES }), null);
+});
+
+test('a usage-limit wording quoted inside other text, or far up a long log, is not a quota stop', () => {
+  assert.equal(matchQuotaLimitLine('grep: docs say "You’ve hit your usage limit"\n'), null);
+  assert.equal(matchQuotaLimitLine('the usage limit has been reached in the fixture\n'), null);
+  const old = [CODEX_QUOTA_LINE, ...Array.from({ length: 20 }, (_, i) => `line ${i}`)].join('\n');
+  assert.equal(matchQuotaLimitLine(old, { tailLines: AUTH_FAILURE_TAIL_LINES }), null);
 });

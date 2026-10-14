@@ -50,6 +50,13 @@ if (login.startsWith('dead')) {
   process.stderr.write('No API key found for ' + process.argv[2] + '.\\n\\nUse /login to log into a provider via OAuth or API key.\\n');
   process.exit(1);
 }
+if (login.startsWith('quota') || process.argv[2].startsWith('spentquota')) {
+  // The real codex ending of a round cut off by the account's usage limit (2026-10-13): the error
+  // twice, then the token tally codex always prints last.
+  const line = 'ERROR: You\u2019ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:39 PM.';
+  process.stderr.write(line + '\\n' + line + '\\ntokens used\\n379,854\\n');
+  process.exit(1);
+}
 try { fs.writeFileSync(path.join(process.cwd(), 'notes.txt'), 'notes'); } catch { /* a read-only posture keeps the repo untouched */ }
 const prompt = process.argv.slice(3).join(' ');
 const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
@@ -189,6 +196,52 @@ test('a dead login moves the seat to another account of the same provider, not t
   const seat = summaryOf(fx.repoRoot, res).seats[0];
   assert.deepEqual(seat.attempts.map((a) => [a.executor, a.outcome]), [['alpha', 'provider-limit'], ['alpha', 'pass']]);
   assert.equal(seat.final.fallbackFrom.kind, 'account-rotation');
+});
+
+test('a usage limit on a headless round moves the seat to another account of the same provider', { skip: SKIP }, async () => {
+  const fx = setup(
+    { alpha: { family: 'alpha', logins: { spent1: 'quota', live1: 'live' } }, beta: { family: 'beta' } },
+    { recentlyUsed: { alpha: ['live1'] } },
+  );
+  const before = Date.now();
+  const res = await run(fx, solo('u-quota'));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+
+  const attempts = attemptsOf(fx.repoRoot, res);
+  assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['alpha', 'pass']]);
+  assert.equal(attempts[1].fallbackFrom.kind, 'account-rotation');
+  assert.equal(attempts[0].failureCause, undefined, 'a quota stop does not mark the provider family as a dead login');
+  assert.equal(selectedAccount(fx.repoRoot, res, '1'), 'spent1');
+  assert.equal(selectedAccount(fx.repoRoot, res, '1-fb1'), 'live1');
+
+  // The round is a quota stop, not a dead login and not a generic non-zero exit.
+  const first = runFile(fx.repoRoot, res, '1', 'result.json');
+  assert.equal(first.classification.failure.code, 'provider-limit');
+  assert.equal(first.classification.failure.cause, 'quota');
+
+  // The account waits out the reset time the provider printed (11:39 PM local, the next one), held
+  // by the existing quarantine record rather than a second field on the result.
+  const capacity = inspectProviderCapacity({ runnerConfig: fx.runnerConfig, provider: 'alpha', runtimeDir: fx.runtimeDir });
+  const quarantine = capacity.providers.alpha.accounts.spent1.quarantine;
+  assert.equal(quarantine.reasonCode, 'quota-limit');
+  const until = Date.parse(quarantine.until);
+  assert.ok(until > before && until <= before + 24 * 3600 * 1000, quarantine.until);
+  assert.deepEqual([new Date(until).getHours(), new Date(until).getMinutes()], [23, 39]);
+  assert.equal(capacity.providers.alpha.accounts.live1.healthy, true);
+});
+
+test('a usage limit is recognised without an account lease and walks to the next provider', { skip: SKIP }, async () => {
+  // No inventory for the spent provider: nothing is leased or quarantined, yet the stop is still a
+  // provider limit, so the seat moves on instead of failing.
+  const fx = setup({ spent: { family: 'spentquota' }, beta: { family: 'beta' } });
+  const res = await run(fx, solo('u-quota-nolease'));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+  const attempts = attemptsOf(fx.repoRoot, res);
+  assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['spent', 'provider-limit'], ['beta', 'pass']]);
+  assert.equal(attempts[1].fallbackFrom.kind, 'next-candidate');
+  const first = runFile(fx.repoRoot, res, '1', 'result.json');
+  assert.equal(first.classification.failure.cause, 'quota');
+  assert.equal(fs.existsSync(path.join(unitDirOf(fx.repoRoot, res), 'producer', '1', 'runs', '01', 'provider-capacity-selection.json')), false);
 });
 
 test('a provider with one account goes straight to the next provider', { skip: SKIP }, async () => {

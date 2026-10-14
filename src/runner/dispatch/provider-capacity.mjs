@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { matchAuthFailureLine } from './provider-auth-failure.mjs';
+import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
 import { getProcessStartTime, resolveHolderLiveness } from './process-identity.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
@@ -1207,7 +1207,9 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
     };
   }
   if (provider === 'openai' || provider === 'openai-codex') {
-    if (/you(?:'|’)ve hit your usage limit/i.test(text) || /usage limit has been reached/i.test(text) || /individual quota reached/i.test(text)) {
+    // The shared quota wordings, read from the stderr tail only: codex streams the agent's whole
+    // transcript to stderr, so a wording anywhere in it may be the agent quoting it.
+    if (matchQuotaLimitLine(text, { tailLines: AUTH_FAILURE_TAIL_LINES })) {
       // Missing/unparseable reset text falls back to the SAME conservative
       // default TTL -- never an expiry-less "temporary" quarantine, which
       // isQuarantined() would otherwise have to catch defensively instead.
