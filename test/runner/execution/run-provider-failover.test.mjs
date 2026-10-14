@@ -145,8 +145,12 @@ function setup(providers, { prefer = Object.keys(providers), recentlyUsed = {} }
   // Accounts that ran recently rank last, so the account a test leaves out is tried first.
   const runtimeDir = fixtureDir('fgos-failover-capacity-');
   const state = { contract: 'provider-capacity-state.v1', providers: {}, assignments: {}, audit: [] };
+  // Listed order is the order the lease reaches them: each account was last selected one second
+  // after the one before it, so a tie never falls to the run-id-seeded hash.
   for (const [family, accounts] of Object.entries(recentlyUsed)) {
-    state.providers[family] = { accounts: Object.fromEntries(accounts.map((accountId) => [accountId, { leases: {}, lastSelectedAt: '2026-01-01T00:00:00.000Z' }])) };
+    state.providers[family] = {
+      accounts: Object.fromEntries(accounts.map((accountId, i) => [accountId, { leases: {}, lastSelectedAt: new Date(Date.UTC(2026, 0, 1, 0, 0, i)).toISOString() }])),
+    };
   }
   fs.writeFileSync(path.join(runtimeDir, 'state.json'), JSON.stringify(state));
   return { repoRoot, worktreeDir, runtimeDir, runnerConfig: { ...cfg.runner, providers: globalProviders } };
