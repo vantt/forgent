@@ -481,7 +481,7 @@ export function prepareBwrapSync(plan, request, backend) {
         // root, the per-dispatch parent and the home all end up owner-only -- the
         // home receives a login copy. Nothing above the named root is touched.
         ensurePrivateDir(res.hostTarget, { root: res.tempRoot ?? res.hostTarget });
-        writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource });
+        writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource, timeoutMs: request.context?.timeoutMs });
         allocatedPaths.push(res.hostTarget);
         if (res.resource === 'private-home') {
           const provisioned = provisionSelectedCredential(res.hostTarget, request);

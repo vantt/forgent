@@ -19,7 +19,7 @@ import { resolvePattern } from './patterns/presets.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
-import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
+import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
 import { resolveAgentDefinition } from '../agent-definitions.mjs';
 import { dispatchLockFile, parseCompositePidIdentity } from '../main-checkout-lock.mjs';
@@ -275,7 +275,7 @@ async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
  * @param {string} [options.unitPath] Path to unit YAML/JSON file or '-' for stdin
  * @param {object} [options.unitData] Raw unit object (in-memory)
  * @param {string} [options.pattern] Pattern name or preset
- * @param {Array} [options.overrides] Array of overrides [{scope, origin, executor, invocation, tier, persona}]
+ * @param {Array} [options.overrides] Array of overrides [{scope, origin, executor, invocation, tier, persona, reasoningEffort, account, timeoutMs}]
  * @param {string} [options.resumeUnitRunId] Unit run ID to resume
  * @param {string} [options.repoRoot] Main repository root
  * @param {string} [options.cwd] Current working directory / worktree
@@ -390,6 +390,10 @@ export async function runUnit(options = {}) {
       declaredOp = declaredOperationOf(options.declared, unit, callerPatternObject || unit.pattern || options.pattern || 'solo', { taskSpecRoot: mainRoot });
     }
     const pinInputs = options.declared !== undefined ? checkedPinInputs(options.pinInputs) : [];
+    // A run timeout in an override is checked before the unit run exists (bind() checks it again).
+    for (const ov of options.overrides ?? []) {
+      if (ov && typeof ov === 'object' && ov.timeoutMs !== undefined) assertRunTimeoutMs(ov.timeoutMs, 'override timeoutMs');
+    }
     const configSnapshot = snapshotRunnerConfig(mainRoot, options.runnerConfig);
     // A pinned account is checked before the unit run exists: every seat it applies to must bind an
     // executor whose provider lists it, and it must not be quarantined now.
@@ -598,6 +602,8 @@ export async function runUnit(options = {}) {
         ...(bound.reasoningEffort ? { reasoningEffort: bound.reasoningEffort } : {}),
       },
       isReadOnlyMode: readOnly,
+      // The run's own time when bind() took one (override or unit); otherwise `runner.timeoutMs`.
+      ...(bound.timeoutMs ? { timeoutMs: bound.timeoutMs } : {}),
       session,
       ...(carriesOperation ? { operations: unitRecord.declared.operations, pinInputs: unitRecord.pinInputs ?? [] } : {}),
       ...(options.providerCapacityRuntimeDir ? { providerCapacityRuntimeDir: options.providerCapacityRuntimeDir } : {}),

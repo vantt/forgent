@@ -254,6 +254,32 @@ test('fgos run "<prompt>" --effort reaches the override bind() reads', () => {
   assert.equal(record.unit.objective, 'Check it');
 });
 
+test('fgos run "<prompt>" --timeout gives the run its own time, kept in unit.json and handed to the dispatch', () => {
+  const tmp = setupTestRepo();
+  const stdout = runCli(['Port the parser', '--capability', 'docs:write', '--timeout', '90m', '--dir', tmp], tmp);
+  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
+  const unitRunId = /"unitRunId": "([^"]+)"/.exec(stdout)[1];
+  const record = unitRecordOf(tmp, stdout);
+  assert.deepEqual(record.overrides, [{ origin: 'human-cli', timeoutMs: 5400000 }]);
+  const binding = record.bindings['producer/1'][0].binding;
+  assert.equal(binding.timeoutMs, 5400000);
+  assert.deepEqual(binding.provenance.timeoutMs, { value: 5400000, source: 'override:human-cli' });
+  const runJsons = [];
+  const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (e.name === 'run.json') runJsons.push(p); } };
+  walk(path.join(tmp, '.fgos', 'assignments', unitRunId));
+  assert.ok(runJsons.length > 0);
+  for (const p of runJsons) assert.equal(JSON.parse(fs.readFileSync(p, 'utf8')).timeoutMs, 5400000, p);
+});
+
+test('fgos run --timeout is refused when malformed, out of range, or on a resume, before any unit run exists', () => {
+  const tmp = setupTestRepo();
+  assert.match(failCli(['Check it', '--capability', 'docs:write', '--timeout', '90', '--dir', tmp], tmp), /--timeout/);
+  assert.match(failCli(['Check it', '--capability', 'docs:write', '--timeout', '9h', '--dir', tmp], tmp), /at most 4h/);
+  assert.match(failCli(['Check it', '--capability', 'docs:write', '--override', '{"timeoutMs":5}', '--dir', tmp], tmp), /timeout/);
+  assert.match(failCli(['--resume', 'unit-run-1-x', '--timeout', '90m', '--dir', tmp], tmp), /--timeout cannot change a resumed unit run/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
 test('fgos run "<prompt>" with both --provider and an --override executor: the override pins', () => {
   const tmp = setupTestRepo();
   const stdout = runCli(['Check it', '--capability', 'docs:write', '--provider', 'test-node', '--override', '{"executor":"test-node"}', '--dir', tmp], tmp);

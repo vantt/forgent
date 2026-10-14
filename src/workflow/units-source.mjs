@@ -74,6 +74,7 @@ export function translateUnitsToWorkflow(unitsPath) {
           writes: [...unit.writes],
           ...(unit.persona !== undefined ? { persona: unit.persona } : {}),
           ...(unit.prefer !== undefined ? { prefer: structuredClone(unit.prefer) } : {}),
+          ...(unit.timeoutMs !== undefined ? { timeoutMs: unit.timeoutMs } : {}),
           contextRefs: [...unit.inputs],
           ...(unit.stanceOptions !== undefined ? { stanceOptions: [...unit.stanceOptions] } : {}),
           ...(unit.anonymizeInputs ? { anonymizeInputs: true } : {}),

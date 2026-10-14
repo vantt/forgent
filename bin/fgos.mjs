@@ -2752,6 +2752,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
 
       const { runUnit, resolveGitRoots } = await import('../src/runner/execution/run.mjs');
+      const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
       const unitPath = flags.unit;
       const resumeUnitRunId = flags.resume;
       const prompt = positional[0];
@@ -2791,6 +2792,22 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({ origin: 'human-cli' });
         for (const ov of overrides) {
           if (ov.reasoningEffort === undefined) ov.reasoningEffort = effort;
+        }
+      }
+      // `--timeout <dur>` (90m, 5400s, 2h) gives the run its own time instead of runner.timeoutMs, the
+      // same way: a `timeoutMs` key on every override that does not name one. It is kept in unit.json,
+      // so a resumed run keeps it and --timeout cannot change it.
+      if (flags.timeout !== undefined) {
+        if (resumeUnitRunId) throw new StoreError('validation', '--timeout cannot change a resumed unit run: it keeps the timeout it was started with');
+        let timeoutMs;
+        try {
+          timeoutMs = parseRunTimeout(requireField(flags.timeout, '--timeout requires a duration, e.g. 90m or 5400s'));
+        } catch (err) {
+          throw new StoreError('validation', err.message);
+        }
+        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({ origin: 'human-cli' });
+        for (const ov of overrides) {
+          if (ov.timeoutMs === undefined) ov.timeoutMs = timeoutMs;
         }
       }
       // `--account <id>` pins the provider account the same way: an `account` key on every override

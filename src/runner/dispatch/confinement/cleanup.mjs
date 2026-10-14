@@ -12,11 +12,14 @@ import { spawnSync } from 'node:child_process';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
 import { envForSession } from '../worker-session.mjs';
 import { writeBackRenewedCredential, settleHeldCredentialHome, writeFileAtomic, createCredentialRenewal } from '../provider-credential-renewal.mjs';
+import { RUN_TIMEOUT_MAX_MS } from '../run-timeout.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 
 /** How old an empty per-dispatch directory must be before the reaper removes it. */
 export const EMPTY_SHELL_GRACE_MS = 600000;
+/** How long past its own run timeout a live dispatcher's home is kept, for the run to stop and settle. */
+export const RUN_SETTLE_GRACE_MS = 600000;
 export const OWNERSHIP_CONTRACT = 'confinement-resource-ownership.v1';
 export const OWNERSHIP_CREATOR = 'fgos-confinement';
 
@@ -85,7 +88,7 @@ export function markResourceRetained(dirPath, { paneId, herdrSession } = {}) {
 /**
  * Write ownership marker inside allocated directory.
  */
-export function writeOwnershipMarker(dirPath, { dispatchId, resource = 'private-home', pid = process.pid } = {}) {
+export function writeOwnershipMarker(dirPath, { dispatchId, resource = 'private-home', pid = process.pid, timeoutMs } = {}) {
   if (!dirPath || typeof dirPath !== 'string') {
     throw new Error('dirPath is required for writeOwnershipMarker.');
   }
@@ -100,6 +103,9 @@ export function writeOwnershipMarker(dirPath, { dispatchId, resource = 'private-
     resource,
     pid,
     createdAt: new Date().toISOString(),
+    // The run timeout of the dispatch that made this home: the reaper keeps a live dispatcher's home
+    // this long (capped), so a run longer than the reaper's default age is not reaped mid-turn.
+    ...(Number.isSafeInteger(timeoutMs) && timeoutMs > 0 ? { timeoutMs } : {}),
   };
 
   const markerPath = path.join(dirPath, OWNERSHIP_MARKER_FILE);
@@ -427,6 +433,11 @@ export function reapOrphanedConfinementResources({
 
       const createdTime = marker.createdAt ? new Date(marker.createdAt).getTime() : 0;
       const isExpired = createdTime > 0 && now - createdTime > maxAgeMs;
+      // A home whose dispatcher is alive and whose run is still inside its own timeout (plus time to
+      // settle) is in use, however old: a run may be given longer than maxAgeMs. The marker's value is
+      // held to the run-timeout ceiling, so no marker keeps a login copy past it.
+      const runTimeoutMs = Number.isSafeInteger(marker.timeoutMs) && marker.timeoutMs > 0 ? Math.min(marker.timeoutMs, RUN_TIMEOUT_MAX_MS) : 0;
+      const isPastRun = createdTime > 0 && now - createdTime > Math.max(maxAgeMs, runTimeoutMs + RUN_SETTLE_GRACE_MS);
       const processDead = !checkLiveness(marker.pid);
 
       // A home kept for a left-open pane is in use until that pane closes,
@@ -439,7 +450,7 @@ export function reapOrphanedConfinementResources({
           skipped.push({ path: cand, reason: 'pane-still-open' });
           continue;
         }
-      } else if (!(processDead || isExpired)) {
+      } else if (!(processDead || isPastRun)) {
         skipped.push({ path: cand, reason: 'process-alive-and-not-expired' });
         continue;
       }

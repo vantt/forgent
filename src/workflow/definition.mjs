@@ -4,6 +4,7 @@
 
 import path from 'node:path';
 import { canonicalizeWrites } from '../runner/dispatch/write-scope.mjs';
+import { runTimeoutProblem } from '../runner/dispatch/run-timeout.mjs';
 
 /** Thrown for a malformed Workflow definition. Kept free of runner imports (bar the import-free
  * write-scope leaf) so the Work-lifecycle kernel can read step data without depending on dispatch. */
@@ -286,6 +287,10 @@ export function validateWorkflow(raw, { source } = {}) {
           throw new WorkflowDefinitionError(`${unitLabel} requires "capability" (e.g. domain:verb or verb)`);
         }
 
+        const timeoutMs = template.timeoutMs;
+        const timeoutProblem = timeoutMs === undefined ? null : runTimeoutProblem(timeoutMs, `${unitLabel} timeoutMs`);
+        if (timeoutProblem) throw new WorkflowDefinitionError(timeoutProblem);
+
         const rigor = template.rigor ? String(template.rigor).trim() : undefined;
         if (rigor && !VALID_RIGORS.has(rigor)) {
           throw new WorkflowDefinitionError(`${unitLabel} invalid rigor "${rigor}", must be one of [${[...VALID_RIGORS].join(', ')}]`);
@@ -354,6 +359,7 @@ export function validateWorkflow(raw, { source } = {}) {
               writes,
               taskSpec: typeof template.taskSpec === 'string' ? template.taskSpec.trim() : undefined,
               persona: typeof template.persona === 'string' && template.persona.trim() ? template.persona.trim() : undefined,
+              ...(timeoutMs !== undefined ? { timeoutMs } : {}),
               // Shape is checked by the Unit contract (validateUnit) before a units file gets here and again at run.
               ...(templateAllowsPrefer && template.prefer !== undefined ? { prefer: Object.freeze(structuredClone(template.prefer)) } : {}),
               params: template.params === undefined ? undefined : structuredClone(template.params),

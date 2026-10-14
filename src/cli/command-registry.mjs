@@ -1276,7 +1276,7 @@ export const COMMAND_REGISTRY = [
   }),
   {
     name: 'run',
-    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--account <id>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
+    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <id>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
     description: 'Door for one task: `fgos run "<prompt>"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`. Also "record" for inline producer turns.',
     parameters: {
       type: 'object',
@@ -1292,6 +1292,7 @@ export const COMMAND_REGISTRY = [
         pattern: { type: 'string', description: 'Pattern name or preset (solo, reviewed, panel, code-change).' },
         override: { type: 'string', description: 'JSON-encoded array or object of overrides.' },
         effort: { type: 'string', description: 'Reasoning effort for this run (low, medium, high, max), rendered into the provider CLI\'s own flag; a level the bound executor does not declare refuses the binding.' },
+        timeout: { type: 'string', description: 'Time each seat of this run may take instead of runner.timeoutMs: a whole number and a unit (ms, s, m, h), e.g. 90m or 5400s, from 1m to 4h (same as "timeoutMs" in --override, or a Unit\'s own timeoutMs, which it overrides). Kept in unit.json for resume; not with --resume.' },
         account: { type: 'string', description: 'Pin a provider account (an id in providers.<provider>.accounts of ~/.fgos/config.json; same as "account" in --override). It pins each seat whose bound executor\'s provider lists it (a checker on another provider binds unpinned) and does not choose the executor: pair it with --provider. Refused before the unit run exists when no seat takes it or it is quarantined; the lease still takes it, and a provider limit on it ends the seat instead of rotating or failing over. Not with --resume.' },
         resume: { type: 'string', description: 'Unit run ID to resume.' },
         dir: { type: 'string', description: 'Main repository root directory. Storage follows it; workers start in the current directory, so run from inside that project or pass --worktree (a different project than the current directory is warned about as dir-differs-from-cwd).' },
@@ -1313,6 +1314,7 @@ export const COMMAND_REGISTRY = [
       'fgos run --unit path/to/unit.yaml --pattern reviewed',
       'fgos run "Summarize the open review findings" --provider openai',
       'fgos run "Fix the typo in the README" --writes README.md --worktree ../wt-typo',
+      'fgos run "Port the parser to the new AST" --writes src/parser --worktree ../wt-parser --timeout 90m',
     ],
     touchesState: true,
     requiresExistingStore: false,

@@ -1,7 +1,7 @@
 // src/runner/execution/unit.mjs — Unit data contract and validator (Wave B / Phase 2)
 // Architecture guard: MUST NOT import src/state/**, src/runner/coordination/**, src/runner/worktree.mjs, or src/runner/merge.mjs
 
-import { RunnerConfigError } from '../dispatch/config.mjs';
+import { RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from '../dispatch/write-scope.mjs';
 
@@ -119,6 +119,8 @@ function isValidInput(inp) {
  * - stanceOptions?: question-local option labels; "other" is reserved; omitted means unmeasured
  * - prefer?: soft executor preference, array of "<executorId>" or {executor, invocation?}
  * - persona?: non-empty string
+ * - timeoutMs?: the time each of its runs may take instead of `runner.timeoutMs` (whole ms, 1m..4h);
+ *   the size of the work, not how it is executed
  * - MUST NOT contain: executor, provider, model, tier, invocation, actors, overrides (G2)
  *
  * @param {unknown} raw
@@ -132,6 +134,7 @@ function isValidInput(inp) {
  *   pattern?: string,
  *   prefer?: readonly (string|{executor: string, invocation?: string})[],
  *   persona?: string,
+ *   timeoutMs?: number,
  *   inputs: readonly string[],
  *   expectedOutputs: readonly string[]
  * }>}
@@ -249,6 +252,8 @@ export function validateUnit(raw) {
     throw new RunnerConfigError('unit.persona must be a non-empty string when present.');
   }
 
+  if (raw.timeoutMs !== undefined) assertRunTimeoutMs(raw.timeoutMs, 'unit.timeoutMs');
+
   // expectedOutputs
   if (raw.expectedOutputs !== undefined && !Array.isArray(raw.expectedOutputs)) {
     throw new RunnerConfigError('unit.expectedOutputs must be an array of strings.');
@@ -275,6 +280,7 @@ export function validateUnit(raw) {
     ...(pattern !== undefined ? { pattern } : {}),
     ...(prefer !== undefined ? { prefer } : {}),
     ...(raw.persona !== undefined ? { persona: raw.persona.trim() } : {}),
+    ...(raw.timeoutMs !== undefined ? { timeoutMs: raw.timeoutMs } : {}),
     inputs: Object.freeze(inputs),
     ...(raw.anonymizeInputs === true ? { anonymizeInputs: true } : {}),
     ...(raw.blind === true ? { blind: true } : {}),

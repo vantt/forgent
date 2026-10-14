@@ -274,3 +274,13 @@ test('validateUnit: the G2 message names the mechanics a unit still may not pin'
     (err) => /executor, provider, model, tier, invocation, actors, overrides\)/.test(err.message) && !/prefer/.test(err.message),
   );
 });
+
+test('validateUnit: a unit may ask for its own run timeout, inside the ceiling', async () => {
+  const { RUN_TIMEOUT_MAX_MS, RUN_TIMEOUT_MIN_MS } = await import('../../../src/runner/dispatch/config.mjs');
+  const base = { id: 'u-heavy', objective: 'Port the parser', capability: 'code:implement' };
+  assert.equal(validateUnit({ ...base, timeoutMs: 5400000 }).timeoutMs, 5400000);
+  assert.equal('timeoutMs' in validateUnit(base), false);
+  for (const bad of [0, -1, 1.5, '90m', RUN_TIMEOUT_MIN_MS - 1, RUN_TIMEOUT_MAX_MS + 1, null]) {
+    assert.throws(() => validateUnit({ ...base, timeoutMs: bad }), (err) => err instanceof RunnerConfigError && /unit\.timeoutMs/.test(err.message), `timeoutMs ${bad}`);
+  }
+});

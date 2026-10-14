@@ -19,6 +19,7 @@
 // only apply it from a checkout you already trust.
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
+import { RUN_TIMEOUT_MIN_MS, RUN_TIMEOUT_MAX_MS, runTimeoutProblem } from './run-timeout.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { mergeConfigDefaults } from '../../setup/config-merge.mjs';
@@ -491,6 +492,26 @@ export function assertReasoningEffort(value, { supported, executorId } = {}) {
     throw new RunnerConfigError(`executor "${executorId}" supports reasoningEffort [${supported.join(', ')}], not "${value}"`);
   }
   return value;
+}
+
+// The floor and ceiling live in a leaf module (the confinement reaper reads the ceiling too).
+export { RUN_TIMEOUT_MIN_MS, RUN_TIMEOUT_MAX_MS };
+const RUN_TIMEOUT_UNIT_MS = Object.freeze({ ms: 1, s: 1000, m: 60000, h: 3600000 });
+
+/** A run timeout in milliseconds, refused when it is not a whole number inside the floor and ceiling. */
+export function assertRunTimeoutMs(value, label = 'run timeout') {
+  const problem = runTimeoutProblem(value, label);
+  if (problem) throw new RunnerConfigError(problem);
+  return value;
+}
+
+/** `90m`, `5400s`, `2h`, `600000ms`: one whole number and one unit, checked like any run timeout. */
+export function parseRunTimeout(text, label = '--timeout') {
+  const match = /^(\d+)(ms|s|m|h)$/.exec(typeof text === 'string' ? text.trim() : '');
+  if (!match) {
+    throw new RunnerConfigError(`${label} takes a whole number and a unit (ms, s, m or h), e.g. 90m or 5400s; got: ${JSON.stringify(text)}`);
+  }
+  return assertRunTimeoutMs(Number(match[1]) * RUN_TIMEOUT_UNIT_MS[match[2]], label);
 }
 
 /**
