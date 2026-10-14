@@ -110,6 +110,15 @@ Người giữ các file dùng chung theo từng bước được ghi ở [proto
   - ghế xai trả exit 0 mà không làm gì;
   - nên đóng follow-up 44287a09c.
 
+- Sau cổng G-M1 (báo cáo `reports/gate-m1-261014-1857.md` trên nhánh `probe/rununit-m1`), Lead quyết:
+  - Ca 2: worker tuân brief tự ở trong scope và khai `needsWrites`, nên không objective nào ép được runner ghi `commit.outOfScope`. Kỳ vọng đổi thành "README không vào commit, worker khai `needsWrites`". Nhánh `outOfScope` do test đơn vị chứng minh; chứng minh live còn UNPROVEN.
+  - Ca 8: `council-lite` từ chối `--seats` là đúng thiết kế (CHANGELOG ghi rõ). Cổng dùng `group-cognition --seats`, đã pass.
+  - F1 (invocation trong Unit `prefer` bị đổi sang herdr): Lead sửa trên nhánh `fix/rununit-prefer-invocation`.
+  - C2 (pool `code:implement` không có ứng viên ghi): Lead sửa config (`cce8d4d62`).
+  - C1 deepseek thiếu credential: `~/.fgos/config.json` không có provider `deepseek` trong `runner.providers`, nên home riêng của lượt confined không có `auth.json`. Chờ owner, vì Lead không sửa config global.
+  - Item riêng: `fgos doctor` nên báo executor có provider không khai account; `policy-refusal` trả exit 0; log `dispatch capability=(none declared)` in sai capability của Unit; subject commit có thể là summary bị cắt kèm "...".
+- Ngoài phạm vi, từ lane gitparse: tên file không phải UTF-8 vẫn mất byte; cổng merge coi main đang merge dở là sạch khi có `ownFileSet`; env `GIT_*` rò vào `git()` của `merge.mjs`; `ls-files` của distill đọc theo dòng.
+
 ## Disposition review
 
 V = [validate-plan-against-code.md](reports/validate-plan-against-code.md), R = [red-team-plan.md](reports/red-team-plan.md).
