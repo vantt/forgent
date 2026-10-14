@@ -1,8 +1,59 @@
 # Lane D — ranh giới ghi (đề xuất 6, 8)
 
-Status: BLOCKED — plan viết xong, code production TẠM DỪNG theo lệnh Lead 10:45 (chờ kết luận hội đồng một-cửa); đề xuất 6 chờ thêm `fix/dispatch-followups`.
+Status: DONE_WITH_CONCERNS cho phạm vi hội đồng một-cửa giao (bước 1 + bước 2/đề xuất 8); đề xuất 6 chờ owner (Q4). npm test: xem mục "Kết quả sau hội đồng một-cửa".
+
+**DỪNG theo lệnh Lead 12:58 (anh vantt yêu cầu).** Trạng thái tại thời điểm dừng:
+- Đã commit trên nhánh: `e9c946b39` (bước 1, confinement label), `54afd4665` (bước 2, đề xuất 8) + 4 commit docs trước đó. Không merge, không push.
+- Chưa commit, giữ trong worktree: cập nhật báo cáo này và `plans/261014-1045-dispatch-write-boundary/plan.md` (mục sau hội đồng).
+- `npm test` toàn bộ (khởi chạy trước lệnh dừng, `env -u CLAUDE_CODE_SESSION_ID`, HEAD `54afd4665`): **đỏ** — tests 7371, pass 7292, fail 4, skipped 10. Không sửa gì thêm vì đang dừng.
+
+### 4 test đỏ trong full suite (đều `test/runner/operation-choice.test.mjs`) — chưa sửa
+
+Cả 4 khoá hợp đồng cũ "lượt read-only làm đổi checkout → failed, không tiến Work", tức đúng hành vi hội đồng đã đổi. Nhưng chúng lộ một hệ quả **vượt ngoài lượt dispatch** mà báo cáo hội đồng không nêu rõ: cổng **tiến Work** (driver loop / operation-choice) cũng đọc kết quả đó.
+
+| Test (dòng) | Trước | Bây giờ |
+|---|---|---|
+| `driver loop runOnce: validate-plan modifying dirty-before plan.md fails closed and does not advance Work` (1208, assert 1244) | Work ở `planning`, quay lại `shape-plan` | **Work tiến sang `executing`** dù lượt validate-plan (read-only) đã sửa `plan.md` có sẵn |
+| `Step 06 executing.scout-blast-radius mutating repository state fails closed and stops driver execution` (1329, assert 1374) | confidence `failed`, driver dừng | confidence `reported` (driver không dừng) |
+| `Finding 2: executeAssignment fails closed on read-only validate-plan mutations without running automatic rollback` (2776, assert 2834) | status `failed` | status `done` (phần "không rollback" vẫn đúng) |
+| `R6/G3: cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles fact...` (5302, assert 5344) | `validation-failed-do-not-advance-work` | `validation-no-evidence-do-not-advance-work` (Work vẫn KHÔNG tiến) |
+
+Đánh giá (lane): 3 dòng sau là hệ quả dự kiến của "correlated → warning". Dòng đầu là điểm cần owner/Lead quyết: trong một worktree đơn-người-ghi do chính Work sở hữu, "validator sửa plan rồi báo pass" nay được tiến Work, chỉ còn cảnh báo. Đó đúng là "rủi ro tồn dư chấp nhận" của hội đồng, nhưng áp vào cổng tiến Work chứ không chỉ vào lượt dispatch. Phương án lane thấy được (chưa làm):
+- A. Theo đúng hội đồng: sửa 4 test sang hợp đồng mới (thêm kiểm `warnings`), chấp nhận Work tiến kèm cảnh báo.
+- B. Giữ cảnh báo ở tầng dispatch, nhưng cổng tiến Work (operation-choice) không tiến khi kết quả read-only có cảnh báo `read-only-mutation-correlated`/`mutated-dirty-before-correlated` → không tiến, không refuse (giống nhánh `no-evidence`). Không tạo lại false-refusal cho round, chỉ chặn tiến Work.
+Lane nghiêng B (giữ đúng tinh thần hội đồng cho lượt chạy, không bỏ bảo vệ Work), nhưng đây là quyết định đụng contract tiến Work → chờ Lead/owner.
 Worktree: `/home/vantt/projects/forgentX-worktrees/dispatch-write-boundary`, nhánh `feat/dispatch-write-boundary` (rebase lên main b0d9fa192, 12:26; `fix/credential-phase-02-doctor-scan` đã vào main. Việc 2 `af132275b` "run a read-only contract sandboxed on a named provider" vẫn chỉ ở `fix/dispatch-followups`, chưa vào main → đề xuất 6 vẫn chờ). 3 test trong file test lane chạy lại trên b0d9fa192: 2 đỏ, 1 xanh như trước.
 Council lane: `architecture-advisory` 2 lần (`wf-run-1791949058825-3690e98f`, `wf-run-1791949750327-0f2d735b`), cả hai dừng ở critique — xem dưới. Plan: [plans/261014-1045-dispatch-write-boundary/plan.md](../../261014-1045-dispatch-write-boundary/plan.md).
+
+## Kết quả sau hội đồng một-cửa (2026-10-14, nhánh rebase lên main f69a446f0)
+
+Phạm vi theo mục "Cập nhật sau hội đồng một-cửa" của brief lane D. Impact GitNexus báo CRITICAL cho `settleRunOutcome`, `classifyEvidenceToOutcomeFacts`, `watchWritesOutsideWorkspace` (index cũ, b334695) — đúng các đường hội đồng giao sửa; cổng là `npm test` toàn bộ. `detect_changes` so với main: chỉ các symbol dự kiến.
+
+### Bước 1 — `RunResult.confinement` ghi backend thật (`e9c946b39`)
+- Nguyên nhân (proven, đọc code + test đỏ): `settlement.mjs` so mode `'confined'` không tồn tại (`CONFINEMENT_MODES` = required/preferred/unconfined) và requirement không tới settlement → luôn `null`.
+- Sửa: `ranConfinementBackend(runDir, launchCommandId, attestation)` đọc bản ghi `protected/prepared-invocation/<launchCommandId>.json` mà Confinement Authority publish (cả cửa cli-spawn supervisor lẫn herdr), `type: none` → null; không có bản ghi thì dùng attestation `outcome: enforced` của dispatch (cửa herdr/legacy: `executeAssignment` truyền `rawResult.attestation`).
+- Test: `test/runner/run-result-confinement-label.test.mjs` (bwrap → `'bwrap'`; backend none dù mode required → null; attestation enforced/unconfined). Đỏ 2/3 trước sửa, xanh sau.
+- Spec RUL84, CHANGELOG. UNPROVEN: chưa chạy lại một lượt bwrap thật end-to-end để thấy `confinement: "bwrap"` trong result.json (test dùng bản ghi đúng shape Authority publish).
+
+### Bước 2 — đề xuất 8: correlated → cảnh báo (`54afd4665`)
+Mọi đường từ chối (RT2-3) và cách xử lý:
+
+| Đường | Trước | Sau |
+|---|---|---|
+| `cli.mjs` `strayWriteError` (cửa CLI) + `work-dispatch.mjs` (cửa Work) | throw `worktree-fail`/`wrote-outside-workspace` | `strayWriteWarning` → `result.warnings[{code:'stray-write-correlated', level, basis, repoRoot, paths}]` + stderr |
+| `settlement.mjs` `classifyEvidenceToOutcomeFacts` (read-only + changedFiles/mutated dirty) | `failed` + refuse `read-only-mutation` | settlement gọi `evaluateAttributionPolicy` (trước đây 0 caller); correlated → `RunResult.warnings`; chỉ `proven` → refuse |
+| `run-result.mjs` policy dự phòng (`mutated-dirty-before-files`, `read-only-mutation`) | refuse | bỏ (settlement là chỗ quyết duy nhất) |
+| `run-result.mjs` `deriveEvidenceFloor` (sàn khi đọc lại, `operation-choice.mjs:386-415`) — **ngoài danh sách RT2-3, lane tìm thêm** | read-only + changedFiles → failed, hạ outcome đã settle | bỏ nhánh đó |
+| `evidence-attribution.mjs` `evaluateAttributionPolicy` | refuse trên correlated | warning `read-only-mutation-correlated` / `mutated-dirty-before-correlated` / `outside-write-scope-correlated`; refuse `read-only-mutation` / `outside-write-scope` chỉ cho `proven` |
+| `assignment-runner.mjs` `rollbackReadOnlyMutations` (0 caller, `git reset --soft` trên cwd) | code chết nguy hiểm | xoá |
+
+Test:
+- `test/runner/dispatch-stray-write-attribution.test.mjs` (end-to-end): cửa CLI phiên khác ghi main → status 0 + warning `plans/`; worker ghi lạc vào main (ca agy) → status 0 + warning `misplaced.mjs` (rủi ro tồn dư chấp nhận); cửa Assignment phiên khác commit giữa lượt read-only (tái hiện `wf-run-1791954133905-844903ed`) → execStatus `completed`, failure null, policy allow, outcome ok, warning `read-only-mutation-correlated`, result.json đọc lại và sàn bằng chứng vẫn ok.
+- `test/runner/evidence-attribution.test.mjs`: correlated → warning; **giữ test từ chối cho ghi đã chứng minh** (proven read-only, proven ngoài write scope).
+- Test cũ khoá hành vi từ chối được sửa theo hợp đồng mới (không nới): `dispatch-production-call-sites` (ca agy → warning, ca ở trong workspace → không warning), `assignment-dispatch` (commit trong lượt read-only → không refuse, có warning, không rollback), `assignment-runresult` (dirty có sẵn bị đổi → warning, evidence vẫn ghi).
+- Spec RUL85, CHANGELOG.
+
+Số RUL: main tới RUL80, `fix/dispatch-followups` giữ RUL81; lane dùng RUL84/85 để tránh đụng lane A–C — Lead đánh lại số khi merge nếu cần.
 
 ## Quan sát về chuyện nhiều cửa (ghi nhanh cho hội đồng một-cửa)
 

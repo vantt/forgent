@@ -1,6 +1,14 @@
 # Ranh giới ghi của dispatch: quy trách nhiệm ghi lạc, Doer docs-only confined
 
-Status: **blocked — chờ kết luận hội đồng một-cửa** (Lead, 2026-10-14 10:45: không sửa code production đến khi có kết quả). Phần 6 còn chờ thêm `fix/dispatch-followups` merge vào main.
+Status: **một phần xong; phần còn lại chờ owner** (cập nhật 2026-10-14 sau hội đồng một-cửa).
+
+## Cập nhật sau hội đồng một-cửa (thay thế phần dưới khi mâu thuẫn)
+
+Kết luận: [council-261014-1231-dispatch-one-door-conclusion.md](../261014-1033-dispatch-operator-improvements/reports/council-261014-1231-dispatch-one-door-conclusion.md) + mục cập nhật trong brief lane D.
+- **Xong — bước 1 hội đồng** (`RunResult.confinement` ghi backend thật): `e9c946b39`.
+- **Xong — bước 2 / đề xuất 8**: mọi đường từ chối dựa trên snapshot → cảnh báo; chỉ `proven` mới từ chối (chưa có observer nào chứng minh): `54afd4665`. **Thay quyết định A dưới đây**: KHÔNG giữ "chữ ký ghi lạc" làm điều kiện từ chối — hội đồng một-cửa chốt correlated → warning không ngoại lệ ("a real stray write is only flagged, not rejected"); ca agy giờ chỉ được cảnh báo.
+- **Chờ owner**: đề xuất 6 (hướng Q4: worktree + `workspace-write` + kiểm phạm vi sau sự việc `scope-checked`, không bwrap subpath — quyết định B và phase 3–4 dưới đây bị thay); observer ghi-path gắn run (điều kiện để từ chối lại) là việc mới, câu hỏi riêng.
+- Quyết định C (mount cwd cho cửa CLI/Work) không nằm trong phạm vi hội đồng giao → giữ ghi nhận, chưa làm.
 Plan cha: [261014-1033-dispatch-operator-improvements](../261014-1033-dispatch-operator-improvements/plan.md). Báo cáo lane: [lane-d report](../261014-1033-dispatch-operator-improvements/reports/lane-d-261014-1045-dispatch-write-boundary.md).
 
 ## Nguồn thiết kế (council)
