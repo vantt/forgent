@@ -196,3 +196,9 @@ A36 (owner-decided 2026-10-14, option B of the review-cost question): sampled de
 2. A seeded random sample of at least 15% of the pack's Weak-exact and Judgment rows (minimum 10 rows, all if fewer), plus every row whose source and target digests differ, is read in full in both directions with its diff. The seed and the sampled IDs are recorded in the report; each row's note says `deep` or `mechanical`.
 3. If more than 3% of the deep-read rows need rework, the reviewer reads the whole pack in full before reporting.
 4. Unchanged: checkpoint reviews (Steps 6 and 10) with their sensitivity packs, truth samples (A28 item 3), merge reviews (A31), owner holds and the closure conditions.
+
+A37 (owner-decided 2026-10-14, option A of the second Step 5 truth escalation, following `review-5-root-truth-final.md`, 8 of 30 sampled units false, 26.7%; 7 of the 8 are in the work-state area): close Step 5 without another draw.
+1. Correct every false sentence that report lists (12 to 13 sentences, verbatim with the correct fact and file:line) under A19, rebind under A22, and send the corrected units to independent truth re-review. No approval carries. The borderline gateway/daemon sentence in `platform-foundations.md` is corrected only if the report's evidence shows the sentence names the built gateway; a sentence about a still-unbuilt daemon stays.
+2. Extend the A35 item 2 note ("known stale carried sentences; full truth check owed at promotion") to `docs/platform/work-state/contracts/cli-io-contract.md` in the candidate-unverified list. Do not sweep the rest of the work-state area against code in Phase 6.
+3. No further truth draw for Step 5: the batch truth sample obligation (A28 item 3(a)) is met by this draw plus the corrections and their re-review.
+4. Scope: this escalation only. A later batch whose truth sample exceeds 10% asks the owner again.
