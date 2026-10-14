@@ -1798,20 +1798,14 @@
       "targetAnchor": "unheaded-block-31",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Code is truth for both effect axes and the whole source field definition. Owner A15 resolves SC-1: the stale exclusive only-review-and-approve assertion is superseded by the current registry contract and a run example, not coordination. Actual --help --json exposes 15 externalEffect verbs including run and no coordination verb. The candidate preserves the source field definitions and corrects its obsolete enumeration; independent review of this changed binding is pending.",
-      "reviewNote": "SC-1 changed row (contract, supersede). work-state.md L665-676 (unheaded-block-67) -> contracts/cli-io-contract.md#unheaded-block-31 L269-279. Source says \"hôm nay chỉ `review` và `approve` mang externalEffect: true\"; code (--help --json and COMMAND_REGISTRY) has 15 such verbs incl. run and no coordination, so the exclusive claim is stale and is replaced by a deferral to `fgos --help --json` plus examples review/approve/run (all real). Surrounding text compared by diff: touchesState/externalEffect definitions, review touchesState:false rationale, declarative-only/STR38 clause byte-identical; the HEAD target no longer contains `coordination`. Dropped only the false exclusivity; review's --github rationale is kept in the first sentences of the same unit. Both digests recomputed with scripts/generate-doc-inventory.mjs extractor at HEAD and d870fe07 and match; at 54c2698ee the target digest differed (expected, 32-hex 9880ec12... -> full 97e66153...).",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2",
+      "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+      ]
     },
     {
       "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",

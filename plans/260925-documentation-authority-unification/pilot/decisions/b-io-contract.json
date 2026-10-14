@@ -501,21 +501,15 @@
       "targetAnchor": "unheaded-block-32",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Code is truth for the whole effect-axis field list. Owner A15 resolves SC-1: replace the retired coordination example with run, preserving every other entry-field definition and qualifier. The actual current machine-readable manifest has 15 externalEffect verbs including run and no coordination verb; both candidate examples now agree. This corrected whole-unit carry supersedes the stale source example, not a claim of verbatim copying or a silent partial carry. Independent review is pending.",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewNote": "supersede of docs/io-contract.md#unheaded-block-19 into cli-io-contract.md#unheaded-block-32 (contract). Whole 5-bullet field list compared line by line via git diff: only the example verb changed `coordination` -> `run`; qualifiers (\"dispatch executor thật tính là effect ngoài .fgos/\", review mutation/--github rationale, \"xem fgos --help --json\" deferral) intact. Code check: manifest has 15 externalEffect verbs incl. run, no coordination; examples review/approve/run all present. Target bytes at HEAD and d870fe07 hash to the stated digest; rationale does not claim verbatim copying.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-io-contract.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+      "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+      ]
     },
     {
       "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",

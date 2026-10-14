@@ -2,7 +2,8 @@
   "version": 1,
   "shard": "s5-root-authorities-governance.json",
   "sources": [
-    "docs/doc-governance.md"
+    "docs/doc-governance.md",
+    "docs/doc-registry.json"
   ],
   "authorSession": "codex-session:17@2026-10-14",
   "authorshipRequired": true,
@@ -1188,6 +1189,15 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:17@2026-10-14",
       "rationale": "Whole source unit docs/doc-governance.md#unheaded-block-60 is retained at docs/platform/governance.md#unheaded-block-60; only relative navigation spelling changes to preserve the same absolute repository destinations. The future component-boundary target is a plain path under the later-batch rule. Every prose clause, rule and list item is retained; shown full text and diff must be checked independently. No new governance rule or authority cutover."
+    },
+    {
+      "claimId": "claim_1ac3dcd4a11d62a3397b6563d1e0a386",
+      "sourceUnitDigest": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:17@2026-10-14",
+      "rationale": "The frozen root-authorities map assigns docs/doc-registry.json to the retained user-knowledge exception. This complete JSON unit is the topic/document registry of end-user knowledge, outside maintained platform authority; retain the file untouched and reclassify out of platform scope. No candidate-to-itself carry, deletion, new platform owner or truth approval."
     }
   ],
   "files": [
@@ -1198,6 +1208,12 @@
         "docs/platform/governance.md"
       ],
       "rationale": "Frozen root-authorities map and Q5 assign the complete governance contract to this candidate root; old source remains untouched until atomic cutover. Original source metadata is retained as provenance."
+    },
+    {
+      "path": "docs/doc-registry.json",
+      "disposition": "reclassify-out-of-platform-scope",
+      "targets": [],
+      "rationale": "Frozen map retains the user-knowledge registry outside platform authority, without modifying source bytes."
     }
   ]
 }

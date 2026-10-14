@@ -1,3 +1,31 @@
+# Latest resume state — Root review material sealed; requests being published
+
+Date: 2026-10-14
+Executor: codex-session:17@2026-10-14
+Session counter: 17
+Step: 5
+State: authoring / bounded requests prepared
+Last green source pin: c8b2d948d6dd0b408011b294fd67aea59870749b
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+
+All nine ordinary boundary verdicts applied at 01fe216b4, pinned to 4f99b9ec9 with notes verbatim; rationale nits untouched. SC-1 now explicitly uses COMMAND_REGISTRY (15 verbs, no coordination), preserving all definitions/qualifiers and valid examples. Exactly two current-pin D target drifts are reopened; their previous A15 acceptance is only history. Third listed Pilot B row stays byte/ancestry equal. Four native gaps conserve both original and intermediate IDs; one native stable-heading digest change is fully shown. No approval carry or identity graft.
+
+Prepared source pack: 76 pending rows (75 governance, one user-knowledge JSON registry); Mirror 0, Unit-exact 51, Weak-exact 17, Judgment 8. Existing N1 generated file disposition and reviewed four-unit corpus rule preserved exactly, without duplicates. No component-boundary change. AGENTS/CLAUDE wait for Step 10.
+
+Both-prior D: exit 0, zero fatal. First-subset E: exit 1, exactly 78 pending source rows + two unchanged historical IO source gaps + 59 candidate-unverified units. Those two gaps are byte-equal starting registry and are not SC-1 consequences; they remain owed, not waived. Root map total 1,072 rows: 367 reviewed / 83 pending / 622 blocking-undecided; AGENTS/CLAUDE excluded. Other 622 source rows and two historical gaps remain for later root authoring. Step 5 is not closed.
+
+Native equality: 94,342 starting / 94,344 intermediate / 94,424 current known IDs; all retained, active full tuples equal inventory, only the one disclosed old heading tuple changes. Four new gaps, zero new retired units; all other decisions equal the accepted boundary checkpoint. Three prior A28 lists equal both D outputs; 13 A34 residual digests remain valid. Registry native-byte-equal compact one-line JSON: 59,499,034 bytes; SHA256 3cc3bc8db1d819940ad7ea9cbb9ffeb85d87ba82f56e0aaf122c89bfff169f0a; below 90 MB. Ratchet clean, placement 510/509/one exception, candidate findings zero; extractor, sources/frozen files, reader/authority sets and witness/payload trees unchanged. New governance full promotion header complete. Review/apply tests 29/29, zero fail/cancel/skip/todo, env -u CLAUDE_CODE_SESSION_ID; no full-suite claim. GitNexus own scope low risk, zero processes.
+
+Requests ready in exact sealed requestTexts of root-authorities-continuation-verification.json (copy one to its path, update this progress, commit explicit paths): governance 76; SC1/list 66 (2 source + 4 gap + 1 heading + 59 A28 units); truth 30 from pinned 226-unit population, no author truth verdict. Packs are already committed by this checkpoint. Initial raw stale-inventory and duplicate N1 draft findings were explained and corrected; final D green, no protected tool change.
+
+Next: publish the three requests as separate bounded commits, writing progress after each; finish native refresh/checkpoint and STOP. Exact request text is sealed in verification so interruption does not require reconstructing a request. Do not start another source pack. Owner-started independent Lead review is next; then apply verdicts, fix any actual truth failures under A19, re-prove conservation before continuing remaining source rows. No promotion, push, merge, main write, Step 6 or protected tool/baseline edits.
+Blockers: no technical/owner-decision blocker. Independent review and 622 unfinished source decisions remain.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Boundary verdicts accepted; root authoring next
 
 Date: 2026-10-14

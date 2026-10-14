@@ -1,0 +1,2673 @@
+{
+  "version": 1,
+  "contentCommit": "c8b2d948d6dd0b408011b294fd67aea59870749b",
+  "authorSession": "codex-session:17@2026-10-14",
+  "rows": 66,
+  "sourceRows": [
+    {
+      "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
+      "sourceUnitDigest": "c219ee825c3475e61bb642fd89e50efedc586df24b0252a6d99e58df63f419d8",
+      "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+      "reviewAuthor": "codex-session:1@2026-10-09",
+      "decision": {
+        "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "sourceUnitDigest": "c219ee825c3475e6",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-31",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "rationale": "Code is truth for both effect axes and the whole source field definition. Owner A15 resolves SC-1: the stale exclusive only-review-and-approve assertion is superseded by the current registry contract and a run example, not coordination. Actual --help --json exposes 15 externalEffect verbs including run and no coordination verb. The candidate preserves the source field definitions and corrects its obsolete enumeration; independent review of this changed binding is pending.",
+        "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ]
+      },
+      "source": {
+        "path": "docs/specs/work-state.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-67",
+        "githubAnchor": "unheaded-block-67",
+        "stableAnchor": "unheaded-block-67",
+        "title": "Unheaded block 67",
+        "startLine": 665,
+        "endLine": 676,
+        "textDigest": "c219ee825c3475e61bb642fd89e50efedc586df24b0252a6d99e58df63f419d8",
+        "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+        "identityFingerprint": "34a8141d026d5c227cf8c981ea5e640d6b8970bcba699617a66dd40b194085a2",
+        "ancestry": [
+          "Spec: Work-State (tầng quản việc của forgent)",
+          "Data Dictionary",
+          "Sổ verb máy-đọc (manifest) — `--help --json`"
+        ],
+        "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — hôm nay chỉ `review` và\n`approve` mang `externalEffect: true`, đúng chế độ `--github` của chúng;\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+      },
+      "target": {
+        "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-31",
+        "githubAnchor": "unheaded-block-31",
+        "stableAnchor": "unheaded-block-31",
+        "title": "Unheaded block 31",
+        "startLine": 269,
+        "endLine": 279,
+        "textDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+        "identityFingerprint": "abdaf7574d8107b6e5d325a95cb8c7327dac1248939788580176154fa990dace",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+      }
+    },
+    {
+      "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
+      "sourceUnitDigest": "39e4ab1f30a6acc99de534a9fd16bd348b9ef8c1827664c0a7a50487f0587c0c",
+      "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+      "reviewAuthor": "codex-session:1@2026-10-09",
+      "decision": {
+        "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
+        "sourceUnitDigest": "39e4ab1f30a6acc9",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "rationale": "Code is truth for the whole effect-axis field list. Owner A15 resolves SC-1: replace the retired coordination example with run, preserving every other entry-field definition and qualifier. The actual current machine-readable manifest has 15 externalEffect verbs including run and no coordination verb; both candidate examples now agree. This corrected whole-unit carry supersedes the stale source example, not a claim of verbatim copying or a silent partial carry. Independent review is pending.",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ]
+      },
+      "source": {
+        "path": "docs/io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-19",
+        "githubAnchor": "unheaded-block-19",
+        "stableAnchor": "unheaded-block-19",
+        "title": "Unheaded block 19",
+        "startLine": 127,
+        "endLine": 137,
+        "textDigest": "39e4ab1f30a6acc99de534a9fd16bd348b9ef8c1827664c0a7a50487f0587c0c",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "6b0f42533c4fbfd6b576f52b1115cc0f8067f63c26b1dd14f1030d857dfa5289",
+        "ancestry": [
+          "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+          "Sổ verb máy-đọc — CLI tự mô tả"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Xem `fgos --help --json` cho\n  danh sách hiện hành mang `externalEffect: true` (ví dụ `review`, `approve`,\n  `coordination` — dispatch executor thật tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      },
+      "target": {
+        "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 292,
+        "textDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "30875a14838a5fce1721d0dcfdf932a096ec6d0afd6aab7c550003f7ec804fb4",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật\n  tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      }
+    }
+  ],
+  "gapRows": [
+    {
+      "decision": {
+        "claimId": "claim_4a023fa2faa879fb0e1dfd8bc5c051e7",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "857ad2167a0283ad4b9f08a4493f324f899b84211e10234b9d0eddfb9683c63f",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-31",
+        "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "authoredBy": "codex-session:17@2026-10-14",
+        "reviewStatus": "pending",
+        "rationale": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-31 at 9881f8622 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry."
+      },
+      "sourceCommit": "9881f8622732e3ba7c8e203097d42674b8aba36d",
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "16e50845e03a9aa5d11b62573eb9e9332174f9a8038a3ffd0a2311fd99f7645c",
+        "identityFingerprint": "16e50845e03a9aa5d11b62573eb9e9332174f9a8038a3ffd0a2311fd99f7645c",
+        "claimId": "claim_4a023fa2faa879fb0e1dfd8bc5c051e7",
+        "sourceAnchor": "unheaded-block-31",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "857ad2167a0283ad4b9f08a4493f324f899b84211e10234b9d0eddfb9683c63f",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-c1961bdb2b361dbc51ec1f99032f5b68d7b44f0c"
+      },
+      "identityGap": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "16e50845e03a9aa5d11b62573eb9e9332174f9a8038a3ffd0a2311fd99f7645c",
+        "identityFingerprint": "16e50845e03a9aa5d11b62573eb9e9332174f9a8038a3ffd0a2311fd99f7645c",
+        "claimId": "claim_4a023fa2faa879fb0e1dfd8bc5c051e7",
+        "sourceAnchor": "unheaded-block-31",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "857ad2167a0283ad4b9f08a4493f324f899b84211e10234b9d0eddfb9683c63f",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-c1961bdb2b361dbc51ec1f99032f5b68d7b44f0c",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-31 is not a stable heading anchor"
+      },
+      "nativeSuccessor": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "abdaf7574d8107b6e5d325a95cb8c7327dac1248939788580176154fa990dace",
+        "identityFingerprint": "abdaf7574d8107b6e5d325a95cb8c7327dac1248939788580176154fa990dace",
+        "claimId": "claim_f87ba30b5de56939a7fa614030efce48",
+        "sourceAnchor": "unheaded-block-31",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-9881f8622732e3ba7c8e203097d42674b8aba36d"
+      },
+      "sourceUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-31",
+        "githubAnchor": "unheaded-block-31",
+        "stableAnchor": "unheaded-block-31",
+        "title": "Unheaded block 31",
+        "startLine": 269,
+        "endLine": 279,
+        "textDigest": "857ad2167a0283ad4b9f08a4493f324f899b84211e10234b9d0eddfb9683c63f",
+        "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+        "identityFingerprint": "16e50845e03a9aa5d11b62573eb9e9332174f9a8038a3ffd0a2311fd99f7645c",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+      },
+      "targetUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-31",
+        "githubAnchor": "unheaded-block-31",
+        "stableAnchor": "unheaded-block-31",
+        "title": "Unheaded block 31",
+        "startLine": 269,
+        "endLine": 279,
+        "textDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+        "identityFingerprint": "abdaf7574d8107b6e5d325a95cb8c7327dac1248939788580176154fa990dace",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+      }
+    },
+    {
+      "decision": {
+        "claimId": "claim_7333c439fa8d29886b82168e015ca113",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-31",
+        "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "authoredBy": "codex-session:17@2026-10-14",
+        "reviewStatus": "pending",
+        "rationale": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-31 at 01fe216b4 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry."
+      },
+      "sourceCommit": "01fe216b469626feaa2340ea702a85d9a84e8ac0",
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "3af72bffebc103ef51db09c2ff3a68c0bf73bd58a9673ee25c5537f7715ea90d",
+        "identityFingerprint": "3af72bffebc103ef51db09c2ff3a68c0bf73bd58a9673ee25c5537f7715ea90d",
+        "claimId": "claim_7333c439fa8d29886b82168e015ca113",
+        "sourceAnchor": "unheaded-block-31",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2",
+        "claimKind": "contract",
+        "status": "future"
+      },
+      "identityGap": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "3af72bffebc103ef51db09c2ff3a68c0bf73bd58a9673ee25c5537f7715ea90d",
+        "identityFingerprint": "3af72bffebc103ef51db09c2ff3a68c0bf73bd58a9673ee25c5537f7715ea90d",
+        "claimId": "claim_7333c439fa8d29886b82168e015ca113",
+        "sourceAnchor": "unheaded-block-31",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-31 is not a stable heading anchor"
+      },
+      "nativeSuccessor": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "abdaf7574d8107b6e5d325a95cb8c7327dac1248939788580176154fa990dace",
+        "identityFingerprint": "abdaf7574d8107b6e5d325a95cb8c7327dac1248939788580176154fa990dace",
+        "claimId": "claim_f87ba30b5de56939a7fa614030efce48",
+        "sourceAnchor": "unheaded-block-31",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-9881f8622732e3ba7c8e203097d42674b8aba36d"
+      },
+      "sourceUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-31",
+        "githubAnchor": "unheaded-block-31",
+        "stableAnchor": "unheaded-block-31",
+        "title": "Unheaded block 31",
+        "startLine": 269,
+        "endLine": 279,
+        "textDigest": "97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2",
+        "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+        "identityFingerprint": "3af72bffebc103ef51db09c2ff3a68c0bf73bd58a9673ee25c5537f7715ea90d",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — xem `fgos --help --json` cho danh sách hiện hành mang `externalEffect: true` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+      },
+      "targetUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-31",
+        "githubAnchor": "unheaded-block-31",
+        "stableAnchor": "unheaded-block-31",
+        "title": "Unheaded block 31",
+        "startLine": 269,
+        "endLine": 279,
+        "textDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+        "identityFingerprint": "abdaf7574d8107b6e5d325a95cb8c7327dac1248939788580176154fa990dace",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+      }
+    },
+    {
+      "decision": {
+        "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "authoredBy": "codex-session:17@2026-10-14",
+        "reviewStatus": "pending",
+        "rationale": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-32 at 01fe216b4 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry."
+      },
+      "sourceCommit": "01fe216b469626feaa2340ea702a85d9a84e8ac0",
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "23e79b860ebcfeacc7ad826543bdf91857ea11d7ff168b28ea8ae92955ec5d27",
+        "identityFingerprint": "23e79b860ebcfeacc7ad826543bdf91857ea11d7ff168b28ea8ae92955ec5d27",
+        "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
+        "sourceAnchor": "unheaded-block-32",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+        "claimKind": "contract",
+        "status": "future"
+      },
+      "identityGap": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "23e79b860ebcfeacc7ad826543bdf91857ea11d7ff168b28ea8ae92955ec5d27",
+        "identityFingerprint": "23e79b860ebcfeacc7ad826543bdf91857ea11d7ff168b28ea8ae92955ec5d27",
+        "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
+        "sourceAnchor": "unheaded-block-32",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-32 is not a stable heading anchor"
+      },
+      "nativeSuccessor": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "30875a14838a5fce1721d0dcfdf932a096ec6d0afd6aab7c550003f7ec804fb4",
+        "identityFingerprint": "30875a14838a5fce1721d0dcfdf932a096ec6d0afd6aab7c550003f7ec804fb4",
+        "claimId": "claim_0abb403f0f4bb4bb6b916849e4895d65",
+        "sourceAnchor": "unheaded-block-32",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-9881f8622732e3ba7c8e203097d42674b8aba36d"
+      },
+      "sourceUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 291,
+        "textDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "23e79b860ebcfeacc7ad826543bdf91857ea11d7ff168b28ea8ae92955ec5d27",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Xem `fgos --help --json` cho\n  danh sách hiện hành mang `externalEffect: true` (ví dụ `review`, `approve`,\n  `run` — dispatch executor thật tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      },
+      "targetUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 292,
+        "textDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "30875a14838a5fce1721d0dcfdf932a096ec6d0afd6aab7c550003f7ec804fb4",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật\n  tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      }
+    },
+    {
+      "decision": {
+        "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "authoredBy": "codex-session:17@2026-10-14",
+        "reviewStatus": "pending",
+        "rationale": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-32 at 9881f8622 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry."
+      },
+      "sourceCommit": "9881f8622732e3ba7c8e203097d42674b8aba36d",
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "2911a2b03dc981b527055f9a4217c22644d3515eb10ecf138e73aba0a0831662",
+        "identityFingerprint": "2911a2b03dc981b527055f9a4217c22644d3515eb10ecf138e73aba0a0831662",
+        "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+        "sourceAnchor": "unheaded-block-32",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-c1961bdb2b361dbc51ec1f99032f5b68d7b44f0c"
+      },
+      "identityGap": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "2911a2b03dc981b527055f9a4217c22644d3515eb10ecf138e73aba0a0831662",
+        "identityFingerprint": "2911a2b03dc981b527055f9a4217c22644d3515eb10ecf138e73aba0a0831662",
+        "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+        "sourceAnchor": "unheaded-block-32",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-c1961bdb2b361dbc51ec1f99032f5b68d7b44f0c",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-32 is not a stable heading anchor"
+      },
+      "nativeSuccessor": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "30875a14838a5fce1721d0dcfdf932a096ec6d0afd6aab7c550003f7ec804fb4",
+        "identityFingerprint": "30875a14838a5fce1721d0dcfdf932a096ec6d0afd6aab7c550003f7ec804fb4",
+        "claimId": "claim_0abb403f0f4bb4bb6b916849e4895d65",
+        "sourceAnchor": "unheaded-block-32",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-9881f8622732e3ba7c8e203097d42674b8aba36d"
+      },
+      "sourceUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 291,
+        "textDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "2911a2b03dc981b527055f9a4217c22644d3515eb10ecf138e73aba0a0831662",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (dispatch executor thật tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      },
+      "targetUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 292,
+        "textDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "30875a14838a5fce1721d0dcfdf932a096ec6d0afd6aab7c550003f7ec804fb4",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật\n  tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      }
+    }
+  ],
+  "stableHeadings": [
+    {
+      "claimId": "claim_3498d50ccefcfce93481393dcec13370",
+      "beforeIdentity": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "7427940de17bc13776d4a087e4df1fe55bb9c9b8a19bcc9ecabfe66125f60d0d",
+        "identityFingerprint": "745122ae9e05e3268851d1a79dd241a0711ac2b040e5b2d384cb6c89d66bf5af",
+        "claimId": "claim_3498d50ccefcfce93481393dcec13370",
+        "sourceAnchor": "entry-fields-and-effect-axes",
+        "unitKind": "heading",
+        "sourceUnitDigest": "e30e6dc5a60e3ccfaec2103922569eb11fed7cc7df9961e70b595854ef81c29e",
+        "claimKind": "contract",
+        "status": "future"
+      },
+      "currentIdentity": {
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitDigest": "5fd40fd49eec27b854cb3d3504ac09f27d5ecd036bcd8a761bcb47dd0edfeb39",
+        "identityFingerprint": "d4bb8134eb40163a9ee29f99230f8be28426dfc902144858b0e8ed27db0e9f17",
+        "claimId": "claim_3498d50ccefcfce93481393dcec13370",
+        "sourceAnchor": "entry-fields-and-effect-axes",
+        "unitKind": "heading",
+        "sourceUnitDigest": "a7e0489cd2409eb4b835d3368b5d642409d0183530639510033cb4c2ea70d6df",
+        "claimKind": "contract",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "9881f8622732e3ba7c8e203097d42674b8aba36d",
+          "fromUnitDigest": "01760e131102d397ba77a1fdf99eea046e809b96d18163950071234ec4389e41",
+          "toUnitDigest": "5fd40fd49eec27b854cb3d3504ac09f27d5ecd036bcd8a761bcb47dd0edfeb39",
+          "fromSourceUnitDigest": "fb9f481077a3b0918f66e7eccf9afaaf2b9326c0824727c376508464ff32b1c4",
+          "toSourceUnitDigest": "a7e0489cd2409eb4b835d3368b5d642409d0183530639510033cb4c2ea70d6df"
+        }
+      },
+      "beforeUnit": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Entry Fields And Effect Axes",
+        "anchor": "entry-fields-and-effect-axes",
+        "githubAnchor": "entry-fields-and-effect-axes",
+        "stableAnchor": "h-c11e92a7ce10",
+        "startLine": 267,
+        "endLine": 267,
+        "textDigest": "e30e6dc5a60e3ccfaec2103922569eb11fed7cc7df9961e70b595854ef81c29e",
+        "sample": "Entry Fields And Effect Axes",
+        "sectionPayloadDigest": "e6cc65918fec7e105533342c54811a8925fb8700da506fc90dbbde9dccf7c4c5",
+        "followingBlockDigest": "97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2",
+        "identityFingerprint": "745122ae9e05e3268851d1a79dd241a0711ac2b040e5b2d384cb6c89d66bf5af",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry"
+        ],
+        "text": "### Entry Fields And Effect Axes",
+        "sectionText": "### Entry Fields And Effect Axes\n\n**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — xem `fgos --help --json` cho danh sách hiện hành mang `externalEffect: true` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38).\n\n- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Xem `fgos --help --json` cho\n  danh sách hiện hành mang `externalEffect: true` (ví dụ `review`, `approve`,\n  `run` — dispatch executor thật tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng.\n\nCả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38."
+      },
+      "currentUnit": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Entry Fields And Effect Axes",
+        "anchor": "entry-fields-and-effect-axes",
+        "githubAnchor": "entry-fields-and-effect-axes",
+        "stableAnchor": "h-c11e92a7ce10",
+        "startLine": 267,
+        "endLine": 267,
+        "textDigest": "a7e0489cd2409eb4b835d3368b5d642409d0183530639510033cb4c2ea70d6df",
+        "sample": "Entry Fields And Effect Axes",
+        "sectionPayloadDigest": "4168b8aa195f3f466631d4d6780cdfa462f4faddb7a708f62119475262aa969a",
+        "followingBlockDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "identityFingerprint": "d4bb8134eb40163a9ee29f99230f8be28426dfc902144858b0e8ed27db0e9f17",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry"
+        ],
+        "text": "### Entry Fields And Effect Axes",
+        "sectionText": "### Entry Fields And Effect Axes\n\n**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38).\n\n- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật\n  tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng.\n\nCả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38."
+      },
+      "reviewStatus": "pending-native-heading-binding",
+      "authoredBy": "codex-session:17@2026-10-14"
+    }
+  ],
+  "candidateUnverified": [
+    {
+      "claimId": "claim_b00f373a151549ef51503fc29e8abd12",
+      "path": "docs/platform/governance.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "1bdf22f366a423941250211f62e5003e55ddb5430a2b6578a2faa9f6c5b027cd",
+      "fileStatus": {
+        "kind": "governance",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 22,
+        "textDigest": "1bdf22f366a423941250211f62e5003e55ddb5430a2b6578a2faa9f6c5b027cd",
+        "sample": "```txt\nDocument type: Governance\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the root documentation-governance contract as candidate material\nDesign st",
+        "identityFingerprint": "cb4fd8ef0e35da2e6d199f7b2f10d79187fb636df58395e91624683853f2a1d5",
+        "ancestry": [
+          "Documentation Governance"
+        ],
+        "text": "```txt\nDocument type: Governance\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the root documentation-governance contract as candidate material\nDesign status: Candidate\nImplementation: Partial; conservation review pending, current truth unverified\nProvenance: docs/doc-governance.md at d900d6151c58114cd9d0f8ef519f91daa8b4ded5\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: Candidate documentation-governance contract; no authority cutover\nUse this when: Reviewing conservation of the root documentation-governance source\nDo not use this for: Replacing the current legacy governance authority or certifying implementation\nLast reviewed: 2026-10-14\nRelated:\n- docs/doc-governance.md\n- docs/reading-map.md\n- docs/platform/README.md\nSupersedes: None; candidate only\nSuperseded by: None\n```"
+      },
+      "shownText": "```txt\nDocument type: Governance\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the root documentation-governance contract as candidate material\nDesign status: Candidate\nImplementation: Partial; conservation review pending, current truth unverified\nProvenance: docs/doc-governance.md at d900d6151c58114cd9d0f8ef519f91daa8b4ded5\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: Candidate documentation-governance contract; no authority cutover\nUse this when: Reviewing conservation of the root documentation-governance source\nDo not use this for: Replacing the current legacy governance authority or certifying implementation\nLast reviewed: 2026-10-14\nRelated:\n- docs/doc-governance.md\n- docs/reading-map.md\n- docs/platform/README.md\nSupersedes: None; candidate only\nSuperseded by: None\n```",
+      "shownTextDigest": "1bdf22f366a423941250211f62e5003e55ddb5430a2b6578a2faa9f6c5b027cd"
+    },
+    {
+      "claimId": "claim_a03a3935d0797de1bd966c9545404124",
+      "path": "docs/platform/governance.md",
+      "anchor": "source-metadata-added-in-candidate",
+      "unitDigest": "8076f3682a1289b266fd074de6eb1ee7842c5905fe9674771792c8d9a53f42a4",
+      "fileStatus": {
+        "kind": "governance",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Source Metadata (Added in candidate)",
+        "anchor": "source-metadata-added-in-candidate",
+        "githubAnchor": "source-metadata-added-in-candidate",
+        "stableAnchor": "h-ea3f77d2b8de",
+        "startLine": 478,
+        "endLine": 478,
+        "textDigest": "8076f3682a1289b266fd074de6eb1ee7842c5905fe9674771792c8d9a53f42a4",
+        "sample": "Source Metadata (Added in candidate)",
+        "sectionPayloadDigest": "a8345e439d8be7b1f8bff1971ed00d3e9681a68c05bc53f8bb0ac8c7a9045ddd",
+        "followingBlockDigest": "59d4e62bd8b88fb77ea3f20660a18f58df4aca5b5d6c3c6f38a15ae6f48755a4",
+        "identityFingerprint": "3ecab719c3a68ee273559cfb54802388f264fea323ac8259360d02ce99353e7f",
+        "ancestry": [
+          "Documentation Governance"
+        ],
+        "text": "## Source Metadata (Added in candidate)",
+        "sectionText": "## Source Metadata (Added in candidate)\n\nAdded in candidate: retain the complete original source header as historical provenance; its accepted status describes the source, not this candidate.\n\n```txt\nDocument type: Governance\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Define fgOS documentation types, authority, lifecycle, provenance, and placement\nDesign status: Accepted\nImplementation: Partial\nProvenance: Promoted from `docs/architect/documentation-system-design.md`\nWriter type: Human + agent coauthor\nCanonical for: fgOS documentation governance\nUse this when: Creating, reviewing, moving, or promoting maintained documentation\nDo not use this for: Current product behavior or implementation detail\nLast reviewed: 2026-09-25\nRelated:\n- `docs/reading-map.md`\n- `docs/transitional-switchboard.md`\n- `docs/platform/migration-authoring-rules.md`\n- `docs/platform/README.md`\n- `docs/architect/documentation-system-design.md`\n```"
+      },
+      "shownText": "## Source Metadata (Added in candidate)\n\nAdded in candidate: retain the complete original source header as historical provenance; its accepted status describes the source, not this candidate.\n\n```txt\nDocument type: Governance\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Define fgOS documentation types, authority, lifecycle, provenance, and placement\nDesign status: Accepted\nImplementation: Partial\nProvenance: Promoted from `docs/architect/documentation-system-design.md`\nWriter type: Human + agent coauthor\nCanonical for: fgOS documentation governance\nUse this when: Creating, reviewing, moving, or promoting maintained documentation\nDo not use this for: Current product behavior or implementation detail\nLast reviewed: 2026-09-25\nRelated:\n- `docs/reading-map.md`\n- `docs/transitional-switchboard.md`\n- `docs/platform/migration-authoring-rules.md`\n- `docs/platform/README.md`\n- `docs/architect/documentation-system-design.md`\n```",
+      "shownTextDigest": "13fb9178500e4b266909f53b6d16acb9b4f44d2479d5e4033f3af40c334f044f"
+    },
+    {
+      "claimId": "claim_12ab602ab6c592378aa624abfd2fd943",
+      "path": "docs/platform/governance.md",
+      "anchor": "unheaded-block-61",
+      "unitDigest": "59d4e62bd8b88fb77ea3f20660a18f58df4aca5b5d6c3c6f38a15ae6f48755a4",
+      "fileStatus": {
+        "kind": "governance",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-61",
+        "githubAnchor": "unheaded-block-61",
+        "stableAnchor": "unheaded-block-61",
+        "title": "Unheaded block 61",
+        "startLine": 480,
+        "endLine": 480,
+        "textDigest": "59d4e62bd8b88fb77ea3f20660a18f58df4aca5b5d6c3c6f38a15ae6f48755a4",
+        "sample": "Added in candidate: retain the complete original source header as historical provenance; its accepted status describes the source, not this candidate.",
+        "identityFingerprint": "8a8cf4328faf64c91545776b0851bb0228cc1bde38027689dfeb41a6b9ab4c46",
+        "ancestry": [
+          "Documentation Governance",
+          "Source Metadata (Added in candidate)"
+        ],
+        "text": "Added in candidate: retain the complete original source header as historical provenance; its accepted status describes the source, not this candidate."
+      },
+      "shownText": "Added in candidate: retain the complete original source header as historical provenance; its accepted status describes the source, not this candidate.",
+      "shownTextDigest": "59d4e62bd8b88fb77ea3f20660a18f58df4aca5b5d6c3c6f38a15ae6f48755a4"
+    },
+    {
+      "claimId": "claim_fe092189b623cca65c6aa3b2f86ee225",
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "anchor": "work-state-implementation-pointers",
+      "unitDigest": "cb275b793cfe6299aaa442b4021cce113f2dfeb62fee2397f0680acdcb9b56d8",
+      "fileStatus": {
+        "kind": "architecture",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Work State Implementation Pointers",
+        "anchor": "work-state-implementation-pointers",
+        "githubAnchor": "work-state-implementation-pointers",
+        "stableAnchor": "h-cf63bc287fab",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "cb275b793cfe6299aaa442b4021cce113f2dfeb62fee2397f0680acdcb9b56d8",
+        "sample": "Work State Implementation Pointers",
+        "sectionPayloadDigest": "d357d4a5224eaffb265d2bcf57b79347b4d4a7ef3ca5c998d31da3cc9f1d3d5b",
+        "followingBlockDigest": "d357d4a5224eaffb265d2bcf57b79347b4d4a7ef3ca5c998d31da3cc9f1d3d5b",
+        "identityFingerprint": "81c03412777fc8287d57b47fada8357be052c8a7b3002d3e3d45210e9d785dc6",
+        "ancestry": [],
+        "text": "# Work State Implementation Pointers",
+        "sectionText": "# Work State Implementation Pointers\n\n```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Module-to-responsibility pointers for the work state engine implementation.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/specs/work-state.md\n```"
+      },
+      "shownText": "# Work State Implementation Pointers\n\n```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Module-to-responsibility pointers for the work state engine implementation.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/specs/work-state.md\n```",
+      "shownTextDigest": "d064a90755c5352fc4affd4662c97742ef9a499571e8a39c66e0388ad6292dea"
+    },
+    {
+      "claimId": "claim_178bb22fcc32ae881dd170c17e2cb2ad",
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "d357d4a5224eaffb265d2bcf57b79347b4d4a7ef3ca5c998d31da3cc9f1d3d5b",
+      "fileStatus": {
+        "kind": "architecture",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 13,
+        "textDigest": "d357d4a5224eaffb265d2bcf57b79347b4d4a7ef3ca5c998d31da3cc9f1d3d5b",
+        "sample": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Module-to-responsibility pointers for the work state engine implem",
+        "identityFingerprint": "e74cd274e1d0eaf6308c46fb75aefb305f703a6fd0e3bf88475a5bc9a9ac5f0f",
+        "ancestry": [
+          "Work State Implementation Pointers"
+        ],
+        "text": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Module-to-responsibility pointers for the work state engine implementation.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/specs/work-state.md\n```"
+      },
+      "shownText": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Module-to-responsibility pointers for the work state engine implementation.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/specs/work-state.md\n```",
+      "shownTextDigest": "d357d4a5224eaffb265d2bcf57b79347b4d4a7ef3ca5c998d31da3cc9f1d3d5b"
+    },
+    {
+      "claimId": "claim_ae1f79478cc3028c10094861b3ca9203",
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "anchor": "1-purpose-and-scope",
+      "unitDigest": "114d842f28715694851c5df891c32b0f8d524b913fbac3111d80abe5434178c6",
+      "fileStatus": {
+        "kind": "architecture",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "1. Purpose And Scope",
+        "anchor": "1-purpose-and-scope",
+        "githubAnchor": "1-purpose-and-scope",
+        "stableAnchor": "h-068518b415ae",
+        "startLine": 15,
+        "endLine": 15,
+        "textDigest": "114d842f28715694851c5df891c32b0f8d524b913fbac3111d80abe5434178c6",
+        "sample": "1. Purpose And Scope",
+        "sectionPayloadDigest": "4e5185bf76d81997933e0c97655c3504c9913d23cecdf0f5ac282aa5f5c701c0",
+        "followingBlockDigest": "4e5185bf76d81997933e0c97655c3504c9913d23cecdf0f5ac282aa5f5c701c0",
+        "identityFingerprint": "8c52985117e847d767dc49fbbffc6ec1ea8480d4df181a506e3181e397a040d1",
+        "ancestry": [
+          "Work State Implementation Pointers"
+        ],
+        "text": "## 1. Purpose And Scope",
+        "sectionText": "## 1. Purpose And Scope\n\nThis document lists which implementation module owns which responsibility of the work state area."
+      },
+      "shownText": "## 1. Purpose And Scope\n\nThis document lists which implementation module owns which responsibility of the work state area.",
+      "shownTextDigest": "e1b073dec637ec79d85401271f3aafc20380c671fbe15117142617fb156bc450"
+    },
+    {
+      "claimId": "claim_0e63fab01f4b08d4713d57dfee60f724",
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "4e5185bf76d81997933e0c97655c3504c9913d23cecdf0f5ac282aa5f5c701c0",
+      "fileStatus": {
+        "kind": "architecture",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 17,
+        "endLine": 17,
+        "textDigest": "4e5185bf76d81997933e0c97655c3504c9913d23cecdf0f5ac282aa5f5c701c0",
+        "sample": "This document lists which implementation module owns which responsibility of the work state area.",
+        "identityFingerprint": "752273badb7544b299467158b339bc1f67266e31d72e58209f2f7c779d44d62e",
+        "ancestry": [
+          "Work State Implementation Pointers",
+          "1. Purpose And Scope"
+        ],
+        "text": "This document lists which implementation module owns which responsibility of the work state area."
+      },
+      "shownText": "This document lists which implementation module owns which responsibility of the work state area.",
+      "shownTextDigest": "4e5185bf76d81997933e0c97655c3504c9913d23cecdf0f5ac282aa5f5c701c0"
+    },
+    {
+      "claimId": "claim_362afb23e9ce278b73edf068fb6018de",
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "anchor": "3-related-files",
+      "unitDigest": "0ebfd1d41b3c588f1f469cc28a8884057b30812a24d5870a8a2e44600cf27385",
+      "fileStatus": {
+        "kind": "architecture",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "3. Related Files",
+        "anchor": "3-related-files",
+        "githubAnchor": "3-related-files",
+        "stableAnchor": "h-94fe020a43c0",
+        "startLine": 46,
+        "endLine": 46,
+        "textDigest": "0ebfd1d41b3c588f1f469cc28a8884057b30812a24d5870a8a2e44600cf27385",
+        "sample": "3. Related Files",
+        "sectionPayloadDigest": "08e9731304f9e54ce01edb082f23b13ff6802af280ca8aeb62ff1d2e1a7a0627",
+        "followingBlockDigest": "08e9731304f9e54ce01edb082f23b13ff6802af280ca8aeb62ff1d2e1a7a0627",
+        "identityFingerprint": "a34d370a5e0128490bcbe3bbf803ea85e553bad8835dee02c38917356d0f7847",
+        "ancestry": [
+          "Work State Implementation Pointers"
+        ],
+        "text": "## 3. Related Files",
+        "sectionText": "## 3. Related Files\n\n- [Work state area portal](../README.md)\n- [Work state spec](../spec.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)"
+      },
+      "shownText": "## 3. Related Files\n\n- [Work state area portal](../README.md)\n- [Work state spec](../spec.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)",
+      "shownTextDigest": "122c1e482e3aecd320c88b0cd8a3ea78174bec02b3aaf68d1c418e4f27ebddad"
+    },
+    {
+      "claimId": "claim_57e8eb7978357a8ab6cd53959e421972",
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "08e9731304f9e54ce01edb082f23b13ff6802af280ca8aeb62ff1d2e1a7a0627",
+      "fileStatus": {
+        "kind": "architecture",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 48,
+        "endLine": 50,
+        "textDigest": "08e9731304f9e54ce01edb082f23b13ff6802af280ca8aeb62ff1d2e1a7a0627",
+        "sample": "- [Work state area portal](../README.md)\n- [Work state spec](../spec.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)",
+        "identityFingerprint": "172b95a3e7dfce6a53584af148501b0ce1e4117f4fb004d8d31381176a17a6d2",
+        "ancestry": [
+          "Work State Implementation Pointers",
+          "3. Related Files"
+        ],
+        "text": "- [Work state area portal](../README.md)\n- [Work state spec](../spec.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)"
+      },
+      "shownText": "- [Work state area portal](../README.md)\n- [Work state spec](../spec.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)",
+      "shownTextDigest": "08e9731304f9e54ce01edb082f23b13ff6802af280ca8aeb62ff1d2e1a7a0627"
+    },
+    {
+      "claimId": "claim_2f0b0a2f17833506438ae6f6b83eb7fd",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "cli-io-contract",
+      "unitDigest": "ace07b86452f1aa48efa0897defdd839191e5d66ea38aacd51db318afb0bc941",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "CLI I/O Contract",
+        "anchor": "cli-io-contract",
+        "githubAnchor": "cli-io-contract",
+        "stableAnchor": "h-1a12f8bbe2ff",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "ace07b86452f1aa48efa0897defdd839191e5d66ea38aacd51db318afb0bc941",
+        "sample": "CLI I/O Contract",
+        "sectionPayloadDigest": "0987d91c6d782d70b13bae3627e042e262c6f3b3a87dfb82997fba01aa7147fb",
+        "followingBlockDigest": "0987d91c6d782d70b13bae3627e042e262c6f3b3a87dfb82997fba01aa7147fb",
+        "identityFingerprint": "30eec96fbd5d409e957985332bf013e29f6dda4b3c266c0198380593269ddb26",
+        "ancestry": [],
+        "text": "# CLI I/O Contract",
+        "sectionText": "# CLI I/O Contract\n\n```txt\nDocument type: Contract\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Owns the input and output contract of the fgOS CLI door and the stdout surface of fgos-runner: writer identity, envelope, exit codes, pagination, verb manifest and version tokens.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nAdded in candidate: the headings Single Write Door, Writer Source Trust Levels, Writer Resolution Rules, Caller Role, Error Path Is Not Enveloped, Runner Stdout Envelope, Recognizing A Real Envelope and Entry Fields And Effect Axes subdivide sections of the sources that have no heading of their own; the text under them is carried from the sources.\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n```"
+      },
+      "shownText": "# CLI I/O Contract\n\n```txt\nDocument type: Contract\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Owns the input and output contract of the fgOS CLI door and the stdout surface of fgos-runner: writer identity, envelope, exit codes, pagination, verb manifest and version tokens.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nAdded in candidate: the headings Single Write Door, Writer Source Trust Levels, Writer Resolution Rules, Caller Role, Error Path Is Not Enveloped, Runner Stdout Envelope, Recognizing A Real Envelope and Entry Fields And Effect Axes subdivide sections of the sources that have no heading of their own; the text under them is carried from the sources.\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n```",
+      "shownTextDigest": "5b0766d639e5e2ff78dc362e6e7abcf0cebb6fd1bd872b5d81cb5dfac178699f"
+    },
+    {
+      "claimId": "claim_66b020a1841dcd96a65ebd9fc32fb3cf",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "0987d91c6d782d70b13bae3627e042e262c6f3b3a87dfb82997fba01aa7147fb",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 16,
+        "textDigest": "0987d91c6d782d70b13bae3627e042e262c6f3b3a87dfb82997fba01aa7147fb",
+        "sample": "```txt\nDocument type: Contract\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Owns the input and output contract of the fgOS CLI door and the stdout",
+        "identityFingerprint": "7832757dd834871a122f02f31599ea54e56bddfe6d6e33d3919279eac76597bc",
+        "ancestry": [
+          "CLI I/O Contract"
+        ],
+        "text": "```txt\nDocument type: Contract\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Owns the input and output contract of the fgOS CLI door and the stdout surface of fgos-runner: writer identity, envelope, exit codes, pagination, verb manifest and version tokens.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nAdded in candidate: the headings Single Write Door, Writer Source Trust Levels, Writer Resolution Rules, Caller Role, Error Path Is Not Enveloped, Runner Stdout Envelope, Recognizing A Real Envelope and Entry Fields And Effect Axes subdivide sections of the sources that have no heading of their own; the text under them is carried from the sources.\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n```"
+      },
+      "shownText": "```txt\nDocument type: Contract\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Owns the input and output contract of the fgOS CLI door and the stdout surface of fgos-runner: writer identity, envelope, exit codes, pagination, verb manifest and version tokens.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nAdded in candidate: the headings Single Write Door, Writer Source Trust Levels, Writer Resolution Rules, Caller Role, Error Path Is Not Enveloped, Runner Stdout Envelope, Recognizing A Real Envelope and Entry Fields And Effect Axes subdivide sections of the sources that have no heading of their own; the text under them is carried from the sources.\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n```",
+      "shownTextDigest": "0987d91c6d782d70b13bae3627e042e262c6f3b3a87dfb82997fba01aa7147fb"
+    },
+    {
+      "claimId": "claim_f80f69f4de87e6414f83673fa0010ba6",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "single-write-door",
+      "unitDigest": "b52d9c4e6e4bb58f446010e169b1f54d25e916b993a08dc4b3c6cb513897fc4c",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Single Write Door",
+        "anchor": "single-write-door",
+        "githubAnchor": "single-write-door",
+        "stableAnchor": "h-fd4d2ad2e5be",
+        "startLine": 36,
+        "endLine": 36,
+        "textDigest": "b52d9c4e6e4bb58f446010e169b1f54d25e916b993a08dc4b3c6cb513897fc4c",
+        "sample": "Single Write Door",
+        "sectionPayloadDigest": "4d3e5ba86bd907aba25dfcc099af5e2891236ac44ec6aac4eb3e2fc2bd2a5c83",
+        "followingBlockDigest": "4d3e5ba86bd907aba25dfcc099af5e2891236ac44ec6aac4eb3e2fc2bd2a5c83",
+        "identityFingerprint": "dbe5f60a418d7c88773bf8c0c9ef78712eb0a5af2e9f8ae9e7cefa53f036f82c",
+        "ancestry": [
+          "CLI I/O Contract",
+          "2. Input Direction Verb And Identity"
+        ],
+        "text": "### Single Write Door",
+        "sectionText": "### Single Write Door\n\nMọi thao tác ghi đi qua đúng **một cửa**: gọi verb của `bin/fgos.mjs`\n(CTR001/CTR002). Không có đường ghi thứ hai vào `.fgos/`."
+      },
+      "shownText": "### Single Write Door\n\nMọi thao tác ghi đi qua đúng **một cửa**: gọi verb của `bin/fgos.mjs`\n(CTR001/CTR002). Không có đường ghi thứ hai vào `.fgos/`.",
+      "shownTextDigest": "4f2ab1788afab728c89add44393da2010a321e92c909cce47a21499d3b97a9d5"
+    },
+    {
+      "claimId": "claim_32a411cc1ef34025d21bebdcc0183c3f",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "writer-source-trust-levels",
+      "unitDigest": "987e8f9f71703323f0ba7b5ca63c5dbddb7536ba1f69683e432efd4463da6890",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Writer Source Trust Levels",
+        "anchor": "writer-source-trust-levels",
+        "githubAnchor": "writer-source-trust-levels",
+        "stableAnchor": "h-d6bf813da5db",
+        "startLine": 66,
+        "endLine": 66,
+        "textDigest": "987e8f9f71703323f0ba7b5ca63c5dbddb7536ba1f69683e432efd4463da6890",
+        "sample": "Writer Source Trust Levels",
+        "sectionPayloadDigest": "1e0381f5c2ec0793960c0bf5225ea27c40e4e532a94139f6c80d71ff1c8eb306",
+        "followingBlockDigest": "b3d95b30cc6cd2a1b0bb6bd8bec47976bedba54191c94aeec67ff6441ebdefb6",
+        "identityFingerprint": "2908d45f61ea15e4ee80a62660a4b11a12097863afadc2c55ed5b67674f3a61d",
+        "ancestry": [
+          "CLI I/O Contract",
+          "2. Input Direction Verb And Identity"
+        ],
+        "text": "### Writer Source Trust Levels",
+        "sectionText": "### Writer Source Trust Levels\n\n| source | Ý nghĩa | Độ tin |\n|---|---|---|\n| `registry` | `id` khớp một phiên đang sống trong sổ đăng ký phiên của fgOS (`.fgos/sessions.json`) | Cao nhất — do chính fgOS cấp và xác nhận |\n| `env` | `id` lấy từ biến môi trường phiên agent (`FGOS_SESSION_ID`/`CLAUDE_CODE_SESSION_ID`), nhưng KHÔNG khớp phiên nào đang sống trong sổ đăng ký | Trung bình — ai cũng tự set được biến môi trường |\n| `pid` | Không có biến môi trường phiên nào hợp lệ; suy đoán tốt-nhất từ pid một tổ tiên tiến trình gần (terminal tay gõ) | Thấp — best-effort, có thể trùng giữa hai pane cùng shell |\n| `unresolved` | KHÔNG một nguồn nào xác nhận được; `id` vẫn là pid của chính tiến trình ghi (KHÔNG BAO GIỜ rỗng/vắng mặt) — `unresolved` là một NHÃN XUẤT XỨ, không phải danh tính vắng mặt (per str46-io-contract) | Không xác định |\n\n- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: `registry` (đối chiếu được với `.fgos/sessions.json`, tin nhất) ·\n  `env` (biến môi trường, ai cũng set được) · `pid` (dò ngược tiến trình cha,\n  best-effort) · `unresolved` (không nguồn nào xác nhận được — `id` vẫn là\n  pid của chính tiến trình gọi, KHÔNG rỗng, KHÔNG vắng khoá; chỉ nhãn\n  `source` nói giá trị chưa kiểm chứng được)."
+      },
+      "shownText": "### Writer Source Trust Levels\n\n| source | Ý nghĩa | Độ tin |\n|---|---|---|\n| `registry` | `id` khớp một phiên đang sống trong sổ đăng ký phiên của fgOS (`.fgos/sessions.json`) | Cao nhất — do chính fgOS cấp và xác nhận |\n| `env` | `id` lấy từ biến môi trường phiên agent (`FGOS_SESSION_ID`/`CLAUDE_CODE_SESSION_ID`), nhưng KHÔNG khớp phiên nào đang sống trong sổ đăng ký | Trung bình — ai cũng tự set được biến môi trường |\n| `pid` | Không có biến môi trường phiên nào hợp lệ; suy đoán tốt-nhất từ pid một tổ tiên tiến trình gần (terminal tay gõ) | Thấp — best-effort, có thể trùng giữa hai pane cùng shell |\n| `unresolved` | KHÔNG một nguồn nào xác nhận được; `id` vẫn là pid của chính tiến trình ghi (KHÔNG BAO GIỜ rỗng/vắng mặt) — `unresolved` là một NHÃN XUẤT XỨ, không phải danh tính vắng mặt (per str46-io-contract) | Không xác định |\n\n- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: `registry` (đối chiếu được với `.fgos/sessions.json`, tin nhất) ·\n  `env` (biến môi trường, ai cũng set được) · `pid` (dò ngược tiến trình cha,\n  best-effort) · `unresolved` (không nguồn nào xác nhận được — `id` vẫn là\n  pid của chính tiến trình gọi, KHÔNG rỗng, KHÔNG vắng khoá; chỉ nhãn\n  `source` nói giá trị chưa kiểm chứng được).",
+      "shownTextDigest": "11296d8d49f12fb2fe54781353afc48b95431822a3033580b482cc56ca5491a8"
+    },
+    {
+      "claimId": "claim_d10f877c9fe11dbae43ffc87d62a16e3",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "writer-resolution-rules",
+      "unitDigest": "8789fb7c71d479865e2c6f7c7ade71a6b69867ca1157db3dd424977918db061b",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Writer Resolution Rules",
+        "anchor": "writer-resolution-rules",
+        "githubAnchor": "writer-resolution-rules",
+        "stableAnchor": "h-e075e30fdb5b",
+        "startLine": 84,
+        "endLine": 84,
+        "textDigest": "8789fb7c71d479865e2c6f7c7ade71a6b69867ca1157db3dd424977918db061b",
+        "sample": "Writer Resolution Rules",
+        "sectionPayloadDigest": "ff49a3c3e6a16c7c56d4bd2bd990721834255fa478afa6878d8d070ec644fb62",
+        "followingBlockDigest": "882fdc920bae5cb93953dd540d22527c18f91455de1d3de225d2ab0a51734fb7",
+        "identityFingerprint": "8adb7dbf30dab47a6edc12bc9893b5bc30d6de705558092b47fb595443587ba3",
+        "ancestry": [
+          "CLI I/O Contract",
+          "2. Input Direction Verb And Identity"
+        ],
+        "text": "### Writer Resolution Rules",
+        "sectionText": "### Writer Resolution Rules\n\n**Registry chỉ ĐỐI CHIẾU, không bao giờ tự cấp danh tính** (per str46-io-contract): giá trị `id` lấy từ biến môi trường luôn giữ nguyên bất\nkể sổ đăng ký có khớp hay không — sổ đăng ký chỉ nâng độ tin (`source`) khi\nkhớp, không bao giờ đổi hay tạo ra `id`. Một dòng sổ đăng ký KHÔNG BAO GIỜ\nkhớp theo thư mục làm việc hay theo pid của chính dòng đó — chỉ khớp đúng\n`id` với `sessionId` của dòng — vì khớp theo thư mục sẽ gộp hai phiên khác\nnhau trong cùng một worktree thành một danh tính, phá đúng mục đích khoá\nhoạt động cây chính (xem spec Runner \"Khoá hoạt động cây chính\").\n\nMột giá trị `id` sai định dạng (ký tự lạ, quá dài) bị LOẠI ở tầng phân giải\nvà rơi xuống nguồn kế tiếp — KHÔNG BAO GIỜ ném lỗi, KHÔNG BAO GIỜ chặn verb\n(per str46-io-contract); không có validator nào đứng trên đường ghi\n`writer`. `writer` fold lên item KHÔNG ĐIỀU KIỆN, GHI ĐÈ mỗi lần (latest-wins)\n— khác khuôn \"cộng thêm không đè\" của outcome/friction/settlement, vì đây là\ndanh tính của LẦN GHI GẦN NHẤT, không phải một chuỗi lịch sử cần giữ mọi lần.\nItem chưa từng qua tính năng này không mang `writer` — vắng mặt hoàn toàn,\ntương thích ngược (RUL11 (tiến hóa schema)). Cơ chế phân giải đầy đủ (thứ tự nguồn, khoá hoạt động cây chính dùng cùng danh tính này): spec Runner RUL49 (compound-learning đổi trục: từ stage sang status retrospective)."
+      },
+      "shownText": "### Writer Resolution Rules\n\n**Registry chỉ ĐỐI CHIẾU, không bao giờ tự cấp danh tính** (per str46-io-contract): giá trị `id` lấy từ biến môi trường luôn giữ nguyên bất\nkể sổ đăng ký có khớp hay không — sổ đăng ký chỉ nâng độ tin (`source`) khi\nkhớp, không bao giờ đổi hay tạo ra `id`. Một dòng sổ đăng ký KHÔNG BAO GIỜ\nkhớp theo thư mục làm việc hay theo pid của chính dòng đó — chỉ khớp đúng\n`id` với `sessionId` của dòng — vì khớp theo thư mục sẽ gộp hai phiên khác\nnhau trong cùng một worktree thành một danh tính, phá đúng mục đích khoá\nhoạt động cây chính (xem spec Runner \"Khoá hoạt động cây chính\").\n\nMột giá trị `id` sai định dạng (ký tự lạ, quá dài) bị LOẠI ở tầng phân giải\nvà rơi xuống nguồn kế tiếp — KHÔNG BAO GIỜ ném lỗi, KHÔNG BAO GIỜ chặn verb\n(per str46-io-contract); không có validator nào đứng trên đường ghi\n`writer`. `writer` fold lên item KHÔNG ĐIỀU KIỆN, GHI ĐÈ mỗi lần (latest-wins)\n— khác khuôn \"cộng thêm không đè\" của outcome/friction/settlement, vì đây là\ndanh tính của LẦN GHI GẦN NHẤT, không phải một chuỗi lịch sử cần giữ mọi lần.\nItem chưa từng qua tính năng này không mang `writer` — vắng mặt hoàn toàn,\ntương thích ngược (RUL11 (tiến hóa schema)). Cơ chế phân giải đầy đủ (thứ tự nguồn, khoá hoạt động cây chính dùng cùng danh tính này): spec Runner RUL49 (compound-learning đổi trục: từ stage sang status retrospective).",
+      "shownTextDigest": "ff9b155cbbeec6170ec89e0639ef9a47dfac284fa3b39ccd4da4d87cf064634e"
+    },
+    {
+      "claimId": "claim_5f9a6123b5c816fb5fbcd4575a29b75c",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "caller-role",
+      "unitDigest": "befd4c0925c52780e0dff93c01ed25165e6ed23c6bafeba2665f172496b25420",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Caller Role",
+        "anchor": "caller-role",
+        "githubAnchor": "caller-role",
+        "stableAnchor": "h-05520214b8d8",
+        "startLine": 103,
+        "endLine": 103,
+        "textDigest": "befd4c0925c52780e0dff93c01ed25165e6ed23c6bafeba2665f172496b25420",
+        "sample": "Caller Role",
+        "sectionPayloadDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
+        "followingBlockDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
+        "identityFingerprint": "d0fe4af7311e0340b884e03d517acefb961f7baf99d63affb7731769fb171e78",
+        "ancestry": [
+          "CLI I/O Contract",
+          "2. Input Direction Verb And Identity"
+        ],
+        "text": "### Caller Role",
+        "sectionText": "### Caller Role\n\nSong song với `writer` (cá thể), mỗi cạnh chuyển trạng thái còn mang `role`\n— **loại** caller: `human` · `runner` · `session` · `system` (giá trị thứ\ntư, gán tự động cho cạnh park nội bộ do máy sinh ra như hệ quả một verb,\nkhông do ai quyết định). `role` và `writer` tách bạch: một cái nói \"ai gây\nra\", một cái nói \"loại gì gây ra\"."
+      },
+      "shownText": "### Caller Role\n\nSong song với `writer` (cá thể), mỗi cạnh chuyển trạng thái còn mang `role`\n— **loại** caller: `human` · `runner` · `session` · `system` (giá trị thứ\ntư, gán tự động cho cạnh park nội bộ do máy sinh ra như hệ quả một verb,\nkhông do ai quyết định). `role` và `writer` tách bạch: một cái nói \"ai gây\nra\", một cái nói \"loại gì gây ra\".",
+      "shownTextDigest": "38d1e05e423ee27f5ab1416fb5c65e831b27b11682d31152e52c24afd61c56d6"
+    },
+    {
+      "claimId": "claim_dd9e99347fb7582d5e53002d16241ac8",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "error-path-is-not-enveloped",
+      "unitDigest": "54081f4a2370577dc2292bd6f53556e29db67c332a9ce6eeff77b95afc9aca34",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Error Path Is Not Enveloped",
+        "anchor": "error-path-is-not-enveloped",
+        "githubAnchor": "error-path-is-not-enveloped",
+        "stableAnchor": "h-a2c1358941c5",
+        "startLine": 140,
+        "endLine": 140,
+        "textDigest": "54081f4a2370577dc2292bd6f53556e29db67c332a9ce6eeff77b95afc9aca34",
+        "sample": "Error Path Is Not Enveloped",
+        "sectionPayloadDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
+        "followingBlockDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
+        "identityFingerprint": "3085a56cec6c869375ff99e199e1932d0080fd856197cfebd6a26a553b784dc1",
+        "ancestry": [
+          "CLI I/O Contract",
+          "3. Output Direction Unified Envelope"
+        ],
+        "text": "### Error Path Is Not Enveloped",
+        "sectionText": "### Error Path Is Not Enveloped\n\n**Đường lỗi không bọc phong bì.** Chỉ đường thành công in phong bì ra `stdout`;\nkhi verb ném lỗi, chẩn đoán đi ra `stderr` kèm mã thoát theo bảng phân loại lỗi\n(stdout=dữ liệu, stderr=chẩn đoán) — bên gọi phân biệt thành/bại bằng mã thoát,\nkhông phải bằng việc dò nội dung phong bì."
+      },
+      "shownText": "### Error Path Is Not Enveloped\n\n**Đường lỗi không bọc phong bì.** Chỉ đường thành công in phong bì ra `stdout`;\nkhi verb ném lỗi, chẩn đoán đi ra `stderr` kèm mã thoát theo bảng phân loại lỗi\n(stdout=dữ liệu, stderr=chẩn đoán) — bên gọi phân biệt thành/bại bằng mã thoát,\nkhông phải bằng việc dò nội dung phong bì.",
+      "shownTextDigest": "7fb9c0138371d23607a544cdc978c4ae6372ea903292d6b2a77ace056e735f86"
+    },
+    {
+      "claimId": "claim_80674c63716d50ad17cb1704ac8a6bef",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "runner-stdout-envelope",
+      "unitDigest": "39837e8811079e85d0b925fa05a05b6cd87150e1610fbe2abb9cfa2ee854fa68",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Runner Stdout Envelope",
+        "anchor": "runner-stdout-envelope",
+        "githubAnchor": "runner-stdout-envelope",
+        "stableAnchor": "h-1741d1bfee33",
+        "startLine": 147,
+        "endLine": 147,
+        "textDigest": "39837e8811079e85d0b925fa05a05b6cd87150e1610fbe2abb9cfa2ee854fa68",
+        "sample": "Runner Stdout Envelope",
+        "sectionPayloadDigest": "1f6afe0253ec3128b0722bbb165151093f3e186c8ccbd6cbad9ff76fd6686826",
+        "followingBlockDigest": "75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b",
+        "identityFingerprint": "0b140efa4ff6496db321421b8818903c1e13ba533be59d9b62de7b5e2ff1514a",
+        "ancestry": [
+          "CLI I/O Contract",
+          "3. Output Direction Unified Envelope"
+        ],
+        "text": "### Runner Stdout Envelope",
+        "sectionText": "### Runner Stdout Envelope\n\n**Vòng tự hành (`fgos-runner`) cũng dùng CÙNG phong bì này cho kết cục cuối của\nmỗi lượt/chu kỳ** (per str46-io-contract) — in liền một dòng thay vì nhiều\ndòng như trên, vì một tiến trình `--watch` phát nhiều phong bì nối tiếp theo\nthời gian; chi tiết đầy đủ + các luồng output khác nằm ngoài phong bì: xem spec\nRunner RUL61 (writer — danh tính người ghi, tách bạch khỏi vai, không bao giờ chặn verb).\n\n**`fgos.mjs` in đúng một dòng phong bì mỗi lời gọi** (một-shot, nên in\nnhiều dòng cho dễ đọc). **`fgos-runner` in MỘT phong bì mỗi lượt `--once`\nhoặc mỗi chu kỳ `--watch`, liền một dòng** — vì `--watch` phát nhiều phong\nbì nối tiếp theo thời gian, mỗi cái phải trọn trong đúng một dòng để bên\nđọc tách được cái này với cái kia; con trỏ (dưới) áp dụng cùng lý do."
+      },
+      "shownText": "### Runner Stdout Envelope\n\n**Vòng tự hành (`fgos-runner`) cũng dùng CÙNG phong bì này cho kết cục cuối của\nmỗi lượt/chu kỳ** (per str46-io-contract) — in liền một dòng thay vì nhiều\ndòng như trên, vì một tiến trình `--watch` phát nhiều phong bì nối tiếp theo\nthời gian; chi tiết đầy đủ + các luồng output khác nằm ngoài phong bì: xem spec\nRunner RUL61 (writer — danh tính người ghi, tách bạch khỏi vai, không bao giờ chặn verb).\n\n**`fgos.mjs` in đúng một dòng phong bì mỗi lời gọi** (một-shot, nên in\nnhiều dòng cho dễ đọc). **`fgos-runner` in MỘT phong bì mỗi lượt `--once`\nhoặc mỗi chu kỳ `--watch`, liền một dòng** — vì `--watch` phát nhiều phong\nbì nối tiếp theo thời gian, mỗi cái phải trọn trong đúng một dòng để bên\nđọc tách được cái này với cái kia; con trỏ (dưới) áp dụng cùng lý do.",
+      "shownTextDigest": "bee547ee1f3dda0b14c27e21f552a8d699736a787e882cc3d7b24bd8c40fd038"
+    },
+    {
+      "claimId": "claim_ed6bec6d01e2f6c816bb3a51dc489aa4",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "recognizing-a-real-envelope",
+      "unitDigest": "6a2cf1b5520ada464d6e35a8eab07b2bd7a2965d511b3cbb46ec1ec993167a81",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Recognizing A Real Envelope",
+        "anchor": "recognizing-a-real-envelope",
+        "githubAnchor": "recognizing-a-real-envelope",
+        "stableAnchor": "h-c3ed882bfb4f",
+        "startLine": 161,
+        "endLine": 161,
+        "textDigest": "6a2cf1b5520ada464d6e35a8eab07b2bd7a2965d511b3cbb46ec1ec993167a81",
+        "sample": "Recognizing A Real Envelope",
+        "sectionPayloadDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
+        "followingBlockDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
+        "identityFingerprint": "496d507bdfcc008de8bffac288490181b74a6c787c7463cde23ab32e22417c82",
+        "ancestry": [
+          "CLI I/O Contract",
+          "3. Output Direction Unified Envelope"
+        ],
+        "text": "### Recognizing A Real Envelope",
+        "sectionText": "### Recognizing A Real Envelope\n\n**Nhận diện một phong bì thật:** parse một dòng stdout ra JSON rồi kiểm\n`contract === 'fgos.v1'` — KHÔNG BAO GIỜ bằng heuristic văn bản (vd \"dòng\nbắt đầu bằng `{`\"), vì luồng progress-trace của `fgos-runner` (xem \"Ngoại\nlệ có lý do\" dưới) có thể tự chứa output của trợ lý bắt đầu bằng `{`."
+      },
+      "shownText": "### Recognizing A Real Envelope\n\n**Nhận diện một phong bì thật:** parse một dòng stdout ra JSON rồi kiểm\n`contract === 'fgos.v1'` — KHÔNG BAO GIỜ bằng heuristic văn bản (vd \"dòng\nbắt đầu bằng `{`\"), vì luồng progress-trace của `fgos-runner` (xem \"Ngoại\nlệ có lý do\" dưới) có thể tự chứa output của trợ lý bắt đầu bằng `{`.",
+      "shownTextDigest": "9f9a90e19dfdadb982a47661a7d2a64c4ce5967250914c0b27206aae9927fd3c"
+    },
+    {
+      "claimId": "claim_3eda80201a85fe5bdf13782a93cc6331",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "unheaded-block-23",
+      "unitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-23",
+        "githubAnchor": "unheaded-block-23",
+        "stableAnchor": "unheaded-block-23",
+        "title": "Unheaded block 23",
+        "startLine": 178,
+        "endLine": 179,
+        "textDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
+        "sample": "Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung\nđúng một chữ, \"ngoại lệ có lý do\", không gọi tuỳ hứng theo từng chỗ:",
+        "identityFingerprint": "a329378df55a88a211d803b53fce8d8b4b954eb4cacd1f78dfc353e97b20d783",
+        "ancestry": [
+          "CLI I/O Contract",
+          "5. Reasoned Envelope Exceptions"
+        ],
+        "text": "Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung\nđúng một chữ, \"ngoại lệ có lý do\", không gọi tuỳ hứng theo từng chỗ:"
+      },
+      "shownText": "Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung\nđúng một chữ, \"ngoại lệ có lý do\", không gọi tuỳ hứng theo từng chỗ:",
+      "shownTextDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8"
+    },
+    {
+      "claimId": "claim_4217ac86de0ba075ca046202b2ce4284",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "unheaded-block-24",
+      "unitDigest": "4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-24",
+        "githubAnchor": "unheaded-block-24",
+        "stableAnchor": "unheaded-block-24",
+        "title": "Unheaded block 24",
+        "startLine": 181,
+        "endLine": 194,
+        "textDigest": "4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a",
+        "sample": "1. **Sổ verb máy-đọc** (`--help`/`--help --json`, kể cả `<verb> --help`) —\n   siêu dữ liệu về CLI, không phải payload của một verb.\n2. **`setup`/`doctor --pretty`** — lối thoát hiể",
+        "identityFingerprint": "fde92b5abeb7f77ed9a293833bdaa2a2f306844dacbc23c087eba1c2890bf029",
+        "ancestry": [
+          "CLI I/O Contract",
+          "5. Reasoned Envelope Exceptions"
+        ],
+        "text": "1. **Sổ verb máy-đọc** (`--help`/`--help --json`, kể cả `<verb> --help`) —\n   siêu dữ liệu về CLI, không phải payload của một verb.\n2. **`setup`/`doctor --pretty`** — lối thoát hiển-thị-cho-người tường minh\n   qua cờ `--pretty`, không phải payload mặc định.\n3. **Log worker** (`.fgos/logs/<id>.log`) — text trần CỐ Ý, để `tail -f`\n   thấy được ngay; bọc phong bì sẽ phá đúng công dụng đó.\n4. **Luồng progress-trace của `fgos-runner`** (gặt-lại, nhận việc, phán\n   làm-rõ/chia-việc, đuôi kết quả proof, thử lại, dừng — cộng dòng lifecycle\n   \"watch mode stopped\" khi nhận tín hiệu dừng) — in console y nguyên như\n   trước, một tính năng KHÁC (đã khoá) với hợp đồng này, không đụng.\n5. **Cửa hook thực thi agent** (`fgos hook <dispatch-decide|decision-question>`) —\n   bypass phong bì CLI và kiểm tra store admission để giữ nguyên vẹn luồng `stdin`,\n   `stdout`, `stderr` và exit code `0`/`2` cho các công cụ như Claude Code và Codex,\n   hoặc xuất JSON stdout trực tiếp cho AGY. Bọc phong bì sẽ phá vỡ giao thức chặn công cụ của agent host."
+      },
+      "shownText": "1. **Sổ verb máy-đọc** (`--help`/`--help --json`, kể cả `<verb> --help`) —\n   siêu dữ liệu về CLI, không phải payload của một verb.\n2. **`setup`/`doctor --pretty`** — lối thoát hiển-thị-cho-người tường minh\n   qua cờ `--pretty`, không phải payload mặc định.\n3. **Log worker** (`.fgos/logs/<id>.log`) — text trần CỐ Ý, để `tail -f`\n   thấy được ngay; bọc phong bì sẽ phá đúng công dụng đó.\n4. **Luồng progress-trace của `fgos-runner`** (gặt-lại, nhận việc, phán\n   làm-rõ/chia-việc, đuôi kết quả proof, thử lại, dừng — cộng dòng lifecycle\n   \"watch mode stopped\" khi nhận tín hiệu dừng) — in console y nguyên như\n   trước, một tính năng KHÁC (đã khoá) với hợp đồng này, không đụng.\n5. **Cửa hook thực thi agent** (`fgos hook <dispatch-decide|decision-question>`) —\n   bypass phong bì CLI và kiểm tra store admission để giữ nguyên vẹn luồng `stdin`,\n   `stdout`, `stderr` và exit code `0`/`2` cho các công cụ như Claude Code và Codex,\n   hoặc xuất JSON stdout trực tiếp cho AGY. Bọc phong bì sẽ phá vỡ giao thức chặn công cụ của agent host.",
+      "shownTextDigest": "4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a"
+    },
+    {
+      "claimId": "claim_9053f1edd1765577dd1bef202eff3d98",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "unheaded-block-25",
+      "unitDigest": "549dded9fe85b1cfd57f1ec7079141e4feb9e6468a31e93485ab91a2305e79fe",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-25",
+        "githubAnchor": "unheaded-block-25",
+        "stableAnchor": "unheaded-block-25",
+        "title": "Unheaded block 25",
+        "startLine": 196,
+        "endLine": 198,
+        "textDigest": "549dded9fe85b1cfd57f1ec7079141e4feb9e6468a31e93485ab91a2305e79fe",
+        "sample": "**Khối `fgos-discovered`** (worker phát cho runner nêu việc mới phát hiện)\nNẰM NGOÀI hợp đồng này — nó là giao thức worker→runner của CTR003, không\nphải cửa ra tới người.",
+        "identityFingerprint": "57878f62bf37872a990b4b836ca7d25169a2ad4edf5b608c06201b1d772e2f63",
+        "ancestry": [
+          "CLI I/O Contract",
+          "5. Reasoned Envelope Exceptions"
+        ],
+        "text": "**Khối `fgos-discovered`** (worker phát cho runner nêu việc mới phát hiện)\nNẰM NGOÀI hợp đồng này — nó là giao thức worker→runner của CTR003, không\nphải cửa ra tới người."
+      },
+      "shownText": "**Khối `fgos-discovered`** (worker phát cho runner nêu việc mới phát hiện)\nNẰM NGOÀI hợp đồng này — nó là giao thức worker→runner của CTR003, không\nphải cửa ra tới người.",
+      "shownTextDigest": "549dded9fe85b1cfd57f1ec7079141e4feb9e6468a31e93485ab91a2305e79fe"
+    },
+    {
+      "claimId": "claim_3498d50ccefcfce93481393dcec13370",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "entry-fields-and-effect-axes",
+      "unitDigest": "a7e0489cd2409eb4b835d3368b5d642409d0183530639510033cb4c2ea70d6df",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 3,
+        "title": "Entry Fields And Effect Axes",
+        "anchor": "entry-fields-and-effect-axes",
+        "githubAnchor": "entry-fields-and-effect-axes",
+        "stableAnchor": "h-c11e92a7ce10",
+        "startLine": 267,
+        "endLine": 267,
+        "textDigest": "a7e0489cd2409eb4b835d3368b5d642409d0183530639510033cb4c2ea70d6df",
+        "sample": "Entry Fields And Effect Axes",
+        "sectionPayloadDigest": "4168b8aa195f3f466631d4d6780cdfa462f4faddb7a708f62119475262aa969a",
+        "followingBlockDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "identityFingerprint": "d4bb8134eb40163a9ee29f99230f8be28426dfc902144858b0e8ed27db0e9f17",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry"
+        ],
+        "text": "### Entry Fields And Effect Axes",
+        "sectionText": "### Entry Fields And Effect Axes\n\n**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38).\n\n- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật\n  tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng.\n\nCả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38."
+      },
+      "shownText": "### Entry Fields And Effect Axes\n\n**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38).\n\n- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật\n  tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng.\n\nCả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38.",
+      "shownTextDigest": "716322c6fa0b77181fec544c0f6c0c191860741374d7ec21c8689fab0682b9ce"
+    },
+    {
+      "claimId": "claim_667088d67f27a0b1b16ced96df73a19a",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "13-related-files",
+      "unitDigest": "73a072fb1b320f93951e427d5e1af422830f13d626e6564e14bbe403012a389d",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "13. Related Files",
+        "anchor": "13-related-files",
+        "githubAnchor": "13-related-files",
+        "stableAnchor": "h-47b0c1740a70",
+        "startLine": 382,
+        "endLine": 382,
+        "textDigest": "73a072fb1b320f93951e427d5e1af422830f13d626e6564e14bbe403012a389d",
+        "sample": "13. Related Files",
+        "sectionPayloadDigest": "6238a5e1752c22a8bb4a2801757a1e891ae0902e8cec197d7a44d5f7f9eb8ea0",
+        "followingBlockDigest": "6238a5e1752c22a8bb4a2801757a1e891ae0902e8cec197d7a44d5f7f9eb8ea0",
+        "identityFingerprint": "f59b5374888cb01890b5eaa1fe23ecd105eb0b4df97a903e4fae268468c7b81b",
+        "ancestry": [
+          "CLI I/O Contract"
+        ],
+        "text": "## 13. Related Files",
+        "sectionText": "## 13. Related Files\n\n- [Work State portal](../README.md)\n- [Work State spec](../spec.md)\n- [Retired decision history](../decisions/retired-decision-history.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)\n- [Legacy source: docs/io-contract.md](../../../io-contract.md)"
+      },
+      "shownText": "## 13. Related Files\n\n- [Work State portal](../README.md)\n- [Work State spec](../spec.md)\n- [Retired decision history](../decisions/retired-decision-history.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)\n- [Legacy source: docs/io-contract.md](../../../io-contract.md)",
+      "shownTextDigest": "aa96c2c16f74af0343fed9584fcff94195956b0e2a92a7c347a4dbc150a4760f"
+    },
+    {
+      "claimId": "claim_c9081814b1f39c068fb76e62b7726390",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "unheaded-block-46",
+      "unitDigest": "6238a5e1752c22a8bb4a2801757a1e891ae0902e8cec197d7a44d5f7f9eb8ea0",
+      "fileStatus": {
+        "kind": "contract",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-46",
+        "githubAnchor": "unheaded-block-46",
+        "stableAnchor": "unheaded-block-46",
+        "title": "Unheaded block 46",
+        "startLine": 384,
+        "endLine": 388,
+        "textDigest": "6238a5e1752c22a8bb4a2801757a1e891ae0902e8cec197d7a44d5f7f9eb8ea0",
+        "sample": "- [Work State portal](../README.md)\n- [Work State spec](../spec.md)\n- [Retired decision history](../decisions/retired-decision-history.md)\n- [Legacy source: docs/specs/work-state.m",
+        "identityFingerprint": "a73dce0c1bbba31643301ee1ec303e8912b38e04184311a30a198fd1c4e4fca2",
+        "ancestry": [
+          "CLI I/O Contract",
+          "13. Related Files"
+        ],
+        "text": "- [Work State portal](../README.md)\n- [Work State spec](../spec.md)\n- [Retired decision history](../decisions/retired-decision-history.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)\n- [Legacy source: docs/io-contract.md](../../../io-contract.md)"
+      },
+      "shownText": "- [Work State portal](../README.md)\n- [Work State spec](../spec.md)\n- [Retired decision history](../decisions/retired-decision-history.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)\n- [Legacy source: docs/io-contract.md](../../../io-contract.md)",
+      "shownTextDigest": "6238a5e1752c22a8bb4a2801757a1e891ae0902e8cec197d7a44d5f7f9eb8ea0"
+    },
+    {
+      "claimId": "claim_e7b9adc648921a3b524b621ac615fad6",
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "retired-decision-history-work-state",
+      "unitDigest": "b15dec1d66d1ae673352b56ff918b917f9e628294a4ef5124f6face82e91e995",
+      "fileStatus": {
+        "kind": "decision",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Retired Decision History: Work State",
+        "anchor": "retired-decision-history-work-state",
+        "githubAnchor": "retired-decision-history-work-state",
+        "stableAnchor": "h-62dd526c04b5",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "b15dec1d66d1ae673352b56ff918b917f9e628294a4ef5124f6face82e91e995",
+        "sample": "Retired Decision History: Work State",
+        "sectionPayloadDigest": "1a6db74c9548d91671e8677038c8a3d5cbb338157fa78edab6420ad6555257ac",
+        "followingBlockDigest": "1a6db74c9548d91671e8677038c8a3d5cbb338157fa78edab6420ad6555257ac",
+        "identityFingerprint": "3a1afe721d06260e83dc93175ec566a1b5d1c1b3588132f7f62add036914e79c",
+        "ancestry": [],
+        "text": "# Retired Decision History: Work State",
+        "sectionText": "# Retired Decision History: Work State\n\n```txt\nDocument type: Decision\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Hold the retired architecture decision records (ADR 0002 to 0032) of the work state area, relocated verbatim from the legacy work-state spec\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n```"
+      },
+      "shownText": "# Retired Decision History: Work State\n\n```txt\nDocument type: Decision\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Hold the retired architecture decision records (ADR 0002 to 0032) of the work state area, relocated verbatim from the legacy work-state spec\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n```",
+      "shownTextDigest": "45a0ff7913dab7fa430cdd6920ceade9b816d3ecdfefabf513845eabc0c05381"
+    },
+    {
+      "claimId": "claim_33eee087ac3e479ed6296daf4c6d143e",
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "1a6db74c9548d91671e8677038c8a3d5cbb338157fa78edab6420ad6555257ac",
+      "fileStatus": {
+        "kind": "decision",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 13,
+        "textDigest": "1a6db74c9548d91671e8677038c8a3d5cbb338157fa78edab6420ad6555257ac",
+        "sample": "```txt\nDocument type: Decision\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Hold the retired architecture decision records (ADR 0002 to 0032) of t",
+        "identityFingerprint": "3815d6b2c36d63d16d763ed62ad3e89775778591e777975faefa9570e030daed",
+        "ancestry": [
+          "Retired Decision History: Work State"
+        ],
+        "text": "```txt\nDocument type: Decision\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Hold the retired architecture decision records (ADR 0002 to 0032) of the work state area, relocated verbatim from the legacy work-state spec\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n```"
+      },
+      "shownText": "```txt\nDocument type: Decision\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Hold the retired architecture decision records (ADR 0002 to 0032) of the work state area, relocated verbatim from the legacy work-state spec\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n```",
+      "shownTextDigest": "1a6db74c9548d91671e8677038c8a3d5cbb338157fa78edab6420ad6555257ac"
+    },
+    {
+      "claimId": "claim_61b042f479508b9e6671ead705da6e76",
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "14-related-files",
+      "unitDigest": "74b54c3ee9e2379ee592933ee6d9a0358b172f1ddf78d3295db44d78bb060e5a",
+      "fileStatus": {
+        "kind": "decision",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "14. Related Files",
+        "anchor": "14-related-files",
+        "githubAnchor": "14-related-files",
+        "stableAnchor": "h-984934b48d7b",
+        "startLine": 933,
+        "endLine": 933,
+        "textDigest": "74b54c3ee9e2379ee592933ee6d9a0358b172f1ddf78d3295db44d78bb060e5a",
+        "sample": "14. Related Files",
+        "sectionPayloadDigest": "004f542a5bde3a173fdcfa6aa53cdbadc1f19970795962fb0bf48e73114759bc",
+        "followingBlockDigest": "004f542a5bde3a173fdcfa6aa53cdbadc1f19970795962fb0bf48e73114759bc",
+        "identityFingerprint": "43311848276abbcb854787d68d88b663c3778cf829a63db06fe162437bd98d07",
+        "ancestry": [
+          "Retired Decision History: Work State"
+        ],
+        "text": "## 14. Related Files",
+        "sectionText": "## 14. Related Files\n\n- [Work State area portal](../README.md)\n- [Work State spec](../spec.md)\n- [Multi-role harness distill record](../history/multi-role-harness-distill-record.md)"
+      },
+      "shownText": "## 14. Related Files\n\n- [Work State area portal](../README.md)\n- [Work State spec](../spec.md)\n- [Multi-role harness distill record](../history/multi-role-harness-distill-record.md)",
+      "shownTextDigest": "4c6e9848de7e4dedb0a7ad79e407df764230818a3d33bf0ecc5f91c76a0c94a1"
+    },
+    {
+      "claimId": "claim_0f27b5622596386e519aae244e6e5b87",
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "unheaded-block-95",
+      "unitDigest": "004f542a5bde3a173fdcfa6aa53cdbadc1f19970795962fb0bf48e73114759bc",
+      "fileStatus": {
+        "kind": "decision",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-95",
+        "githubAnchor": "unheaded-block-95",
+        "stableAnchor": "unheaded-block-95",
+        "title": "Unheaded block 95",
+        "startLine": 935,
+        "endLine": 937,
+        "textDigest": "004f542a5bde3a173fdcfa6aa53cdbadc1f19970795962fb0bf48e73114759bc",
+        "sample": "- [Work State area portal](../README.md)\n- [Work State spec](../spec.md)\n- [Multi-role harness distill record](../history/multi-role-harness-distill-record.md)",
+        "identityFingerprint": "43d14f384e4570570ffd58d395823df5d4b2af3deed94000441d58763a3ae2a5",
+        "ancestry": [
+          "Retired Decision History: Work State",
+          "14. Related Files"
+        ],
+        "text": "- [Work State area portal](../README.md)\n- [Work State spec](../spec.md)\n- [Multi-role harness distill record](../history/multi-role-harness-distill-record.md)"
+      },
+      "shownText": "- [Work State area portal](../README.md)\n- [Work State spec](../spec.md)\n- [Multi-role harness distill record](../history/multi-role-harness-distill-record.md)",
+      "shownTextDigest": "004f542a5bde3a173fdcfa6aa53cdbadc1f19970795962fb0bf48e73114759bc"
+    },
+    {
+      "claimId": "claim_373fbe5946a45421c2b7a250d7ebbcf3",
+      "path": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "anchor": "multi-role-harness-distill-record",
+      "unitDigest": "c98f5791cdbbddca365d9380156be1beab1612a7d572b34ee5d7cda2c2a75a60",
+      "fileStatus": {
+        "kind": "history",
+        "kindCanonical": false,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Multi-Role Harness Distill Record",
+        "anchor": "multi-role-harness-distill-record",
+        "githubAnchor": "multi-role-harness-distill-record",
+        "stableAnchor": "h-cc4310a03ab3",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "c98f5791cdbbddca365d9380156be1beab1612a7d572b34ee5d7cda2c2a75a60",
+        "sample": "Multi-Role Harness Distill Record",
+        "sectionPayloadDigest": "23354ff6d36685c865345ed911d19b95b22c5bac322c47f823fdb279de29be67",
+        "followingBlockDigest": "23354ff6d36685c865345ed911d19b95b22c5bac322c47f823fdb279de29be67",
+        "identityFingerprint": "7655d0683069a9637a045bcf4bbb45635ef7f32bc7edbed15af81c6e43ea0188",
+        "ancestry": [],
+        "text": "# Multi-Role Harness Distill Record",
+        "sectionText": "# Multi-Role Harness Distill Record\n\n```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Dated narrative record of how the multi-role team harness decision was distilled and what happened after the distill.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/specs/work-state.md\n```"
+      },
+      "shownText": "# Multi-Role Harness Distill Record\n\n```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Dated narrative record of how the multi-role team harness decision was distilled and what happened after the distill.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/specs/work-state.md\n```",
+      "shownTextDigest": "82aee2fba6883a126908c77e6824a034c81ae480204db2fd95f1311938ed8a82"
+    },
+    {
+      "claimId": "claim_e64ffe67cb2ab1ce431b12b77ef43f31",
+      "path": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "23354ff6d36685c865345ed911d19b95b22c5bac322c47f823fdb279de29be67",
+      "fileStatus": {
+        "kind": "history",
+        "kindCanonical": false,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 13,
+        "textDigest": "23354ff6d36685c865345ed911d19b95b22c5bac322c47f823fdb279de29be67",
+        "sample": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Dated narrative record of how the multi-role team harness decision was ",
+        "identityFingerprint": "88a840218fe48e9d78ea75aff05f1bf23f49963340f232bdf89fae819cff21e8",
+        "ancestry": [
+          "Multi-Role Harness Distill Record"
+        ],
+        "text": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Dated narrative record of how the multi-role team harness decision was distilled and what happened after the distill.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/specs/work-state.md\n```"
+      },
+      "shownText": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Dated narrative record of how the multi-role team harness decision was distilled and what happened after the distill.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/specs/work-state.md\n```",
+      "shownTextDigest": "23354ff6d36685c865345ed911d19b95b22c5bac322c47f823fdb279de29be67"
+    },
+    {
+      "claimId": "claim_af4ff9aa70ed41333c7bf928a95aaa27",
+      "path": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "anchor": "1-purpose-and-scope",
+      "unitDigest": "3c47bf821af476b6ef6aeb600c18f3e02e414a584b903989c9166bb5c458944d",
+      "fileStatus": {
+        "kind": "history",
+        "kindCanonical": false,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "1. Purpose And Scope",
+        "anchor": "1-purpose-and-scope",
+        "githubAnchor": "1-purpose-and-scope",
+        "stableAnchor": "h-068518b415ae",
+        "startLine": 15,
+        "endLine": 15,
+        "textDigest": "3c47bf821af476b6ef6aeb600c18f3e02e414a584b903989c9166bb5c458944d",
+        "sample": "1. Purpose And Scope",
+        "sectionPayloadDigest": "322ff44464a915090c5003dd765463b7d2dc113730c6e49f9a0ca95961f81962",
+        "followingBlockDigest": "322ff44464a915090c5003dd765463b7d2dc113730c6e49f9a0ca95961f81962",
+        "identityFingerprint": "6b347ffa206da25051289a30a129a57b9425164255e66d14569b34d425e7d921",
+        "ancestry": [
+          "Multi-Role Harness Distill Record"
+        ],
+        "text": "## 1. Purpose And Scope",
+        "sectionText": "## 1. Purpose And Scope\n\nDated narrative of one decision record: the journey, the state at distill time, and the review after distill. The decision text itself lives in [retired-decision-history.md](../decisions/retired-decision-history.md)."
+      },
+      "shownText": "## 1. Purpose And Scope\n\nDated narrative of one decision record: the journey, the state at distill time, and the review after distill. The decision text itself lives in [retired-decision-history.md](../decisions/retired-decision-history.md).",
+      "shownTextDigest": "e055f180aae77cec1407ee194157cebc83bea1d09f308339505ac7b5de794188"
+    },
+    {
+      "claimId": "claim_cbaf6ad2c21529cbd2fecbe0e4132f24",
+      "path": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "322ff44464a915090c5003dd765463b7d2dc113730c6e49f9a0ca95961f81962",
+      "fileStatus": {
+        "kind": "history",
+        "kindCanonical": false,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 17,
+        "endLine": 17,
+        "textDigest": "322ff44464a915090c5003dd765463b7d2dc113730c6e49f9a0ca95961f81962",
+        "sample": "Dated narrative of one decision record: the journey, the state at distill time, and the review after distill. The decision text itself lives in [retired-decision-history.md](../dec",
+        "identityFingerprint": "fd2caa26baf44ee69476fa3ca24c464b8aea0905eccb405b1ad25a4f9cecb9c3",
+        "ancestry": [
+          "Multi-Role Harness Distill Record",
+          "1. Purpose And Scope"
+        ],
+        "text": "Dated narrative of one decision record: the journey, the state at distill time, and the review after distill. The decision text itself lives in [retired-decision-history.md](../decisions/retired-decision-history.md)."
+      },
+      "shownText": "Dated narrative of one decision record: the journey, the state at distill time, and the review after distill. The decision text itself lives in [retired-decision-history.md](../decisions/retired-decision-history.md).",
+      "shownTextDigest": "322ff44464a915090c5003dd765463b7d2dc113730c6e49f9a0ca95961f81962"
+    },
+    {
+      "claimId": "claim_355e2e7d7188f92d6960f8df61af138b",
+      "path": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "anchor": "5-related-files",
+      "unitDigest": "cf18376a42bddc0e4c1b6fb81faafb0599c3e6c45d5440d61144aca5cabc9bc8",
+      "fileStatus": {
+        "kind": "history",
+        "kindCanonical": false,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "5. Related Files",
+        "anchor": "5-related-files",
+        "githubAnchor": "5-related-files",
+        "stableAnchor": "h-5ae0b9b8b4e1",
+        "startLine": 88,
+        "endLine": 88,
+        "textDigest": "cf18376a42bddc0e4c1b6fb81faafb0599c3e6c45d5440d61144aca5cabc9bc8",
+        "sample": "5. Related Files",
+        "sectionPayloadDigest": "bec0bee4883c07d780fdb7326d398df733b3d360628904265c1b87d86dbd5251",
+        "followingBlockDigest": "bec0bee4883c07d780fdb7326d398df733b3d360628904265c1b87d86dbd5251",
+        "identityFingerprint": "f385b35a3c9cbc40c7ecd348c26d1c028e7487332380931e7382f0e00137a03b",
+        "ancestry": [
+          "Multi-Role Harness Distill Record"
+        ],
+        "text": "## 5. Related Files",
+        "sectionText": "## 5. Related Files\n\n- [Work state area portal](../README.md)\n- [Retired decision history](../decisions/retired-decision-history.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)"
+      },
+      "shownText": "## 5. Related Files\n\n- [Work state area portal](../README.md)\n- [Retired decision history](../decisions/retired-decision-history.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)",
+      "shownTextDigest": "53c07d6870e7ac23f89a26aad76d8a6bd139aad608bb92ce4c0dbd9a61145366"
+    },
+    {
+      "claimId": "claim_646e9db9521c2005fa76d437f292c4e8",
+      "path": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "bec0bee4883c07d780fdb7326d398df733b3d360628904265c1b87d86dbd5251",
+      "fileStatus": {
+        "kind": "history",
+        "kindCanonical": false,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 90,
+        "endLine": 92,
+        "textDigest": "bec0bee4883c07d780fdb7326d398df733b3d360628904265c1b87d86dbd5251",
+        "sample": "- [Work state area portal](../README.md)\n- [Retired decision history](../decisions/retired-decision-history.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-stat",
+        "identityFingerprint": "a79424f0e5e47a75ab816b8324e7303651e2d1eb5c63a68b3f47e8826fcf8cdd",
+        "ancestry": [
+          "Multi-Role Harness Distill Record",
+          "5. Related Files"
+        ],
+        "text": "- [Work state area portal](../README.md)\n- [Retired decision history](../decisions/retired-decision-history.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)"
+      },
+      "shownText": "- [Work state area portal](../README.md)\n- [Retired decision history](../decisions/retired-decision-history.md)\n- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)",
+      "shownTextDigest": "bec0bee4883c07d780fdb7326d398df733b3d360628904265c1b87d86dbd5251"
+    },
+    {
+      "claimId": "claim_6e7e6c494be10e4791240d2b06d702ca",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "work-state",
+      "unitDigest": "2a8b93c172f11f9d2f118fea5a934559964ccb299327b5deb8621632a1d2d98a",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Work State",
+        "anchor": "work-state",
+        "githubAnchor": "work-state",
+        "stableAnchor": "h-7e885f29a711",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "2a8b93c172f11f9d2f118fea5a934559964ccb299327b5deb8621632a1d2d98a",
+        "sample": "Work State",
+        "sectionPayloadDigest": "402fdee5f2de6e3510907b5bcc86080b6b4f8c1f3b40cbec3bc6cb347ea739ea",
+        "followingBlockDigest": "402fdee5f2de6e3510907b5bcc86080b6b4f8c1f3b40cbec3bc6cb347ea739ea",
+        "identityFingerprint": "b1de1857f48439509e345bcb2ade87579c4f35df51faa8364c3c496d2722b216",
+        "ancestry": [],
+        "text": "# Work State",
+        "sectionText": "# Work State\n\n```txt\nDocument type: Area portal\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Route readers through the candidate documents of the work state area and point to the legacy sources they are drawn from\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/contracts/cli-io-contract.md\n- docs/platform/work-state/architecture/implementation-pointers.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n- docs/work-item-lifecycle-vision.md\n- docs/platform/vision.md\n```"
+      },
+      "shownText": "# Work State\n\n```txt\nDocument type: Area portal\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Route readers through the candidate documents of the work state area and point to the legacy sources they are drawn from\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/contracts/cli-io-contract.md\n- docs/platform/work-state/architecture/implementation-pointers.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n- docs/work-item-lifecycle-vision.md\n- docs/platform/vision.md\n```",
+      "shownTextDigest": "fdc906f0187105d772f0adb87ee9b336d1b748a1cdd7d8231ff7269c49fb7594"
+    },
+    {
+      "claimId": "claim_ed518acf009411ce9041b0cd75212b4f",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "402fdee5f2de6e3510907b5bcc86080b6b4f8c1f3b40cbec3bc6cb347ea739ea",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 20,
+        "textDigest": "402fdee5f2de6e3510907b5bcc86080b6b4f8c1f3b40cbec3bc6cb347ea739ea",
+        "sample": "```txt\nDocument type: Area portal\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Route readers through the candidate documents of the work state are",
+        "identityFingerprint": "068e189846c858826fb66f273950f2f0ade1c796d7ab93ed3eb392ac1f817288",
+        "ancestry": [
+          "Work State"
+        ],
+        "text": "```txt\nDocument type: Area portal\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Route readers through the candidate documents of the work state area and point to the legacy sources they are drawn from\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/contracts/cli-io-contract.md\n- docs/platform/work-state/architecture/implementation-pointers.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n- docs/work-item-lifecycle-vision.md\n- docs/platform/vision.md\n```"
+      },
+      "shownText": "```txt\nDocument type: Area portal\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Route readers through the candidate documents of the work state area and point to the legacy sources they are drawn from\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/spec.md\n- docs/platform/work-state/contracts/cli-io-contract.md\n- docs/platform/work-state/architecture/implementation-pointers.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n- docs/work-item-lifecycle-vision.md\n- docs/platform/vision.md\n```",
+      "shownTextDigest": "402fdee5f2de6e3510907b5bcc86080b6b4f8c1f3b40cbec3bc6cb347ea739ea"
+    },
+    {
+      "claimId": "claim_cc394d5b0cb0a9b1279269b3e692b476",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "1-purpose-and-audience",
+      "unitDigest": "19bf6e1bfdcb178636bc7848a2c7131f85cd93ce2822f4d0d3d8d6db1876aee8",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "1. Purpose And Audience",
+        "anchor": "1-purpose-and-audience",
+        "githubAnchor": "1-purpose-and-audience",
+        "stableAnchor": "h-c2ca2e0102fe",
+        "startLine": 22,
+        "endLine": 22,
+        "textDigest": "19bf6e1bfdcb178636bc7848a2c7131f85cd93ce2822f4d0d3d8d6db1876aee8",
+        "sample": "1. Purpose And Audience",
+        "sectionPayloadDigest": "e85c4884fdf2e000440b7e03de3b0f0889c8284005aaaa5e077daf4697782d4c",
+        "followingBlockDigest": "565e157d554380e371b36756303e6a49480075fdc1a98ca544b8b5b3d95705d5",
+        "identityFingerprint": "2587782ae011df821613a046f4f9f7ed7a0e7f0d2e3946a562e7165ca9f73b25",
+        "ancestry": [
+          "Work State"
+        ],
+        "text": "## 1. Purpose And Audience",
+        "sectionText": "## 1. Purpose And Audience\n\nThis document is the entry point of the candidate documents of the work state area. It holds navigation only.\n\nThe documents listed here are candidate material. No reader reads them yet. The legacy documents stay canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md)."
+      },
+      "shownText": "## 1. Purpose And Audience\n\nThis document is the entry point of the candidate documents of the work state area. It holds navigation only.\n\nThe documents listed here are candidate material. No reader reads them yet. The legacy documents stay canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md).",
+      "shownTextDigest": "d81045db4b15f6136d7c48cad8df86dfe4633930962ab0c1f40598c9adeda36e"
+    },
+    {
+      "claimId": "claim_38e265e31664e037fe8d1dc75bb9ddc6",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "565e157d554380e371b36756303e6a49480075fdc1a98ca544b8b5b3d95705d5",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 24,
+        "endLine": 24,
+        "textDigest": "565e157d554380e371b36756303e6a49480075fdc1a98ca544b8b5b3d95705d5",
+        "sample": "This document is the entry point of the candidate documents of the work state area. It holds navigation only.",
+        "identityFingerprint": "cd3f59b9629062dd597ed32afb2f88ee82a38050b4830cab7165265acd6f057e",
+        "ancestry": [
+          "Work State",
+          "1. Purpose And Audience"
+        ],
+        "text": "This document is the entry point of the candidate documents of the work state area. It holds navigation only."
+      },
+      "shownText": "This document is the entry point of the candidate documents of the work state area. It holds navigation only.",
+      "shownTextDigest": "565e157d554380e371b36756303e6a49480075fdc1a98ca544b8b5b3d95705d5"
+    },
+    {
+      "claimId": "claim_ee0a84fe03107c499ac59a87bbbb3d0d",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "7928379e01fa7625ab5fe776f09064979906a3269bcaace401926e6f083ecc9f",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 26,
+        "endLine": 26,
+        "textDigest": "7928379e01fa7625ab5fe776f09064979906a3269bcaace401926e6f083ecc9f",
+        "sample": "The documents listed here are candidate material. No reader reads them yet. The legacy documents stay canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state",
+        "identityFingerprint": "451742dc0a19edf1da980ae3e634be2c941505fc36908ef8689e553012bf2e5f",
+        "ancestry": [
+          "Work State",
+          "1. Purpose And Audience"
+        ],
+        "text": "The documents listed here are candidate material. No reader reads them yet. The legacy documents stay canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md)."
+      },
+      "shownText": "The documents listed here are candidate material. No reader reads them yet. The legacy documents stay canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md).",
+      "shownTextDigest": "7928379e01fa7625ab5fe776f09064979906a3269bcaace401926e6f083ecc9f"
+    },
+    {
+      "claimId": "claim_c56b55017b8f21f481d0ccf9526b55af",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "2-read-first",
+      "unitDigest": "0179e23b52d6975730a1141c8ae453735d17ccf63c8792b0ce9ad7ca41ef9f1d",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "2. Read First",
+        "anchor": "2-read-first",
+        "githubAnchor": "2-read-first",
+        "stableAnchor": "h-3b0392e1ee2d",
+        "startLine": 28,
+        "endLine": 28,
+        "textDigest": "0179e23b52d6975730a1141c8ae453735d17ccf63c8792b0ce9ad7ca41ef9f1d",
+        "sample": "2. Read First",
+        "sectionPayloadDigest": "678a5f954ec08ce04c589014638beef17c0a40d257dd87311c833bd711055d91",
+        "followingBlockDigest": "678a5f954ec08ce04c589014638beef17c0a40d257dd87311c833bd711055d91",
+        "identityFingerprint": "2a4c0a13254f64f58f0855d1b59f1a5ea149d67683326bfa9062fb727482b352",
+        "ancestry": [
+          "Work State"
+        ],
+        "text": "## 2. Read First",
+        "sectionText": "## 2. Read First\n\n| Reader goal | Read |\n| --- | --- |\n| Find the canonical text today | [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md) |\n| Open the candidate spec | [spec.md](spec.md) |\n| Open the candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |\n| Open the candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |\n| Open the candidate retired decision history | [decisions/retired-decision-history.md](decisions/retired-decision-history.md) |\n| Open the candidate harness distill record | [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) |"
+      },
+      "shownText": "## 2. Read First\n\n| Reader goal | Read |\n| --- | --- |\n| Find the canonical text today | [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md) |\n| Open the candidate spec | [spec.md](spec.md) |\n| Open the candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |\n| Open the candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |\n| Open the candidate retired decision history | [decisions/retired-decision-history.md](decisions/retired-decision-history.md) |\n| Open the candidate harness distill record | [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) |",
+      "shownTextDigest": "6cc1179df3b677b5a0b986c570f22e9455d21b170c11d14a5eeb76910dafadec"
+    },
+    {
+      "claimId": "claim_40c4b5d0d4b4213b60aaa9ac1a397c76",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "678a5f954ec08ce04c589014638beef17c0a40d257dd87311c833bd711055d91",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 30,
+        "endLine": 37,
+        "textDigest": "678a5f954ec08ce04c589014638beef17c0a40d257dd87311c833bd711055d91",
+        "sample": "| Reader goal | Read |\n| --- | --- |\n| Find the canonical text today | [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md) |\n| Open t",
+        "identityFingerprint": "c1641428bf6621ec47ee9b99fcece7c58720086dff86ec4967444110dc6a8089",
+        "ancestry": [
+          "Work State",
+          "2. Read First"
+        ],
+        "text": "| Reader goal | Read |\n| --- | --- |\n| Find the canonical text today | [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md) |\n| Open the candidate spec | [spec.md](spec.md) |\n| Open the candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |\n| Open the candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |\n| Open the candidate retired decision history | [decisions/retired-decision-history.md](decisions/retired-decision-history.md) |\n| Open the candidate harness distill record | [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) |"
+      },
+      "shownText": "| Reader goal | Read |\n| --- | --- |\n| Find the canonical text today | [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md) |\n| Open the candidate spec | [spec.md](spec.md) |\n| Open the candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |\n| Open the candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |\n| Open the candidate retired decision history | [decisions/retired-decision-history.md](decisions/retired-decision-history.md) |\n| Open the candidate harness distill record | [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) |",
+      "shownTextDigest": "678a5f954ec08ce04c589014638beef17c0a40d257dd87311c833bd711055d91"
+    },
+    {
+      "claimId": "claim_f8a9d4e67202c6e0baeab16e124dcd57",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "3-document-map",
+      "unitDigest": "4e6d7bbc90fe594a85b59680da7e9631bdbae1f41127a43db7b03993b2563949",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "3. Document Map",
+        "anchor": "3-document-map",
+        "githubAnchor": "3-document-map",
+        "stableAnchor": "h-94a35c53f50a",
+        "startLine": 39,
+        "endLine": 39,
+        "textDigest": "4e6d7bbc90fe594a85b59680da7e9631bdbae1f41127a43db7b03993b2563949",
+        "sample": "3. Document Map",
+        "sectionPayloadDigest": "efd8ff22ee1d6e3922302215002a4727e69f2722e5507cba54d9e92f94f2fd17",
+        "followingBlockDigest": "efd8ff22ee1d6e3922302215002a4727e69f2722e5507cba54d9e92f94f2fd17",
+        "identityFingerprint": "350a7244720d2eba1041222b0c9f5b18ebf446838df3b2cd888c3edac78df448",
+        "ancestry": [
+          "Work State"
+        ],
+        "text": "## 3. Document Map",
+        "sectionText": "## 3. Document Map\n\n| Document | Kind |\n| --- | --- |\n| [spec.md](spec.md) | Spec |\n| [contracts/cli-io-contract.md](contracts/cli-io-contract.md) | Contract |\n| [architecture/implementation-pointers.md](architecture/implementation-pointers.md) | Architecture |\n| [decisions/retired-decision-history.md](decisions/retired-decision-history.md) | Decision |\n| [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) | History |"
+      },
+      "shownText": "## 3. Document Map\n\n| Document | Kind |\n| --- | --- |\n| [spec.md](spec.md) | Spec |\n| [contracts/cli-io-contract.md](contracts/cli-io-contract.md) | Contract |\n| [architecture/implementation-pointers.md](architecture/implementation-pointers.md) | Architecture |\n| [decisions/retired-decision-history.md](decisions/retired-decision-history.md) | Decision |\n| [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) | History |",
+      "shownTextDigest": "b8214146a6d3dbd601715bb0c3ea375020b421fd0be0e5479536b0d3d5bc5ebb"
+    },
+    {
+      "claimId": "claim_9b6b90e68f3ff5f021a0c257ab0523bf",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "efd8ff22ee1d6e3922302215002a4727e69f2722e5507cba54d9e92f94f2fd17",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 41,
+        "endLine": 47,
+        "textDigest": "efd8ff22ee1d6e3922302215002a4727e69f2722e5507cba54d9e92f94f2fd17",
+        "sample": "| Document | Kind |\n| --- | --- |\n| [spec.md](spec.md) | Spec |\n| [contracts/cli-io-contract.md](contracts/cli-io-contract.md) | Contract |\n| [architecture/implementation-pointers.",
+        "identityFingerprint": "909ad268d09b42516cbdbe321202c2877bbe26867d71a3d59c9f012adfdb9cd8",
+        "ancestry": [
+          "Work State",
+          "3. Document Map"
+        ],
+        "text": "| Document | Kind |\n| --- | --- |\n| [spec.md](spec.md) | Spec |\n| [contracts/cli-io-contract.md](contracts/cli-io-contract.md) | Contract |\n| [architecture/implementation-pointers.md](architecture/implementation-pointers.md) | Architecture |\n| [decisions/retired-decision-history.md](decisions/retired-decision-history.md) | Decision |\n| [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) | History |"
+      },
+      "shownText": "| Document | Kind |\n| --- | --- |\n| [spec.md](spec.md) | Spec |\n| [contracts/cli-io-contract.md](contracts/cli-io-contract.md) | Contract |\n| [architecture/implementation-pointers.md](architecture/implementation-pointers.md) | Architecture |\n| [decisions/retired-decision-history.md](decisions/retired-decision-history.md) | Decision |\n| [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) | History |",
+      "shownTextDigest": "efd8ff22ee1d6e3922302215002a4727e69f2722e5507cba54d9e92f94f2fd17"
+    },
+    {
+      "claimId": "claim_5dbd7535e303723c8a0150bf8db5e89e",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "4-legacy-source-pointers",
+      "unitDigest": "4dedd0722088de326bb89be824a5f78fde42fc5a1ec1f8ff50ebabcab5c3464c",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "4. Legacy Source Pointers",
+        "anchor": "4-legacy-source-pointers",
+        "githubAnchor": "4-legacy-source-pointers",
+        "stableAnchor": "h-280c04217f32",
+        "startLine": 49,
+        "endLine": 49,
+        "textDigest": "4dedd0722088de326bb89be824a5f78fde42fc5a1ec1f8ff50ebabcab5c3464c",
+        "sample": "4. Legacy Source Pointers",
+        "sectionPayloadDigest": "be1281027c255070ecf6bb35298e0e4562415565ef33574a1ca344e0249898bf",
+        "followingBlockDigest": "19916875886c488a79940aadd1b3ab4c61288ef66c148300b483d9cacf94d994",
+        "identityFingerprint": "c357c183dbc24ca5dd18ac4a6dfaa4fc097774cbcf7c227418289a9c69ebf9f4",
+        "ancestry": [
+          "Work State"
+        ],
+        "text": "## 4. Legacy Source Pointers",
+        "sectionText": "## 4. Legacy Source Pointers\n\nCanonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md)\n\nA third retained source, [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [vision.md](../vision.md)."
+      },
+      "shownText": "## 4. Legacy Source Pointers\n\nCanonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md)\n\nA third retained source, [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [vision.md](../vision.md).",
+      "shownTextDigest": "541d20c922e9975731514c9ac2dc2a2275cf80c89645e0e26948589c88e8a8fb"
+    },
+    {
+      "claimId": "claim_cfd5521d6c7f6d2ef7bf91e5d87d7c59",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "19916875886c488a79940aadd1b3ab4c61288ef66c148300b483d9cacf94d994",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 51,
+        "endLine": 51,
+        "textDigest": "19916875886c488a79940aadd1b3ab4c61288ef66c148300b483d9cacf94d994",
+        "sample": "Canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md)",
+        "identityFingerprint": "f11274b1d4f83790a331c82b6473ebd785860145c86d8273ed1027001ecbe62a",
+        "ancestry": [
+          "Work State",
+          "4. Legacy Source Pointers"
+        ],
+        "text": "Canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md)"
+      },
+      "shownText": "Canonical until the cutover: [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md)",
+      "shownTextDigest": "19916875886c488a79940aadd1b3ab4c61288ef66c148300b483d9cacf94d994"
+    },
+    {
+      "claimId": "claim_3301f241ae14c5f317abe23dcecdb700",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "4ec367b6fb47b2dc7705caa2b3ae458f74136f697291ee505a2e884233efd793",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 53,
+        "endLine": 53,
+        "textDigest": "4ec367b6fb47b2dc7705caa2b3ae458f74136f697291ee505a2e884233efd793",
+        "sample": "A third retained source, [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md), is not covered by this candidate area. It belongs to the platform vision candida",
+        "identityFingerprint": "1afd98da3c2363e451b0b07fdcfa2293b3ce4491facfd9b03e16530230474b37",
+        "ancestry": [
+          "Work State",
+          "4. Legacy Source Pointers"
+        ],
+        "text": "A third retained source, [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [vision.md](../vision.md)."
+      },
+      "shownText": "A third retained source, [docs/work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md), is not covered by this candidate area. It belongs to the platform vision candidate [vision.md](../vision.md).",
+      "shownTextDigest": "4ec367b6fb47b2dc7705caa2b3ae458f74136f697291ee505a2e884233efd793"
+    },
+    {
+      "claimId": "claim_1d0364df7e95a5e3db661955c385ebe7",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "5-related-files",
+      "unitDigest": "c91a0a9f8d28a1ebc3cee7e8545128407fdc9bea4cc8f20a0e52ad44be626672",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "5. Related Files",
+        "anchor": "5-related-files",
+        "githubAnchor": "5-related-files",
+        "stableAnchor": "h-88b8359c1b47",
+        "startLine": 55,
+        "endLine": 55,
+        "textDigest": "c91a0a9f8d28a1ebc3cee7e8545128407fdc9bea4cc8f20a0e52ad44be626672",
+        "sample": "5. Related Files",
+        "sectionPayloadDigest": "d329826e03cec87fa8debb4a68909e81621aef1fcef5cec549342c2dbf25c561",
+        "followingBlockDigest": "d329826e03cec87fa8debb4a68909e81621aef1fcef5cec549342c2dbf25c561",
+        "identityFingerprint": "67905c28bb60f7ed2a16340fa9f84c19da4950d4bcd702def56e59ad070a148e",
+        "ancestry": [
+          "Work State"
+        ],
+        "text": "## 5. Related Files",
+        "sectionText": "## 5. Related Files\n\n| Relationship | File |\n| --- | --- |\n| candidate spec | [spec.md](spec.md) |\n| candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |\n| candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |\n| candidate retired decision history | [decisions/retired-decision-history.md](decisions/retired-decision-history.md) |\n| candidate harness distill record | [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) |\n| legacy owner | [../../specs/work-state.md](../../specs/work-state.md) |\n| legacy owner | [../../io-contract.md](../../io-contract.md) |\n| retained source for the platform vision candidate | [../../work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md) |\n| platform vision candidate | [../vision.md](../vision.md) |"
+      },
+      "shownText": "## 5. Related Files\n\n| Relationship | File |\n| --- | --- |\n| candidate spec | [spec.md](spec.md) |\n| candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |\n| candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |\n| candidate retired decision history | [decisions/retired-decision-history.md](decisions/retired-decision-history.md) |\n| candidate harness distill record | [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) |\n| legacy owner | [../../specs/work-state.md](../../specs/work-state.md) |\n| legacy owner | [../../io-contract.md](../../io-contract.md) |\n| retained source for the platform vision candidate | [../../work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md) |\n| platform vision candidate | [../vision.md](../vision.md) |",
+      "shownTextDigest": "a8438b2333bccf968eac16630ab63631c4926703bcc6a07672e5a521b54a19f4"
+    },
+    {
+      "claimId": "claim_3e7d96cb9ba40105c67c9f10b5b90f37",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "d329826e03cec87fa8debb4a68909e81621aef1fcef5cec549342c2dbf25c561",
+      "fileStatus": {
+        "kind": "area-portal",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 57,
+        "endLine": 67,
+        "textDigest": "d329826e03cec87fa8debb4a68909e81621aef1fcef5cec549342c2dbf25c561",
+        "sample": "| Relationship | File |\n| --- | --- |\n| candidate spec | [spec.md](spec.md) |\n| candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |",
+        "identityFingerprint": "65ddc54b6a722d79ceaadcceb9bea55c457b490a58171a51f357267792372dc4",
+        "ancestry": [
+          "Work State",
+          "5. Related Files"
+        ],
+        "text": "| Relationship | File |\n| --- | --- |\n| candidate spec | [spec.md](spec.md) |\n| candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |\n| candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |\n| candidate retired decision history | [decisions/retired-decision-history.md](decisions/retired-decision-history.md) |\n| candidate harness distill record | [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) |\n| legacy owner | [../../specs/work-state.md](../../specs/work-state.md) |\n| legacy owner | [../../io-contract.md](../../io-contract.md) |\n| retained source for the platform vision candidate | [../../work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md) |\n| platform vision candidate | [../vision.md](../vision.md) |"
+      },
+      "shownText": "| Relationship | File |\n| --- | --- |\n| candidate spec | [spec.md](spec.md) |\n| candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |\n| candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |\n| candidate retired decision history | [decisions/retired-decision-history.md](decisions/retired-decision-history.md) |\n| candidate harness distill record | [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md) |\n| legacy owner | [../../specs/work-state.md](../../specs/work-state.md) |\n| legacy owner | [../../io-contract.md](../../io-contract.md) |\n| retained source for the platform vision candidate | [../../work-item-lifecycle-vision.md](../../work-item-lifecycle-vision.md) |\n| platform vision candidate | [../vision.md](../vision.md) |",
+      "shownTextDigest": "d329826e03cec87fa8debb4a68909e81621aef1fcef5cec549342c2dbf25c561"
+    },
+    {
+      "claimId": "claim_d0a4a0ba4c7eac82a7694e85effbd735",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "work-state-specification",
+      "unitDigest": "9a658ef61faf272a7f509a32ce47a8778f94d791140af01f0dbdab633456a4aa",
+      "fileStatus": {
+        "kind": "spec",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Work State Specification",
+        "anchor": "work-state-specification",
+        "githubAnchor": "work-state-specification",
+        "stableAnchor": "h-5afea8d22a70",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "9a658ef61faf272a7f509a32ce47a8778f94d791140af01f0dbdab633456a4aa",
+        "sample": "Work State Specification",
+        "sectionPayloadDigest": "48be7e1956a052be73118c1dd9f46ea4380226e957820b79e128011e137c6985",
+        "followingBlockDigest": "48be7e1956a052be73118c1dd9f46ea4380226e957820b79e128011e137c6985",
+        "identityFingerprint": "32b941f3fdd2ce60d7dcfc85349429e7bb2f5a9322a1fadcc3fc2655c294e2e4",
+        "ancestry": [],
+        "text": "# Work State Specification",
+        "sectionText": "# Work State Specification\n\n```txt\nDocument type: Spec\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Own the observable behavior, state model, records, stages, verbs and rules of the work state area.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/contracts/cli-io-contract.md\n- docs/platform/work-state/architecture/implementation-pointers.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n```"
+      },
+      "shownText": "# Work State Specification\n\n```txt\nDocument type: Spec\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Own the observable behavior, state model, records, stages, verbs and rules of the work state area.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/contracts/cli-io-contract.md\n- docs/platform/work-state/architecture/implementation-pointers.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n```",
+      "shownTextDigest": "a7a11e5f0bb2e094616bfb50a3f85857b7e466047093407630b3e5057cca8efd"
+    },
+    {
+      "claimId": "claim_b59a3cdc9f62daead75352fbce112437",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "48be7e1956a052be73118c1dd9f46ea4380226e957820b79e128011e137c6985",
+      "fileStatus": {
+        "kind": "spec",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 17,
+        "textDigest": "48be7e1956a052be73118c1dd9f46ea4380226e957820b79e128011e137c6985",
+        "sample": "```txt\nDocument type: Spec\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Own the observable behavior, state model, records, stages, verbs and rules",
+        "identityFingerprint": "ec3339e70a70e5444af03a4695bac00febdd38a8f68a69ea8fce5c425b3386ab",
+        "ancestry": [
+          "Work State Specification"
+        ],
+        "text": "```txt\nDocument type: Spec\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Own the observable behavior, state model, records, stages, verbs and rules of the work state area.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/contracts/cli-io-contract.md\n- docs/platform/work-state/architecture/implementation-pointers.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n```"
+      },
+      "shownText": "```txt\nDocument type: Spec\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Own the observable behavior, state model, records, stages, verbs and rules of the work state area.\nDesign status: Candidate\nLast reviewed: 2026-10-06\nRelated:\n- docs/platform/work-state/README.md\n- docs/platform/work-state/contracts/cli-io-contract.md\n- docs/platform/work-state/architecture/implementation-pointers.md\n- docs/platform/work-state/decisions/retired-decision-history.md\n- docs/platform/work-state/history/multi-role-harness-distill-record.md\n- docs/specs/work-state.md\n- docs/io-contract.md\n```",
+      "shownTextDigest": "48be7e1956a052be73118c1dd9f46ea4380226e957820b79e128011e137c6985"
+    },
+    {
+      "claimId": "claim_8c62d6551e80993c22ab57147c8f81c3",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "4-capture-and-evidence-records",
+      "unitDigest": "f26008336cbb1037dda0f2ae2290c62963215e24d0301057f1e367e3dcab9bfb",
+      "fileStatus": {
+        "kind": "spec",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "4. Capture And Evidence Records",
+        "anchor": "4-capture-and-evidence-records",
+        "githubAnchor": "4-capture-and-evidence-records",
+        "stableAnchor": "h-39269fa13d61",
+        "startLine": 87,
+        "endLine": 87,
+        "textDigest": "f26008336cbb1037dda0f2ae2290c62963215e24d0301057f1e367e3dcab9bfb",
+        "sample": "4. Capture And Evidence Records",
+        "sectionPayloadDigest": "95acad19943ec3bec0f17e89bd1a2913178b14fa1918abd8a3582102d3547e09",
+        "followingBlockDigest": "95acad19943ec3bec0f17e89bd1a2913178b14fa1918abd8a3582102d3547e09",
+        "identityFingerprint": "2ce079f4c42dea77ad0ff8b097ebccdcf9c5927848771e7701d2f2f99d887834",
+        "ancestry": [
+          "Work State Specification"
+        ],
+        "text": "## 4. Capture And Evidence Records",
+        "sectionText": "## 4. Capture And Evidence Records\n\nSubsections: Outcome Record, Friction Record, Settlement Record, Close Lesson Record, Human Gate Record, Discovery Gate Record."
+      },
+      "shownText": "## 4. Capture And Evidence Records\n\nSubsections: Outcome Record, Friction Record, Settlement Record, Close Lesson Record, Human Gate Record, Discovery Gate Record.",
+      "shownTextDigest": "acd76bd3aedb9520db2b3b6ba47c22fb94a3a00c80fe5bf8440bde8f72a01e25"
+    },
+    {
+      "claimId": "claim_aa9218de6bffacb2aa3b7a151fedb77e",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "95acad19943ec3bec0f17e89bd1a2913178b14fa1918abd8a3582102d3547e09",
+      "fileStatus": {
+        "kind": "spec",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 89,
+        "endLine": 89,
+        "textDigest": "95acad19943ec3bec0f17e89bd1a2913178b14fa1918abd8a3582102d3547e09",
+        "sample": "Subsections: Outcome Record, Friction Record, Settlement Record, Close Lesson Record, Human Gate Record, Discovery Gate Record.",
+        "identityFingerprint": "e226d53b306132ba046a7c051c32d338bd8acdb47e0c85c620b08489c2c52da3",
+        "ancestry": [
+          "Work State Specification",
+          "4. Capture And Evidence Records"
+        ],
+        "text": "Subsections: Outcome Record, Friction Record, Settlement Record, Close Lesson Record, Human Gate Record, Discovery Gate Record."
+      },
+      "shownText": "Subsections: Outcome Record, Friction Record, Settlement Record, Close Lesson Record, Human Gate Record, Discovery Gate Record.",
+      "shownTextDigest": "95acad19943ec3bec0f17e89bd1a2913178b14fa1918abd8a3582102d3547e09"
+    },
+    {
+      "claimId": "claim_ee3e0d3cc2479898da8a20672923576f",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "5-workflow-step-and-stage-model",
+      "unitDigest": "1f32213caa9b7a362e4f9264696aa1969ced613dc7bf66d3263c74ddca1ac806",
+      "fileStatus": {
+        "kind": "spec",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "5. Workflow Step And Stage Model",
+        "anchor": "5-workflow-step-and-stage-model",
+        "githubAnchor": "5-workflow-step-and-stage-model",
+        "stableAnchor": "h-b79dcffcbe52",
+        "startLine": 232,
+        "endLine": 232,
+        "textDigest": "1f32213caa9b7a362e4f9264696aa1969ced613dc7bf66d3263c74ddca1ac806",
+        "sample": "5. Workflow Step And Stage Model",
+        "sectionPayloadDigest": "69876b8abcf241ab133b5f7a4e06a3366f94b8ecc9e315ccc249c01b612aaeba",
+        "followingBlockDigest": "69876b8abcf241ab133b5f7a4e06a3366f94b8ecc9e315ccc249c01b612aaeba",
+        "identityFingerprint": "d92bb44d59634f3b3a77c4ae975a1a2c46be24ca428b471499287409eeaa7773",
+        "ancestry": [
+          "Work State Specification"
+        ],
+        "text": "## 5. Workflow Step And Stage Model",
+        "sectionText": "## 5. Workflow Step And Stage Model\n\nSubsections: Workflow Step Replaces Stage, Discovery And Exploring Stages, Planning Stage."
+      },
+      "shownText": "## 5. Workflow Step And Stage Model\n\nSubsections: Workflow Step Replaces Stage, Discovery And Exploring Stages, Planning Stage.",
+      "shownTextDigest": "b9b575e490c26fb939d5115d4abb480ab1e7ab4ce738e596d074eb458d09ac17"
+    },
+    {
+      "claimId": "claim_1ef09ff15a7cb12419b5c10e1d60f936",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "unheaded-block-27",
+      "unitDigest": "69876b8abcf241ab133b5f7a4e06a3366f94b8ecc9e315ccc249c01b612aaeba",
+      "fileStatus": {
+        "kind": "spec",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-27",
+        "githubAnchor": "unheaded-block-27",
+        "stableAnchor": "unheaded-block-27",
+        "title": "Unheaded block 27",
+        "startLine": 234,
+        "endLine": 234,
+        "textDigest": "69876b8abcf241ab133b5f7a4e06a3366f94b8ecc9e315ccc249c01b612aaeba",
+        "sample": "Subsections: Workflow Step Replaces Stage, Discovery And Exploring Stages, Planning Stage.",
+        "identityFingerprint": "8286128ea7d9463e646354a6205acf20d2a36c57c32558c57501bf9786d07df8",
+        "ancestry": [
+          "Work State Specification",
+          "5. Workflow Step And Stage Model"
+        ],
+        "text": "Subsections: Workflow Step Replaces Stage, Discovery And Exploring Stages, Planning Stage."
+      },
+      "shownText": "Subsections: Workflow Step Replaces Stage, Discovery And Exploring Stages, Planning Stage.",
+      "shownTextDigest": "69876b8abcf241ab133b5f7a4e06a3366f94b8ecc9e315ccc249c01b612aaeba"
+    },
+    {
+      "claimId": "claim_847c78bb09c21dd00ea3cdd56dfff0ed",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "8-tool-registry",
+      "unitDigest": "f4f9e9e9a1350ede402b09ff84e48dfa87b46f7b605cb89788e7bac8d5ca32db",
+      "fileStatus": {
+        "kind": "spec",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "8. Tool Registry",
+        "anchor": "8-tool-registry",
+        "githubAnchor": "8-tool-registry",
+        "stableAnchor": "h-ed253af2e274",
+        "startLine": 601,
+        "endLine": 601,
+        "textDigest": "f4f9e9e9a1350ede402b09ff84e48dfa87b46f7b605cb89788e7bac8d5ca32db",
+        "sample": "8. Tool Registry",
+        "sectionPayloadDigest": "bf1d6f189051b2a329a87fe64f1be27ea4faec22215c94b6606481ebae6ba06c",
+        "followingBlockDigest": "bf1d6f189051b2a329a87fe64f1be27ea4faec22215c94b6606481ebae6ba06c",
+        "identityFingerprint": "ee07da4c8c5cb20aea9dd0c259e9de983cbdce06308cad1c52c1f690b8576908",
+        "ancestry": [
+          "Work State Specification"
+        ],
+        "text": "## 8. Tool Registry",
+        "sectionText": "## 8. Tool Registry\n\nSubsections: Registry Projection And Registration Standard, Tool Registry Verbs."
+      },
+      "shownText": "## 8. Tool Registry\n\nSubsections: Registry Projection And Registration Standard, Tool Registry Verbs.",
+      "shownTextDigest": "870e392de09f1a325aa4e21238fc7328b5dfa167a85c73ba4cd3b96d0c1bcf28"
+    },
+    {
+      "claimId": "claim_2d40db0a3a51d53c2dcaca6f0e220760",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "unheaded-block-60",
+      "unitDigest": "bf1d6f189051b2a329a87fe64f1be27ea4faec22215c94b6606481ebae6ba06c",
+      "fileStatus": {
+        "kind": "spec",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-60",
+        "githubAnchor": "unheaded-block-60",
+        "stableAnchor": "unheaded-block-60",
+        "title": "Unheaded block 60",
+        "startLine": 603,
+        "endLine": 603,
+        "textDigest": "bf1d6f189051b2a329a87fe64f1be27ea4faec22215c94b6606481ebae6ba06c",
+        "sample": "Subsections: Registry Projection And Registration Standard, Tool Registry Verbs.",
+        "identityFingerprint": "04aad547770969f39095177aada3788ed13d71e0b8f665bbf0d8659f7ee32895",
+        "ancestry": [
+          "Work State Specification",
+          "8. Tool Registry"
+        ],
+        "text": "Subsections: Registry Projection And Registration Standard, Tool Registry Verbs."
+      },
+      "shownText": "Subsections: Registry Projection And Registration Standard, Tool Registry Verbs.",
+      "shownTextDigest": "bf1d6f189051b2a329a87fe64f1be27ea4faec22215c94b6606481ebae6ba06c"
+    },
+    {
+      "claimId": "claim_0da2d8002224e164a98be8318dadb650",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "15-source-provenance-and-coverage",
+      "unitDigest": "585bb28b7915224df08e4107704e6266f9c81fab514bdf349582be1527b5950b",
+      "fileStatus": {
+        "kind": "spec",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "15. Source Provenance And Coverage",
+        "anchor": "15-source-provenance-and-coverage",
+        "githubAnchor": "15-source-provenance-and-coverage",
+        "stableAnchor": "h-f14392fec71a",
+        "startLine": 1177,
+        "endLine": 1177,
+        "textDigest": "585bb28b7915224df08e4107704e6266f9c81fab514bdf349582be1527b5950b",
+        "sample": "15. Source Provenance And Coverage",
+        "sectionPayloadDigest": "9635c37a607caab23d8c57b594b11914c8f1bf0e9cd1a2bcc7e952072bca1a36",
+        "followingBlockDigest": "9635c37a607caab23d8c57b594b11914c8f1bf0e9cd1a2bcc7e952072bca1a36",
+        "identityFingerprint": "de50b130ec4e3bfc3a080c63bf8146c2252b0d0db9b84fd4f58fa17aef3f6bd6",
+        "ancestry": [
+          "Work State Specification"
+        ],
+        "text": "## 15. Source Provenance And Coverage",
+        "sectionText": "## 15. Source Provenance And Coverage\n\n---\narea: work-state\nupdated: 2026-08-12\nsources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution, fan-out-parallel, human-rounds, work-item-verb-surface, base-workflow-model-s1, base-workflow-model-s2, self-improve-loop, work-graph-intelligence-s1, work-graph-intelligence-s2a, work-graph-intelligence-s2b, entry-standardization, work-id-tsk-hash, p50-workflow-induct, str61-chat-context-continuity, str68-discovery-judge-robustness, compound-learn-enduser-docs, str77-79-doc-gap-fixes, str83-fgos-slash-commands, str86-runner-headless-git, str73-done-flip-cos-check, str93-discovery-precedence-labels, str7-str8-priority-intent, str51-llm-assist-classify, str46-io-contract-lat2, str46-io-contract-lat3, spec-docs-lifecycle-realignment]\ndecisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e, 2e92b7a5, 5a6900b2, b28487af, 2ae492d8, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, a2146274, 896219a7, b5c0ba0c, b2d18cc7, b0da87aa, 8cf7effe, 81322763, 28e6184b, 14091e58, 19330e09, bce79d8a, 87536f3f, 9c67c3d1, 6aa67ae4, 1c776c56, 1d336d8a, ea8b9a8d, 757e5dd7, ecfd0d1a, 0f3b6eb0, 0e575f83, ee0f95c3, f69951df, f176c18a, d3445024, a5825b8b, a58a7563, 11d5ebc4, 10a740da, 8fc155eb]\ncoverage: partial\n---"
+      },
+      "shownText": "## 15. Source Provenance And Coverage\n\n---\narea: work-state\nupdated: 2026-08-12\nsources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution, fan-out-parallel, human-rounds, work-item-verb-surface, base-workflow-model-s1, base-workflow-model-s2, self-improve-loop, work-graph-intelligence-s1, work-graph-intelligence-s2a, work-graph-intelligence-s2b, entry-standardization, work-id-tsk-hash, p50-workflow-induct, str61-chat-context-continuity, str68-discovery-judge-robustness, compound-learn-enduser-docs, str77-79-doc-gap-fixes, str83-fgos-slash-commands, str86-runner-headless-git, str73-done-flip-cos-check, str93-discovery-precedence-labels, str7-str8-priority-intent, str51-llm-assist-classify, str46-io-contract-lat2, str46-io-contract-lat3, spec-docs-lifecycle-realignment]\ndecisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e, 2e92b7a5, 5a6900b2, b28487af, 2ae492d8, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, a2146274, 896219a7, b5c0ba0c, b2d18cc7, b0da87aa, 8cf7effe, 81322763, 28e6184b, 14091e58, 19330e09, bce79d8a, 87536f3f, 9c67c3d1, 6aa67ae4, 1c776c56, 1d336d8a, ea8b9a8d, 757e5dd7, ecfd0d1a, 0f3b6eb0, 0e575f83, ee0f95c3, f69951df, f176c18a, d3445024, a5825b8b, a58a7563, 11d5ebc4, 10a740da, 8fc155eb]\ncoverage: partial\n---",
+      "shownTextDigest": "ece94e68e59bca6ef0848e19eaa32390f34f69d326b34240e3d024e373d8320d"
+    },
+    {
+      "claimId": "claim_ac433070c1a842c2396a6fe4b6d5a0f6",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "16-related-files",
+      "unitDigest": "9a02e832f3ff3a984664a32119ecc2a14bc98072bf9f867873ebe81e61f6d238",
+      "fileStatus": {
+        "kind": "spec",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "16. Related Files",
+        "anchor": "16-related-files",
+        "githubAnchor": "16-related-files",
+        "stableAnchor": "h-d2cff0292f95",
+        "startLine": 1187,
+        "endLine": 1187,
+        "textDigest": "9a02e832f3ff3a984664a32119ecc2a14bc98072bf9f867873ebe81e61f6d238",
+        "sample": "16. Related Files",
+        "sectionPayloadDigest": "43c88a88d0eb57f524b0b2768bb6132b7136f7c04066dbea712d00c731c3d9a4",
+        "followingBlockDigest": "43c88a88d0eb57f524b0b2768bb6132b7136f7c04066dbea712d00c731c3d9a4",
+        "identityFingerprint": "ad0f07a3329d6fd7157a14ce0282d1cd5007deb69180c7afadeabb0ccfa0f719",
+        "ancestry": [
+          "Work State Specification"
+        ],
+        "text": "## 16. Related Files",
+        "sectionText": "## 16. Related Files\n\n- [README.md](README.md)\n- [contracts/cli-io-contract.md](contracts/cli-io-contract.md)\n- [architecture/implementation-pointers.md](architecture/implementation-pointers.md)\n- [decisions/retired-decision-history.md](decisions/retired-decision-history.md)\n- [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)\n- [docs/specs/work-state.md](../../specs/work-state.md)\n- [docs/io-contract.md](../../io-contract.md)"
+      },
+      "shownText": "## 16. Related Files\n\n- [README.md](README.md)\n- [contracts/cli-io-contract.md](contracts/cli-io-contract.md)\n- [architecture/implementation-pointers.md](architecture/implementation-pointers.md)\n- [decisions/retired-decision-history.md](decisions/retired-decision-history.md)\n- [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)\n- [docs/specs/work-state.md](../../specs/work-state.md)\n- [docs/io-contract.md](../../io-contract.md)",
+      "shownTextDigest": "f3faccf8579d2bfa74b88c2c8ed47cbee902eb72526668370116b6fecd43f26b"
+    },
+    {
+      "claimId": "claim_679bf517a1831f6c2a5dd74c478ed811",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "unheaded-block-99",
+      "unitDigest": "43c88a88d0eb57f524b0b2768bb6132b7136f7c04066dbea712d00c731c3d9a4",
+      "fileStatus": {
+        "kind": "spec",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      },
+      "status": "candidate-unverified",
+      "unit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-99",
+        "githubAnchor": "unheaded-block-99",
+        "stableAnchor": "unheaded-block-99",
+        "title": "Unheaded block 99",
+        "startLine": 1189,
+        "endLine": 1195,
+        "textDigest": "43c88a88d0eb57f524b0b2768bb6132b7136f7c04066dbea712d00c731c3d9a4",
+        "sample": "- [README.md](README.md)\n- [contracts/cli-io-contract.md](contracts/cli-io-contract.md)\n- [architecture/implementation-pointers.md](architecture/implementation-pointers.md)\n- [deci",
+        "identityFingerprint": "ad8795201dead4e5f371ee3e6b26e4efd8a4307813c9e43aa0c0995170783598",
+        "ancestry": [
+          "Work State Specification",
+          "16. Related Files"
+        ],
+        "text": "- [README.md](README.md)\n- [contracts/cli-io-contract.md](contracts/cli-io-contract.md)\n- [architecture/implementation-pointers.md](architecture/implementation-pointers.md)\n- [decisions/retired-decision-history.md](decisions/retired-decision-history.md)\n- [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)\n- [docs/specs/work-state.md](../../specs/work-state.md)\n- [docs/io-contract.md](../../io-contract.md)"
+      },
+      "shownText": "- [README.md](README.md)\n- [contracts/cli-io-contract.md](contracts/cli-io-contract.md)\n- [architecture/implementation-pointers.md](architecture/implementation-pointers.md)\n- [decisions/retired-decision-history.md](decisions/retired-decision-history.md)\n- [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)\n- [docs/specs/work-state.md](../../specs/work-state.md)\n- [docs/io-contract.md](../../io-contract.md)",
+      "shownTextDigest": "43c88a88d0eb57f524b0b2768bb6132b7136f7c04066dbea712d00c731c3d9a4"
+    }
+  ],
+  "packSha256": "2ed3fec52b5ef3c247b81ce913f14f474dd04a9c2d3d5118ef098c9bf9e8c3c6"
+}

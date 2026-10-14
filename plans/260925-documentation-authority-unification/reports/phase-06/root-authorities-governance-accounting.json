@@ -4,11 +4,12 @@
   "authorSession": "codex-session:17@2026-10-14",
   "source": "docs/doc-governance.md",
   "target": "docs/platform/governance.md",
-  "rowCount": 75,
+  "rowCount": 76,
   "classCounts": {
-    "Judgment": 7,
+    "Mirror": 0,
+    "Unit-exact": 51,
     "Weak-exact": 17,
-    "Unit-exact": 51
+    "Judgment": 8
   },
   "rows": [
     {
@@ -835,9 +836,21 @@
       "targetUnitDigest": "4aad7684bd5ff59163cf2e9cfc405f7b897c2a9b3a6fc678531b179c343e305f",
       "wholeUnitTextEqual": false,
       "linkRelocationOnly": true
+    },
+    {
+      "claimId": "claim_1ac3dcd4a11d62a3397b6563d1e0a386",
+      "class": "Judgment",
+      "classReason": "Explicit generated-projection or non-platform exception decision; no platform counterpart or exact carry.",
+      "sourceAnchor": "file-block",
+      "sourceUnitDigest": "aeba8c2c451e1857f6145081e3d4e82a6a081867a40bf73687aa4bed9acc1844",
+      "targetUnitDigest": null
     }
   ],
   "allRowsPending": true,
   "truthUnverified": true,
-  "NoComponentBoundaryChange": true
+  "NoComponentBoundaryChange": true,
+  "extraSources": [
+    "docs/doc-registry.json"
+  ],
+  "N1": "Four docs/decisions/index.md units already have the independently reviewed history corpus-rule disposition; s2-generated-projections.json records regenerate-from-source for the file. Preserve both exactly, without duplicate source rows or a retiring-root change."
 }
