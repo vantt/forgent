@@ -18,7 +18,8 @@ A. **Một bộ phân loại thuần cho mọi cửa** (`classifyStrayWrites`, �
 - **Từ chối** chỉ khi: (1) proven — attestation confinement cho thấy ghi ngoài grant; hoặc (2) chữ ký ghi lạc — workspace không có delta (HEAD không đổi VÀ tập dirty không đổi) trong khi ngoài workspace xuất hiện path mới. Ca agy khớp (2); ca F2/F7 không khớp (Doer đã commit).
 - **Còn lại** (correlated) → chấp nhận + `warnings[]` (`stray-write-correlated`: paths, level, basis, hash) trong kết quả dispatch, exit 0, `show-run` in ra. Không DispatchError, không needs-input (Release con người: không tạo vòng retry vì người đứng xem).
 - Không theo dõi theo tiến trình: inotify không có pid, fanotify cần CAP_SYS_ADMIN, ptrace xung đột sandbox executor (critique, cả 3 ghế đồng ý).
-- `evaluateAttributionPolicy` (0 caller production): nối vào bộ phân loại hoặc xoá — không để chết.
+- Lượt read-only: HEAD của cwd dịch chuyển trong lượt là bằng chứng correlated, không phải đột biến của lượt (ca 12:03:38, `wf-run-1791954133905-844903ed`). Lượt confined `host-write-denied` không thể commit (`.git` ro) → HEAD đổi là proven do bên ngoài → allow; lượt read-only unconfined (`--contract`) → cảnh báo.
+- `evaluateAttributionPolicy` (0 caller production): nối vào bộ phân loại hoặc xoá — không để chết. `rollbackReadOnlyMutations` (0 caller, `git reset --soft` trên cwd có thể là main): xoá.
 - Đánh đổi chấp nhận, ghi vào spec: Doer làm việc thật trong worktree VÀ ghi thêm vào main sẽ chỉ bị cảnh báo, không bị chặn (khi chưa confined).
 
 B. **Docs-only confined = thu hẹp `writes:`, không phải capability/mode mới** (RUL77: posture thuộc capability; trục thứ hai là quyết định trùng lặp). Hai lớp:
@@ -27,7 +28,7 @@ B. **Docs-only confined = thu hẹp `writes:`, không phải capability/mode m�
 
 C. **Sửa mount mặc định của cửa CLI/Work** (`cli.mjs:822` `workspaceRoot ?? root` → `resources.mjs:310` mount rw cả main khi lượt confined `workspace-write` đi qua cửa này; cửa Assignment đã truyền `effectiveCwd`). Mount cwd, main ro. Làm sau Việc 2 (cùng file) với ma trận test: worktree trong/ngoài root, `target/` symlink, commit từ trong worktree.
 
-D. **Doctrine không code**: phiên điều phối không ghi vào worktree đang có lượt dispatch (nguyên nhân F7).
+D. **Doctrine không code**: phiên điều phối không ghi vào worktree đang có lượt dispatch (nguyên nhân F7); panel/ghế read-only chạy trên worktree sạch riêng, không trên main checkout (ca 12:03:38 chạy cwd = main).
 
 ## Phụ thuộc vào kết luận một-cửa
 
@@ -37,7 +38,7 @@ Bất biến giữ dù cửa nào còn: một bộ phân loại ở settlement; 
 
 | # | Việc | Điều kiện mở |
 |---|---|---|
-| 1 | Bộ phân loại + cảnh báo trong kết quả (đề xuất 8); test `test/runner/dispatch-stray-write-attribution.test.mjs` (đỏ, chưa commit) chuyển xanh | kết luận một-cửa |
+| 1 | Bộ phân loại + cảnh báo trong kết quả (đề xuất 8); 2 ca đỏ trong `test/runner/dispatch-stray-write-attribution.test.mjs` (cửa CLI: file dirty; cửa Assignment: commit của phiên khác) chuyển xanh, ca agy giữ xanh | kết luận một-cửa |
 | 2 | Kiểm footprint `writes:` sau lượt | kết luận một-cửa |
 | 3 | Mount cwd cho cửa CLI/Work (C) | một-cửa + `fix/dispatch-followups` merged |
 | 4 | Mount hẹp theo `writes:` (đề xuất 6) | như 3 |

@@ -30,9 +30,14 @@ Thêm hai ca thật trong chính council của lane (proven, evidence trong `fgo
 - Lần 1, critique reviewer (openai, read-only): `read-only-mutation` vì phiên lane commit báo cáo + ghi test vào worktree đích lúc nó chạy; evidence ghi `level: correlated, basis: pre-post-git-snapshot` mà vẫn refuse → cửa Assignment cũng refuse trên correlated.
 - Lần 2, critique reviewer: stderr `wrote outside its workspace ... plans/261014-1033-dispatch-operator-improvements/reports/` — báo cáo các lane khác ghi vào main. Bộ chặn làm hỏng chính council bàn về nó.
 
+Ca thật thứ tư (Lead chuyển, lane xác minh bằng `fgos workflow status wf-run-1791954133905-844903ed`): bước framing (claude-herdr, read-only, cwd = main checkout, không có worktree riêng) → `policy-refusal` `read-only-mutation`; evidence `gitBefore 81e07602c` → `gitAfter e7f02ed09` (`gitBeforeSource: pre-launch`), `changedFiles` = 5 báo cáo `plans/261007-1700-provider-credential-rotation-safety/reports/code-review-261014-{0930,0935,0945,1000,1010}-*.md`. Reflog main: `e7f02ed09` là commit của phiên khác lúc 12:03:38 (`docs(report): add the independent reviews ...`). Cơ chế (proven, đọc code): `computeChangedFiles` (`settlement.mjs:207`) gộp `git diff gitBefore..gitAfter` của cwd vào `changedFiles` → HEAD dịch chuyển do commit của người khác bị tính là đột biến của lượt read-only (`settlement.mjs:291`). Khác hình dạng với ca CLI (file dirty ngoài workspace): ở đây là commit vào chính checkout lượt đang đọc.
+
+Phát hiện phụ (proven, đọc code): `rollbackReadOnlyMutations` (`assignment-runner.mjs:276`) chạy `git reset --soft gitBefore` rồi gỡ file "mới" trong cwd của lượt — nếu được gọi trong ca trên sẽ lùi commit của phiên khác trên main. Hiện **0 caller** (chỉ có định nghĩa); main vẫn ở `e7f02ed09`, 5 file còn nguyên. Code chết nguy hiểm: plan đề xuất xoá cùng phase 1.
+
 Test tái hiện (CHƯA commit theo lệnh Lead): `test/runner/dispatch-stray-write-attribution.test.mjs`, đã sửa theo 2 finding của reviewer council (worker commit thay đổi tracked thay vì chỉ ghi file ignore; attestation store riêng của fixture, không ghi `~/.local/state`):
 - `a file another session writes into the main checkout ... is not blamed` — **đỏ** (`worktree-fail`, `strayPaths: ['plans/']`).
 - `a worker that leaves its workspace untouched while files appear in the main checkout is refused` — xanh (giữ bảo vệ lớp agy).
+- `a commit another session lands in a read-only round's checkout is not the round's mutation` (cửa Assignment, `executeAssignment` + `validate-plan`, tái hiện ca thứ tư) — **đỏ** (`read-only-mutation`, `changedFiles: ['plans/other/reports/code-review.md']`).
 
 Thiết kế: plan (bộ phân loại chung; từ chối chỉ khi proven hoặc chữ ký ghi lạc "workspace không delta + ngoài có path mới"; còn lại `warnings[]` trong kết quả).
 
