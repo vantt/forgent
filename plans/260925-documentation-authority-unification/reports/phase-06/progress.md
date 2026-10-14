@@ -4,11 +4,11 @@ Date: 2026-10-14
 Executor: codex-session:18@2026-10-14
 Session counter: 18
 Step: 5
-State: ready-for-review / first request published
+State: ready-for-review / both requests published; final checkpoint running
 Last green content and inventory pin: 7833bb4c11125394ea5482fdc781ccd1cf8e4e1d
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
-Current turn commits: e52fac3e4 (resume), dfbbd1de9 (liveness evidence), 17d9464fc (template history), 1157b7243 (77 ordinary verdicts and seven corrections), 7833bb4c1 (pending bindings and historical index). Material/proof commit: ecf646b27. The first bounded request is published in this progress commit; resolve HEAD after commit. Second request follows.
+Current turn commits: e52fac3e4 (resume), dfbbd1de9 (liveness evidence), 17d9464fc (template history), 1157b7243 (77 ordinary verdicts and seven corrections), 7833bb4c1 (pending bindings and historical index). Material/proof commit: ecf646b27. Rework request commit: 097b731ec. The second bounded request is published in this progress commit; resolve HEAD after commit.
 All 77 ordinary ok verdicts at 563247893 applied: 75 decision rows and two native/list accounting verdicts, notes verbatim and report pin exact. Truth report is not applied; original sample/population remain byte-identical.
 Seven reworks remain pending after accurate rationales and the documentation portal link ../README.md. No approval carries; one native table gap and one stable heading digest consequence are fully shown. The unverified table gap remains explicit global open data, with its real successor; its conservation accounting goes to Lead alongside the two Related Files rows, never a waiver.
 New source decisions: 63 pending (58 historical-template, 5 unchanged non-platform user-portal); Unit-exact 10 / Weak-exact 35 / Judgment 18. Three former templates are preserved with original metadata and fenced verbatim placeholder tables; an Added-in-candidate history index routes to them. Backlog unchanged; AGENTS/CLAUDE remain Step 10; no component-boundary change.
@@ -17,7 +17,7 @@ Registry native-byte-equal compact one-line JSON: 59,529,541 bytes, SHA256 3e0e5
 Two sealed bounded requests (texts/hashes in root-conservation-turn18-verification.json):
 - review-request-261014-1548-root-conservation-rework.md: exactly seven rework decisions and their directly affected native table/heading accounting; full shown text, digests and diffs.
 - review-request-261014-1548-root-template-conservation.md: 63 source decisions plus 11 new candidate eligibility/list units, 74 entries; full shown text and digests.
-Remaining publication: review-request-261014-1548-root-template-conservation.md only. The seven-row rework request and full pack/sidecar are committed by this checkpoint. After each pack update progress, then final report-only native refresh and STOP. No further source authoring this turn.
+Remaining publication: none. Both requests and full packs/sidecars are committed by this checkpoint. After each pack update progress, then final report-only native refresh and STOP. No further source authoring this turn.
 Blockers: no unexplained technical/proof failure. Owner truth decision (5/30 false, A28) remains parked and no truth sentence is corrected. Lead conservation review is pending. Native table gap accounting stays owed and is shown, not silently approved. No promotion, Step 6, push, main write/merge, protected tool or baseline edit.
 Next: publish the two requests, final native checkpoint, STOP. Subsequent work applies independent conservation verdicts and continues the 559 undecided source rows; truth corrections wait for the owner's Lead brief.
 
