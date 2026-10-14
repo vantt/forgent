@@ -1,3 +1,44 @@
+# Latest resume state — Two bounded conservation requests committed; STOP
+
+Date: 2026-10-14
+Executor: codex-session:18@2026-10-14
+Session counter: 18
+Step: 5
+State: ready-for-review; authoring incomplete; STOP
+Last green content and decision pin: 7833bb4c11125394ea5482fdc781ccd1cf8e4e1d
+Material/proof commit: ecf646b27
+Post-request inventory pin: 0be4761c7ee3d285f382f2b59757dfd85052d89a
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Final checkpoint is this progress/evidence commit; resolve HEAD on resume.
+
+Turn commits before checkpoint: e52fac3e4, dfbbd1de9, 17d9464fc, 1157b7243, 7833bb4c1, ecf646b27, 097b731ec, 0be4761c7. All writes stayed in the required worktree/branch; no main write/merge, push, rebase, promotion, Step 6 or protected tool/baseline edit.
+
+All 77 ordinary ok verdicts at 563247893 applied: 75 decision rows and two native/list accounting verdicts; notes verbatim, exact report pin. Seven reworks corrected and pending (four governance, one Pilot B, two native SC-1 predecessors), with no approval carry. Documentation portal now resolves to docs/README.md through ../README.md; rationales account for nine link spellings, the deferral rewrite and the intermediate predecessor's example-only delta. The approve --github qualifier is not restored because current approve code explicitly forbids that transport. No SC-1 target prose or truth-sample sentence was edited.
+
+New source decisions: 63 pending — architecture template 17, area README template 24, contract template 17, unchanged non-platform user portal 5. Unit-exact 10 / Weak-exact 35 / Judgment 18. Historical carriers preserve every placeholder/instruction and original metadata; only placeholder link tables are fenced verbatim. A labelled historical index routes to the three carriers. Backlog already decided and untouched. AGENTS/CLAUDE wait for Step 10. No component-boundary change.
+
+Root map: 1,072 rows, 440 reviewed / 73 pending / 559 undecided. Both-prior D exit 0, zero fatal, identical global open counts. Both nine-source scoped strict E exit 1: exactly 68 pending source rows, two unchanged historical IO gaps and 70 candidate-unverified units. Strict E is red; Step 5 is not closed. Full reverse tuple equality passes under both priors: 59 old list tuples unchanged plus 11 new eligible history units. Prior Agent/Host/Packaging A28 lists and all 13 A34 residuals stay unchanged and valid.
+
+Native equality retains all 94,424 starting and 94,489 intermediate IDs/full tuples; 94,494 known IDs now. The only old tuple delta is the disclosed governance Related Files stable heading. One native table gap is retained as unverified global open data with its real same-file successor, zero new retired units and no identity graft. Its full before/current text/digests are shown with the directly affected rework rows for Lead accounting; no silent gap disposition or closure waiver. This gap remains owed after the request.
+
+Compact persisted registry: 59,529,541 bytes, one-line JSON, SHA256 3e0e5b8386cf29a6e546b6bb57d7ea15eb0f21607709180e8d1beb3640496d13, below 90 MB. Post-request refresh reads that exact persisted base, reports bound/no carry-forward, and active native tuples and registry bytes are equal. Request texts, packs and sidecar SHA256 match the sealed material exactly. Content/decision trees remain equal to the D/E proof pin after report-only publication. Evidence/reproducible helpers: root-conservation-turn18-verification.json.
+
+Preservation: extractor, frozen sources, witness/payload trees, authority and reader-link sets unchanged. First-parent allowlist has only prior exact A3/A21 exemptions, no new violation. Ratchet clean (995/25/1), placement 514/513/one exception/zero gaps, H zero findings. Relevant review/apply tests under env -u CLAUDE_CODE_SESSION_ID: 29/29, zero fail/cancel/skip/todo. GitNexus own scope low risk, zero affected processes. No full-suite, installed-release, gateway or truth certification.
+
+Committed requests, full shown text/digests/diffs, under 80 entries:
+- review-request-261014-1548-root-conservation-rework.md — commit 097b731ec; seven corrected decisions plus their direct native table/heading accounting, no unrelated row re-review.
+- review-request-261014-1548-root-template-conservation.md — commit 0be4761c7; 63 source decisions plus 11 candidate eligibility/list units (74 entries).
+Both full packs and JSON sidecars are committed. Preview: rework http://design-lap:7701/s/feb130f49e60; templates http://design-lap:7701/s/f652161b22ac.
+
+Resolved in-scope obstacles: four malformed proposal file-level keys corrected to path/targets; 29 placeholder link findings resolved by verbatim fences; scratch native accounting lookup changed to a map. All are explained; no gate/checker/extractor/vocabulary/baseline change.
+Blockers: no unexplained technical/proof failure. Owner decision on the 5/30 false truth units (A28) stays parked. Truth report not applied; its sample and population are byte-identical, no new draw. Independent Lead conservation review and the disclosed native gap accounting are pending. The two historical IO gaps and 559 undecided source rows remain owed.
+Next: owner starts Lead on the two requests. Apply committed conservation verdicts with exact notes/pins; re-prove D/E/native equality and resume the 559 undecided source rows in bounded packs. Truth corrections wait for the owner's Lead brief; do not guess or change the sample. No promotion, Step 6, push or main merge. STOP.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Conservation proofs sealed; bounded requests publishing
 
 Date: 2026-10-14
