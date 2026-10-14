@@ -37,6 +37,7 @@ export async function simulateUnitBindings(unit, runnerConfig, { session = {}, o
       executor: bound.executor,
       invocation: bound.invocation,
       ...(bound.account ? { account: bound.account } : {}),
+      ...(bound.provenance?.account?.skipped ? { accountSkipped: bound.provenance.account.skipped } : {}),
       ...(bound.provenance?.familySpread?.value.sharedWith.length ? { sharesFamilyWith: bound.provenance.familySpread.value.sharedWith } : {}),
     });
     return { outcome: 'pass', role };

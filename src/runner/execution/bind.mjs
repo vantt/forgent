@@ -367,13 +367,17 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
   }
 
   // 5b. Account: only an override pins one (`fgos run --account`, or `account` in `--override`).
-  // It must be an account of the chosen executor's own provider; the lease still picks it, from an
-  // inventory narrowed to it, so a quarantine or governance refusal stays where it was.
+  // It pins this seat when the chosen executor's own provider lists it; the lease still takes it,
+  // from an inventory narrowed to it, so a quarantine or governance refusal stays where it was. A
+  // seat on another provider (a checker must use another family) binds unpinned, with the reason
+  // recorded; the unit run refuses a pin no seat takes. The pin never steers the executor choice.
   let account = null;
+  let accountSkipped = null;
   if (matchingOverride && matchingOverride.account !== undefined) {
     const pin = resolveAccountPin(runnerConfig, { executorId, mechanism, accountId: matchingOverride.account });
-    if (pin.refused) return pin;
-    account = pin;
+    if (pin.refused?.reason === 'account-pin-invalid') return pin;
+    if (pin.refused) accountSkipped = pin.refused;
+    else account = pin;
   }
 
   // 6. Tier & Model (T)
@@ -501,8 +505,12 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     };
   }
 
-  if (account) {
-    provenance.account = { value: account.id, source: `override:${matchingOverride.origin ?? 'unknown'}` };
+  if (account || accountSkipped) {
+    provenance.account = {
+      value: account ? account.id : null,
+      source: `override:${matchingOverride.origin ?? 'unknown'}`,
+      ...(accountSkipped ? { skipped: accountSkipped } : {}),
+    };
   }
 
   if (matchingOverride?.origin) {

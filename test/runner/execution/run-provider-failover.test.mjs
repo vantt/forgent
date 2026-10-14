@@ -458,8 +458,20 @@ test('a quarantined pinned account is refused before any unit run exists, and a 
 
 test('an account of another provider is refused before any unit run exists', { skip: SKIP }, async () => {
   const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live' } }, beta: { family: 'beta', logins: { b1: 'live' } } });
-  await assert.rejects(run(fx, solo('u-pin-other'), pin('b1')), /"b1".*providers\.alpha\.accounts/);
+  await assert.rejects(run(fx, solo('u-pin-other'), pin('b1')), /applies to no seat.*"b1".*providers\.alpha\.accounts/s);
   assert.deepEqual(unitRuns(fx), []);
+});
+
+test('a pinned account on a reviewed unit pins the seat of its provider; the checker of another provider binds freely', { skip: SKIP }, async () => {
+  const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live', a2: 'live' } }, beta: { family: 'beta' } }, { recentlyUsed: { alpha: ['a2'] } });
+  const res = await run(fx, { ...writer('u-pin-reviewed'), pattern: 'reviewed' }, { pattern: 'reviewed', ...pin('a2') });
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results.map((r) => [r.role, r.outcome, r.refused])));
+  assert.deepEqual(attemptsOf(fx.repoRoot, res)[0].binding.account, { provider: 'alpha', id: 'a2' });
+  assert.equal(selectedAccount(fx.repoRoot, res, '1'), 'a2');
+  const reviewer = attemptsOf(fx.repoRoot, res, 'reviewer/1')[0].binding;
+  assert.equal(reviewer.executor, 'beta');
+  assert.equal(reviewer.account, undefined);
+  assert.equal(reviewer.provenance.account.skipped.reason, 'account-pin-no-inventory');
 });
 
 // A writing seat that already changed the worktree before its provider limit is not run again on
@@ -501,5 +513,39 @@ test('a read-only seat of a writing unit still rotates: its sandbox kept the wor
   const reviewer = attemptsOf(fx.repoRoot, res, 'reviewer/1');
   assert.deepEqual(reviewer.map((a) => [a.binding.executor, a.outcome]), [['beta', 'provider-limit'], ['beta', 'pass']], JSON.stringify(res.results.map((r) => [r.role, r.outcome, r.fallbackExhausted])));
   assert.equal(reviewer[1].fallbackFrom.kind, 'account-rotation');
+  assert.ok(reviewer.every((a) => a.writeBaseline === undefined), 'a read-only seat records no write baseline, so nothing it did not write can stop it');
   assert.equal(res.outcome, 'pass');
+});
+
+test('a pinned writing seat that changed the worktree before its limit reports the changed paths, not only the pin', { skip: SKIP }, async () => {
+  const fx = setup({ alpha: { family: 'alpha', logins: { partial1: 'partial', live1: 'live' } } });
+  const res = await run(fx, writer('u-pin-partial'), pin('partial1'));
+  assert.equal(res.outcome, 'provider-limit');
+  const exhausted = res.results[0].fallbackExhausted;
+  assert.equal(exhausted.reason, 'partial-writes');
+  assert.deepEqual(exhausted.paths, ['README.md', 'README.old', 'notes.txt']);
+  assert.equal(exhausted.accountPinned, 'partial1');
+});
+
+test('a resume takes a new baseline: work a person kept after a partial-writes stop does not stop the next rotation', { skip: SKIP }, async () => {
+  const fx = setup(
+    { alpha: { family: 'alpha', logins: { partial1: 'partial', spent2: 'quota', live3: 'live' } } },
+    { recentlyUsed: { alpha: ['spent2', 'live3'] } },
+  );
+  const first = await run(fx, writer('u-partial-resume'));
+  assert.equal(first.results[0].fallbackExhausted?.reason, 'partial-writes');
+  // The person keeps the half-done work (the files stay as they are) and resumes. partial1 is now
+  // quarantined, so the lease takes spent2, whose quota stop writes nothing: that seat rotates.
+  fs.writeFileSync(path.join(fx.worktreeDir, 'notes.txt'), 'kept');
+  const resumed = await runUnit({
+    resumeUnitRunId: first.unitRunId,
+    repoRoot: fx.repoRoot,
+    cwd: fx.worktreeDir,
+    worktree: fx.worktreeDir,
+    session: { herdrPresent: false, headless: true },
+    providerCapacityRuntimeDir: fx.runtimeDir,
+  });
+  const attempts = attemptsOf(fx.repoRoot, resumed);
+  assert.deepEqual(attempts.slice(1).map((a) => a.fallbackFrom?.kind), ['account-rotation'], JSON.stringify(resumed.results[0].fallbackExhausted));
+  assert.equal(selectedAccount(fx.repoRoot, resumed, '1-fb1'), 'live3');
 });

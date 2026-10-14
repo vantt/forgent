@@ -8,22 +8,25 @@
 // is not run again by itself.
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/**.
 
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { changedPaths, gitContext } from './commit-unit-work.mjs';
+import { sha256FileSync } from '../dispatch/proof-helpers.mjs';
 
 const inStore = (p) => p === '.fgos' || p.startsWith('.fgos/');
 
-/** A path's content: its sha256, `link:<target>` for a symlink, or null when it does not exist. */
+/**
+ * A path's content: its sha256 (streamed), `link:<target>` for a symlink, null when it does not
+ * exist, or `unreadable:<size>:<mtime>` when it cannot be read (still compared, never a crash).
+ */
 function contentOf(file) {
   let stat;
   try { stat = fs.lstatSync(file); } catch { return null; }
   if (stat.isSymbolicLink()) return `link:${fs.readlinkSync(file)}`;
   if (!stat.isFile()) return `type:${stat.mode & fs.constants.S_IFMT}`;
-  return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+  try { return sha256FileSync(file); } catch { return `unreadable:${stat.size}:${stat.mtimeMs}`; }
 }
 
 /**

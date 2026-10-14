@@ -1,6 +1,6 @@
 // test/runner/execution/account-pin.test.mjs -- an override may pin the provider account a seat
-// runs on. bind() honours the pin only for an account listed under the bound executor's own
-// provider, records where the pin came from, and refuses every other case by name.
+// runs on. bind() pins it on a seat whose bound executor's provider lists it and records where the
+// pin came from; any other seat binds unpinned, with the reason recorded. A malformed id is refused.
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -50,28 +50,42 @@ test('a binding without a pinned account carries no account at all', () => {
   assert.equal(bound.provenance.account, undefined);
 });
 
-test('an account of another provider is refused, naming the accounts the bound provider has', () => {
+test('a seat whose provider does not list the account binds unpinned and says why', () => {
   const bound = bind(ask([{ origin: 'human-cli', account: 'b1' }]), ctx);
-  assert.equal(bound.refused.reason, 'account-pin-unknown');
-  assert.match(bound.refused.detail, /"b1".*providers\.alpha\.accounts.*"alpha"/);
-  assert.match(bound.refused.detail, /a1, a2/);
+  assert.equal(bound.refused, undefined);
+  assert.equal(bound.executor, 'alpha', 'the pin does not steer which executor binds');
+  assert.equal(bound.account, undefined);
+  assert.equal(bound.provenance.account.value, null);
+  assert.equal(bound.provenance.account.skipped.reason, 'account-pin-unknown');
+  assert.match(bound.provenance.account.skipped.detail, /"b1".*providers\.alpha\.accounts.*"alpha"/);
+  assert.match(bound.provenance.account.skipped.detail, /a1, a2/);
 });
 
-test('an executor whose provider has no account list cannot take a pinned account', () => {
+test('an executor whose provider has no account list binds unpinned', () => {
   const bound = bind(ask([{ origin: 'human-cli', account: 'a1' }], 'docs:gamma'), ctx);
-  assert.equal(bound.refused.reason, 'account-pin-no-inventory');
-  assert.match(bound.refused.detail, /"gamma".*no account list/);
+  assert.equal(bound.account, undefined);
+  assert.equal(bound.provenance.account.skipped.reason, 'account-pin-no-inventory');
+  assert.match(bound.provenance.account.skipped.detail, /"gamma".*no account list/);
 });
 
-test('a tool executor leases no account, so a pin on it is refused', () => {
+test('a tool executor leases no account, so it binds unpinned', () => {
   const bound = bind(ask([{ origin: 'human-cli', account: 'a1' }], 'docs:tool'), ctx);
-  assert.equal(bound.refused.reason, 'account-pin-unsupported');
+  assert.equal(bound.account, undefined);
+  assert.equal(bound.provenance.account.skipped.reason, 'account-pin-unsupported');
 });
 
 test('an account that is not a non-empty string is refused', () => {
   for (const value of ['', 7, null]) {
     const bound = bind(ask([{ origin: 'human-cli', account: value }]), ctx);
     assert.equal(bound.refused?.reason, 'account-pin-invalid', `account ${JSON.stringify(value)}`);
+  }
+});
+
+test('an inherited object key is not an account', () => {
+  for (const id of ['constructor', '__proto__', 'toString']) {
+    const bound = bind(ask([{ origin: 'human-cli', account: id }]), ctx);
+    assert.equal(bound.account, undefined, id);
+    assert.equal(bound.provenance.account.skipped.reason, 'account-pin-unknown', id);
   }
 });
 

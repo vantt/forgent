@@ -41,7 +41,7 @@ export function resolveAccountPin(runnerConfig, { executorId, mechanism, account
   if (known.length === 0) {
     return refuse('account-pin-no-inventory', `account "${accountId}" cannot be pinned: executor "${executorId}" (provider "${provider}") has no account list (providers.${provider}.accounts in ~/.fgos/config.json), so it leases no account`);
   }
-  if (!accounts[accountId]) {
+  if (!Object.hasOwn(accounts, accountId)) {
     return refuse('account-pin-unknown', `account "${accountId}" is not in providers.${provider}.accounts of executor "${executorId}" (provider "${provider}"); its accounts are: ${known.join(', ')}`);
   }
   return { provider, id: accountId };
