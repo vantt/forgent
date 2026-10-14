@@ -242,7 +242,10 @@ function writeBaseOf(workflow, stepId) {
   return nearest[0] ?? null;
 }
 
-/** Refuse a definition where a writing unit builds on more than one writing unit, before any run exists. */
+/**
+ * Refuse a units file where a writing unit builds on more than one writing unit, before any run
+ * exists. A preset or plan with that shape keeps starting such a unit from HEAD, as before.
+ */
 function assertWriteChains(workflow) {
   for (const step of workflow.steps) {
     if (!step.units.some((u) => u.template.writes?.length)) continue;
@@ -257,11 +260,13 @@ function assertWriteChains(workflow) {
 }
 
 /**
- * Paths a unit's producer changed outside the unit's write scope: those its commit reports as out of
- * scope, and any it committed outside the scope. The scope is the one the Unit run recorded (its
- * `writes` widened to generated render targets), read back from unit.json.
+ * Paths a unit's producer changed outside the unit's write scope: those its commits report as out
+ * of scope, and any path the unit's branch changed since its base outside the scope -- every
+ * commit on it, a resumed round's or one the producer made itself included. Paths come from
+ * `git diff -z`, so a name git would quote (non-ASCII, spaces) is matched as it is. The scope is
+ * the one the Unit run recorded (its `writes` widened to generated render targets).
  */
-function outOfScopeWrites(mainRoot, unitRunId, writes, results) {
+function outOfScopeWrites(mainRoot, { unitRunId, writes, results, branch, baseSha }) {
   let scope = writes;
   try {
     scope = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8')).writeScope ?? writes;
@@ -269,9 +274,18 @@ function outOfScopeWrites(mainRoot, unitRunId, writes, results) {
   const found = new Set();
   for (const result of results) {
     for (const file of result?.commit?.outOfScope ?? []) found.add(file);
-    for (const file of result?.commit?.files ?? []) if (!matchesWriteScope(file, scope)) found.add(file);
   }
+  const changed = branch && baseSha
+    ? (gitOut(mainRoot, ['diff', '-z', '--no-renames', '--name-only', baseSha, branch, '--']) ?? '').split('\0').filter(Boolean)
+    : results.flatMap((result) => result?.commit?.files ?? []);
+  for (const file of changed) if (!matchesWriteScope(file, scope)) found.add(file);
   return [...found].sort();
+}
+
+/** The writing unit a writer starts from, or null; a definition with more than one gets none (HEAD). */
+function singleWriteBaseOf(workflow, stepId) {
+  const base = writeBaseOf(workflow, stepId);
+  return base && !base.refused ? base : null;
 }
 
 function gitOk(cwd, args) {
@@ -520,26 +534,31 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           let ownsWorktree = false;
           let baseRef = null;
           let baseSha = null;
+          // Why a writing unit cannot get its own worktree; it then fails without running.
+          let prepError = null;
+          const base = unitData.writes.length > 0 ? singleWriteBaseOf(workflow, step.id) : null;
           if (resumeUnitRunId) {
             // The seats run in the worktree recorded in the Unit run; never make another one here.
             unitWorktree = uState.worktreePath ?? worktreePath;
             uBranch = uState.branch ?? null;
+            baseSha = uState.baseSha ?? null;
           } else if (unitData.writes.length > 0) {
             uBranch = `wf/${workflowRunId}/${u.id}`;
             // A unit that builds on a writing unit starts on that unit's branch, so it sees its work.
-            const base = writeBaseOf(workflow, step.id);
-            baseRef = (base && state.steps[base.stepId]?.units[base.unitId]?.branch) || 'HEAD';
-            baseSha = gitOut(mainRoot, ['rev-parse', '--verify', '--quiet', `${baseRef}^{commit}`])?.trim() || null;
-            try {
-              const wtInfo = createWorkflowWorktree({
-                repoRoot: mainRoot,
-                branch: uBranch,
-                baseRef: baseSha ?? baseRef,
-              });
-              unitWorktree = wtInfo.worktreePath;
-              ownsWorktree = true;
-            } catch {
-              unitWorktree = worktreePath;
+            baseRef = base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD';
+            baseSha = baseRef ? gitOut(mainRoot, ['rev-parse', '--verify', '--quiet', `${baseRef}^{commit}`])?.trim() || null : null;
+            if (!baseSha) {
+              prepError = base
+                ? `base branch "${baseRef ?? `of unit ${base.unitId}`}" of writing unit ${base.unitId} is gone; it cannot start from the work it builds on`
+                : `cannot resolve ${baseRef} to start the unit's worktree from`;
+            } else {
+              try {
+                unitWorktree = createWorkflowWorktree({ repoRoot: mainRoot, branch: uBranch, baseRef: baseSha }).worktreePath;
+                ownsWorktree = true;
+              } catch (err) {
+                // Never fall back to the shared checkout: a writer there would commit onto the caller's branch.
+                prepError = `could not create the unit's worktree on ${uBranch}: ${err.message}`;
+              }
             }
           }
 
@@ -564,6 +583,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           // the run still `running` and no event saying why.
           let unitRunResult;
           try {
+            if (prepError) throw new RunnerConfigError(prepError);
             unitRunResult = await runUnit({
               unitData,
               repoRoot: mainRoot,
@@ -592,9 +612,14 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             };
           }
 
-          // Writing outside the unit's scope is a finding: the unit does not pass, its branch is not integrated.
+          // Writing outside the unit's scope is a finding: the unit does not pass, its branch is not
+          // integrated. A writer standing on such a branch carries those paths too, so they never
+          // reach the target through it.
           const outOfScope = unitData.writes.length > 0 && unitRunResult.unitRunId
-            ? outOfScopeWrites(mainRoot, unitRunResult.unitRunId, unitData.writes, unitRunResult.results || [])
+            ? [...new Set([
+              ...outOfScopeWrites(mainRoot, { unitRunId: unitRunResult.unitRunId, writes: unitData.writes, results: unitRunResult.results || [], branch: uBranch, baseSha }),
+              ...(base ? state.steps[base.stepId]?.units[base.unitId]?.outOfScope ?? [] : []),
+            ])].sort()
             : [];
           if (outOfScope.length > 0 && unitRunResult.outcome === 'pass') unitRunResult = { ...unitRunResult, outcome: 'findings' };
 
@@ -889,7 +914,10 @@ function resolveStart(params) {
   } else {
     throw new RunnerConfigError('startWorkflow requires workflowId, workflow, planPath, or unitsPath');
   }
-  assertWriteChains(workflow);
+  if (params.unitsPath) {
+    if (params.seats !== undefined) throw new RunnerConfigError('--seats rebuilds a registered panel preset; it cannot be used with a units file');
+    assertWriteChains(workflow);
+  }
   const effort = params.effort === undefined || params.effort === null ? null : assertReasoningEffort(params.effort);
 
   const contextRefs = normalizeContextRefs(params.contextRefs);

@@ -9,6 +9,8 @@ import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { validateUnit } from '../runner/execution/unit.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
+const BRANCH_SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+
 /**
  * Read a units file (`fgos workflow start --units <file>`) and build the Workflow it stands for:
  * one step per Unit, the Unit's `dependsOn` as the step's, so units run in dependency order and
@@ -50,6 +52,10 @@ export function translateUnitsToWorkflow(unitsPath) {
       throw new RunnerConfigError(`units[${i}]: ${err.message}`);
     }
     if (seen.has(unit.id)) throw new RunnerConfigError(`units[${i}] has duplicate unit id "${unit.id}"`);
+    // The id names the unit's step and its branch (wf/<run>/<id>), so it must be a safe branch segment.
+    if (!BRANCH_SAFE_ID.test(unit.id) || unit.id.includes('..') || unit.id.endsWith('.lock')) {
+      throw new RunnerConfigError(`units[${i}] unit id "${unit.id}" must be letters, digits, ".", "_" or "-", starting with a letter or digit (it names the unit's branch)`);
+    }
     seen.add(unit.id);
     if (unit.expectedOutputs.length > 0) {
       throw new RunnerConfigError(`units[${i}] "${unit.id}": expectedOutputs is not carried by a workflow unit; state it in the objective`);

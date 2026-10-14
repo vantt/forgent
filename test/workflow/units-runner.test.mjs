@@ -1,7 +1,7 @@
 // test/workflow/units-runner.test.mjs — Running a units file: unit prefer/persona, --effort,
 // out-of-scope writes, and chaining a writing unit onto the branch of the writing unit it builds on.
 
-import test, { after } from 'node:test';
+import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -13,10 +13,8 @@ import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 seedFileLocalBwrapRegistry();
 
+// makeFixtureDir removes these at exit (FGOS_KEEP_TEST_FIXTURES=1 keeps them for debugging).
 const fixtures = [];
-after(() => {
-  for (const dir of fixtures) fs.rmSync(dir, { recursive: true, force: true });
-});
 
 const git = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
 
@@ -26,11 +24,14 @@ const WORKER = `
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
-for (const m of prompt.matchAll(/WRITE:([A-Za-z0-9._/-]+)/g)) {
+// Only the producer writes; a reviewer reads the same objective and must leave the worktree alone.
+const ownResult = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt)?.[1] ?? '';
+const producer = ownResult.includes('/producer/');
+for (const m of producer ? prompt.matchAll(/WRITE:(\\S+)/g) : []) {
   fs.mkdirSync(path.dirname(m[1]), { recursive: true });
   fs.writeFileSync(m[1], m[1] + ' written\\n');
 }
-const seen = [...prompt.matchAll(/EXPECT:([A-Za-z0-9._/-]+)/g)].map((m) => m[1]).filter((f) => fs.existsSync(f));
+const seen = [...prompt.matchAll(/EXPECT:(\\S+)/g)].map((m) => m[1]).filter((f) => fs.existsSync(f));
 const effortAt = process.argv.indexOf('--effort');
 const effort = effortAt === -1 ? 'none' : process.argv[effortAt + 1];
 const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
@@ -53,7 +54,7 @@ function setupRepo({ effortCli = false } = {}) {
   execFileSync('git', ['config', 'user.name', 'Units Test'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'units@test.local'], { cwd: tmp, stdio: 'ignore' });
   fs.writeFileSync(path.join(tmp, 'README.md'), '# Units\n');
-  fs.writeFileSync(path.join(tmp, '.gitignore'), '.fgos/\nworker.mjs\n');
+  fs.writeFileSync(path.join(tmp, '.gitignore'), '.fgos/\nworker.mjs\n*-bin\n');
   execFileSync('git', ['add', 'README.md', '.gitignore'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'initial'], { cwd: tmp, stdio: 'ignore' });
 
@@ -85,10 +86,31 @@ function setupRepo({ effortCli = false } = {}) {
         },
       },
       capabilities: { 'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard' } },
-      patterns: { defaultRule: { mutatingMinRigor: 'standard' } },
+      patterns: { defaultRule: { mutatingMinRigor: 'standard' }, reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'] } } },
     },
   }, null, 2));
   return tmp;
+}
+
+// A reviewed unit needs its reviewer in another provider family than its producer: two executors
+// whose commands are differently named links to node, both preferred for every capability.
+function useTwoFamilies(tmp) {
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const worker = path.join(tmp, 'worker.mjs');
+  cfg.runner.executors = {};
+  for (const name of ['alpha', 'beta']) {
+    const command = path.join(tmp, `${name}-bin`);
+    fs.symlinkSync(process.execPath, command);
+    const args = [worker, '{prompt}'];
+    cfg.runner.executors[name] = {
+      kind: 'agent', allowCrossProvider: true, command, args, providerModel: name,
+      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
+    };
+  }
+  cfg.runner.defaultExecutor = 'alpha';
+  cfg.runner.capabilities['docs:write'].prefer = [{ executor: 'alpha' }, { executor: 'beta' }];
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
 }
 
 function unitsFile(tmp, units) {
@@ -228,4 +250,85 @@ test('resume keeps the effort the run started with', async () => {
   assert.match(state.steps.s.units.u.results.at(-1).runResult.agentClaim.summary, /Effort: low/);
   // A resume of the finished run changes nothing.
   assert.equal((await resumeWorkflow(parked.workflowRunId, opts(tmp))).effort, 'low');
+});
+
+test('a file outside the scope is found by its real name, so a non-ASCII name inside the scope passes', async () => {
+  const tmp = setupRepo();
+  const workflow = validateWorkflow({
+    id: 'unicode',
+    steps: [{ id: 'w', units: [{ id: 'w', template: { capability: 'docs:write', objective: 'WRITE:docs/résumé.md', writes: ['docs/**'] } }] }],
+  });
+  const state = await startWorkflow({ workflow, ...opts(tmp) });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps.w));
+  assert.equal(state.steps.w.units.w.outOfScope, undefined);
+});
+
+test('out-of-scope writes accepted as findings do not reach the target through a later writer on that branch', async () => {
+  const tmp = setupRepo();
+  useTwoFamilies(tmp);
+  const workflow = validateWorkflow({
+    id: 'leak',
+    steps: [
+      { id: 'a', units: [{ id: 'w-a', template: { capability: 'docs:write', pattern: 'reviewed', acceptOutcomes: ['pass', 'findings'], objective: 'WRITE:a.txt WRITE:stray.txt', writes: ['a.txt'] } }] },
+      { id: 'b', dependsOn: ['a'], units: [{ id: 'w-b', template: { capability: 'docs:write', pattern: 'reviewed', acceptOutcomes: ['pass', 'findings'], objective: 'WRITE:b.txt', writes: ['b.txt'] } }] },
+      { id: 'land', kind: 'integrate', dependsOn: ['b'] },
+    ],
+  });
+  const state = await startWorkflow({ workflow, ...opts(tmp) });
+  assert.equal(state.steps.a.units['w-a'].outcome, 'findings', JSON.stringify(state.steps.a));
+  assert.deepEqual(state.steps.a.units['w-a'].outOfScope, ['stray.txt']);
+  // w-b stands on w-a's branch, so it carries the stray file too and is not integrated.
+  assert.deepEqual(state.steps.b.units['w-b'].outOfScope, ['stray.txt']);
+  assert.equal(state.steps.b.units['w-b'].outcome, 'findings');
+  assert.equal(fs.existsSync(path.join(tmp, 'stray.txt')), false, 'the stray file never reached the trunk');
+  assert.equal(fs.existsSync(path.join(tmp, 'b.txt')), false);
+});
+
+test('a units file refuses a unit id that cannot name a branch, and --seats with a units file', async () => {
+  const tmp = setupRepo();
+  await assert.rejects(
+    () => startWorkflow({ unitsPath: unitsFile(tmp, [{ id: 'fix login', objective: 'x', capability: 'docs:write' }]), ...opts(tmp) }),
+    /unit id "fix login"/,
+  );
+  await assert.rejects(
+    () => startWorkflow({ unitsPath: unitsFile(tmp, [{ id: 'u', objective: 'x', capability: 'docs:write' }]), seats: ['a', 'b', 'c'], ...opts(tmp) }),
+    /seats.*units file/,
+  );
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false);
+});
+
+test('a writer whose base writer has no branch fails instead of starting from HEAD', async () => {
+  const tmp = setupRepo();
+  const workflow = validateWorkflow({
+    id: 'lost-base',
+    steps: [
+      { id: 'a', units: [{ id: 'w-a', template: { capability: 'docs:write', objective: 'WRITE:a.txt', writes: ['a.txt'] } }] },
+      { id: 'gate', dependsOn: ['a'], gate: { kind: 'human', question: 'Go?' } },
+      { id: 'b', dependsOn: ['gate'], units: [{ id: 'w-b', template: { capability: 'docs:write', objective: 'WRITE:b.txt', writes: ['b.txt'] } }] },
+    ],
+  });
+  const parked = await startWorkflow({ workflow, ...opts(tmp) });
+  assert.equal(parked.status, 'parked');
+  const branchA = parked.steps.a.units['w-a'].branch;
+  execFileSync('git', ['worktree', 'remove', '--force', parked.steps.a.units['w-a'].worktreePath], { cwd: tmp });
+  execFileSync('git', ['branch', '-D', branchA], { cwd: tmp });
+  const { answerWorkflow } = await import('../../src/workflow/index.mjs');
+  const state = await answerWorkflow(parked.workflowRunId, { stepId: 'gate', answer: 'yes', approved: true, ...opts(tmp) });
+  assert.equal(state.status, 'failed');
+  assert.match(state.steps.b.reason, new RegExp(`base branch "${branchA}"`));
+});
+
+test('a preset or plan writer that builds on two writers keeps starting from HEAD; only a units file is refused', async () => {
+  const tmp = setupRepo();
+  const workflow = validateWorkflow({
+    id: 'two-bases',
+    steps: [
+      { id: 'a', units: [{ id: 'w-a', template: { capability: 'docs:write', objective: 'WRITE:a.txt', writes: ['a.txt'] } }] },
+      { id: 'b', units: [{ id: 'w-b', template: { capability: 'docs:write', objective: 'WRITE:b.txt', writes: ['b.txt'] } }] },
+      { id: 'c', dependsOn: ['a', 'b'], units: [{ id: 'w-c', template: { capability: 'docs:write', objective: 'WRITE:c.txt', writes: ['c.txt'] } }] },
+    ],
+  });
+  const state = await startWorkflow({ workflow, ...opts(tmp) });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  assert.equal(state.steps.c.units['w-c'].baseRef, 'HEAD');
 });
