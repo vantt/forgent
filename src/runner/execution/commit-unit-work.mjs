@@ -7,8 +7,16 @@
 // this trusted code, running outside the confinement, stages and commits what
 // the worker left in the worktree -- only the part inside the unit's write
 // scope, and only paths it staged itself.
+//
+// Everything in the worktree is the worker's to write, the `.git` pointer file
+// and any hook directory a relative core.hooksPath names included. So the git
+// calls here never read either from the worktree: the gitdir comes from the
+// main repository, the hook path is resolved against the main checkout, no
+// fsmonitor runs, and no GIT_* variable of the caller's environment applies.
 
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { partitionPaths } from '../dispatch/write-scope.mjs';
 
@@ -19,40 +27,91 @@ const CONVENTIONAL_SUBJECT = /^(feat|fix|docs|refactor|test|chore|perf|build|ci|
 
 const SUBJECT_MAX = 100;
 
-function git(cwd, args, { env, input } = {}) {
-  return execFileSync('git', args, {
-    cwd,
+/** The caller's environment without any GIT_* variable: none of them may redirect these calls. */
+function cleanEnv(extra = {}) {
+  const env = {};
+  for (const [key, value] of Object.entries(process.env)) if (!key.startsWith('GIT_')) env[key] = value;
+  return { ...env, ...extra };
+}
+
+function rawGit(cwd, args) {
+  return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: cleanEnv() });
+}
+
+/** Raised when `worktree` is not a working tree of the trusted repository. */
+class UntrustedWorktreeError extends Error {}
+
+/**
+ * How to run git on `worktree`. With `repoRoot` (the main checkout, which a confined worker cannot
+ * write), the gitdir is looked up from the repository's own worktree list, never read from the
+ * worktree's `.git` file. Without it (a caller whose worker runs unconfined anyway) git finds the
+ * gitdir as usual.
+ */
+export function gitContext({ worktree, repoRoot = null }) {
+  const workTree = fs.realpathSync(worktree);
+  const prefix = ['-c', 'core.fsmonitor=false'];
+  if (!repoRoot) return { cwd: workTree, prefix };
+
+  const mainRoot = fs.realpathSync(repoRoot);
+  const commonDir = path.resolve(mainRoot, rawGit(mainRoot, ['rev-parse', '--git-common-dir']).trim());
+  let gitDir = null;
+  if (workTree === mainRoot) {
+    gitDir = commonDir;
+  } else {
+    const linked = path.join(commonDir, 'worktrees');
+    for (const name of fs.existsSync(linked) ? fs.readdirSync(linked) : []) {
+      let pointer;
+      try { pointer = fs.readFileSync(path.join(linked, name, 'gitdir'), 'utf8').trim(); } catch { continue; }
+      let target;
+      try { target = fs.realpathSync(path.dirname(path.resolve(linked, name, pointer))); } catch { continue; }
+      if (target === workTree) { gitDir = path.join(linked, name); break; }
+    }
+  }
+  if (!gitDir) throw new UntrustedWorktreeError(`${workTree} is not a working tree of the repository at ${mainRoot}`);
+
+  // A relative hooks path is read against the main checkout, whose hooks the worker cannot edit.
+  let hooksPath = '';
+  try { hooksPath = rawGit(mainRoot, ['config', '--get', 'core.hooksPath']).trim(); } catch { /* unset */ }
+  if (hooksPath && !path.isAbsolute(hooksPath) && !hooksPath.startsWith('~')) {
+    prefix.push('-c', `core.hooksPath=${path.resolve(mainRoot, hooksPath)}`);
+  }
+  return { cwd: workTree, prefix: ['--git-dir', gitDir, '--work-tree', workTree, ...prefix] };
+}
+
+function git(ctx, args, { env, input } = {}) {
+  return execFileSync('git', [...ctx.prefix, ...args], {
+    cwd: ctx.cwd,
     encoding: 'utf8',
     stdio: [input === undefined ? 'ignore' : 'pipe', 'pipe', 'pipe'],
     maxBuffer: 64 * 1024 * 1024,
     ...(input === undefined ? {} : { input }),
-    env: env ? { ...process.env, ...env } : process.env,
+    env: cleanEnv(env),
   });
 }
 
 const nulList = (out) => out.split('\0').filter(Boolean);
 
-function hasConfigured(cwd, key) {
+function hasConfigured(ctx, key) {
   try {
-    return git(cwd, ['config', '--get', key]).trim() !== '';
+    return git(ctx, ['config', '--get', key]).trim() !== '';
   } catch {
     return false;
   }
 }
 
 /** Paths in the index that differ from HEAD; renames are reported as their two halves. */
-export function stagedPaths(worktree) {
-  return nulList(git(worktree, ['diff', '--cached', '--name-only', '--no-renames', '-z']));
+export function stagedPaths(ctx) {
+  return nulList(git(ctx, ['diff', '--cached', '--name-only', '--no-renames', '-z']));
 }
 
 /**
  * Every path `git status` sees as changed, staged or not, untracked files one by one. An unstaged
  * rename shows up as a deletion and an untracked file, so each half is judged on its own.
  */
-export function changedPaths(worktree) {
+export function changedPaths(ctx) {
   // Content changes inside a submodule are not a change of this repository: staging the
   // submodule path would stage nothing and the staged-set check would fail.
-  const fields = git(worktree, ['status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignore-submodules=dirty']).split('\0');
+  const fields = git(ctx, ['status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignore-submodules=dirty']).split('\0');
   const paths = [];
   for (let i = 0; i < fields.length; i += 1) {
     const entry = fields[i];
@@ -72,10 +131,11 @@ const outsideStore = (p) => !p.startsWith(STORE_PREFIX) && p !== '.fgos';
  * them, it stages only what it chose) and paths already dirty inside the scope (never committed
  * by the run; they stay for whoever left them).
  */
-export function preflightUnitWorktree({ worktree, scope }) {
+export function preflightUnitWorktree({ worktree, repoRoot, scope }) {
+  const ctx = gitContext({ worktree, repoRoot });
   return {
-    foreignStaged: stagedPaths(worktree),
-    preExistingInScope: partitionPaths(changedPaths(worktree).filter(outsideStore), scope).inScope,
+    foreignStaged: stagedPaths(ctx),
+    preExistingInScope: partitionPaths(changedPaths(ctx).filter(outsideStore), scope).inScope,
   };
 }
 
@@ -97,8 +157,8 @@ export function subjectFrom(summary, unitId) {
 const sameSet = (a, b) => a.length === b.length && new Set([...a, ...b]).size === a.length;
 
 /** Literal pathspecs on stdin: no argument limit, and no `*`, `[` or `:(magic)` reading. */
-function withPaths(worktree, args, paths) {
-  return git(worktree, [...args, '--pathspec-from-file=-', '--pathspec-file-nul'], {
+function withPaths(ctx, args, paths) {
+  return git(ctx, [...args, '--pathspec-from-file=-', '--pathspec-file-nul'], {
     env: { GIT_LITERAL_PATHSPECS: '1' },
     input: `${paths.join('\0')}\0`,
   });
@@ -115,6 +175,7 @@ function withPaths(worktree, args, paths) {
  *
  * @param {object} p
  * @param {string} p.worktree
+ * @param {string} [p.repoRoot] the main checkout; required whenever the producer ran confined
  * @param {string} p.unitId
  * @param {string} [p.summary]
  * @param {string[]} p.scope canonical write scope; `['**']` for "everything outside .fgos"
@@ -124,7 +185,7 @@ function withPaths(worktree, args, paths) {
  * @returns {{ status: 'committed'|'no-changes'|'failed', sha?: string, subject?: string, files?: string[],
  *   outOfScope: string[], preExistingInScope: string[], needsWrites?: string[], reason?: string, error?: string }}
  */
-export function commitUnitWork({ worktree, unitId, summary, scope, changedFiles = null, excludePaths = [], needsWrites }) {
+export function commitUnitWork({ worktree, repoRoot = null, unitId, summary, scope, changedFiles = null, excludePaths = [], needsWrites }) {
   if (!Array.isArray(scope)) throw new TypeError('commitUnitWork requires a write scope (use ["**"] for the whole worktree)');
   const base = {
     outOfScope: [],
@@ -133,13 +194,20 @@ export function commitUnitWork({ worktree, unitId, summary, scope, changedFiles 
   };
   const failed = (reason, detail, extra = {}) => ({ status: 'failed', reason, error: detail, ...base, ...extra });
   try {
-    const foreign = stagedPaths(worktree);
+    let ctx;
+    try {
+      ctx = gitContext({ worktree, repoRoot });
+    } catch (err) {
+      if (err instanceof UntrustedWorktreeError) return failed('untrusted-worktree', err.message);
+      throw err;
+    }
+    const foreign = stagedPaths(ctx);
     if (foreign.length > 0) {
       return failed('foreign-staged-index', foreignIndexDetail(foreign), { stagedPaths: foreign });
     }
 
     const excluded = new Set(excludePaths);
-    const candidates = changedPaths(worktree).filter((p) => outsideStore(p) && !excluded.has(p));
+    const candidates = changedPaths(ctx).filter((p) => outsideStore(p) && !excluded.has(p));
     const { inScope, outOfScope } = partitionPaths(candidates, scope);
     const agentChanged = new Set(changedFiles ?? []);
     base.outOfScope = outOfScope.filter((p) => agentChanged.has(p));
@@ -147,14 +215,14 @@ export function commitUnitWork({ worktree, unitId, summary, scope, changedFiles 
 
     // From here until the commit lands, a failure takes back only what this call staged, so a
     // retry does not find the runner's own staging and refuse it as foreign.
-    const unstage = () => { try { withPaths(worktree, ['reset', '-q'], inScope); } catch { /* best effort */ } };
+    const unstage = () => { try { withPaths(ctx, ['reset', '-q'], inScope); } catch { /* best effort */ } };
     try {
-      withPaths(worktree, ['add', '-A'], inScope);
+      withPaths(ctx, ['add', '-A'], inScope);
     } catch (err) {
       unstage();
       throw err;
     }
-    const nowStaged = stagedPaths(worktree);
+    const nowStaged = stagedPaths(ctx);
     if (!sameSet(nowStaged, inScope)) {
       unstage();
       return failed('staged-set-mismatch', 'the index after staging does not hold exactly the in-scope paths', {
@@ -166,22 +234,22 @@ export function commitUnitWork({ worktree, unitId, summary, scope, changedFiles 
     const subject = subjectFrom(summary, unitId);
     // Use the repository's own identity; only fill the gap when it has none.
     const identity = {};
-    if (!hasConfigured(worktree, 'user.name')) {
+    if (!hasConfigured(ctx, 'user.name')) {
       identity.GIT_AUTHOR_NAME = identity.GIT_COMMITTER_NAME = 'fgOS runner';
     }
-    if (!hasConfigured(worktree, 'user.email')) {
+    if (!hasConfigured(ctx, 'user.email')) {
       identity.GIT_AUTHOR_EMAIL = identity.GIT_COMMITTER_EMAIL = 'runner@fgos.local';
     }
     try {
-      git(worktree, ['commit', '-q', '-m', subject], { env: identity });
+      git(ctx, ['commit', '-q', '-m', subject], { env: identity });
     } catch (err) {
       unstage();
       throw err;
     }
-    const sha = git(worktree, ['rev-parse', 'HEAD']).trim();
+    const sha = git(ctx, ['rev-parse', 'HEAD']).trim();
 
     // A pre-commit hook can still change the index between the check above and the commit.
-    const inCommit = nulList(git(worktree, ['show', '--name-only', '--no-renames', '--format=', '-z', 'HEAD']));
+    const inCommit = nulList(git(ctx, ['show', '--name-only', '--no-renames', '--format=', '-z', 'HEAD']));
     if (!sameSet(inCommit, inScope)) {
       const unexpected = inCommit.filter((p) => !inScope.includes(p));
       const missing = inScope.filter((p) => !inCommit.includes(p));
@@ -197,9 +265,10 @@ export function commitUnitWork({ worktree, unitId, summary, scope, changedFiles 
 }
 
 /** Whether `sha` is still in the history of the worktree's HEAD. */
-export function commitOnBranch(worktree, sha) {
+export function commitOnBranch(worktree, sha, repoRoot = null) {
   try {
-    git(worktree, ['merge-base', '--is-ancestor', sha, 'HEAD']);
+    const ctx = gitContext({ worktree, repoRoot });
+    git(ctx, ['merge-base', '--is-ancestor', sha, 'HEAD']);
     return true;
   } catch {
     return false;

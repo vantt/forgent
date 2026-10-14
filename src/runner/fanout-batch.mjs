@@ -118,6 +118,7 @@ export async function fanoutBatchExecutorCli(
         // blocked.
         const commit = commitUnitWork({
           worktree: wtPath,
+          repoRoot: root,
           unitId: candidateId,
           summary: `${candidateId}: ${workItem.title}`,
           // A Work item declares no write scope: everything outside .fgos is the worker's.

@@ -144,18 +144,18 @@ function lastAttempts(unitRecord) {
  * again without spawning the agent. Not when the failed commit is still on the branch carrying
  * paths outside the scope; a person has to take that commit off first.
  */
-function commitPending(attempt, worktree) {
+function commitPending(attempt, worktree, mainRoot) {
   const commit = attempt?.commit;
   if (commit?.status !== 'failed') return false;
-  return !(commit.reason === 'committed-set-mismatch' && commit.sha && commitOnBranch(worktree, commit.sha));
+  return !(commit.reason === 'committed-set-mismatch' && commit.sha && commitOnBranch(worktree, commit.sha, mainRoot));
 }
 
 /** A resume cannot go past a commit that landed holding paths outside the unit's write scope. */
-function assertNoStrayCommit(unitRunId, unitRecord) {
+function assertNoStrayCommit(unitRunId, unitRecord, mainRoot) {
   for (const attempt of lastAttempts(unitRecord)) {
     const commit = attempt.commit;
     if (commit?.status !== 'failed' || commit.reason !== 'committed-set-mismatch' || !commit.sha) continue;
-    if (!commitOnBranch(unitRecord.worktree, commit.sha)) continue;
+    if (!commitOnBranch(unitRecord.worktree, commit.sha, mainRoot)) continue;
     const diff = [
       ...(commit.unexpected ?? []).map((p) => `+${p}`),
       ...(commit.missing ?? []).map((p) => `-${p}`),
@@ -246,7 +246,7 @@ export async function runUnit(options = {}) {
         throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": another process (PID ${pid}) holds lock at "${lockPath}"`);
       }
     }
-    assertNoStrayCommit(unitRunId, unitRecord);
+    assertNoStrayCommit(unitRunId, unitRecord, mainRoot);
   } else {
     let raw;
     if (options.unitData) {
@@ -343,7 +343,7 @@ export async function runUnit(options = {}) {
   // A producer round whose commit is still pending is not settled yet: the pattern asks for it
   // again, and runRole commits it without spawning the agent.
   const pendingCommitKeys = () => new Set(Object.entries(unitRecord.bindings ?? {})
-    .filter(([, attempts]) => commitPending(attempts[attempts.length - 1], unitRecord.worktree))
+    .filter(([, attempts]) => commitPending(attempts[attempts.length - 1], unitRecord.worktree, mainRoot))
     .map(([key]) => key));
   const history = () => {
     const pending = pendingCommitKeys();
@@ -498,6 +498,8 @@ export async function runUnit(options = {}) {
     const writeScope = unitRecord.writeScope ?? unit.writes ?? [];
     const commitWork = (summarySource, runResult, excludePaths) => commitUnitWork({
       worktree: unitRecord.worktree,
+      // The gitdir and hooks come from the main checkout, never from the worker-writable worktree.
+      repoRoot: mainRoot,
       unitId: summarySource.id,
       summary: runResult?.agentClaim?.summary,
       scope: writeScope,
@@ -509,8 +511,8 @@ export async function runUnit(options = {}) {
     // The agent already did this round's work and only the runner commit failed: commit again,
     // never spawn the agent a second time.
     const lastRecorded = recorded[recorded.length - 1];
-    if (!readOnly && commitPending(lastRecorded, unitRecord.worktree)) {
-      const { foreignStaged } = preflightUnitWorktree({ worktree: unitRecord.worktree, scope: writeScope });
+    if (!readOnly && commitPending(lastRecorded, unitRecord.worktree, mainRoot)) {
+      const { foreignStaged } = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope });
       if (foreignStaged.length > 0) return foreignIndexRefusal(role, round, foreignStaged);
       const prior = readUnitRunHistory(unitDir).find((h) => h.role === role && (h.round ?? 1) === round);
       const excludePaths = lastRecorded.preExistingInScope ?? [];
@@ -557,7 +559,7 @@ export async function runUnit(options = {}) {
     // runner never commits them. A resumed attempt keeps what its first launch saw.
     let preExistingInScope = [];
     if (!readOnly) {
-      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, scope: writeScope });
+      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, scope: writeScope });
       if (preflight.foreignStaged.length > 0) return foreignIndexRefusal(role, round, preflight.foreignStaged);
       preExistingInScope = recorded[0]?.preExistingInScope ?? preflight.preExistingInScope;
     }

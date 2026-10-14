@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { changedPaths, commitUnitWork } from '../../../src/runner/execution/commit-unit-work.mjs';
+import { changedPaths, commitUnitWork, gitContext } from '../../../src/runner/execution/commit-unit-work.mjs';
 
 function git(cwd, ...args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
@@ -245,5 +245,77 @@ test('an untracked nested repository is staged under its own name, as add -A alw
 test('an intent-to-add rename in the worktree column yields both halves, not a garbled path', () => withRepo({ 'old.txt': 'o\n'.repeat(20) }, (dir) => {
   fs.renameSync(path.join(dir, 'old.txt'), path.join(dir, 'new.txt'));
   git(dir, 'add', '-N', 'new.txt');
-  assert.deepEqual(changedPaths(dir).sort(), ['new.txt', 'old.txt']);
+  assert.deepEqual(changedPaths(gitContext({ worktree: dir })).sort(), ['new.txt', 'old.txt']);
 }));
+
+/** A main repo with one linked worktree, as the runner sees a unit's worktree. */
+function withLinkedWorktree(fn) {
+  const main = makeRepo();
+  const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-commit-unit-wt-'));
+  fs.rmSync(wt, { recursive: true });
+  git(main, 'worktree', 'add', '-q', '-b', 'unit', wt);
+  try { return fn({ main, wt }); } finally {
+    fs.rmSync(wt, { recursive: true, force: true });
+    fs.rmSync(main, { recursive: true, force: true });
+  }
+}
+
+/** A repo the worker builds and points the worktree's .git file at; its config runs a command on git status. */
+function fakeRepoWithFsmonitor(dir, marker) {
+  const fake = path.join(dir, '.fake-git');
+  git(dir, 'init', '-q', '--separate-git-dir', fake, path.join(dir, '.fake-wt'));
+  fs.writeFileSync(path.join(fake, 'config'), `[core]\n\tfsmonitor = touch ${marker}; false\n[user]\n\tname = w\n\temail = w@w\n`, { flag: 'a' });
+  return fake;
+}
+
+test('a .git pointer the worker rewrote is ignored when repoRoot names the trusted repository', () => withLinkedWorktree(({ main, wt }) => {
+  const marker = path.join(os.tmpdir(), `fgos-pwned-${process.pid}-${Date.now()}`);
+  const fake = fakeRepoWithFsmonitor(wt, marker);
+  fs.writeFileSync(path.join(wt, '.git'), `gitdir: ${fake}\n`);
+  write(wt, 'docs/x.md');
+  const branchBefore = git(main, 'rev-parse', 'unit').trim();
+  const r = commitUnitWork({ worktree: wt, repoRoot: main, unitId: 'u1', summary: 's', scope: ['docs'] });
+  assert.equal(fs.existsSync(marker), false, 'no command from the worker-built config ran');
+  assert.equal(r.status, 'committed', r.error);
+  assert.notEqual(git(main, 'rev-parse', 'unit').trim(), branchBefore, 'the real unit branch moved');
+  assert.equal(git(main, 'show', '--name-only', '--format=', 'unit').trim(), 'docs/x.md');
+  fs.rmSync(marker, { force: true });
+}));
+
+test('a relative hooksPath runs the main checkout copy of the hook, never the worktree copy', () => withLinkedWorktree(({ main, wt }) => {
+  const marker = path.join(os.tmpdir(), `fgos-hook-${process.pid}-${Date.now()}`);
+  fs.mkdirSync(path.join(main, '.githooks'));
+  fs.writeFileSync(path.join(main, '.githooks/pre-commit'), `#!/bin/sh\necho trusted >> ${marker}\n`, { mode: 0o755 });
+  git(main, 'config', 'core.hooksPath', '.githooks');
+  fs.mkdirSync(path.join(wt, '.githooks'));
+  fs.writeFileSync(path.join(wt, '.githooks/pre-commit'), `#!/bin/sh\necho worker >> ${marker}\n`, { mode: 0o755 });
+  write(wt, 'docs/x.md');
+  const r = commitUnitWork({ worktree: wt, repoRoot: main, unitId: 'u1', summary: 's', scope: ['docs'] });
+  assert.equal(r.status, 'committed', r.error);
+  assert.equal(fs.readFileSync(marker, 'utf8'), 'trusted\n');
+  fs.rmSync(marker, { force: true });
+}));
+
+test('a worktree that is not a worktree of repoRoot is refused, not committed somewhere else', () => withLinkedWorktree(({ main }) => withRepo(undefined, (stranger) => {
+  write(stranger, 'docs/x.md');
+  const r = commitUnitWork({ worktree: stranger, repoRoot: main, unitId: 'u1', summary: 's', scope: ['docs'] });
+  assert.equal(r.status, 'failed');
+  assert.equal(r.reason, 'untrusted-worktree');
+})));
+
+test('GIT_DIR, GIT_WORK_TREE and GIT_INDEX_FILE inherited by the runner do not redirect the commit', () => withRepo(undefined, (dir) => withRepo(undefined, (other) => {
+  write(dir, 'a.txt');
+  const saved = { GIT_DIR: process.env.GIT_DIR, GIT_WORK_TREE: process.env.GIT_WORK_TREE, GIT_INDEX_FILE: process.env.GIT_INDEX_FILE };
+  const otherHead = head(other);
+  const otherGitDir = path.join(other, '.git');
+  Object.assign(process.env, { GIT_DIR: otherGitDir, GIT_WORK_TREE: other, GIT_INDEX_FILE: path.join(otherGitDir, 'index') });
+  let r;
+  try {
+    r = commitUnitWork({ worktree: dir, repoRoot: dir, unitId: 'u1', summary: 's', scope: ['**'] });
+  } finally {
+    for (const [k, v] of Object.entries(saved)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+  }
+  assert.equal(r.status, 'committed', r.error);
+  assert.equal(head(other), otherHead);
+  assert.deepEqual(committed(dir), ['a.txt']);
+})));
