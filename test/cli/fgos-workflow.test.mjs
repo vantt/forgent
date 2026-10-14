@@ -84,3 +84,28 @@ test('workflow start repeats context-ref into one persisted field and refuses ma
     assert.match(refused.stderr, /contextRefs/);
   }
 });
+
+test('workflow start --units refuses a second definition source, --seats and a bad --effort before any run exists', (t) => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-units-cli-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
+  execFileSync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '--allow-empty', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
+  const units = path.join(tmp, 'units.json');
+  fs.writeFileSync(units, JSON.stringify([{ id: 'u', objective: 'Read', capability: 'docs:write' }]));
+  const invoke = (args) => spawnSync(process.execPath, [FGOS, 'workflow', 'start', ...args, '--foreground', '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
+
+  const cases = [
+    [['delphi', '--units', units], /exactly one of <workflowId>, --plan <path> or --units <file>/],
+    [['--plan', 'plans/x', '--units', units], /exactly one of/],
+    [[], /exactly one of/],
+    [['--units', units, '--seats', 'a|b|c'], /cannot be used with --units/],
+    [['--units', units, '--effort', 'turbo'], /reasoningEffort "turbo"/],
+    [['--units', path.join(tmp, 'missing.json')], /units file not readable/],
+  ];
+  for (const [args, expected] of cases) {
+    const refused = invoke(args);
+    assert.notEqual(refused.status, 0, args.join(' '));
+    assert.match(refused.stderr, expected, args.join(' '));
+  }
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false, 'no run was created');
+});

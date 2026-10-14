@@ -1622,6 +1622,8 @@ export const COMMAND_REGISTRY = [
         sub: { type: 'string', description: 'Subcommand: start, status (run state plus advance: running, pid, logPath, lastLines, hint), answer, resume, operations, stages.' },
         id: { type: 'string', description: 'Workflow ID or Workflow Run ID.' },
         plan: { type: 'string', description: '"start" only: path to AgentKit plan.md or plan directory.' },
+        units: { type: 'string', description: '"start" only: a YAML or JSON units file, { id?, title?, units: [Unit...] } or a list of Units, run as a one-off Workflow with one step per Unit; a Unit\'s dependsOn orders the steps and hands it the earlier reports. A Unit may carry a soft "prefer" executor list and a "persona". A writing Unit that builds on exactly one writing Unit starts from that Unit\'s branch; building on two or more is refused (merge them or add an integrate step). Nothing is merged for you: the result lists every writing Unit\'s branch and worktree (writeBranches). Exactly one of <workflowId>, --plan, --units; not combinable with --seats.' },
+        effort: { type: 'string', description: '"start" only: reasoning effort every unit of the run asks for (low, medium, high, max), checked against each chosen executor; kept for resume.' },
         request: { type: 'string', description: '"start" only: the owner request this run serves; every unit receives it in its objective.' },
         'context-ref': { type: 'array', items: { type: 'string' }, description: '"start" only, repeatable: safe repo-relative path or handoff reference; first-step Units receive these alongside template.contextRefs.' },
         seats: { type: 'string', description: '"start" only (and a consistency check on "resume"): pipe-separated entries, at least 2; a lens is 3-160 characters on one line without braces, distinct case-insensitively; rebuilds a base whose panel is generic (group-cognition, business-discussion, nominal-group, delphi) with one panel seat per lens, in order. Topology, gates, checkers and the synthesizer stay as registered; there is no seat maximum, seats beyond the provider families share one (reported as seatsPreflight). An entry "@name" (lowercase letters, digits and "-") seats a named persona on that seat only: looked up in fgos/agents of the project, then domains/*/agents, then the installed core/agents, pinned at start, never silently replaced; an unknown or duplicated name refuses the start. Bases with curated seats (council-lite, architecture-advisory) are refused. Context refs are also copied to the later steps so every seat and checker receives them.' },
@@ -1640,6 +1642,7 @@ export const COMMAND_REGISTRY = [
     examples: [
       'fgos workflow start coding/feature',
       'fgos workflow start --plan plans/my-plan',
+      'fgos workflow start --units units.yaml --effort high --foreground',
       'fgos workflow start delphi --foreground',
       'fgos workflow start group-cognition --request "Why does month-end close slip?" --seats "reconciliation bottlenecks|handoff timing|automation failure modes" --context-ref docs/finance/close-policy.md',
       'fgos workflow status wf-run-1234',

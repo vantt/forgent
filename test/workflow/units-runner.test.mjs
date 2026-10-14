@@ -132,9 +132,15 @@ test('a units file runs through startWorkflow, and a unit\'s prefer and persona 
   assert.equal(state.status, 'completed', JSON.stringify(state.steps));
   assert.match(state.workflowId, /^units\//);
 
-  const record = unitRecordOf(tmp, state.steps.look.units.look.unitRunId);
+  const unitRunId = state.steps.look.units.look.unitRunId;
+  const record = unitRecordOf(tmp, unitRunId);
   assert.deepEqual(record.unit.prefer, ['test-node']);
   assert.equal(record.unit.persona, 'code-reviewer');
+  // bind() chose from the unit's own prefer and took its persona, no override involved.
+  const provenance = producerAssignment(tmp, unitRunId).binding.provenance;
+  assert.deepEqual(provenance.executor, { value: 'test-node', source: 'unit-prefer' });
+  assert.deepEqual(provenance.persona, { value: 'code-reviewer', source: 'unit' });
+  assert.deepEqual(record.overrides, []);
 });
 
 test('--effort becomes a human-cli reasoningEffort override on every unit, kept in the run for resume', async () => {
@@ -331,4 +337,19 @@ test('a preset or plan writer that builds on two writers keeps starting from HEA
   const state = await startWorkflow({ workflow, ...opts(tmp) });
   assert.equal(state.status, 'completed', JSON.stringify(state.steps));
   assert.equal(state.steps.c.units['w-c'].baseRef, 'HEAD');
+});
+
+test('fgos workflow start --units <file> --effort runs the units and reports the write branches', async () => {
+  const tmp = setupRepo({ effortCli: true });
+  const file = unitsFile(tmp, [
+    { id: 'w-a', objective: 'WRITE:a.txt', capability: 'docs:write', writes: ['a.txt'] },
+    { id: 'w-b', objective: 'WRITE:b.txt EXPECT:a.txt', capability: 'docs:write', writes: ['b.txt'], dependsOn: ['w-a'] },
+  ]);
+  const out = execFileSync(process.execPath, [path.resolve('bin/fgos.mjs'), 'workflow', 'start', '--units', file, '--effort', 'high', '--foreground', '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
+  const state = JSON.parse(out).data;
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  assert.equal(state.effort, 'high');
+  assert.deepEqual(state.writeBranches.map((e) => e.unitId), ['w-a', 'w-b']);
+  assert.equal(state.writeBranches[1].baseRef, state.writeBranches[0].branch);
+  assert.match(state.steps['w-b'].units['w-b'].results.at(-1).runResult.agentClaim.summary, /Seen: a\.txt Effort: high/);
 });
