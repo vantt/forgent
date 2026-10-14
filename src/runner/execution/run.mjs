@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 import { execFileSync, execSync } from 'node:child_process';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
-import { expandGenerated } from '../dispatch/write-scope.mjs';
+import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
 import { bind, nextCandidate, retrySameCandidate, getProviderFamily } from './bind.mjs';
 import { credentialFaultFamilies, inspectAccountRotation, mayRotateAccount } from './account-rotation.mjs';
 import { createRoleExecutorLedger } from './role-ledger.mjs';
@@ -513,7 +513,17 @@ export async function runUnit(options = {}) {
       const { foreignStaged } = preflightUnitWorktree({ worktree: unitRecord.worktree, scope: writeScope });
       if (foreignStaged.length > 0) return foreignIndexRefusal(role, round, foreignStaged);
       const prior = readUnitRunHistory(unitDir).find((h) => h.role === role && (h.round ?? 1) === round);
-      const commit = commitWork(rUnit || unit, prior?.runResult, lastRecorded.preExistingInScope ?? []);
+      const excludePaths = lastRecorded.preExistingInScope ?? [];
+      let commit = commitWork(rUnit || unit, prior?.runResult, excludePaths);
+      if (commit.status === 'no-changes') {
+        // The agent's in-scope files are gone (cleaned up with the index): that is not a pass.
+        const missing = partitionPaths((prior?.runResult?.evidence?.changedFiles ?? [])
+          .filter((p) => !excludePaths.includes(p)), writeScope).inScope;
+        if (missing.length > 0) {
+          commit = { ...commit, status: 'failed', reason: 'work-missing', missing,
+            error: `the files this round changed in scope are no longer in the worktree: ${missing.join(', ')}; run the unit again` };
+        }
+      }
       lastRecorded.commit = commit;
       lastRecorded.outcome = commit.status === 'failed' ? 'execution-failure' : 'pass';
       persistUnitRecord();

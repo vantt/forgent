@@ -50,14 +50,17 @@ export function stagedPaths(worktree) {
  * rename shows up as a deletion and an untracked file, so each half is judged on its own.
  */
 export function changedPaths(worktree) {
-  const fields = git(worktree, ['status', '--porcelain=v1', '-z', '--untracked-files=all']).split('\0');
+  // Content changes inside a submodule are not a change of this repository: staging the
+  // submodule path would stage nothing and the staged-set check would fail.
+  const fields = git(worktree, ['status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignore-submodules=dirty']).split('\0');
   const paths = [];
   for (let i = 0; i < fields.length; i += 1) {
     const entry = fields[i];
     if (entry.length < 4) continue;
-    paths.push(entry.slice(3));
-    // A staged rename or copy is followed by its source path.
-    if (entry[0] === 'R' || entry[0] === 'C') paths.push(fields[++i]);
+    // An untracked nested repository is listed as `dir/` but staged (as a gitlink) as `dir`.
+    paths.push(entry.slice(3).replace(/\/$/, ''));
+    // A rename or copy, staged or intent-to-add, is followed by its source path.
+    if ('RC'.includes(entry[0]) || 'RC'.includes(entry[1])) paths.push(fields[++i]);
   }
   return [...new Set(paths)];
 }
@@ -142,11 +145,18 @@ export function commitUnitWork({ worktree, unitId, summary, scope, changedFiles 
     base.outOfScope = outOfScope.filter((p) => agentChanged.has(p));
     if (inScope.length === 0) return { status: 'no-changes', ...base };
 
-    withPaths(worktree, ['add', '-A'], inScope);
+    // From here until the commit lands, a failure takes back only what this call staged, so a
+    // retry does not find the runner's own staging and refuse it as foreign.
+    const unstage = () => { try { withPaths(worktree, ['reset', '-q'], inScope); } catch { /* best effort */ } };
+    try {
+      withPaths(worktree, ['add', '-A'], inScope);
+    } catch (err) {
+      unstage();
+      throw err;
+    }
     const nowStaged = stagedPaths(worktree);
     if (!sameSet(nowStaged, inScope)) {
-      // Take back only what this call staged; whatever else appeared in the index is not ours.
-      try { withPaths(worktree, ['reset', '-q'], inScope); } catch { /* reported below */ }
+      unstage();
       return failed('staged-set-mismatch', 'the index after staging does not hold exactly the in-scope paths', {
         unexpected: nowStaged.filter((p) => !inScope.includes(p)),
         missing: inScope.filter((p) => !nowStaged.includes(p)),
@@ -162,7 +172,12 @@ export function commitUnitWork({ worktree, unitId, summary, scope, changedFiles 
     if (!hasConfigured(worktree, 'user.email')) {
       identity.GIT_AUTHOR_EMAIL = identity.GIT_COMMITTER_EMAIL = 'runner@fgos.local';
     }
-    git(worktree, ['commit', '-q', '-m', subject], { env: identity });
+    try {
+      git(worktree, ['commit', '-q', '-m', subject], { env: identity });
+    } catch (err) {
+      unstage();
+      throw err;
+    }
     const sha = git(worktree, ['rev-parse', 'HEAD']).trim();
 
     // A pre-commit hook can still change the index between the check above and the commit.

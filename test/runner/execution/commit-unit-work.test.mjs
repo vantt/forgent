@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { commitUnitWork } from '../../../src/runner/execution/commit-unit-work.mjs';
+import { changedPaths, commitUnitWork } from '../../../src/runner/execution/commit-unit-work.mjs';
 
 function git(cwd, ...args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
@@ -199,4 +199,51 @@ test('nothing in scope is no-changes, and still names what changed out of scope'
 
 test('a missing scope is a caller bug, not "commit everything"', () => withRepo(undefined, (dir) => {
   assert.throws(() => commitUnitWork({ worktree: dir, unitId: 'u1', summary: 's' }), /scope/);
+}));
+
+test('a commit a hook rejects takes back what the runner staged, so the next try is not refused as foreign', () => withRepo(undefined, (dir) => {
+  const hooks = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-commit-unit-hooks-'));
+  fs.writeFileSync(path.join(hooks, 'pre-commit'), '#!/bin/sh\nexit 1\n', { mode: 0o755 });
+  git(dir, 'config', 'core.hooksPath', hooks);
+  write(dir, 'a.txt');
+  const r = commitUnitWork({ worktree: dir, unitId: 'u1', summary: 's', scope: ['**'] });
+  assert.equal(r.status, 'failed');
+  assert.equal(r.reason, 'git-error');
+  assert.deepEqual(staged(dir), [], 'the index is as it was before the call');
+  git(dir, 'config', 'core.hooksPath', '.no-hooks');
+  fs.rmSync(hooks, { recursive: true, force: true });
+  assert.equal(commitUnitWork({ worktree: dir, unitId: 'u1', summary: 's', scope: ['**'] }).status, 'committed');
+}));
+
+test('a submodule with only dirty content is not a change to commit, and does not block the rest', () => withRepo(undefined, (dir) => {
+  const sub = makeRepo({ 'inner.txt': 'i\n' });
+  try {
+    git(dir, '-c', 'protocol.file.allow=always', 'submodule', 'add', '-q', sub, 'sm');
+    git(dir, 'commit', '-qm', 'add submodule');
+    fs.writeFileSync(path.join(dir, 'sm', 'inner.txt'), 'dirty\n');
+    write(dir, 'top.txt');
+    const r = commitUnitWork({ worktree: dir, unitId: 'u1', summary: 's', scope: ['**'] });
+    assert.equal(r.status, 'committed', r.error);
+    assert.deepEqual(committed(dir), ['top.txt']);
+  } finally {
+    fs.rmSync(sub, { recursive: true, force: true });
+  }
+}));
+
+test('an untracked nested repository is staged under its own name, as add -A always did', () => withRepo(undefined, (dir) => {
+  const nested = path.join(dir, 'nested');
+  fs.mkdirSync(nested);
+  git(nested, 'init', '-q', '-b', 'main');
+  fs.writeFileSync(path.join(nested, 'n.txt'), 'n\n');
+  git(nested, '-c', 'user.name=t', '-c', 'user.email=t@t', 'add', '-A');
+  git(nested, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'n');
+  const r = commitUnitWork({ worktree: dir, unitId: 'u1', summary: 's', scope: ['**'] });
+  assert.equal(r.status, 'committed', r.error);
+  assert.deepEqual(committed(dir), ['nested']);
+}));
+
+test('an intent-to-add rename in the worktree column yields both halves, not a garbled path', () => withRepo({ 'old.txt': 'o\n'.repeat(20) }, (dir) => {
+  fs.renameSync(path.join(dir, 'old.txt'), path.join(dir, 'new.txt'));
+  git(dir, 'add', '-N', 'new.txt');
+  assert.deepEqual(changedPaths(dir).sort(), ['new.txt', 'old.txt']);
 }));

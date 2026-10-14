@@ -1694,3 +1694,26 @@ test('resume after committed-set-mismatch refuses while the commit is on the bra
   assert.deepEqual(resumed.results[0].commit.files, ['docs/in.md']);
   assert.equal(producerSpawns(repoRoot, first.unitRunId), 1, 'still no second spawn');
 });
+
+test('a commit-only resume whose in-scope work is gone fails as work-missing instead of passing empty', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  writeScopedWorker(repoRoot, { files: { 'docs/in.md': 'i\n' }, waitFor: '.go' });
+  const running = runUnit({ unitData: { id: 'u-gone', objective: 'Write docs', capability: 'docs:write', writes: ['docs'] }, repoRoot, cwd: worktreeDir, pattern: 'solo' });
+  await waitForFile(path.join(worktreeDir, '.started'));
+  fs.writeFileSync(path.join(worktreeDir, 'foreign.txt'), 'f\n');
+  gitIn(worktreeDir, 'add', 'foreign.txt');
+  fs.writeFileSync(path.join(worktreeDir, '.go'), '');
+  const first = await running;
+  assert.equal(first.results[0].commit.reason, 'foreign-staged-index');
+
+  // The person clears the index and, with it, the agent's file.
+  gitIn(worktreeDir, 'reset', '-q', 'foreign.txt');
+  fs.rmSync(path.join(worktreeDir, 'docs'), { recursive: true, force: true });
+  const resumed = await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
+  assert.equal(resumed.outcome, 'execution-failure');
+  assert.equal(resumed.results[0].commit.status, 'failed');
+  assert.equal(resumed.results[0].commit.reason, 'work-missing');
+  assert.deepEqual(resumed.results[0].commit.missing, ['docs/in.md']);
+  assert.equal(producerSpawns(repoRoot, first.unitRunId), 1);
+});
