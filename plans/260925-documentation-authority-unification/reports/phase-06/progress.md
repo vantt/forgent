@@ -8,11 +8,12 @@ State: authoring
 Resume HEAD: 7d83c6b63
 Last green conservation source: 798daa37b1aa616d110588da8ebb7b832eb7c8d0
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
-SYNC: 77830ba77eb05991d95b005919776ee6254e833b
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
 Registry: compact one-line JSON, 59,454,311 bytes; stop line 90,000,000 bytes.
 Authorization: start Step 5; merge main under A31, route conflict/conservation consequences to one bounded independent request and STOP. If none, SC-1 first, then mapped pending source rows in packs of about 80. No promotion, push, rebase, Step 6, protected tool/baseline edits or main checkout writes.
 Resume tree clean; cwd/branch and ancestry verified. Technical blockers: none established. No new owner question.
-Next: resume A-H checks, merge main, account legacy digests, machine-check receipts and native identity consequences. Preserve reviewed bindings unless actual bytes changed. Final progress will record exact SYNC, proofs and request.
+Merge: clean ort merge, 16 imported files, no conflict and no platform content change. Three exact main-side legacy spec digests accounted; content review owed.
+Next: finish native D/E and identity accounting; A31 request if conservation rows arise. Preserve reviewed bindings unless actual bytes changed. Final progress will record exact SYNC, proofs and request.
 
 Earlier progress follows intact.
 
