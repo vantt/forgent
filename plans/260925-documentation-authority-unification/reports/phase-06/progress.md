@@ -9,6 +9,41 @@ Last green source and final proof inventory pin: 0c8bc44c6b67863659231450e01860a
 Content pin: 23062c2ce9caaf6711a906673e2dc14c3f345ec3
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Checkpoint before this pack: da7277eec71cfb635b0c43525b367b49fe180095. This pack/progress commit is the next publication; resolve HEAD after it.
+
+Applied both corrected ordinary rows at a5b13d6df, verbatim notes; original provenance 18962827a retained. No format blocker remains. Authored all 240 source rows, all pending: 104 Unit-exact / 83 Weak-exact / 53 Judgment. All 15 carriers retain the mapped source and metadata; placeholder links fenced verbatim; 25 link spellings explicitly accounted. Two pairs of byte-identical empty template headings use one shared owner each under the duplicate rule, with no source or truth loss. Source groups: eight templates 100, coexistence 25, id-systems audit 32, runbook 18, routing handoff 19, distribution vision 22, switchboard 13, docs portal 11. No component-boundary change.
+
+Root map: 1,072 rows; 508 reviewed / 245 pending / 319 undecided. Both-prior D: exit 0, zero fatal and identical outputs. Both 24-source strict E: identical expected red, exactly 240 pending source rows, three existing historical source gaps (two IO and the unchanged switchboard gap newly included by scope), 792 candidate-unverified units. No identical-owner open group in this bounded scope. Step 5 remains open; historical gaps are not waived or given guessed dispositions. Existing-gap accounting: root-mapped-existing-gap-accounting-turn20.json.
+
+Native proof: all 94,494 old known IDs/full tuples retained; 94,761 current known IDs, zero new gaps or retired units, full active tuple equality. Compact persisted one-line registry 59,682,291 bytes, SHA256 661ebcb2490195b9d5fc0d6a45bc90e4670f408ca13a2251f9d2210dcc91ec16; native-byte-equal and below 90 MB. Root list = 70 old root rows + 693 exact accepted Packaging rows included by namespace + 29 genuinely new reverse units. Full previous row/status records preserved; prior Agent/Host/Packaging lists, holds, exceptions and A34 residual files byte-identical. Re-scope accounting: root-mapped-candidate-rescope-accounting-turn20.json. No new truth sample, truth report/sample/population byte-identical; owner's 5/30 false decision remains parked.
+
+Preservation: A has only seven prior exact exemptions, no new violation; extractor closure, frozen roots, witness/payload trees, authority and reader-link sets unchanged. Ratchet 995/25/1; placement 529/528/one existing exception, zero gap; H zero findings. Review/apply tests with env -u CLAUDE_CODE_SESSION_ID: 29/29, zero fail/cancel/skip/todo. GitNexus own scope low risk, zero affected processes. No full-suite, installed-release, gateway or truth certification. Evidence/reproducible helpers: root-conservation-turn20-verification.json.
+
+Publication after this commit: 3/4 packs, 204/240 source entries and 0/29 new reverse entries. Pack sizes: 68, 68, 68, 65, each under 80, full shown text/diffs and full 64-hex digests. Requests published so far:
+- review-request-261014-1648-mapped-root-conservation-01.md
+- review-request-261014-1649-mapped-root-conservation-02.md
+- review-request-261014-1649-mapped-root-conservation-03.md
+
+Remaining publication: 1 pack(s), 36 source entries and 29 reverse entries. Remaining undecided outside this turn's authoring group: 319. No technical or unexplained proof blocker. The existing three historical source gaps stay owed for a subsequent bounded native request; this is no Step 5 closure. Resolved in-scope data issues: invalid behavior claimKind changed to existing specification; metadata-only rationales narrowed to actual metadata units; duplicate headings bound to shared owners. A concurrently started scratch refresh was terminated, its outputs discarded; final refresh/gates were rerun serially at the final pin.
+
+Next: publish the remaining bounded packs with progress after each, then STOP.
+No promotion, push, rebase, main write/merge, Step 6, protected tool/baseline edit or secret-file read.
+
+Earlier progress follows intact.
+
+---
+
+# Latest resume state — Bounded mapped root conservation requests
+
+Date: 2026-10-14
+Executor: codex-session:20@2026-10-14
+Session counter: 20
+Step: 5
+State: ready-for-review; authoring complete for the authorized 240-row group
+Last green source and final proof inventory pin: 0c8bc44c6b67863659231450e01860abde32074f
+Content pin: 23062c2ce9caaf6711a906673e2dc14c3f345ec3
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
 Checkpoint before this pack: 77dad24dd0fba1718576fc7a1a71a7be9fa11a17. This pack/progress commit is the next publication; resolve HEAD after it.
 
 Applied both corrected ordinary rows at a5b13d6df, verbatim notes; original provenance 18962827a retained. No format blocker remains. Authored all 240 source rows, all pending: 104 Unit-exact / 83 Weak-exact / 53 Judgment. All 15 carriers retain the mapped source and metadata; placeholder links fenced verbatim; 25 link spellings explicitly accounted. Two pairs of byte-identical empty template headings use one shared owner each under the duplicate rule, with no source or truth loss. Source groups: eight templates 100, coexistence 25, id-systems audit 32, runbook 18, routing handoff 19, distribution vision 22, switchboard 13, docs portal 11. No component-boundary change.
