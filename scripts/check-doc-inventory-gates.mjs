@@ -618,6 +618,35 @@ export function reviewReportAuthor(report) {
 
 export const isCheckpointReviewReport = reportPath => typeof reportPath === 'string' && /\/review-(?:3|6|10)-checkpoint(?:-[a-z0-9-]+)?\.md$/.test(reportPath);
 
+export function reviewReportHeader(report, name) {
+  return typeof report === 'string' ? report.match(new RegExp(`^${name}:\\s*(.+)$`, 'mi'))?.[1].trim() : null;
+}
+
+/** Cells of one Markdown table line, split on unescaped pipes, with escaped pipes restored. */
+export function reviewTableCells(line) {
+  return line.trim().split(/(?<!\\)\|/).slice(1, -1).map((cell) => cell.trim().replace(/\\\|/g, '|'));
+}
+
+/**
+ * Why one ordinary verdict line does not bind `row`: an empty list means it binds.
+ * The five cells are claim, verdict, note, full source digest (extending the row's
+ * recorded prefix) and target digest (`none` when the row names no target). A line
+ * with the wrong cell count reports only that, because its other cells are shifted.
+ * `checkNote: false` and a wider `verdicts` set serve a lint run before application,
+ * when the shard holds no note yet and rework or hold verdicts are still legitimate.
+ */
+export function ordinaryVerdictCellProblems(cells, row, { checkNote = true, verdicts = ['ok'] } = {}) {
+  if (cells.length !== 5) return ['wrong-cell-count'];
+  const problems = [];
+  if (cells[0] !== row.claimId) problems.push('claim-mismatch');
+  if (!verdicts.includes(cells[1])) problems.push('bad-verdict');
+  if (checkNote && cells[2] !== row.reviewNote) problems.push('note-mismatch');
+  if (!/^[0-9a-f]{64}$/.test(cells[3])) problems.push('source-digest-not-64-hex');
+  else if (!/^[0-9a-f]{16,64}$/.test(row.sourceUnitDigest || '') || !cells[3].startsWith(row.sourceUnitDigest)) problems.push('source-digest-mismatch');
+  if (!(row.targetOwner ? /^[0-9a-f]{64}$/.test(row.targetUnitDigest || '') && cells[4] === row.targetUnitDigest : cells[4] === 'none')) problems.push('target-digest-mismatch');
+  return problems;
+}
+
 export function validateManualReview(row, shard, reportOf) {
   const findings = [];
   const fail = (type, message) => findings.push({ type, message: `claim ${row.claimId}: ${message}` });
@@ -631,7 +660,7 @@ export function validateManualReview(row, shard, reportOf) {
   if (!nonEmpty(author)) fail('decision-authored-by-missing', 'a reviewed manual row needs authoredBy or committed legacy review-author provenance');
   if (!nonEmpty(shardAuthor)) fail('decision-author-session-missing', 'a reviewed manual row needs its shard or committed legacy review author');
   if ([author, shardAuthor].some((identity) => nonEmpty(identity) && reviewSessionIdentity(identity) === reviewSessionIdentity(row.reviewedBy))) fail('decision-self-review', 'reviewer and author must be different sessions, regardless of date or prefix');
-  const header = (name) => typeof report === 'string' ? report.match(new RegExp(`^${name}:\\s*(.+)$`, 'mi'))?.[1].trim() : null;
+  const header = (name) => reviewReportHeader(report, name);
   const ordinary = row.reviewMode === 'ordinary' && header('Review mode') === 'ordinary' && !isCheckpointReviewReport(row.reviewReport);
   const bound = typeof report === 'string' &&
     /^reviewer:[^\s@]+-session:[^\s@]+@\d{4}-\d{2}-\d{2}$/.test(row.reviewedBy || '') &&
@@ -643,12 +672,9 @@ export function validateManualReview(row, shard, reportOf) {
       /^[0-9a-f]{64}$/.test(row.seedScoreId || '') && header('Seed score') === row.seedScoreId
     )) &&
     nonEmpty(row.reviewNote) && report.split(/\r?\n/).some((line) => {
-      const cells = line.trim().split(/(?<!\\)\|/).slice(1, -1).map((cell) => cell.trim().replace(/\\\|/g, '|'));
-      if (cells[0] !== row.claimId || cells[1] !== 'ok' || cells[2] !== row.reviewNote) return false;
-      if (!ordinary) return cells.length === 3;
-      return cells.length === 5 && /^[0-9a-f]{40}$/.test(row.reviewReportCommit || '') && /^[0-9a-f]{64}$/.test(cells[3]) &&
-        /^[0-9a-f]{16,64}$/.test(row.sourceUnitDigest || '') && cells[3].startsWith(row.sourceUnitDigest) &&
-        (row.targetOwner ? /^[0-9a-f]{64}$/.test(row.targetUnitDigest || '') && cells[4] === row.targetUnitDigest : cells[4] === 'none');
+      const cells = reviewTableCells(line);
+      if (!ordinary) return cells[0] === row.claimId && cells[1] === 'ok' && cells[2] === row.reviewNote && cells.length === 3;
+      return /^[0-9a-f]{40}$/.test(row.reviewReportCommit || '') && ordinaryVerdictCellProblems(cells, row).length === 0;
     });
   if (!bound) fail('decision-review-report-missing', 'no matching committed independent verdict with shown-text or checkpoint sensitivity bindings');
   return findings;

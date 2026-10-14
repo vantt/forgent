@@ -172,3 +172,79 @@ test('checkpoint reports cannot use the ordinary channel to omit sensitivity pro
     });
   }
 });
+
+function lintFixture(t) {
+  const f = fixture(t), review = ordinaryReport(f);
+  const text = review.text.replace(/^Review mode/m, `Author session: ${f.author}\nReview mode`);
+  const lines = text.split('\n');
+  const rowLine = lines.findIndex(line => line.startsWith('| claim_'));
+  const lint = (text, { inventory = true } = {}) => {
+    fs.writeFileSync(path.join(f.root, review.reportPath), text);
+    const before = fs.readFileSync(path.join(f.root, 'shard.json'), 'utf8');
+    const status = f.git('status', '--porcelain', '--untracked-files=all');
+    const result = f.run('--lint-review', review.reportPath, '--shard', 'shard.json', ...(inventory ? ['--inventory', 'inventory.json'] : []));
+    assert.equal(fs.readFileSync(path.join(f.root, 'shard.json'), 'utf8'), before, 'lint must not rewrite the shard');
+    assert.equal(f.git('status', '--porcelain', '--untracked-files=all'), status, 'lint must not write any file');
+    return { status: result.status, stderr: result.stderr, out: result.stdout ? JSON.parse(result.stdout) : null };
+  };
+  const reasons = (result) => result.out.problems.map(problem => `${problem.line}:${problem.claimId}:${problem.reason}`);
+  return { f, review, text, lines, rowLine, lint, reasons, firstId: review.shard.claims[0].claimId };
+}
+
+test('the review lint accepts a well-formed ordinary report before application and writes nothing', (t) => {
+  const l = lintFixture(t);
+  const result = l.lint(l.text);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.out.ok, true);
+  assert.deepEqual(result.out.problems, []);
+  assert.equal(result.out.claimRows, l.review.shard.claims.length);
+});
+
+test('the review lint uses the recorded target digest of an applied shard without an inventory', (t) => {
+  const l = lintFixture(t);
+  const applied = structuredClone(l.review.shard);
+  for (const row of applied.claims) row.targetUnitDigest = l.review.unitsOf(row.targetOwner).find(unit => unit.anchor === row.targetAnchor).textDigest;
+  fs.writeFileSync(path.join(l.f.root, 'shard.json'), JSON.stringify(applied));
+  const result = l.lint(l.text, { inventory: false });
+  assert.equal(result.status, 0, result.stderr);
+  fs.writeFileSync(path.join(l.f.root, 'shard.json'), JSON.stringify(l.review.shard));
+  const unverifiable = l.lint(l.text, { inventory: false });
+  assert.equal(unverifiable.status, 1);
+  assert.ok(l.reasons(unverifiable).includes(`${l.rowLine + 1}:${l.firstId}:target-digest-unverifiable`));
+});
+
+test('the review lint names the line and claim of each malformed verdict row', async (t) => {
+  const cases = {
+    'source-digest-not-64-hex': (l) => l.text.replace(l.review.inventory.claimLedger[0].sourceUnitDigest, l.review.inventory.claimLedger[0].sourceUnitDigest.slice(0, 16)),
+    'wrong-cell-count': (l) => [...l.lines.slice(0, l.rowLine), l.lines[l.rowLine] + ' ' + l.lines[l.rowLine + 1], ...l.lines.slice(l.rowLine + 2)].join('\n'),
+    'non-bare-first-cell': (l) => l.text.replace(`| ${l.firstId} |`, `| \`${l.firstId}\` |`),
+    'target-digest-mismatch': (l) => l.text.replace(l.review.unitsOf(l.f.target).find(unit => unit.anchor === l.review.shard.claims[0].targetAnchor).textDigest, 'f'.repeat(64)),
+    'source-digest-mismatch': (l) => l.text.replace(l.review.inventory.claimLedger[0].sourceUnitDigest, 'e'.repeat(64)),
+    'bad-verdict': (l) => l.text.replace(`| ${l.firstId} | ok |`, `| ${l.firstId} | okay |`),
+  };
+  for (const [reason, edit] of Object.entries(cases)) {
+    await t.test(reason, sub => {
+      const l = lintFixture(sub), result = l.lint(edit(l));
+      assert.equal(result.status, 1);
+      assert.equal(result.out.ok, false);
+      assert.deepEqual(l.reasons(result), [`${l.rowLine + 1}:${l.firstId}:${reason}`]);
+      assert.ok(result.out.problems[0].message);
+    });
+  }
+});
+
+test('the review lint allows labelled non-claim rows but reports unknown claims and missing headers', (t) => {
+  const l = lintFixture(t);
+  const labelled = l.text + '| Candidate-unverified list Root (70) | ok | Checked the committed list. | none | none |\n';
+  assert.equal(l.lint(labelled).status, 0);
+  const shortLabel = l.text + '| Candidate-unverified list Root (70) | ok | Checked the committed list. | none |\n';
+  const short = l.lint(shortLabel);
+  assert.deepEqual(l.reasons(short), [`${l.lines.length}:null:wrong-cell-count`]);
+  const unknownId = 'claim_' + 'f'.repeat(32);
+  const unknown = l.lint(l.text + `| ${unknownId} | ok | Read it. | ${'a'.repeat(64)} | none |\n`);
+  assert.deepEqual(l.reasons(unknown), [`${l.lines.length}:${unknownId}:unknown-claim`]);
+  const headless = l.lint(l.text.replace(/^Review mode: ordinary\n/m, ''));
+  assert.equal(headless.status, 1);
+  assert.ok(l.reasons(headless).includes('null:null:missing-header'));
+  assert.ok(headless.out.problems.some(problem => /Review mode/.test(problem.message)));
+});

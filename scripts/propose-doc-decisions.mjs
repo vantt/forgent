@@ -5,7 +5,7 @@ import os from 'node:os';
 import { createHash, randomBytes } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
-import { applyDecisions, buildCommittedReviewReportLookup, buildConservationUnitLookup, classifyExactCarry, isCheckpointReviewReport, isEvidenceMirrorPath, isLegacySourceItem, isLegacyDecisionShard, loadDecisionShards, reviewReportAuthor, reviewSessionIdentity, validateManualReview } from './check-doc-inventory-gates.mjs';
+import { applyDecisions, buildCommittedReviewReportLookup, buildConservationUnitLookup, classifyExactCarry, isCheckpointReviewReport, isEvidenceMirrorPath, isLegacySourceItem, isLegacyDecisionShard, loadDecisionShards, ordinaryVerdictCellProblems, reviewReportAuthor, reviewReportHeader, reviewSessionIdentity, reviewTableCells, validateManualReview } from './check-doc-inventory-gates.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];
@@ -19,6 +19,9 @@ Modes:
   --seed-pack <pack.json>    Reviewer-only Markdown sensitivity pack; --key required.
   --score-pack <key>         Score the reviewer's markdown --verdicts.
   --apply-review <shard>     Apply independent markdown verdicts to the shard.
+  --lint-review <report.md>  Read-only check of an ordinary report before commit
+                             against one or more --shard <path> files; prints
+                             JSON problems (line, claim, reason), exits 1 on any.
   --coverage                 Legacy-source coverage by Source tables and mirrors.
   --rebind <shard>           Unique digest plus recorded heading ancestry required.
   --snapshot                 Dry-run merged legacy ledger rows plus sha256.
@@ -45,6 +48,9 @@ Inputs:
   --source <path>            Source document for --propose.
   --target <path>            Counterpart document for --propose.
   --shard <name>             Required proposed shard identity (version stays 1).
+                             With --lint-review: repeatable decision shard path.
+                             A row without a recorded target digest needs
+                             --inventory to resolve its target unit.
   --author <identity>        Proposal author; explicit current author for legacy packs.
   --out <path>               Write JSON to this path; otherwise print JSON.
   --reviewer <identity>      reviewer:<model>-session:<id>@<date>; independent.
@@ -306,12 +312,70 @@ export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.auth
   return { pack: { version: 1, shard: pack.shard, rows: shown }, key: { version: 1, shard: pack.shard, commit: pack.commit, packId: jsonDigest(pack), seed, nonce, reviewer, rows: keyRows } };
 }
 
+const REVIEW_VERDICTS = ['ok', 'rework', 'hold'];
+
+const LINT_MESSAGES = {
+  'wrong-cell-count': (cells) => `${cells.length} cells, need 5 (rows joined on one line?)`,
+  'bad-verdict': (cells) => `verdict "${cells[1]}" is not one of ${REVIEW_VERDICTS.join(', ')}`,
+  'source-digest-not-64-hex': () => 'source digest is not a full 64-hex sha256',
+  'source-digest-mismatch': () => 'source digest does not extend the shard row digest',
+  'target-digest-mismatch': () => 'target digest does not match the shard row target',
+};
+
+/**
+ * Pre-commit check of an ordinary review report against the shard rows it decides,
+ * with the same per-line rule the gate applies after application, minus the note
+ * (absent before application). A table that holds a claim row, or whose header
+ * starts with Claim, is a verdict table: its rows must have five cells; rows whose
+ * first cell names a claim must name it bare and bind that claim's shard row.
+ * `targetDigestOf(row)` supplies the target digest for rows not yet applied.
+ */
+export function lintReviewReport(text, rowsById, { targetDigestOf = null } = {}) {
+  const problems = [];
+  const report = (line, claimId, reason, message) => problems.push({ line, claimId, reason, message });
+  for (const name of ['Reviewer', 'Author session', 'Review mode']) {
+    if (!reviewReportHeader(text, name)) report(null, null, 'missing-header', `header "${name}:" is missing`);
+  }
+  const mode = reviewReportHeader(text, 'Review mode');
+  if (mode && mode !== 'ordinary') report(null, null, 'missing-header', `header "Review mode:" is ${mode}, not ordinary`);
+  const lines = text.split(/\r?\n/);
+  const blocks = [];
+  lines.forEach((line, index) => {
+    if (!line.trim().startsWith('|')) return;
+    if (blocks.at(-1)?.end === index) blocks.at(-1).rows.push(index);
+    else blocks.push({ rows: [index] });
+    blocks.at(-1).end = index + 1;
+  });
+  let claimRows = 0;
+  for (const block of blocks) {
+    const cellsOf = block.rows.map((index) => reviewTableCells(lines[index]));
+    if (cellsOf[0][0] !== 'Claim' && !cellsOf.some((cells) => /claim_[0-9a-f]{32}/.test(cells[0] || ''))) continue;
+    block.rows.forEach((index, i) => {
+      const cells = cellsOf[i], first = cells[0] || '', line = index + 1;
+      const named = first.match(/claim_[0-9a-f]{32}/)?.[0] || null;
+      if (named && first !== named) return report(line, named, 'non-bare-first-cell', 'first cell is not a bare claim ID, so the applier skips this row');
+      if (named) claimRows++;
+      if (cells.length !== 5) return report(line, named, 'wrong-cell-count', LINT_MESSAGES['wrong-cell-count'](cells));
+      if (!named) return;
+      const row = rowsById.get(named);
+      if (!row) return report(line, named, 'unknown-claim', 'claim is not in any given shard');
+      let expected = row;
+      if (row.targetOwner && row.targetUnitDigest === undefined) {
+        if (!targetDigestOf) return report(line, named, 'target-digest-unverifiable', 'shard row has no recorded target digest; pass --inventory to resolve it');
+        expected = { ...row, targetUnitDigest: targetDigestOf(row) };
+      }
+      for (const reason of ordinaryVerdictCellProblems(cells, expected, { checkNote: false, verdicts: REVIEW_VERDICTS })) report(line, named, reason, LINT_MESSAGES[reason](cells));
+    });
+  }
+  return { ok: problems.length === 0, claimRows, problems };
+}
+
 function indexVerdicts(verdicts, expectedIds) {
   const index = new Map();
   for (const row of verdicts) {
     if (index.has(row.claimId)) throw new Error(`duplicate verdict ${row.claimId}`);
     if (!expectedIds.has(row.claimId)) throw new Error(`unknown verdict ${row.claimId}`);
-    if (!['ok', 'rework', 'hold'].includes(row.verdict) || !row.note?.trim()) throw new Error(`verdict and own note required for ${row.claimId}`);
+    if (!REVIEW_VERDICTS.includes(row.verdict) || !row.note?.trim()) throw new Error(`verdict and own note required for ${row.claimId}`);
     index.set(row.claimId, row);
   }
   for (const id of expectedIds) if (!index.has(id)) throw new Error(`missing verdict ${id}`);
@@ -339,7 +403,7 @@ export function parseReviewVerdicts(text, reviewer, binding = null) {
   for (const line of text.split(/\r?\n/)) {
     if (!/^\s*\|\s*claim_[0-9a-f]{32}\s*\|/.test(line)) continue;
     const cells = line.trim().split(/(?<!\\)\|/).slice(1, -1).map((cell) => cell.trim().replace(/\\\|/g, '|'));
-    if (cells.length !== (ordinary ? 5 : 3) || !['ok', 'rework', 'hold'].includes(cells[1]) || !cells[2]) throw new Error('verdict row requires claimId, verdict, own note and ordinary shown digests');
+    if (cells.length !== (ordinary ? 5 : 3) || !REVIEW_VERDICTS.includes(cells[1]) || !cells[2]) throw new Error('verdict row requires claimId, verdict, own note and ordinary shown digests');
     verdicts.push({ claimId: cells[0], verdict: cells[1], note: cells[2], ...(ordinary ? { sourceUnitDigest: cells[3], targetUnitDigest: cells[4] === 'none' ? null : cells[4] } : {}) });
   }
   if (!verdicts.length) throw new Error('review report has no verdict rows');
@@ -564,7 +628,7 @@ function renderReviewPack(pack) {
 export function runCli(argv, cwd = process.cwd()) {
   if (argv.includes('--help')) { console.log(HELP); return 0; }
   const booleanModes = ['--summary', '--propose', '--coverage', '--snapshot'];
-  const valuedModes = ['--pack', '--seed-pack', '--score-pack', '--apply-review', '--rebind', '--verify'];
+  const valuedModes = ['--pack', '--seed-pack', '--score-pack', '--apply-review', '--lint-review', '--rebind', '--verify'];
   const modes = [...booleanModes, ...valuedModes].filter((mode) => argv.includes(mode));
   const values = new Map();
   const options = new Set(['--inventory', '--repo-root', '--source', '--target', '--shard', '--author', '--out', '--reviewer', '--verdicts', '--seed', '--key', '--maps', '--decisions', '--identity-registry', '--review-pack', '--seed-key', '--seed-verdicts', ...valuedModes]);
@@ -576,7 +640,7 @@ export function runCli(argv, cwd = process.cwd()) {
       if (!argv[i + 1] || argv[i + 1].startsWith('--')) throw new Error(`${argv[i]} requires a value`);
       const option = argv[i];
       const value = argv[++i];
-      if (option === '--decisions') values.set(option, [...(values.get(option) || []), value]);
+      if (option === '--decisions' || (option === '--shard' && modes[0] === '--lint-review')) values.set(option, [...(values.get(option) || []), value]);
       else {
         if (values.has(option)) throw new Error(`${option} is not repeatable`);
         values.set(option, value);
@@ -588,6 +652,19 @@ export function runCli(argv, cwd = process.cwd()) {
     };
     const jsonInput = (option) => JSON.parse(fs.readFileSync(resolve(option), 'utf8'));
     let result;
+    if (modes[0] === '--lint-review') {
+      if (values.has('--out')) throw new Error('--lint-review writes no file; omit --out');
+      if (!values.has('--shard')) throw new Error('--lint-review requires at least one --shard <path>');
+      const rowsById = new Map(values.get('--shard').flatMap((input) => loadDecisionShards(path.resolve(cwd, input))).flatMap((shard) => shard.claims).map((row) => [row.claimId, row]));
+      let targetDigestOf = null;
+      if (values.has('--inventory')) {
+        const context = loadProposalContext(resolve('--inventory'), path.resolve(cwd, values.get('--repo-root') || '.'));
+        targetDigestOf = (row) => (context.unitsOf(row.targetOwner) || []).find((unit) => unit.anchor === row.targetAnchor)?.textDigest ?? null;
+      }
+      const result = { report: values.get('--lint-review'), ...lintReviewReport(fs.readFileSync(resolve('--lint-review'), 'utf8'), rowsById, { targetDigestOf }) };
+      console.log(JSON.stringify(result, null, 2));
+      return result.ok ? 0 : 1;
+    }
     if (modes[0] === '--score-pack') {
       const key = jsonInput('--score-pack');
       result = scoreReviewPack(key, parseReviewVerdicts(fs.readFileSync(resolve('--verdicts'), 'utf8'), key.reviewer));
