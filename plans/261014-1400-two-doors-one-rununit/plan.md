@@ -17,6 +17,11 @@ M1 đóng 2026-10-14 19:30. M2 đang chạy. Lead: phiên điều phối; owner:
 
 - M1 = đợt A-E, cộng hai lane ngoài phase (gitparse, các fix khoá resume / pin persona / invocation `prefer` của Lead).
 - Cổng G-M1: [gate-m1-261014-1857](reports/gate-m1-261014-1857.md); ca 2 và ca 8 đổi kỳ vọng (mục để ngỏ). Ma trận provider 6/6 sau khi Lead thêm provider `deepseek` vào `~/.fgos/config.json` (owner cho phép; backup `config.json.bak-20261014-deepseek`).
+- Owner chốt 2026-10-14 20:05: lane `help` (sau khi 06 merge, trước G-M2). Nội dung:
+  - Rust host chuyển `--help`/`--help --json` xuống Node, để `fgos --help --json` chạy được ở mọi project;
+  - thêm `fgos <verb> --help --json`;
+  - registry có `subcommands` cho verb nhiều sub-verb (`dispatch`, `workflow`, ...), kèm test schema khớp cờ thật;
+  - mục `run`/`workflow` ghi rõ khi nào dùng cửa nào.
 - Owner chốt 2026-10-14 19:54: activate cho các project khác (mcp-skill-hub, mdview, ...) ngay sau cổng G-M2.
 - Mốc E: activate `sha256:0f0d988e…` từ main `b78c0019c`, `previousArtifactDigest` `sha256:bbea6dba…`. Qua `fgos` trần: doctor có `active-release-matches-checkout` và `runner-generated-paths` đạt (10 check đỏ có từ trước, không do release); one-liner đọc `unit-run-1791980280110-d94db2c6` pass; preset `group-cognition --seats` `wf-run-1791980326757-126e4fc8` pass.
 
