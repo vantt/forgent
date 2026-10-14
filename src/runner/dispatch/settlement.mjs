@@ -202,6 +202,32 @@ export function safeGitCommittedDiffFiles(dir, gitBefore, gitAfter) {
 }
 
 /**
+ * The sandbox backend the worker really ran under, or null when it ran without one.
+ *
+ * Read from what the Confinement Authority prepared for this launch (its
+ * prepared-invocation record names the backend instance, `none` when there was
+ * none), else from an attestation the dispatch returned as enforced. The mode a
+ * caller requested is never evidence: a required posture can still resolve to an
+ * unconfined launch, and a requested mode named nothing that ran.
+ */
+export function ranConfinementBackend(runDir, launchCommandId, attestation = null) {
+  if (runDir && launchCommandId) {
+    try {
+      const record = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'prepared-invocation', `${launchCommandId}.json`), 'utf8'));
+      const type = record?.backend?.type;
+      if (typeof type === 'string' && type) return type === 'none' ? null : type;
+    } catch {
+      // No record for this launch: fall through to the attestation.
+    }
+  }
+  if (attestation?.outcome === 'enforced') {
+    const type = attestation.backend?.type;
+    if (typeof type === 'string' && type && type !== 'none') return type;
+  }
+  return null;
+}
+
+/**
  * Compute changed files produced during the run (Step 04 §5.3).
  */
 export function computeChangedFiles(dir, gitBefore, gitAfter, dirtyBefore, dirtyAfter) {
@@ -493,6 +519,7 @@ export async function settleRunOutcome({
   launchCommandId = null,
   receipt = null,
   adapterOutcome = null,
+  attestation = null,
   opts = {},
 }) {
   const root = resolveSafeRoot(runDir, opts?.repoRoot);
@@ -702,7 +729,7 @@ export async function settleRunOutcome({
     controlToken,
     executorId: resolvedExecutorId || runMeta.executorId || null,
     adapter: opts?.adapter || (resolvedExecutorId?.includes('herdr') ? 'herdr-spawn' : 'cli-spawn'),
-    confinement: (effectivePolicy?.confinement?.requirement?.mode === 'confined' ? (effectivePolicy?.confinement?.backend?.type ?? 'bwrap') : null),
+    confinement: ranConfinementBackend(runDir, launchCommandId, attestation),
     role: assignment?.role ?? null,
     ...(effectivePolicy ? { policy: effectivePolicy, executorRedirected } : {}),
     settledAt,

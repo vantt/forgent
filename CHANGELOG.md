@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - A headless round that stops because the provider account used up its quota (codex "You've hit your usage limit") now settles as `provider-limit` with `failure.cause: quota` instead of a generic non-zero exit, so a Workflow unit or `execute --contract` moves to another account or candidate, and a leased account waits out the reset time the provider printed.
+- An Assignment run's `result.json` now names the sandbox it really ran under in `confinement` (`bwrap`), read from the launch the Confinement Authority prepared or the dispatch's enforced attestation; it was always `null` before, even for sandboxed seats.
 
 ## [v0.2.0-rc.5] - 2026-10-14
 
