@@ -502,7 +502,7 @@
       "claimKind": "contract",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "Code is truth for the whole effect-axis field list. Owner A15 resolves SC-1: replace the retired coordination example with run, preserving every other entry-field definition and qualifier. The actual current machine-readable manifest has 15 externalEffect verbs including run and no coordination verb; both candidate examples now agree. This corrected whole-unit carry supersedes the stale source example, not a claim of verbatim copying or a silent partial carry. Independent review is pending.",
+      "rationale": "Whole source unit is carried. Besides replacing the coordination example with run, the diff replaces the fgos --help --json deferral with explicit current assertions: COMMAND_REGISTRY is the source, 15 verbs carry externalEffect: true, and coordination is absent. The review/approve/run examples, dispatch executor qualifier, other bullets and field definitions are conserved; no approval carries.",
       "authoredBy": "codex-session:1@2026-10-09",
       "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
       "targetAncestry": [

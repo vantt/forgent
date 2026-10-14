@@ -1798,14 +1798,20 @@
       "targetAnchor": "unheaded-block-31",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Code is truth for both effect axes and the whole source field definition. Owner A15 resolves SC-1: the stale exclusive only-review-and-approve assertion is superseded by the current registry contract and a run example, not coordination. Actual --help --json exposes 15 externalEffect verbs including run and no coordination verb. The candidate preserves the source field definitions and corrects its obsolete enumeration; independent review of this changed binding is pending.",
+      "reviewNote": "work-state.md block 67 to cli-io-contract block 31: diff shows only the clause \"hôm nay chỉ review và approve mang externalEffect: true, đúng chế độ --github của chúng\" replaced by the COMMAND_REGISTRY, 15 verbs, no coordination statement with review/approve/run examples; all 15 and the missing coordination verb confirmed in code; review rationale and STR38 clause intact; rationale truthful. Low observation: the per-verb \"exactly their --github mode\" qualifier for approve is dropped with the stale exclusivity (registry comment lines 18-20 still say so), a true fact now silent for approve. Accepted as part of the owner-approved supersede of that sentence.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-sc1.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ]
+      ],
+      "reviewReportCommit": "563247893e1b8fd795c43d611fd1d5ed28d150b5"
     },
     {
       "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",

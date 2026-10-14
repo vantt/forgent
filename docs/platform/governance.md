@@ -468,7 +468,7 @@ because its plan exists.
 
 | Relationship | File |
 |---|---|
-| documentation portal | [README.md](README.md) |
+| documentation portal | [README.md](../README.md) |
 | reader routing | [reading-map.md](../reading-map.md) |
 | operative transitional switchboard | [transitional-switchboard.md](../transitional-switchboard.md) |
 | migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |

@@ -27,6 +27,7 @@ Superseded by: None
 
 ## 3. Read First
 
+```markdown
 | Need | Read |
 |---|---|
 | Full direction / north star | [vision.md](vision.md) |
@@ -38,6 +39,7 @@ Superseded by: None
 | Proof/evidence | [verification/](verification/) |
 | Open proposals | [proposals/](proposals/) |
 | Historical context | [history/](history/) |
+```
 
 ## 4. Decision Surface
 
@@ -49,6 +51,7 @@ Superseded by: None
 
 ## 5. Canonical Documents
 
+```markdown
 | Purpose | Path | Authority |
 |---|---|---|
 | Full direction | [vision.md](vision.md) | Canonical for intended direction |
@@ -57,6 +60,7 @@ Superseded by: None
 | Subcomponents | [subcomponents/](subcomponents/) or §6 below | Canonical for child component navigation |
 | Architecture | [architecture/](architecture/) | Canonical for rationale/boundary |
 | Contract | [contracts/](contracts/) | Normative interface/rule |
+```
 
 ## 6. Subcomponent Map
 
@@ -103,6 +107,7 @@ whole-system boundary map.
 
 ## 12. Related Files
 
+```markdown
 | Relationship | File |
 |---|---|
 | states full direction | [vision.md](vision.md) |
@@ -112,6 +117,7 @@ whole-system boundary map.
 | explains design shape | [architecture/](architecture/) |
 | defines normative rules | [contracts/](contracts/) |
 | proves claims | [verification/](verification/) |
+```
 
 
 ## Source Metadata (Added in candidate)

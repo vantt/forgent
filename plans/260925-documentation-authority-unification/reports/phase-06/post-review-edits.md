@@ -54,3 +54,7 @@ Before editing, affected reviewed source rows: `claim_4eeb2f406288458e61bad21531
 ## Root effect-axis manifest correction (pending independent review)
 
 2026-10-14: before editing, `root-authorities-sc1-before-edit.json` lists all three reviewed Pilot B rows targeting the Entry Fields And Effect Axes section. Two historical SC-1 rows are currently reviewed under A15; both will be reopened again. The third row is the unchanged declarative-only paragraph and retains its approval only if its native digest/ancestry remain equal. Replace both effect-axis example clauses with an explicit COMMAND_REGISTRY manifest statement: 15 externalEffect verbs, no coordination; the old exclusive two-verb statement remains superseded. Preserve every field definition, review/--github rationale, state axis and declarative-only qualifier. Run native D and route every target-drift row plus both historical SC-1 rows to independent review; account native gaps without graft. No law, source, vocabulary, gate or baseline change.
+
+## Governance navigation correction
+
+Author: codex-session:18@2026-10-14. Lead conservation report at 563247893 requires the documentation portal link in Related Files to be `[README.md](../README.md)`. The two affected decisions were already pending; no approved decision is carried into changed text. Other reviewed units are unchanged. Exact before/current text and native binding consequences are in the bounded root conservation rework request. Truth report and sample remain untouched.

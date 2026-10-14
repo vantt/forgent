@@ -51,11 +51,13 @@ Use explicit normative language: must, must not, may.
 
 ## 12. Related Files
 
+```markdown
 | Relationship | File |
 |---|---|
 | owning area | [../README.md](../README.md) |
 | current behavior | [../spec.md](../spec.md) |
 | verification evidence | [../verification/](../verification/) |
+```
 
 
 ## Source Metadata (Added in candidate)

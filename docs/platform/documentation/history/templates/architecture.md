@@ -56,12 +56,14 @@ Include component-boundary impact:
 
 ## 11. Related Files
 
+```markdown
 | Relationship | File |
 |---|---|
 | current behavior | [../spec.md](../spec.md) |
 | area portal | [../README.md](../README.md) |
 | contracts affected | [../contracts/](../contracts/) |
 | verification evidence | [../verification/](../verification/) |
+```
 
 
 ## Source Metadata (Added in candidate)
