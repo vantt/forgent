@@ -11,6 +11,32 @@ B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
 Published/prepared request paths:
 - plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-2100-root-authorities-governance.md
+- plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-2100-root-authorities-sc1.md
+Remaining publication paths (exact text sealed in verification):
+- plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-2100-root-authorities-truth.md
+
+Three independent bounded packs: governance source 76, SC1/native/list 66, truth 30. All source/gap decisions remain pending. Nine preceding ok notes are verbatim and pinned to 4f99b9ec9. Full shown text/digests and source/current native identities are committed in the review material.
+Both-prior D zero fatal. Scoped E still red: 78 pending source rows, two unchanged historical IO gaps, 59 exact candidate-unverified units. Native equality retains all 94,424 IDs including intermediate identities. Compact registry 59,499,034 bytes, native-byte-equal, below 90 MB. Ratchet, placement, H and preservation pass; tests 29/29 under env -u CLAUDE_CODE_SESSION_ID. No full suite claim.
+Root map has 622 undecided rows and 83 pending source rows overall (five were prior open rows outside the submitted subset). AGENTS/CLAUDE remain Step 10. No Step 5 closure. Technical/owner-decision blockers: none; independent Lead review is next.
+Next: finish request publication if any remains, final native refresh/checkpoint, then STOP. On resume after review, apply exact ordinary notes, correct any independently identified false sentences under A19, rerun both-prior D/E/native equality, and continue remaining root sources only after this review scope settles. No promotion, push, main merge/write, Step 6, or protected tool/baseline edits.
+
+Earlier progress follows intact.
+
+---
+
+# Latest resume state — Bounded root review request publication
+
+Date: 2026-10-14
+Executor: codex-session:17@2026-10-14
+Session counter: 17
+Step: 5
+State: publishing bounded requests; no further source authoring
+Last green content pin: c8b2d948d6dd0b408011b294fd67aea59870749b
+Review material commit: 89cd398f8
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Published/prepared request paths:
+- plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-2100-root-authorities-governance.md
 Remaining publication paths (exact text sealed in verification):
 - plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-2100-root-authorities-sc1.md
 - plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-2100-root-authorities-truth.md
