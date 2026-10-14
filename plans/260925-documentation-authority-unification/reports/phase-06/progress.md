@@ -1,3 +1,80 @@
+# Native registry proof complete — bounded re-review next
+
+Date: 2026-10-15
+Executor: codex-session:31@2026-10-15
+Session counter: 31
+Assignment: unit-run-1792004760377-5cf0f327/producer/1
+Step: 5
+State: ready-for-review / native proof complete; no new review pack
+Input HEAD / last green native source proof: 7e9fd4bd5d9eff9ef748190256cbe182c5ace00c
+Last green prior proof: 6c6a65e8543fa72012bd55f8999f13f9ed6193c4
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Current-turn commit: none; runner owns the commit of declared files.
+
+Resumed from the journal at HEAD 7e9fd4bd5; clean starting tree and ancestry from the previous green native source pin verified. The assignment overrides ordinary git-write/review-pack steps: native proof only, hard 35-minute limit, writes only inside this plan, scratch under /tmp/fgos-work/resume-truth/. The old scratch directory was absent; generation/check helpers were recovered verbatim from the committed verification record, with the already-documented labelled-prior API correction. Native background sync started at 2026-10-14T19:06:55.945Z, completed at 2026-10-14T19:28:55.340Z (1319.395 seconds). Complete proof including post-persistence checks took 1528.68 seconds and completed at 2026-10-14T19:32:24.625423+00:00. The minute-30 stop was not triggered.
+
+Full unchanged native generation: 4,404 files, 87,368 live claims; complete enumerable cache is 1,257,804,733 bytes. All prior known IDs are conserved across live/retired/gap sets; exact live claim-ID/source-path/anchor/full-digest tuples equal the native ledger. Fifteen independently accepted retired assignments were overlaid in scratch before carry/generation, preserving committed review fields and notes. The carry keeps four edited heading IDs, discovers four current body IDs and preserves their four predecessor IDs as explicit native gaps; zero newly retired units. No gap disposition, successor judgment or approval is invented.
+
+Both-prior D, before and after persistence: zero fatal. Full union-scoped E, before and after persistence: strict remains red with exactly claims-partial-carry=1, claims-not-reviewed=25, identical-units-multiple-owners=345 and candidate-blocks-unreferenced=1398. Against the previous proof the not-reviewed count decreases 75 -> 25 and the union reverse list 1400 -> 1398. Four new native gaps are outside this legacy-source union; their disposition and independent conservation review remain explicitly owed. Global D open data is recorded verbatim in verification and is not strict closure. The original three Coordination Rings holds, exact identical-unit exceptions and A34 residuals remain untouched.
+
+All three candidate-unverified lists were refreshed from actual individual native conservation results: root 832 -> 830, agent 568 -> 568, packaging 694 -> 694. Individual complete tuple sets equal their persisted lists and their deduplicated union equals final E (1398). Changed tuples carry no approval; retained supplemental receipt metadata remains historical evidence, never current truth certification. A35/A37 carrier-level stale-truth caveats remain.
+
+Working registry persisted at 2026-10-14T19:29:33.851Z as compact one-line JSON: 59808373 bytes, SHA256 ed56c7750b36ee68ececea9399d6852f6ca07c41aa903d908102fb4666d8bce8. It is byte-identical to the passing scratch registry, below the 90,000,000-byte stop line. D/E and full known-ID/live-tuple/list equality were rerun against these persisted bytes. Reproducible helper sources, exact commands, complete native outputs, logs, timestamps, byte hashes, all changed-row audit entries and full old/current native unit witnesses are stored in [root-boundary-native-verification.json](root-boundary-native-verification.json), `nativeProofResume`.
+
+Commands (run with the stated cwd and input HEAD):
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=16384 /tmp/fgos-work/resume-truth/native-sync.mjs current
+env -u CLAUDE_CODE_SESSION_ID node /tmp/fgos-work/resume-truth/native-witnesses.mjs
+env -u CLAUDE_CODE_SESSION_ID node /tmp/fgos-work/resume-truth/persist-and-refresh.mjs
+env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=16384 /tmp/fgos-work/resume-truth/post-check.mjs post
+python3 /tmp/fgos-work/resume-truth/finalize-proof.py
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/resume-truth node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs
+```
+
+Tests: 39/39 pass; zero fail/cancel/skip/todo. Ratchet clean (995 files, 26 accounted edits, one accounted addition); placement 529/528/one recorded exception, zero gaps; candidate-status findings zero; extractor closure and authority statuses unchanged. No full-suite or current-truth certification is claimed. No git write, workspace .fgos write, secret read, docs/ or decision-shard edit, checker/gate/vocabulary/extractor/baseline change, new review pack/request, promotion, push, main merge or Step 6 work. Preview is not generated: no MDView MCP is available, and its CLI would need an out-of-scope local database write (the prior attempt was read-only).
+
+## Exact next-turn re-review population
+
+Every decision/classification row changed by 7e9fd4bd5 is audited in `nativeProofResume.changedAtInputCommit.allChangedRows`: 148 exact file/kind/ID before-after records, comprising 115 retained reviewed rows and 33 pending rows. All 278 separately identified review applications (including alias/retained proposals and accounting stamps) are also indexed there; native witnesses add every genuine consequence. The 115 unchanged accepted rows must not be resubmitted. Next turn packages the following 33 pending rows, alias 0114, all eight current native changed units and the four exact predecessor gaps, with full shown text/digests and current content pins. No pack was authored this turn.
+
+| Shard | Exact pending IDs |
+|---|---|
+| `plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json` | `claim_75041e871c0b191949808b55f541184d`, `claim_0e2474daa2e50a259dd3a37b94f26b81`, `claim_b9b42545b42b04889685191ada1a3892` |
+| `plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json` | `claim_4eeb2f406288458e61bad21531966ab1`, `claim_7b2641076e23f0d2528c250d4e59cba2`, `claim_a1a323052194c5140b628b5f3861fa05`, `claim_797fb0be5db3c260c97745cd0894bec8`, `claim_a26a90f97c6a399a30ce1df9207743b0`, `claim_bdeaa6f1cce78532047ba6bf959cc43a`, `claim_45e83e644c43384e188c16e20172a52c`, `claim_8d6b06dae659395981e196d4f7d33c15` |
+| `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json` | `claim_970b6ae8bfa6cb7f00a0e4c2d98e4d4d` |
+| `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json` | `claim_f7459f118bd93b8769e6c90ace8c68fe`, `claim_f703aeda7755ab376e6e3eee88eb82c2`, `claim_53838c4268148341ce0069394572d0eb`, `claim_daaf3726036adad15b2529ad43f71d44`, `claim_045b588f4d839f90c40b48fbc0fc3f4d`, `claim_b69096018a7da1d3dc629b5d37f6fdac`, `claim_2ae81c7bed935553943d6777b81e2114`, `claim_5c520fcb1a68ba27e2093341834258c7` |
+| `plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json` | `claim_6174137a754842159b087cb0c603e8e5`, `claim_ec5d5e0befef92d8598542ed3b0db18f`, `claim_4b96f4f42ea417623dcc794155fa17ce` |
+| `plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json` | `claim_b8dbd6e5b0014db31359419b93bb22f7`, `claim_32d0beb22a64eadc4714946feef4bb4c`, `claim_bf41e5090dd12c430e3a55206ea11658`, `claim_e56acda46bfc3c474d9bb6eed3c6b2ac`, `claim_bee83aee35ec25ec87d88a57a984cf50`, `claim_e3d06a1b8f2bf25a2fb2a85d80cdf7db` |
+| `plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json` | `claim_05086f8eb3a7fe8c76475c68250251ce`, `claim_be95c2d548d7fa5a1d2406be5584a36a` |
+| `plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json` | `claim_8f6ab9b2c2de71369769d27719a09b8e`, `claim_a5326477491a9bc30a98744da8e9bfb9` |
+
+Alias: `root-authorities-draft-0114` in `draft-alias-root-authorities.json`; source decision `claim_d76334798a7de5ca967d48855418497f`, current per-verb-help source anchor, full binding/proposal before-after in verification. No alias acceptance or activation.
+
+Native edited headings in `docs/platform/packaging-distribution/spec.md` (same native IDs, actual full before/current units in verification):
+
+| Anchor | ID |
+|---|---|
+| `business-rules` | `claim_1949b8f6fe89493f823b6f221221fbd9` |
+| `data-dictionary` | `claim_5c7a41cb0091d5fa398c963b4f28b50d` |
+| `edge-cases-settled` | `claim_2f739974e1476867978dee814839dd04` |
+| `lịch-sử-quyết-định` | `claim_39c66e391d621f2df14c19a014dfdbd6` |
+
+Native body predecessor/current witness pairs in that same file (no identity graft/disposition authored):
+
+| Anchor | Preserved gap ID | Current live ID |
+|---|---|---|
+| `unheaded-block-85` | `claim_c672194e8f040114aacefb82c65e2919` | `claim_86009039e04de00c901a1bb4cdca5a0e` |
+| `unheaded-block-91` | `claim_20f38a82d30c5923697861c1e198884d` | `claim_e14d7447d5d452d255c66edfb040d969` |
+| `unheaded-block-92` | `claim_89f3bd41bc70e9e84876aa2bf484cc2d` | `claim_5b4314fb79de70a2d846f9baca39c1c5` |
+| `unheaded-block-93` | `claim_af947ec5c805af2dc4217e040ff22708` | `claim_6f90031e6a0cb0e0d0a910fe3e68609b` |
+
+Next: package one bounded independent re-review of exactly the population above and any proven additional binding consequence, using full digests/text, exact pending equality, differing/absent lists and immutable current-content pins. Assign/account the four native gaps through the ordinary authorized review channel; do not change a checker to remove them. Preserve A28/A31 changed-code/text refs as pending/candidate-unverified and retain their old receipts as history.
+
+No external blocker prevents packaging. Independent review and four gap dispositions remain owed; E is not green and Step 5 is not closed. Existing obligations remain: independent invented-claim sample/hostile review, committed fresh-reader key and two readers, consumer-edge/cutover accounting and final batch report. A37 means no further Step 5 truth draw; full work-state truth remains owed at promotion. Existing owner questions remain unchanged. Stop within Step 5; no promotion, push, main merge or Step 6.
+
+---
 # Committed verdicts applied — file corrections complete; native proof next
 
 Date: 2026-10-15

@@ -2,7 +2,7 @@
   "version": 1,
   "batch": "packaging-distribution",
   "authorization": "A28",
-  "authoredCommit": "6c6a65e8543fa72012bd55f8999f13f9ed6193c4",
+  "authoredCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
   "meaning": "Exact native reverse-open units; candidate-unverified, never a truth approval or cutover waiver.",
   "count": 694,
   "rows": [
@@ -10374,21 +10374,27 @@
     "fullNativeTupleEquality": true,
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
-    "meaning": "Exact individual native checkConservation reverse-open tuples, independently equal to the corresponding part of the full union-scoped E."
+    "meaning": "Exact individual native checkConservation reverse-open tuples; full tuple union equals union-scoped E. Candidate-unverified, no truth approval.",
+    "verifiedCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
+    "verification": "reports/phase-06/root-boundary-native-verification.json nativeProofResume",
+    "reviewStatus": "pending independent conservation review of changed tuples only",
+    "supplementalMetadata": "Preserved receipt/reason metadata is historical evidence from the prior list; current decisions/classification refs are read from unchanged shards at the verified commit. It does not grant current truth approval."
   },
   "resolutionRebinding": {
     "ownerResolutionCommit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
     "reviewStatus": "pending independent conservation review",
     "meaning": "Exact fresh reverse-open tuples only; no code-truth approval. Changes are shown in the bounded F6 resolution request."
   },
-  "conservationReview": {
-    "reviewStatus": "reviewed",
-    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-    "reviewedAt": "2026-10-14",
-    "reviewNote": "Reran strict E: 693 rows, tuple set (claimId, path, anchor, digest) equals the committed list exactly; prior 692 differ by the 6 changed tuples and the 7 added; all rows candidate non-canonical (593 non-promoted Candidate/Draft, 100 history) and spot checks of six rows are eligible",
-    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
-    "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
-    "reviewMode": "ordinary"
-  },
-  "previousCount": 693
+  "previousCount": 694,
+  "conservationReviewHistory": [
+    {
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewNote": "Reran strict E: 693 rows, tuple set (claimId, path, anchor, digest) equals the committed list exactly; prior 692 differ by the 6 changed tuples and the 7 added; all rows candidate non-canonical (593 non-promoted Candidate/Draft, 100 history) and spot checks of six rows are eligible",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
+      "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
+      "reviewMode": "ordinary"
+    }
+  ]
 }

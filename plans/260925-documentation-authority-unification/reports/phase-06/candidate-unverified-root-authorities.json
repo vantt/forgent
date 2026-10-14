@@ -2,7 +2,7 @@
   "version": 1,
   "batch": "root-authorities",
   "authorization": "A28",
-  "authoredCommit": "6c6a65e8543fa72012bd55f8999f13f9ed6193c4",
+  "authoredCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
   "scope": [
     "docs/architecture-manifest.json",
     "docs/coexistence.md",
@@ -39,7 +39,7 @@
   ],
   "scopeLimit": "Final mapped Step 5 source population; AGENTS.md/CLAUDE.md deferred to Step 10. Review and other closure obligations remain open.",
   "meaning": "Native reverse-open list; candidate-unverified, no truth approval.",
-  "count": 832,
+  "count": 830,
   "rows": [
     {
       "claimId": "claim_d32ffe8c2dcf1fffb004c4087509896f",
@@ -5586,24 +5586,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_04292efdbc4e0d275d80e978702ae3e8",
-      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "anchor": "unheaded-block-30",
-      "unitDigest": "a5128895b71f07c2e1baa3ecb90cd302f016fdb4191518ef02835a768c8dc156",
-      "status": "candidate-unverified"
-    },
-    {
       "claimId": "claim_3498d50ccefcfce93481393dcec13370",
       "path": "docs/platform/work-state/contracts/cli-io-contract.md",
       "anchor": "entry-fields-and-effect-axes",
       "unitDigest": "975361492379d31f2ae35f770578eedd6314db46011c4b6d004ba89cc145012f",
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_e13202e5fb3991e61452914186b2920c",
-      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "anchor": "unheaded-block-38",
-      "unitDigest": "9b711cb5a088ede56ad00207289f1fed2ccc05887597169bbc41eb2e55429db3",
       "status": "candidate-unverified"
     },
     {
@@ -5886,12 +5872,16 @@
       "meaning": "Carrier-level caveat; tuple population is still the exact native T6 reverse-open set, not a truth receipt."
     }
   ],
-  "previousCount": 830,
+  "previousCount": 832,
   "nativeRebinding": {
     "authorization": "A28 + A31",
     "fullNativeTupleEquality": true,
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
-    "meaning": "Exact individual native checkConservation reverse-open tuples, independently equal to the corresponding part of the full union-scoped E."
+    "meaning": "Exact individual native checkConservation reverse-open tuples; full tuple union equals union-scoped E. Candidate-unverified, no truth approval.",
+    "verifiedCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
+    "verification": "reports/phase-06/root-boundary-native-verification.json nativeProofResume",
+    "reviewStatus": "pending independent conservation review of changed tuples only",
+    "supplementalMetadata": "Preserved receipt/reason metadata is historical evidence from the prior list; current decisions/classification refs are read from unchanged shards at the verified commit. It does not grant current truth approval."
   }
 }

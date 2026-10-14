@@ -2,7 +2,7 @@
   "version": 1,
   "batch": "agent-coordination",
   "authorization": "A28 + A31; committed machine re-pin verdicts applied",
-  "authoredCommit": "6c6a65e8543fa72012bd55f8999f13f9ed6193c4",
+  "authoredCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
   "meaning": "Conservation-only candidate-unverified units, exactly the native scoped strict E reverse-open set after committed evidence-only re-pin review. The 134 actually changed-code receipts remain unverified; truth is sampled under A28 and checked in full at promotion.",
   "count": 568,
   "rows": [
@@ -9411,12 +9411,16 @@
       "status": "candidate-unverified"
     }
   ],
-  "previousCount": 488,
+  "previousCount": 568,
   "nativeRebinding": {
     "authorization": "A28 + A31",
     "fullNativeTupleEquality": true,
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
-    "meaning": "Exact individual native checkConservation reverse-open tuples, independently equal to the corresponding part of the full union-scoped E."
+    "meaning": "Exact individual native checkConservation reverse-open tuples; full tuple union equals union-scoped E. Candidate-unverified, no truth approval.",
+    "verifiedCommit": "7e9fd4bd5d9eff9ef748190256cbe182c5ace00c",
+    "verification": "reports/phase-06/root-boundary-native-verification.json nativeProofResume",
+    "reviewStatus": "pending independent conservation review of changed tuples only",
+    "supplementalMetadata": "Preserved receipt/reason metadata is historical evidence from the prior list; current decisions/classification refs are read from unchanged shards at the verified commit. It does not grant current truth approval."
   }
 }
