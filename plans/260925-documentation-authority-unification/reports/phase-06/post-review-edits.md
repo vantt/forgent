@@ -40,3 +40,7 @@ Author: codex-session:10@2026-10-14. Independent report: `review-4-packaging-tru
 - `docs/platform/packaging-distribution/verification/install-and-release-proof.md`
 
 Changed source-target bindings and native units are returned to pending review without approval carry. Full shown text and digests appear in the bounded follow-up request.
+
+## Packaging owner-resolution representation (2026-10-14)
+
+Owner resolution at `5563bcb70d1c9f0706925271e8209e7eb49fd28b` supersedes the installed-default npm trigger by the dated coordinator window and leaves the end-of-window obligation owed to Packaging-distribution. Update the candidate decision and the release-boundaries retention status; preserve the literal original clause. All affected native units, stable headings, reviewed bindings and reverse tuples are shown in the bounded closure-resolution request and return for independent conservation review. No implementation change or promotion.

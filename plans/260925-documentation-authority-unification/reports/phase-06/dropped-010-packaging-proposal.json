@@ -7,12 +7,12 @@
       "sourceClaimId": "claim_6a37273a0a45d24c53e344928c3edf22",
       "sourcePath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
       "sourceAnchor": "unheaded-block-14",
-      "proposedVerdict": "retire-installed-default-trigger",
+      "proposedVerdict": "superseded by decision",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:8@2026-10-13",
+      "authoredBy": "codex-session:12@2026-10-14",
       "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
       "targetAnchor": "proposed-disposition",
-      "rationale": "The public/default Rust channel and deprecated npm compatibility are separate channels. Code and implementation history retain both npm entries. Retire only the automatic installed-default trigger, preserving runner and entry ownership obligations; no intentional retirement is inferred from absence.",
+      "rationale": "Superseded by decision: the same-day ownership header and the dated coordinator window show intentional coexistence; the coordinator 30-day window is the successor to the automatic installed-default trigger.",
       "retentionOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
       "retentionAnchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
       "retentionFileDigest": "ca26b29daebedfa5dc1d2e98c5e9655e4491a2122296618220e141902583236f",
@@ -25,13 +25,30 @@
         "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f",
         "c831811faaa0be93f505456aae6a134865ccbc9b"
       ],
-      "limits": "Proposal only; do not alter the existing reviewed deferral or FLAGGED retention until the independently reviewed verdict.",
+      "limits": "Owner resolution decided; newly authored conservation representation pending independent review. No removal, support extension or authority cutover.",
       "sourceUnitDigest": "6f959e9066321a5afcbb3c6ae57d46b03fa8da3ae18f7ce0b5454eff36ba701e",
       "targetUnitDigest": "b1ec345e0756e842dfa086f9c4ef0110dca6a04da2c95d9139cb11186688c3a2",
       "sourceShownText": "`package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` stays until the runner migrates. A header in `bin/fgos.mjs` and the root `AGENTS.md` state the ownership rule for editors already at that path.",
       "targetShownText": "## Proposed Disposition\n\nAdded in candidate — propose retirement of the automatic installed-default removal or redirection trigger. Keep the npm compatibility mapping, runner mapping and source-entry ownership header under their existing support and release policy. This does not decide when the npm fallback channel ends, extend its support promise, or remove a payload.\n\nThe current `package.json:9-12` maps both npm entries to the Node payload. `bin/fgos.mjs:4-10` expressly retains global npm and direct Node compatibility channels while requiring Rust host payload resolution through manifest fields. The source obligation was introduced by `4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f`; the implementation header added by `c831811faaa0be93f505456aae6a134865ccbc9b` explicitly retained npm compatibility and did not remove that mapping. The candidate spec distinguishes the native public/default posture from the deprecated npm channel.\n\nThe current code proves coexistence, not intentional retirement of the original obligation. No commit explicitly retiring the trigger was found by the recorded symbol/history search. Independent review must decide whether this proposal becomes a retirement verdict or whether a restoration remains owed. Until that verdict, dropped-010 stays deferred to Packaging-distribution and its FLAGGED-obsolete literal retention is unchanged.",
       "sourceShownTextDigest": "6f959e9066321a5afcbb3c6ae57d46b03fa8da3ae18f7ce0b5454eff36ba701e",
-      "targetShownTextDigest": "fd9c92a3a1bd2b50533a4763eaa00363205e5a7619b208637ec875fb33ad972d"
+      "targetShownTextDigest": "fd9c92a3a1bd2b50533a4763eaa00363205e5a7619b208637ec875fb33ad972d",
+      "successor": {
+        "decision": "2026-09-15 coordinator 30-day window",
+        "owner": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+        "anchor": "2-coordinator-setup",
+        "line": 72,
+        "companionOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "companionAnchor": "2-open-release-decisions",
+        "companionLine": 35,
+        "earliestRemoval": "2026-10-18"
+      },
+      "owedObligation": "Removing or redirecting bin.fgos after the window remains owed to Packaging-distribution (release-owner decision). Nothing is removed now.",
+      "ownerResolution": {
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+        "commit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
+        "text": "F6 resolution (owner-decided 2026-10-14, option A of the Step 4 decision, following `review-4-packaging-truth-f6.md` part 2): dropped-010 is superseded by decision, not retired by absence.\n1. The installed-default removal trigger for npm `bin.fgos` is superseded by the 2026-09-15 coordinator decision (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`, with the `architecture/release-boundaries.md:35` row): the Rust host is the installed default from the preview, and the Node fallback is deprecated and supported for 30 calendar days, earliest removal 2026-10-18. The disposition cites that decision as its successor.\n2. Removing or redirecting `bin.fgos` after the window stays an owed obligation, owned by Packaging-distribution (release-owner decision). The disposition text says so; nothing is removed now.\n3. The rationale says \"superseded by decision\" and drops the \"no intentional retirement is inferred from absence\" wording. The FLAGGED-obsolete verbatim retention may now be resolved consistently with this verdict. The runner mapping and source-entry ownership header stay.",
+        "shownTextDigest": "f2a190c215efd2f962ba97b71118536ba72fdf316fc27cea30584299c7ab7487"
+      }
     }
   ]
 }

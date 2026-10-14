@@ -44,7 +44,7 @@
     },
     {
       "id": "dropped-002",
-      "title": "Contract versioning (independent versions, exact version pair from range intersection, no best-effort coercio\u2026",
+      "title": "Contract versioning (independent versions, exact version pair from range intersection, no best-effort coercio…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -97,7 +97,7 @@
     },
     {
       "id": "dropped-003",
-      "title": "Lifecycle state chain received -> admitted/refused -> selected/refused -> granted/refused -> dispatched -> te\u2026",
+      "title": "Lifecycle state chain received -> admitted/refused -> selected/refused -> granted/refused -> dispatched -> te…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -148,7 +148,7 @@
     },
     {
       "id": "dropped-004",
-      "title": "Physical placement layout tree (workspace root, apps/, packages/host-runtime/rust modules, distribution, comp\u2026",
+      "title": "Physical placement layout tree (workspace root, apps/, packages/host-runtime/rust modules, distribution, comp…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -199,7 +199,7 @@
     },
     {
       "id": "dropped-005",
-      "title": "Class definitions (core: required, fgOS-owned, atomically released, static-linked; packaged extension: option\u2026",
+      "title": "Class definitions (core: required, fgOS-owned, atomically released, static-linked; packaged extension: option…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -265,7 +265,7 @@
     },
     {
       "id": "dropped-006",
-      "title": "Same-process built-ins vs runtime extensions and cross-process cost (cold start, batch hot loops, one-shot CL\u2026",
+      "title": "Same-process built-ins vs runtime extensions and cross-process cost (cold start, batch hot loops, one-shot CL…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -427,7 +427,7 @@
     },
     {
       "id": "dropped-009",
-      "title": "Both adapters delegate a complete use case (never split a state transaction between native and legacy); comma\u2026",
+      "title": "Both adapters delegate a complete use case (never split a state transaction between native and legacy); comma…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -480,7 +480,7 @@
     },
     {
       "id": "dropped-010",
-      "title": "package.json bin.fgos removed/pointed at workspace shim at default flip, bin.fgos-runner stays, ownership hea\u2026",
+      "title": "package.json bin.fgos removed/pointed at workspace shim at default flip, bin.fgos-runner stays, ownership hea…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -510,25 +510,12 @@
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
-        "decision": "defer-with-owner",
-        "owner": "Packaging-distribution batch (Step 4)",
         "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
-        "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee",
-        "reviewStatus": "reviewed",
-        "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "package.json:9-12",
           "bin/fgos.mjs:1-10"
         ],
-        "statusNote": "FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed.",
-        "flaggedObsolete": true,
-        "ownerQueue": false,
-        "reviewer": "owner",
-        "reviewedAt": "2026-10-13",
-        "reviewNote": "F6: dropped-010 is deferred, not retired. The installed-default npm bin.fgos removal stays an open obligation owned by the Packaging-distribution batch (Step 4), which decides restore or retirement there. The FLAGGED-obsolete verbatim retention in architecture/release-boundaries.md stands until then.",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
-        "reviewReportCommit": "371eca2685d030d878e352924835cd1559e09501",
         "stubOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
         "stubAnchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
         "retainedVerbatim": {
@@ -536,14 +523,37 @@
           "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
           "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee"
         },
-        "deferralOwnerAnswer": "F6",
-        "deferralReason": "Owner F6: installed-default npm bin.fgos removal remains an open obligation. Packaging-distribution decides restore or retirement; FLAGGED-obsolete verbatim retention stands until then.",
-        "deferredToStep": 4
+        "decision": "superseded by decision",
+        "owner": "Packaging-distribution (release-owner decision)",
+        "authoredBy": "codex-session:12@2026-10-14",
+        "reviewStatus": "pending",
+        "successor": {
+          "decision": "2026-09-15 coordinator 30-day window",
+          "owner": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+          "anchor": "2-coordinator-setup",
+          "line": 72,
+          "companionOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "companionAnchor": "2-open-release-decisions",
+          "companionLine": 35,
+          "earliestRemoval": "2026-10-18"
+        },
+        "owedObligation": "Removing or redirecting bin.fgos after the window remains owed to Packaging-distribution (release-owner decision). Nothing is removed now.",
+        "rationale": "Superseded by decision: the same-day ownership header and the dated coordinator window show intentional coexistence; the coordinator 30-day window is the successor to the automatic installed-default trigger.",
+        "statusNote": "Superseded by decision (owner F6 resolution, 2026-10-14): the installed-default npm `bin.fgos` removal trigger has the 2026-09-15 coordinator 30-day window as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; compatibility-window row above, originally line 35). The Rust host is the installed default from preview; the deprecated Node fallback is supported for 30 calendar days after preview publication, earliest removal 2026-10-18. Removing or redirecting `bin.fgos` after the window remains owed to Packaging-distribution (release-owner decision). The original clause below is retained verbatim as dated design. The runner mapping and source-entry ownership header stay; nothing is removed now.",
+        "flaggedObsolete": false,
+        "retentionStatus": "superseded-by-decision; original clause retained verbatim as dated design",
+        "ownerResolution": {
+          "report": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+          "commit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
+          "text": "F6 resolution (owner-decided 2026-10-14, option A of the Step 4 decision, following `review-4-packaging-truth-f6.md` part 2): dropped-010 is superseded by decision, not retired by absence.\n1. The installed-default removal trigger for npm `bin.fgos` is superseded by the 2026-09-15 coordinator decision (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`, with the `architecture/release-boundaries.md:35` row): the Rust host is the installed default from the preview, and the Node fallback is deprecated and supported for 30 calendar days, earliest removal 2026-10-18. The disposition cites that decision as its successor.\n2. Removing or redirecting `bin.fgos` after the window stays an owed obligation, owned by Packaging-distribution (release-owner decision). The disposition text says so; nothing is removed now.\n3. The rationale says \"superseded by decision\" and drops the \"no intentional retirement is inferred from absence\" wording. The FLAGGED-obsolete verbatim retention may now be resolved consistently with this verdict. The runner mapping and source-entry ownership header stay.",
+          "shownTextDigest": "f2a190c215efd2f962ba97b71118536ba72fdf316fc27cea30584299c7ab7487"
+        },
+        "reviewNote": "Owner decision accepted; newly authored representation and its conservation bindings await independent Lead review."
       }
     },
     {
       "id": "dropped-011",
-      "title": "Rust-host-first cost: legacy call pays Rust launcher + Node startup, both runtimes shipped, compatibility fai\u2026",
+      "title": "Rust-host-first cost: legacy call pays Rust launcher + Node startup, both runtimes shipped, compatibility fai…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -593,7 +603,7 @@
     },
     {
       "id": "dropped-012",
-      "title": "Scope (options, ordering, transition, cutover, rollback only) and obligation that every native migration slic\u2026",
+      "title": "Scope (options, ordering, transition, cutover, rollback only) and obligation that every native migration slic…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -643,7 +653,7 @@
     },
     {
       "id": "dropped-013",
-      "title": "Rejected options rationale (Option A: heavy investment in a composition root scheduled for removal; Option C:\u2026",
+      "title": "Rejected options rationale (Option A: heavy investment in a composition root scheduled for removal; Option C:…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -708,7 +718,7 @@
     },
     {
       "id": "dropped-014",
-      "title": "Per-component repeat procedure (10 steps: read the boundary advisory, pick a complete boundary, shared fixtur\u2026",
+      "title": "Per-component repeat procedure (10 steps: read the boundary advisory, pick a complete boundary, shared fixtur…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -765,7 +775,7 @@
     },
     {
       "id": "dropped-015",
-      "title": "Rollback bullets: legacy and native only side by side during the operation observation window; never delete a\u2026",
+      "title": "Rollback bullets: legacy and native only side by side during the operation observation window; never delete a…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -816,7 +826,7 @@
     },
     {
       "id": "dropped-016",
-      "title": "P1 compatibility harness: changed areas, performance gates (legacy exec overhead <= 25 ms p50, native version\u2026",
+      "title": "P1 compatibility harness: changed areas, performance gates (legacy exec overhead <= 25 ms p50, native version…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -879,7 +889,7 @@
     },
     {
       "id": "dropped-017",
-      "title": "Test and review gates table (per commit, R1 integration/release, R2, R3, future writer proof), evidence rules\u2026",
+      "title": "Test and review gates table (per commit, R1 integration/release, R2, R3, future writer proof), evidence rules…",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,

@@ -147,7 +147,7 @@ Native Rust dynamic libraries are not the default external mechanism: Rust has n
 
 Added in candidate: verbatim restoration of `docs/architect/host-invocation-routing/legacy-cli-transition.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`; preservation is not a fresh implementation claim.
 
-**Checked status:** FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed.
+**Checked status:** Superseded by decision (owner F6 resolution, 2026-10-14): the installed-default npm `bin.fgos` removal trigger has the 2026-09-15 coordinator 30-day window as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; compatibility-window row above, originally line 35). The Rust host is the installed default from preview; the deprecated Node fallback is supported for 30 calendar days after preview publication, earliest removal 2026-10-18. Removing or redirecting `bin.fgos` after the window remains owed to Packaging-distribution (release-owner decision). The original clause below is retained verbatim as dated design. The runner mapping and source-entry ownership header stay; nothing is removed now.
 
 **Code evidence:** `package.json:9-12`; `bin/fgos.mjs:1-10`.
 

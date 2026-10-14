@@ -3,19 +3,19 @@
 ```txt
 Document type: Decision
 Audience: Release owner, maintainer and independent reviewer
-Purpose: Propose the disposition of the retained installed-default npm entry obligation
+Purpose: Record the owner-decided successor to the installed-default npm entry trigger and the owed removal obligation
 Design status: Candidate
-Implementation: Proposed retirement of a dated trigger clause; no retirement is approved here
+Implementation: Owner-decided successor; end-of-window removal or redirect remains owed
 Provenance: dropped-010; original legacy-cli-transition.md obligation and current ownership boundary
 Writer type: Human + agent coauthor
 Canonical: No
-Canonical for: The pending decision proposal only
-Use this when: Reviewing the original installed-default trigger against the retained npm compatibility channel
-Do not use this for: Removing npm entries, changing release support, or treating the proposal as accepted
-Last reviewed: Pending independent review
+Canonical for: Candidate record of the owner F6 resolution and remaining Packaging-distribution obligation
+Use this when: Reading the successor window and the owed end-of-window removal or redirect
+Do not use this for: Claiming removal is implemented, extending release support, or an authority cutover
+Last reviewed: Owner resolution 2026-10-14; conservation representation pending independent review
 Related:
 - docs/platform/packaging-distribution/spec.md
-Supersedes: None until independent verdict
+Supersedes: The automatic installed-default npm bin.fgos removal trigger, by the owner F6 resolution
 Superseded by: None recorded
 ```
 
@@ -25,8 +25,10 @@ Superseded by: None recorded
 
 ## Proposed Disposition
 
-Added in candidate — propose retirement of the automatic installed-default removal or redirection trigger. Keep the npm compatibility mapping, runner mapping and source-entry ownership header under their existing support and release policy. This does not decide when the npm fallback channel ends, extend its support promise, or remove a payload.
+Added in candidate — owner F6 resolution (2026-10-14): **superseded by decision**. The automatic installed-default removal or redirection trigger for npm `bin.fgos` has the 2026-09-15 coordinator decision as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; `docs/platform/host-invocation-routing/architecture/release-boundaries.md:35`). The Rust host is the installed default from the preview; the Node fallback is deprecated and supported for 30 calendar days after preview publication, earliest removal 2026-10-18.
+
+Removing or redirecting `bin.fgos` after the window remains an **owed obligation owned by Packaging-distribution (release-owner decision)**. Nothing is removed now. The runner mapping and source-entry ownership header stay; this resolution does not extend the support promise.
 
 The current `package.json:9-12` maps both npm entries to the Node payload. `bin/fgos.mjs:4-10` expressly retains global npm and direct Node compatibility channels while requiring Rust host payload resolution through manifest fields. The source obligation was introduced by `4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f`; the implementation header added by `c831811faaa0be93f505456aae6a134865ccbc9b` explicitly retained npm compatibility and did not remove that mapping. The candidate spec distinguishes the native public/default posture from the deprecated npm channel.
 
-The current code proves coexistence, not intentional retirement of the original obligation. No commit explicitly retiring the trigger was found by the recorded symbol/history search. Independent review must decide whether this proposal becomes a retirement verdict or whether a restoration remains owed. Until that verdict, dropped-010 stays deferred to Packaging-distribution and its FLAGGED-obsolete literal retention is unchanged.
+The rationale is **superseded by decision**: the same-day ownership header and the dated coordinator window show intentional coexistence. The coordinator window supersedes the automatic installed-default trigger; absence of a removal commit is not the retirement rationale. The original obligation remains preserved verbatim above and at the resolved retention anchor in `docs/platform/host-invocation-routing/architecture/release-boundaries.md`. The end-of-window removal or redirect remains owed to Packaging-distribution.
