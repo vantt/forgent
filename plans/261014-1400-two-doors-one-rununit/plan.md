@@ -96,6 +96,20 @@ Người giữ các file dùng chung theo từng bước được ghi ở [proto
 
 Đã chốt, không hỏi lại: one-liner có `--writes` mà không có worktree thì từ chối. Việc tự tạo worktree là item riêng sau M1 (Lead quyết #11).
 
+## Mục để ngỏ, ghi lại sau đợt A
+
+- RT-H3 (lane land): xoá cả warnings lẫn evidence trong `result.json` thì Work vẫn tiến. Muốn chặn phải băm evidence lúc settle (cùng lớp với `claimSha256`). Đây là cơ chế mới, làm thành item riêng sau M2.
+- RT-H4 (lane land): Lead duyệt. Khi Work đọc một kết quả read-only, warning `stray-write-correlated` chỉ được ghi lại, không chặn Work. Lý do: tín hiệu này chỉ đoán theo tương quan trong checkout dùng chung, chặn ở đây sẽ lặp lại lỗi báo nhầm của đề xuất #8.
+- UNPROVEN còn mang theo:
+  - chưa có lượt bwrap thật ghi `confinement: "bwrap"`, đóng ở G-M1 ca 1;
+  - chưa có lượt herdr thật mang `stray-write-correlated`;
+  - herdr-spawn có tạo `stdout.log` không, L9 kiểm;
+  - `reasoningEffort` của policy có tới adapter không.
+- Ngoài plan, cần ghi thành item:
+  - fgos đang activate rơi về Node nên `fgos convention` không chạy;
+  - ghế xai trả exit 0 mà không làm gì;
+  - nên đóng follow-up 44287a09c.
+
 ## Disposition review
 
 V = [validate-plan-against-code.md](reports/validate-plan-against-code.md), R = [red-team-plan.md](reports/red-team-plan.md).

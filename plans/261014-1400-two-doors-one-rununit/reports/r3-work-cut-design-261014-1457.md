@@ -2,7 +2,9 @@
 
 Lane L8 · nhánh `feat/rununit-spike` từ `87ec14c09` · chỉ đọc code, không sửa code · 2026-10-14
 
-**Lead duyệt:** _(chưa — Lead ghi "duyệt" kèm ngày ở đây; P10 chưa được viết code trước dòng này)_
+**Lead duyệt:** duyệt, 2026-10-14. Chấp nhận cả mười câu, kể cả hai chỗ đổi mặc định (câu 4, câu 8). Hai mục để ngỏ:
+1. L10 thêm `declaredOperationFields` vào `dispatch/assignment.mjs`. Hàm này chỉ cộng thêm, không đổi chữ ký `buildAssignment`, để P11 khỏi phải gom lại.
+2. Lỗi khoá resume `run.mjs:185-207`: Lead đã sửa riêng trước đợt B (nhánh `fix/rununit-resume-lock`). L9/L10 không phải nhận nữa.
 
 ## Tóm tắt quyết định
 
