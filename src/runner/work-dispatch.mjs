@@ -85,6 +85,12 @@ export function resolveAgentTypeForWork(work, cwd, stage) {
  *
  * `opts.stage` names the step (default: the item's own); `opts.feedback` rides into the prompt;
  * `opts.onUnitRunCreated(unitRunId)` is told the run's id as soon as it exists.
+ * `opts.resumeUnitRunId` resumes that run in `cwd` (its own worktree) instead of starting one: a
+ * round whose commit failed is committed again without the agent, and the Unit it ran is reused.
+ *
+ * An error carrying `resumable: true` left work in the worktree that only a resume of
+ * `err.unitRunId` may go on with (a commit that failed, or a stop over the worker's own partial
+ * writes): the caller keeps that worktree.
  *
  * The loop runs without a pane: `herdrPresent: false` keeps the cli transport even when the
  * runner itself was started inside herdr.
@@ -102,9 +108,9 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
   // became dirty in the main checkout during the round is reported (never blocked).
   const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: mainRoot, cwd });
 
-  let unitRunId = null;
+  let unitRunId = opts.resumeUnitRunId ?? null;
   const unit = await runUnit({
-    unitData,
+    ...(opts.resumeUnitRunId ? { resumeUnitRunId: opts.resumeUnitRunId } : { unitData }),
     worktree: cwd,
     cwd,
     ...(repoRoot ? { repoRoot } : {}),
@@ -148,7 +154,10 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
 
   const fail = (errorClass, message, extra = {}) => new DispatchError(errorClass, message, { ...facts, ...extra });
   if (seat.commit?.status === 'failed') {
-    throw fail('worktree-fail', `runner commit of the worker's changes failed: ${seat.commit.error ?? seat.commit.reason}`, { runnerCommit: seat.commit });
+    // The work is done and only the commit failed: a resume of this run commits it again without
+    // spawning the agent. Not when the failed commit already landed holding the wrong files.
+    const resumable = seat.commit.reason !== 'committed-set-mismatch';
+    throw fail('worktree-fail', `runner commit of the worker's changes failed: ${seat.commit.error ?? seat.commit.reason}`, { runnerCommit: seat.commit, resumable });
   }
   const outcome = seat.outcome ?? unit.outcome;
   if (outcome === 'pass') {
@@ -166,7 +175,10 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
     throw fail('no-executor', `no executor may run this work (capability "${unitData.capability}"): ${refused.reason ?? 'refused'}${refused.detail ? ` (${refused.detail})` : ''}; register an executor with a confined invocation in runner.capabilities["${unitData.capability}"].prefer`, { refused });
   }
   if (outcome === 'provider-limit') {
-    throw fail('provider-limit', `every candidate for this work hit its provider limit${seat.fallbackExhausted?.detail ? `: ${seat.fallbackExhausted.detail}` : ''}`, { fallbackExhausted: seat.fallbackExhausted ?? null });
+    // Stopped over its own partial writes: the worktree holds them, and only a resume of this run
+    // may go on over them.
+    const resumable = seat.fallbackExhausted?.reason === 'partial-writes';
+    throw fail('provider-limit', `every candidate for this work hit its provider limit${seat.fallbackExhausted?.detail ? `: ${seat.fallbackExhausted.detail}` : ''}`, { fallbackExhausted: seat.fallbackExhausted ?? null, resumable });
   }
   const failureCode = runResult?.classification?.failure?.code ?? null;
   if (failureCode === 'execution-timeout') {
@@ -299,6 +311,15 @@ function isSafeRepoRelative(ref) {
     && !ref.includes('\\') && !ref.includes('\0') && !ref.split('/').includes('..');
 }
 
+function unitIdOf(id, tail) {
+  return `work-${id}-${String(tail)}`.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/-+/g, '-').replace(/-$/, '');
+}
+
+/** The id `workUnitFor` gives the step Unit of `item` at `stage` (default: its own step). */
+export function workUnitIdFor(item, stage) {
+  return unitIdOf(item.id, stage ?? effectiveStep(item ?? {}, getDomain(item?.domain, { onUnrecognized: () => {} })));
+}
+
 /**
  * The single place a Work item becomes Unit data for `runUnit`.
  *
@@ -400,8 +421,7 @@ export function workUnitFor(item, opts = {}) {
   const writes = !mutating ? [] : (Array.isArray(expectedFiles) && expectedFiles.length ? [...expectedFiles] : ['**']);
   const rigor = workRigorFor(item, matchedOp?.policy);
   const preferId = resolved.configured && cfg.executors?.[resolved.executorId] ? resolved.executorId : null;
-  const idTail = String(operation ?? stage);
-  const unitId = `work-${item?.id}-${idTail}`.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/-+/g, '-').replace(/-$/, '');
+  const unitId = unitIdOf(item.id, operation ?? stage);
 
   const unitData = {
     id: unitId,

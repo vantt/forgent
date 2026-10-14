@@ -246,7 +246,7 @@ if (prompt.includes('item-bad-claim')) {
 
 test('an item whose capability has no executor pool parks as no-executor with what to configure, and the runner keeps serving other items', async () => {
   const fx = setup();
-  // The synthetic domain's step asks for capability "assembling", which no pool serves.
+  // The synthetic domain's step asks for capability "synthetic:assembling", which no pool serves.
   seedItem(fx.dir, { id: 'item-no-pool', domain: 'synthetic' });
   seedItem(fx.dir, { id: 'item-served', verify: 'test -f output.txt' });
   const script = writeWorker(fx.scriptDir, 'producing', PRODUCING);
@@ -258,7 +258,7 @@ test('an item whose capability has no executor pool parks as no-executor with wh
   assert.equal(byId['item-no-pool'].outcome, 'parked');
   assert.equal(byId['item-no-pool'].errorClass, 'no-executor');
   assert.equal(byId['item-no-pool'].attempts, 1, 'retrying cannot fix a config gap');
-  assert.match(fs.readFileSync(path.join(fx.dir, 'logs', 'item-no-pool.log'), 'utf8'), /runner\.capabilities\["assembling"\]\.prefer/);
+  assert.match(fs.readFileSync(path.join(fx.dir, 'logs', 'item-no-pool.log'), 'utf8'), /runner\.capabilities\["synthetic:assembling"\]\.prefer/);
   assert.equal(byId['item-served'].outcome, 'awaiting-approval');
 });
 
@@ -292,4 +292,70 @@ fs.rmSync('.started', { force: true });`);
   assert.ok(warning, `expected a stray-write warning in the loop log: ${JSON.stringify(logs)}`);
   assert.match(warning, /stray-write-correlated/);
   assert.match(warning, /seed\.txt/);
+});
+
+test('a round stopped on its own partial writes keeps its checkout, and the item\'s next dispatch resumes that same Unit run over them', async () => {
+  const fx = setup();
+  seedItem(fx.dir, { id: 'item-partial', verify: 'test -f output.txt' });
+  // First launch: writes half of the work, then hits its provider limit. Run again over that
+  // half, it finishes. The worktree is the only place the worker can keep anything.
+  const script = writeWorker(fx.scriptDir, 'partial-then-finish', `if (fs.existsSync('partial.txt')) {
+  fs.writeFileSync('output.txt', 'finished\\n');
+} else {
+  fs.writeFileSync('partial.txt', 'half of the work\\n');
+  ${LIMITED}
+}`);
+  const config = {
+    executors: { spent: executorFor(script, 'spentquota') },
+    capabilities: { 'code:implement': { prefer: [{ executor: 'spent' }] } },
+    modelPolicies: modelPolicies('spentquota'),
+  };
+
+  const first = await runLoop(fx, config);
+
+  assert.equal(first.dispatched[0].outcome, 'parked');
+  assert.equal(first.dispatched[0].errorClass, 'provider-limit');
+  const [stopped, ...others] = unitRuns(fx.repoRoot);
+  assert.equal(others.length, 0);
+  assert.equal(stopped.record.bindings['producer/1'].at(-1).retryStopped?.reason, 'partial-writes');
+  assert.equal(fs.readFileSync(path.join(stopped.record.worktree, 'partial.txt'), 'utf8'), 'half of the work\n', 'the half-done file is still there after the park');
+
+  moveWork(fx.dir, { id: 'item-partial', to: 'todo', expectedStatus: 'blocked', role: 'human' });
+  const second = await runLoop(fx, config);
+
+  assert.equal(second.dispatched[0].outcome, 'awaiting-approval');
+  assert.deepEqual(unitRuns(fx.repoRoot).map((r) => r.unitRunId), [stopped.unitRunId], 'the same Unit run was resumed, no new one');
+  const events = readRawEvents(fx.dir).filter((e) => e.type === 'executor.dispatch');
+  assert.equal(events.at(-1).payload.unitRunId, stopped.unitRunId);
+  assert.deepEqual(git(fx.repoRoot, 'show', '--format=', '--name-only', 'fgw/item-partial').split('\n').sort(), ['output.txt', 'partial.txt']);
+});
+
+test('a failed runner commit keeps the checkout: retries and the next dispatch resume the same Unit run and only commit, never spawning the agent again', async () => {
+  const fx = setup();
+  seedItem(fx.dir, { id: 'item-commit-fails' });
+  const hooks = fs.realpathSync(makeFixtureDir('fgos-loop-rununit-hooks-'));
+  const allow = path.join(hooks, 'allow');
+  fs.writeFileSync(path.join(hooks, 'pre-commit'), `#!/bin/sh\n[ -f ${JSON.stringify(allow)} ] && exit 0\necho rejected-by-hook >&2\nexit 1\n`);
+  fs.chmodSync(path.join(hooks, 'pre-commit'), 0o755);
+  git(fx.repoRoot, 'config', 'core.hooksPath', hooks);
+  const script = writeWorker(fx.scriptDir, 'producing', PRODUCING);
+  const config = { executors: { 'fgos-coding-implement': executorFor(script) }, modelPolicies: modelPolicies('node') };
+
+  const first = await runLoop(fx, config);
+
+  assert.equal(first.dispatched[0].outcome, 'parked');
+  assert.equal(first.dispatched[0].errorClass, 'worktree-fail');
+  assert.equal(countWorkerRuns(fx.repoRoot), 1, 'the agent ran once; the retries only tried to commit again');
+  const [failed, ...others] = unitRuns(fx.repoRoot);
+  assert.equal(others.length, 0, 'retries resumed the same Unit run');
+  assert.equal(fs.readFileSync(path.join(failed.record.worktree, 'output.txt'), 'utf8'), 'produced\n', 'the uncommitted work is still there');
+
+  fs.writeFileSync(allow, '');
+  moveWork(fx.dir, { id: 'item-commit-fails', to: 'todo', expectedStatus: 'blocked', role: 'human' });
+  const second = await runLoop(fx, config);
+
+  assert.equal(second.dispatched[0].outcome, 'awaiting-approval');
+  assert.equal(countWorkerRuns(fx.repoRoot), 1, 'the agent was never spawned again');
+  assert.deepEqual(unitRuns(fx.repoRoot).map((r) => r.unitRunId), [failed.unitRunId]);
+  assert.equal(git(fx.repoRoot, 'show', '--format=', '--name-only', 'fgw/item-commit-fails'), 'output.txt');
 });

@@ -166,17 +166,6 @@ function writeRunnerConfig(repoRoot, executorScript) {
   );
 }
 
-/** For the explicit `--config <path>` tests below: `--config` names an
- * arbitrary file for the loop's own settings. A worker runs as a Unit run,
- * which binds from the repo's `.fgos/config.json`, so the same config goes
- * there too. */
-function writeExplicitRunnerConfigFile(repoRoot, executorScript) {
-  const configPath = path.join(repoRoot, 'runner-config.json');
-  fs.writeFileSync(configPath, JSON.stringify(runnerConfigFor(executorScript)));
-  writeRunnerConfig(repoRoot, executorScript);
-  return configPath;
-}
-
 function branchLog(repoRoot, branch) {
   return execFileSync('git', ['log', '--oneline', branch], { cwd: repoRoot, encoding: 'utf8' });
 }
@@ -1048,11 +1037,11 @@ test('e2e crash-idempotency: runner killed mid-round (after doing, before the wo
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   add(repoRoot, 'item-crash', { verify: 'test -f output.txt' });
-  const configPath = writeExplicitRunnerConfigFile(repoRoot, writeHoldingExecutor(scriptDir, 'output.txt'));
+  writeRunnerConfig(repoRoot, writeHoldingExecutor(scriptDir, 'output.txt'));
 
   // First --once: while the worker holds mid-round, SIGKILL the runner. Its
   // worktree teardown (in a `finally`) never runs.
-  const child = spawn(process.execPath, [RUNNER, '--once', '--config', configPath], { cwd: repoRoot, stdio: 'ignore' });
+  const child = spawn(process.execPath, [RUNNER, '--once'], { cwd: repoRoot, stdio: 'ignore' });
   const exited = new Promise((resolve) => child.on('exit', (code, signal) => resolve({ code, signal })));
   let held = null;
   for (const deadline = Date.now() + 30000; !held && Date.now() < deadline;) {
@@ -1081,13 +1070,13 @@ test('e2e crash-idempotency: runner killed mid-round (after doing, before the wo
 
   // Second --once: the killed runner left its runner.lock behind, so this
   // run cleans the stale lock and yields busy (exit 6).
-  const second = runner(repoRoot, ['--once', '--config', configPath]);
+  const second = runner(repoRoot, ['--once']);
   assert.equal(second.status, 6, `expected busy (stale lock cleaned): ${second.stderr}`);
   assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'runner.lock')), false);
 
   // Third --once: acquires a clean lock; startup reap resolves the stale
   // `doing` item. Its branch carries no commit, so it is reclaimed blocked.
-  const third = runner(repoRoot, ['--once', '--config', configPath]);
+  const third = runner(repoRoot, ['--once']);
   assert.equal(third.status, 0, `post-clean --once did not recover cleanly: ${third.stderr}`);
   assert.equal(stateView(repoRoot).work['item-crash'].status, 'blocked');
   assert.equal(branchAheadCount(repoRoot, 'fgw/item-crash'), 0, 'the reap never re-ran the item');
@@ -1178,6 +1167,14 @@ test('e2e --watch: stays alive over an idle frontier, completes a cycle, and a s
   } finally {
     if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
   }
+});
+
+test('e2e --config is gone: the repo\'s own .fgos/config.json is the one runner config, so the flag is rejected as a validation error (exit 4)', () => {
+  const repoRoot = initTempRepo();
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  const result = runner(repoRoot, ['--once', '--config', path.join(repoRoot, 'runner-config.json')]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /unknown flag "--config"/);
 });
 
 test('e2e --watch --dry-run is rejected as a validation error (exit 4)', () => {

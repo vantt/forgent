@@ -81,7 +81,7 @@ import {
   BREAKER_MISSES,
 } from './anti-loop.mjs';
 import { resolveTierModel } from './dispatch.mjs';
-import { spawnWorker } from './work-dispatch.mjs';
+import { spawnWorker, workUnitIdFor } from './work-dispatch.mjs';
 import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
 import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, findCheckoutPath, branchNameFor, createBranchRef } from './worktree.mjs';
@@ -348,6 +348,50 @@ function git(repoRoot, args) {
  * the log points at the run's own output files instead. */
 function workerRunPointer(unitRunId) {
   return `fgos-runner: worker running as unit run ${unitRunId}; while it runs its output is captured under .fgos/assignments/${unitRunId}/producer/*/runs/*/protected/capture/, and lands in that run's stdout.log once it settles\n`;
+}
+
+// A worker round that left work only its own Unit run may go on with (a runner commit that
+// failed, or a stop over the worker's own partial writes) keeps its worktree, and the item's next
+// attempt resumes that run there instead of starting a new one. The marker is the runner's own
+// runtime note of which run and checkout that is; the Unit run record stays the truth.
+function resumeMarkerFile(dir, id) {
+  return path.join(dir, 'runtime', 'runner-resume', `${encodeURIComponent(id)}.json`);
+}
+
+function keepForResume(dir, id, { unitRunId, worktree }) {
+  const file = resumeMarkerFile(dir, id);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, JSON.stringify({ unitRunId, worktree, keptAt: new Date().toISOString() }, null, 2));
+}
+
+function clearResume(dir, id) {
+  fs.rmSync(resumeMarkerFile(dir, id), { force: true });
+}
+
+/** The kept Unit run of `item` at `stage` and its worktree, when both still stand; else null. */
+function resumableRun(repoRoot, dir, item, stage) {
+  let marker;
+  try {
+    marker = JSON.parse(fs.readFileSync(resumeMarkerFile(dir, item.id), 'utf8'));
+  } catch {
+    return null;
+  }
+  let record = null;
+  try {
+    record = JSON.parse(fs.readFileSync(path.join(dir, 'assignments', marker.unitRunId, 'unit.json'), 'utf8'));
+  } catch {
+    // no such run: the marker is stale
+  }
+  const checkout = record && fs.existsSync(marker.worktree)
+    ? findCheckoutPath(git(repoRoot, ['worktree', 'list', '--porcelain']), branchNameFor(item.id))
+    : null;
+  const stands = record?.unit?.id === workUnitIdFor(item, stage)
+    && checkout && fs.realpathSync(checkout) === fs.realpathSync(marker.worktree);
+  if (!stands) {
+    clearResume(dir, item.id);
+    return null;
+  }
+  return { unitRunId: marker.unitRunId, worktree: marker.worktree };
 }
 
 /** Branch facts the recovery matrix needs (stale-doing resolution, goal-
@@ -905,9 +949,16 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
     attempt += 1;
     let wt = null;
     let failure = null;
+    let keepWorktree = false;
+    let resume = null;
 
     try {
-      if (rootId !== item.id) {
+      resume = resumableRun(repoRoot, dir, item);
+      if (resume) {
+        wt = { path: resume.worktree, branch: branchNameFor(item.id) };
+        if (dispatchBaseline === null) dispatchBaseline = git(repoRoot, ['rev-parse', wt.branch]).trim();
+        log(`fgos-runner: resuming unit run ${resume.unitRunId} for "${item.id}" in its kept worktree ${wt.path}`);
+      } else if (rootId !== item.id) {
         // Leaf: idempotent — createBranchRef is a no-op if fgw/<rootId>
         // already exists (an earlier sibling leaf, or the root's own prior
         // dispatch, already created it). No explicit baseRef here (tsk-386):
@@ -921,7 +972,9 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       } else {
         wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
       }
-      if (dispatchBaseline === null) {
+      if (resume) {
+        // The kept worktree holds the run's own work: never reset over it.
+      } else if (dispatchBaseline === null) {
         dispatchBaseline = git(repoRoot, ['rev-parse', wt.branch]).trim();
       } else {
         // Retry never builds on debris: the reused branch's HEAD is the
@@ -1057,7 +1110,9 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         // The run's id reaches the item's log the moment the run exists, so a
         // runner that dies mid-round still leaves the id a resume needs.
         onUnitRunCreated: (unitRunId) => appendWorkerLogChunk(dir, item.id, workerRunPointer(unitRunId)),
+        ...(resume ? { resumeUnitRunId: resume.unitRunId } : {}),
       });
+      clearResume(dir, item.id);
       lastWorkerOutput = worker.stdout ?? ''; // wgi-8: terminal-outcome discovery source (success/verify-miss)
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model}, unit run ${worker.unitRunId})`);
       // Executor-aware dispatch announce/audit (D8, tsk-62v): one line to
@@ -1160,6 +1215,13 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         // DispatchError (worker-spawn-fail / worker-timeout) or WorktreeError
         // (worktree-fail) — recovery-matrix vocabulary, routed below.
         failure = { errorClass: err.errorClass, message: err.message };
+        if (err.resumable && wt && err.unitRunId) {
+          keepWorktree = true;
+          keepForResume(dir, item.id, { unitRunId: err.unitRunId, worktree: wt.path });
+          log(`fgos-runner: keeping worktree ${wt.path} of "${item.id}" for unit run ${err.unitRunId}; the item's next attempt resumes it`);
+        } else {
+          clearResume(dir, item.id);
+        }
         lastWorkerOutput = err.stdout ?? lastWorkerOutput; // wgi-8: a timed-out/failed worker can still have surfaced discoveries
         log(`fgos-runner: ${err.errorClass} for "${item.id}" (attempt ${attempt}): ${err.message}`);
         // Persist the failing outcome (D1/D3/D4). DispatchError carries the
@@ -1186,7 +1248,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         throw err;
       }
     } finally {
-      if (wt) removeDispatchWorktree(repoRoot, wt.path, log);
+      if (wt && !keepWorktree) removeDispatchWorktree(repoRoot, wt.path, log);
     }
 
     const decision = resolveAction(failure.errorClass, attempt);
@@ -1449,8 +1511,15 @@ export async function runOnce(options = {}) {
           break;
         }
         let wt = null;
+        let keepWorktree = false;
         try {
-          wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
+          const resume = resumableRun(repoRoot, dir, item, discoverEntry);
+          if (resume) {
+            wt = { path: resume.worktree, branch: branchNameFor(item.id) };
+            log(`fgos-runner: resuming unit run ${resume.unitRunId} for "${item.id}" in its kept worktree ${wt.path}`);
+          } else {
+            wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
+          }
           const feedbackView = listWork(dir);
           const worker = await spawnWorker(item, config, wt.path, {
             fgosDir: dir,
@@ -1461,7 +1530,9 @@ export async function runOnce(options = {}) {
               reason: feedbackView.work?.[item.id]?.reason,
             },
             onUnitRunCreated: (unitRunId) => appendWorkerLogChunk(dir, item.id, workerRunPointer(unitRunId)),
+            ...(resume ? { resumeUnitRunId: resume.unitRunId } : {}),
           });
+          clearResume(dir, item.id);
           log(`fgos-runner: research worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model}, unit run ${worker.unitRunId})`);
           const commit = worker.commit;
           appendWorkerLog(dir, item.id, {
@@ -1533,8 +1604,15 @@ export async function runOnce(options = {}) {
           // dispatch is logged and the sweep moves on to the next item,
           // never bubbling out to abort the rest of this runOnce pass.
           log(`fgos-runner: discovery dispatch failed for "${item.id}" (left at stage discovery, status todo, for the next sweep to retry): ${err.message}`);
+          if (err?.resumable && wt && err.unitRunId) {
+            keepWorktree = true;
+            keepForResume(dir, item.id, { unitRunId: err.unitRunId, worktree: wt.path });
+            log(`fgos-runner: keeping worktree ${wt.path} of "${item.id}" for unit run ${err.unitRunId}; the next sweep resumes it`);
+          } else {
+            clearResume(dir, item.id);
+          }
         } finally {
-          if (wt) removeDispatchWorktree(repoRoot, wt.path, log);
+          if (wt && !keepWorktree) removeDispatchWorktree(repoRoot, wt.path, log);
         }
       }
 
