@@ -120,3 +120,8 @@ test('a source or origin the data declares about itself has no effect', () => {
   assert.equal(tpl.source, undefined);
   assert.equal(tpl.origin, undefined);
 });
+
+test('a unit naming syncBase is refused instead of losing the sync: a workflow unit does not carry it', () => {
+  const file = unitsFile('sync.json', [{ id: 'catch-up', objective: 'Catch up', capability: 'code:implement', writes: ['src'], syncBase: 'main' }]);
+  assert.throws(() => translateUnitsToWorkflow(file), (e) => e instanceof RunnerConfigError && /syncBase is not carried by a workflow unit/.test(e.message) && /fgos run --unit/.test(e.message));
+});

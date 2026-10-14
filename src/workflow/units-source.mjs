@@ -57,6 +57,9 @@ export function translateUnitsToWorkflow(unitsPath) {
       throw new RunnerConfigError(`units[${i}] unit id "${unit.id}" must be letters, digits, ".", "_" or "-", starting with a letter or digit (it names the unit's branch)`);
     }
     seen.add(unit.id);
+    if (unit.syncBase !== undefined) {
+      throw new RunnerConfigError(`units[${i}] "${unit.id}": syncBase is not carried by a workflow unit (its worktree starts from its dependency's branch); run that unit with fgos run --unit`);
+    }
     if (unit.expectedOutputs.length > 0) {
       throw new RunnerConfigError(`units[${i}] "${unit.id}": expectedOutputs is not carried by a workflow unit; state it in the objective`);
     }
