@@ -162,3 +162,36 @@ test('run and workflow entries say which door one task and planned work take, wi
   assert.ok(workflowEntry.subcommands.start.examples.some((e) => e.includes('--units')), 'workflow start needs a --units example');
   assert.ok(workflowEntry.subcommands.start.examples.some((e) => /^fgos workflow start [a-z]/.test(e)), 'workflow start needs a preset example');
 });
+
+// The `fgos` shell function (scripts/fgos-shell-integration.sh) appends
+// `--dir <root>` to every call that lacks one, and `fgos doctor` probes the
+// shell setup with exactly `fgos --help` through it.
+test('help accepts the --dir the shell function appends, through the real shell function', () => {
+  const cwd = tmpCwd();
+  const expected = manifestOf(cwd);
+  for (const args of [['--help', '--json', '--dir', cwd], ['-h', '--json', `--dir=${cwd}`], ['--help', 'add', '--json', '--dir', cwd]]) {
+    const result = run(cwd, args);
+    assert.equal(result.status, 0, `${args.join(' ')}: ${result.stderr}`);
+    assert.deepEqual(JSON.parse(result.stdout), args.includes('add') ? expected.commands.find((c) => c.name === 'add') : expected, args.join(' '));
+  }
+  spawnSync('git', ['init', '-q'], { cwd });
+  fs.mkdirSync(path.join(cwd, 'bin'));
+  fs.symlinkSync(FGOS, path.join(cwd, 'bin', 'fgos.mjs'));
+  const integration = path.resolve(__dirname, '../../scripts/fgos-shell-integration.sh');
+  const env = { ...process.env };
+  delete env.CLAUDE_CODE_SESSION_ID;
+  for (const line of ['fgos --help', 'fgos --help --json', 'fgos -h dispatch --json']) {
+    const result = spawnSync('bash', ['-c', `source "${integration}" && ${line}`], { cwd, encoding: 'utf8', env });
+    assert.equal(result.status, 0, `${line}: ${result.stderr}`);
+    assert.ok(result.stdout.length > 0, line);
+  }
+});
+
+test('an exact -h/--help token is help even where it would be a flag value (same rule as the Rust host)', () => {
+  const cwd = tmpCwd();
+  for (const [args, verb] of [[['metrics', 'coverage', '--by', '-h', '--json'], 'metrics'], [['version', '--x', '-h', '--json'], 'version'], [['add', '--title', '--help', '--json'], 'add']]) {
+    const result = run(cwd, args);
+    assert.equal(result.status, 0, `${args.join(' ')}: ${result.stderr}`);
+    assert.equal(JSON.parse(result.stdout).name, verb, args.join(' '));
+  }
+});

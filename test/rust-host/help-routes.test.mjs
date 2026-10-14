@@ -112,8 +112,8 @@ test('fgos <verb> --help --json through the host returns the manifest entry for 
   const cases = [
     ...native.map((name) => ({ args: [name, '--help', '--json'], expected: entryOf(name) })),
     ...native.map((name) => ({ args: [name, '-h', '--json'], expected: entryOf(name) })),
-    { args: ['metrics', 'runs', '--help', '--json'], expected: entryOf('metrics') },
-    { args: ['convention', 'name', '--kind', 'report', '--help', '--json'], expected: entryOf('convention') },
+    { args: ['metrics', 'runs', '--help', '--json'], expected: { ...entryOf('metrics'), subcommands: { runs: entryOf('metrics').subcommands.runs } } },
+    { args: ['convention', 'name', '--kind', 'report', '--help', '--json'], expected: { ...entryOf('convention'), subcommands: { name: entryOf('convention').subcommands.name } } },
     { args: ['add', '--help', '--json'], expected: entryOf('add') },
     { args: ['init', '-h', '--json'], expected: entryOf('init') },
     { args: ['run', 'do it', '--writes', 'a.txt', '--help', '--json'], expected: entryOf('run') },

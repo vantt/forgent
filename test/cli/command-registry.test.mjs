@@ -113,7 +113,8 @@ test('no registry description names a step the default domain has retired', () =
   const offenders = [];
   for (const { where, text } of describedStrings()) {
     for (const step of retired) {
-      if (new RegExp(`\\b${step}\\b`).test(text)) offenders.push(`${where} names retired step "${step}"`);
+      // a standalone word only: a hyphenated value such as the friction reason `clarify-pass` is not the step
+      if (new RegExp(`(?<![\\w-])${step}(?![\\w-])`).test(text)) offenders.push(`${where} names retired step "${step}"`);
     }
   }
   assert.deepEqual(offenders, [], `registry prose names retired step(s):\n${offenders.join('\n')}`);

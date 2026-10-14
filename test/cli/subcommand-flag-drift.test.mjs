@@ -189,10 +189,12 @@ function subRegions(verb, caseText, subs) {
   return { regions, shared };
 }
 
-const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands);
+const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && !entry.nativeOnly);
+const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nativeOnly);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
   assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'gateway', 'goal', 'merge', 'session', 'tool', 'workflow']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['convention', 'friction', 'metrics']);
 });
 
 for (const entry of MULTI) {
@@ -240,3 +242,71 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
   for (const name of ['acknowledge-iron-law', 'timeout', 'no-timeout', 'wait', 'no-wait']) assert.ok(nextReads.has(name), name);
   assert.ok(regionReads(subRegions('tool', verbCase('tool'), ['check', 'query']).shared, 'probe').has('config'));
 });
+
+// Native verbs (the Rust host runs them; `--help` is answered from this
+// registry). Same rule, read from the Rust sources: the sub-verb list equals
+// the crate's AVAILABLE_SUBCOMMANDS, and the `"--flag"` literals in a
+// sub-verb's own Rust region equal its schema's flags. Regions: metrics -> its
+// metrics_cli/<sub>.rs file; friction -> its match arm in friction_cli.rs;
+// convention -> one parser shared by every sub-verb (cli_projector.rs), so
+// its flags must equal the union of the sub-verbs' schemas.
+const RUST = (rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+const NATIVE_SOURCES = {
+  metrics: {
+    subs: RUST('packages/observe/rust/src/metrics_cli/mod.rs'),
+    region: (sub) => {
+      const file = path.join(REPO_ROOT, `packages/observe/rust/src/metrics_cli/${sub}.rs`);
+      return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '';
+    },
+  },
+  friction: {
+    subs: RUST('packages/observe/rust/src/friction_cli.rs'),
+    region: (sub, subs) => {
+      const src = RUST('packages/observe/rust/src/friction_cli.rs');
+      const start = src.indexOf(`"${sub}" =>`);
+      assert.ok(start >= 0, `friction_cli.rs has no "${sub}" arm`);
+      const ends = subs.map((other) => src.indexOf(`"${other}" =>`, start + 1)).filter((i) => i > start);
+      return src.slice(start, Math.min(...ends, src.indexOf('"--help" |', start)));
+    },
+  },
+  convention: {
+    subs: RUST('packages/convention/rust/src/lib.rs'),
+    shared: () => {
+      const src = RUST('apps/fgos/src/cli_projector.rs');
+      const start = src.indexOf('fn project_convention_request');
+      return src.slice(start, src.indexOf('#[cfg(test)]', start));
+    },
+  },
+};
+
+function rustSubcommands(src) {
+  const m = /AVAILABLE_SUBCOMMANDS: &\[&str\] = &\[([^\]]*)\]/.exec(src);
+  assert.ok(m, 'AVAILABLE_SUBCOMMANDS not found');
+  return [...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
+}
+
+const rustFlags = (text) => new Set([...text.matchAll(/"--([a-z][a-z-]*)"/g)].map((m) => m[1]).filter((n) => !GLOBAL.has(n)));
+const schemaFlags = (spec) => Object.keys(spec.parameters.properties).filter((n) => !(spec.parameters.positional ?? []).includes(n));
+
+for (const entry of NATIVE) {
+  test(`${entry.name} (native): sub-verbs and their flags match the Rust sources`, () => {
+    const source = NATIVE_SOURCES[entry.name];
+    const subs = rustSubcommands(source.subs);
+    assert.deepEqual(Object.keys(entry.subcommands).sort(), [...subs].sort(), `${entry.name}: registry sub-verbs != AVAILABLE_SUBCOMMANDS`);
+    const problems = [];
+    if (source.shared) {
+      const declared = new Set(Object.values(entry.subcommands).flatMap(schemaFlags));
+      assert.deepEqual([...declared].sort(), [...rustFlags(source.shared())].sort(), `${entry.name}: schema flags != the shared Rust parser's flags`);
+      return;
+    }
+    for (const sub of subs) {
+      const read = rustFlags(source.region(sub, subs));
+      const declared = new Set(schemaFlags(entry.subcommands[sub]));
+      // a positional parameter may also be accepted as a flag (friction show --subject)
+      const accepted = new Set(Object.keys(entry.subcommands[sub].parameters.properties));
+      for (const name of read) if (!accepted.has(name)) problems.push(`${entry.name} ${sub} reads --${name}, not in its schema`);
+      for (const name of declared) if (!read.has(name)) problems.push(`${entry.name} ${sub} declares --${name}, which its Rust handler never reads`);
+    }
+    assert.deepEqual(problems, []);
+  });
+}

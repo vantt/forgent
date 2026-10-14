@@ -92,11 +92,126 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
+  withSubcommands({
     name: 'metrics',
     invoke: 'fgos metrics <subcommand>',
     description: 'Observation metrics suite (cases, harness scorecard, runs, run coverage, discussions and passive agreement, eval records, outcomes, entropy, snapshot). Native Rust host command.',
-    parameters: { type: 'object', properties: {}, required: [] },
+    subcommands: {
+      ping: {
+        description: 'Health check: echoes the resolved root and any stdin length.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos metrics ping'],
+      },
+      case: {
+        description: 'Measured cases: "open <name> --harness fgos|cook-plan|plain [--task]" starts one, "close <name> --interventions <N> --verdict usable|fixed|discarded" ends it, "list" lists them (--open: only open ones).',
+        parameters: {
+          type: 'object',
+          properties: {
+            action: { type: 'string', description: 'Positional: open, close or list.', enum: ['open', 'close', 'list'] },
+            name: { type: 'string', description: 'Positional after open/close: the case name.' },
+            harness: { type: 'string', description: 'open: the harness measured (fgos, cook-plan, plain).' },
+            task: { type: 'string', description: 'open: a one-line task description.' },
+            interventions: { type: 'string', description: 'close: how many times a person had to step in.' },
+            verdict: { type: 'string', description: 'close: usable, fixed or discarded.' },
+            note: { type: 'string', description: 'close: free-text note.' },
+            items: { type: 'string', description: 'close: comma-separated work item ids the case produced.' },
+            sessions: { type: 'string', description: 'close: comma-separated session ids.' },
+            open: { type: 'boolean', description: 'list: only cases still open.' },
+          },
+          positional: ['action', 'name'],
+          required: ['action'],
+        },
+        examples: ['fgos metrics case open login-fix --harness fgos --task "fix login"', 'fgos metrics case close login-fix --interventions 1 --verdict usable', 'fgos metrics case list --open'],
+      },
+      harness: {
+        description: 'Harness scorecard over closed cases.',
+        parameters: {
+          type: 'object',
+          properties: {
+            case: { type: 'string', description: 'Only this case.' },
+            since: { type: 'string', description: 'ISO date-time lower bound.' },
+            until: { type: 'string', description: 'ISO date-time upper bound.' },
+          },
+          required: [],
+        },
+        examples: ['fgos metrics harness', 'fgos metrics harness --since 2026-10-01T00:00:00Z'],
+      },
+      faults: {
+        description: 'Recorded faults, newest first.',
+        parameters: {
+          type: 'object',
+          properties: {
+            class: { type: 'string', description: 'Only this fault class.' },
+            since: { type: 'string', description: 'ISO date-time lower bound.' },
+            until: { type: 'string', description: 'ISO date-time upper bound.' },
+            limit: { type: 'string', description: 'Positive integer: at most this many.' },
+          },
+          required: [],
+        },
+        examples: ['fgos metrics faults --limit 20'],
+      },
+      runs: {
+        description: 'Run outcomes grouped by executor, adapter or role.',
+        parameters: {
+          type: 'object',
+          properties: {
+            by: { type: 'string', description: 'executor, adapter or role.', enum: ['executor', 'adapter', 'role'] },
+            case: { type: 'string', description: 'Only runs of this case.' },
+            since: { type: 'string', description: 'ISO date-time lower bound.' },
+            until: { type: 'string', description: 'ISO date-time upper bound.' },
+          },
+          required: [],
+        },
+        examples: ['fgos metrics runs --by executor'],
+      },
+      coverage: {
+        description: 'How many unit runs carry a readable run result.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos metrics coverage'],
+      },
+      discussions: {
+        description: 'Discussion panels and their passive stance agreement, grouped by workflow, executor or persona.',
+        parameters: {
+          type: 'object',
+          properties: {
+            by: { type: 'string', description: 'workflow, executor or persona.', enum: ['workflow', 'executor', 'persona'] },
+            since: { type: 'string', description: 'ISO date-time lower bound.' },
+            until: { type: 'string', description: 'ISO date-time upper bound.' },
+          },
+          required: [],
+        },
+        examples: ['fgos metrics discussions --by workflow'],
+      },
+      eval: {
+        description: 'Eval records: "record" appends one read as a JSON object from stdin, "list" lists them (filters --harness, --question).',
+        parameters: {
+          type: 'object',
+          properties: {
+            action: { type: 'string', description: 'Positional: record or list.', enum: ['record', 'list'] },
+            harness: { type: 'string', description: 'list: only this harness.' },
+            question: { type: 'string', description: 'list: only this question.' },
+          },
+          positional: ['action'],
+          required: ['action'],
+        },
+        examples: ['fgos metrics eval list', 'fgos metrics eval record < eval.json'],
+      },
+      outcomes: {
+        description: 'Work item outcome counts from the work store.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos metrics outcomes'],
+      },
+      entropy: {
+        description: 'Work-graph entropy indicators.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos metrics entropy'],
+      },
+      snapshot: {
+        description: 'A point-in-time snapshot of the work store metrics.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos metrics snapshot'],
+      },
+    },
     examples: ['fgos metrics ping', 'fgos metrics coverage', 'fgos metrics discussions --by workflow', 'fgos metrics eval list'],
     touchesState: true,
     requiresExistingStore: false,
@@ -104,25 +219,153 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
     nativeOnly: true,
-  },
-  {
+  }),
+  withSubcommands({
     name: 'friction',
     invoke: 'fgos friction <subcommand>',
     description: 'Observation friction recording, resolution, inspection, and ranking. Native Rust host command.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos friction ping'],
+    subcommands: {
+      record: {
+        description: 'Record one friction against a subject. --detail-stdin reads the detail text from stdin.',
+        parameters: {
+          type: 'object',
+          properties: {
+            subject: { type: 'string', description: 'kind:id, kind one of run, session, executor, case, work (e.g. work:tsk-abc).' },
+            layer: { type: 'string', description: 'Where it hit: verification, state, environment, docs, spec, context, task, task-spec, executor or attestation.' },
+            'error-class': { type: 'string', description: 'Error class.' },
+            disposition: { type: 'string', description: 'advisory, blocked, parked or halted.' },
+            producer: { type: 'string', description: 'Who records it.' },
+            attempts: { type: 'string', description: 'Attempts before it resolved (integer).' },
+            'doc-type': { type: 'string', description: 'Optional: tutorial, how-to, reference or explanation.' },
+            detail: { type: 'string', description: 'Detail text.' },
+            'detail-stdin': { type: 'boolean', description: 'Read the detail text from stdin instead of --detail.' },
+          },
+          required: ['subject', 'layer', 'error-class', 'disposition', 'producer'],
+        },
+        examples: ['fgos friction record --subject work:tsk-abc --layer verification --error-class usage --disposition advisory --producer agent --detail "flag missing"'],
+      },
+      resolve: {
+        description: 'Mark a subject\'s friction resolved.',
+        parameters: {
+          type: 'object',
+          properties: {
+            subject: { type: 'string', description: 'kind:id, kind one of run, session, executor, case, work.' },
+            reason: { type: 'string', description: 'answer, done, wontfix, clarify-pass or migrated.' },
+            by: { type: 'string', description: 'Who resolved it.' },
+          },
+          required: ['subject', 'reason', 'by'],
+        },
+        examples: ['fgos friction resolve --subject work:tsk-abc --reason done --by agent'],
+      },
+      list: {
+        description: 'List recorded frictions.',
+        parameters: {
+          type: 'object',
+          properties: {
+            kind: { type: 'string', description: 'Only subjects of this kind.' },
+            layer: { type: 'string', description: 'Only this layer (see record --layer).' },
+            since: { type: 'string', description: 'ISO date-time lower bound.' },
+          },
+          required: [],
+        },
+        examples: ['fgos friction list --layer verification'],
+      },
+      show: {
+        description: 'Show one subject\'s frictions.',
+        parameters: {
+          type: 'object',
+          properties: { subject: { type: 'string', description: 'Positional or --subject: kind:id (e.g. work:tsk-abc).' } },
+          positional: ['subject'],
+          required: ['subject'],
+        },
+        examples: ['fgos friction show work:tsk-abc'],
+      },
+      rank: {
+        description: 'Subjects ranked by friction.',
+        parameters: {
+          type: 'object',
+          properties: { limit: { type: 'string', description: 'At most this many (integer).' } },
+          required: [],
+        },
+        examples: ['fgos friction rank --limit 10'],
+      },
+      ping: {
+        description: 'Health check: echoes the resolved root.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos friction ping'],
+      },
+      migrate: {
+        description: 'Migrate legacy friction records into the friction store.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos friction migrate'],
+      },
+    },
+    examples: ['fgos friction ping', 'fgos friction rank --limit 10'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
     nativeOnly: true,
-  },
-  {
+  }),
+  withSubcommands({
     name: 'convention',
-    invoke: 'fgos convention <subcommand>',
-    description: 'Generate and check repository artifact names and paths through the native Convention component.',
-    parameters: { type: 'object', properties: {}, required: [] },
+    invoke: 'fgos convention <name|path|check|classify>',
+    description: 'Generate and check repository artifact names and paths (reports, plans, journals) through the native Convention component. Use it instead of constructing such paths by hand.',
+    subcommands: {
+      name: {
+        description: 'The file name for a new artifact of a kind.',
+        parameters: {
+          type: 'object',
+          properties: {
+            kind: { type: 'string', description: 'Artifact kind: report, plan or journal (inferred from --type when omitted).' },
+            type: { type: 'string', description: 'Artifact type, e.g. audit, review; "plan" and "journal" imply that kind.' },
+            slug: { type: 'string', description: 'Descriptive kebab-case slug.' },
+            at: { type: 'string', description: 'Timestamp to name it at (default: now).' },
+          },
+          required: ['slug'],
+        },
+        examples: ['fgos convention name --kind report --type audit --slug x'],
+      },
+      path: {
+        description: 'The repo-relative path for a new artifact of a kind.',
+        parameters: {
+          type: 'object',
+          properties: {
+            kind: { type: 'string', description: 'Artifact kind: report, plan or journal (inferred from --type when omitted).' },
+            type: { type: 'string', description: 'Artifact type, e.g. audit, review; "plan" and "journal" imply that kind.' },
+            slug: { type: 'string', description: 'Descriptive kebab-case slug.' },
+            at: { type: 'string', description: 'Timestamp to name it at (default: now).' },
+            plan: { type: 'string', description: 'Name (not path) of the plan directory a report belongs under, YYMMDD-HHMM-slug.' },
+          },
+          required: ['slug'],
+        },
+        examples: ['fgos convention path --kind report --type review --slug lane-x --plan 261014-1400-two-doors-one-rununit'],
+      },
+      check: {
+        description: 'Check paths against the convention rules: exactly one of --all or explicit paths after "--".',
+        parameters: {
+          type: 'object',
+          properties: {
+            all: { type: 'boolean', description: 'Check every artifact in the repository.' },
+            paths: { type: 'array', items: { type: 'string' }, description: 'Positional after "--": the paths to check.' },
+          },
+          positional: ['paths'],
+          required: [],
+        },
+        examples: ['fgos convention check --all', 'fgos convention check -- plans/261014-1400-two-doors-one-rununit/reports/review-261014-2115-lane-x.md'],
+      },
+      classify: {
+        description: 'Which placement rule (kind, cardinality, scope) one path falls under; a path no placement rule matches is refused (unknown-kind).',
+        parameters: {
+          type: 'object',
+          properties: { path: { type: 'string', description: 'Positional after "--": the one path to classify.' } },
+          positional: ['path'],
+          required: ['path'],
+        },
+        examples: ['fgos convention classify -- fixtures/demo/spec.md'],
+      },
+    },
     examples: [
       'fgos convention name --kind report --type audit --slug x',
       'fgos convention check --all',
@@ -133,7 +376,7 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
     nativeOnly: true,
-  },
+  }),
   {
     name: 'init',
     invoke: 'fgos init',

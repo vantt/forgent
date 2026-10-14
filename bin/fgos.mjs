@@ -4445,8 +4445,12 @@ function printVerbHelp(verb, sub, json) {
 // verb's entry. Anything else on the line is refused rather than ignored.
 function handleHelp(args) {
   const json = args.includes('--json');
-  // A repeated help token (`fgos -h --help`) asks the same thing.
-  const words = args.filter((a) => a !== '--json' && a !== '--help' && a !== '-h');
+  // `--dir <root>` is the global store flag (the `fgos` shell function appends
+  // it to every call); help reads no store, so it is accepted and unused. A
+  // repeated help token (`fgos -h --help`) asks the same thing.
+  const words = args
+    .filter((a, i) => !(a === '--dir' || a.startsWith('--dir=') || (i > 0 && args[i - 1] === '--dir')))
+    .filter((a) => a !== '--json' && a !== '--help' && a !== '-h');
   const option = words.find((a) => a.startsWith('-'));
   if (option !== undefined) {
     refuseHelp(`unknown option "${option}" for --help. Usage: fgos --help [<verb> [<sub>]] [--json]`);
@@ -4906,7 +4910,9 @@ async function main() {
   try {
     const { flags, positional } = parseArgs(rest);
 
-    if ((flags.help !== undefined || positional.includes('-h')) && handleVerbHelp(verb, flags, positional)) {
+    // Same rule as the Rust host: any exact `--help`/`-h` token asks for help,
+    // even where the parser took it as the previous flag's value.
+    if ((rest.includes('--help') || rest.includes('-h')) && handleVerbHelp(verb, flags, positional)) {
       return;
     }
 
