@@ -624,7 +624,7 @@ test('e2e stage-discovery: a research worker that only writes RESEARCH.md (no gi
 
   assert.equal(stateView(repoRoot).work['item-research-eo'].workflowStep, 'planning');
   assert.equal(branchAheadCount(repoRoot, 'fgw/item-research-eo'), 1);
-  assert.match(branchLog(repoRoot, 'fgw/item-research-eo'), /item-research-eo: /);
+  assert.match(branchLog(repoRoot, 'fgw/item-research-eo'), /chore\(item-research-eo\): /);
 });
 
 test('e2e stage-discovery: --once advances the item to exploring and parks it in awaiting-human when the real worker reports an unclear verdict (tsk-4v6/tsk-30v)', () => {
@@ -952,7 +952,7 @@ test('e2e runner commit: a worker that only edits files gets its work committed 
   assert.match(workerLog, /commit runner/);
 });
 
-test('e2e runner commit: with no Result summary the commit subject falls back to "<id>: <title>"', () => {
+test('e2e runner commit: with no Result summary the commit subject falls back to "chore(<id>): <title>"', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
 
@@ -962,7 +962,7 @@ test('e2e runner commit: with no Result summary the commit subject falls back to
 
   const result = runner(repoRoot, ['--once']);
   assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
-  assert.match(branchLog(repoRoot, 'fgw/item-fallback'), /item-fallback: Produce the file/);
+  assert.match(branchLog(repoRoot, 'fgw/item-fallback'), /chore\(item-fallback\): Produce the file/);
 });
 
 test('e2e runner commit: a worker that already committed itself (older contract) gets no second commit', () => {
