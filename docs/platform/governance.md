@@ -351,7 +351,7 @@ Rules:
 - Area-level `spec.md` summarizes current area behavior and links to
   subcomponent specs; it does not duplicate every subcomponent detail.
 - Subcomponent docs must link back to the parent area README and to the relevant
-  [component-boundary.md](platform/component-boundary.md) entry when read from
+  `docs/platform/component-boundary.md` entry when read from
   this governance doc; inside area docs use the correct relative path.
 - Cross-area contracts stay at the owning area or platform contract surface;
   subcomponent contract docs can own local obligations but must link to the
@@ -454,8 +454,8 @@ promotion is per-area or repository-wide; transformation order alone never
 changes authority.
 
 Until a newer program is explicitly accepted, each area portal's current-source
-mapping controls, operationalized through [transitional-switchboard.md](transitional-switchboard.md).
-Authors during migration must follow [platform/migration-authoring-rules.md](platform/migration-authoring-rules.md)
+mapping controls, operationalized through [transitional-switchboard.md](../transitional-switchboard.md).
+Authors during migration must follow [platform/migration-authoring-rules.md](migration-authoring-rules.md)
 (one claim, one canonical owner, never dual-author prose, ratchet enforcement on legacy roots).
 A target marked partial/candidate does not outrank that map, and readers must surface
 conflicts rather than infer authority from path or date. Any redirect/stub must be
@@ -469,11 +469,11 @@ because its plan exists.
 | Relationship | File |
 |---|---|
 | documentation portal | [README.md](README.md) |
-| reader routing | [reading-map.md](reading-map.md) |
-| operative transitional switchboard | [transitional-switchboard.md](transitional-switchboard.md) |
-| migration authoring rules | [platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) |
-| platform portal | [platform/README.md](platform/README.md) |
-| source design discussion | [architect/documentation-system-design.md](architect/documentation-system-design.md) |
+| reader routing | [reading-map.md](../reading-map.md) |
+| operative transitional switchboard | [transitional-switchboard.md](../transitional-switchboard.md) |
+| migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |
+| platform portal | [platform/README.md](README.md) |
+| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |
 
 ## Source Metadata (Added in candidate)
 
