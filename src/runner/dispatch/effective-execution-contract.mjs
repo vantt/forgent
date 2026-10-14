@@ -502,7 +502,7 @@ export function renderEffectiveContractSummary(contract) {
     `- Mutation: ${contract.mutation}`,
     `- Claim path: ${contract.resultClaim.path}`,
     `- Timeout: ${contract.limits.executorTimeoutMs ?? contract.limits.timeoutMs}ms`,
-    `- Write scope: ${contract.workspace.writeScope.length > 0 ? contract.workspace.writeScope.join(', ') : '(none - read-only)'}`,
+    `- Write scope: ${contract.workspace.writeScope.length > 0 ? contract.workspace.writeScope.join(', ') : 'none in the workspace (read-only); your result files are still required'}`,
     `- Main checkout: ${contract.workspace.mainCheckout || '(none)'}`,
     `- Permission enforcement: ${contract.enforcementPosture}`,
   ];

@@ -891,6 +891,11 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     const agentReportPath = path.join(path.dirname(agentResultPath), 'agent-report.md');
     const readOnly = isReadOnlyAssignment(assignment);
     lines.push('Result artifact:');
+    // "Read-only" and "write these files" side by side read as a contradiction: a worker told the write
+    // scope was none refused to write its result files, and the round scored no-evidence.
+    if (readOnly) {
+      lines.push('- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.');
+    }
     lines.push(`- Write structured JSON to ${agentResultPath}`);
     for (const instruction of renderAgentResultClaimInstructions(assignment).split('\n')) {
       lines.push(`  ${instruction.slice(2)}`);
@@ -910,7 +915,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     lines.push(`- Mutation: ${ec.mutation}`);
     lines.push(`- Claim path: ${ec.resultClaim?.path || (options.runDir ? path.join(options.runDir, 'agent-result.json') : '(none)')}`);
     lines.push(`- Timeout: ${ec.limits?.executorTimeoutMs ?? ec.limits?.timeoutMs}ms`);
-    lines.push(`- Write scope: ${ec.workspace?.writeScope && ec.workspace.writeScope.length > 0 ? ec.workspace.writeScope.join(', ') : '(none - read-only)'}`);
+    lines.push(`- Write scope: ${ec.workspace?.writeScope && ec.workspace.writeScope.length > 0 ? ec.workspace.writeScope.join(', ') : 'none in the workspace (read-only); your result files are still required'}`);
     lines.push(`- Permission enforcement: ${ec.enforcementPosture ?? 'instructed'}`);
   }
 
