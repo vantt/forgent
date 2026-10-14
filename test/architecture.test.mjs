@@ -385,8 +385,26 @@ export function checkRunDoorCallers(usesBySymbol) {
   return violations;
 }
 
+/**
+ * `export * from` a run door's home relays every symbol without naming one, so usesSymbol
+ * cannot see a caller behind it: such a relay is refused outright.
+ */
+export function findStarRelaysOfRunDoors(file, rawSource) {
+  const homes = new Set(Object.values(RUN_DOOR_HOMES));
+  const hits = [];
+  for (const m of rawSource.matchAll(/export\s*\*\s*(?:as\s+\w+\s*)?from\s*['"]([^'"]+)['"]/g)) {
+    const target = path.posix.normalize(path.posix.join(path.posix.dirname(file), m[1]));
+    if (homes.has(target)) hits.push(`${file}: export * from ${m[1]}`);
+  }
+  return hits;
+}
+
+function runDoorScanFiles() {
+  return ['src', 'bin', 'scripts', 'domains', 'core'].flatMap((dir) => mjsFilesUnder(dir));
+}
+
 function runDoorUses() {
-  const files = [...mjsFilesUnder('src'), ...mjsFilesUnder('bin'), ...mjsFilesUnder('scripts')];
+  const files = runDoorScanFiles();
   const uses = Object.fromEntries(Object.keys(RUN_DOOR_HOMES).map((symbol) => [symbol, []]));
   for (const file of files) {
     const raw = fs.readFileSync(path.join(root, file), 'utf8');
@@ -400,6 +418,8 @@ function runDoorUses() {
 
 test('run-door call sites: executeAssignment, executeExecutorCli, commitUnitWork and executeThroughConfinement are called only from their named files plus R3_PENDING_WORK_CALLERS', () => {
   assert.deepEqual(checkRunDoorCallers(runDoorUses()), []);
+  const relays = runDoorScanFiles().flatMap((file) => findStarRelaysOfRunDoors(file, fs.readFileSync(path.join(root, file), 'utf8')));
+  assert.deepEqual(relays, []);
 });
 
 test('run-door call-site guard catches an aliased import, a dynamic import(), a require() and a namespace call', () => {
@@ -419,6 +439,10 @@ test('run-door call-site guard catches an aliased import, a dynamic import(), a 
   assert.equal(usesSymbol("const u = 'https://x'; executeExecutorCli(x);", 'executeExecutorCli'), true);
   assert.equal(usesSymbol("const q = 'a`b';\nexecuteExecutorCli(x);\nconst t = `c`;", 'executeExecutorCli'), true);
   assert.equal(usesSymbol("const r = `${fn({ a: 1 }) + executeAssignment(a)}`;", 'executeAssignment'), true);
+  assert.deepEqual(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * from './dispatch/assignment-runner.mjs';"),
+    ['src/runner/relay.mjs: export * from ./dispatch/assignment-runner.mjs']);
+  assert.equal(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * as d from './execution/commit-unit-work.mjs';").length, 1);
+  assert.deepEqual(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * from './dispatch/config.mjs';"), []);
   assert.ok(checkRunDoorCallers({ executeExecutorCli: ['src/runner/fanout-batch.mjs', 'src/runner/dispatch/assignment-runner.mjs', 'src/runner/new.mjs'] })
     .some((v) => v.includes('src/runner/new.mjs')));
   assert.ok(checkRunDoorCallers({ commitUnitWork: ['src/runner/execution/run.mjs', 'src/runner/loop.mjs'] })
