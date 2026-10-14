@@ -1,3 +1,36 @@
+# Bounded corrections pack ready — independent review next
+
+Date: 2026-10-15
+Executor: codex-session:32@2026-10-15
+Session counter: 32
+Assignment: unit-run-1792006482248-ed75dedf/producer/1
+Step: 5
+State: ready-for-review / one bounded request authored; Step 5 open
+Content commit: 7e9fd4bd5d9eff9ef748190256cbe182c5ace00c
+Proof commit / last green native source proof: 04e476784ed528970ae33b13dbd220bff9948a5a
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Current-turn commit: none; runner commits the declared files.
+
+Resumed by reading this journal first, then the phase resume/review protocol. Starting tree clean; HEAD is the proof commit and descends from the correction commit. The assignment narrows this turn to packaging only: no native sync, git write, docs/decision shard edit, workspace .fgos mutation, secret read or protected checker/gate/vocabulary/extractor/baseline change. Scratch is only `/tmp/fgos-work/bounded-rereview/`.
+
+One pending request: [review-request-261015-0236-bounded-corrections.md](review-request-261015-0236-bounded-corrections.md). One pack: [review-pack-261015-0236-bounded-corrections.md](review-pack-261015-0236-bounded-corrections.md), 44 entries, complete [sidecar](review-pack-261015-0236-bounded-corrections.md.json). Counts: 33 pending changed shard rows (30 ordinary claim/gap rows + 3 classification accounting), alias 0114, 8 native accounting entries (4 edited headings + 4 predecessor-gap/current-body pairs), root-list accounting 832 -> 830, and one file-level check of all 21 changed user-knowledge files. The 25 committed reworks plus 2 tidied rationales, 5 distribution binding consequences and 1 real AGENTS split successor exactly explain the 33 changed pending rows; the strict E count of 25 is a different scoped live-claim metric including existing holds. The prior next-turn population is now packaged, not expanded to the 115 unchanged accepted rows. Every row identifies its report and finding; source/current/prior target text, before/after decision data, full native digests and shown-text hashes are included. A36 differing-digest list: 37 entries; 21 differing full files separately listed. One Q5 intentionally absent platform target, explicitly `none`.
+
+[Verification](verification-261015-0236-bounded-corrections.md) and [machine record](verification-261015-0236-bounded-corrections.md.json) include exact changed-tuple population/shard equality, immutable full pin/file/text hash checks, report existence, exact two-removal reverse-list delta, all 21 corpus ownership checks, reproducible helper sources and test output. Review-format/decision-review tests: 39/39 pass with env -u CLAUDE_CODE_SESSION_ID, zero fail/cancel/skip/todo. Native proof is reused verbatim from 04e476784; no registry sync rerun. D remains zero fatal in that proof; strict E remains red with partial-carry=1, not-reviewed=25, identical-unit groups=345, union candidate-unverified=1398. No fresh approval or closure is inferred.
+
+Next action: owner starts one independent review session for the bounded request and commits its exact verdicts/notes. Ordinary application and the four native gap dispositions follow through the existing authorized channels; no identity graft, stale truth approval or classification acceptance is invented here. Existing Coordination Rings holds, identical-unit exceptions, A34 residuals and owner-queue obligations remain unchanged.
+
+Remaining Step 5 closure items:
+
+1. Bounded re-review above, exact committed verdict application and four predecessor-gap dispositions.
+2. Independent seeded 50-block invented-claim sample (20 unreferenced, 20 rewritten-rationale, 10 random), plus independent hostile pass; zero open Critical/High after fixes or owner acceptance.
+3. Commit fresh-reader key before owner starts two independent readers; three scenarios per reader, six DoD questions each, at least 5/6 correct, zero nonexistent anchors, zero legacy-authority answers, at most eight files/run; record actual anchor and isolation evidence.
+4. Consumer-edge/cutover and draft-alias accounting, then Step 5 batch report with counts, holds, defects, review/rework effort and proof links.
+
+A37 means no further Step 5 truth draw; A35/A37 known-stale work-state carrier caveats and full truth at promotion remain. No external blocker prevents packaging; independent review and listed closure work remain owed. STOP ready for review, within Step 5. No Step 6, promotion, push or main merge. No preview URL: persisted journal records no available MDView MCP and an out-of-scope CLI database write; no such write was attempted.
+
+---
+
 # Native registry proof complete — bounded re-review next
 
 Date: 2026-10-15
