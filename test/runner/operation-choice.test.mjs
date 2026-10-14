@@ -576,6 +576,22 @@ test('a read-only run that would advance Work stops instead when its result carr
   assert.equal(broke.canAdvanceEdge, false);
   assert.equal(broke.reason, 'assignment-validate-plan-failed');
 
+  // A round refused by policy or failing its contract keeps its own failure reason:
+  // a proven write is not relabelled as a correlated one.
+  for (const outcome of [
+    { category: 'policy', executed: 'failed', refused: true, evidence: 'failed', satisfied: false, failure: { family: 'policy', code: 'read-only-mutation' } },
+    { category: 'contract', executed: 'completed', evidence: 'failed', satisfied: false, failure: { family: 'contract', code: 'invalid-agent-result-claim' } },
+  ]) {
+    const own = interpretAssignmentRunResult({
+      choice: { operation: 'validate-plan' },
+      runResult: { ...lastRunResult, outcome, evidence: { ...lastRunResult.evidence, changedFiles: ['docs/plan.md'] } },
+      contextSignals: { constraintsWritten: true },
+      repoRoot: tempDir,
+    });
+    assert.equal(own.canAdvanceEdge, false, outcome.failure.code);
+    assert.equal(own.reason, 'assignment-validate-plan-failed', outcome.failure.code);
+  }
+
   // Changed files are a mutating run's expected output, never a correlated mutation.
   const mutating = interpretAssignmentRunResult({
     choice: { operation: 'validate-plan', assignment: { mutation: 'mutating', resultKind: 'gate-verdict' } },
@@ -583,7 +599,24 @@ test('a read-only run that would advance Work stops instead when its result carr
     contextSignals: { constraintsWritten: true },
     repoRoot: tempDir,
   });
-  assert.notEqual(mutating.reason, 'assignment-validate-plan-correlated-mutation');
+  assert.equal(mutating.canAdvanceEdge, true);
+});
+
+test('a stored review-item result read back without its assignment is gated as read-only by its reviewer role', () => {
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'review-item' },
+    runResult: {
+      role: 'reviewer',
+      status: 'done',
+      confidence: 'reported',
+      agentClaim: { status: 'done', verdict: 'APPROVED', summary: 'Looks right' },
+      warnings: [{ code: 'read-only-mutation-correlated', level: 'correlated', paths: ['src/x.mjs'] }],
+      evidence: { changedFiles: ['src/x.mjs'], artifacts: [] },
+    },
+  });
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'assignment-review-item-correlated-mutation');
 });
 
 test('Step 06 planning.validate-plan READY WITH CONSTRAINTS requires recorded constraints before advancing edge', () => {
@@ -1300,7 +1333,7 @@ test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker 
   assert.equal(item.workflowStep, 'planning');
 });
 
-test('driver loop runOnce: validate-plan modifying dirty-before plan.md is reported as a correlated mutation and does not advance Work (Finding 2 fix)', async () => {
+test('driver loop runOnce: validate-plan modifying dirty-before plan.md is reported as a correlated mutation and does not advance Work', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -1436,7 +1469,7 @@ test('Step 06 executing.scout-blast-radius report with fake executor stores all 
   assert.equal(work.workflowStep, 'executing');
 });
 
-test('Step 06 executing.scout-blast-radius mutating repository state is reported as a correlated mutation and stops driver execution', async () => {
+test('executing.scout-blast-radius mutating repository state is reported as a correlated mutation and stops driver execution', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   seedTaskSpecs(tempDir, ['scout-blast-radius']);
@@ -2884,7 +2917,7 @@ test('Positive test: valid structured review-item claim with real findings tied 
   assert.equal(interpreted.reason, 'review-item-approved');
 });
 
-test('Finding 2: executeAssignment reports read-only validate-plan mutations as a warning, Work does not advance on them, and no automatic rollback runs', async () => {
+test('executeAssignment reports read-only validate-plan mutations as a warning, Work does not advance on them, and no automatic rollback runs', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -5423,7 +5456,7 @@ test('reviewer LOW: a stored failed result from a read-only dirty mutation never
   assert.equal(choice.reason, 'validation-failed-do-not-advance-work', 'the lost dirty-mutation fact may not upgrade the recorded failed verdict');
 });
 
-test('R6/G3: cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles fact, reports a correlated mutation and does not advance Work, not silently downgraded to no-evidence', () => {
+test('cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles fact, reports a correlated mutation and does not advance Work, not silently downgraded to no-evidence', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);

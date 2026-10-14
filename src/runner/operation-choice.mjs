@@ -1709,27 +1709,37 @@ function fallbackMutationForAssignment(asgn) {
   }
 }
 
-const CORRELATED_MUTATION_WARNING_CODES = new Set(['read-only-mutation-correlated', 'mutated-dirty-before-correlated']);
+const CORRELATED_MUTATION_WARNING_CODES = new Set([
+  'read-only-mutation-correlated',
+  'mutated-dirty-before-correlated',
+  // The executor CLI door's repo-root watch: the main checkout changed while
+  // the round's own workspace may have stayed clean.
+  'stray-write-correlated',
+]);
+
+// A round that failed on its own terms keeps its failure reason even when its
+// checkout also changed: a non-zero exit (a timeout settles as 124), a policy
+// refusal (a proven write among them), or a provider, resource or contract
+// failure.
+function runFailedOnItsOwn(runResult, outcome) {
+  const exitCode = runResult?.runtime?.exitCode;
+  if (typeof exitCode === 'number' && exitCode !== 0) return true;
+  if (outcome?.category === 'policy') return true;
+  const family = outcome?.failure?.family ?? runResult?.failure?.family;
+  return family === 'provider' || family === 'resource' || family === 'contract' || family === 'policy';
+}
 
 // A read-only result counts as carrying a correlated mutation when settle
 // recorded the warning, or -- for a stored result read back from disk, whose
 // warnings are as writable as any other field -- when its evidence still shows
 // changed files or a mutated pre-existing dirty file.
-function runProcessBroke(runResult, outcome) {
-  const runtime = runResult?.runtime && typeof runResult.runtime === 'object' ? runResult.runtime : {};
-  if (runtime.isTimeout === true || (typeof runtime.signal === 'string' && runtime.signal)) return true;
-  if (typeof runtime.exitCode === 'number' && runtime.exitCode !== 0) return true;
-  const family = outcome?.failure?.family ?? runResult?.failure?.family;
-  return family === 'provider' || family === 'resource';
-}
-
 function hasReadOnlyCorrelatedMutation({ choice, runResult }) {
   if (!runResult || typeof runResult !== 'object') return false;
   const asgn = choice?.assignment ?? runResult.assignment ?? {};
   const operation = asgn.operation ?? choice?.operation;
   const mutation = asgn.mutation === 'read-only' || asgn.mutation === 'mutating'
     ? asgn.mutation
-    : fallbackMutationForAssignment({ ...asgn, operation });
+    : fallbackMutationForAssignment({ ...asgn, role: asgn.role ?? runResult.role, operation });
   if (!isReadOnlyAssignment({ mutation })) return false;
   const warnings = Array.isArray(runResult.warnings) ? runResult.warnings : [];
   if (warnings.some((w) => CORRELATED_MUTATION_WARNING_CODES.has(w?.code))) return true;
@@ -1765,14 +1775,12 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
   // prove the round made it. Work, the consumer, still refuses to advance on
   // such a result: the plan or code it would advance on may have been edited
   // under it. Checked ahead of no-evidence so the operator sees the change
-  // signal instead of a generic missing-evidence stop. A run whose process
-  // itself broke (non-zero exit, signal, timeout, provider/resource failure)
-  // keeps its own failure reason.
+  // signal instead of a generic missing-evidence stop.
   if (hasReadOnlyCorrelatedMutation({ choice, runResult })) {
     return Object.freeze({
       canAdvanceEdge: false,
       stop: true,
-      reason: runProcessBroke(runResult, outcome)
+      reason: runFailedOnItsOwn(runResult, outcome)
         ? `assignment-${operation}-failed`
         : `assignment-${operation}-correlated-mutation`,
     });

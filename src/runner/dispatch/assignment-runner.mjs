@@ -2736,6 +2736,7 @@ export async function executeAssignment(assignment, opts = {}) {
       adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,
       // Which sandbox really ran: the herdr door's prepared launch or the dispatch's own attestation.
       attestation: rawResult?.attestation ?? null,
+      dispatchWarnings: rawResult?.warnings ?? [],
       // The adapter that really ran, so result.json states the transport instead of a guess.
       opts: { ...opts, adapter: resolvedAdapter, repoRoot: root, cwd },
     });

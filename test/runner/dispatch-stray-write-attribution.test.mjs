@@ -15,6 +15,7 @@ import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { runOutcome } from '../../src/runner/dispatch/run-result.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
+import { interpretAssignmentRunResult } from '../../src/runner/operation-choice.mjs';
 
 // Attestation records go to a fixture-owned store, never the machine's own.
 const attestationStore = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-stray-write-attestations-'));
@@ -218,6 +219,56 @@ process.stdout.write('reviewed\\n');
       isReadOnlyOperation: true,
     } });
     assert.equal(reread.category, 'ok');
+  } finally {
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
+
+// An Assignment round launched through the executor CLI door (herdr, legacy
+// adapters) watches the main checkout as well as its workspace. A read-only
+// round that leaves its worktree alone while a file appears in the main
+// checkout is the agy incident: accepted with a warning, and the warning must
+// reach the settled result so Work, reading it, does not advance on it.
+test('a read-only Assignment round that writes into the main checkout carries the warning in its result and Work does not advance', { skip }, async () => {
+  const { base, root, worktree } = fixture();
+  const harness = path.join(base, 'harness');
+  fs.mkdirSync(harness);
+  try {
+    const stray = path.join(root, 'misplaced.mjs');
+    const script = path.join(harness, 'stray-reviewer.mjs');
+    fs.writeFileSync(script, `
+import fs from 'node:fs';
+import path from 'node:path';
+fs.writeFileSync(${JSON.stringify(stray)}, 'export const misplaced = 1;\\n');
+for (const top of [process.cwd(), ${JSON.stringify(root)}]) {
+  const runsDir = path.join(top, '.fgos', 'assignments');
+  if (!fs.existsSync(runsDir)) continue;
+  for (const asgn of fs.readdirSync(runsDir)) {
+    const runDir = path.join(runsDir, asgn, 'runs', '01');
+    if (!fs.existsSync(runDir)) continue;
+    fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nPlan is sound.\\n');
+    fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Plan sound' }));
+  }
+}
+process.stdout.write('reviewed\\n');
+`);
+    const runnerConfig = {
+      executor: { allowCrossProvider: true, command: process.execPath, args: [script, '{prompt}'] },
+      modelPolicies: { claude: { standard: 'test-model' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      timeoutMs: 20000,
+    };
+    const assignment = buildAssignment({ workId: 'tsk-stray-asgn', stage: 'planning', operation: 'validate-plan' });
+    const result = await executeAssignment(assignment, { cwd: worktree, repoRoot: root, runnerConfig, legacySpawn: true });
+    assert.ok(fs.existsSync(stray), 'the worker wrote outside its workspace');
+    assert.deepEqual(
+      (result.warnings ?? []).filter((w) => w.code === 'stray-write-correlated').map((w) => w.paths),
+      [['misplaced.mjs']],
+      `settled warnings: ${JSON.stringify(result.warnings)}`,
+    );
+    const interpreted = interpretAssignmentRunResult({ choice: { operation: 'validate-plan', assignment }, runResult: result, repoRoot: root });
+    assert.equal(interpreted.canAdvanceEdge, false);
+    assert.equal(interpreted.reason, 'assignment-validate-plan-correlated-mutation');
   } finally {
     fs.rmSync(base, { recursive: true, force: true });
   }

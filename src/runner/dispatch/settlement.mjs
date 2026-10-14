@@ -542,6 +542,9 @@ export async function settleRunOutcome({
   receipt = null,
   adapterOutcome = null,
   attestation = null,
+  // Correlated findings the launching door already made (the executor CLI door's
+  // repo-root watch, `stray-write-correlated`); kept beside settle's own.
+  dispatchWarnings = [],
   opts = {},
 }) {
   const root = resolveSafeRoot(runDir, opts?.repoRoot);
@@ -760,7 +763,10 @@ export async function settleRunOutcome({
     executorId: resolvedExecutorId || runMeta.executorId || null,
     adapter: opts?.adapter || (resolvedExecutorId?.includes('herdr') ? 'herdr-spawn' : 'cli-spawn'),
     confinement: ranConfinementBackend(runDir, launchCommandId, attestation),
-    warnings: attributionPolicy.warnings,
+    warnings: [
+      ...(Array.isArray(attributionPolicy.warnings) ? attributionPolicy.warnings : []),
+      ...(Array.isArray(dispatchWarnings) ? dispatchWarnings : []),
+    ],
     role: assignment?.role ?? null,
     ...(effectivePolicy ? { policy: withLaunchProvenance(effectivePolicy, { reasoningEffort, modelWarnings }), executorRedirected } : {}),
     settledAt,

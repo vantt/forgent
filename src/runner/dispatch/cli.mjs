@@ -912,7 +912,7 @@ export async function executeExecutorCli(
     const resultToBuild = {
       ...execResult,
       attestation: result?.attestation,
-      ...(strayWarning ? { warnings: [strayWarning] } : {}),
+      ...(strayWarning ? { warnings: [...(Array.isArray(execResult?.warnings) ? execResult.warnings : []), strayWarning] } : {}),
     };
     const built = buildDispatchResult({ mechanism, result: resultToBuild, headBefore, headAfter, lostUncommittedPaths, provider, command });
     const modelWarnings = collectModelWarnings(modelCheck, execResult ?? {});
