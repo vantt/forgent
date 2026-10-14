@@ -6,7 +6,6 @@ import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 import http from 'node:http';
 import {
-  buildPrompt,
   loadRunnerConfig,
   loadRunnerConfigFromDir,
   ensureRunnerConfigForDir,
@@ -17,13 +16,10 @@ import {
   resolveExecutorEnv,
   executeExecutorCli,
   resolveExecutorAndOverrides,
-  logExecutorDispatch,
   decideDispatchMechanism,
   decideExecutorDispatchMechanism,
   decideExecutorCli,
   compileDispatchPlan,
-  fanoutBatchExecutorCli,
-  spawnWorker,
   RunnerConfigError,
   DispatchError,
   DEFAULT_ADAPTER,
@@ -32,16 +28,17 @@ import {
   EXECUTOR_KINDS,
   EXECUTOR_CARRIES,
   INVOCATION_VIA,
-  executorIdForWork,
   resolveAgentTypeForTaskSpec,
-  resolveAgentTypeForWork,
   validateProviderAccountInventory,
   ProviderCapacityConfigError,
 } from '../../src/runner/dispatch.mjs';
+import { buildPrompt, executorIdForWork } from '../../src/runner/work-compat.mjs';
+import { spawnWorker, resolveAgentTypeForWork, resolveWorkForDispatch } from '../../src/runner/work-dispatch.mjs';
+import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
 import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 import { buildDispatchResult } from '../../src/runner/dispatch/result-ladder.mjs';
-import { initStore, addWork, listWork, readRawEvents } from '../../src/state/store.mjs';
+import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
@@ -3016,14 +3013,15 @@ test('the CLI entrypoint guard still fires when dispatch.mjs is invoked through 
   }
 });
 
-test('an unknown CLI subcommand still exits non-zero with a usage message naming execute and decide, never resolve', () => {
+test('an unknown CLI subcommand still exits non-zero with a usage message naming decide and fgos run, never resolve or execute', () => {
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(process.execPath, [dispatchPath, 'bogus'], { encoding: 'utf8' });
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /unknown subcommand/);
   assert.doesNotMatch(result.stderr, /resolve <executorId>/);
-  assert.match(result.stderr, /execute <executorId>/);
+  assert.doesNotMatch(result.stderr, /execute <executorId>/);
   assert.match(result.stderr, /decide <executorId>/);
+  assert.match(result.stderr, /fgos run "<prompt>"/);
 });
 
 // --- tsk-129: the "execute" CLI entry point tees live chunks to stderr ---
@@ -3033,34 +3031,9 @@ test('an unknown CLI subcommand still exits non-zero with a usage message naming
 // the one "fgos: dispatch ..." line until the final JSON, however long the
 // child actually ran -- RESEARCH.md's own finding for this item.)
 
-test('the "execute" CLI entry point tees the spawned executor\'s own stdout/stderr chunks live to this process\'s stderr, and stdout still carries exactly one parseable JSON line', () => {
-  const { repoRoot } = mkTempGitRepo();
-  const scriptPath = writeMultiChunkExecutor(repoRoot);
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(process.execPath, [dispatchPath, 'execute', 'probe', '--for', 'execute'], { encoding: 'utf8', cwd: repoRoot });
-  assert.equal(result.status, 0, result.stderr);
-  // Live-teed chunks from the spawned child arrive on THIS process's own
-  // stderr, alongside the pre-existing "fgos: dispatch ..." chokepoint line.
-  assert.match(result.stderr, /out-chunk-1/);
-  assert.match(result.stderr, /out-chunk-2/);
-  assert.match(result.stderr, /err-chunk-1/);
-  // stdout keeps carrying exactly one line -- the final JSON result --
-  // untouched by the live tee, so a scripted caller's JSON.parse still works.
-  const lines = result.stdout.trim().split('\n');
-  assert.equal(lines.length, 1);
-  const parsed = JSON.parse(lines[0]);
-  assert.equal(parsed.status, 0);
-});
-
 // --- tsk-322: guard helper for --repo-root without --cwd when process.cwd() diverges ---
 
-test('dispatch CLI: --repo-root alone with process.cwd() resolving to a DIFFERENT main checkout refuses with a clear error, no worker spawned', () => {
+test('dispatch CLI: --repo-root alone with process.cwd() resolving to a DIFFERENT main checkout refuses with a clear error', () => {
   const repo1 = mkTempGitRepo();
   const repo2 = mkTempGitRepo();
   const scriptPath = writeEchoExecutor(repo2.repoRoot);
@@ -3073,7 +3046,7 @@ test('dispatch CLI: --repo-root alone with process.cwd() resolving to a DIFFEREN
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'probe', '--for', 'execute', '--repo-root', repo2.repoRoot],
+    [dispatchPath, 'decide', 'probe', '--repo-root', repo2.repoRoot],
     { encoding: 'utf8', cwd: repo1.repoRoot },
   );
   assert.notEqual(result.status, 0);
@@ -3081,7 +3054,7 @@ test('dispatch CLI: --repo-root alone with process.cwd() resolving to a DIFFEREN
   assert.match(result.stderr, /pass --cwd explicitly/);
 });
 
-test('dispatch CLI: --repo-root alone with process.cwd() resolving to the SAME path unchanged, worker spawns normally', () => {
+test('dispatch CLI: --repo-root alone with process.cwd() resolving to the SAME path decide answers normally', () => {
   const { repoRoot } = mkTempGitRepo();
   const scriptPath = writeEchoExecutor(repoRoot);
   writeRunnerConfigFixture(repoRoot, {
@@ -3093,12 +3066,12 @@ test('dispatch CLI: --repo-root alone with process.cwd() resolving to the SAME p
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'probe', '--for', 'execute', '--prompt', 'hello', '--repo-root', repoRoot],
+    [dispatchPath, 'decide', 'probe', '--repo-root', repoRoot],
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
   const parsed = JSON.parse(result.stdout.trim());
-  assert.equal(parsed.status, 0);
+  assert.equal(parsed.configured, true);
 });
 
 test('dispatch CLI: both --cwd and --repo-root given unchanged, no guard fires', () => {
@@ -3114,12 +3087,12 @@ test('dispatch CLI: both --cwd and --repo-root given unchanged, no guard fires',
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'probe', '--for', 'execute', '--prompt', 'hello', '--cwd', repo2.repoRoot, '--repo-root', repo2.repoRoot],
+    [dispatchPath, 'decide', 'probe', '--cwd', repo2.repoRoot, '--repo-root', repo2.repoRoot],
     { encoding: 'utf8', cwd: repo1.repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
   const parsed = JSON.parse(result.stdout.trim());
-  assert.equal(parsed.status, 0);
+  assert.equal(parsed.configured, true);
 });
 
 test('dispatch CLI: neither given unchanged, existing default-process.cwd() behavior untouched', () => {
@@ -3134,12 +3107,12 @@ test('dispatch CLI: neither given unchanged, existing default-process.cwd() beha
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'probe', '--for', 'execute', '--prompt', 'hello'],
+    [dispatchPath, 'decide', 'probe'],
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
   const parsed = JSON.parse(result.stdout.trim());
-  assert.equal(parsed.status, 0);
+  assert.equal(parsed.configured, true);
 });
 
 // --- spawnWorker: fake executor, tier->model, cwd, timeout, spawn-fail --
@@ -3852,80 +3825,6 @@ test('executeExecutorCli honors a caller-supplied tier override, feeding it into
   assert.deepEqual(payload.args, ['flash-3.5:x']);
 });
 
-test('the "execute" CLI entry point honors --model, overriding the computed default', () => {
-  const { repoRoot } = mkTempGitRepo();
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
-  writeRunnerConfigFixture(repoRoot, { executor: { command: process.execPath, args: [scriptPath, '{model}', '{prompt}'], allowCrossProvider: true }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 });
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(
-    process.execPath,
-    [dispatchPath, 'execute', 'claude', '--prompt', 'hello', '--model', 'a-specific-override-model'],
-    { encoding: 'utf8', cwd: repoRoot },
-  );
-  assert.equal(result.status, 0, result.stderr);
-  const parsed = JSON.parse(result.stdout);
-  assert.equal(parsed.model, 'a-specific-override-model');
-  const payload = JSON.parse(parsed.stdout);
-  assert.equal(payload.args[0], 'a-specific-override-model');
-});
-
-test('the "execute" CLI entry point honors --tier, changing which configured model resolves', () => {
-  const { repoRoot } = mkTempGitRepo();
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: process.execPath, args: [scriptPath, '{model}', '{prompt}'], allowCrossProvider: true },
-    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
-  // tsk-5tm-5 D9: the flat cfg.models map was replaced by cfg.modelPolicies
-  // -- 'light' work-tier maps to the default provider's 'nano'
-  // policy tier (DEFAULT_TIER_TO_POLICY, dispatch.mjs) -- 'haiku' here,
-  // named explicitly in the fixture above rather than read back from it,
-  // since this test now owns its own isolated config.
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(
-    process.execPath,
-    [dispatchPath, 'execute', 'claude', '--prompt', 'hello', '--tier', 'nano'],
-    { encoding: 'utf8', cwd: repoRoot },
-  );
-  assert.equal(result.status, 0, result.stderr);
-  const parsed = JSON.parse(result.stdout);
-  assert.equal(parsed.model, 'haiku');
-});
-
-test('the "execute" CLI entry point honors --repo-root, decoupling spawn cwd from config root', () => {
-  const { repoRoot } = mkTempGitRepo();
-  const worktreeDir = mkTempDir();
-  const scriptPath = writeEchoExecutor(worktreeDir);
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true },
-    timeoutMs: 5000,
-  });
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(
-    process.execPath,
-    [
-      dispatchPath,
-      'execute',
-      'claude',
-      '--prompt',
-      'hello',
-      '--cwd',
-      worktreeDir,
-      '--repo-root',
-      repoRoot,
-    ],
-    { encoding: 'utf8', cwd: process.cwd() },
-  );
-  assert.equal(result.status, 0, result.stderr);
-  const parsed = JSON.parse(result.stdout);
-  assert.equal(parsed.mechanism, 'out-of-process');
-  const payload = JSON.parse(parsed.stdout);
-  assert.equal(fs.realpathSync(payload.cwd), fs.realpathSync(worktreeDir));
-});
-
 // --- tsk-5tm-3 D5: `executeExecutorCli` / `execute <executorId>` — the
 // self-execute counterpart to `resolve` above, matching marketing-cockpit's
 // `run_task()`: self-execute every adapter-resolvable case via
@@ -4489,143 +4388,6 @@ test('executeExecutorCli\'s per-cwd lock heartbeat keeps a genuinely live, still
   assert.ok(renewedTs >= initial.ts);
 });
 
-
-test('the "execute" CLI entry point prints a structured {error,errorClass} JSON line on stdout when dispatch fails, alongside the human-readable message on stderr (dispatch-execute optimization pass)', async () => {
-  const { repoRoot, fgosDir } = mkTempGitRepo();
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
-  const testCwd = repoRoot;
-  const { dispatchLockFile } = await import('../../src/runner/main-checkout-lock.mjs');
-  const lockPath = path.join(fgosDir, dispatchLockFile(testCwd));
-  fs.writeFileSync(lockPath, 'INVALID-JSON-CORRUPT-LOCK');
-
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(
-    process.execPath,
-    [dispatchPath, 'execute', 'cli-executor', '--for', 'execute', '--prompt', 'x', '--cwd', testCwd],
-    { encoding: 'utf8', cwd: repoRoot },
-  );
-  assert.notEqual(result.status, 0);
-  const parsed = JSON.parse(result.stdout.trim());
-  assert.equal(parsed.errorClass, 'dispatch-in-flight');
-  assert.match(parsed.error, /ambiguous/);
-  assert.match(result.stderr, /ambiguous/);
-});
-
-test('the "execute" CLI entry point omits errorClass from the structured stdout line for a non-DispatchError failure (RunnerConfigError, e.g.)', () => {
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(process.execPath, [dispatchPath, 'execute'], { encoding: 'utf8' });
-  assert.notEqual(result.status, 0);
-  const parsed = JSON.parse(result.stdout.trim());
-  assert.equal(parsed.errorClass, undefined);
-  assert.match(parsed.error, /usage: node src\/runner\/dispatch\.mjs execute/);
-});
-
-test('the "execute" CLI entry point self-executes a real adapter-resolvable executor and prints the real result as JSON, never bare {command,args}', () => {
-  const { repoRoot } = mkTempGitRepo();
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-executor', '--for', 'execute', '--prompt', 'hello-from-cli'], {
-    encoding: 'utf8',
-    cwd: repoRoot,
-  });
-  assert.equal(result.status, 0, result.stderr);
-  const parsed = JSON.parse(result.stdout);
-  assert.equal(parsed.mechanism, 'out-of-process');
-  assert.equal(parsed.status, 0);
-  const payload = JSON.parse(parsed.stdout);
-  assert.equal(payload.args[0], 'hello-from-cli');
-});
-
-test('the "execute" CLI entry point accepts --prompt-file, overrides --prompt when both given, and structured-errors on bad file path', () => {
-  const { repoRoot } = mkTempGitRepo();
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const promptFilePath = path.join(dir, 'prompt.txt');
-  fs.writeFileSync(promptFilePath, 'content-from-file');
-
-  // --prompt-file alone
-  const res1 = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-executor', '--for', 'execute', '--prompt-file', promptFilePath], {
-    encoding: 'utf8',
-    cwd: repoRoot,
-  });
-  assert.equal(res1.status, 0, res1.stderr);
-  const parsed1 = JSON.parse(res1.stdout);
-  assert.equal(parsed1.status, 0);
-  const payload1 = JSON.parse(parsed1.stdout);
-  assert.equal(payload1.args[0], 'content-from-file');
-
-  // --prompt-file overriding --prompt when both given
-  const res2 = spawnSync(
-    process.execPath,
-    [dispatchPath, 'execute', 'cli-executor', '--for', 'execute', '--prompt', 'inline-prompt', '--prompt-file', promptFilePath],
-    {
-      encoding: 'utf8',
-      cwd: repoRoot,
-    },
-  );
-  assert.equal(res2.status, 0, res2.stderr);
-  const parsed2 = JSON.parse(res2.stdout);
-  assert.equal(parsed2.status, 0);
-  const payload2 = JSON.parse(parsed2.stdout);
-  assert.equal(payload2.args[0], 'content-from-file');
-
-  // nonexistent --prompt-file path producing structured error JSON on stdout with exit code 1
-  const badFilePath = path.join(dir, 'nonexistent-prompt-file.txt');
-  const res3 = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-executor', '--for', 'execute', '--prompt-file', badFilePath], {
-    encoding: 'utf8',
-    cwd: repoRoot,
-  });
-  assert.equal(res3.status, 1);
-  const parsed3 = JSON.parse(res3.stdout.trim());
-  assert.equal(parsed3.errorClass, undefined);
-  assert.match(parsed3.error, /ENOENT|no such file or directory/i);
-});
-
-test('the "execute" CLI entry point hands back {mechanism:"in-process",...} for a live-task-access native executor, never spawning anything', () => {
-  const { repoRoot } = mkTempGitRepo();
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { 'native-executor': { kind: 'agent', agentType: 'code-simplifier' } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(
-    process.execPath,
-    [dispatchPath, 'execute', 'native-executor', '--for', 'execute', '--prompt', 'do it', '--has-live-task-access'],
-    { encoding: 'utf8', cwd: repoRoot },
-  );
-  assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', agentType: 'code-simplifier', prompt: 'do it', authorityScope: 'external-harness', attestation: null });
-});
-
-test('the "execute" CLI entry point exits non-zero with a usage message when executorId is omitted', () => {
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(process.execPath, [dispatchPath, 'execute'], { encoding: 'utf8' });
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /usage: node src\/runner\/dispatch\.mjs execute/);
-});
 
 // --- executors.<id>.carries (D15, tsk-5td; first real consumer tsk-2ie5/
 // tsk-2c1) — closed enum at config-load, plus a real pre-dispatch gate on
@@ -5461,7 +5223,7 @@ test('decideExecutorCli resolves work-item-based (--work) to the same result a p
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byWork = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-candidate', hasLiveTaskAccess: true });
+  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'tsk-fanout-candidate', hasLiveTaskAccess: true });
   const byName = await decideExecutorCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
   assert.deepEqual(byWork, { mechanism: 'in-process', agentType: 'general-purpose', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.rule-2.live-task-access'] });
   // Positional-id path stays byte-identical (no executorId field) -- every
@@ -5492,13 +5254,13 @@ test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-
   // hasLiveTaskAccess:true (a live/native session) -- must still resolve
   // out-of-process, since agy is cli-spawn-shaped (tsk-pdg D1): this is
   // the exact real gap tsk-1m8 found live before tsk-pdg fixed it.
-  const withLiveAccess = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: true });
+  const withLiveAccess = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: true });
   assert.deepEqual(withLiveAccess, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
   // hasLiveTaskAccess:false (the real fgos loop headless runner) --
   // byte-identical mechanism/configured shape either way, matching
   // tsk-pdg's own live evidence against the real repo before this item's
   // migration.
-  const headless = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: false });
+  const headless = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: false });
   assert.deepEqual(headless, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
@@ -5523,7 +5285,7 @@ test('decideExecutorCli resolves work-item-based (--work) to "in-process" by def
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byWork = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-unregistered', hasLiveTaskAccess: true });
+  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'tsk-fanout-unregistered', hasLiveTaskAccess: true });
   assert.deepEqual(byWork, { mechanism: 'in-process', executorId: 'fgos-coding-implement', configured: false, reasonCodes: ['native-first.rule-2.live-task-access'] });
   // The SAME unregistered executorId, looked up by NAME (not --work), used
   // to keep its pre-D4 byte-identical "no executor -> out-of-process"
@@ -5555,7 +5317,7 @@ test('decideExecutorCli resolves work-item-based (--work) to "out-of-process" wh
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const byWork = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-no-live-access' });
+  const byWork = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'tsk-fanout-no-live-access' });
   assert.deepEqual(byWork, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: false, reasonCodes: ['native-first.rule-1.no-native-mechanism'] });
 });
 
@@ -5568,7 +5330,7 @@ test('decideExecutorCli throws a RunnerConfigError when --work names a work item
     timeoutMs: 5000,
   });
   await assert.rejects(
-    () => decideExecutorCli(undefined, { repoRoot: root, work: 'no-such-work-item' }),
+    () => decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, work: 'no-such-work-item' }),
     RunnerConfigError,
   );
 });
@@ -5599,7 +5361,7 @@ test('a positional executorId still wins over --work when both are somehow passe
   assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
-test('the "decide" CLI entry point resolves --work <id> the same way as a positional executorId', () => {
+test('fgos dispatch decide resolves --work <id> the same way as a positional executorId (the bare dispatch module refuses --work)', () => {
   const { repoRoot, fgosDir } = mkTempGitRepo();
   addWork(fgosDir, {
     id: 'tsk-fanout-cli-candidate',
@@ -5617,14 +5379,13 @@ test('the "decide" CLI entry point resolves --work <id> the same way as a positi
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'decide', '--work', 'tsk-fanout-cli-candidate', '--has-live-task-access'],
+    [path.resolve('bin/fgos.mjs'), 'dispatch', 'decide', '--work', 'tsk-fanout-cli-candidate', '--has-live-task-access'],
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', agentType: 'general-purpose', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.rule-2.live-task-access'] });
+  assert.deepEqual(JSON.parse(result.stdout).data, { mechanism: 'in-process', agentType: 'general-purpose', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.rule-2.live-task-access'] });
 });
 
 // tsk-60f D4: the two resolveExecutorCli usage-error tests this cluster
@@ -5682,164 +5443,7 @@ test('the "decide" CLI entry point resolves --for <purpose> the same way as a po
   assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'unavailable', configured: false, reasonCodes: ['selector.unregistered', 'capability.unknown'] });
 });
 
-test('the "execute" CLI entry point honors --carries, threading it through end to end', () => {
-  const { repoRoot } = mkTempGitRepo();
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
-  writeRunnerConfigFixture(repoRoot, { executor: { command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 });
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(
-    process.execPath,
-    [dispatchPath, 'execute', 'claude', '--prompt', 'hello', '--carries', 'repo-content'],
-    { encoding: 'utf8', cwd: repoRoot },
-  );
-  assert.equal(result.status, 0, result.stderr);
-  const parsed = JSON.parse(result.stdout);
-  assert.equal(parsed.mechanism, 'out-of-process');
-  assert.equal(parsed.status, 0);
-});
-
-test('the "log" CLI entry point appends a executor.dispatch event and prints it as JSON', () => {
-  const { repoRoot } = mkTempGitRepo();
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(
-    process.execPath,
-    [dispatchPath, 'log', 'gather', '--id', 'tsk-2c1', '--provider', 'agy', '--command', 'agy', '--model', 'gemini-flash'],
-    { encoding: 'utf8', cwd: repoRoot },
-  );
-  assert.equal(result.status, 0, result.stderr);
-  const printed = JSON.parse(result.stdout);
-  assert.equal(printed.type, 'executor.dispatch');
-  assert.equal(printed.payload.id, 'tsk-2c1');
-  assert.equal(printed.payload.executorId, 'gather');
-  assert.equal(printed.payload.provider, 'agy');
-  assert.equal(printed.payload.command, 'agy');
-  assert.equal(printed.payload.model, 'gemini-flash');
-  const dispatchEvents = readRawEvents(path.join(repoRoot, '.fgos')).filter((e) => e.type === 'executor.dispatch');
-  const logged = dispatchEvents[dispatchEvents.length - 1];
-  assert.equal(logged.type, 'executor.dispatch');
-  assert.equal(logged.payload.id, 'tsk-2c1');
-});
-
-test('the "log" CLI entry point exits non-zero with a usage message when a required flag is missing', () => {
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(process.execPath, [dispatchPath, 'log', 'gather', '--id', 'tsk-2c1'], { encoding: 'utf8' });
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /usage: node src\/runner\/dispatch\.mjs log/);
-});
-
-// --- logExecutorDispatch (D9-shaped audit line for an IN-SESSION executor
-// call — the sibling loop.mjs's own executor.dispatch event has no claim to
-// attach to; closes bee's own named gap, tsk-2ie5/tsk-2c1) -----------------
-
-test('logExecutorDispatch appends a executor.dispatch event with baseCommit/headRef always null (no worktree attestation applies in-session)', () => {
-  const { fgosDir } = mkTempGitRepo();
-  const event = logExecutorDispatch(fgosDir, {
-    id: 'tsk-2c1',
-    executorId: 'gather',
-    provider: 'agy',
-    command: 'agy',
-    model: 'gemini-flash',
-  });
-  assert.equal(event.type, 'executor.dispatch');
-  assert.equal(event.payload.baseCommit, null);
-  assert.equal(event.payload.headRef, null);
-  // Tầng A (TA-D2/TA-D12): logExecutorDispatch now writes into this
-  // writer's own open file under `.fgos/events/`, not the frozen baseline
-  // `events.jsonl` -- readRawEvents(dir) is the one door that reads both.
-  const dispatchEvents = readRawEvents(fgosDir).filter((e) => e.type === 'executor.dispatch');
-  assert.equal(dispatchEvents.length, 1);
-});
-
-test('logExecutorDispatch appends multiple sequential calls without corrupting the log — sequential seq, no duplicate/dropped lines (parallel gather branches must never race the write)', () => {
-  const { fgosDir } = mkTempGitRepo();
-  const events = [1, 2, 3, 4].map((n) =>
-    logExecutorDispatch(fgosDir, { id: 'tsk-2c1', executorId: 'gather', provider: 'agy', command: 'agy', model: `m${n}` }),
-  );
-  const seqs = events.map((e) => e.seq);
-  assert.deepEqual(seqs, [...new Set(seqs)].sort((a, b) => a - b), 'no duplicate seq');
-  const dispatchEvents = readRawEvents(fgosDir).filter((e) => e.type === 'executor.dispatch');
-  assert.equal(dispatchEvents.length, 4);
-});
-
-// --- P4 observability additive fields (docs/history/agent-coordination-
-// foundation/plan.md): capability/mechanism/tier/fallbackReason/outcome are
-// optional and default to null, byte-identical to every pre-existing caller
-// that never supplied them -------------------------------------------------
-
-test('logExecutorDispatch defaults capability/mechanism/tier/fallbackReason/outcome to null when omitted (backward compatible)', () => {
-  const { fgosDir } = mkTempGitRepo();
-  const event = logExecutorDispatch(fgosDir, {
-    id: 'tsk-2c1',
-    executorId: 'gather',
-    provider: 'agy',
-    command: 'agy',
-    model: 'gemini-flash',
-  });
-  assert.equal(event.payload.capability, null);
-  assert.equal(event.payload.mechanism, null);
-  assert.equal(event.payload.tier, null);
-  assert.equal(event.payload.fallbackReason, null);
-  assert.equal(event.payload.outcome, null);
-});
-
-test('logExecutorDispatch records capability/mechanism/tier/outcome when the caller supplies them', () => {
-  const { fgosDir } = mkTempGitRepo();
-  const event = logExecutorDispatch(fgosDir, {
-    id: 'tsk-2c1',
-    executorId: 'gather',
-    provider: 'agy',
-    command: 'agy',
-    model: 'gemini-flash',
-    capability: 'code:review',
-    mechanism: 'out-of-process',
-    tier: 'standard',
-    outcome: 'done',
-  });
-  assert.equal(event.payload.capability, 'code:review');
-  assert.equal(event.payload.mechanism, 'out-of-process');
-  assert.equal(event.payload.tier, 'standard');
-  assert.equal(event.payload.outcome, 'done');
-  assert.equal(event.payload.fallbackReason, null);
-});
-
-test('logExecutorDispatch records a fallbackReason when the caller supplies one', () => {
-  const { fgosDir } = mkTempGitRepo();
-  const event = logExecutorDispatch(fgosDir, {
-    id: 'tsk-2c1',
-    executorId: 'gather',
-    provider: 'agy',
-    command: 'agy',
-    model: 'gemini-flash',
-    fallbackReason: 'no executor configured for code:debug -- ran inline',
-  });
-  assert.equal(event.payload.fallbackReason, 'no executor configured for code:debug -- ran inline');
-});
-
 // --- CLI subcommand --cwd flag coverage ---------------------------------
-
-test('dispatch CLI execute subcommand respects --cwd flag', () => {
-  const repo = mkTempGitRepo();
-  const workerRepo = mkTempGitRepo();
-  const scriptPath = writeEchoExecutor(repo.repoRoot);
-  const dispatchScriptPath = path.resolve(process.cwd(), 'src/runner/dispatch.mjs');
-  writeRunnerConfigFixture(workerRepo.repoRoot, {
-    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    executors: { testexec: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}'] } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
-
-  const out = execFileSync(process.execPath, [dispatchScriptPath, 'execute', 'testexec', '--for', 'execute', '--cwd', workerRepo.repoRoot, '--prompt', 'hello'], {
-    encoding: 'utf8',
-    cwd: repo.repoRoot,
-  });
-  const res = JSON.parse(out);
-  assert.equal(res.status, 0);
-  const echoData = JSON.parse(res.stdout);
-  assert.equal(echoData.cwd, workerRepo.repoRoot);
-});
 
 test('dispatch CLI decide subcommand respects --cwd flag', () => {
   const repo = mkTempGitRepo();
@@ -5857,43 +5461,6 @@ test('dispatch CLI decide subcommand respects --cwd flag', () => {
   const res = JSON.parse(out);
   assert.equal(res.mechanism, 'in-process');
   assert.equal(res.agentType, 'test');
-});
-
-test('dispatch CLI log subcommand accepts --capability/--mechanism/--tier/--fallback-reason/--outcome and records them (P4 observability)', () => {
-  const repo = mkTempGitRepo();
-  const dispatchScriptPath = path.resolve(process.cwd(), 'src/runner/dispatch.mjs');
-
-  const out = execFileSync(
-    process.execPath,
-    [
-      dispatchScriptPath,
-      'log',
-      'gather',
-      '--id',
-      'tsk-p4-cli',
-      '--provider',
-      'agy',
-      '--command',
-      'agy',
-      '--model',
-      'gemini-flash',
-      '--capability',
-      'code:review',
-      '--mechanism',
-      'out-of-process',
-      '--tier',
-      'standard',
-      '--outcome',
-      'done',
-    ],
-    { encoding: 'utf8', cwd: repo.repoRoot },
-  );
-  const event = JSON.parse(out);
-  assert.equal(event.type, 'executor.dispatch');
-  assert.equal(event.payload.capability, 'code:review');
-  assert.equal(event.payload.mechanism, 'out-of-process');
-  assert.equal(event.payload.tier, 'standard');
-  assert.equal(event.payload.outcome, 'done');
 });
 
 // --- fanout-batch and fgos schedule --candidates -------------------------
@@ -6770,20 +6337,5 @@ test('compileDispatchPlan governance-blocked and unavailable branches never popu
   assert.equal(unavailablePlan.mechanism, 'unavailable');
   assert.equal(unavailablePlan.tier, undefined);
   assert.equal(unavailablePlan.policy, undefined);
-});
-
-test('logExecutorDispatch writes governance payload into executor.dispatch event generically (0c)', () => {
-  const { fgosDir } = mkTempGitRepo();
-  const gov = { carries: ['repo-content'], egress: null };
-  const event = logExecutorDispatch(fgosDir, {
-    id: 'tsk-5x7-1',
-    executorId: 'agy',
-    provider: 'agy',
-    command: 'agy',
-    model: 'gemini-flash',
-    governance: gov,
-  });
-  assert.equal(event.type, 'executor.dispatch');
-  assert.deepEqual(event.payload.governance, gov);
 });
 

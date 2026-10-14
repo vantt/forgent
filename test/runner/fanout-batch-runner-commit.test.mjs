@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 
@@ -80,7 +80,7 @@ test('fanout batch: a worker that only edits files is committed by the runner, s
 test('fanout batch: a worker that committed itself is not committed twice', async () => {
   const { repoRoot, fgosDir } = setup(`
     import fs from 'node:fs';
-    import { execFileSync } from 'node:child_process';
+    import { execFileSync, spawnSync } from 'node:child_process';
     fs.writeFileSync('output.txt', 'produced\\n');
     execFileSync('git', ['add', 'output.txt']);
     execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);
@@ -107,4 +107,26 @@ test('fanout batch: a failing runner commit returns the item blocked, never left
   assert.equal(result.fired.length, 1);
   assert.notEqual(result.fired[0].status, 0);
   assert.equal(listWork(fgosDir).work.cand1.status, 'blocked');
+});
+
+test('fanout batch runs from its own node entry: `node src/runner/fanout-batch.mjs "<ids>"` prints the same result JSON', () => {
+  const { repoRoot, fgosDir } = setup(`
+    import fs from 'node:fs';
+    fs.writeFileSync('output.txt', 'produced\\n');
+  `);
+  const entry = path.resolve('src/runner/fanout-batch.mjs');
+
+  const out = spawnSync(process.execPath, [entry, 'cand1'], { cwd: repoRoot, encoding: 'utf8' });
+
+  assert.equal(out.status, 0, out.stderr);
+  const result = JSON.parse(out.stdout.trim().split('\n').at(-1));
+  assert.deepEqual(result.fired.map((f) => [f.id, f.errorClass]), [['cand1', null]]);
+  assert.deepEqual(result.deferred, []);
+  assert.equal(listWork(fgosDir).work.cand1.status, 'awaiting-approval');
+});
+
+test('fanout batch node entry with no candidate ids is a usage error, not an empty batch', () => {
+  const out = spawnSync(process.execPath, [path.resolve('src/runner/fanout-batch.mjs')], { cwd: mkTempDir(), encoding: 'utf8' });
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /usage: node src\/runner\/fanout-batch\.mjs "<id>,<id>\.\.\." \[--has-live-task-access\]/);
 });

@@ -824,25 +824,25 @@ export const COMMAND_REGISTRY = [
   },
   {
     name: 'dispatch',
-    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|execute|log|probe-account> [runId]',
-    description: '"inspect" is Dispatch-owned runtime inspection. "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine clear door; it never recovers, launches, signals, or controls a Run. "recover" remains the semantic recovery door for a STANDALONE Run. "decide", "execute", and "log" provide canonical control-plane decisions, execution dispatch, and logging. "probe-account" is diagnostic: it starts every CLI configured for one provider account at the same moment through the real dispatch door (confinement, leased login, herdr pane) with a read-only prompt, reports per CLI an outcome class (ok, blocked-trust-prompt, auth, quota, sandbox, timeout, other) with its evidence line and run/pane refs plus an account-fault vs cli-fault verdict read from the invocations that declare their own sandbox only, and closes the panes it opened. It selects and schedules nothing.',
+    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|probe-account> [runId]',
+    description: '"inspect" is Dispatch-owned runtime inspection. "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine clear door; it never recovers, launches, signals, or controls a Run. "recover" remains the semantic recovery door for a STANDALONE Run. "decide" answers which mechanism and executor a dispatch resolves to; it runs nothing (one task runs through `fgos run`, planned work through `fgos workflow start`). "probe-account" is diagnostic: it starts every CLI configured for one provider account at the same moment through the real dispatch door (confinement, leased login, herdr pane) with a read-only prompt, reports per CLI an outcome class (ok, blocked-trust-prompt, auth, quota, sandbox, timeout, other) with its evidence line and run/pane refs plus an account-fault vs cli-fault verdict read from the invocations that declare their own sandbox only, and closes the panes it opened. It selects and schedules nothing.',
     parameters: {
       type: 'object',
       properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'inspect', 'watch', 'recover', 'reconcile', 'decide', 'execute', 'log', 'probe-account'] },
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'inspect', 'watch', 'recover', 'reconcile', 'decide', 'probe-account'] },
         invocation: { type: 'string', description: '"probe-account" only: comma-separated invocation ids to limit the probe to (default: every invocation that runs as the account).' },
         executor: { type: 'string', description: '"probe-account" only: limit the probe to one executor id (default: every executor of the provider).' },
-        'timeout-ms': { type: 'string', description: '"probe-account"/"execute": per-call timeout in milliseconds.' },
+        'timeout-ms': { type: 'string', description: '"probe-account" only: per-call timeout in milliseconds.' },
         run: { type: 'string', description: '"inspect" selector, and "reconcile plan --action collect-result" only: Run id selector / target runId.' },
         assignment: { type: 'string', description: '"inspect" selector, and "reconcile plan --action clear-assignment-claim" only: Assignment id selector.' },
-        cwd: { type: 'string', description: 'Working directory path for inspect, reconcile, or execute/decide.' },
+        cwd: { type: 'string', description: 'Working directory path for inspect, reconcile, decide or probe-account.' },
         'provider-capacity': { type: 'boolean', description: '"inspect" only: report provider-capacity inventory/state/quarantine/leases from global config/state.' },
         'run-id': { type: 'string', description: 'The runId to read (positional or --run-id).' },
         interval: { type: 'string', description: '"watch" only: milliseconds between readings (default 1000).' },
         ticks: { type: 'string', description: '"watch" only: stop after this many readings; omitted, watch until the run stops.' },
         intent: { type: 'string', description: '"recover" without --action only: the requested recovery intent, "resume" (default) or "reassign" (needs replacement-authority evidence in the run\'s controller directory, or the recommendation comes back "needs-input").' },
         action: { type: 'string', description: '"recover" only: JSON-encoded action object to apply, exactly as returned by a prior "recover" call\'s own `action` field. Presence of this flag is what selects the apply path over the observe path; giving it requires all four --expected-* fields and --action-key too. "reconcile plan" only (different meaning): the plain action-kind string to plan, one of "clear-cwd-lock" (default), "collect-result" (requires --run), "clear-assignment-claim" (requires --assignment), or "repair-projection" (requires --run).' },
-        provider: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" or "quarantine", "log", or "probe-account": provider id as `inspect --provider-capacity` lists it, e.g. openai-codex.' },
+        provider: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" or "quarantine", or "probe-account": provider id as `inspect --provider-capacity` lists it, e.g. openai-codex.' },
         account: { type: 'string', description: '"reconcile provider-capacity clear-quarantine", "quarantine" or "probe-account": account id from ~/.fgos/config.json.' },
         reason: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" or "quarantine": operator reason, e.g. token refreshed or quota exhausted.' },
         until: { type: 'string', description: '"reconcile provider-capacity quarantine" only: ISO date-time (in the future) when the account is selectable again.' },
@@ -854,23 +854,11 @@ export const COMMAND_REGISTRY = [
         'action-key': { type: 'string', description: '"recover" apply only: the `actionKey` from the recommendation being applied. Consumed exactly once -- a repeat call with the same key returns the prior recorded outcome instead of repeating the effect.' },
         json: { type: 'boolean', description: 'Accepted as a no-op -- the envelope is always JSON.' },
         for: { type: 'string', description: '"decide" only: capability or purpose name to resolve.' },
-        prompt: { type: 'string', description: '"execute" only: prompt text for the executor.' },
-        model: { type: 'string', description: '"execute"/"log" only: model override.' },
-        tier: { type: 'string', description: '"execute"/"log" only: tier override.' },
-        effort: { type: 'string', description: '"execute" only: reasoning effort (low, medium, high, max) rendered into the provider CLI\'s own flag.' },
-        carries: { type: 'string', description: '"execute" only: data classification carried (e.g. repo-content, user-text).' },
-        'has-live-task-access': { type: 'boolean', description: '"decide"/"execute" only: caller has live task/subagent access.' },
+        'has-live-task-access': { type: 'boolean', description: '"decide" only: caller has live task/subagent access.' },
         'needs-soul': { type: 'boolean', description: '"decide" only: task requires an agent soul.' },
         work: { type: 'string', description: '"decide" only: work item id.' },
         stage: { type: 'string', description: '"decide" only: work item stage.' },
-        id: { type: 'string', description: '"log" only: work item id.' },
-        command: { type: 'string', description: '"log" only: command string.' },
-        capability: { type: 'string', description: '"log" only: capability name.' },
-        mechanism: { type: 'string', description: '"log" only: dispatch mechanism.' },
-        'fallback-reason': { type: 'string', description: '"log" only: fallback explanation.' },
-        outcome: { type: 'string', description: '"log" only: execution outcome.' },
-        contract: { type: 'string', description: '"execute" only: path to inline execution contract file.' },
-        'repo-root': { type: 'string', description: '"decide"/"execute" only: main checkout repository root.' },
+        'repo-root': { type: 'string', description: '"decide"/"probe-account" only: main checkout repository root.' },
       },
       positional: ['sub', 'run-id'],
       required: ['sub'],
@@ -889,17 +877,12 @@ export const COMMAND_REGISTRY = [
       'fgos dispatch recover run_abc123 --intent reassign',
       'fgos dispatch recover run_abc123 --action \'{"type":"resume-driver"}\' --expected-snapshot <hash> --expected-control-epoch 0 --expected-expires-at <iso> --action-key <key>',
       'fgos dispatch decide --for general-purpose --has-live-task-access',
-      'fgos dispatch execute <executorId> --prompt "..."',
-      'fgos dispatch log <executorId> --id <id> --provider <p> --command <c>',
       'fgos dispatch probe-account --provider openai --account tetcu72',
     ],
     touchesState: true,
-    // "execute" writes Run directories and state projections; "log"
-    // calls logExecutorDispatch which appends to .fgos/events/<writer>.jsonl
-    // (touchesState: true); "execute" spawns external processes on the host /
-    // containers (externalEffect: true). Per the registry invariant, a verb
-    // with multiple sub-modes is classified by its most-privileged effect on
-    // each axis (renders [write+external] in help).
+    // "reconcile"/"recover" write guard and Run state (touchesState: true);
+    // "probe-account" spawns provider CLIs (externalEffect: true). A verb with
+    // several sub-modes is classified by its most-privileged effect on each axis.
     requiresExistingStore: false,
     externalEffect: true,
     paginated: false,

@@ -21,7 +21,7 @@
  * already dispatching this cwd, try again shortly"):
  *   - worker-spawn-fail  — the executor process could not be started.
  *   - worker-timeout     — the executor ran past its time budget.
- *   - dispatch-in-flight — another `dispatch.mjs execute` call already
+ *   - dispatch-in-flight — another dispatch of the same cwd already
  *                          holds the per-cwd lock for this dispatch (or the
  *                          lock file itself is corrupt/ambiguous) — a
  *                          transient condition, same shape as

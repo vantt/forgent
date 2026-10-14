@@ -2110,8 +2110,8 @@ export async function executeAssignment(assignment, opts = {}) {
   // racing the same lock file -- the second would see the first as HELD by
   // "a different holder" and refuse), so this is scoped to cli-spawn only.
   // Keyed on the SAME dispatchLockFile(cwd) name executeExecutorCli already
-  // uses, so a cli-spawn Assignment, a herdr-spawn Assignment, and an ad-hoc
-  // `dispatch execute` all contend on ONE lock file per cwd. A per-call
+  // uses, so a cli-spawn Assignment, a herdr-spawn Assignment, and a direct
+  // executeExecutorCli call all contend on ONE lock file per cwd. A per-call
   // string identity (matching executeExecutorCli's own scheme, not a bare
   // process.pid) is required because one long-lived process can dispatch
   // several different Assignments in a row (or concurrently) against the
@@ -2123,14 +2123,11 @@ export async function executeAssignment(assignment, opts = {}) {
   // -- an operator who already knows concurrent mutation here is safe skips
   // the acquisition entirely, same as never having contended for the lock.
   // Gated on `effectiveMutation === 'mutating'`: S4's own problem statement
-  // is concurrent MUTATING Assignments racing a cwd, and this repo's own
-  // test suite (assignment-dispatch.test.mjs's "genuinely concurrent
-  // invocations under the same --work id" Red-Team fix tests) already
-  // proves concurrent READ-ONLY dispatch to the SAME cwd through this exact
-  // cli-spawn/`--contract` door is intentional, existing, relied-upon
-  // behavior -- an unconditional lock here regressed both tests outright
-  // (verified by running them). Read-only Assignments never acquire and are
-  // therefore never blocked by, nor able to block, this lock.
+  // is concurrent MUTATING Assignments racing a cwd; concurrent READ-ONLY
+  // dispatch to the SAME cwd is intentional, relied-upon behavior
+  // (assignment-cwd-mutex-concurrency.test.mjs proves both). Read-only
+  // Assignments never acquire and are therefore never blocked by, nor able
+  // to block, this lock.
   let cwdLockRes = null;
   let cwdLockHeartbeat = null;
 

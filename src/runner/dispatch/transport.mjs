@@ -33,7 +33,7 @@
 // further (e.g. `agy`) no longer survives its own parent's timeout kill.
 //
 // NESTED DISPATCH DEPTH CAP: an executor spawned here may itself be another
-// dispatch-capable CLI that calls `node dispatch.mjs execute` again (e.g.
+// dispatch-capable CLI that dispatches again through fgOS (e.g.
 // `agy` fanning out its own sub-agents). `DISPATCH_DEPTH_ENV` threads a
 // counter through the child's environment so that nested call can see how
 // deep it already is; `MAX_DISPATCH_DEPTH` refuses the spawn outright once

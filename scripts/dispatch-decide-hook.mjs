@@ -54,7 +54,7 @@ async function decideBlock() {
     return null;
   }
   if (decided.mechanism === 'in-process') return null;
-  return { toolName, subagentType };
+  return { toolName, subagentType, executorId: decided.executorId ?? '<executor>' };
 }
 
 let blocked = null;
@@ -67,7 +67,7 @@ try {
 if (blocked) {
   process.stderr.write(
     `BLOCKED: this ${blocked.toolName} call resolves to out-of-process dispatch (no native in-process handler for "${blocked.subagentType}"). ` +
-      'Run `fgos dispatch execute` (or `node src/runner/dispatch.mjs execute`) instead of calling this tool directly -- it self-executes and hands back the real result. ' +
+      `Run it through \`fgos run "<prompt>" --provider ${blocked.executorId}\` instead of calling this tool directly -- it runs the task as one unit and hands back the real result. ` +
       `(decided via: decide --for "${blocked.subagentType}" --needs-soul --has-live-task-access)\n`,
   );
   process.exit(2);

@@ -1,4 +1,5 @@
-// `dispatch execute --effort <level>`: one command sets how hard the worker
+// A reasoning-effort level for one run (`fgos run --effort <level>`, handed on to
+// `executeExecutorCli`): one command sets how hard the worker
 // reasons, without editing the provider's own config file. The level goes
 // through the same validation as an Assignment's reasoningEffort (canonical
 // vocabulary, then the executor's own declared `supports.reasoningEffort`),
@@ -10,7 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
-import { executeExecutorCli, runDispatchCli } from '../../src/runner/dispatch/cli.mjs';
+import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { renderReasoningEffortArgs, checkLaunchedModel, collectModelWarnings } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
@@ -149,17 +150,6 @@ test('execute --effort refuses an invocation whose CLI has no effort control', a
     /runs "some-agent", which has no reasoning-effort control fgOS can set/,
   );
   assert.equal(fs.existsSync(path.join(root, 'argv.json')), false);
-});
-
-test('the CLI door parses --effort and refuses a bad level before launch', async () => {
-  const root = fixtureRepo();
-  const ok = await runDispatchCli(['execute', 'fake', '--for', 'execute', '--prompt', 'hi', '--effort', 'low', '--cwd', root, '--repo-root', root], { returnResult: true });
-  assert.equal(ok.status, 0, ok.stderr);
-  assert.equal(ok.reasoningEffort.native, 'low');
-  await assert.rejects(
-    runDispatchCli(['execute', 'fake', '--for', 'execute', '--prompt', 'hi', '--effort', 'bogus', '--cwd', root, '--repo-root', root], { returnResult: true }),
-    /invalid reasoningEffort "bogus"/,
-  );
 });
 
 test('the model check warns when policy replaced the requested model or the argv never carries it', () => {

@@ -12,6 +12,7 @@ import { buildPrompt, executorIdForWork } from './work-compat.mjs';
 import { workDispatchContext } from './work-dispatch.mjs';
 import fs from 'node:fs';
 import { resolveFgosBin } from '../setup/bin-discovery.mjs';
+import { isMainModule } from '../../scripts/lib/is-main-module.mjs';
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const LOCAL_FGOS_MJS = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
@@ -207,4 +208,30 @@ export async function fanoutBatchExecutorCli(
   }
 
   return { fired, mechanismChanged, unavailable, deferred };
+}
+
+// CLI entry point: `node src/runner/fanout-batch.mjs "<id>,<id>..." [--has-live-task-access]
+// [--cwd <dir>]` prints the batch result as one JSON line. Only runs when executed directly.
+if (isMainModule(import.meta.url)) {
+  const args = process.argv.slice(2);
+  const flagValue = (name) => {
+    const i = args.indexOf(name);
+    return i !== -1 ? args[i + 1] : undefined;
+  };
+  const idsArg = args[0] && !args[0].startsWith('--') ? args[0] : undefined;
+  if (!idsArg) {
+    process.stderr.write('usage: node src/runner/fanout-batch.mjs "<id>,<id>..." [--has-live-task-access] [--cwd <dir>]\n');
+    process.exitCode = 1;
+  } else {
+    try {
+      const result = await fanoutBatchExecutorCli(idsArg, {
+        cwd: flagValue('--cwd') ?? process.cwd(),
+        hasLiveTaskAccess: args.includes('--has-live-task-access'),
+      });
+      process.stdout.write(`${JSON.stringify(result)}\n`);
+    } catch (err) {
+      process.stderr.write(`${err.message}\n`);
+      process.exitCode = 1;
+    }
+  }
 }

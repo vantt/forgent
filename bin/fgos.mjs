@@ -44,6 +44,7 @@ import { rebuildViewFromDir } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, DispatchError } from '../src/runner/dispatch.mjs';
+import { resolveWorkForDispatch } from '../src/runner/work-dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
@@ -948,6 +949,23 @@ function submitWork(dir, text, opts = {}) {
   };
   const { event } = addWork(dir, work);
   return event.payload;
+}
+
+// The dispatch doors that ran one task straight through dispatch are gone; each now has a
+// runUnit door. This is the one place that says which: every caller of `fgos dispatch`
+// (shell, gateway, scripts) gets the same validation error, before anything runs.
+function retiredDispatchDoorMessage(sub, positional, flags) {
+  if (sub === 'execute') {
+    if (flags.assignment !== undefined) {
+      return 'fgos dispatch execute --assignment was removed: run the unit with `fgos run --unit <file>`, or planned work with `fgos workflow start <preset>|--units <file>`.';
+    }
+    const executor = positional[1] && !String(positional[1]).startsWith('--') ? positional[1] : '<executor>';
+    return `fgos dispatch execute was removed: run one task with \`fgos run "<prompt>" --provider ${executor} [--writes <paths> --worktree <path>]\`, or a unit file with \`fgos run --unit <file>\`.`;
+  }
+  if (sub === 'log') {
+    return 'fgos dispatch log was removed: every run records its own provenance under `.fgos/assignments/<unitRunId>/`; run work through `fgos run` and read it there.';
+  }
+  return null;
 }
 
 async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3)) {
@@ -2555,7 +2573,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // imports a herdr client or a dispatch adapter, so there is no path from
     // this case to sending anything into a pane.
     case 'dispatch': {
-      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|execute|log|probe-account>');
+      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|probe-account>');
+      const retired = retiredDispatchDoorMessage(sub, positional, flags);
+      if (retired) throw new StoreError('validation', retired);
       const KNOWN_DISPATCH_SUBVERBS = [
         'show-run',
         'inspect',
@@ -2563,8 +2583,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         'recover',
         'reconcile',
         'decide',
-        'execute',
-        'log',
         'probe-account',
       ];
       if (!KNOWN_DISPATCH_SUBVERBS.includes(sub)) {
@@ -2573,24 +2591,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'probe-account') {
         return await runDispatchCli(rawArgv, { returnResult: true });
       }
-      if (sub === 'decide' || sub === 'execute' || sub === 'log') {
+      if (sub === 'decide') {
+        // Dispatch holds no Work store: `decide --work` gets its Work lookup from here.
         try {
-          return await runDispatchCli(rawArgv, { returnResult: true });
+          return await runDispatchCli(rawArgv, { returnResult: true, resolveWork: resolveWorkForDispatch });
         } catch (err) {
-          if (sub === 'execute' || err instanceof DispatchError || err.errorClass) {
-            err.isDispatchExecute = (sub === 'execute');
-            let errorClass = err.errorClass;
-            if (!errorClass) {
-              const code = err.code ?? '';
-              if (code.startsWith('governance') || code.startsWith('redirect.') || (err.message && (/governance gate rejected/.test(err.message) || /cross-provider/.test(err.message)))) {
-                errorClass = 'governance-refused';
-              }
-            }
-            const payload = {
-              error: err.message,
-              ...(errorClass ? { errorClass } : {}),
-            };
-            process.stdout.write(`${JSON.stringify(payload)}\n`);
+          if (err instanceof DispatchError || err.errorClass) {
+            process.stdout.write(`${JSON.stringify({ error: err.message, ...(err.errorClass ? { errorClass: err.errorClass } : {}) })}\n`);
           }
           throw err;
         }
@@ -4721,7 +4728,7 @@ async function handleHook(rest) {
           process.stdout.write(
             JSON.stringify({
               decision: 'deny',
-              reason: `BLOCKED: this subagent call resolves to out-of-process dispatch (no native in-process handler for "${subagentType}"). Run \`fgos dispatch execute\` instead.`,
+              reason: `BLOCKED: this subagent call resolves to out-of-process dispatch (no native in-process handler for "${subagentType}"). Run it through \`fgos run "<prompt>" --provider ${decided.executorId ?? '<executor>'}\` instead.`,
             }) + '\n',
           );
           process.exit(0);
@@ -4950,7 +4957,7 @@ async function main() {
     if (recorded) {
       process.stderr.write(`fgos: invocation fault recorded to ${recorded}\n`);
     }
-    if (err instanceof DispatchError || err.isDispatchExecute || (verb === 'dispatch' && err.errorClass && err.errorClass !== 'validation')) {
+    if (err instanceof DispatchError || (verb === 'dispatch' && err.errorClass && err.errorClass !== 'validation')) {
       process.exitCode = 1;
     } else {
       process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
