@@ -265,7 +265,15 @@ export function resolveWorkForDispatch({ workId, stage, fgosDir }) {
  * and its domain. The item itself never crosses into dispatch.
  */
 export function workDispatchHint(work, stage) {
-  const rigor = workRigorFor(work);
+  let rigor;
+  try {
+    rigor = workRigorFor(work);
+  } catch (err) {
+    // A malformed rigor on an item written before the store validated it: hand it on as is, so
+    // dispatch's own rigor check judges it exactly as it judged the item's field before.
+    if (!(err instanceof RunnerConfigError)) throw err;
+    rigor = work.rigor;
+  }
   return {
     workExecutorId: executorIdForWork(work, stage) ?? null,
     agentType: typeof work.agentType === 'string' && work.agentType ? work.agentType : null,

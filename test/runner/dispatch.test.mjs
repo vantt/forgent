@@ -4624,6 +4624,28 @@ test('decide --work keeps the item rigor: a risk-heavy item plans at rigor high,
   assert.equal(compileDispatchPlan(cfg, { workId: critical.id, workHint: workDispatchHint(critical) }).policy.rigor, 'critical');
 });
 
+test('decide --work: a resolver that still returns the old { workItem, executorId } shape is refused, not sent to a default executor', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' } }, timeoutMs: 5000 });
+  const oldShape = () => ({ workItem: { id: 'tsk-old' }, executorId: 'fgos-coding-implement' });
+  await assert.rejects(
+    () => decideExecutorCli(undefined, { repoRoot: root, resolveWork: oldShape, workId: 'tsk-old', hasLiveTaskAccess: true }),
+    /without the executor identity/,
+  );
+});
+
+test('decide --work: an item with a malformed legacy rigor still resolves its executor, as before the hint', () => {
+  const cfg = {
+    executors: { 'fgos-coding-implement': { command: 'claude', args: ['{prompt}'] } },
+    modelPolicies: { claude: { standard: 's', flagship: 'f', frontier: 'x', nano: 'n' } },
+  };
+  const legacy = sampleWork({ id: 'tsk-legacy-rigor', rigor: 'extreme' });
+  const hint = workDispatchHint(legacy);
+  assert.equal(hint.rigor, 'extreme', 'handed on for dispatch to judge');
+  const plan = compileDispatchPlan(cfg, { workId: legacy.id, workHint: hint });
+  assert.equal(plan.executorId, 'fgos-coding-implement');
+});
+
 test('dispatch doors refuse a Work item instead of ignoring it', async () => {
   assert.throws(() => compileDispatchPlan({}, { work: 'tsk-x', workItem: { id: 'tsk-x' } }), /compileDispatchPlan takes no Work item/);
   await assert.rejects(() => decideExecutorCli(undefined, { repoRoot: mkTempDir(), work: 'tsk-x' }), /decideExecutorCli takes no Work item \(work\)/);

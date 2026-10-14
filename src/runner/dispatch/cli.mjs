@@ -1039,7 +1039,9 @@ export async function decideExecutorCli(
     if (!resolved) {
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
-    workHint = { ...resolved, workExecutorId: resolved.workExecutorId ?? null };
+    // The executor identity is required (null when the Workflow declares none); a resolver
+    // that leaves it out is refused by the plan instead of falling back to a default executor.
+    workHint = resolved;
   }
 
   let assignmentItem;

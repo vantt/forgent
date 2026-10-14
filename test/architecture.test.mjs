@@ -917,8 +917,12 @@ export function findWorkShapedInputs(file, rawSource) {
 // A dynamic import() or require() whose specifier is not one plain literal, createRequire, and
 // node:module itself load code the import guards above cannot follow. Each file allowed one is
 // named here with the reason; nothing else in the guarded set may load code by a computed name.
+// Each entry pins the exact loads allowed (line numbers dropped), so a new one in the same file fails.
 const DYNAMIC_LOAD_ALLOWLIST = {
-  'src/runner/dispatch/provider-credential-renewal.mjs': 'createRequire loads the node:sqlite builtin by its literal name, nothing else',
+  'src/runner/dispatch/provider-credential-renewal.mjs': {
+    reason: 'createRequire loads the node:sqlite builtin by its literal name, nothing else',
+    loads: ['createRequire', 'createRequire', 'imports node:module'],
+  },
 };
 const LITERAL_SPECIFIER = /^\s*(?:'[^'\\\n]*'|"[^"\\\n]*"|`[^`$\\]*`)\s*[,)]/;
 
@@ -931,13 +935,21 @@ export function findDynamicLoads(file, rawSource) {
     const after = code.slice(m.index + m[0].length);
     if (!LITERAL_SPECIFIER.test(after)) hits.push(`${file}:${lineOf(m.index)}: ${m[1]}() of a computed specifier`);
   }
-  for (const m of shape.matchAll(/(?<![\w$])(createRequire|eval)(?![\w$])|(?<![\w$.])new\s+Function\b/g)) {
-    hits.push(`${file}:${lineOf(m.index)}: ${m[0]}`);
+  for (const m of shape.matchAll(/(?<![\w$])(createRequire|eval)(?![\w$])|(?<![\w$.])(?:new\s+)?Function\s*\(/g)) {
+    hits.push(`${file}:${lineOf(m.index)}: ${m[0].replace(/\s+/g, ' ')}`);
   }
+  // Modules that load or evaluate code by a name or text given at run time.
   for (const spec of extractImports(code)) {
-    if (spec === 'module' || spec === 'node:module') hits.push(`${file}: imports ${spec}`);
+    if (/^(node:)?(module|vm|worker_threads)$/.test(spec)) hits.push(`${file}: imports ${spec}`);
   }
   return hits;
+}
+
+/** A violation when `file` loads code dynamically beyond exactly what its allowlist entry pins, else null. */
+export function checkDynamicLoads(file, rawSource) {
+  const allowed = [...(DYNAMIC_LOAD_ALLOWLIST[file]?.loads ?? [])].sort();
+  const loads = findDynamicLoads(file, rawSource).map((h) => h.replace(/^[^:]+:(\d+:)?\s*/, '')).sort();
+  return JSON.stringify(loads) === JSON.stringify(allowed) ? null : `${file}: ${JSON.stringify(loads)} (allowed: ${JSON.stringify(allowed)})`;
 }
 
 test('Work stays a consumer: dispatch, execution, the dispatch barrel and src/workflow/** take no Work-shaped input', () => {
@@ -982,17 +994,10 @@ test('Work-shaped input guard catches each way a Work item can come in, and igno
 });
 
 test('A4 dynamic-load guard: no computed import()/require(), createRequire or eval in the guarded files beyond the named allowlist', () => {
-  const violations = [];
-  const allowedSeen = new Set();
-  for (const file of a4GuardedFiles()) {
-    const hits = findDynamicLoads(file, fs.readFileSync(path.join(root, file), 'utf8'));
-    if (!hits.length) continue;
-    if (Object.hasOwn(DYNAMIC_LOAD_ALLOWLIST, file)) allowedSeen.add(file);
-    else violations.push(...hits);
-  }
-  assert.deepEqual(violations, [], `Expected no computed code load in the A4-guarded files, found:\n${violations.join('\n')}`);
-  // An allowlisted file that stopped loading dynamically leaves the list.
-  assert.deepEqual([...allowedSeen].sort(), Object.keys(DYNAMIC_LOAD_ALLOWLIST).sort());
+  const violations = a4GuardedFiles()
+    .map((file) => checkDynamicLoads(file, fs.readFileSync(path.join(root, file), 'utf8')))
+    .filter(Boolean);
+  assert.deepEqual(violations, [], `Expected no computed code load in the A4-guarded files beyond the pinned allowlist, found:\n${violations.join('\n')}`);
 });
 
 test('A4 dynamic-load guard catches a computed specifier, createRequire and eval, and passes literal loads', () => {
@@ -1007,6 +1012,9 @@ test('A4 dynamic-load guard catches a computed specifier, createRequire and eval
     'const r = nodeModule.createRequire(import.meta.url);',
     "eval('1');",
     "const f = new Function('return 1');",
+    "const f = Function('return 1');",
+    "import vm from 'node:vm';",
+    "import { Worker } from 'worker_threads';",
   ];
   for (const source of caught) assert.ok(findDynamicLoads('x.mjs', source).length >= 1, source);
   const passed = [
@@ -1019,4 +1027,10 @@ test('A4 dynamic-load guard catches a computed specifier, createRequire and eval
     'obj.require(name); obj.import(x);',
   ];
   for (const source of passed) assert.deepEqual(findDynamicLoads('x.mjs', source), [], source);
+  // The allowlist pins the loads of a file, not the file: one more load there is caught.
+  const renewal = 'src/runner/dispatch/provider-credential-renewal.mjs';
+  const real = fs.readFileSync(path.join(root, renewal), 'utf8');
+  assert.equal(checkDynamicLoads(renewal, real), null);
+  assert.ok(checkDynamicLoads(renewal, `${real}\nconst extra = require(name);\n`));
+  assert.ok(checkDynamicLoads('src/runner/dispatch/other.mjs', "import { createRequire } from 'node:module';"));
 });
