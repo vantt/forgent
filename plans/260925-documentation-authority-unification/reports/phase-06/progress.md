@@ -1,3 +1,21 @@
+# Latest resume state — Corrected verdict application and bounded authoring
+
+Date: 2026-10-14
+Executor: codex-session:20@2026-10-14
+Session counter: 20
+Step: 5
+State: authoring
+Review evidence: a5b13d6df; original provenance 18962827a retained.
+Last green commit: 11b84b1ae6dede3cd9f46e2c4c84a7fff1460e93
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Resume tree clean on required worktree and branch. Apply the two corrected ordinary verdicts, refresh both-prior D/scoped E/native equality, then author up to 240 mapped rows in bounded packs. Persist compact registry below 90 MB. Truth report/sample untouched; owner 5/30 decision parked. No promotion, main merge/write, push, Step 6 or protected tool edits.
+Next: native resume proofs and exact-note application, then source packs with progress after each.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Ordinary verdict bindings blocked; STOP
 
 Date: 2026-10-14
