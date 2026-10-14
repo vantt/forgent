@@ -1,7 +1,7 @@
 # Lane D — ranh giới ghi (đề xuất 6, 8)
 
 Status: BLOCKED — plan viết xong, code production TẠM DỪNG theo lệnh Lead 10:45 (chờ kết luận hội đồng một-cửa); đề xuất 6 chờ thêm `fix/dispatch-followups`.
-Worktree: `/home/vantt/projects/forgentX-worktrees/dispatch-write-boundary`, nhánh `feat/dispatch-write-boundary` (từ main 88315d5de).
+Worktree: `/home/vantt/projects/forgentX-worktrees/dispatch-write-boundary`, nhánh `feat/dispatch-write-boundary` (rebase lên main b0d9fa192, 12:26; `fix/credential-phase-02-doctor-scan` đã vào main. Việc 2 `af132275b` "run a read-only contract sandboxed on a named provider" vẫn chỉ ở `fix/dispatch-followups`, chưa vào main → đề xuất 6 vẫn chờ). 3 test trong file test lane chạy lại trên b0d9fa192: 2 đỏ, 1 xanh như trước.
 Council lane: `architecture-advisory` 2 lần (`wf-run-1791949058825-3690e98f`, `wf-run-1791949750327-0f2d735b`), cả hai dừng ở critique — xem dưới. Plan: [plans/261014-1045-dispatch-write-boundary/plan.md](../../261014-1045-dispatch-write-boundary/plan.md).
 
 ## Quan sát về chuyện nhiều cửa (ghi nhanh cho hội đồng một-cửa)
