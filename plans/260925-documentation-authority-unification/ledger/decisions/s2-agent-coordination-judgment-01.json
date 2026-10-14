@@ -734,13 +734,19 @@
       "targetAnchor": "upstream-source-source-inventory-2026-10-14",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:27@2026-10-14",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/dispatch-control-plane.md#source-inventory is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/dispatch-control-plane.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "reviewNote": "deep: New dated successor section appended to the history file with a source line and fenced verbatim copy of the changed heading unit; no source line missing; the original snapshot is untouched.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "dc8434225f7e28e2fdc197f3f20f18586d2cb5b689504e1df6f992ad122c5e6b",
       "targetAncestry": [
         "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_35964c798e2d6ae0072c66bff3143ec7",

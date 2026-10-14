@@ -7611,10 +7611,16 @@
         "targetAnchor": null,
         "claimKind": "contract",
         "disposition": "retain-as-evidence",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "rationale": "A31 upstream removed this native old unit. Preserve its complete exact text as immutable git evidence at c18020da3; current successor shown separately, not claimed to contain every old clause. Pending conservation review; no approval carry.",
         "sourcePath": "docs/specs/work-state.md",
-        "sourceAnchor": "trợ-giúp-theo-từng-verb-fgos---help"
+        "sourceAnchor": "trợ-giúp-theo-từng-verb-fgos---help",
+        "reviewNote": "deep: heading unit Tro giup theo tung verb: upstream retitled it to fgos <verb> [<sub>] with --help or -h and optional --json, and the heading digest binds the section payload so the old identity vanished; 14 of 17 old lines survive, the 3 replaced are in the main hunk; retain-as-evidence of the exact old unit at c18020da3 is honest, the new heading section is a new native unit",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_f1eca3e6fcc3886007fa5de37d686e54",
@@ -7624,10 +7630,16 @@
         "targetAnchor": null,
         "claimKind": "contract",
         "disposition": "retain-as-evidence",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "rationale": "A31 upstream removed this native old unit. Preserve its complete exact text as immutable git evidence at c18020da3; current successor shown separately, not claimed to contain every old clause. Pending conservation review; no approval carry.",
         "sourcePath": "docs/specs/work-state.md",
-        "sourceAnchor": "unheaded-block-70"
+        "sourceAnchor": "unheaded-block-70",
+        "reviewNote": "deep: first paragraph reworded (without --json becomes or -h; init extended to Rust host verbs); 2 of 4 old lines replaced per main hunk; old text kept as git evidence, successor shown separately and not claimed complete",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_9bb5739f68a7b4bafcd959ef59104e6a",
@@ -7636,11 +7648,17 @@
         "targetAnchor": null,
         "claimKind": "specification",
         "disposition": "retain-as-evidence",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "rationale": "A31 upstream removed this native old unit. Preserve its complete exact text as immutable git evidence at c18020da3; current successor shown separately, not claimed to contain every old clause. Pending conservation review; no approval carry.",
         "authoredBy": "codex-session:27@2026-10-14",
         "sourcePath": "docs/specs/work-state.md",
-        "sourceAnchor": "unheaded-block-104"
+        "sourceAnchor": "unheaded-block-104",
+        "reviewNote": "deep: 54-line RUL1 to RUL-block of work-state.md: exactly one line (RUL55 tail) changed upstream so the block digest died; 53 lines survive verbatim in the new block; retention as evidence is conservative and says no full carry, no loss",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_500d588a939fd6109cf102b8343484bb",
@@ -7650,9 +7668,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: AGENTS.md dispatch bullet list: the out-of-process bullet was rewritten upstream (dispatch execute to fgos run); 2 of 3 lines verbatim; old unit retained as git evidence and the missing line is in the main hunk",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_d9db34871d7f7b24bdfaa6790972929e",
@@ -7662,9 +7686,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: paragraph that the dispatch line is one logical action needing a live Monitor tee was deleted by main with no replacement (all 5 lines absent from the current file); retain-as-evidence is the only honest disposition and nothing claims it survives",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_0abb403f0f4bb4bb6b916849e4895d65",
@@ -7674,9 +7704,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: candidate cli-io-contract block-32: all 12 old lines survive verbatim in the new unit, which only adds the subcommands bullet carried from io-contract.md line 138; the rationale label upstream removal is loose (the change is a Lead carry of an upstream addition) but the disposition is conservative and no word is lost",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_5bcbc702fe7871f4aa75438608e11ed5",
@@ -7686,9 +7722,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: candidate Per-Verb Help paragraph: 2 old lines replaced by the upstream text for -h and Rust host verbs (carried in 6c6a65e85, same wording as the main work-state.md help paragraph); old text retained as evidence",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_9791b2c8e56e8a5c2ade4a9aa217983a",
@@ -7698,9 +7740,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: ADR 0047 heading unit: main appended the supersession tag to the heading only (partly superseded by 0061); the other 10 lines are verbatim; retaining the old unit as git evidence is exact and the tag is in the main hunk",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_aa3eea4d98170ab62b6b47ef96e1b60a",
@@ -7710,9 +7758,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: ADR 0052 heading unit: only the heading line changed (tag partly superseded by 0060); rest verbatim; same reasoning as ADR 0047",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_09ff561d37bbda20da2142e7689f648e",
@@ -7722,9 +7776,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: ADR block for case 1 to 6: two lines edited upstream (fallback quota update note and account inventory wording); 16 of 18 lines verbatim; main hunk lines match",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_4bc815996fac3aa23edd525c535de0cf",
@@ -7734,9 +7794,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: RUL46 to RUL48 block: one RUL48 line prefixed with the RUL93 note that --config was replaced; 7 of 8 lines verbatim; main hunk",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_1c3bcebb94ec5ac3461041e669efe71d",
@@ -7746,9 +7812,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: provider failure paragraph: pure insertion of the quota last-words sentence, no old word removed; digest died only because the paragraph grew; retaining old unit as evidence is conservative",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_55c394350b3154e23c7c3a1287088301",
@@ -7758,9 +7830,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: RUL68 line: bracketed note that the purpose door part is superseded by RUL90 and decision 0062 is inserted, old text kept; nothing removed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_e41b4bcf688480211f8708d1ba9165a9",
@@ -7770,9 +7848,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: RUL77 and RUL79 lines: RUL77 gains a superseded-by-RUL90 tag and a 2026-10-14 sentence on Unit prefer, RUL79 gains confined-verdict wording; old words all kept; main hunk",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       },
       {
         "claimId": "claim_0264cb8f75e6809260542f2c469d101f",
@@ -7782,9 +7866,15 @@
         "disposition": "retain-as-evidence",
         "targetOwner": null,
         "targetAnchor": null,
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:27@2026-10-14",
-        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry."
+        "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+        "reviewNote": "deep: struck-through fgos-runner no-scope item: the --config wording is replaced by an RUL93 note; one old line differs and the replaced words are in the main hunk; old text kept as evidence",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+        "reviewMode": "ordinary",
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
       }
     ],
     "changedClassificationRefs": [

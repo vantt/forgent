@@ -78,8 +78,8 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "Source heading \"Entry Points & Triggers\" is represented by the frozen heading \"2. Entry Points And Triggers\"; only the title (ampersand and numbering) differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
-      "authoredBy": "codex-session:26@2026-10-14",
+      "rationale": "The source unit is carried to docs/platform/work-state/spec.md#2-entry-points-and-triggers. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "authoredBy": "codex-session:30@2026-10-15",
       "targetUnitDigest": "03a0e8994292975079c7a2b309b047eb29e3fa5afa1dcaa5f89c47dab1b44538",
       "targetAncestry": [
         "Work State Specification"
@@ -93,8 +93,8 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "The 24-line CLI entry-point verb list is identical in the candidate block under 2. Entry Points And Triggers (diff clean); the map keeps it as specification, not contract. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
-      "authoredBy": "codex-session:26@2026-10-14",
+      "rationale": "The source unit is carried to docs/platform/work-state/spec.md#unheaded-block-3. The current target differs from the source only in the listed A37 correction fragments and, for a heading unit, its frozen title/level. Source identity and the current real target digest/ancestry are retained. Authorized A37 truth correction changes this target unit (claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203, claim_eb0bf7783bb1b1027c012f050c782203). Under A19/A22 the code-backed false clauses are corrected, the full target digest and ancestry are rebound, and this row returns to pending for independent truth/conservation re-review with no prior approval carried. All other source and target clauses stay byte-identical.",
+      "authoredBy": "codex-session:30@2026-10-15",
       "targetUnitDigest": "21e9b6c7342fa4e8f55cbc2f791698156e82ba65eeb4cacc8f80decfa70fc58c",
       "targetAncestry": [
         "Work State Specification",
@@ -151,13 +151,19 @@
       "targetAnchor": "11-business-rules",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source heading \"Business Rules\" is represented by frozen heading \"11. Business Rules\"; only the numbering prefix differs. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "authoredBy": "codex-session:27@2026-10-14",
+      "reviewNote": "deep: Heading unit with section payload: only the RUL55 line differs from the prior source and the identical line is in the target; every other diff against the source is the earlier corrected text, none from this merge.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "765b8e058e0fff60e1af8dea50abdb3838bbcd5ae59f225920829e959a5de0df",
       "targetAncestry": [
         "Work State Specification"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_904f21e704c3d43d63ae2a762bf9791c",

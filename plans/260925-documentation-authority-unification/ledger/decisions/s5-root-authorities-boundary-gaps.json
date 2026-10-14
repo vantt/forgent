@@ -13,22 +13,16 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-85",
-      "authoredBy": "codex-session:15@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate.",
-      "reviewNote": "Old candidate unit packaging#85 (0ce5ce17, 7d83c6b63) superseded by the candidate import 648a2fee, which equals main's table verbatim (import diff is rows 7 and 7b only); rationale accurate",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "reviewStatus": "pending",
+      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate. A22 binding consequence of the authorized verbatim distribution re-carry: the actual target text/digest changed by the shown upstream hunk. The real full-document line map identifies this counterpart; independent conservation re-review is pending with no prior approval carried.",
+      "targetUnitDigest": "b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ],
-      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+      ]
     },
     {
       "claimId": "claim_04703f011b22383992b94545055b9e56",

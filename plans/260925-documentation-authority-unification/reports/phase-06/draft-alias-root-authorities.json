@@ -1134,11 +1134,11 @@
     },
     {
       "aliasId": "root-authorities-draft-0114",
-      "fromPath": "docs/specs/work-state.md#trợ-giúp-theo-từng-verb-fgos---help",
+      "fromPath": "docs/specs/work-state.md#trợ-giúp-theo-từng-verb-fgos---help-h---json",
       "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "toAnchor": "9-per-verb-help",
       "kind": "split",
-      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
       "immutableRefs": [],
       "recordedAt": "2026-10-14"
     },

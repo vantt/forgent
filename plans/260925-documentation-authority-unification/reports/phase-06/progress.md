@@ -1,3 +1,46 @@
+# Committed verdicts applied — file corrections complete; native proof next
+
+Date: 2026-10-15
+Executor: codex-session:30@2026-10-15
+Session counter: 30
+Assignment: unit-run-1792003776433-ffef386c/producer/1
+Step: 5
+State: rework / file-only corrections complete; native sync and bounded re-review deferred
+Starting HEAD / immutable Lead report pin: 68b95dbd83adf817d42571d2c0b2961be75d78d2
+Last green native source proof: c6e51879cf324be3a9f483231f4111f73e8a9e4d (previous session; this turn does not refresh that proof)
+Last green prior proof: 6c6a65e8543fa72012bd55f8999f13f9ed6193c4
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Current-turn commit: none; runner-owned file-only handoff.
+
+Resume: read this journal first, the complete phase resume rules, owner answers A19/A22/A28/A31/A35–A37 and all six committed Lead reports including every Notes section. Starting tree was clean, branch/worktree match, and HEAD descends from the previous green proof. This assignment explicitly replaces the usual commit/full-sync/review-pack end-of-turn actions: file edits only, hard 35-minute ceiling, scratch only under /tmp/fgos-work/verdict-resume/, no full native sync and no new review pack or request.
+
+Applied all 278 committed ok verdicts through the unchanged ordinary applyReviewVerdicts API. Every note is verbatim and every acceptance pins the Lead report commit above. Counts: pending 18 ok; truth 14 truth-unit ok plus 11 claim ok / 10 rework; sync-01 63 ok / 12 rework; sync-02 75 ok; sync-03 75 ok; sync-04 22 ok / 3 rework. Accounting entries retain their separately labelled report identifiers; they are not invented platform claims. The 121 ordinary claim/gap approvals are written to the actual shards; nine alias/retained proposals receive their review fields. Fifteen retired-unit approvals are staged in root-boundary-sync-accounting.json bindings.retiredAssignments for the next native registry overlay. Fourteen truth, four conflict, fifteen identity and 100 receipt acceptances are stored as conservation/truth accounting stamps in root-boundary-native-verification.json fileEditsResume. Changed-code/text classification refs remain pending/candidate-unverified; their old truth receipts remain history. Six legacy pilot gap rows lacked sourceUnitDigest in their old shard shape; the exact working-registry full digests were proved before supplying them to the existing applier.
+
+All 25 requested reworks are fixed. The ten truth rationales no longer claim an unchanged/equal/verbatim target before their A37 correction paragraph; claim_05086f8e and claim_be95c2d5 are tidied the same way and returned to pending despite their ok verdicts. Actual text, digests and ancestry stay correct. The eight distribution rows now have the actual upstream four change groups, verbatim, in docs/platform/packaging-distribution/spec.md: the doctor-check entry, tag-pin plus verification bullets, dated upgrade follow-up, and HELP_SELECTORS edge-case bullet (five diff hunks). Exact whole-document line maps and canonical ancestry prove eight changed native units and thirteen bound decisions, including five related A22 consequences. Four historical body carries become supersede under A23; the source-current heading carries retain their structural move label. All thirteen decisions return to pending with their real target digest/ancestry and no approval carried.
+
+Wrong-target claims claim_045b588f and claim_b6909601 now bind the exact digest-equal CLI I/O contract blocks 30 and 38. Manifest claim_4b96f4f4 names the real difference: removal of src/runner/dispatch-log.mjs; five new kernel/infra mappings; fanout-batch.mjs and work-dispatch.mjs changing from infra to use-case. The old two-line AGENTS predecessor claim_5c520fcb is partial-carry with both successors explicitly named. Its second line has its own existing native current ID claim_2ae81c7bed935553943d6777b81e2114 in s5-root-boundary-sync.json, pending reclassify-out-of-platform-scope under Q5; AGENTS.md itself is untouched. Three sync-04 pendingReason strings are aligned to the pack: current candidate text actually changed by the upstream merge. These refs remain pending without review identity/date. Re-review input recorded: 29 rebound decisions, three pendingReason corrections, one new split-successor decision and one changed alias proposal, plus any real native consequences found next turn.
+
+Alias root-authorities-draft-0114: the resolver failure was from-anchor-missing, not a missing destination heading. Update fromPath to the current per-verb help heading in docs/specs/work-state.md, bind its actual current native claim_d76334798a7de5ca967d48855418497f and full digest, and retain the valid CLI contract destination 9-per-verb-help. The new source-decision report is pinned; the changed alias proposal returns to pending with no carried alias acceptance. Existing alias resolver over all 347 draft entries: zero findings. Active alias table stays untouched.
+
+User knowledge: checked every one of the 21 explanation/knowledge files changed by the upstream merge, including dispatch-execute files and knowledge why-files. All remain named in s2-corpus-user-knowledge.json sources, classified user-knowledge/non-authority, and receive file-level reclassify-out-of-platform-scope with no platform owner from the independently reviewed corpus rule through the unchanged applyDecisions API. Zero targeted findings; no shard expansion needed. Exact paths, hashes, upstream blobs, rule and output decisions are recorded. This is the requested file-level ownership check, not full native inventory equality or a truth sweep.
+
+Verification: 57/57 review/apply/alias tests pass with env -u CLAUDE_CODE_SESSION_ID, zero fail/cancel/skip/todo. Ratchet clean (995 legacy files, 26 accounted edits, one accounted addition); constitution/placement passes (529 files, 528 matched, one recorded exception); candidate-status findings zero; git diff --check clean. All 278 applier stamps validate against committed reports; 115 ordinary approvals survive unchanged, while the six newly edited accepted rows are pending. All 29 rebindings have real current target digests/ancestry and no review fields. Protected source/checker/extractor/vocabulary/registry/active-alias/switchboard bytes remain unchanged. The first bounded helper pass omitted extractor ancestry and over-reported distribution changes; the final canonical ancestry/line-map pass restored every unaffected post-applier row and proves only eight actual changed units. This explained scratch/helper correction changes no checker, identity or baseline. Reproduction sources and checks are stored in fileEditsResume of root-boundary-native-verification.json.
+
+MDView preview was attempted with mdview open; SQLite rejected the write because its database is read-only (error 8). No new preview URL is claimed.
+
+Native D/E, full known-ID/live-tuple equality, reverse-list equality and registry persistence are NOT claimed for this turn. The working registry and all three candidate-unverified lists retain the previous proven bytes until the next full native pass. No owner decision or external blocker prevents that next pass; its deliberate deferral is the assignment boundary. No git write, workspace .fgos write, secret read, promotion, push, main merge, new review pack/request or Step 6 work.
+
+Next turn MUST:
+
+1. Run the full unchanged native sync from the persisted working registry, with both labelled prior registries together. Overlay the fifteen independently reviewed retiredAssignments from root-boundary-sync-accounting.json in that native pass; preserve known opaque IDs and discover/account every real new, changed, retired or gap consequence of these edits. Preserve the three Coordination Rings holds, exact identical-unit exceptions and A34 partial-carry residuals.
+2. Run both-prior D, full union-scoped E, complete native known-ID/live-tuple equality and exact individual/union candidate-list equality. Refresh all three candidate-unverified lists from those actual native outputs; persist only a passing compact working registry below 90 MB. Retain A35/A37 stale-carrier promotion caveats and all changed-code/text refs pending under A28/A31.
+3. Package ONE bounded independent re-review of every changed row/proposal above and its genuine native consequences, with complete text, full digests, exact pending equality, differing/absent lists and current content pins. Do not resubmit unchanged accepted rows. Then stop within Step 5; no promotion, push, main merge or Step 6.
+
+Other Step 5 closure obligations from the prior journal remain: independent invented-claim sample/hostile review, committed fresh-reader key and two readers, consumer-edge/cutover accounting, and the final batch report. A37 means no further Step 5 truth draw; full work-state truth remains owed at promotion. Existing owner questions and consumer/generation obligations are unchanged.
+
+---
+
 # Bounded native resume — verification complete
 
 Date: 2026-10-15

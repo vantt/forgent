@@ -3087,25 +3087,19 @@
     },
     {
       "aliasId": "root-authorities-draft-0114",
-      "claimId": "claim_522c26efde7ef029b3ce6e25829a8915",
+      "claimId": "claim_d76334798a7de5ca967d48855418497f",
       "sourcePath": "docs/specs/work-state.md",
-      "sourceAnchor": "trợ-giúp-theo-từng-verb-fgos---help",
-      "sourceUnitDigest": "aadcac783bf592674ae3d58de41b7e75038b16e2550de06a19c322c91a088be9",
+      "sourceAnchor": "trợ-giúp-theo-từng-verb-fgos---help-h---json",
+      "sourceUnitDigest": "8bbf5f90fa21dfbe14c7ca22e285fa97b8ffc915f8482b1f15c93a1002a28242",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetNativeAnchor": "9-per-verb-help",
-      "targetUnitDigest": "c57c03b28277a6a6bb5608ca73c026fab2a79333bccf9bc89a53208ea9d16dcb",
+      "targetUnitDigest": "4caa102d6379d79bdbc1549552a850498dff81a7ea57a43e020f9f3c3be9a67e",
       "targetBrowserAnchor": "9-per-verb-help",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-alias-02.md",
-      "reviewReportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59",
-      "authoredBy": "codex-session:23@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "Preview only: exact reviewed disposition identifies the owner; browser navigation uses a real containing heading while the native decision anchor/digest remain in this binding. Consumer files and the active alias table stay untouched. At cutover revalidate source/target bytes and independent review before activating this proposal.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewNote": "deep: Trợ giúp theo từng verb — `fgos <verb> ~ (H3 line 713) becomes 9. Per-Verb Help (H2 line 314) with byte-identical section payload; only title/level change, same subject; decision 522c26ef promote reviewed to 9-per-verb-help, source anchor/claim bound via the identity registry; anchor exists, resolver exact hit",
-      "reviewMode": "ordinary",
-      "sourceDecisionReviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "sourceDecisionReviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+      "authoredBy": "codex-session:30@2026-10-15",
+      "reviewStatus": "pending",
+      "rationale": "Upstream bc7bb3f00 renamed the per-verb help source heading. Retarget the draft lookup to the current source heading, bind its real current native identity/digest and the unchanged browser destination 9-per-verb-help. The new source conservation decision is independently reviewed; this changed alias proposal remains pending under A22 with no alias approval carried.",
+      "sourceDecisionReviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "sourceDecisionReviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "aliasId": "root-authorities-draft-0115",
@@ -6339,10 +6333,16 @@
         "claim_92432fc7ae23620e94e6f8e1aaefe0ea"
       ],
       "authoredBy": "codex-session:25@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Navigation preview routes to the template's own complete history carrier. The independently reviewed source decision remains the sole conservation owner; same-heading text equality permits this contextual navigation landing without changing decision ownership. Re-review this changed alias before activation.",
       "navigationOwner": "docs/platform/documentation/history/templates/spec.md",
-      "navigationAnchor": null
+      "navigationAnchor": null,
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewNote": "deep: whole-file digests 980f368c and d55f536a recomputed from git blobs; alias now redirected to history/templates/spec.md which carries all source lines (diff is candidate header, fences and Source Metadata added in candidate); resolver resolves docs/templates/spec.md exactly to it. Observation: reviewer asked kind moved, author used redirected, defensible as splitRouting is true here and validator accepts it.",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "reviewMode": "ordinary"
     },
     {
       "aliasId": "root-authorities-draft-0264",
@@ -6377,14 +6377,20 @@
       "targetUnitDigest": "b4f4ae113f2bb06b797cf4343fc31eace2b66fcd98070172f36877405f9df170",
       "targetBrowserAnchor": "1-current-summary",
       "authoredBy": "codex-session:25@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Navigation preview routes to the template's own complete history carrier. The independently reviewed source decision remains the sole conservation owner; same-heading text equality permits this contextual navigation landing without changing decision ownership. Re-review this changed alias before activation.",
       "navigationOwner": "docs/platform/documentation/history/templates/spec.md",
       "navigationAnchor": "1-current-summary",
       "navigationUnitDigest": "b4f4ae113f2bb06b797cf4343fc31eace2b66fcd98070172f36877405f9df170",
       "decisionOwnerUnchanged": "docs/platform/documentation/history/templates/discussion.md",
       "sourceDecisionReviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-mapped-root-conservation-01.md",
-      "sourceDecisionReviewReportCommit": "729bea7588017b285553332d838543bedecd2605"
+      "sourceDecisionReviewReportCommit": "729bea7588017b285553332d838543bedecd2605",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewNote": "deep: unit b4f4ae11 (empty heading 1-current-summary) is identical at templates/spec.md L19, history spec.md L22 and discussion.md L22; alias toOwner is now history/templates/spec.md#1-current-summary (anchor check ok, resolver exact) while decision owner stays discussion.md as the brief asked; source decision report 729bea758 and commit exist and bind claim_e8ad412d.",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "reviewMode": "ordinary"
     },
     {
       "aliasId": "root-authorities-draft-0266",
@@ -7179,10 +7185,16 @@
         "claim_8d6c0a21110220c459497ae1f42f44c4"
       ],
       "authoredBy": "codex-session:25@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Navigation preview routes to the template's own complete history carrier. The independently reviewed source decision remains the sole conservation owner; same-heading text equality permits this contextual navigation landing without changing decision ownership. Re-review this changed alias before activation.",
       "navigationOwner": "docs/platform/documentation/history/templates/vision.md",
-      "navigationAnchor": null
+      "navigationAnchor": null,
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewNote": "deep: whole-file digests 61d867cd and 3b1371f3 recomputed; alias retargeted from README to history/templates/vision.md which carries all source lines plus candidate header and Source Metadata; resolver exact. Same redirected versus moved observation as 0263, not a defect.",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "reviewMode": "ordinary"
     },
     {
       "aliasId": "root-authorities-draft-0301",
@@ -7217,14 +7229,20 @@
       "targetUnitDigest": "e008f4420e278caad8afa31028a0c49c1ae2422e2bb99bbdfab4c0bd433d94ab",
       "targetBrowserAnchor": "1-purpose",
       "authoredBy": "codex-session:25@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Navigation preview routes to the template's own complete history carrier. The independently reviewed source decision remains the sole conservation owner; same-heading text equality permits this contextual navigation landing without changing decision ownership. Re-review this changed alias before activation.",
       "navigationOwner": "docs/platform/documentation/history/templates/vision.md",
       "navigationAnchor": "1-purpose",
       "navigationUnitDigest": "e008f4420e278caad8afa31028a0c49c1ae2422e2bb99bbdfab4c0bd433d94ab",
       "decisionOwnerUnchanged": "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
       "sourceDecisionReviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-mapped-root-conservation-02.md",
-      "sourceDecisionReviewReportCommit": "729bea7588017b285553332d838543bedecd2605"
+      "sourceDecisionReviewReportCommit": "729bea7588017b285553332d838543bedecd2605",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewNote": "deep: unit e008f442 (empty heading 1-purpose) identical at templates/vision.md L20, history vision.md L22 and intent-preservation-ledger.md L22; alias now vision.md#1-purpose (anchor ok, resolver exact), decision owner stays the ledger; source decision report 729bea758 pinned and exists.",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "reviewMode": "ordinary"
     },
     {
       "aliasId": "root-authorities-draft-0303",
@@ -8301,17 +8319,23 @@
     {
       "path": "docs/doc-registry.json",
       "authoredBy": "codex-session:25@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "action": "retain-path-no-alias",
       "rationale": "Frozen root-map non-platform/retained exception: no reviewed platform target exists. Keep the original lookup; do not fabricate source-to-self proof or a platform alias.",
       "claimIds": [
         "claim_1ac3dcd4a11d62a3397b6563d1e0a386"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewNote": "deep: docs/doc-registry.json sha256 of HEAD blob equals aeba8c2c (file untouched); only the copied sentence about generated backlog decisions was removed from the rationale and authoredBy changed; remaining text is accurate.",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "reviewMode": "ordinary"
     },
     {
       "path": "docs/reading-map.md",
       "authoredBy": "codex-session:25@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "action": "retain-path-no-alias",
       "rationale": "Frozen root-map non-platform/retained exception: no reviewed platform target exists. Keep the original lookup; do not fabricate source-to-self proof or a platform alias.",
       "claimIds": [
@@ -8338,7 +8362,13 @@
         "claim_f38b8380d1b2da4f7e4ba72af1c006aa",
         "claim_aad6d095624ef67fd09cb8c0cc89fd97",
         "claim_c3b29b18751a7153eb574a571a8a1009"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewNote": "deep: docs/reading-map.md HEAD blob sha256 equals f063f083; the inapplicable backlog sentence is removed, nothing else changed, claim list of 23 ids identical to the reviewed proposal.",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "reviewMode": "ordinary"
     },
     {
       "path": "docs/specs/reading-map.md",
@@ -8361,7 +8391,7 @@
     {
       "path": "docs/user/README.md",
       "authoredBy": "codex-session:25@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "action": "retain-path-no-alias",
       "rationale": "Frozen root-map non-platform/retained exception: no reviewed platform target exists. Keep the original lookup; do not fabricate source-to-self proof or a platform alias.",
       "claimIds": [
@@ -8370,12 +8400,18 @@
         "claim_01a923cb28cac05c7896422d07c3c11f",
         "claim_ecefb56ff29adc37074cec0af7f36312",
         "claim_ee85a9e312493fde5fa5dfcf8b3eb573"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewNote": "deep: docs/user/README.md HEAD blob sha256 equals 29ea4aab; copied backlog sentence removed, claim list of 5 ids unchanged.",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "reviewMode": "ordinary"
     },
     {
       "path": "docs/backlog.md",
       "authoredBy": "codex-session:25@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "action": "retain-path-no-alias",
       "rationale": "Frozen root-map non-platform/retained exception: no reviewed platform target exists. Keep the original lookup; do not fabricate source-to-self proof or a platform alias. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes.",
       "claimIds": [
@@ -8384,12 +8420,18 @@
         "claim_d7660c15ae6c2d2e7d610c1aa571101c",
         "claim_743cde02b9562c5f8e4724512ee6fc8f",
         "claim_56db2b3b7a6258289e1ab13f5c69d47f"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewNote": "deep: docs/backlog.md HEAD blob sha256 equals b714ae95; rationale now states the absent .bee input, bee not installed, b6763388b hand-added rows and keep-and-do-not-regenerate wording, all verified; claims are the five backlog ids and match the shard.",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "reviewMode": "ordinary"
     },
     {
       "path": "docs/platform/proposals/documentation-system-unification.md",
       "authoredBy": "codex-session:25@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "action": "retain-path-no-alias",
       "rationale": "Frozen root-map retained in-platform proposal: the existing docs/platform/proposals/documentation-system-unification.md remains its own path; no retiring legacy path or alternate platform alias owner is proposed. Keep its original lookup; no source-to-self conservation proof is fabricated.",
       "claimIds": [
@@ -8591,7 +8633,13 @@
         "claim_de09df02bda39fb8f2935e363dfc0548",
         "claim_2047cc016364760abcd38f21e912b858",
         "claim_60c5c8932ffd88d36facd181b66fe477"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewNote": "deep: proposals file HEAD blob sha256 equals 2ed9005a; the wrong non-platform wording is replaced by a retained in-platform proposal statement that is true because the path sits under docs/platform/proposals; claim list unchanged.",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "reviewMode": "ordinary"
     },
     {
       "path": "docs/decisions/index.md",

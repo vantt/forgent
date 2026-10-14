@@ -8870,13 +8870,19 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceAnchor": "unheaded-block-37",
+      "reviewNote": "deep: Old exact unit stays verbatim in the literal snapshot (prior and current target digests equal); gap row for the replaced block.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a",
       "targetAncestry": [
         "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
       ],
-      "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
-      "sourceAnchor": "unheaded-block-37"
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     }
   ]
 }

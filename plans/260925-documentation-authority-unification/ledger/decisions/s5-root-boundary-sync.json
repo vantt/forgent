@@ -11,7 +11,8 @@
     "docs/io-contract.md",
     "docs/specs/distribution.md",
     "docs/specs/reading-map.md",
-    "docs/specs/work-state.md"
+    "docs/specs/work-state.md",
+    "AGENTS.md"
   ],
   "claims": [
     {
@@ -21,14 +22,20 @@
       "targetAnchor": "upstream-source-unheaded-block-4-2026-10-14",
       "claimKind": "navigation",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:27@2026-10-14",
       "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
       "targetKind": "history-evidence",
+      "reviewNote": "deep: Main's note carried in a dated successor section with labelled source line and fence; 0 source lines missing. Advisory: sibling README units bind to legacy/README.md while this one binds to retired-engine/README.md; the same text is also inside row d7b301f8's carrier.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d3f4bd4035f70868a76bd1be7fd94c2d060ad4cf848f849d8d7c09cd8e53a8c5",
       "targetAncestry": [
         "Retired engine snapshot: README.md"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_142558254b0fa5e0b0fe78096f4caa9c",
@@ -39,11 +46,17 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "component-internal-ownership",
       "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: New unit with the dispatch-log wording is present in the target section; remaining differences are earlier accepted corrections.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c0bb4ead0f6620892a21de57af6673d4d2e2c67ae656917f1ee7f9a24363a67a",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_d11900e7305d31956a2f066f6e29db57",
@@ -54,11 +67,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
       "targetAnchor": "upstream-source-unheaded-block-37-2026-10-14",
       "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: Dated successor section of the dispatch-control-plane history file; 0 source lines missing, only label and fence added.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "920cfaa5ed282548566e7c4ae5ba14679c1a65211d8fd42e7773752846d5c72f",
       "targetAncestry": [
         "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_e0e3f54e0ac694fa7a5542eac3f7a721",
@@ -69,11 +88,17 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "routing-identities",
       "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: New Routing Identities block text is in the target section, including main's --for/--work sentence.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_44e6d52dac61b16b646f7fadc1a8afe7",
@@ -84,24 +109,36 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
       "targetAnchor": "upstream-source-unheaded-block-11-2026-10-14",
       "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: Dated successor section holds the full changed prompt block (0 missing, 5 label and fence lines); original snapshot untouched.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f8ef3610193e0fdade4078f09bc4a7103184b7f66f9203a98b780859063a2f86",
       "targetAncestry": [
         "Historical File: still-consumed cognitive prompt; mixed manual runtime instructions superseded by registered skill"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_0416642260519cf992931a4968e80c03",
       "sourceUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:27@2026-10-14",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
       "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "reviewNote": "deep: Sampled. Whole-file digest of source and candidate manifest equal; byte-identical copy of main's manifest including the 7 changed entries.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_e5e2846158bbd249d1ebbd70161f02a0",
@@ -110,13 +147,19 @@
       "targetAnchor": "5-reasoned-envelope-exceptions",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
       "authoredBy": "codex-session:27@2026-10-14",
+      "reviewNote": "deep: New block-15 equals the target exception list with the section heading and intro added; item 1 carries the -h and verb sub wording.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8a4450efa42cf8d7d02b90b65a9e093fbbfd3178788f682caa9a3a7cba5b73b7",
       "targetAncestry": [
         "CLI I/O Contract"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_cbc7ad17e0764ac8d1d4d386e3b62e74",
@@ -125,15 +168,21 @@
       "targetAnchor": "unheaded-block-31",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
       "authoredBy": "codex-session:27@2026-10-14",
+      "reviewNote": "deep: Sampled. Byte-equal new block-18 and target block-31 (3.0 manifest sentences).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_b8fa7fa2cd614433de754bbb92302140",
@@ -142,15 +191,21 @@
       "targetAnchor": "unheaded-block-33",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
       "authoredBy": "codex-session:27@2026-10-14",
+      "reviewNote": "deep: New block-19 is in the target with the subcommands bullet and the corrected externalEffect sentence; 0 lines missing.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_f7459f118bd93b8769e6c90ace8c68fe",
@@ -160,9 +215,9 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
-      "targetUnitDigest": "cdc65be47d5ab1b4f61dfdef36be58ea1c499cff90dd56e3b3bcb5431aa561f4",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -178,9 +233,9 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
-      "targetUnitDigest": "b1e15730d97d645508d833b30133c31d6ac119466d80377b70c7815d0b8e08b3",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "targetUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -196,9 +251,9 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
-      "targetUnitDigest": "adbe84814a993cfb5f57b2646665d448fe34ee2d2583e6b2f930855f035722e8",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "targetUnitDigest": "b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -214,9 +269,9 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
-      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "targetUnitDigest": "b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -229,9 +284,15 @@
       "sourceUnitDigest": "3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry."
+      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "reviewNote": "deep: New block-2 of the retained reading map, target none; the text is the same unit with main's four changes, retained in place.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_d76334798a7de5ca967d48855418497f",
@@ -241,12 +302,18 @@
       "targetAnchor": "9-per-verb-help",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "reviewNote": "deep: Heading rebind; the new -h/--json/subcommand wording is in the contract section 9 and 8 blocks it owns.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4caa102d6379d79bdbc1549552a850498dff81a7ea57a43e020f9f3c3be9a67e",
       "targetAncestry": [
         "CLI I/O Contract"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_9be8a10fa3ce503d2ebc2ffe6ffc76ad",
@@ -255,14 +322,20 @@
       "targetAnchor": "unheaded-block-93",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
       "authoredBy": "codex-session:27@2026-10-14",
+      "reviewNote": "deep: Business Rules body: RUL55 extension carried verbatim into the spec; other differences are earlier accepted corrections.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d8bf5e1f48a181d1cc996d8e39c12e715dbf18e894203ed47c457a4a3a4b8835",
       "targetAncestry": [
         "Work State Specification",
         "11. Business Rules"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_9c7dc2d7af79db454e4d63ffffe3d6f6",
@@ -272,30 +345,36 @@
       "targetAnchor": "unheaded-block-29",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "reviewNote": "deep: Sampled. Byte-equal new block-66 and target block-29 (3.0 sentence).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_045b588f4d839f90c40b48fbc0fc3f4d",
       "sourceUnitDigest": "a5128895b71f07c2e1baa3ecb90cd302f016fdb4191518ef02835a768c8dc156",
-      "targetOwner": "docs/platform/work-state/spec.md",
-      "targetAnchor": "unheaded-block-67",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-30",
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "targetUnitDigest": "dbfcaa1881570e24492daa35eb776b4fbea75fab92318188517e6b81ee2bdbd2",
+      "rationale": "The complete upstream work-state source unit is already carried verbatim in the CLI I/O contract, proved by full native digest equality. Bind this real contract unit rather than the unrelated same-number spec block. A22 independent conservation re-review is pending with no approval carry.",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "targetUnitDigest": "a5128895b71f07c2e1baa3ecb90cd302f016fdb4191518ef02835a768c8dc156",
       "targetAncestry": [
-        "Work State Specification",
-        "9. Behaviors And Operations",
-        "Submit Verb"
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Manifest Shape"
       ]
     },
     {
@@ -306,30 +385,44 @@
       "targetAnchor": "unheaded-block-37",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
+      "reviewNote": "mechanical: Digests, anchor and shard/pack equality pass; text script-equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7cb2dbfd3b698c923c15d17222daf08e96f5fcbf54aa79afd3e1248fdd8d9b2e",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "9. Per-Verb Help"
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+    },
+    {
+      "claimId": "claim_b69096018a7da1d3dc629b5d37f6fdac",
+      "sourceUnitDigest": "9b711cb5a088ede56ad00207289f1fed2ccc05887597169bbc41eb2e55429db3",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-38",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "The complete upstream work-state source unit is already carried verbatim in the CLI I/O contract, proved by full native digest equality. Bind this real contract unit rather than the unrelated same-number spec block. A22 independent conservation re-review is pending with no approval carry.",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "targetUnitDigest": "9b711cb5a088ede56ad00207289f1fed2ccc05887597169bbc41eb2e55429db3",
       "targetAncestry": [
         "CLI I/O Contract",
         "9. Per-Verb Help"
       ]
     },
     {
-      "claimId": "claim_b69096018a7da1d3dc629b5d37f6fdac",
-      "sourceUnitDigest": "9b711cb5a088ede56ad00207289f1fed2ccc05887597169bbc41eb2e55429db3",
-      "targetOwner": "docs/platform/work-state/spec.md",
-      "targetAnchor": "unheaded-block-72",
-      "claimKind": "specification",
-      "disposition": "supersede",
+      "claimId": "claim_2ae81c7bed935553943d6777b81e2114",
+      "sourceUnitDigest": "e4e33c148710cfb9775867b0160ed6e82d2e469d0f118ad9ba5ae33ce79c2484",
+      "claimKind": "historical-context",
+      "disposition": "reclassify-out-of-platform-scope",
       "reviewStatus": "pending",
-      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "targetUnitDigest": "c36313e9a59bc69c1f04a65dc22c55bd72e374e693fd9f4351a3534d1ccf1493",
-      "targetAncestry": [
-        "Work State Specification",
-        "9. Behaviors And Operations",
-        "Edit Verb"
-      ]
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "This current native AGENTS.md unit is the second line of predecessor claim_5c520fcb1a68ba27e2093341834258c7 after upstream inserted a paragraph. Its full text remains verbatim and is retained at AGENTS.md#unheaded-block-24. Root instructions are outside platform authority under Q5; this own row records that retained instruction owner and completes the predecessor split accounting. No source-to-self carry proof, approval carry or instruction truth certification. Independent conservation re-review pending."
     }
   ],
   "registryGaps": [
@@ -338,7 +431,7 @@
       "sourcePath": "AGENTS.md",
       "sourceAnchor": "unheaded-block-22",
       "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
-      "disposition": "supersede",
+      "disposition": "partial-carry",
       "targetOwner": "AGENTS.md",
       "targetAnchor": "unheaded-block-22",
       "targetUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
@@ -347,8 +440,9 @@
         "Dispatch — routing work to an executor"
       ],
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "A31 upstream splits this old two-line unit by inserting a paragraph. This target carries only the first line. The second line has its own current native decision claim_2ae81c7bed935553943d6777b81e2114 at AGENTS.md#unheaded-block-24; together the two successors conserve the complete predecessor. Preserve the old opaque identity/digest; A22 pending independent conservation re-review, no approval carry.",
+      "remainder": "The second original line (the fgos dispatch decide routing-check sentence) is conserved by AGENTS.md#unheaded-block-24, native current claim claim_2ae81c7bed935553943d6777b81e2114 in ledger/decisions/s5-root-boundary-sync.json. The first line remains the existing target at unheaded-block-22; upstream inserted a separate paragraph between them."
     },
     {
       "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
@@ -358,14 +452,20 @@
       "disposition": "supersede",
       "targetOwner": "AGENTS.md",
       "targetAnchor": "unheaded-block-25",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: Same-file successor; target equals main's new sentence (--work only through fgos dispatch decide).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
       "targetAncestry": [
         "forgent",
         "Dispatch — routing work to an executor"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
@@ -375,14 +475,20 @@
       "disposition": "supersede",
       "targetOwner": "AGENTS.md",
       "targetAnchor": "unheaded-block-27",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: Same-file successor; only change is --step to --stage, verbatim from main.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
       "targetAncestry": [
         "forgent",
         "Dispatch — routing work to an executor"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_1a97144c81c563726dfeb3413c4eaddc",
@@ -392,14 +498,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/architect/component-boundary/component-boundary-advisory.md",
       "targetAnchor": "unheaded-block-82",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: Same-file successor; only change is the dispatch-log removal clause, verbatim from main.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c200204a074853d064951111f53eae21171ee1037c5989affe83e6852678a370",
       "targetAncestry": [
         "fgOS Component Boundary Advisory",
         "12. Dispatch As A Replaceable System"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_755cc3f7baeabc42702373bb6d09154c",
@@ -409,14 +521,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
       "targetAnchor": "unheaded-block-18",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: Same-file successor; only change is dispatch execute to fgos run, verbatim from main.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b2a4faec46b201424ddcb35d23ac473adf5af2e1d458ebb6d465a71f712789ff",
       "targetAncestry": [
         "Compare discussion setups with metrics eval",
         "2. Blind the judge; distinguish data blindness from isolation"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_f162d77427a68d4fd4ba8a43c39ba746",
@@ -426,14 +544,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
       "targetAnchor": "unheaded-block-20",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: Same-file successor; only change is the execute sentence replaced by the fgos run bind sentence, verbatim from main.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0e2eeef061c7503ce2fe8137971b43a39091d7dcac1b54e6f88a9ec2b9cb60a2",
       "targetAncestry": [
         "Compare discussion setups with metrics eval",
         "2. Blind the judge; distinguish data blindness from isolation"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_e8446ab5cec97974f2099db88f606c3f",
@@ -443,14 +567,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
       "targetAnchor": "unheaded-block-25",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: Same-file successor; command block replaced by main's fgos run block (5 lines for 4), verbatim from main.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "62428c714fde779b055513565a62eabcdc8b2a12cd6861954c2b52da73ffc8fd",
       "targetAncestry": [
         "Compare discussion setups with metrics eval",
         "2. Blind the judge; distinguish data blindness from isolation"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_6b514c8b4b2a093c292c034910f88967",
@@ -460,14 +590,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
       "targetAnchor": "unheaded-block-26",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: compare-discussion block-26 grows from 7 to 14 lines (worker starts in current directory, read-only without --writes, override pins judge, removed dispatch execute flags and decision 0062); every changed line is in the main hunk and the old clauses survive, so supersede with the new same-anchor unit is right",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5e0c0d92c5ae966c7f3e80f6911198849ccc9502290145fed047a77977526668",
       "targetAncestry": [
         "Compare discussion setups with metrics eval",
         "2. Blind the judge; distinguish data blindness from isolation"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_4aaead9c70d5ee34ecd075e726a5ada3",
@@ -477,14 +613,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-heterogeneous-and-homogeneous-roster.md",
       "targetAnchor": "unheaded-block-6",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: only change is the inserted parenthetical saying dispatch.mjs execute is a removed door (decision 0062) and the run now goes through fgos run --provider; rest verbatim; equals main hunk",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b801d755c6885db5c81cff045af8605df9fcfefcdf700a1f6124ebe90ebfa68c",
       "targetAncestry": [
         "Example family: heterogeneous roster, and the homogeneous fallback",
         "Heterogeneous — independently routed shaper/alternative/critic/synthesizer/red-team"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_ba149847526096094f03951b68e8de88",
@@ -494,14 +636,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
       "targetAnchor": "unheaded-block-11",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: old block-10 to new block-11 (anchor shifts by one after an upstream insert); Monitor wording replaced by the backgrounded-run clause; all lines from main hunk, no unlabelled addition",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d45184644477e2106cf09a899c7e060e3c23448866e772b8fd92b8665e00a4a5",
       "targetAncestry": [
         "Handle a worktree-guard refusal of the dispatch Step B command",
         "The mitigation"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_e5e168e23061583ac8d6e17486ddaef7",
@@ -511,14 +659,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
       "targetAnchor": "unheaded-block-12",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: old block-11 to new block-12; single phrase change from out-of-process dispatch with a --prompt to work run with a prompt; line map matches main diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3b2d6d5612f62fbe66c0c05f4c5e0b616920aac58d2fa7bea993daa34c0ce694",
       "targetAncestry": [
         "Handle a worktree-guard refusal of the dispatch Step B command",
         "The mitigation"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_942340421f82e17fab0ef9d210141a65",
@@ -528,14 +682,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
       "targetAnchor": "unheaded-block-3",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: old block-2 to new block-3; the dispatch path now runs the work as a Unit through fgos run and the tool is Bash not Bash/Monitor; both edits are main hunk lines",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cc298b8de2142aefebfd38e7d1218563084f0460dea4c3f8b53c7d95f5236587",
       "targetAncestry": [
         "Handle a worktree-guard refusal of the dispatch Step B command",
         "When this applies"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_b6ff5b306a6ee73547e62548362341b9",
@@ -545,14 +705,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
       "targetAnchor": "unheaded-block-4",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: old block-3 to new block-4; the node dispatch.mjs execute command line is replaced by fgos run with --provider --capability --json; fence lines unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4eb36b8aa4bc7b5c58a4fb81fbdbb2de7fee7a66ffb3b2f6369900c5897bd798",
       "targetAncestry": [
         "Handle a worktree-guard refusal of the dispatch Step B command",
         "When this applies"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_4b1910a70def813eb4f7f5aed13f3d0c",
@@ -562,14 +728,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
       "targetAnchor": "unheaded-block-9",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: old block-8 to new block-9; only the words through Monitor are dropped; verified against main diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e4d863acf24b5b0fe3a040291ff6bb0cfcdce4d4f26c87cfc488461d0bfaabcc",
       "targetAncestry": [
         "Handle a worktree-guard refusal of the dispatch Step B command",
         "The mitigation"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_25e7de5470ee9fda566c3de5be00f57b",
@@ -579,14 +751,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md",
       "targetAnchor": "unheaded-block-10",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: old block-9 to new block-10; the heredoc command line is swapped for the fgos run form, same as the block-3 change, nothing else moved",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5c5a0d9c9f1fa5cd247fe1e8acd8d5aa16f79180053db5af374b18b185fe481c",
       "targetAncestry": [
         "Handle a worktree-guard refusal of the dispatch Step B command",
         "The mitigation"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_5ad7915f076019507cae1a93c14ad2d7",
@@ -596,14 +774,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
       "targetAnchor": "unheaded-block-27",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: install how-to block-27 adds the fgctl upgrade and FGCTL_VERSION lines before the unchanged --from archive line; main hunk",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e21779e108d69203bc26537f09f82d14f57f45bc2cf5232134320c9dfe08d105",
       "targetAncestry": [
         "How to install fgOS in a project and use fgos doctor",
         "2. Order of operations for a new project"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_0b03338bd7576f97d0cd046630a49fee",
@@ -613,14 +797,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
       "targetAnchor": "unheaded-block-28",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: upgrade sentence extended (downloads and verifies when no --from, updates .fgos/distribution.json); rollback sentence and fgctl status line kept; main hunk",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ab07915018064a880c69774d42994e1da515f12837c2276b64f98be6c00c9f88",
       "targetAncestry": [
         "How to install fgOS in a project and use fgos doctor",
         "2. Order of operations for a new project"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_d85a5331d5712b2f5c2ecd9cab60e487",
@@ -630,15 +820,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
       "targetAnchor": "unheaded-block-29",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: only the fgctl upgrade table row is rewritten (optional --from, FGCTL_VERSION, distribution.json); neighbouring rows byte-equal; main hunk",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8b845575534e8e9dfe409dc59e73bb7168d3579f320d6b6cd34d709fda7cfdb5",
       "targetAncestry": [
         "How to install fgOS in a project and use fgos doctor",
         "2. Order of operations for a new project",
         "2.1. What each command does"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
@@ -648,15 +844,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
       "targetAnchor": "unheaded-block-37",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: one new doctor table row runner-generated-paths inserted, existing rows unchanged; carried from main, code truth of the new check is out of A31 scope",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f68e806e498e7dfdaf578fd7a5e2bd066c34115737ec13a5faec13540f39170e",
       "targetAncestry": [
         "How to install fgOS in a project and use fgos doctor",
         "4. Every doctor check",
         "4.2. Project config (written by setup or `--fix`)"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_4b0be5d6b3c4382616bd5748e7bd6c94",
@@ -666,14 +868,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/how-to/write-wrapper-script-for-worktree-guard-refusal.md",
       "targetAnchor": "unheaded-block-5",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: example command swapped to fgos run and the live-tee Monitor requirement clause deleted; the deletion is main's own (same text is retired row claim_d9db34871d7f7b24bdfaa6790972929e), so supersede plus retained evidence is consistent",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3f67c68602b612b7b71b3a4f9e51029ff998d01d07a1a46af50fffcf4b1afe53",
       "targetAncestry": [
         "Use `scripts/write-wrapper-script.mjs` instead of hand-authoring a wrapper file",
         "When to use it"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_19b74556b576db8c4a0acfdd6e5fe1fe",
@@ -683,14 +891,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/knowledge/how-to-reuse-the-shared-executor-dispatch-fallback-fragment/reuse-the-shared-executor-dispatch-fallback-fragment.md",
       "targetAnchor": "unheaded-block-4",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: one line changed, dispatch.mjs decide then execute becomes fgos dispatch decide then fgos run --provider; remainder of the numbered list verbatim",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "09d4c13d8beacf9a66aaeb522177ea8f91999302941260da55147e7e012e4e08",
       "targetAncestry": [
         "How to reuse the shared executor-dispatch-fallback fragment in a new skill",
         "Steps"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_c3f7f02e554068e22d81262ad18df6df",
@@ -700,14 +914,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
       "targetAnchor": "unheaded-block-8",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: the out-of-process bullet is rewritten to the fgos run Unit command and keeps the do-not-run-the-resolved-command-through-Bash rule; main hunk",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ff4c2df95c47422b2bd00390b05c64edaa1906ca0531f97b97bc5219794a66e3",
       "targetAncestry": [
         "How to wire a skill through the dispatch decision",
         "Branching"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_5f8671a3f3421989a05e27f088a086ef",
@@ -717,14 +937,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
       "targetAnchor": "unheaded-block-9",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: old rule that a worktree-backed item passes --cwd and --repo-root is replaced by --writes and --worktree plus a note that dispatch execute was removed (decision 0062); the old rule is removed on purpose by main so supersede is the truthful disposition, old text stays in git",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8c02ef1948d72d0146635298850bac68cb00c6a0e133f66c5917eedbe8330a9e",
       "targetAncestry": [
         "How to wire a skill through the dispatch decision",
         "Branching"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_d8d20682950e9f29f5fbce07c6a850c3",
@@ -734,14 +960,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
       "targetAnchor": "unheaded-block-9",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: numbered step 3 now names fgos dispatch decide then fgos run and notes the removed node dispatch.mjs execute door; closing sentence about never running a resolved command through Bash kept",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7dee0bdfbd830d666ddf27b962f997632bdab15056fda6b5e958c48c3ab2f211",
       "targetAncestry": [
         "How to wire an existing skill's inline-reasoning step through an agent-executor executor",
         "Steps"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_7ae2ffc8a883b917293312f8b63805eb",
@@ -751,14 +983,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "unheaded-block-11",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: conflict-resolved candidate block-11 gains the four-line sentence that --for and --work stay on decide and execute --assignment was removed; the c18020da3 candidate never carried the old stay-supported sentence (grep empty) so main lines were added after the selector-label sentence instead of replacing; text equals main hunk, resolved file sha matches the merge",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "54a906894d376247d082bf9a679ebc746eba36386228da9014bc0d329beb7bbb",
       "targetAncestry": [
         "Dispatch Control Plane",
         "Routing Identities"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_75041e871c0b191949808b55f541184d",
@@ -768,14 +1006,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "unheaded-block-31",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: forbidden-dependency bullet now says dispatch logging was isolated and the module is removed (decision 0062); verbatim main hunk, same line in the architect source",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e6a51d5c197169a5427b3a20aab9b9c9ad0e458bc7ef25ccf8a34ae1b2713ed5",
       "targetAncestry": [
         "Dispatch Control Plane",
         "Component-Internal Ownership"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_b9b42545b42b04889685191ada1a3892",
@@ -785,14 +1029,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "unheaded-block-37",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: Audit Seam table row rewritten to removed with decision 0062 wording; verbatim main hunk, other table rows unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "26f57ec1a1282005fa3076c63998c3fb78981b3ff51b90ebcbb2d0eca20f42a1",
       "targetAncestry": [
         "Dispatch Control Plane",
         "Source Inventory"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_2f7cbb5fabfc5e77f7014c54f020c524",
@@ -802,11 +1052,17 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: whole file equals main docs/architecture-manifest.json byte for byte (sha256 0eab58e6...); diff to the old copy is exactly the dispatch-log removal, five added modules and two kind changes; anchor check is not defined for a JSON file-block so I proved it with the extractor",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
       "targetAncestry": [],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_c201fb480171293641c2fb049fd33936",
@@ -816,14 +1072,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
       "targetAnchor": "unheaded-block-6",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: releaseVersion cell now says installed or upgraded and written when fgctl init or fgctl upgrade downloads; one table cell changed; equals main hunk",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8d8476fca1d3b135c3ef5f862b59b6e9f7decd3a3ab855089eeb119c9163fa99",
       "targetAncestry": [
         "Contract: Distribution Pin",
         "3. Field Specifications & Optionality"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_199501685fd82d464892f7a06aad9516",
@@ -833,14 +1095,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-13",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: implementation-evidence sentence swaps fgctl-init.test.mjs for the two download test files; nothing else moved; equals main hunk",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d78cfec31f57634f9a0546edea529181e549e9abe991cb86d8523f5b015e2a4d",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "3.1.1 Windows Native Channel"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_73221307a66a364372a7f8206227e62f",
@@ -850,14 +1118,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-4",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: only the fgctl upgrade table row changed (source order --from then FGCTL_FROM then FGCTL_VERSION then latest, checksum, distribution.json); other rows byte-equal; main hunk",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "2. Entry Points"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_05845829294e08426b2f9395aab26d05",
@@ -867,14 +1141,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
       "targetAnchor": "unheaded-block-3",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: one table row now cites fgctl-init*.test.mjs with the shared fixture; equals main hunk",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ec9cbdb02d32abafa961280883c27c21451cd219d326901d115428856b42a39b",
       "targetAncestry": [
         "Verification: Install And Release Proof",
         "2. Proof Surfaces"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_8e98d801bec98373306633c016311e24",
@@ -884,14 +1164,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
       "targetAnchor": "unheaded-block-5",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: the fgctl-init test command line in the proof list expands to five test files; fence and neighbours unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6542d0d7e4c8eaaa77c4d1c39bbc7a332624be7ffea00a6ca0b5b5d567775d9e",
       "targetAncestry": [
         "Verification: Install And Release Proof",
         "3. Suggested Verification Commands"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_4217ac86de0ba075ca046202b2ce4284",
@@ -901,14 +1187,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-24",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: Lead carry in 6c6a65e85, item 1 of the stream list now covers -h and <verb> [<sub>] --help; bytes equal docs/io-contract.md hunk at line 86; rest of the unit verbatim",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221",
       "targetAncestry": [
         "CLI I/O Contract",
         "5. Reasoned Envelope Exceptions"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_0bf4d10d1c0f4cda16abe6091d639b64",
@@ -918,15 +1210,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-29",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: schema_version 3.0 fragment carried as the exact io-contract.md and work-state.md changed fragment; surrounding candidate clauses preserved; old 2.0 wording kept inside the new sentence",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_bc055098a9e2bedf2ed30ab0dfcacf79",
@@ -936,15 +1234,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-31",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: old block-30 to new block-31 (anchor shifts because the Sub-verb paragraph became a new block-30, a new unit not in this pack); carried text equals the io-contract.md hunk at line 124 and keeps the access-removal history",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_3d2d87a2a9582e2faebabc79470d8ee8",
@@ -954,14 +1258,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-93",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: RUL55 line in the candidate equals main docs/specs/work-state.md RUL55 byte for byte, old tail clause deleted and the 2026-10-14 extension added exactly as upstream; sibling RUL lines unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d8bf5e1f48a181d1cc996d8e39c12e715dbf18e894203ed47c457a4a3a4b8835",
       "targetAncestry": [
         "Work State Specification",
         "11. Business Rules"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_975c8349e0d069aabf88161d933f2228",
@@ -971,13 +1281,19 @@
       "disposition": "supersede",
       "targetOwner": "docs/reference/dispatch-module-boundaries.md",
       "targetAnchor": "unheaded-block-3",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: three table rows edited (prepare.mjs door wording, cli.mjs removed execute and log, dispatch.mjs guard); equals main hunk; the other rows byte-equal",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f181007d6c80684c15dc6211eb00115a238cdab88f22bec5eb2d50453454701c",
       "targetAncestry": [
         "`src/runner/dispatch` module boundaries"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
@@ -987,14 +1303,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-102",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: runner.md block-100 to 102 (anchor shifts by two); fgos-runner bullet drops --config with the RUL93 note and six source-file bullets are added (write-scope, units-source, account-pin, partial-writes, work-dispatch, operation-choice); every added line is in the main diff, old bullets verbatim",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3f6a59c3d3764c1b978073ad68eb16ce1b0382d6bf362815f45ad79dd1625224",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Pointers (implementation)"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_c2cb6de3e8b1288ed15fcd60f3154bbb",
@@ -1004,14 +1326,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-9",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+      "reviewNote": "deep: one inserted parenthetical that fgos-runner has no --config (RUL93); rest of block-9 verbatim; main hunk",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f14dad0a401a272c3f3606f6c1e458003aacc9b553636202bf42ec9fad29a3f0",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Data Dictionary"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     }
   ]
 }

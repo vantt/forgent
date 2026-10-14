@@ -103,7 +103,7 @@
       "targetAnchor": "routing-identities",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:27@2026-10-14",
       "rationale": "The committed reviewer rejected this specific binding: LEG:architecture/dispatch-control-plane.md#routing-identities -> architecture/dispatch-control-plane.md#routing-identities (supersede): Routing Identities target keeps the for[] binding path (lines 81-83) that contradicts resolve.mjs:255-266 where an executor for never binds a purpose; only prefer binds. The corrected current successor at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities now states the code-checked boundary in Routing Identities; evidence: src/runner/dispatch/resolve.mjs:25-66; src/runner/dispatch/resolve.mjs:255-309. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review. A31 boundary merge: current target imports main capability tool-executor restriction; the shown full source and target bind this conservation review only. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
       "beforeTargetedFix": {
@@ -114,10 +114,16 @@
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
       "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewNote": "deep: Heading section of the current Routing Identities; main's --for/--work sentence with the execute --assignment removal is in the target; remaining differences are earlier accepted corrections.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_0fc7c6e612423aa78420e2b5ad63f1bf",
@@ -191,13 +197,19 @@
       "targetAnchor": "component-internal-ownership",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:27@2026-10-14",
       "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "reviewNote": "deep: Source delta (dispatch-log bullet) equals the target delta line for line; Component-Internal Ownership section now has the dispatch-log removal wording.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c0bb4ead0f6620892a21de57af6673d4d2e2c67ae656917f1ee7f9a24363a67a",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_8ed451a179a884fe1b475149f75e2b26",
@@ -2267,7 +2279,7 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "component-internal-ownership",
       "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
         "targetAnchor": "component-internal-ownership",
@@ -2276,10 +2288,16 @@
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
       "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewNote": "deep: Block text unchanged by merge (lines moved 262 to 264); target section carries the corrected bullets including the new dispatch-log bullet.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c0bb4ead0f6620892a21de57af6673d4d2e2c67ae656917f1ee7f9a24363a67a",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_3eb1d76cbee05b14310c7bf9188db06d",
@@ -9244,7 +9262,7 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "routing-identities",
       "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
         "targetAnchor": "routing-identities",
@@ -9253,10 +9271,16 @@
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
       "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewNote": "deep: Source text unchanged by the merge; target section still carries the code fence and everything in the unit (0 source lines missing).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     }
   ],
   "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
@@ -9292,13 +9316,19 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "routing-identities",
       "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceAnchor": "unheaded-block-9",
+      "reviewNote": "deep: Old Routing Identities block-9 gap row; target section carries the corrected wording plus main's sentence.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
       "targetAncestry": [
         "Dispatch Control Plane"
       ],
-      "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
-      "sourceAnchor": "unheaded-block-9"
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_194da7d0a9b40e6ba93d40df2b58eaec",
@@ -9309,13 +9339,19 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "component-internal-ownership",
       "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceAnchor": "unheaded-block-31",
+      "reviewNote": "deep: Old block-31 gap row; successor section holds the new dispatch-log bullet in place of the old one.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c0bb4ead0f6620892a21de57af6673d4d2e2c67ae656917f1ee7f9a24363a67a",
       "targetAncestry": [
         "Dispatch Control Plane"
       ],
-      "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
-      "sourceAnchor": "unheaded-block-31"
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     }
   ]
 }

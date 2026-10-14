@@ -357,14 +357,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-81",
-      "targetUnitDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
       "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry.",
+      "reviewNote": "deep: previously ok in review-3-boundary-gaps, now pending with review fields cleared (no approval carry); target text digest 661c9e16 is unchanged at the prior unit and moved from block-79 to 81 only; source text is the older pre-main text and the main edit (RUL76 clause) is already inside the target",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
-      ]
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",

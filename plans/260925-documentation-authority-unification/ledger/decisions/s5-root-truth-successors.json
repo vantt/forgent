@@ -136,14 +136,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "unheaded-block-12",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
+      "reviewNote": "deep: successor of the old unit 8fc59c5d (predecessor id and old digest kept, recomputed from cd82746a8), new unit de888795 recomputes at b1e53b4fb; diff is the 3 decisions-pointer ops, pointers verified (docs/decisions/index.md exists, .bee and distill report absent), no approval carried",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "de888795c53722a1fceec49302307ace1e440cf43aa639e2d32fce78aad12273",
       "targetAncestry": [
         "Platform Foundations",
         "Luật nền platform forgent (Phase 0 — compound-learning stack)"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_eb0bf7783bb1b1027c012f050c782203",
@@ -153,14 +159,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-3",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
+      "reviewNote": "deep: successor of old unit c8fc6e5b to 21e9b6c7, both recompute; diff is tier to size, per-item TTL (leafTtlDays 0, ttlDays 7) and cleanup noop vs blocked, each verified in bin/fgos.mjs and cleanup-harness.mjs; pending, no approval carried",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "21e9b6c7342fa4e8f55cbc2f791698156e82ba65eeb4cacc8f80decfa70fc58c",
       "targetAncestry": [
         "Work State Specification",
         "2. Entry Points And Triggers"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_3c9b65402d8ece4ef57ad337ba5d9d72",
@@ -170,15 +182,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-39",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
+      "reviewNote": "deep: successor of old unit fadda0c2 to the corrected alias paragraph; verified aliases {decompose: planning} and 4 coding transitions by node import of domain-registry and domains/coding/workflows/feature.yaml:154-162; pending, no approval carried",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f092e335e21534b0c6d0a03e9d98b8b6311f62d646ae9216dafb872d86c23ba0",
       "targetAncestry": [
         "Work State Specification",
         "5. Workflow Step And Stage Model",
         "Planning Stage"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_1f9fb4feceda8f5bf6a18b151ce0a397",
@@ -188,14 +206,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-55",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
+      "reviewNote": "deep: successor of old unit 4b215c2f; take explicit id checks deps and lineage only when todo (bin/fgos.mjs take case), pick explicit id only checks existence and claim-port.mjs enforces status todo and leaf unmerged deps; corrected text matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b93b1271702eedfac07aee1897bce1aa36c6322ede478bf5b3df20194da452ad",
       "targetAncestry": [
         "Work State Specification",
         "7. Pull Door Take And Return"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_acab595482e4f9f7ae05e21a1a28f11b",
@@ -205,15 +229,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-64",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
+      "reviewNote": "deep: successor of old unit 6507aee6; init refused outside the main worktree at bin/fgos.mjs:4978-4984 init-in-worktree guard and detection wrapped in try/catch in case init, so the corrected Blocked-when is true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8c083fa704b78795877465578a80d3603ef9ef8bbf2f9000c1547daead10880f",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Init Verb"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_7c4295aa058b6a7fa5c6b945a0441a35",
@@ -223,15 +253,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-67",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
+      "reviewNote": "deep: successor of old unit 0cee9be2; submit rejects --tier as retired and reads size/rigor/kind/risk (bin/fgos.mjs submit case and submitWork, classify.mjs returns size/kind/risk, rigor only when passed); RUL60 title now matches the pointer",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "dbfcaa1881570e24492daa35eb776b4fbea75fab92318188517e6b81ee2bdbd2",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Submit Verb"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_02a2110f086ac00ef2d59c9d4d9afeb1",
@@ -241,15 +277,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-68",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
+      "reviewNote": "deep: successor of old unit ecb4ec26; discover rejects --tier and reads size/rigor/kind/risk, classificationPatchFromVerdict in src/intake/discovery.mjs patches size/rigor/kind/risk; corrected synopsis and four-flag text true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bc0b6df719a361a226f5f5c04024ef0cb5a149307ffccb2cbd07d1c556d51616",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Discover Verb"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry."
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     }
   ]
 }

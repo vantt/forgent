@@ -151,9 +151,9 @@
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "The complete heading from docs/specs/distribution.md#data-dictionary, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#data-dictionary. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "targetUnitDigest": "daf68f421dfeceaf353dae3acd35391978f7dd56e9f10b1a0d6d4d0a13d7380b",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "targetUnitDigest": "e8d05524cc8e6a78761cdc9da1fe7e6fe6fd2ad2726e398f3b6af1780f719487",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -471,9 +471,9 @@
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "The complete heading from docs/specs/distribution.md#business-rules, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#business-rules. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "targetUnitDigest": "675341c756080b8acf77769cafe1a61d87e3a70ef5546c9e3cf7884cb853fce3",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "targetUnitDigest": "20742a59e4e674df21d7d96d98e3a18aadf88e4d17d678c1880078520370b0ac",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -532,13 +532,13 @@
       "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
       "sourceUnitDigest": "7d3b22dcbeba036ee788b91dd1409d06f722321a5b10851c97cd677654203743",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "lịch-sử-quyết-định",
+      "targetAnchor": "l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "The complete heading from docs/specs/distribution.md#lịch-sử-quyết-định, under \"Lịch sử quyết định\", is retained at docs/platform/packaging-distribution/spec.md#lịch-sử-quyết-định. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "targetUnitDigest": "ac304b14f8b735b34c045e37fb6f686838cdfa55774338919cdf258cc85a3850",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "targetUnitDigest": "75835bc044b19fbcddfbe17788fe06579ba39bf2c99d1b381aa810e6390a9726",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -553,9 +553,9 @@
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "The complete heading from docs/specs/distribution.md#edge-cases-settled, under \"Edge Cases Settled\", is retained at docs/platform/packaging-distribution/spec.md#edge-cases-settled. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "targetUnitDigest": "27d796445bca33db32cf7b287a079e920f33f612ace58427a56f40ea607b3f66",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "A31 upstream distribution changes are now carried verbatim into the retained source detail: doctor-check registry entry, downloaded-tag pin and mandatory verification bullets, the dated upgrade follow-up, and the help-selector edge-case bullet. This unit binds the complete real current candidate counterpart by digest and ancestry. A22 independent conservation re-review is pending; no approval carry or code-truth certification.",
+      "targetUnitDigest": "70b3e24c7665deb086b89512653742923101d6225f10fe0b71857316abd91708",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
@@ -746,19 +746,19 @@
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-85",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-5, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-85. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream source successor: complete current table imported verbatim into the existing candidate owner; independent conservation review pending. No implementation truth approval. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "The historical source unit is superseded by its complete current retained distribution counterpart. The target now includes only the authorized upstream doctor-check, download pin/verification, dated upgrade follow-up or help-selector additions shown in the exact source-to-current diff. Its native digest differs from the historical source while heading ancestry is retained. A23 requires supersede because claim-bearing words changed; A22 requires pending independent conservation re-review with no approval carry or truth certification.",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-5",
+      "targetUnitDigest": "b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ],
-      "sourcePath": "docs/specs/distribution.md",
-      "sourceAnchor": "unheaded-block-5"
+      ]
     },
     {
       "claimId": "claim_bdeaa6f1cce78532047ba6bf959cc43a",
@@ -766,19 +766,19 @@
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-91",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-14, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-91. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "targetUnitDigest": "cdc65be47d5ab1b4f61dfdef36be58ea1c499cff90dd56e3b3bcb5431aa561f4",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "The historical source unit is superseded by its complete current retained distribution counterpart. The target now includes only the authorized upstream doctor-check, download pin/verification, dated upgrade follow-up or help-selector additions shown in the exact source-to-current diff. Its native digest differs from the historical source while heading ancestry is retained. A23 requires supersede because claim-bearing words changed; A22 requires pending independent conservation re-review with no approval carry or truth certification.",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-14",
+      "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Business Rules"
-      ],
-      "sourcePath": "docs/specs/distribution.md",
-      "sourceAnchor": "unheaded-block-14"
+      ]
     },
     {
       "claimId": "claim_45e83e644c43384e188c16e20172a52c",
@@ -786,19 +786,19 @@
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-92",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-15, under \"Lịch sử quyết định\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-92. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "targetUnitDigest": "b1e15730d97d645508d833b30133c31d6ac119466d80377b70c7815d0b8e08b3",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "The historical source unit is superseded by its complete current retained distribution counterpart. The target now includes only the authorized upstream doctor-check, download pin/verification, dated upgrade follow-up or help-selector additions shown in the exact source-to-current diff. Its native digest differs from the historical source while heading ancestry is retained. A23 requires supersede because claim-bearing words changed; A22 requires pending independent conservation re-review with no approval carry or truth certification.",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-15",
+      "targetUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
-        "Lịch sử quyết định"
-      ],
-      "sourcePath": "docs/specs/distribution.md",
-      "sourceAnchor": "unheaded-block-15"
+        "L\u1ecbch s\u1eed quy\u1ebft \u0111\u1ecbnh"
+      ]
     },
     {
       "claimId": "claim_8d6b06dae659395981e196d4f7d33c15",
@@ -806,19 +806,19 @@
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-93",
       "claimKind": "specification",
-      "disposition": "move",
+      "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-16, under \"Edge Cases Settled\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-93. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "targetUnitDigest": "adbe84814a993cfb5f57b2646665d448fe34ee2d2583e6b2f930855f035722e8",
+      "authoredBy": "codex-session:30@2026-10-15",
+      "rationale": "The historical source unit is superseded by its complete current retained distribution counterpart. The target now includes only the authorized upstream doctor-check, download pin/verification, dated upgrade follow-up or help-selector additions shown in the exact source-to-current diff. Its native digest differs from the historical source while heading ancestry is retained. A23 requires supersede because claim-bearing words changed; A22 requires pending independent conservation re-review with no approval carry or truth certification.",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-16",
+      "targetUnitDigest": "b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Edge Cases Settled"
-      ],
-      "sourcePath": "docs/specs/distribution.md",
-      "sourceAnchor": "unheaded-block-16"
+      ]
     }
   ]
 }

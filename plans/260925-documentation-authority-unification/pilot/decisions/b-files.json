@@ -35,14 +35,21 @@
       "targetOwner": "docs/specs/work-state.md",
       "targetAnchor": "unheaded-block-113",
       "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewNote": "deep: pilot gap row re-pin only, target anchor shifted by two after the upstream inserted blocks (0002 note); prior and current target unit have the same digest and ancestry and are unique in b1e53b4fb; reviewStatus reset to pending and no approval carried; pack source shown is the first of seven identical boilerplate units (arbitrary, see Notes), real conservation of that line is held by the identity rows",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "75563525a8cefd7b1bfa75c0b3ee3e7c9c995b17e5af5a25191b64b5ecbf0292",
       "targetAncestry": [
         "Spec: Work-State (tầng quản việc của forgent)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0002 — Mô hình việc phẳng"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14"
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
@@ -59,14 +66,21 @@
       "targetOwner": "docs/specs/work-state.md",
       "targetAnchor": "unheaded-block-122",
       "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewNote": "deep: pilot gap row re-pin only, target anchor shifted by two after the upstream inserted blocks (0004 Boi canh); prior and current target unit have the same digest and ancestry and are unique in b1e53b4fb; reviewStatus reset to pending and no approval carried; pack source shown is the first of seven identical boilerplate units (arbitrary, see Notes), real conservation of that line is held by the identity rows",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e64dd190deebcac53e83492fe91319c1fced7ca4a6054a2b4c4745821020e531",
       "targetAncestry": [
         "0002 — Mô hình việc phẳng",
         "0004 — Phạm vi & non-goal",
         "Bối cảnh"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14"
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_7a0776311f7105750a4f234681f513a3",
@@ -75,14 +89,21 @@
       "targetOwner": "docs/specs/work-state.md",
       "targetAnchor": "unheaded-block-134",
       "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewNote": "deep: pilot gap row re-pin only, target anchor shifted by two after the upstream inserted blocks (0007 Boi canh); prior and current target unit have the same digest and ancestry and are unique in b1e53b4fb; reviewStatus reset to pending and no approval carried; pack source shown is the first of seven identical boilerplate units (arbitrary, see Notes), real conservation of that line is held by the identity rows",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
       "targetAncestry": [
         "0002 — Mô hình việc phẳng",
         "0007 — Tiến hoá schema & event",
         "Bối cảnh"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14"
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
@@ -91,14 +112,21 @@
       "targetOwner": "docs/specs/work-state.md",
       "targetAnchor": "unheaded-block-140",
       "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewNote": "deep: pilot gap row re-pin only, target anchor shifted by two after the upstream inserted blocks (0011 Boi canh); prior and current target unit have the same digest and ancestry and are unique in b1e53b4fb; reviewStatus reset to pending and no approval carried; pack source shown is the first of seven identical boilerplate units (arbitrary, see Notes), real conservation of that line is held by the identity rows",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f0eb277249c05d987db88e8f1d6b6889788206f611c9b07aa9dc74e49982edee",
       "targetAncestry": [
         "0002 — Mô hình việc phẳng",
         "0011 — Version tường minh cho mọi contract",
         "Bối cảnh"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14"
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
@@ -107,14 +135,21 @@
       "targetOwner": "docs/specs/work-state.md",
       "targetAnchor": "unheaded-block-146",
       "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewNote": "deep: pilot gap row re-pin only, target anchor shifted by two after the upstream inserted blocks (0012 Boi canh); prior and current target unit have the same digest and ancestry and are unique in b1e53b4fb; reviewStatus reset to pending and no approval carried; pack source shown is the first of seven identical boilerplate units (arbitrary, see Notes), real conservation of that line is held by the identity rows",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba",
       "targetAncestry": [
         "0002 — Mô hình việc phẳng",
         "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
         "Bối cảnh"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14"
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     },
     {
       "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
@@ -123,14 +158,21 @@
       "targetOwner": "docs/specs/work-state.md",
       "targetAnchor": "unheaded-block-170",
       "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewNote": "deep: pilot gap row re-pin only, target anchor shifted by two after the upstream inserted blocks (0024 Boi canh); prior and current target unit have the same digest and ancestry and are unique in b1e53b4fb; reviewStatus reset to pending and no approval carried; pack source shown is the first of seven identical boilerplate units (arbitrary, see Notes), real conservation of that line is held by the identity rows",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bc40e0a51da3f0b6c1bc1f2d9e080ca9425d47377adf8516d68d3017e61c10d2",
       "targetAncestry": [
         "0002 — Mô hình việc phẳng",
         "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
         "Bối cảnh"
       ],
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:27@2026-10-14"
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     }
   ],
   "claims": []

@@ -6672,13 +6672,19 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "sourcePath": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "sourceAnchor": "unheaded-block-11",
+      "reviewNote": "deep: Old 685-line prompt block stays verbatim in the literal snapshot (target digest unchanged).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f961caf92280854444e1b95118a9f279f20116913c16634978122a8256524070",
       "targetAncestry": [
         "Historical File: still-consumed cognitive prompt; mixed manual runtime instructions superseded by registered skill"
       ],
-      "sourcePath": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
-      "sourceAnchor": "unheaded-block-11"
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     }
   ]
 }
