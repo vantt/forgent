@@ -619,3 +619,24 @@ test('N2: fixConfinementBackendRegistryReadable returns skipped contract on corr
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('defaultConfinementTempRoots includes the tempRoot and the privateHomeRoot a registered backend declares', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-roots-registry-'));
+  const previous = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  try {
+    const registryPath = path.join(dir, 'confinement-backends.json');
+    fs.writeFileSync(registryPath, JSON.stringify({
+      contract: 'confinement-backend-registry.v1',
+      confinementBackends: { bwrap: { type: 'bwrap', tempRoot: path.join(dir, 'temp'), privateHomeRoot: path.join(dir, 'homes') } },
+    }));
+    process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = registryPath;
+    const roots = defaultConfinementTempRoots();
+    assert.ok(roots.includes(path.join(dir, 'temp')), 'the backend tempRoot is scanned');
+    assert.ok(roots.includes(path.join(dir, 'homes')), 'the backend privateHomeRoot is scanned');
+    assert.ok(roots.includes(path.join(os.tmpdir(), 'fgos-confinement')), 'the default root stays');
+  } finally {
+    if (previous === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = previous;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

@@ -55,6 +55,7 @@ const LOCK_MARGIN_MS = 30 * 1000;
 const COOLDOWN_FILE = 'cooldown.json';
 const PENDING_DIR = 'pending';
 const SCRATCH_PREFIX = 'scratch-';
+const STAGING_PREFIX = '.tmp-';
 export const MAX_PENDING_COPIES = 5;
 const TORN_DIR = 'torn';
 
@@ -398,8 +399,10 @@ function ompEntries(db) {
 const ompLayout = {
   name: 'omp-agent-db',
   files: ['agent.db'],
-  // Written beside the store while it is open (write-ahead log, or rollback journal in another mode); a login
-  // renewed after the last checkpoint lives only here. The shared-memory index (`-shm`) carries no data.
+  // Written beside the store while it is open. A login renewed after the last checkpoint lives only in the
+  // write-ahead log. A hot rollback journal holds the pages as they were before the transaction, so it is kept
+  // for the files it guards, not for a newer login: a copy staged with one stays for hand recovery. The
+  // shared-memory index (`-shm`) carries no data, and SQLite rebuilds it from the log.
   sidecars: ['agent.db-wal', 'agent.db-journal'],
   read(home, { loadSqlite }) {
     const file = path.join(home, 'agent.db');
@@ -464,7 +467,7 @@ const ompLayout = {
     if (snapshotSqliteFile(path.join(copyHome, 'agent.db'), destination, { loadSqlite })) return;
     // No snapshot (the module is unavailable, or the file cannot be opened): the files as they are, write-ahead
     // log and rollback journal included. The pane's processes are already stopped, so nothing is writing to them.
-    for (const suffix of ['', '-wal', '-journal', '-shm']) {
+    for (const suffix of ['', '-wal', '-journal']) {
       const from = path.join(copyHome, `agent.db${suffix}`);
       try {
         fs.statSync(from);
@@ -648,7 +651,8 @@ function listLeftovers(accountDir) {
 const hasLeftovers = (accountDir) => listLeftovers(accountDir).length > 0;
 
 /**
- * Accounts whose pending copies exceed MAX_PENDING_COPIES, `[{provider, accountId, count}]`. Nothing is
+ * Login stores whose pending copies exceed MAX_PENDING_COPIES, `[{provider, accountId, store, count}]`
+ * (`store`: the CLI of a per-CLI store, null for an account's single store). Nothing is
  * dropped to get back under the limit unless it is a redundant duplicate, so an account can stay over it.
  */
 export function inspectPendingCopiesOverLimit({ runtimeDir }) {
@@ -661,15 +665,93 @@ export function inspectPendingCopiesOverLimit({ runtimeDir }) {
     for (const accountId of subdirs(path.join(root, provider))) {
       const accountDir = path.join(root, provider, accountId);
       // An account with one login store per CLI keeps each store's pending copies under stores/<cli>.
-      const storeDirs = [accountDir, ...subdirs(path.join(accountDir, 'stores')).map((cli) => path.join(accountDir, 'stores', cli))];
-      for (const storeDir of storeDirs) {
+      const storeDirs = [{ store: null, dir: accountDir }, ...subdirs(path.join(accountDir, 'stores')).map((cli) => ({ store: cli, dir: path.join(accountDir, 'stores', cli) }))];
+      for (const { store, dir: storeDir } of storeDirs) {
         let count = 0;
         try { count = fs.readdirSync(path.join(storeDir, PENDING_DIR)).filter((n) => !n.startsWith('.')).length; } catch { /* none */ }
-        if (count > MAX_PENDING_COPIES) found.push({ provider, accountId, count });
+        if (count > MAX_PENDING_COPIES) found.push({ provider, accountId, store, count });
       }
     }
   }
   return found;
+}
+
+// ---------------------------------------------------------------------------------------------------
+// Interrupted stagings: `pending/.tmp-<pid>-<id>` is a copy being staged. A crash before the rename leaves it
+// behind, possibly part of a login, and the leftover listing skips hidden names, so nothing applies it. It is
+// reported, and removed only when it is provably not needed.
+// ---------------------------------------------------------------------------------------------------
+
+function listInterruptedStagings(storeDir) {
+  const pendingDir = path.join(storeDir, PENDING_DIR);
+  try {
+    return fs.readdirSync(pendingDir).filter((n) => n.startsWith(STAGING_PREFIX)).sort().map((n) => path.join(pendingDir, n));
+  } catch { return []; }
+}
+
+// A staging whose writer is still running is being written, not left behind. The pid is in the name; one that
+// cannot be read or looked up counts as alive, so an unclear case is kept.
+function stagingWriterAlive(dir) {
+  const pid = Number(/^\.tmp-(\d+)-/.exec(path.basename(dir))?.[1]);
+  if (!Number.isInteger(pid) || pid <= 0) return true;
+  try { process.kill(pid, 0); return true; } catch (err) { return err?.code !== 'ESRCH'; }
+}
+
+// Every file under `dir` as `[relative name, bytes]`, sorted; null when anything cannot be read.
+function treeBytes(dir, base = dir) {
+  const out = [];
+  try {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        const inner = treeBytes(full, base);
+        if (inner === null) return null;
+        out.push(...inner);
+      } else if (entry.isFile()) out.push([path.relative(base, full), fs.readFileSync(full)]);
+      else return null;
+    }
+  } catch { return null; }
+  return out;
+}
+
+function treesIdentical(a, b) {
+  const x = treeBytes(a);
+  const y = treeBytes(b);
+  if (x === null || y === null || x.length !== y.length) return false;
+  return x.every(([name, bytes], i) => name === y[i][0] && bytes.equals(y[i][1]));
+}
+
+/**
+ * Remove the interrupted stagings that are provably not needed: the writer is gone and the staging is either
+ * empty or byte for byte the same as a copy the account already keeps in `pending/` (or `torn/`) of the same
+ * store. Anything else stays and keeps being reported. Read-write on `pending/` only; counts, no names.
+ */
+export function sweepInterruptedStagings({ runtimeDir } = {}) {
+  const result = { removed: 0, kept: 0 };
+  const root = path.join(runtimeDir, 'account-locks');
+  const subdirs = (dir) => {
+    try { return fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); } catch { return []; }
+  };
+  for (const provider of subdirs(root)) {
+    for (const accountId of subdirs(path.join(root, provider))) {
+      const accountDir = path.join(root, provider, accountId);
+      const storeDirs = [accountDir, ...subdirs(path.join(accountDir, 'stores')).map((cli) => path.join(accountDir, 'stores', cli))];
+      for (const storeDir of storeDirs) {
+        const kept = [];
+        try { for (const n of fs.readdirSync(path.join(storeDir, PENDING_DIR))) if (!n.startsWith('.')) kept.push(path.join(storeDir, PENDING_DIR, n)); } catch { /* none */ }
+        try { for (const n of fs.readdirSync(path.join(storeDir, TORN_DIR))) if (!n.startsWith('.')) kept.push(path.join(storeDir, TORN_DIR, n)); } catch { /* none */ }
+        for (const staging of listInterruptedStagings(storeDir)) {
+          if (stagingWriterAlive(staging)) continue;
+          let names;
+          try { names = fs.readdirSync(staging); } catch { result.kept += 1; continue; }
+          const unneeded = names.length === 0 || kept.some((copy) => treesIdentical(staging, copy));
+          if (!unneeded) { result.kept += 1; continue; }
+          try { fs.rmSync(staging, { recursive: true, force: true }); result.removed += 1; } catch { result.kept += 1; }
+        }
+      }
+    }
+  }
+  return result;
 }
 
 /**
@@ -699,7 +781,8 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
       const tornIn = (dir) => { try { return fs.readdirSync(path.join(dir, TORN_DIR)).filter((n) => !n.startsWith('.')).map((n) => path.join(dir, TORN_DIR, n)); } catch { return []; } };
       for (const storeDir of storeDirs) {
         const stranded = readStoreDirs !== null && !readStoreDirs.has(storeDir);
-        for (const dir of [...listLeftovers(storeDir), ...tornIn(storeDir)]) {
+        const interrupted = listInterruptedStagings(storeDir).filter((d) => !stagingWriterAlive(d));
+        for (const dir of [...listLeftovers(storeDir), ...tornIn(storeDir), ...interrupted]) {
           const name = path.basename(dir);
           const staged = /^(\d{15})-/.exec(name);
           let at;
@@ -707,7 +790,8 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
           else { try { at = fs.statSync(dir).mtimeMs; } catch { continue; } }
           const ageMs = now - at;
           const torn = path.basename(path.dirname(dir)) === TORN_DIR;
-          if (ageMs >= minAgeMs || torn) found.push({ provider, accountId, kind: torn ? 'torn' : staged ? 'pending' : 'scratch', ageMs, storeDir, stranded });
+          const staging = name.startsWith(STAGING_PREFIX);
+          if (ageMs >= minAgeMs || torn || staging) found.push({ provider, accountId, kind: torn ? 'torn' : staging ? 'staging' : staged ? 'pending' : 'scratch', ageMs, storeDir, stranded });
         }
       }
     }

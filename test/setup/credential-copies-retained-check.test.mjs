@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 import { checkCredentialCopiesRetained, fixCredentialCopiesRetained, checkConfinementOrphanedResourcesReaped } from '../../src/setup/registrations.mjs';
 import { extendOwnershipMarker, writeOwnershipMarker, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
@@ -225,5 +226,38 @@ test('without a readable inventory the layout is not judged and the copies keep 
     const result = runWith(w, undefined, now);
     assert.equal(result.passed, true);
     assert.match(result.message, /a dispatch for that account applies them/);
+  } finally { w.cleanup(); }
+});
+
+test('an interrupted staging is reported with its own wording, and the fix removes only one that is provably not needed', () => {
+  const w = workspace();
+  try {
+    const pendingDir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'pending');
+    const dead = spawnSync(process.execPath, ['-e', '0']).pid;
+    const put = (name, content) => {
+      const dir = path.join(pendingDir, name);
+      fs.mkdirSync(dir, { recursive: true });
+      if (content !== undefined) fs.writeFileSync(path.join(dir, 'auth.json'), content);
+    };
+    put('000000000001000-aaaa', FAKE_TOKEN);
+    put(`.tmp-${dead}-same`, FAKE_TOKEN);
+    put(`.tmp-${dead}-only`, 'ONLY-COPY-BYTES');
+    const before = run(w);
+    assert.match(before.message, /xai\/acct: 2 interrupted staging\(s\)/);
+    assert.equal(before.message.includes(FAKE_TOKEN), false);
+    assert.equal(before.message.includes('ONLY-COPY-BYTES'), false);
+    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], runtimeDir: w.runtimeDir });
+    assert.equal(fixed.changed, true);
+    assert.match(fixed.message, /interrupted staging\(s\): 1 removed, 1 kept/);
+    assert.match(run(w).message, /xai\/acct: 1 interrupted staging\(s\)/);
+  } finally { w.cleanup(); }
+});
+
+test('an over-limit store is named by its CLI in the doctor line', () => {
+  const w = workspace();
+  try {
+    const storeDir = path.join(w.runtimeDir, 'account-locks', 'openai', 'acct', 'stores', 'codex', 'pending');
+    for (let i = 0; i < 6; i += 1) fs.mkdirSync(path.join(storeDir, `${String(1000 + i).padStart(15, '0')}-copy`), { recursive: true });
+    assert.match(run(w).message, /openai\/acct \(store codex\): 6 pending login copies waiting, over the limit/);
   } finally { w.cleanup(); }
 });

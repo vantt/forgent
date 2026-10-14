@@ -341,8 +341,8 @@ export function ensureMachineBackendRegistryDefaults(registryPath = resolveMachi
 }
 
 /**
- * Every temp root private homes can live under: the default one plus each registered backend's own
- * `tempRoot`. An unreadable or malformed registry is reported by its own doctor check; the default root
+ * Every root private homes can live under: the default temp root plus each registered backend's own
+ * `tempRoot` and `privateHomeRoot`. An unreadable or malformed registry is reported by its own doctor check; the default root
  * alone is used meanwhile.
  */
 export function defaultConfinementTempRoots() {
@@ -350,7 +350,10 @@ export function defaultConfinementTempRoots() {
   try {
     const registry = loadMachineBackendRegistry();
     for (const instance of Object.values(registry?.confinementBackends || {})) {
-      if (instance?.config?.tempRoot) roots.add(instance.config.tempRoot);
+      // A registered instance is its own config (spec §6.2): `tempRoot` and `privateHomeRoot` sit on it.
+      // A private home is allocated under `privateHomeRoot` when the backend sets one (resources.mjs).
+      if (instance?.tempRoot) roots.add(instance.tempRoot);
+      if (instance?.privateHomeRoot) roots.add(instance.privateHomeRoot);
     }
   } catch { /* the default root only */ }
   return [...roots];
