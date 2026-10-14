@@ -772,7 +772,7 @@ test('settleClaim({ patch }) runs full editWork validation suite (Finding P2 fix
   );
 });
 
-test('Finding 3 regression test: read-only assignment committing a new file leaves checkout clean after failing closed', async () => {
+test('read-only assignment whose checkout gains a commit during the run is accepted with a warning and nothing is rolled back', async () => {
   const tempDir = mkTempDir();
   execSync('git init', { cwd: tempDir, stdio: 'ignore' });
   execSync('git config user.name "Test" && git config user.email "test@test.local"', { cwd: tempDir, stdio: 'ignore' });
@@ -846,10 +846,14 @@ test('Finding 3 regression test: read-only assignment committing a new file leav
     runnerConfig: cfg,
   });
 
-  assert.equal(runResult.status, 'failed');
-  assert.equal(runResult.confidence, 'failed');
+  // A snapshot cannot tell this worker's commit from another session's on the same
+  // checkout, so the change is a warning, not a refusal.
+  assert.notEqual(runResult.status, 'failed');
+  assert.notEqual(runResult.classification.policy?.disposition, 'refuse');
   assert.ok(runResult.evidence.changedFiles.some((f) => f.includes('new-from-readonly.txt')), 'changedFiles must record the mutated file');
-  assert.equal(fs.existsSync(newFilePath), true, 'read-only execution must fail closed without automatic destructive file rollback');
+  assert.deepEqual(runResult.warnings?.map((w) => w.code), ['read-only-mutation-correlated']);
+  assert.ok(runResult.warnings[0].paths.some((f) => f.includes('new-from-readonly.txt')), 'the warning names the changed file');
+  assert.equal(fs.existsSync(newFilePath), true, 'nothing is rolled back: the change may be another session\'s');
 });
 
 

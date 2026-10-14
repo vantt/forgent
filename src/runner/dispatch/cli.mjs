@@ -145,15 +145,14 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
  * A round settles when the worker writes its own result file. That establishes
  * the worker DID something; it establishes nothing about WHERE. Measured: agy
  * was given a worktree, reported settled, and had written six files into the
- * main checkout instead -- onto another track's branch. Nothing in the ladder
- * can catch that, because the ladder's whole subject is whether the round
- * ended, not where it ran.
+ * main checkout instead -- onto another track's branch.
  *
  * This compares the main checkout's dirty paths before and after. It is
- * EVIDENCE, not proof: the main checkout is a live working tree and somebody
- * else may dirty it while a round is in flight, so the refusal below names
- * what it observed rather than asserting who did it. A false positive costs a
- * re-run; the failure it exists to catch costs a stranger's branch.
+ * EVIDENCE, not proof: the main checkout is a live working tree other sessions
+ * write to while a round is in flight (measured 2026-10-14: a Doer's whole
+ * round was refused for three reports another session wrote into main). So
+ * what it sees is reported as a warning on the result, never a refusal; a
+ * refusal needs a write observed and bound to the run, which this is not.
  *
  * Nothing is watched when the worker was given the repo root itself as its
  * workspace -- there is no outside to write to.
@@ -184,17 +183,23 @@ export function watchWritesOutsideWorkspace({ repoRoot, cwd }) {
 }
 
 /**
- * The error a settled-but-misplaced round becomes. `worktree-fail` is the
- * existing class for "the isolated checkout was not respected", so the
- * recovery matrix already knows to retry it a bounded number of times rather
- * than treating it as a worker that needs a person.
+ * The warning a round carries when paths outside its workspace became dirty
+ * while it ran, or null when none did. Correlated evidence only: it names what
+ * appeared and where, and says nothing about who wrote it. Also printed to
+ * stderr so a caller reading only the process output sees it.
  */
-export function strayWriteError({ workId, tier, model, cwd, repoRoot, strayPaths }) {
-  return new DispatchError(
-    'worktree-fail',
-    `executor for work "${workId}" reported success but wrote outside its workspace. It was given ${cwd}; these paths became dirty in ${repoRoot} during the round: ${strayPaths.join(', ')}. The round is refused rather than accepted: work in the wrong checkout is not this item's work, and it may belong to whoever else has that checkout open.`,
-    { workId, tier, model, reason: 'wrote-outside-workspace', cwd, repoRoot, strayPaths },
+export function strayWriteWarning({ repoRoot, strayPaths }) {
+  if (!Array.isArray(strayPaths) || strayPaths.length === 0) return null;
+  process.stderr.write(
+    `fgos: warning: paths outside the worker's workspace became dirty in ${repoRoot} during the round (another session may have written them): ${strayPaths.join(', ')}\n`,
   );
+  return {
+    code: 'stray-write-correlated',
+    level: 'correlated',
+    basis: ['pre-post-git-snapshot'],
+    repoRoot,
+    paths: strayPaths,
+  };
 }
 
 export function openRunnerRun({ fgosDir, workId, executorId, cwd }) {
@@ -880,10 +885,7 @@ export async function executeExecutorCli(
     opened.closeRun('settled');
 
     // Same question as the runner path asks: the round ended, but where?
-    const strayPaths = outsideWatch.strayPaths();
-    if (strayPaths.length > 0) {
-      throw strayWriteError({ workId: executorId, tier, model, cwd, repoRoot: root, strayPaths });
-    }
+    const strayWarning = strayWriteWarning({ repoRoot: root, strayPaths: outsideWatch.strayPaths() });
 
     const headAfter = captureHeadSha(cwd);
     const dirtyAfter = checkoutDirtyPaths(root, cwd);
@@ -902,6 +904,7 @@ export async function executeExecutorCli(
     const resultToBuild = {
       ...execResult,
       attestation: result?.attestation,
+      ...(strayWarning ? { warnings: [strayWarning] } : {}),
     };
     const base = buildDispatchResult({ mechanism, result: resultToBuild, headBefore, headAfter, lostUncommittedPaths, provider, command });
     return resolvedByPurpose ? { ...base, executorId } : base;

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - A headless round that stops because the provider account used up its quota (codex "You've hit your usage limit") now settles as `provider-limit` with `failure.cause: quota` instead of a generic non-zero exit, so a Workflow unit or `execute --contract` moves to another account or candidate, and a leased account waits out the reset time the provider printed.
+- A dispatch round is no longer refused because files changed in a shared checkout while it ran (`wrote-outside-workspace`, `read-only-mutation`, `mutated-dirty-before-files`). A before/after snapshot cannot tell the worker's writes from another session's, so the round is accepted and the paths are reported in its result as `warnings` (`stray-write-correlated`, `read-only-mutation-correlated`, `mutated-dirty-before-correlated`) and on stderr. A write proven to be the run's own would still be refused; nothing proves one yet.
 - An Assignment run's `result.json` now names the sandbox it really ran under in `confinement` (`bwrap`), read from the launch the Confinement Authority prepared or the dispatch's enforced attestation; it was always `null` before, even for sandboxed seats.
 
 ## [v0.2.0-rc.5] - 2026-10-14

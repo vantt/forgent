@@ -99,20 +99,28 @@ test('evaluateAttributionPolicy: allows safe execution within write scope', () =
   assert.equal(policy.code, null);
 });
 
-test('evaluateAttributionPolicy: refuses when pre-existing dirty files are mutated', () => {
+// A before/after snapshot shows what changed, never who changed it: every
+// finding it supports is reported as a warning and the round is accepted. Only
+// a write proven to belong to the run (a run-bound observer's attestation,
+// within its coverage) is refused.
+
+test('evaluateAttributionPolicy: a mutated pre-existing dirty file is a warning, not a refusal', () => {
   const policy = evaluateAttributionPolicy({
     attributions: [
       { path: 'docs/dirty.md', level: 'correlated', firstObserved: 'pre-launch' },
     ],
-    isReadOnly: false,
+    isReadOnly: true,
     mutatedDirtyBeforeFiles: ['docs/dirty.md'],
   });
 
-  assert.equal(policy.disposition, 'refuse');
-  assert.equal(policy.code, 'mutated-dirty-before-files');
+  assert.equal(policy.disposition, 'allow');
+  assert.equal(policy.code, null);
+  assert.deepEqual(policy.warnings, [
+    { code: 'mutated-dirty-before-correlated', level: 'correlated', basis: ['dirty-before-hash-changed'], paths: ['docs/dirty.md'] },
+  ]);
 });
 
-test('evaluateAttributionPolicy: refuses when read-only operation mutates workspace files', () => {
+test('evaluateAttributionPolicy: a correlated change under a read-only operation is a warning, not a refusal', () => {
   const policy = evaluateAttributionPolicy({
     attributions: [
       { path: 'src/mutated.mjs', level: 'correlated', firstObserved: 'post-run' },
@@ -120,11 +128,28 @@ test('evaluateAttributionPolicy: refuses when read-only operation mutates worksp
     isReadOnly: true,
   });
 
-  assert.equal(policy.disposition, 'refuse');
-  assert.equal(policy.code, 'read-only-mutation');
+  assert.equal(policy.disposition, 'allow');
+  assert.deepEqual(policy.warnings, [
+    { code: 'read-only-mutation-correlated', level: 'correlated', basis: ['pre-post-git-snapshot'], paths: ['src/mutated.mjs'] },
+  ]);
 });
 
-test('evaluateAttributionPolicy: refuses when changes occur outside declared write scope', () => {
+test('evaluateAttributionPolicy: a proven write under a read-only operation is refused', () => {
+  const policy = evaluateAttributionPolicy({
+    attributions: [
+      { path: 'src/mutated.mjs', level: 'proven', firstObserved: 'post-run' },
+      { path: 'docs/bystander.md', level: 'correlated', firstObserved: 'post-run' },
+    ],
+    isReadOnly: true,
+  });
+
+  assert.equal(policy.disposition, 'refuse');
+  assert.equal(policy.code, 'read-only-mutation');
+  assert.match(policy.reason, /src\/mutated\.mjs/);
+  assert.doesNotMatch(policy.reason, /bystander/);
+});
+
+test('evaluateAttributionPolicy: a correlated change outside the declared write scope is a warning', () => {
   const policy = evaluateAttributionPolicy({
     attributions: [
       { path: 'docs/outside.md', level: 'correlated', firstObserved: 'post-run' },
@@ -133,8 +158,21 @@ test('evaluateAttributionPolicy: refuses when changes occur outside declared wri
     writeScope: ['src/'],
   });
 
+  assert.equal(policy.disposition, 'allow');
+  assert.deepEqual(policy.warnings.map((w) => [w.code, w.paths]), [['outside-write-scope-correlated', ['docs/outside.md']]]);
+});
+
+test('evaluateAttributionPolicy: a proven write outside the declared write scope is refused', () => {
+  const policy = evaluateAttributionPolicy({
+    attributions: [
+      { path: 'docs/outside.md', level: 'proven', firstObserved: 'post-run' },
+    ],
+    isReadOnly: false,
+    writeScope: ['src/'],
+  });
+
   assert.equal(policy.disposition, 'refuse');
-  assert.equal(policy.code, 'outside-workspace-change-correlated');
+  assert.equal(policy.code, 'outside-write-scope');
 });
 
 test('evaluateAttributionPolicy: refuses contradictory worker claim while keeping input evidence', () => {

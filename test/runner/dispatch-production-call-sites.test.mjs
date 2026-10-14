@@ -370,37 +370,35 @@ test('a caller that supplies its own run directory keeps it', { skip: process.pl
   }
 });
 
-test('a worker that reports success from the wrong checkout is refused, and the stray paths are named', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
-  // The failure this closes was measured, not imagined: agy was handed a
+test('a worker that writes into the main checkout instead of its workspace is flagged in the result, and the stray paths are named', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
+  // The failure this guards was measured, not imagined: agy was handed a
   // worktree, wrote six files into the main checkout -- onto a branch
-  // belonging to somebody else's work -- and reported settled. The ladder
-  // cannot see it: its subject is whether the round ended, never where.
+  // belonging to somebody else's work -- and reported settled. A snapshot of
+  // the main checkout cannot tell that worker from another session writing
+  // there at the same time, so the round is accepted and the paths travel as
+  // a warning on its result instead of a refusal.
   const root = fixtureRepo();
   const worktree = path.join(root, 'wt');
   fs.mkdirSync(worktree, { recursive: true });
   // The worker writes into the repo root instead of the worktree it was given.
   mockHerdr(root, { writesTo: path.join(root, 'src', 'setup') });
   try {
-    await assert.rejects(
-      () => withMockHerdr(path.join(root, 'herdr'), () => executeExecutorCli('herdr-worker', {
-        prompt: 'do the thing',
-        repoRoot: root,
-        cwd: worktree,
-        tier: 'standard',
-      })),
-      (err) => {
-        assert.equal(err.errorClass, 'worktree-fail');
-        assert.equal(err.reason, 'wrote-outside-workspace');
-        // git collapses a wholly-untracked directory to one entry, so what is
-        // named here is `src/` rather than the file inside it. In the incident
-        // this guards against the directory already existed and git listed the
-        // individual files; either way the refusal points at where to look.
-        assert.ok(err.strayPaths.some((p) => p.startsWith('src')),
-          `the refusal names where it appeared, got: ${JSON.stringify(err.strayPaths)}`);
-        assert.match(err.message, /wrote outside its workspace/);
-        return true;
-      },
-    );
+    const res = await withMockHerdr(path.join(root, 'herdr'), () => executeExecutorCli('herdr-worker', {
+      prompt: 'do the thing',
+      repoRoot: root,
+      cwd: worktree,
+      tier: 'standard',
+    }));
+    assert.equal(res.status, 0);
+    const [warning] = res.warnings ?? [];
+    assert.equal(warning?.code, 'stray-write-correlated');
+    assert.equal(warning?.level, 'correlated');
+    // git collapses a wholly-untracked directory to one entry, so what is
+    // named here is `src/` rather than the file inside it. In the incident
+    // this guards against the directory already existed and git listed the
+    // individual files; either way the warning points at where to look.
+    assert.ok(warning.paths.some((p) => p.startsWith('src')),
+      `the warning names where it appeared, got: ${JSON.stringify(warning.paths)}`);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -419,6 +417,7 @@ test('a worker that stays in its workspace is not accused of anything', { skip: 
       tier: 'standard',
     }));
     assert.equal(res.status, 0);
+    assert.equal(res.warnings, undefined, 'nothing appeared outside the workspace, so nothing is flagged');
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

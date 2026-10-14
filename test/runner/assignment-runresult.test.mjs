@@ -672,9 +672,11 @@ test('executeAssignment persists mutatedDirtyBeforeFiles (in both evidence.json 
 
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
 
-  // A read-only op that mutates a pre-existing dirty file must fail closed.
-  assert.equal(runOutcome(result).category, 'policy');
-  assert.equal(runOutcome(result).evidence, 'failed');
+  // A changed pre-existing dirty file is correlated evidence (another session may
+  // have edited it): the run is not refused, and the change is named as a warning.
+  assert.notEqual(runOutcome(result).category, 'policy');
+  assert.equal(result.classification.policy?.disposition === 'refuse', false);
+  assert.deepEqual(result.warnings?.map((w) => [w.code, w.paths]), [['mutated-dirty-before-correlated', ['preexisting-dirty.txt']]]);
   assert.deepEqual(result.evidence.mutatedDirtyBeforeFiles, ['preexisting-dirty.txt'],
     'result.json evidence must persist the mutated pre-existing dirty file (R6)');
 

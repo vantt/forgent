@@ -21,7 +21,7 @@ import {
   resolveAgentTypeForTaskSpec,
   openRunnerRun,
   watchWritesOutsideWorkspace,
-  strayWriteError,
+  strayWriteWarning,
 } from './dispatch/cli.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHints, buildPrompt } from './work-compat.mjs';
 import { getDomain, resolveDomainName, effectiveStep, bundleForStep } from '../state/domain-registry.mjs';
@@ -262,14 +262,12 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     (doorResult) => {
       closeRun('settled');
       // Settling says the worker finished. It does not say where.
-      const strayPaths = outsideWatch.strayPaths();
-      if (strayPaths.length > 0) {
-        throw strayWriteError({ workId: work.id, tier, model, cwd, repoRoot: repoRootForWatch, strayPaths });
-      }
+      const strayWarning = strayWriteWarning({ repoRoot: repoRootForWatch, strayPaths: outsideWatch.strayPaths() });
       const execResult = doorResult?.result ?? doorResult;
       return {
         ...execResult,
         attestation: doorResult?.attestation,
+        ...(strayWarning ? { warnings: [strayWarning] } : {}),
         templateName,
         templateHash,
         executorId,

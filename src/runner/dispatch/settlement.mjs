@@ -22,7 +22,7 @@ import { markRunSettled } from './visibility-session.mjs';
 import { normalizeRunResultV2, normalizeRunResultV3, interpretRunResult } from './run-result.mjs';
 import { validateAgentResultClaim, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
-import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
+import { attributeWorkspaceChanges, evaluateAttributionPolicy } from './evidence-attribution.mjs';
 import { parseUsageForAdapter } from './usage-parsers.mjs';
 
 export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
@@ -261,8 +261,8 @@ function classifyEvidenceToOutcomeFacts({
   claimInvalid = false,
   workerArtifacts = [],
   changedFiles = [],
-  hasDirtyBeforeMutation = false,
   isReadOnlyOperation = true,
+  attributionRefusal = null,
   role,
   assignment,
 }) {
@@ -314,15 +314,17 @@ function classifyEvidenceToOutcomeFacts({
     };
   }
 
-  const hasExternalEvidence = changedFiles.length > 0 || hasDirtyBeforeMutation;
+  const hasExternalEvidence = changedFiles.length > 0;
 
-  if (isReadOnlyOperation && hasExternalEvidence) {
+  // Only a write proven to be the run's own is refused (evaluateAttributionPolicy);
+  // a change merely seen across the run travels as a warning instead.
+  if (attributionRefusal) {
     return {
       execStatus: 'failed',
       confidenceLevel: 'failed',
       verdict: 'not-applicable',
-      failure: { family: 'policy', code: 'read-only-mutation' },
-      policy: { disposition: 'refuse', code: 'read-only-mutation' },
+      failure: { family: 'policy', code: attributionRefusal.code },
+      policy: { disposition: 'refuse', code: attributionRefusal.code },
     };
   }
 
@@ -706,6 +708,14 @@ export async function settleRunOutcome({
     stdout: stdoutContent,
     stderr: stderrContent,
   });
+  // A before/after snapshot of the run's checkout cannot tell the run's writes from
+  // another session's (a commit landing on a shared checkout mid-run moves HEAD), so
+  // every change it shows is correlated: no attestation is passed, nothing is proven.
+  const attributionPolicy = evaluateAttributionPolicy({
+    attributions: attributeWorkspaceChanges({ postRunDirt: changedFiles }),
+    isReadOnly,
+    mutatedDirtyBeforeFiles,
+  });
   const evidenceFacts = classifyEvidenceToOutcomeFacts({
     exitCode,
     signal,
@@ -714,8 +724,8 @@ export async function settleRunOutcome({
     claimInvalid,
     workerArtifacts: workerArtifactPaths,
     changedFiles,
-    hasDirtyBeforeMutation: mutatedDirtyBeforeFiles.length > 0,
     isReadOnlyOperation: isReadOnly,
+    attributionRefusal: attributionPolicy.disposition === 'refuse' ? attributionPolicy : null,
     role: assignment?.role,
     assignment,
   });
@@ -730,6 +740,7 @@ export async function settleRunOutcome({
     executorId: resolvedExecutorId || runMeta.executorId || null,
     adapter: opts?.adapter || (resolvedExecutorId?.includes('herdr') ? 'herdr-spawn' : 'cli-spawn'),
     confinement: ranConfinementBackend(runDir, launchCommandId, attestation),
+    warnings: attributionPolicy.warnings,
     role: assignment?.role ?? null,
     ...(effectivePolicy ? { policy: effectivePolicy, executorRedirected } : {}),
     settledAt,
