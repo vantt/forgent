@@ -5440,7 +5440,10 @@ export function checkCredentialCopiesRetained({
   inventory,
   inventoryUnreadable,
 } = {}) {
-  const copies = inspectRetainedCredentialCopies({ runtimeDir, now, minAgeMs, inventory });
+  // Without the provider inventory no store layout can be judged: every copy is listed at any age, and none
+  // is said to wait for a dispatch, which could not run on a config that cannot be read either.
+  const unjudged = inventory === undefined;
+  const copies = inspectRetainedCredentialCopies({ runtimeDir, now, minAgeMs: unjudged ? 0 : minAgeMs, inventory });
   const stranded = copies.filter((c) => c.stranded);
   // A kept home under a root no reaper or dispatch retries (a registered backend's own root) never counts its
   // own attempts up, so it is held from the start: doctor fails naming it and --fix settles it. A root nested
@@ -5460,23 +5463,28 @@ export function checkCredentialCopiesRetained({
   // a failure (nothing but the owner or a repair clears it); copies waiting for a renewal are a warning. A copy
   // in a store directory the account's layout no longer reads is never applied, so it fails like a held home
   // at any age, and it is only named, never applied to the new layout's stores or dropped.
+  const unjudgedCopies = unjudged && copies.length + overLimit.length > 0;
   const problems = [
-    ...overLimit.map((a) => (a.stranded
+    ...(unjudgedCopies
+      ? [
+        `login store layout not checked: ${inventoryUnreadable ?? 'no provider account inventory was read'}`,
+        ...overLimit.map((a) => `${a.provider}/${a.accountId}${a.store ? ` (store ${a.store})` : ''}: ${a.count} pending login copies, over the limit of ${MAX_PENDING_COPIES} (whether a dispatch re-checks them is not known until the provider inventory can be read; the limit drops only copies identical to another, never one that may be the only valid login)`),
+        ...summarizeByAccount(copies.filter((c) => c.kind !== 'torn' && c.kind !== 'staging'), 'login copy(ies) kept (whether a dispatch applies them is not known until the provider inventory can be read)'),
+      ]
+      : []),
+    ...(unjudgedCopies ? [] : overLimit).map((a) => (a.stranded
       ? `${a.provider}/${a.accountId}: ${a.count} pending login copies at ${a.storeDir}, over the limit of ${MAX_PENDING_COPIES}, in a directory the account's login store layout no longer reads (no dispatch re-checks or drops them; recover the logins by hand)`
       : `${a.provider}/${a.accountId}${a.store ? ` (store ${a.store})` : ''}: ${a.count} pending login copies waiting, over the limit of ${MAX_PENDING_COPIES} (the limit drops only copies identical to another, never one that may be the only valid login; a dispatch for that account re-checks them, and if the source stays unreadable recover the logins by hand)`)),
     ...strandedByStore(stranded.filter((c) => c.kind !== 'torn'), 'login copy(ies) that no dispatch applies'),
     ...strandedByStore(stranded.filter((c) => c.kind === 'torn'), 'half-written login copy(ies) kept for hand recovery'),
-    ...summarizeByAccount(copies.filter((c) => c.kind !== 'torn' && c.kind !== 'staging' && !c.stranded), 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)'),
+    ...(unjudgedCopies ? [] : summarizeByAccount(copies.filter((c) => c.kind !== 'torn' && c.kind !== 'staging' && !c.stranded), 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)')),
     ...summarizeByAccount(copies.filter((c) => c.kind === 'staging' && !c.stranded), 'interrupted staging(s) of a login copy (a crash cut the copy short; "fgos doctor --fix" removes one that is empty, identical to a copy already kept, or shown by the source login of the account to be no newer, any other stays for hand recovery)'),
     ...summarizeByAccount(copies.filter((c) => c.kind === 'torn' && !c.stranded), 'half-written login copy(ies) kept for hand recovery (never applied or dropped automatically)'),
     ...held.map((home) => `${home.provider}/${home.accountId}: private home held ${home.attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS ? 'after repeated staging failures' : 'under a root that nothing retries by itself'}, ${formatAge(home.ageMs)} old, at ${home.dir} ("fgos doctor --fix" re-checks it and removes it once its login is shown to be applied or obsolete; otherwise recover the login from it by hand)`),
     ...summarizeByAccount(retrying, 'private home(s) kept after a staging failure, retried by the reaper'),
-    ...(inventory === undefined && copies.length + overLimit.length > 0
-      ? [`login store layout not checked (${inventoryUnreadable ?? 'no provider account inventory read'}), so a copy no dispatch reads is not told apart`]
-      : []),
   ];
   const text = problems.join('; ');
-  return held.length > 0 || stranded.length > 0 || overLimit.some((a) => a.stranded) ? { passed: false, message: text } : { passed: true, message: `warning: ${text}` };
+  return held.length > 0 || stranded.length > 0 || overLimit.some((a) => a.stranded) || unjudgedCopies ? { passed: false, message: text } : { passed: true, message: `warning: ${text}` };
 }
 
 function strandedByStore(copies, what) {
@@ -5495,11 +5503,19 @@ function strandedByStore(copies, what) {
  * `{ inventoryUnreadable }` with the reason when the global config cannot be read or is invalid. The
  * inventory lives only in the global config, so this never depends on the directory doctor runs in.
  */
-export function readDoctorProviderInventory(globalConfigPath) {
+export function readDoctorProviderInventory(globalConfigPath = path.join(os.homedir(), '.fgos', 'config.json')) {
+  // The reason names only an error code or class and the config path, never the error message: a parse
+  // message can quote part of the file.
+  let config;
   try {
-    return { inventory: providerAccountInventory(loadGlobalConfig(globalConfigPath)?.runner ?? {}) };
+    config = loadGlobalConfig(globalConfigPath);
   } catch (err) {
-    return { inventoryUnreadable: `provider account inventory not readable: ${err.message}` };
+    return { inventoryUnreadable: `global config unreadable (${err?.code ?? 'not valid JSON or not readable'}) at ${globalConfigPath}` };
+  }
+  try {
+    return { inventory: providerAccountInventory(config?.runner ?? {}) };
+  } catch (err) {
+    return { inventoryUnreadable: `global config refused by the provider inventory validator (${err?.code ?? err?.name ?? 'error'}) at ${globalConfigPath}` };
   }
 }
 

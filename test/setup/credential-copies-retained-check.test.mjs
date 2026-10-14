@@ -36,7 +36,25 @@ function addKeptHome(w, dispatchId, attempts, { provider = 'xai', accountId = 'a
   return dir;
 }
 
-const run = (w, now = Date.now()) => checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot], retriedRoots: [w.tempRoot], now });
+// The inventory that reads every account directory on disk the way its own layout says: a directory with
+// stores/<cli> belongs to a per-CLI account, any other to a single-store one. These tests are about what a
+// readable inventory leaves waiting; the layout judgement has tests of its own.
+function inventoryOfDisk(w) {
+  const root = path.join(w.runtimeDir, 'account-locks');
+  const dirs = (dir) => { try { return fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); } catch { return []; } };
+  const inventory = {};
+  for (const provider of dirs(root)) {
+    inventory[provider] = { accounts: {} };
+    for (const accountId of dirs(path.join(root, provider))) {
+      const clis = dirs(path.join(root, provider, accountId, 'stores'));
+      inventory[provider].accounts[accountId] = clis.length > 0
+        ? { credentialSources: Object.fromEntries(clis.map((cli) => [cli, { kind: 'codex-home', home: '/x' }])) }
+        : { credentialSource: { kind: 'codex-home', home: '/x' } };
+    }
+  }
+  return inventory;
+}
+const run = (w, now = Date.now()) => checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot], retriedRoots: [w.tempRoot], now, inventory: inventoryOfDisk(w) });
 
 test('a clean machine passes', () => {
   const w = workspace();
@@ -217,15 +235,35 @@ test('copies of an account the inventory no longer lists are named for hand reco
   } finally { w.cleanup(); }
 });
 
-test('without a readable inventory the layout is not judged and the copies keep the waiting wording', () => {
+test('without a readable inventory the check fails, says the layout was not checked, and promises nothing about a dispatch', () => {
   const w = workspace();
   try {
     const now = Date.now();
     addPendingIn(w, 'openai', 'acct', 'stores/pi', now - 3 * 24 * HOUR);
-    const result = runWith(w, undefined, now);
-    assert.equal(result.passed, true);
-    assert.match(result.message, /a dispatch for that account applies them/);
+    for (let i = 0; i < 6; i += 1) addPendingIn(w, 'openai', 'other', '.', now - (3 + i) * 24 * HOUR);
+    const result = checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot], retriedRoots: [w.tempRoot], now, inventoryUnreadable: 'global config unreadable (test) at /x' });
+    assert.equal(result.passed, false);
+    assert.match(result.message, /login store layout not checked: global config unreadable \(test\) at \/x/);
+    assert.equal(result.message.includes('a dispatch for that account applies them'), false);
+    assert.equal(result.message.includes('a dispatch for that account re-checks them'), false);
+    assert.match(result.message, /openai\/acct: 1 login copy\(ies\) kept/);
+    assert.match(result.message, /openai\/other: 6 pending login copies, over the limit/);
   } finally { w.cleanup(); }
+});
+
+test('without a readable inventory a young copy is still listed, and with nothing retained there is nothing to fail', () => {
+  const w = workspace();
+  try {
+    addPendingIn(w, 'openai', 'acct', '.', Date.now() - 60 * 1000);
+    const young = checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot], retriedRoots: [w.tempRoot], inventoryUnreadable: 'global config unreadable (test) at /x' });
+    assert.equal(young.passed, false);
+    assert.match(young.message, /login store layout not checked/);
+    assert.match(young.message, /openai\/acct: 1 login copy\(ies\) kept/);
+  } finally { w.cleanup(); }
+  const empty = workspace();
+  try {
+    assert.equal(checkCredentialCopiesRetained({ runtimeDir: empty.runtimeDir, roots: [empty.tempRoot], retriedRoots: [empty.tempRoot] }).passed, true);
+  } finally { empty.cleanup(); }
 });
 
 // A process id above the kernel's limit: signalling it always says "no such process".
@@ -474,18 +512,36 @@ test('the registered check reads the global inventory even from a directory with
     assert.equal(result.passed, false, result.message);
     assert.match(result.message, /openai-codex\/acct: 1 login copy\(ies\) that no dispatch applies/);
     assert.equal(result.message.includes(FAKE_TOKEN), false);
+    // A copy in the store the account declares waits for a renewal, which only a really read inventory can say:
+    // with no global config at all every account directory would read as stranded.
+    const declared = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai-codex', 'acct', 'stores', 'codex', 'pending', `${String(Date.now() - 3 * 24 * HOUR).padStart(15, '0')}-abcd`);
+    fs.mkdirSync(declared, { recursive: true });
+    const again = withHome(home, () => entry.check(home));
+    assert.match(again.message, /openai-codex\/acct: 1 pending login copy\(ies\) waiting for a renewal \(a dispatch for that account applies them\)/);
+    assert.equal(again.message.includes(path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai-codex', 'acct', 'stores', 'codex') + ' '), false, 'the declared store is not named as stranded');
   } finally { fs.rmSync(home, { recursive: true, force: true }); }
 });
 
-test('the registered check says the layout was not checked when the global config cannot be read', () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cred-doctor-home-'));
-  try {
-    fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-    fs.writeFileSync(path.join(home, '.fgos', 'config.json'), '{ not json');
-    const pending = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai', 'acct', 'pending', `${String(Date.now() - 3 * 24 * HOUR).padStart(15, '0')}-abcd`);
-    fs.mkdirSync(pending, { recursive: true });
-    const entry = DOCTOR_CHECKS.find((c) => c.id === 'credential-copies-retained');
-    const result = withHome(home, () => entry.check(home));
-    assert.match(result.message, /login store layout not checked \(provider account inventory not readable: /);
-  } finally { fs.rmSync(home, { recursive: true, force: true }); }
+test('the registered check fails with the reason when the global config cannot be read, and never echoes what the file says', () => {
+  for (const [label, content, wantReason] of [
+    ['not json', '{ "runner": { "x": "LOOKS-LIKE-A-SECRET-VALUE" } oops', /global config unreadable \(not valid JSON or not readable\)/],
+    ['refused by the validator', JSON.stringify({ runner: { providers: { openai: { accounts: { acct: { unknownKey: true } } } } } }), /global config refused by the provider inventory validator/],
+  ]) {
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cred-doctor-home-'));
+    try {
+      fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
+      fs.writeFileSync(path.join(home, '.fgos', 'config.json'), content);
+      const pending = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai', 'acct', 'pending', `${String(Date.now() - 60 * 1000).padStart(15, '0')}-abcd`);
+      fs.mkdirSync(pending, { recursive: true });
+      const entry = DOCTOR_CHECKS.find((c) => c.id === 'credential-copies-retained');
+      const result = withHome(home, () => entry.check(home));
+      assert.equal(result.passed, false, label);
+      assert.match(result.message, wantReason, label);
+      assert.ok(result.message.includes(path.join(home, '.fgos', 'config.json')), 'the config path is named');
+      assert.equal(result.message.includes('LOOKS-LIKE-A-SECRET-VALUE'), false, label);
+      assert.equal(/position|Expected|Unexpected|unknown key/i.test(result.message), false, `no parser or validator text (${label}): ${result.message}`);
+      assert.equal(result.message.includes('a dispatch for that account applies them'), false);
+      assert.match(result.message, /openai\/acct: 1 login copy\(ies\) kept/, 'a young copy is listed too');
+    } finally { fs.rmSync(home, { recursive: true, force: true }); }
+  }
 });
