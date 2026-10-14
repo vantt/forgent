@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "beforeCommit": "01fe216b469626feaa2340ea702a85d9a84e8ac0",
+  "scope": "docs/platform/work-state/contracts/cli-io-contract.md#entry-fields-and-effect-axes",
+  "reviewedPilotBRows": [
+    {
+      "shardPath": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "previousDecision": {
+        "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "sourceUnitDigest": "c219ee825c3475e6",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-31",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "reviewed",
+        "rationale": "Code is truth for both effect axes and the whole source field definition. Owner A15 resolves SC-1: the stale exclusive only-review-and-approve assertion is superseded by the current registry contract and a run example, not coordination. Actual --help --json exposes 15 externalEffect verbs including run and no coordination verb. The candidate preserves the source field definitions and corrects its obsolete enumeration; independent review of this changed binding is pending.",
+        "reviewNote": "SC-1 changed row (contract, supersede). work-state.md L665-676 (unheaded-block-67) -> contracts/cli-io-contract.md#unheaded-block-31 L269-279. Source says \"hôm nay chỉ `review` và `approve` mang externalEffect: true\"; code (--help --json and COMMAND_REGISTRY) has 15 such verbs incl. run and no coordination, so the exclusive claim is stale and is replaced by a deferral to `fgos --help --json` plus examples review/approve/run (all real). Surrounding text compared by diff: touchesState/externalEffect definitions, review touchesState:false rationale, declarative-only/STR38 clause byte-identical; the HEAD target no longer contains `coordination`. Dropped only the false exclusivity; review's --github rationale is kept in the first sentences of the same unit. Both digests recomputed with scripts/generate-doc-inventory.mjs extractor at HEAD and d870fe07 and match; at 54c2698ee the target digest differed (expected, 32-hex 9880ec12... -> full 97e66153...).",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+        "reviewedAt": "2026-10-09",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+      },
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-31",
+        "githubAnchor": "unheaded-block-31",
+        "stableAnchor": "unheaded-block-31",
+        "title": "Unheaded block 31",
+        "startLine": 269,
+        "endLine": 279,
+        "textDigest": "97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2",
+        "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+        "identityFingerprint": "3af72bffebc103ef51db09c2ff3a68c0bf73bd58a9673ee25c5537f7715ea90d",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — xem `fgos --help --json` cho danh sách hiện hành mang `externalEffect: true` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+      }
+    },
+    {
+      "shardPath": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "previousDecision": {
+        "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
+        "sourceUnitDigest": "39e4ab1f30a6acc9",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "reviewed",
+        "rationale": "Code is truth for the whole effect-axis field list. Owner A15 resolves SC-1: replace the retired coordination example with run, preserving every other entry-field definition and qualifier. The actual current machine-readable manifest has 15 externalEffect verbs including run and no coordination verb; both candidate examples now agree. This corrected whole-unit carry supersedes the stale source example, not a claim of verbatim copying or a silent partial carry. Independent review is pending.",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "reviewNote": "supersede of docs/io-contract.md#unheaded-block-19 into cli-io-contract.md#unheaded-block-32 (contract). Whole 5-bullet field list compared line by line via git diff: only the example verb changed `coordination` -> `run`; qualifiers (\"dispatch executor thật tính là effect ngoài .fgos/\", review mutation/--github rationale, \"xem fgos --help --json\" deferral) intact. Code check: manifest has 15 externalEffect verbs incl. run, no coordination; examples review/approve/run all present. Target bytes at HEAD and d870fe07 hash to the stated digest; rationale does not claim verbatim copying.",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+        "reviewedAt": "2026-10-09",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-io-contract.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+      },
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 291,
+        "textDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "23e79b860ebcfeacc7ad826543bdf91857ea11d7ff168b28ea8ae92955ec5d27",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Xem `fgos --help --json` cho\n  danh sách hiện hành mang `externalEffect: true` (ví dụ `review`, `approve`,\n  `run` — dispatch executor thật tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      }
+    },
+    {
+      "shardPath": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "previousDecision": {
+        "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+        "sourceUnitDigest": "78393c0183b6bda3",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-33",
+        "claimKind": "contract",
+        "disposition": "merge",
+        "reviewStatus": "reviewed",
+        "rationale": "Both axes remain declarative only; the who-may-call-which-verb gate belongs to STR38. Carried verbatim under Entry Fields And Effect Axes, where work-state.md 665-676 states the same declarative-only point.",
+        "authoredBy": "codex-session:1@2026-10-08",
+        "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L139-140 -> target L293-294 (contract/merge); target text byte-equal to source; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+        "reviewedAt": "2026-10-09",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      },
+      "target": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-33",
+        "githubAnchor": "unheaded-block-33",
+        "stableAnchor": "unheaded-block-33",
+        "title": "Unheaded block 33",
+        "startLine": 293,
+        "endLine": 294,
+        "textDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+        "sample": "Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38.",
+        "identityFingerprint": "09c3e021c9425c045fe449a643d34c2a0822b5ab6874cf19bff4bead073bf38c",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38."
+      }
+    }
+  ],
+  "historicalHeldSC1Rows": [
+    "claim_ce947d10ed900598bde4df5b552e0265",
+    "claim_e2377849e4ba8e3d3beaf70880e4ed23"
+  ],
+  "resumeFact": "Both historically held SC-1 rows were independently accepted under A15 in October 9 reports; they are nevertheless reopened for this Step 5 edit, without approval carry."
+}
