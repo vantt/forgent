@@ -73,7 +73,7 @@ When a workflow step declares a human gate (`gate: { kind: "human" }`) or when a
 
 ## 3. Execution Invariants
 
-- **G2 Non-Infrastructure:** Presets and plans do not pin providers; an ad-hoc Unit (one-liner `--provider`, `prefer` in a `--units` file) may carry a soft `prefer` that `bind()` tries first and fails over from. Nothing pins executors, models, tiers, or invocations; those are resolved solely by `bind()`.
+- **G2 Non-Infrastructure:** Units, presets, plans, and driver prompts never pin executors, providers, models, tiers, or invocations; an ad-hoc Unit (one-liner `--provider`, `prefer` in a `--units` file) may carry a soft `prefer` that `bind()` tries first and fails over from. Only a human `--override` or `execute <executor>` pins; everything else is resolved by `bind()`.
 - **Runner Commits, Worker Does Not:** A writing Unit's brief lists its write scope; the worker edits files and stops, never running `git add`/`git commit`. After a passing round the runner commits only paths inside the Unit's `writes` (subject from the first line of the worker's `summary`); a path the worker needs outside that scope goes in `needsWrites`, not on disk.
 - **G7 Herdr Default:** All out-of-process unit runs default to spawning in a watched `herdr` terminal pane when herdr is available, falling back to `cli` when headless.
 - **Fail-Closed Mutating Gate:** Every file mutation runs strictly inside an isolated linked git worktree matching the Unit run specification.
