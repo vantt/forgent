@@ -7,6 +7,8 @@
 // - Policy decides whether the round may be accepted.
 // These dimensions are independent and stored/read independently.
 
+import { matchesWriteScope } from './write-scope.mjs';
+
 export const ATTRIBUTION_LEVELS = Object.freeze(['proven', 'correlated', 'excluded', 'unattributed']);
 export const POLICY_DISPOSITIONS = Object.freeze(['allow', 'refuse', 'needs-input', 'not-applicable']);
 
@@ -123,8 +125,8 @@ export function attributeWorkspaceChanges({
 function checkCoverage(filePath, declaredCoverage) {
   if (!declaredCoverage) return false;
   const paths = declaredCoverage.paths || declaredCoverage.writeScope || [];
-  if (!Array.isArray(paths)) return false;
-  return paths.some((p) => p === filePath || filePath.startsWith(p.endsWith('/') ? p : `${p}/`));
+  if (!Array.isArray(paths) || paths.length === 0) return false;
+  return matchesWriteScope(filePath, paths);
 }
 
 function checkAttestation(filePath, adapterAttestation) {
@@ -203,7 +205,7 @@ export function evaluateAttributionPolicy({
     };
   }
 
-  const inScope = (p) => writeScope.some((scoped) => p === scoped || p.startsWith(scoped.endsWith('/') ? scoped : `${scoped}/`));
+  const inScope = (p) => matchesWriteScope(p, writeScope);
   const hasScope = Array.isArray(writeScope) && writeScope.length > 0;
   if (hasScope) {
     const provenOutside = proven.filter((a) => !inScope(a.path));

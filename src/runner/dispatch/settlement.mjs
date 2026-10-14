@@ -708,6 +708,10 @@ export async function settleRunOutcome({
     }
   }
 
+  // The scope the assignment declared (a unit's writes): a change inside it is covered, one outside
+  // it warns. Coverage says "inside the declared scope", never "written by this run".
+  const declaredWrites = Array.isArray(assignment?.writes) && assignment.writes.length > 0 ? assignment.writes : null;
+  const declaredCoverage = declaredWrites ? { paths: declaredWrites } : null;
   const evidenceData = {
     operationMutability: isReadOnly ? 'read-only' : 'mutates-repo',
     gitBefore,
@@ -718,7 +722,7 @@ export async function settleRunOutcome({
     mutatedDirtyBeforeFiles,
     changedFiles,
     changedFileReasons,
-    attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: resolvedDirtyAfter }),
+    attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: resolvedDirtyAfter, declaredCoverage }),
     artifacts: workerArtifacts,
     tests: [],
     ...(providerCapacityFault ? { providerCapacity: providerCapacityFault } : {}),
@@ -740,8 +744,9 @@ export async function settleRunOutcome({
   // another session's (a commit landing on a shared checkout mid-run moves HEAD), so
   // every change it shows is correlated: no attestation is passed, nothing is proven.
   const attributionPolicy = evaluateAttributionPolicy({
-    attributions: attributeWorkspaceChanges({ postRunDirt: changedFiles }),
+    attributions: attributeWorkspaceChanges({ postRunDirt: changedFiles, declaredCoverage }),
     isReadOnly,
+    writeScope: declaredWrites,
     mutatedDirtyBeforeFiles,
   });
   const evidenceFacts = classifyEvidenceToOutcomeFacts({

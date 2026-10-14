@@ -185,3 +185,35 @@ test('evaluateAttributionPolicy: refuses contradictory worker claim while keepin
   assert.equal(policy.disposition, 'refuse');
   assert.equal(policy.code, 'contradictory-worker-claim');
 });
+
+// Coverage and the policy's scope read a declared scope through the one shared matcher: a file,
+// a directory, a glob, and any spelling of the same entry are one scope.
+test('attributeWorkspaceChanges: coverage reads declared writes through the shared matcher', () => {
+  const coverage = (paths, file) => attributeWorkspaceChanges({ postRunDirt: [file], declaredCoverage: { paths } })[0].coverageMatched;
+  assert.equal(coverage(['docs/a.md'], 'docs/a.md'), true);
+  assert.equal(coverage(['docs'], 'docs/guide/a.md'), true);
+  assert.equal(coverage(['./docs'], 'docs/a.md'), true);
+  assert.equal(coverage(['docs//'], 'docs/a.md'), true);
+  assert.equal(coverage(['src/**/*.mjs'], 'src/runner/x.mjs'), true);
+  assert.equal(coverage(['*.md'], 'README.md'), true);
+  assert.equal(coverage(['docs'], 'docs-old/a.md'), false);
+  assert.equal(coverage(['src/**/*.mjs'], 'src/runner/x.json'), false);
+  assert.equal(coverage(['**'], '.fgos/state.json'), false);
+  assert.equal(coverage([], 'docs/a.md'), false);
+});
+
+test('evaluateAttributionPolicy: no outside-scope warning for a file inside a glob, a ./ entry or a directory entry', () => {
+  const warn = (writeScope, files) => evaluateAttributionPolicy({
+    attributions: files.map((p) => ({ path: p, level: 'correlated', firstObserved: 'post-run' })),
+    writeScope,
+  }).warnings.filter((w) => w.code === 'outside-write-scope-correlated').flatMap((w) => w.paths);
+  assert.deepEqual(warn(['./docs'], ['docs/a.md']), []);
+  assert.deepEqual(warn(['src/**/*.mjs'], ['src/runner/x.mjs', 'src/runner/x.json']), ['src/runner/x.json']);
+  assert.deepEqual(warn(['docs/a.md', 'plans/*/reports/**'], ['plans/p1/reports/r.md', 'docs/b.md']), ['docs/b.md']);
+});
+
+test('evaluateAttributionPolicy: a proven write inside a glob scope is allowed, outside it refused', () => {
+  const policy = (p) => evaluateAttributionPolicy({ attributions: [{ path: p, level: 'proven', firstObserved: 'post-run' }], writeScope: ['src/**/*.mjs'] });
+  assert.equal(policy('src/a/b.mjs').disposition, 'allow');
+  assert.equal(policy('src/a/b.json').code, 'outside-write-scope');
+});

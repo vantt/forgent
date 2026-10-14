@@ -1650,3 +1650,72 @@ test('done findings survive both settlement branches; verified mutating work sti
     }
   }
 });
+
+// A round's changes are matched against the scope its assignment declared: inside it they are
+// covered, outside it they warn. Without a declared scope, coverage was never checked at all.
+function scopedWriteRun({ writes, claim }) {
+  const tempDir = mkTempDir();
+  execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: tempDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tempDir, 'README.md'), 'seed\n');
+  execFileSync('git', ['add', '.'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'seed'], { cwd: tempDir, stdio: 'ignore' });
+  const executorScript = path.join(os.tmpdir(), `fgos-scoped-writer-${path.basename(tempDir)}.mjs`);
+  fs.writeFileSync(executorScript, `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    fs.mkdirSync(path.join(cwd, 'docs', 'guide'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, 'docs', 'guide', 'a.md'), 'inside\\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, 'src', 'out.mjs'), 'outside\\n');
+    const runsDir = path.join(cwd, '.fgos', 'assignments');
+    for (const asgn of fs.readdirSync(runsDir)) {
+      const runDir = path.join(runsDir, asgn, 'runs', '01');
+      if (fs.existsSync(runDir)) fs.writeFileSync(path.join(runDir, 'agent-result.json'), ${JSON.stringify(JSON.stringify(claim))});
+    }
+    process.exit(0);
+  `);
+  const runnerConfig = {
+    executors: { claude: { kind: 'agent', command: process.execPath, args: [executorScript, '{prompt}'], allowCrossProvider: true } },
+    modelPolicies: { claude: { standard: 'test-model' } },
+    timeoutMs: 5000,
+  };
+  const declared = buildAssignment({ workId: `tsk-scoped-${path.basename(tempDir).slice(-6).toLowerCase()}`, stage: 'executing', operation: 'implement-item' });
+  const assignment = writes === undefined ? declared : { ...declared, writes };
+  return executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+}
+
+const DONE_CLAIM = {
+  contract: { id: 'agent-result-claim', version: 2 },
+  status: 'done',
+  summary: 'docs(guide): write the guide',
+  needsWrites: ['src/out.mjs'],
+};
+
+test('a change inside the declared writes is covered and only the one outside warns; both attribution passes read the scope', async () => {
+  const result = await scopedWriteRun({ writes: ['./docs'], claim: DONE_CLAIM });
+  const byPath = Object.fromEntries(result.evidence.attribution.map((a) => [a.path, a]));
+  assert.equal(byPath['docs/guide/a.md'].coverageMatched, true);
+  assert.equal(byPath['docs/guide/a.md'].level, 'correlated', 'coverage is not authorship: no attestation, still correlated');
+  assert.equal(byPath['src/out.mjs'].coverageMatched, false);
+  const outside = (result.warnings ?? []).filter((w) => w.code === 'outside-write-scope-correlated');
+  assert.deepEqual(outside.map((w) => w.paths), [['src/out.mjs']]);
+  assert.equal(result.classification.policy.disposition, 'allow');
+});
+
+test('needsWrites leaves a claim valid and reaches the RunResult agentClaim unchanged', async () => {
+  const result = await scopedWriteRun({ writes: ['docs/**/*.md'], claim: DONE_CLAIM });
+  assert.notEqual(result.classification.outcome.category, 'failed');
+  assert.deepEqual(result.agentClaim.needsWrites, ['src/out.mjs']);
+  const byPath = Object.fromEntries(result.evidence.attribution.map((a) => [a.path, a]));
+  assert.equal(byPath['docs/guide/a.md'].coverageMatched, true, 'a glob entry covers a file it matches whole');
+});
+
+test('an assignment without writes keeps the old attribution: nothing covered, no scope warning', async () => {
+  const result = await scopedWriteRun({ writes: undefined, claim: DONE_CLAIM });
+  assert.ok(result.evidence.attribution.length >= 2);
+  assert.ok(result.evidence.attribution.every((a) => a.coverageMatched === false));
+  assert.equal((result.warnings ?? []).some((w) => w.code === 'outside-write-scope-correlated'), false);
+});
