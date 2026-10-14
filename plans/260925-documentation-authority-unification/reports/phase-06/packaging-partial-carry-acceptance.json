@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rule": "A34",
+  "residualFile": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-residual.json",
+  "residualSha256": "064d821db2dc6079b72323900f75c2a1870f25e7649210df9f129243bd9b5a29",
+  "rows": [
+    {
+      "claimId": "claim_dc75ad7e62660d3711910c31e2882533",
+      "sourceUnitDigest": "3b4563ef12a08c63362ee6a262109828d32f9515918343fe1ae56a55e54ece59",
+      "targetUnitDigest": "6cc6e399493acc5297347592b2c25321f3966e749515b140164c6d2afe66963e",
+      "residualSha256": "064d821db2dc6079b72323900f75c2a1870f25e7649210df9f129243bd9b5a29",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-03.md",
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940",
+      "cutoverObligation": true
+    }
+  ],
+  "strictE": "red; partial-carry disposition unchanged; acceptance revoked on any digest drift"
+}

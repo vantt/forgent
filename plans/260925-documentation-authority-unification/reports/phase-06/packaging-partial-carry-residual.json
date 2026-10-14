@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "rule": "A34",
+  "ownerAnswerCommit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
+  "sourceCommit": "478c54d67c4721d495687a88408780f82235f793",
+  "rows": [
+    {
+      "claimId": "claim_dc75ad7e62660d3711910c31e2882533",
+      "disposition": "partial-carry",
+      "reviewNote": "Heading title carried at architecture/runtime-identity-and-activation.md#historical-decisions-promoted-or-tracked with empty payload; ledger remainder names the full settled-facts table (dev:<rev> row included) as deferred to the stub; stub row 12d5dbb2 holds the 18 non-dev rows so nothing is orphaned; stays an open cutover obligation",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-03.md",
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940",
+      "remainderDescription": "The full compound settled-facts table, including the dev:<rev> clause, is deferred as a separate source unit to the Dev Source Activation Restoration Stub. Its other clauses are retained in that stub companion table; dev restoration remains Plan C.",
+      "source": {
+        "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "anchor": "historical-decisions-promoted-or-tracked",
+        "unitDigest": "3b4563ef12a08c63362ee6a262109828d32f9515918343fe1ae56a55e54ece59",
+        "shownText": "## Historical Decisions Promoted Or Tracked\n\n| Decision | Status |\n|---|---|\n| Runtime identity is digest-based, not PATH-based. | Settled for V1. |\n| `artifactDigest` is the digest of the canonical release tree manifest, not an archive digest. | Settled for V1. |\n| Release tree manifest uses normalized logical paths and refuses symlinks/case collisions in V1. | Settled for V1. |\n| Project commands enter through stable local shims under workspace `.fgos/installation/bin/`. | Settled for V1. |\n| Immutable release payloads live under a shared content-addressed machine/trust-domain release store, not under each worktree. | Settled for V1. |\n| Activation is per workspace via `.fgos/installation/activation.json`; there is no single repository-wide active runtime pointer in V1. | Settled for V1. |\n| Packaging release/activation state uses workspace installation roots and must not share a namespace with work coordination state. | Settled for V1. |\n| The project/team pin is tracked as `.fgos/distribution.json`; machine-local activation state remains ignored. | Settled for V1. |\n| `activation.json` is a durably published workspace binding, not a symlink, in V1. | Settled for V1. |\n| Install transaction state lives under the release store root's `installs/<activationId>.json`, not inside `activation.json`. | Settled for V1. |\n| Mutating invocations create lease files; `fgctl` may stage/verify during leases but refuses activation while a non-stale mutating lease exists. | Settled for V1. |\n| V1 does not do automatic state migration during upgrade/rollback. | Settled for V1. |\n| `fgctl` never writes host-visible projection files directly; local `fgos init` / `doctor --fix` owns projection materialization under active identity. | Settled for V1. |\n| Existing projects are adoptable: a missing state schema record is treated as schema `1` and written during local `fgos init`. | Settled for V1. |\n| Source checkouts support explicit `dev:<rev>` activation for dogfood; it is non-distributable and skips immutable release guarantees. | Settled for V1. |\n| `fgctl` V1 is a Rust bootstrap binary with local path/tarball and GitHub release asset as acquisition sources. | Settled for V1. |\n| Candidate preflight is static: `fgctl` never executes candidate release code before the ready binding is published. | Settled for V1 (P7 red-team fix, 2026-09-14). |\n| Shared gateway/web are architecture constraints only, not active delivery scope. | Promoted for active delivery. |",
+        "shownTextDigest": "e5041d0fe791fcae6827465d44dfe722cd9118b97e84785dd5527a7309127158"
+      },
+      "primaryTarget": {
+        "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": "historical-decisions-promoted-or-tracked",
+        "unitDigest": "6cc6e399493acc5297347592b2c25321f3966e749515b140164c6d2afe66963e",
+        "shownText": "#### Historical Decisions Promoted Or Tracked",
+        "shownTextDigest": "d21f43aed882765f2691423639089f248003025b5ae02d6ec9031220c5438851"
+      },
+      "untransferredRemainder": {
+        "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "anchor": "unheaded-block-7",
+        "unitDigest": "0266dc3bbac745ba6953a93d03d3ccb6a9cfb9c06d3dfc4f760b28f5b9224bcf",
+        "shownText": "| Decision | Status |\n|---|---|\n| Runtime identity is digest-based, not PATH-based. | Settled for V1. |\n| `artifactDigest` is the digest of the canonical release tree manifest, not an archive digest. | Settled for V1. |\n| Release tree manifest uses normalized logical paths and refuses symlinks/case collisions in V1. | Settled for V1. |\n| Project commands enter through stable local shims under workspace `.fgos/installation/bin/`. | Settled for V1. |\n| Immutable release payloads live under a shared content-addressed machine/trust-domain release store, not under each worktree. | Settled for V1. |\n| Activation is per workspace via `.fgos/installation/activation.json`; there is no single repository-wide active runtime pointer in V1. | Settled for V1. |\n| Packaging release/activation state uses workspace installation roots and must not share a namespace with work coordination state. | Settled for V1. |\n| The project/team pin is tracked as `.fgos/distribution.json`; machine-local activation state remains ignored. | Settled for V1. |\n| `activation.json` is a durably published workspace binding, not a symlink, in V1. | Settled for V1. |\n| Install transaction state lives under the release store root's `installs/<activationId>.json`, not inside `activation.json`. | Settled for V1. |\n| Mutating invocations create lease files; `fgctl` may stage/verify during leases but refuses activation while a non-stale mutating lease exists. | Settled for V1. |\n| V1 does not do automatic state migration during upgrade/rollback. | Settled for V1. |\n| `fgctl` never writes host-visible projection files directly; local `fgos init` / `doctor --fix` owns projection materialization under active identity. | Settled for V1. |\n| Existing projects are adoptable: a missing state schema record is treated as schema `1` and written during local `fgos init`. | Settled for V1. |\n| Source checkouts support explicit `dev:<rev>` activation for dogfood; it is non-distributable and skips immutable release guarantees. | Settled for V1. |\n| `fgctl` V1 is a Rust bootstrap binary with local path/tarball and GitHub release asset as acquisition sources. | Settled for V1. |\n| Candidate preflight is static: `fgctl` never executes candidate release code before the ready binding is published. | Settled for V1 (P7 red-team fix, 2026-09-14). |\n| Shared gateway/web are architecture constraints only, not active delivery scope. | Promoted for active delivery. |",
+        "shownTextDigest": "0266dc3bbac745ba6953a93d03d3ccb6a9cfb9c06d3dfc4f760b28f5b9224bcf"
+      },
+      "cutoverObligation": true,
+      "restorationOwner": "Plan C (draft, unscheduled); Packaging-distribution tracks the cutover obligation"
+    }
+  ]
+}
