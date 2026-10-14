@@ -5,8 +5,8 @@ tsk-2uf-2 (`docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md`):
 the execution-boundary contract every WORKER follows — in
 this fgOS repo, "worker" is a role, not an identity (`CONTEXT.md`'s pinned
 terminology): it can be a live in-process session doing the work itself,
-or an out-of-process executor (`agy`, `pi`, Codex, …) dispatched through
-`dispatch.mjs execute`. Whoever is holding the pen while real edits get
+or an out-of-process executor (`agy`, `pi`, Codex, …) run as a Unit
+through `fgos run`. Whoever is holding the pen while real edits get
 made follows this contract; the **driver** — the session that claimed the
 unit, decided the mechanism, and will verify/commit/return it — never
 delegates that half away, and never does the driver's own job through this

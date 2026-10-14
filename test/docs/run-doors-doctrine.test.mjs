@@ -38,10 +38,48 @@ for (const surface of ['core/skills', '.agents/skills', 'plugins/fgOS/skills']) 
     assert.match(g2, /prefer/);
   });
 
-  test(`${surface}/_shared/capability-matching ad-hoc delegation leads with the one-liner`, () => {
+  test(`${surface}/_shared/capability-matching ad-hoc delegation runs through the one-liner, provider soft`, () => {
     const adhoc = section(read(`${surface}/_shared/capability-matching.md`), '## Ad-hoc one-shot delegation');
     assert.ok(adhoc.includes('fgos run "'), 'one-liner missing');
-    assert.ok(adhoc.indexOf('fgos run "') < adhoc.indexOf('execute <executor>'), 'one-liner is not the first choice');
+    assert.ok(adhoc.includes('--writes'), 'write scope missing');
+    assert.match(adhoc, /--provider[^.]*soft preference/, 'provider is not taught as a soft preference');
     assert.ok(!adhoc.includes('plans and Units still never pin one'), 'stale "Units never pin" sentence');
+  });
+}
+
+// The raw dispatch doors are gone: `dispatch execute` (with `--contract` and
+// `--assignment`), `dispatch log` and `dispatch fanout-batch`. Neither the
+// always-loaded layer nor any skill source or render may still teach them,
+// and `decide --work` runs only through `fgos dispatch decide`.
+const REMOVED_DOOR_PATTERNS = [
+  /dispatch\.mjs"?\s+(execute|log|fanout-batch)\b/,
+  /\bdispatch (execute|log)\b/,
+  /--contract\b/,
+  /\bexecute <(executor|agent|EXECUTOR_ID|executorId)/i,
+  /dispatch\.mjs"?\s+decide --work/,
+];
+
+function markdownFiles(rel) {
+  const abs = path.join(repoRoot, rel);
+  if (!fs.existsSync(abs)) return [];
+  if (fs.statSync(abs).isFile()) return [rel];
+  const out = [];
+  for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
+    const child = path.join(rel, entry.name);
+    if (entry.isDirectory()) out.push(...markdownFiles(child));
+    else if (entry.name.endsWith('.md')) out.push(child);
+  }
+  return out;
+}
+
+for (const surface of ['AGENTS.md', 'core/skills', 'domains', '.agents/skills', 'plugins/fgOS/skills', '.claude/skills']) {
+  test(`${surface} teaches no removed dispatch door`, () => {
+    const hits = [];
+    for (const file of markdownFiles(surface)) {
+      read(file).split('\n').forEach((line, i) => {
+        if (REMOVED_DOOR_PATTERNS.some((re) => re.test(line))) hits.push(`${file}:${i + 1}: ${line.trim().slice(0, 160)}`);
+      });
+    }
+    assert.deepEqual(hits, [], `removed dispatch doors still taught:\n${hits.join('\n')}`);
   });
 }

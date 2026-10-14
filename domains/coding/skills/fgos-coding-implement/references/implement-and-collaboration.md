@@ -16,21 +16,23 @@ its answer:
   question.
 - **`in-process`** — same as `unavailable`, optionally via the returned
   `agentType`.
-- **`out-of-process`** — dispatch via `node src/runner/dispatch.mjs
-  execute <executorId> --prompt "..." --has-live-task-access` instead of
-  writing the change yourself; read the result's `stdout` as the work
-  product. **Commit ownership:** per
-  `../_shared/coding-worker-contract.md`'s Layer 2 rules, the dispatched
-  worker ran the item's own verify and left its edits in the worktree —
-  it never commits. You commit them in Step 4, exactly as you would your
-  own change; you do NOT re-run Verify (the worker already did). Check
-  `git status` shows the worker's changes (an empty status means the
-  worker changed nothing, or committed itself — read `git log -1` before
-  deciding). If the worker returned `[BLOCKED]`, that is a driver-side
-  problem to handle (park the item / retry dispatch) — never write the
-  change yourself to paper over a worker that didn't finish its own half.
-  `verifiedSha` from the `execute` call names the worker's own tip, which
-  your Step 4 commit moves past — call `fgos return` bare after you commit.
+- **`out-of-process`** — run the Implement step as a writing Unit
+  instead of writing the change yourself:
+  `fgos run "<prompt>" --provider <executorId> --capability code:implement --writes '**' --worktree <item worktree> --json`
+  (narrow `--writes` to the item's own paths when they are known). Read
+  `results[-1].runResult.agentClaim.summary` as the work product.
+  **Commit ownership:** per `../_shared/coding-worker-contract.md`'s
+  Layer 2 rules, the worker ran the item's own verify and left its edits
+  in the worktree — it never commits. After a passing round the runner
+  commits the paths inside `--writes`; `results[-1].commit` says what it
+  did (`committed` with `sha`/`files`, `no-changes`, or `failed` with a
+  `reason`). `no-changes` means the worker changed nothing; `failed` or a
+  non-empty `outOfScope`/`needsWrites` is a driver-side problem to handle
+  (park the item / widen `--writes` and run again) — never write the change
+  yourself to paper over a worker that didn't finish its own half. If the
+  worker returned `[BLOCKED]` (`outcome` other than `pass`), the same
+  holds. Call `fgos return` bare afterwards; it re-runs verify on the
+  runner's commit.
 
 Either way, before editing a symbol yourself, apply `CLAUDE.md`'s
 impact-analysis capability gate rather than assuming GitNexus is on this
