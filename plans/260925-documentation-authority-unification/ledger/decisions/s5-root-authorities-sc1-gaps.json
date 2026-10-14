@@ -13,15 +13,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-31",
+      "authoredBy": "codex-session:17@2026-10-14",
+      "reviewStatus": "reviewed",
+      "rationale": "The predecessor block 31 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The only delta to the real same-file successor is adding review/approve/run examples. All other wording is retained, including field definitions, review rationale and STR38 clause. Native predecessor identity is conserved without graft or approval carry.",
+      "reviewNote": "Source is the real same-file predecessor block 31 at 9881f8622 (digest verified) and it already has COMMAND_REGISTRY, 15 verbs and no coordination; the sole delta is the inserted \"(ví dụ review, approve, run\" example list, as the rationale says; the STR38 clause and review rationale are verbatim.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
       ],
-      "authoredBy": "codex-session:17@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "The predecessor block 31 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The only delta to the real same-file successor is adding review/approve/run examples. All other wording is retained, including field definitions, review rationale and STR38 clause. Native predecessor identity is conserved without graft or approval carry."
+      "reviewReportCommit": "18962827a371c629b91475e6b2540a998fa30e9a"
     },
     {
       "claimId": "claim_7333c439fa8d29886b82168e015ca113",
@@ -76,15 +82,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-32",
+      "authoredBy": "codex-session:17@2026-10-14",
+      "reviewStatus": "reviewed",
+      "rationale": "The predecessor block 32 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The only delta to the real same-file successor is adding review/approve/run examples. All other wording, list items and dispatch executor qualifier are retained. Native predecessor identity is conserved without graft or approval carry.",
+      "reviewNote": "Predecessor block 32 at 9881f8622 (digest verified) differs from the current unit only by the added example list plus a line reflow, which is whitespace only; the dispatch executor qualifier and all bullets are retained, and the rationale no longer claims the manifest wording is new.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
       ],
-      "authoredBy": "codex-session:17@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "The predecessor block 32 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The only delta to the real same-file successor is adding review/approve/run examples. All other wording, list items and dispatch executor qualifier are retained. Native predecessor identity is conserved without graft or approval carry."
+      "reviewReportCommit": "18962827a371c629b91475e6b2540a998fa30e9a"
     }
   ]
 }

@@ -343,7 +343,20 @@
           "text": "| Relationship | File |\n|---|---|\n| documentation portal | [README.md](../README.md) |\n| reader routing | [reading-map.md](../reading-map.md) |\n| operative transitional switchboard | [transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n| platform portal | [platform/README.md](README.md) |\n| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |"
         },
         "status": "pending-native-conservation-accounting",
-        "reason": "One real native table identity gap follows the README destination correction; old ID retained, no graft or approval carry. Independent reviewer checks this consequence together with the two corrected Related Files source rows."
+        "reason": "One real native table identity gap follows the README destination correction; old ID retained, no graft or approval carry. Independent reviewer checks this consequence together with the two corrected Related Files source rows.",
+        "conservationReview": {
+          "claimIdOrList": "claim_a01d870cf693e19d3ee3b376a2c99093",
+          "verdict": "ok",
+          "reviewNote": "Gap is genuine: block 60 identity e22049e0... at c8b2d948d and febba28a... (claim_c810411255d8383db9a186eb780c0b44) at HEAD both recomputed; the registry keeps the old ID in identityGaps as unclassified future with the real successor shown, no source decision exists for it and no identity is guessed or grafted.",
+          "sourceUnitDigest": "4aad7684bd5ff59163cf2e9cfc405f7b897c2a9b3a6fc678531b179c343e305f",
+          "targetUnitDigest": "0729946d01afffc2b5800527271a368947d3971968759a447bd51eec81f15f5b",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewMode": "ordinary",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
+          "reviewReportCommit": "18962827a371c629b91475e6b2540a998fa30e9a"
+        },
+        "accountingStatus": "independently-reviewed; native gap remains explicit unverified open data"
       }
     ],
     "newRetiredUnits": [],
@@ -419,7 +432,20 @@
           ],
           "text": "## 14. Related Files",
           "sectionText": "## 14. Related Files\n\n| Relationship | File |\n|---|---|\n| documentation portal | [README.md](../README.md) |\n| reader routing | [reading-map.md](../reading-map.md) |\n| operative transitional switchboard | [transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n| platform portal | [platform/README.md](README.md) |\n| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |"
-        }
+        },
+        "conservationReview": {
+          "claimIdOrList": "claim_5dae6eed87e8f69f3c3530f0d203b7fa",
+          "verdict": "ok",
+          "reviewNote": "Heading 14-related-files keeps its claimId and stable anchor; text digest fee84962 to e589d54d and identity da6c4f70 to 79106d7d both recompute, and the only content change is the one README destination (plus the five other destinations already in the source row), so the digest change is purely mechanical; lineage and needs-review sit in the accounting file, not in the working registry unit.",
+          "sourceUnitDigest": "fee84962ef28aa9f7435ec5dd77a474a013bc2f2595a9d34f403da53411cdbc9",
+          "targetUnitDigest": "e589d54d9c81da5e926e98fa5cecf502a3fbe44355a75963d71242b42ef55edb",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewMode": "ordinary",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
+          "reviewReportCommit": "18962827a371c629b91475e6b2540a998fa30e9a"
+        },
+        "accountingStatus": "independently-reviewed; native gap remains explicit unverified open data"
       }
     ]
   }

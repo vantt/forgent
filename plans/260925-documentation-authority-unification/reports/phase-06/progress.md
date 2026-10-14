@@ -1,18 +1,21 @@
-# Latest resume state — Root conservation continuation
+# Latest resume state — Ordinary verdict report-format blocker
 
 Date: 2026-10-14
 Executor: codex-session:19@2026-10-14
 Session counter: 19
 Step: 5
-State: authoring
+State: rework / blocked for Lead report-format correction
 Starting HEAD: 18962827a371c629b91475e6b2540a998fa30e9a
 Last green content pin: 7833bb4c11125394ea5482fdc781ccd1cf8e4e1d
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
-Resume: required worktree/branch verified, clean tree and last-green ancestry confirmed.
-Scope: apply all 73 ordinary ok verdicts pinned to 18962827a with verbatim notes; re-prove both-prior D/scoped E/native equality; continue remaining Step 5 rows in at least three bounded review packs if no blocker.
-Truth report/sample stay untouched; owner decision on 5/30 false units remains parked. AGENTS/CLAUDE wait for Step 10. No promotion, push, rebase, main write/merge, Step 6 or protected-tool/baseline edit.
-Next: resume checks, exact review application and cheap bookkeeping fixes, then pending source decisions and candidate-unverified scope expansion. Registry compact one-line, stop at 90 MB.
+Current turn resume commit: 747f4d45d. This application/progress commit follows; resolve HEAD.
+Applied 71 of 73 ok verdicts at exact report pin 18962827a: 68 decisions and three native/list accounting notes, all verbatim. Two source rows remain pending with no approval carry. Cheap bookkeeping fixes record non-live design-discussion references and align the template contentCommit to 7833bb4c1. Neither original review report is edited.
+Blocker: claim_e2377849e4ba8e3d3beaf70880e4ed23 has a 16-hex source digest in the committed ordinary table, while apply requires the full native source digest and validateManualReview requires 64 hex. The full digest in its note is correct but cannot replace the table column. claim_ee85a9e312493fde5fa5dfcf8b3eb573 shares a physical line with the candidate-list verdict: ten cells instead of five. Both proposed approvals produce decision-review-report-missing under the unchanged validator. Lead must commit the full-digest cell and newline corrections with every note unchanged; scratch normalization does not bind valid committed evidence.
+Proof so far: both-prior D zero fatal; native equality retains all 94,494 IDs/full tuples, no new gaps or retired units; root list remains 70 full tuples; registry unchanged at 59,529,541 bytes, compact one-line SHA256 3e0e5b8386cf29a6e546b6bb57d7ea15eb0f21607709180e8d1beb3640496d13. Tests 29/29 green under env -u CLAUDE_CODE_SESSION_ID. Final scoped E and post-commit refresh are still running, not yet certified in this checkpoint.
+Root source map: 1,072 total, 506 reviewed / seven pending / 559 undecided. No new source row or 240-row carrier is authored after this Lead blocker. Truth sample/report/population and prior lists/residuals unchanged; the 5/30 owner decision stays parked.
+Prepared request: review-request-261014-1632-root-verdict-format-corrections.md; not yet committed. Preview http://design-lap:7701/s/d8ffc2e1e4ad. Next: finish scoped E, commit request/evidence/progress, refresh and prove exact persisted native tuples, STOP. After Lead corrections, apply the two pending source rows and resume at least three bounded packs.
+No promotion, push, rebase, main write/merge, Step 6, protected tool/baseline edit or secret read.
 
 Earlier progress follows intact.
 
