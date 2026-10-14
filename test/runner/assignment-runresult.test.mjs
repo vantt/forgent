@@ -1756,7 +1756,7 @@ test('safeGitStatusFiles reads Vietnamese names, spaces, edge spaces and renames
   git('mv', 'cũ.md', 'mới.md');
   fs.mkdirSync(path.join(dir, '.fgos'));
   fs.writeFileSync(path.join(dir, '.fgos', 'state.json'), '{}\n');
-  assert.deepEqual(safeGitStatusFiles(dir).sort(), [' lề .md', 'a b.md', 'mới.md', 'tab\there.md', 'tài liệu/ghi chú.md'].sort());
+  assert.deepEqual(safeGitStatusFiles(dir).sort(), [' lề .md', 'a b.md', 'cũ.md', 'mới.md', 'tab\there.md', 'tài liệu/ghi chú.md'].sort());
 });
 
 test('safeGitCommittedDiffFiles reads a committed Vietnamese name with spaces byte for byte', () => {
@@ -1780,4 +1780,44 @@ test('a Vietnamese name with spaces reaches changedFiles byte for byte and is co
   const byPath = Object.fromEntries(result.evidence.attribution.map((a) => [a.path, a]));
   assert.equal(byPath['tài liệu/ghi chú.md'].coverageMatched, true);
   assert.deepEqual((result.warnings ?? []).filter((w) => w.code === 'outside-write-scope-correlated').map((w) => w.paths), [['ngoài phạm vi.md']]);
+});
+
+// Settlement reads a worktree exactly as the runner's commit does (commit-unit-work changedPaths):
+// a rename is both its halves, a nested repo has no trailing slash, a submodule's own dirt is not a
+// change here. A rename read as its new path only hid an out-of-scope deletion from outOfScope.
+test('safeGitStatusFiles lists both halves of a staged or intent-to-add rename, like the runner commit', () => {
+  const { dir, git } = quotedNameRepo();
+  git('mv', 'cũ.md', 'docs mới.md');
+  fs.renameSync(path.join(dir, 'a b.md'), path.join(dir, 'ab.md'));
+  git('add', '-N', 'ab.md');
+  git('rm', '--cached', '-q', 'a b.md');
+  assert.deepEqual(safeGitStatusFiles(dir).sort(), ['a b.md', 'ab.md', 'cũ.md', 'docs mới.md'].sort());
+});
+
+test('safeGitCommittedDiffFiles lists both halves of a committed rename', () => {
+  const { dir, git } = quotedNameRepo();
+  const before = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
+  git('mv', 'cũ.md', 'tài liệu.md');
+  git('commit', '-m', 'move');
+  const after = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
+  assert.deepEqual(safeGitCommittedDiffFiles(dir, before, after).sort(), ['cũ.md', 'tài liệu.md'].sort());
+});
+
+test('safeGitStatusFiles names an untracked nested repo without a trailing slash and skips a submodule\'s own dirt', () => {
+  const { dir, git } = quotedNameRepo();
+  const sub = mkTempDir();
+  const subGit = (...args) => execFileSync('git', args, { cwd: sub, stdio: 'ignore' });
+  subGit('init');
+  subGit('config', 'user.email', 'test@example.com');
+  subGit('config', 'user.name', 'Tester');
+  fs.writeFileSync(path.join(sub, 'x.md'), 'x\n');
+  subGit('add', '.');
+  subGit('commit', '-m', 'sub');
+  git('-c', 'protocol.file.allow=always', 'submodule', 'add', '-q', sub, 'mô-đun');
+  git('commit', '-m', 'add submodule');
+  fs.writeFileSync(path.join(dir, 'mô-đun', 'x.md'), 'dirty inside\n');
+  fs.mkdirSync(path.join(dir, 'lồng'));
+  execFileSync('git', ['init', '-q'], { cwd: path.join(dir, 'lồng') });
+  fs.writeFileSync(path.join(dir, 'lồng', 'y.md'), 'y\n');
+  assert.deepEqual(safeGitStatusFiles(dir), ['lồng']);
 });
