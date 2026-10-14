@@ -51,7 +51,7 @@
       "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-0027-root-pending-resume.md",
       "entries": 18,
       "mode": "A36: previous bounded alias, reopened decision and retained-path wording re-review",
-      "packSHA256": "cbddc3777b72f6937ac6cfc67ce93da772be754025f5e471f330d9a27a26e6c9",
+      "packSHA256": "e8eb0aa275fcb0f3a038669289ced34176a7f7775f245cc4a5d051f049d1fe0e",
       "differingDigestRows": [
         "claim_0956ea2eadf0a32787b7fd0e51d693a6",
         "claim_f0b2a4079764d68b1102ddddb08776ce",

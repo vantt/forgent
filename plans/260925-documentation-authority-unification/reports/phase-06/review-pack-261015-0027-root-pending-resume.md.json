@@ -2,7 +2,7 @@
   "version": 1,
   "contentCommit": "b1e53b4fb0e99963328e84b63a4764c0d87abb21",
   "authorSession": "codex-session:28@2026-10-15",
-  "packSHA256": "cbddc3777b72f6937ac6cfc67ce93da772be754025f5e471f330d9a27a26e6c9",
+  "packSHA256": "e8eb0aa275fcb0f3a038669289ced34176a7f7775f245cc4a5d051f049d1fe0e",
   "rows": [
     {
       "id": "claim_0956ea2eadf0a32787b7fd0e51d693a6",
@@ -734,7 +734,9 @@
           "navigationOwner": "docs/platform/documentation/history/templates/spec.md",
           "navigationAnchor": "1-current-summary",
           "navigationUnitDigest": "b4f4ae113f2bb06b797cf4343fc31eace2b66fcd98070172f36877405f9df170",
-          "decisionOwnerUnchanged": "docs/platform/documentation/history/templates/discussion.md"
+          "decisionOwnerUnchanged": "docs/platform/documentation/history/templates/discussion.md",
+          "sourceDecisionReviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-mapped-root-conservation-01.md",
+          "sourceDecisionReviewReportCommit": "729bea7588017b285553332d838543bedecd2605"
         }
       },
       "previousProposal": {
@@ -950,7 +952,9 @@
           "navigationOwner": "docs/platform/documentation/history/templates/vision.md",
           "navigationAnchor": "1-purpose",
           "navigationUnitDigest": "e008f4420e278caad8afa31028a0c49c1ae2422e2bb99bbdfab4c0bd433d94ab",
-          "decisionOwnerUnchanged": "docs/platform/documentation/history/templates/intent-preservation-ledger.md"
+          "decisionOwnerUnchanged": "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
+          "sourceDecisionReviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-mapped-root-conservation-02.md",
+          "sourceDecisionReviewReportCommit": "729bea7588017b285553332d838543bedecd2605"
         }
       },
       "previousProposal": {

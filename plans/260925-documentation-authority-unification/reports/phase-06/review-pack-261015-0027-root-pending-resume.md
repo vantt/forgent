@@ -1592,7 +1592,9 @@ Target digest: 8a8c8caeb0c74d79e39d3263c288acc22c451f971b366c6822ebec5a5ad5effe
     "navigationOwner": "docs/platform/documentation/history/templates/spec.md",
     "navigationAnchor": "1-current-summary",
     "navigationUnitDigest": "b4f4ae113f2bb06b797cf4343fc31eace2b66fcd98070172f36877405f9df170",
-    "decisionOwnerUnchanged": "docs/platform/documentation/history/templates/discussion.md"
+    "decisionOwnerUnchanged": "docs/platform/documentation/history/templates/discussion.md",
+    "sourceDecisionReviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-mapped-root-conservation-01.md",
+    "sourceDecisionReviewReportCommit": "729bea7588017b285553332d838543bedecd2605"
   }
 }
 ```
@@ -2034,7 +2036,9 @@ Target digest: d554ba84b1559c01a9eb1628d110baa45b8e38e942fc3ac08a0a3bd32561b6c4
     "navigationOwner": "docs/platform/documentation/history/templates/vision.md",
     "navigationAnchor": "1-purpose",
     "navigationUnitDigest": "e008f4420e278caad8afa31028a0c49c1ae2422e2bb99bbdfab4c0bd433d94ab",
-    "decisionOwnerUnchanged": "docs/platform/documentation/history/templates/intent-preservation-ledger.md"
+    "decisionOwnerUnchanged": "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
+    "sourceDecisionReviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-mapped-root-conservation-02.md",
+    "sourceDecisionReviewReportCommit": "729bea7588017b285553332d838543bedecd2605"
   }
 }
 ```

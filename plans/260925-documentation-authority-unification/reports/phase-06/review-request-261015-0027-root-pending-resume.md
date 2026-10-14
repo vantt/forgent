@@ -4,7 +4,7 @@ Author session: codex-session:28@2026-10-15
 Content commit: b1e53b4fb0e99963328e84b63a4764c0d87abb21
 Entries: 18
 Pack: [review-pack-261015-0027-root-pending-resume.md](review-pack-261015-0027-root-pending-resume.md)
-Pack SHA256: cbddc3777b72f6937ac6cfc67ce93da772be754025f5e471f330d9a27a26e6c9
+Pack SHA256: e8eb0aa275fcb0f3a038669289ced34176a7f7775f245cc4a5d051f049d1fe0e
 Sidecar: review-pack-261015-0027-root-pending-resume.md.json
 Review scope: A36: previous bounded alias, reopened decision and retained-path wording re-review
 
