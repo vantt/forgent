@@ -216,3 +216,43 @@ Herdr provides visibility only.
 - Mark historical sources as non-canonical instead of deleting rationale.
 - Check all local links after moving documents.
 ~~~~
+
+## Upstream Source agent-coordination-documentation 2026-10-14
+
+Source: docs/architect/agent-coordination/README.md at da8285e06; upstream current-source conservation snapshot.
+This dated successor preserves the complete changed unit; prior literal snapshots remain unchanged.
+
+````text
+# Agent Coordination Documentation
+
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/README.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
+Document type: Portal
+Design status: Accepted
+Implementation: Partial
+Last reviewed: 2026-09-01
+Canonical for: navigation only
+
+> **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và các khái niệm `CoordinationSession`/`CoordinationProtocol`/`FlowDefinition` đã được thu hồi ở P4 của track Request-to-Run (D-0050). Hệ thống đã chuyển sang mô hình gọn: **Unit run** qua **CollaborationPattern** (`solo`, `reviewed`, `panel` + preset) và **Workflow run** (`src/workflow/**`). Các tài liệu trong thư mục này lưu giữ thiết kế lịch sử của Step 00–09.
+
+> **Ghi chú (2026-10-14, decision 0062 trong `docs/specs/runner.md`):** các cửa dispatch thô mà tài liệu, proof và roadmap trong thư mục này nhắc tới — `dispatch execute` (cả `--contract`, `--assignment`), `dispatch log`, `dispatch fanout-batch` — đã bị xoá. Việc chạy qua `fgos run "<prompt>"` / `fgos run --unit` hoặc `fgos workflow start`. Các bản ghi verification/proof giữ nguyên lệnh đã chạy lúc đó, như bằng chứng lịch sử.
+
+This documentation describes how fgOS coordinates agents across providers,
+models, tiers, roles, capabilities, and execution mechanisms while preserving
+Work lifecycle authority and evidence integrity.
+
+Read [Agent Coordination Foundation Vision](vision.md) first. It is the highest
+authority for system identity, foundation boundaries, optional coordination
+structure, and domain augmentation. Then read the
+[Intent Preservation Ledger](intent-preservation-ledger.md) before narrowing or
+deferring an Agent Coordination capability.
+
+The documentation is organized by authority. Canonical vocabulary and accepted
+architecture are separated from proposals, implementation roadmaps,
+verification evidence, playbooks, and history.
+
+Read [Documentation Governance](documentation-governance.md) before changing
+definitions, statuses, or document placement.
+````

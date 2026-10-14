@@ -1,3 +1,17 @@
+# Boundary source and receipt checkpoint
+
+Step: 5
+State: authoring
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Main input: 554401219ddbc4676c3b57381a468904442855e9
+Last green A37 checkpoint: c18020da3
+
+The main merge and four conflicts are complete. Eleven root-source fragments are recarried; six exact changed upstream source units have separate pinned successor snapshots in their existing history owners, leaving original literal snapshots untouched. Code-evidence scanning is complete at the actual merge pin; unchanged cited bytes are repinned in a new immutable receipt artifact with all non-pin fields/authorship preserved. Changed-code references will be parked pending and their current units added to the native candidate-unverified list. Local runner.generatedPaths=[] was restored uncommitted and the exact stash retained. No source code, checker, gate, vocabulary, extractor or baseline was independently edited.
+
+Next: commit these candidate/receipt bytes to establish a real content/receipt pin; carry the persisted working registry natively, rebind changed decisions and all new current/gap/retired units with no approval carry, run both-prior D/scoped E/native equality and persist. Then package the bounded review set and stop.
+
+---
+
 # Boundary merge checkpoint
 
 Step: 5

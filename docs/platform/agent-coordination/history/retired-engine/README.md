@@ -346,3 +346,12 @@ Herdr provides visibility only.
 - Check all local links after moving documents.
 
 ~~~~
+
+## Upstream Source unheaded-block-4 2026-10-14
+
+Source: docs/architect/agent-coordination/README.md at da8285e06; upstream current-source conservation snapshot.
+This dated successor preserves the complete changed unit; prior literal snapshots remain unchanged.
+
+````text
+> **Ghi chú (2026-10-14, decision 0062 trong `docs/specs/runner.md`):** các cửa dispatch thô mà tài liệu, proof và roadmap trong thư mục này nhắc tới — `dispatch execute` (cả `--contract`, `--assignment`), `dispatch log`, `dispatch fanout-batch` — đã bị xoá. Việc chạy qua `fgos run "<prompt>"` / `fgos run --unit` hoặc `fgos workflow start`. Các bản ghi verification/proof giữ nguyên lệnh đã chạy lúc đó, như bằng chứng lịch sử.
+````

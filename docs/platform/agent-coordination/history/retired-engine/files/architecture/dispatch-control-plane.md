@@ -400,3 +400,35 @@ target-state sections are reconciled with implementation.
 | Work Driver | `src/runner/loop.mjs`, `src/runner/fanout-batch.mjs` | Work item lifecycle orchestration, batch fan-out driving (`pick -> executeExecutorCli -> return`), fail-safe settlement (`fgos return --to blocked`), and worker slots occupancy (`OccupancyPort`). |
 | Audit Seam | `src/runner/dispatch-log.mjs` | Audit event logging (`logExecutorDispatch`) isolated from dispatch core. |
 ~~~~
+
+## Upstream Source source-inventory 2026-10-14
+
+Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md at da8285e06; upstream current-source conservation snapshot.
+This dated successor preserves the complete changed unit; prior literal snapshots remain unchanged.
+
+````text
+## Source Inventory
+
+| Layer | Modules | Responsibilities & Boundaries |
+| --- | --- | --- |
+| Dispatch Core | `src/runner/dispatch/**` (`cli.mjs`, `plan.mjs`, `resolve.mjs`, `prepare.mjs`, `settlement.mjs`, `reconcile-cli-spawn.mjs`, `herdr-reconcile.mjs`, `proof-helpers.mjs`, `assignment-runner.mjs`, `confinement/**`, `transport.mjs`, `herdr-round.mjs`, `brief.mjs`, `assignment.mjs`, `runtime-inspection.mjs`) | Execution allocation, plan compilation, executor commands, confinement, and adapter execution. Strictly zero references to `pick`, `return`, `claim`, or `appendEvent`. |
+| Work Driver Compatibility | `src/runner/work-compat.mjs` | Leaf compatibility module (registered as "infra" in architecture manifest) housing Work Driver compatibility lookup implementations (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) with zero imports into dispatch core; consumed by `plan.mjs`/`cli.mjs` via compatibility re-export. |
+| Stage Operation Selection | `src/runner/dispatch/operation-choice.mjs` | Bridge for stage operation selection (`chooseStageOperation`, `executeDriverOperationChoice`) consuming hardened RunResult. |
+| Work Driver | `src/runner/loop.mjs`, `src/runner/fanout-batch.mjs` | Work item lifecycle orchestration, batch fan-out driving (`pick -> executeExecutorCli -> return`), fail-safe settlement (`fgos return --to blocked`), and worker slots occupancy (`OccupancyPort`). |
+| Audit Seam | removed (`src/runner/dispatch-log.mjs`, decision 0062) | Audit event logging (`logExecutorDispatch`) was isolated from dispatch core; `fgos run` now records provenance under `.fgos/assignments/<unitRunId>/`. |
+````
+
+## Upstream Source unheaded-block-37 2026-10-14
+
+Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md at da8285e06; upstream current-source conservation snapshot.
+This dated successor preserves the complete changed unit; prior literal snapshots remain unchanged.
+
+````text
+| Layer | Modules | Responsibilities & Boundaries |
+| --- | --- | --- |
+| Dispatch Core | `src/runner/dispatch/**` (`cli.mjs`, `plan.mjs`, `resolve.mjs`, `prepare.mjs`, `settlement.mjs`, `reconcile-cli-spawn.mjs`, `herdr-reconcile.mjs`, `proof-helpers.mjs`, `assignment-runner.mjs`, `confinement/**`, `transport.mjs`, `herdr-round.mjs`, `brief.mjs`, `assignment.mjs`, `runtime-inspection.mjs`) | Execution allocation, plan compilation, executor commands, confinement, and adapter execution. Strictly zero references to `pick`, `return`, `claim`, or `appendEvent`. |
+| Work Driver Compatibility | `src/runner/work-compat.mjs` | Leaf compatibility module (registered as "infra" in architecture manifest) housing Work Driver compatibility lookup implementations (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) with zero imports into dispatch core; consumed by `plan.mjs`/`cli.mjs` via compatibility re-export. |
+| Stage Operation Selection | `src/runner/dispatch/operation-choice.mjs` | Bridge for stage operation selection (`chooseStageOperation`, `executeDriverOperationChoice`) consuming hardened RunResult. |
+| Work Driver | `src/runner/loop.mjs`, `src/runner/fanout-batch.mjs` | Work item lifecycle orchestration, batch fan-out driving (`pick -> executeExecutorCli -> return`), fail-safe settlement (`fgos return --to blocked`), and worker slots occupancy (`OccupancyPort`). |
+| Audit Seam | removed (`src/runner/dispatch-log.mjs`, decision 0062) | Audit event logging (`logExecutorDispatch`) was isolated from dispatch core; `fgos run` now records provenance under `.fgos/assignments/<unitRunId>/`. |
+````

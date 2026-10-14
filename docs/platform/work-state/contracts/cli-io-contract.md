@@ -178,8 +178,9 @@ Consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông �
 Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung
 đúng một chữ, "ngoại lệ có lý do", không gọi tuỳ hứng theo từng chỗ:
 
-1. **Sổ verb máy-đọc** (`--help`/`--help --json`, kể cả `<verb> --help`) —
-   siêu dữ liệu về CLI, không phải payload của một verb.
+1. **Sổ verb máy-đọc** (`--help`/`-h`, có hoặc không `--json`, kể cả
+   `<verb> [<sub>] --help`) — siêu dữ liệu về CLI, không phải payload của
+   một verb.
 2. **`setup`/`doctor --pretty`** — lối thoát hiển-thị-cho-người tường minh
    qua cờ `--pretty`, không phải payload mặc định.
 3. **Log worker** (`.fgos/logs/<id>.log`) — text trần CỐ Ý, để `tail -f`
@@ -245,8 +246,9 @@ trên MỌI verb).
 
 CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng
 máy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành
-`'2.0'`, per str46-io-contract — tăng từ `'1.0'` vì một trường bị xoá,
-xem ngay dưới), mỗi mục mô tả một verb — `name`, cách gọi, mô tả một dòng,
+`'3.0'` — tăng từ `'2.0'` khi cờ của verb có sub-verb dời vào
+`subcommands`, xem ngay dưới; `'2.0'` từng tăng từ `'1.0'` vì một trường bị
+xoá, per str46-io-contract), mỗi mục mô tả một verb — `name`, cách gọi, mô tả một dòng,
 lược đồ tham số (cờ/positional), ví dụ, và ô `deprecated`. Sổ này để một
 listener/giao diện **sinh** khung lệnh và khung form từ manifest thay vì
 hard-code từng verb. Bản thân sổ verb là **siêu dữ liệu về CLI**, KHÔNG bọc
@@ -259,10 +261,27 @@ dòng "positional: `<tên>`" cho tham số này, KHÔNG BAO GIỜ in nhầm thà
 "required: `--<tên>`" như một cờ thật — một tham số vừa nhận positional vừa
 nhận qua cờ (vd `id` của `discover`/`take`) in cả hai dạng phân biệt (per str77-79-doc-gap-fixes / ea8b9a8d — RUL54 (sổ verb máy-đọc không in nhầm tham số positional thành cờ bắt buộc)).
 
+**Sub-verb (lane help của plan two-doors-one-rununit, 2026-10-14).** Verb
+có sub-verb ở vị trí đầu (`dispatch`, `workflow`, `merge`, `session`,
+`gateway`, `goal`, `tool`, `agents`, và verb chạy ở Rust host `metrics`,
+`friction`, `convention`) mang thêm `subcommands: {<sub>: {description,
+parameters, examples}}` — `parameters` của từng sub-verb chỉ chứa cờ mà
+sub-verb đó thật sự đọc, cùng dạng `{type, properties, required,
+positional?}`. `parameters` cấp verb của các verb này chỉ còn `sub` (enum
+đúng bằng các khoá của `subcommands`, sinh ra từ đó — một nguồn). Schema
+từng sub-verb khớp cờ handler thật đọc, hai chiều (test
+`test/cli/subcommand-flag-drift.test.mjs`, quét tĩnh mã nguồn; với verb
+Rust host thì đối chiếu `AVAILABLE_SUBCOMMANDS` và cờ trong mã Rust của
+sub-verb đó).
+
 `fgos --help --json` trả `{schema_version, commands: […]}` — CLI công bố
 toàn bộ mặt verb để một listener/giao diện **sinh** khung lệnh từ manifest
-thay vì hard-code từng verb. `schema_version` hiện `'2.0'` (tăng từ `'1.0'`
-vì trường `access` bị xoá). Mỗi mục verb mang:
+thay vì hard-code từng verb. `schema_version` hiện `'3.0'` (tăng từ `'2.0'`
+khi cờ của verb có sub-verb dời vào `subcommands`; `'2.0'` từng tăng từ
+`'1.0'` vì trường `access` bị xoá). `fgos <verb> [<sub>] --help --json` trả
+riêng mục của một verb (thu hẹp về một sub-verb khi có), cùng hình dạng một
+phần tử `commands[]`. Cả hai chạy được qua Rust host ở mọi project và không
+bao giờ chạy verb. Mỗi mục verb mang:
 
 ### Entry Fields And Effect Axes
 
@@ -290,6 +309,9 @@ phối hay xác danh; cổng "ai được nói verb nào" vẫn là việc riên
   `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật
   tính là effect ngoài `.fgos/`).
 - `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng.
+- `subcommands` cho verb có sub-verb ở vị trí đầu: `{<sub>: {description,
+  parameters, examples}}`, mỗi sub-verb chỉ mang cờ nó thật sự đọc;
+  `parameters` cấp verb khi đó chỉ còn `sub`.
 
 Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa
 nối vào điều phối hay xác danh; cổng "ai được nói verb nào" thuộc STR38.
@@ -313,10 +335,27 @@ nay đọc được bằng máy.
 
 ## 9. Per-Verb Help
 
-Gọi `--help` (không kèm `--json`) SAU tên một verb cụ thể (vd `fgos submit
+Gọi `--help` (hoặc `-h`) SAU tên một verb cụ thể (vd `fgos submit
 --help`) in đúng mục trợ giúp của RIÊNG verb đó (cách gọi, mô tả, tham số,
 ví dụ) — không phải toàn bộ sổ verb. Áp dụng ĐỒNG NHẤT cho mọi verb, kể cả
-`init`.
+`init` và verb chạy ở Rust host (`version`, `metrics`, `friction`,
+`convention`, `gate-bypass`): Rust host giao mọi lời gọi có token help cho
+payload Node, nơi giữ sổ verb, thay vì chạy verb.
+
+- **Dạng máy-đọc:** kèm `--json` thì in đúng object của verb đó như trong
+  `commands[]` của sổ verb, không bọc phong bì. Với verb có sub-verb, đối
+  số vị trí đầu tiên thu hẹp mục về một sub-verb (`subcommands` chỉ còn
+  sub-verb đó); sub-verb không có trong sổ → thoát mã 4, stdout rỗng. Với
+  verb không có sub-verb, đối số vị trí là đối số của verb (vd prompt của
+  `run`) và bị bỏ qua.
+- **Token help:** `--help`/`-h` đứng riêng ở BẤT KỲ vị trí nào là yêu cầu
+  trợ giúp — kể cả khi đứng sau một cờ nhận giá trị (`fgos init --dir -h`)
+  — ở cả Rust host lẫn payload Node, nên trợ giúp không bao giờ lỡ tay
+  chạy verb.
+- **Dạng đầu dòng:** `fgos --help|-h [<verb> [<sub>]] [--json] [--dir
+  <x>]` in toàn bộ sổ verb, hoặc mục của một verb/sub-verb. `--dir` (cờ hàm
+  shell `fgos` tự gắn vào mọi lời gọi) được nhận và không dùng; verb lạ,
+  sub-verb lạ, từ thừa hay option khác → thoát mã 4, stdout rỗng.
 
 - **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào
   trong sổ verb.

@@ -1,0 +1,1565 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:1@2026-10-11",
+  "sourceCommit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+  "status": "pending-machine-repin-review",
+  "receipts": [
+    {
+      "claimId": "claim_39e4f58e68986802a16d978b42f5a1db",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "38517e6c917bb4e21624a0e07b496579d6190b6adb9983f5fe18e16c3526eeb8",
+      "shownText": "A requested screen is the second stage of the sample, not another death read.\n`evaluateLadder` emits `provider-limit` for credential/quota screen matches.\nIts pane fate is `keep-always`; `paused-limit` remains a recognized alias.\nKeep all failure panes by default; both limit outcomes survive automated\n`closeAlways` (`liveness.mjs:93-109`). Operator destructive intent is separate\nand guarded. Never infer Run completion from `agent_status` or pane idleness;\nthe ladder settles on the result file, which still requires normalization\n(`liveness.mjs:238-246`).",
+      "shownTextDigest": "38517e6c917bb4e21624a0e07b496579d6190b6adb9983f5fe18e16c3526eeb8",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "The previously independently accepted shown text is unchanged, but main changed a cited code blob. Every cited span is uniquely located byte-for-byte in current code; the updated ranges/blob pins require independent closure re-confirmation. No prior code-evidence approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_c26b6c8149e0b5bc78dab2b6e1fb6e0a",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        },
+        {
+          "claimId": "claim_ad392d3c304da7625a3e2f75aa0753e6",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "2-production-ladder-semantics",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 211,
+            "endLine": 302,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 352,
+            "endLine": 370,
+            "blobSha": "0cebf531509a9b6d0f9047e0ab25fd63eb7d6492"
+          },
+          {
+            "path": "src/runner/recovery.mjs",
+            "startLine": 126,
+            "endLine": 133,
+            "blobSha": "d588b72f956ddcbaa4c65dfeecaf0388fabe0be4"
+          },
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 93,
+            "endLine": 109,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 238,
+            "endLine": 246,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      },
+      "codeRebindingWitnesses": [
+        {
+          "path": "src/runner/dispatch/herdr-round.mjs",
+          "oldStart": 341,
+          "oldEnd": 359,
+          "newStart": 351,
+          "newEnd": 369,
+          "spanDigest": "fcf68e268844e4680f66cb745565474ba85adab1155f7682b2f4e22e0114debf",
+          "unchangedCitedBytes": true
+        }
+      ],
+      "recoveryProvenance": {
+        "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
+        "receiptClaimId": "claim_f2b49dde03982181f6b70e8673696528",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current-earlier.md",
+        "reportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+        "verdictClaimId": "claim_f2b49dde03982181f6b70e8673696528",
+        "unitDigest": "38517e6c917bb4e21624a0e07b496579d6190b6adb9983f5fe18e16c3526eeb8",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_e134b71a09a0a8fd7c62eef87959daf4",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "45eb2c3f056d30141e5d53b6c349a7b8d46092bfc87346e0b2dd841f8b2081b9",
+      "shownText": "Current durable Run admission and attempt accounting are implemented in\n`src/runner/dispatch/assignment-runner.mjs:672-783`. Retry attempts retain the\nAssignment and previous evidence; observer restarts are not a fresh semantic\nrequest. Exact admission caps must come from that implementation/effective\ncontract, not a retired session retry declaration.",
+      "shownTextDigest": "45eb2c3f056d30141e5d53b6c349a7b8d46092bfc87346e0b2dd841f8b2081b9",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Executor Fallback And Effect Eligibility > 4. One Attempt History, Explicit Caps, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: open; Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below.. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "4-one-attempt-history-explicit-caps",
+        "status": "open",
+        "reason": "Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below."
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 844,
+            "endLine": 894,
+            "blobSha": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_e4d528f17a5416a724940f404f23c34f",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_e4d528f17a5416a724940f404f23c34f",
+        "unitDigest": "45eb2c3f056d30141e5d53b6c349a7b8d46092bfc87346e0b2dd841f8b2081b9",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_c7c1506a1c8d6e7bfe85935c0868d924",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-15",
+      "unitDigest": "76d215590439cb81c3b2cf2c436f9232b4e67a3670186038b25c43c774f80d0b",
+      "shownText": "The older Work-runner recovery matrix separately uses\n`DEFAULT_MAX_RETRIES = 2` (`src/runner/recovery.mjs:91`).\nIts claim-attempt counter is not interchangeable with every Assignment\nadmission counter.",
+      "shownTextDigest": "76d215590439cb81c3b2cf2c436f9232b4e67a3670186038b25c43c774f80d0b",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Executor Fallback And Effect Eligibility > 4. One Attempt History, Explicit Caps, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: open; Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below.. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "4-one-attempt-history-explicit-caps",
+        "status": "open",
+        "reason": "Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below."
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 844,
+            "endLine": 894,
+            "blobSha": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_26e261dd7c1d9513cc78c22af376e32c",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_26e261dd7c1d9513cc78c22af376e32c",
+        "unitDigest": "76d215590439cb81c3b2cf2c436f9232b4e67a3670186038b25c43c774f80d0b",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_95d630cee33a4aee7d6a44e1e0a3c4a9",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-16",
+      "unitDigest": "35ebb378e8d447d5f996404dad8eec4626b4f00311d2221a450ee6eb418c21ad",
+      "shownText": "The proposed `maxAttemptsPerAssignment`/`maxAttemptsPerExecutor` policy and\nunique primary-plus-fallback candidate list are not accepted current config\nfields or a shipped universal default. `fallbackExecutors` is recorded but\nreserved-not-executed by the Assignment policy resolver\n(`assignment-policy.mjs:380-388`). Current Execution Core quota fallback uses\nits own binding/replacement path; this proposal must not claim the old session\n`maxRetries` mechanism still schedules it.",
+      "shownTextDigest": "35ebb378e8d447d5f996404dad8eec4626b4f00311d2221a450ee6eb418c21ad",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Executor Fallback And Effect Eligibility > 4. One Attempt History, Explicit Caps, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: open; Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below.. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "4-one-attempt-history-explicit-caps",
+        "status": "open",
+        "reason": "Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below."
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 844,
+            "endLine": 894,
+            "blobSha": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_495320a2651797d50b14e45043ed7596",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_495320a2651797d50b14e45043ed7596",
+        "unitDigest": "35ebb378e8d447d5f996404dad8eec4626b4f00311d2221a450ee6eb418c21ad",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_7731fbd40c6c0d51f94c7e55b93c0925",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-17",
+      "unitDigest": "eaec6dc020fab8b2c62e171dce457ad67da1e92ed6d7310280c9a18593db508e",
+      "shownText": "Future unified caps would count admitted attempts, including pre-launch\nfailure, preserve counts across executors and reject exhaustion before another\nadmission. This is a design requirement, not proof that the proposed two-attempt,\none-attempt-per-executor schema is implemented.",
+      "shownTextDigest": "eaec6dc020fab8b2c62e171dce457ad67da1e92ed6d7310280c9a18593db508e",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Executor Fallback And Effect Eligibility > 4. One Attempt History, Explicit Caps, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: open; Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below.. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "4-one-attempt-history-explicit-caps",
+        "status": "open",
+        "reason": "Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below."
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 844,
+            "endLine": 894,
+            "blobSha": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_a90e5c051e094c84be73364438f16b55",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_a90e5c051e094c84be73364438f16b55",
+        "unitDigest": "eaec6dc020fab8b2c62e171dce457ad67da1e92ed6d7310280c9a18593db508e",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_67592e838ebefa5d77fb98b4af14e367",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "6-local-concurrency-and-durability",
+      "unitDigest": "b54abb5801b4e539ddd8dc29f1135d06a751a9833cd45a7fd27e72aff7b63cd6",
+      "shownText": "## 6. Local Concurrency And Durability\n\nControl acquisition must not reclaim a live process merely because TTL expired.\nHolder identity is `{hostId, bootId, pid, processStartTime}` of the process doing\ncontrol, not a guessed Rust parent. Unknown liveness is not dead. A dead holder\nmay leave a remotely queued command: successor first reconciles pending control.\n\nImplemented (Phase 02 H1, `src/runner/dispatch/run-lock.mjs`): holder identity\nis `{id, pid, bootId, processStartTime, host}` (`buildRunControlHolder`,\n`host` in place of this section's `hostId`), and `resolveHolderLiveness`\nencodes the reclaim decision above as a table — a live pid, a pid whose\nliveness cannot be disproven (unreadable `/proc/<pid>/stat`), or a pre-H1\nholder record with no `processStartTime` to cross-check all resolve to\n`held`, never `dead`; only a genuinely dead pid, a pid reused by a different\nprocess (`processStartTime` mismatch), or a `bootId` predating the current\nboot resolve to `dead`.\n\nRecommended local implementation for safe reclaim without unlink races:\none per-scope lock directory containing immutable generation records and\ntoken-specific release markers. Contenders publish generation `g+1` only after\n`g` is released or its exact process identity is proven dead. Exactly one wins\nexclusive publication. Never unlink/overwrite an earlier generation during\nacquire/release, so a delayed release cannot delete its successor. A live holder\nnever self-recognizes a second concurrent acquisition as reentrant. Generation\nrecords are retained with the runtime/session artifacts; compaction is offline\nonly after the scope is quiescent.\n\nThe proposed durability profile requires a fully written/fsynced temp file in\nthe same directory, atomic non-overwriting publication and directory fsync.\nIt calls for temp+rename+directory fsync under the owning lock for replacement.\nThose are design requirements; the implementation's best-effort directory\nfsync and other limits are stated below, not silently promoted to guarantees.\nCurrent terminal `result.json` is published by `publishImmutableProof`\n(`settlement.mjs:434`), not the mutable writer. `run.json` updates, the\neffective-execution-contract projection and bookkeeping markers use their\nmutable/marker writers. An unreadable existing result refuses relaunch rather\nthan overwriting evidence. The proof helper fsyncs the file, hard-links it\nwithout overwrite, treats `EEXIST` as an existing proof and rethrows other link\nerrors; directory fsync is best-effort (`proof-helpers.mjs:73-125`).\nA dedicated unsupported-filesystem diagnostic/doctor probe is a design\nrequirement, not an implemented check. No distributed lease, background\nrenewal service or TTL-only takeover is required by this local design.",
+      "shownTextDigest": "097936745e3bd24722d05d5c02697903f13d2e8a95e1e7c7cee804833dfdaf68",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 6-local-concurrency-and-durability evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_8583ddde780e3b33f160facfa96d595a",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "same real named section; changed full shown text or inherited stale receipt digest, pending current-code recheck"
+        },
+        {
+          "claimId": "claim_8583ddde780e3b33f160facfa96d595a",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "same real named section; changed full shown text or inherited stale receipt digest, pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "6-local-concurrency-and-durability",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/run-lock.mjs",
+            "startLine": 306,
+            "endLine": 412,
+            "blobSha": "d44e2aef594ad322fa5496601501431b6ce216b3"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 844,
+            "endLine": 894,
+            "blobSha": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 442,
+            "endLine": 467,
+            "blobSha": "8cf6555c531c1b2fb8a1ff4419626d67b31d71dc"
+          },
+          {
+            "path": "src/runner/dispatch/proof-helpers.mjs",
+            "startLine": 73,
+            "endLine": 125,
+            "blobSha": "ec8e9f6ab9406cea6eb7ff9ab1edf4fe962862ca"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 948,
+            "endLine": 971,
+            "blobSha": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+        "receiptClaimId": "claim_8583ddde780e3b33f160facfa96d595a",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+        "reportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+        "verdictClaimId": "claim_8583ddde780e3b33f160facfa96d595a",
+        "unitDigest": "b54abb5801b4e539ddd8dc29f1135d06a751a9833cd45a7fd27e72aff7b63cd6",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_eb4f9f793cdbefbf6465ae8c571bf941",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "evidence-freshness",
+      "unitDigest": "a5ed6e5263456f13da8dab4f2e7a0dac4414800fc5d0c834946ee149438ab060",
+      "shownText": "## Evidence Freshness\n\nMutating operations must distinguish pre-existing state from changes attributable\nto the Run. Evidence checks should use pre/post snapshots, git state, artifact\ntimestamps/hashes, expected-file rules, or equivalent operation-specific proof.\n\nImplemented evidence attribution makes this distinction explicit (src/runner/dispatch/evidence-attribution.mjs:10,69,197): pre/post Git\nsnapshots provide correlation only, not proof of process authorship. Attribution\nlevels are `proven`, `correlated`, `excluded`, and `unattributed`; only\nadapter/confinement evidence with declared positive coverage can produce\n`proven`.",
+      "shownTextDigest": "faa9d44513c3fb2422d55a38e47b23487982324f3a0f94fb078e327072348dd8",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Assignment, Run, And RunResult Contract > Evidence Freshness, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "evidence-freshness",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/evidence-attribution.mjs",
+            "startLine": 33,
+            "endLine": 85,
+            "blobSha": "e09504371a539816e5195f4b33a87f0c158c07ad"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_59bb3e40fdbbd3291ce08be605dcaea9",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_59bb3e40fdbbd3291ce08be605dcaea9",
+        "unitDigest": "a5ed6e5263456f13da8dab4f2e7a0dac4414800fc5d0c834946ee149438ab060",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_057f9c8cb4fef4cce1ca3f05007755d5",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "unheaded-block-43",
+      "unitDigest": "f744e2923b9068c954f7ae266189faf35330c266658063c57d6658a572de2c88",
+      "shownText": "Implemented evidence attribution makes this distinction explicit (src/runner/dispatch/evidence-attribution.mjs:10,69,197): pre/post Git\nsnapshots provide correlation only, not proof of process authorship. Attribution\nlevels are `proven`, `correlated`, `excluded`, and `unattributed`; only\nadapter/confinement evidence with declared positive coverage can produce\n`proven`.",
+      "shownTextDigest": "f744e2923b9068c954f7ae266189faf35330c266658063c57d6658a572de2c88",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Assignment, Run, And RunResult Contract > Evidence Freshness, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "evidence-freshness",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/evidence-attribution.mjs",
+            "startLine": 33,
+            "endLine": 85,
+            "blobSha": "e09504371a539816e5195f4b33a87f0c158c07ad"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_3b5b33fcec9481881f386c93533cbbef",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_3b5b33fcec9481881f386c93533cbbef",
+        "unitDigest": "f744e2923b9068c954f7ae266189faf35330c266658063c57d6658a572de2c88",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_ad5d6c50833838b291a8afa244710000",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-114",
+      "unitDigest": "669f5ebe000ba02c27c5d0a823869ff52225521d129d840c7eef336ce7cb9714",
+      "shownText": "Herdr's Rust implementation (`herdr-dashboard/src/`) names several of its own\ntypes with \"orchestrator\" in Rust-identifier casing: the `PaneOrchestrator`\ntrait (`ports.rs`) governing pane open/reuse/focus, and the\n`OrchestratorSettings` (`packages/herdr-fgos-common/rust/src/settings.rs`) and\n`HerdrOrchestratorToggles` (`herdr-dashboard/src/main.rs`) govern the\n`herdrOrchestrator` configuration namespace. These\nare Rust port terms describing Herdr's own pane-lifecycle and toggle\nmechanics — a different vocabulary from this document's own \"orchestrator\"\nglossary entry above (§5.1: the T0 composition layer that manages N units of work and stays attached). Do not\nrename `PaneOrchestrator` or its sibling identifiers to align with that\nglossary sense, and do not read a `PaneOrchestrator`/`OrchestratorSettings`\ncitation elsewhere in the repo as evidence fgOS's own dispatch layer is\nbeing described.",
+      "shownTextDigest": "669f5ebe000ba02c27c5d0a823869ff52225521d129d840c7eef336ce7cb9714",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 12. Transport > 12.1a Herdr Own Rust Vocabulary Is a Separate Namespace, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "121a-herdr-own-rust-vocabulary-is-a-separate-namespace",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 770,
+            "endLine": 812,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          },
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 937,
+            "endLine": 945,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_544f10be516ae91a0371ed99f034402e",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_544f10be516ae91a0371ed99f034402e",
+        "unitDigest": "669f5ebe000ba02c27c5d0a823869ff52225521d129d840c7eef336ce7cb9714",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_093256d8e4834a042c5d3bca090debfa",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-115",
+      "unitDigest": "f3ea3f7469efb8a1d17340e69d5f005ebc28b137a1a8236837abdfd673d27cdd",
+      "shownText": "Current `herdr-spawn` keeps CLI-shaped invocation but requires configured\n`interactiveMode`; non-interactive dispatch is rejected\n(`transport.mjs:913-921`). It starts a fresh interactive agent pane through\n`herdr agent start`; the prompt is delivered through a disk artifact rather\nthan typed as a multiline shell command.",
+      "shownTextDigest": "f3ea3f7469efb8a1d17340e69d5f005ebc28b137a1a8236837abdfd673d27cdd",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 12. Transport > 12.2 Near-Term Herdr Adapter, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "122-near-term-herdr-adapter",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 770,
+            "endLine": 812,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          },
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 937,
+            "endLine": 945,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_b2aeba067935366ebd6f2b54ff144b5d",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_b2aeba067935366ebd6f2b54ff144b5d",
+        "unitDigest": "f3ea3f7469efb8a1d17340e69d5f005ebc28b137a1a8236837abdfd673d27cdd",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_22c21e333a3e28ce4157a3a8ecb45cc0",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-116",
+      "unitDigest": "d5487f392710c3185e9446c6b531670e0c39d51c1975c337f3d1d9cb9a7067a4",
+      "shownText": "Completion is a worker-written `outbox/result-<round>.json`, not pane status,\nstdout sentinels, `[DONE]` or a screenshot. A failed dispatch's pane stays open\nby default and its error identifies the pane; a separately configured sweep\nmay close failed-round panes, not provider-limit pauses\n(`transport.mjs:748-814`).",
+      "shownTextDigest": "d5487f392710c3185e9446c6b531670e0c39d51c1975c337f3d1d9cb9a7067a4",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 12. Transport > 12.2 Near-Term Herdr Adapter, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "122-near-term-herdr-adapter",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 770,
+            "endLine": 812,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          },
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 937,
+            "endLine": 945,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_1c5560d85b38aa19415d0ce1857b0405",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_1c5560d85b38aa19415d0ce1857b0405",
+        "unitDigest": "d5487f392710c3185e9446c6b531670e0c39d51c1975c337f3d1d9cb9a7067a4",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_04708da0808dc431babd8703bca2f6f5",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-117",
+      "unitDigest": "783d0f691c229b5e3167bad2a846d06ffea7cc7180943b63149286a4e7d48a62",
+      "shownText": "The old non-interactive temporary-script/sentinel/echo-strip/timeout-kill\nrecipe is removed and must not be used as current instructions. Result files\nstill require their own contract/evidence validation; terminal visibility\ndoes not decide Work lifecycle.",
+      "shownTextDigest": "783d0f691c229b5e3167bad2a846d06ffea7cc7180943b63149286a4e7d48a62",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 12. Transport > 12.2 Near-Term Herdr Adapter, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "122-near-term-herdr-adapter",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 770,
+            "endLine": 812,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          },
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 937,
+            "endLine": 945,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_24fdc7fec7ba4b6c2dd1ecf610e923e4",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_24fdc7fec7ba4b6c2dd1ecf610e923e4",
+        "unitDigest": "783d0f691c229b5e3167bad2a846d06ffea7cc7180943b63149286a4e7d48a62",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_bd150b090a443355048d83d8fe69502e",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-118",
+      "unitDigest": "cf4282de7c03e113012ec5beb85a426e24d35078f3a3f04ae8bb8f7d2d1a32aa",
+      "shownText": "AgentMessage/mailbox transport remains an unimplemented design target.",
+      "shownTextDigest": "cf4282de7c03e113012ec5beb85a426e24d35078f3a3f04ae8bb8f7d2d1a32aa",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 12. Transport > 12.2 Near-Term Herdr Adapter, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "122-near-term-herdr-adapter",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 770,
+            "endLine": 812,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          },
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 937,
+            "endLine": 945,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_910cb0d99d3df78a901c83c4f1fadbe8",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_910cb0d99d3df78a901c83c4f1fadbe8",
+        "unitDigest": "cf4282de7c03e113012ec5beb85a426e24d35078f3a3f04ae8bb8f7d2d1a32aa",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_4b558ff641410c3268750f6261d1fc44",
+      "path": "docs/platform/agent-coordination/vision.md",
+      "anchor": "unheaded-block-16",
+      "unitDigest": "39b03335c44fcb778cf7ee00cf3266ebf92a333145f6ef7c5b976630bb945445",
+      "shownText": "Independently governable delivery units belong in Work intake. Temporary\nresearch, review and consultation instead have current Unit/Pattern execution\npaths without requiring an extra Work record. The old claim that no neutral\nexecution path exists is no longer current; further dynamic planning models\nare design questions, not grounds to revive a session-local task store.",
+      "shownTextDigest": "39b03335c44fcb778cf7ee00cf3266ebf92a333145f6ef7c5b976630bb945445",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Agent Coordination Foundation Vision > Problems This Vision Resolves > 2. Planning Currently Over-Materializes Work, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: open; Earlier problem framing is labelled dated context; the former mission-lite/engine premise is not current implementation.. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "2-planning-currently-over-materializes-work",
+        "status": "open",
+        "reason": "Earlier problem framing is labelled dated context; the former mission-lite/engine premise is not current implementation."
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 539,
+            "endLine": 582,
+            "blobSha": "f8cc0749f0f7920146c2c3fbafd2227713e26a89"
+          },
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. Earlier problem framing is labelled dated context; the former mission-lite/engine premise is not current implementation.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_394a133a65ff7b4001e221b48521f98e",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_394a133a65ff7b4001e221b48521f98e",
+        "unitDigest": "39b03335c44fcb778cf7ee00cf3266ebf92a333145f6ef7c5b976630bb945445",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_0605d63a7150fccffd52a88a25b08b36",
+      "path": "docs/platform/agent-coordination/vision.md",
+      "anchor": "v-006-planning-is-pluggable-and-composable",
+      "unitDigest": "eac723e36bcb6926e0680aaf014a1403ef242dd5daf271173e8c1421d30c6f0c",
+      "shownText": "### V-006: Planning Is Pluggable And Composable\n\nPlanning intelligence may come from a caller, declared Workflow or domain\ndoctrine without forking governed execution. The current coding harness enriches\nand validates supporting inline contracts through its pure seam; it is not proof\nthat research/marketing harnesses or a universal plugin SDK already exist.\nEvidence: `domains/coding/harness/enrich-and-validate-contract.mjs:102-147`.",
+      "shownTextDigest": "f5158f85b1bfec08a7cebc60639820e8e65d59f8f73290fe9861001ce6fd165b",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Agent Coordination Foundation Vision > Accepted Vision Decisions > V-006: Planning Is Pluggable And Composable, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "v-006-planning-is-pluggable-and-composable",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 539,
+            "endLine": 582,
+            "blobSha": "f8cc0749f0f7920146c2c3fbafd2227713e26a89"
+          },
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_f3e80fdcdf87ff296332d7c2a8acb838",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_f3e80fdcdf87ff296332d7c2a8acb838",
+        "unitDigest": "eac723e36bcb6926e0680aaf014a1403ef242dd5daf271173e8c1421d30c6f0c",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_a2a8446112a1203bd413ab67e787ac52",
+      "path": "docs/platform/agent-coordination/vision.md",
+      "anchor": "unheaded-block-31",
+      "unitDigest": "196b1ff54d776e4ff08ce7f645dbdf2224eb15fdb01bbb16f6d10c42526b2b67",
+      "shownText": "Planning intelligence may come from a caller, declared Workflow or domain\ndoctrine without forking governed execution. The current coding harness enriches\nand validates supporting inline contracts through its pure seam; it is not proof\nthat research/marketing harnesses or a universal plugin SDK already exist.\nEvidence: `domains/coding/harness/enrich-and-validate-contract.mjs:102-147`.",
+      "shownTextDigest": "196b1ff54d776e4ff08ce7f645dbdf2224eb15fdb01bbb16f6d10c42526b2b67",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Agent Coordination Foundation Vision > Accepted Vision Decisions > V-006: Planning Is Pluggable And Composable, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: verified. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "v-006-planning-is-pluggable-and-composable",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 539,
+            "endLine": 582,
+            "blobSha": "f8cc0749f0f7920146c2c3fbafd2227713e26a89"
+          },
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_f5b89b92a4963c1b7c322100d6ce5f73",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_f5b89b92a4963c1b7c322100d6ce5f73",
+        "unitDigest": "196b1ff54d776e4ff08ce7f645dbdf2224eb15fdb01bbb16f6d10c42526b2b67",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_8d1098aad227478a4ecfba67e29f6a69",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-135",
+      "unitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
+      "shownText": "Status: implemented in the reviewed candidate.",
+      "shownTextDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 14. Narrow Implementation Status > 14.3 Item 2 - `herdr-spawn` Adapter, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: open; Dated finding/candidate/task-window record, explicitly not a current runtime assertion or fresh proof. Its old execution counts/probes have not been reproduced by this truth pass (UNPROVEN).. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "143-item-2---herdr-spawn-adapter",
+        "status": "open",
+        "reason": "Dated finding/candidate/task-window record, explicitly not a current runtime assertion or fresh proof. Its old execution counts/probes have not been reproduced by this truth pass (UNPROVEN)."
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 770,
+            "endLine": 812,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          },
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 937,
+            "endLine": 945,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. Dated finding/candidate/task-window record, explicitly not a current runtime assertion or fresh proof. Its old execution counts/probes have not been reproduced by this truth pass (UNPROVEN).",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_identity_gap_a4d78a2cbd06571524e6ea0b",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_identity_gap_a4d78a2cbd06571524e6ea0b",
+        "unitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    },
+    {
+      "claimId": "claim_b36b3352394e5987921d8ca3fab02023",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-136",
+      "unitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
+      "shownText": "Implemented behavior:",
+      "shownTextDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This current unit belongs to the truth-only section Dispatch Control Plane Redesign > 14. Narrow Implementation Status > 14.3 Item 2 - `herdr-spawn` Adapter, pinned at 96a13ab21670e1f5d9748c02cd615ea5598b53f5. Its full shown text, class and code/design boundary require independent review. The accepted carriage and all historical/payload bytes are unchanged. Author section status: open; Dated finding/candidate/task-window record, explicitly not a current runtime assertion or fresh proof. Its old execution counts/probes have not been reproduced by this truth pass (UNPROVEN).. No prior verdict is carried to this receipt.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "143-item-2---herdr-spawn-adapter",
+        "status": "open",
+        "reason": "Dated finding/candidate/task-window record, explicitly not a current runtime assertion or fresh proof. Its old execution counts/probes have not been reproduced by this truth pass (UNPROVEN)."
+      },
+      "currentEvidence": {
+        "commit": "da8285e065835dc3136ca0daabb2cd19e05d10fb",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 770,
+            "endLine": 812,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          },
+          {
+            "path": "src/runner/dispatch/transport.mjs",
+            "startLine": 937,
+            "endLine": 945,
+            "blobSha": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. Dated finding/candidate/task-window record, explicitly not a current runtime assertion or fresh proof. Its old execution counts/probes have not been reproduced by this truth pass (UNPROVEN).",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "recoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_identity_gap_25e5d945e6bcfb37b1d3c891",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_identity_gap_25e5d945e6bcfb37b1d3c891",
+        "unitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      }
+    }
+  ],
+  "repinProvenance": [
+    {
+      "claimId": "claim_39e4f58e68986802a16d978b42f5a1db",
+      "priorRef": {
+        "claimId": "claim_39e4f58e68986802a16d978b42f5a1db",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of 2269f2d27:candidate-classifications-agent-coordination-recovery.json receipt; object equal after restoring evidence pins; 1 cited range byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/recovery.mjs",
+          "beforeBlob": "a2272b4a665b8d366932129cd91fd5f3b6f4014f",
+          "afterBlob": "d588b72f956ddcbaa4c65dfeecaf0388fabe0be4",
+          "beforeStartLine": 105,
+          "beforeEndLine": 112,
+          "startLine": 126,
+          "endLine": 133,
+          "status": "unchanged-excerpt",
+          "excerpt": "export const RECOVERY = Object.freeze({\n  'worker-spawn-fail': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'worker-timeout': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'verify-miss': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'verify-timeout': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'worktree-fail': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'corrupt-log': Object.freeze({ action: 'halt' }),\n  'reject-returned': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),",
+          "excerptDigest": "49c671b2e1d38b87c673f0b53eb6b8b188078e929e879c1b89c9fb85b2b2e16a"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_e134b71a09a0a8fd7c62eef87959daf4",
+      "priorRef": {
+        "claimId": "claim_e134b71a09a0a8fd7c62eef87959daf4",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of a1fd2136a:candidate-classifications-agent-coordination-main-repin.json receipt; object equal after restoring evidence pins; 1 cited range byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "beforeBlob": "7f90571424dd6fded8e890d1494c522f180ea153",
+          "afterBlob": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a",
+          "beforeStartLine": 919,
+          "beforeEndLine": 969,
+          "startLine": 844,
+          "endLine": 894,
+          "status": "unchanged-excerpt",
+          "excerpt": "    }\n    return {\n      record: {\n        attempt,\n        attemptStr,\n        runId,\n        retryId: retryId ?? null,\n        predecessorRunId,\n        destination,\n        admissionPayloadDigest: payloadDigest,\n        admittedAt: new Date().toISOString(),\n        // S5: the admitting process's own identity, stamped into this same\n        // atomic CAS commit -- see the `admitterAlive` check above for why\n        // this exists and when it is (and is not) consulted.\n        admittedBy: buildRunControlHolder(`${runId}:admission:${process.pid}`),\n      },\n    };\n  });\n\n  if (admission.status === 'duplicate-retry') {\n    throw new RunnerConfigError(\n      `executeAssignment: retryId \"${retryId}\" for assignment \"${assignmentId}\" was already admitted with a different destination/payload digest -- refusing (duplicate-retry)`,\n      { code: 'admission-duplicate-retry', phase: 'pre-admission' },\n    );\n  }\n  if (admission.status === 'invalid-predecessor') {\n    throw new RunnerConfigError(\n      `executeAssignment: predecessorRunId \"${predecessorRunId}\" for assignment \"${assignmentId}\" does not match the current committed Run \"${admission.currentRunId}\" -- refusing (invalid-predecessor)`,\n      { code: 'admission-invalid-predecessor', phase: 'pre-admission' },\n    );\n  }\n  if (admission.status === 'run-in-flight') {\n    // M1: nothing for THIS new attempt was ever created (no run directory) --\n    // 'pre-admission' is correct, matching every other admission refusal\n    // above.\n    throw new RunnerConfigError(\n      `executeAssignment: assignment \"${assignmentId}\"'s prior attempt \"${admission.priorRunId}\" (attempt ${admission.priorAttempt}) has not settled and its control holder is alive or its liveness could not be disproven -- refusing a new attempt that would race it (pass --force-new-attempt to override)`,\n      { code: 'admission-run-in-flight', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt, holder: admission.holder },\n    );\n  }\n  if (admission.status === 'run-already-settled') {\n    // S5: opt-in (`refuseIfSettled`) refusal -- see its own comment above\n    // for why this exists. Nothing for THIS new attempt was ever created.\n    throw new RunnerConfigError(\n      `executeAssignment: assignment \"${assignmentId}\"'s prior attempt \"${admission.priorRunId}\" (attempt ${admission.priorAttempt}) already settled -- the caller opted into refuseIfSettled and must resume/link that result instead of dispatching a fresh attempt over it`,\n      { code: 'admission-run-already-settled', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt },\n    );\n  }\n\n  const record = admission.record;\n  const runDir = path.join(runsDir, record.attemptStr);",
+          "excerptDigest": "fad4d70ccfd6ff9da04cb17afef36b119bd2a163dc6d9414c726cbf99ad8f62a"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_c7c1506a1c8d6e7bfe85935c0868d924",
+      "priorRef": {
+        "claimId": "claim_c7c1506a1c8d6e7bfe85935c0868d924",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of a1fd2136a:candidate-classifications-agent-coordination-main-repin.json receipt; object equal after restoring evidence pins; 1 cited range byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "beforeBlob": "7f90571424dd6fded8e890d1494c522f180ea153",
+          "afterBlob": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a",
+          "beforeStartLine": 919,
+          "beforeEndLine": 969,
+          "startLine": 844,
+          "endLine": 894,
+          "status": "unchanged-excerpt",
+          "excerpt": "    }\n    return {\n      record: {\n        attempt,\n        attemptStr,\n        runId,\n        retryId: retryId ?? null,\n        predecessorRunId,\n        destination,\n        admissionPayloadDigest: payloadDigest,\n        admittedAt: new Date().toISOString(),\n        // S5: the admitting process's own identity, stamped into this same\n        // atomic CAS commit -- see the `admitterAlive` check above for why\n        // this exists and when it is (and is not) consulted.\n        admittedBy: buildRunControlHolder(`${runId}:admission:${process.pid}`),\n      },\n    };\n  });\n\n  if (admission.status === 'duplicate-retry') {\n    throw new RunnerConfigError(\n      `executeAssignment: retryId \"${retryId}\" for assignment \"${assignmentId}\" was already admitted with a different destination/payload digest -- refusing (duplicate-retry)`,\n      { code: 'admission-duplicate-retry', phase: 'pre-admission' },\n    );\n  }\n  if (admission.status === 'invalid-predecessor') {\n    throw new RunnerConfigError(\n      `executeAssignment: predecessorRunId \"${predecessorRunId}\" for assignment \"${assignmentId}\" does not match the current committed Run \"${admission.currentRunId}\" -- refusing (invalid-predecessor)`,\n      { code: 'admission-invalid-predecessor', phase: 'pre-admission' },\n    );\n  }\n  if (admission.status === 'run-in-flight') {\n    // M1: nothing for THIS new attempt was ever created (no run directory) --\n    // 'pre-admission' is correct, matching every other admission refusal\n    // above.\n    throw new RunnerConfigError(\n      `executeAssignment: assignment \"${assignmentId}\"'s prior attempt \"${admission.priorRunId}\" (attempt ${admission.priorAttempt}) has not settled and its control holder is alive or its liveness could not be disproven -- refusing a new attempt that would race it (pass --force-new-attempt to override)`,\n      { code: 'admission-run-in-flight', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt, holder: admission.holder },\n    );\n  }\n  if (admission.status === 'run-already-settled') {\n    // S5: opt-in (`refuseIfSettled`) refusal -- see its own comment above\n    // for why this exists. Nothing for THIS new attempt was ever created.\n    throw new RunnerConfigError(\n      `executeAssignment: assignment \"${assignmentId}\"'s prior attempt \"${admission.priorRunId}\" (attempt ${admission.priorAttempt}) already settled -- the caller opted into refuseIfSettled and must resume/link that result instead of dispatching a fresh attempt over it`,\n      { code: 'admission-run-already-settled', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt },\n    );\n  }\n\n  const record = admission.record;\n  const runDir = path.join(runsDir, record.attemptStr);",
+          "excerptDigest": "fad4d70ccfd6ff9da04cb17afef36b119bd2a163dc6d9414c726cbf99ad8f62a"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_95d630cee33a4aee7d6a44e1e0a3c4a9",
+      "priorRef": {
+        "claimId": "claim_95d630cee33a4aee7d6a44e1e0a3c4a9",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of a1fd2136a:candidate-classifications-agent-coordination-main-repin.json receipt; object equal after restoring evidence pins; 1 cited range byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "beforeBlob": "7f90571424dd6fded8e890d1494c522f180ea153",
+          "afterBlob": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a",
+          "beforeStartLine": 919,
+          "beforeEndLine": 969,
+          "startLine": 844,
+          "endLine": 894,
+          "status": "unchanged-excerpt",
+          "excerpt": "    }\n    return {\n      record: {\n        attempt,\n        attemptStr,\n        runId,\n        retryId: retryId ?? null,\n        predecessorRunId,\n        destination,\n        admissionPayloadDigest: payloadDigest,\n        admittedAt: new Date().toISOString(),\n        // S5: the admitting process's own identity, stamped into this same\n        // atomic CAS commit -- see the `admitterAlive` check above for why\n        // this exists and when it is (and is not) consulted.\n        admittedBy: buildRunControlHolder(`${runId}:admission:${process.pid}`),\n      },\n    };\n  });\n\n  if (admission.status === 'duplicate-retry') {\n    throw new RunnerConfigError(\n      `executeAssignment: retryId \"${retryId}\" for assignment \"${assignmentId}\" was already admitted with a different destination/payload digest -- refusing (duplicate-retry)`,\n      { code: 'admission-duplicate-retry', phase: 'pre-admission' },\n    );\n  }\n  if (admission.status === 'invalid-predecessor') {\n    throw new RunnerConfigError(\n      `executeAssignment: predecessorRunId \"${predecessorRunId}\" for assignment \"${assignmentId}\" does not match the current committed Run \"${admission.currentRunId}\" -- refusing (invalid-predecessor)`,\n      { code: 'admission-invalid-predecessor', phase: 'pre-admission' },\n    );\n  }\n  if (admission.status === 'run-in-flight') {\n    // M1: nothing for THIS new attempt was ever created (no run directory) --\n    // 'pre-admission' is correct, matching every other admission refusal\n    // above.\n    throw new RunnerConfigError(\n      `executeAssignment: assignment \"${assignmentId}\"'s prior attempt \"${admission.priorRunId}\" (attempt ${admission.priorAttempt}) has not settled and its control holder is alive or its liveness could not be disproven -- refusing a new attempt that would race it (pass --force-new-attempt to override)`,\n      { code: 'admission-run-in-flight', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt, holder: admission.holder },\n    );\n  }\n  if (admission.status === 'run-already-settled') {\n    // S5: opt-in (`refuseIfSettled`) refusal -- see its own comment above\n    // for why this exists. Nothing for THIS new attempt was ever created.\n    throw new RunnerConfigError(\n      `executeAssignment: assignment \"${assignmentId}\"'s prior attempt \"${admission.priorRunId}\" (attempt ${admission.priorAttempt}) already settled -- the caller opted into refuseIfSettled and must resume/link that result instead of dispatching a fresh attempt over it`,\n      { code: 'admission-run-already-settled', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt },\n    );\n  }\n\n  const record = admission.record;\n  const runDir = path.join(runsDir, record.attemptStr);",
+          "excerptDigest": "fad4d70ccfd6ff9da04cb17afef36b119bd2a163dc6d9414c726cbf99ad8f62a"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_7731fbd40c6c0d51f94c7e55b93c0925",
+      "priorRef": {
+        "claimId": "claim_7731fbd40c6c0d51f94c7e55b93c0925",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of a1fd2136a:candidate-classifications-agent-coordination-main-repin.json receipt; object equal after restoring evidence pins; 1 cited range byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "beforeBlob": "7f90571424dd6fded8e890d1494c522f180ea153",
+          "afterBlob": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a",
+          "beforeStartLine": 919,
+          "beforeEndLine": 969,
+          "startLine": 844,
+          "endLine": 894,
+          "status": "unchanged-excerpt",
+          "excerpt": "    }\n    return {\n      record: {\n        attempt,\n        attemptStr,\n        runId,\n        retryId: retryId ?? null,\n        predecessorRunId,\n        destination,\n        admissionPayloadDigest: payloadDigest,\n        admittedAt: new Date().toISOString(),\n        // S5: the admitting process's own identity, stamped into this same\n        // atomic CAS commit -- see the `admitterAlive` check above for why\n        // this exists and when it is (and is not) consulted.\n        admittedBy: buildRunControlHolder(`${runId}:admission:${process.pid}`),\n      },\n    };\n  });\n\n  if (admission.status === 'duplicate-retry') {\n    throw new RunnerConfigError(\n      `executeAssignment: retryId \"${retryId}\" for assignment \"${assignmentId}\" was already admitted with a different destination/payload digest -- refusing (duplicate-retry)`,\n      { code: 'admission-duplicate-retry', phase: 'pre-admission' },\n    );\n  }\n  if (admission.status === 'invalid-predecessor') {\n    throw new RunnerConfigError(\n      `executeAssignment: predecessorRunId \"${predecessorRunId}\" for assignment \"${assignmentId}\" does not match the current committed Run \"${admission.currentRunId}\" -- refusing (invalid-predecessor)`,\n      { code: 'admission-invalid-predecessor', phase: 'pre-admission' },\n    );\n  }\n  if (admission.status === 'run-in-flight') {\n    // M1: nothing for THIS new attempt was ever created (no run directory) --\n    // 'pre-admission' is correct, matching every other admission refusal\n    // above.\n    throw new RunnerConfigError(\n      `executeAssignment: assignment \"${assignmentId}\"'s prior attempt \"${admission.priorRunId}\" (attempt ${admission.priorAttempt}) has not settled and its control holder is alive or its liveness could not be disproven -- refusing a new attempt that would race it (pass --force-new-attempt to override)`,\n      { code: 'admission-run-in-flight', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt, holder: admission.holder },\n    );\n  }\n  if (admission.status === 'run-already-settled') {\n    // S5: opt-in (`refuseIfSettled`) refusal -- see its own comment above\n    // for why this exists. Nothing for THIS new attempt was ever created.\n    throw new RunnerConfigError(\n      `executeAssignment: assignment \"${assignmentId}\"'s prior attempt \"${admission.priorRunId}\" (attempt ${admission.priorAttempt}) already settled -- the caller opted into refuseIfSettled and must resume/link that result instead of dispatching a fresh attempt over it`,\n      { code: 'admission-run-already-settled', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt },\n    );\n  }\n\n  const record = admission.record;\n  const runDir = path.join(runsDir, record.attemptStr);",
+          "excerptDigest": "fad4d70ccfd6ff9da04cb17afef36b119bd2a163dc6d9414c726cbf99ad8f62a"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_67592e838ebefa5d77fb98b4af14e367",
+      "priorRef": {
+        "claimId": "claim_67592e838ebefa5d77fb98b4af14e367",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of a1fd2136a:candidate-classifications-agent-coordination-main-repin.json receipt; object equal after restoring evidence pins; 2 cited ranges byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "beforeBlob": "7f90571424dd6fded8e890d1494c522f180ea153",
+          "afterBlob": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a",
+          "beforeStartLine": 919,
+          "beforeEndLine": 969,
+          "startLine": 844,
+          "endLine": 894,
+          "status": "unchanged-excerpt",
+          "excerpt": "    }\n    return {\n      record: {\n        attempt,\n        attemptStr,\n        runId,\n        retryId: retryId ?? null,\n        predecessorRunId,\n        destination,\n        admissionPayloadDigest: payloadDigest,\n        admittedAt: new Date().toISOString(),\n        // S5: the admitting process's own identity, stamped into this same\n        // atomic CAS commit -- see the `admitterAlive` check above for why\n        // this exists and when it is (and is not) consulted.\n        admittedBy: buildRunControlHolder(`${runId}:admission:${process.pid}`),\n      },\n    };\n  });\n\n  if (admission.status === 'duplicate-retry') {\n    throw new RunnerConfigError(\n      `executeAssignment: retryId \"${retryId}\" for assignment \"${assignmentId}\" was already admitted with a different destination/payload digest -- refusing (duplicate-retry)`,\n      { code: 'admission-duplicate-retry', phase: 'pre-admission' },\n    );\n  }\n  if (admission.status === 'invalid-predecessor') {\n    throw new RunnerConfigError(\n      `executeAssignment: predecessorRunId \"${predecessorRunId}\" for assignment \"${assignmentId}\" does not match the current committed Run \"${admission.currentRunId}\" -- refusing (invalid-predecessor)`,\n      { code: 'admission-invalid-predecessor', phase: 'pre-admission' },\n    );\n  }\n  if (admission.status === 'run-in-flight') {\n    // M1: nothing for THIS new attempt was ever created (no run directory) --\n    // 'pre-admission' is correct, matching every other admission refusal\n    // above.\n    throw new RunnerConfigError(\n      `executeAssignment: assignment \"${assignmentId}\"'s prior attempt \"${admission.priorRunId}\" (attempt ${admission.priorAttempt}) has not settled and its control holder is alive or its liveness could not be disproven -- refusing a new attempt that would race it (pass --force-new-attempt to override)`,\n      { code: 'admission-run-in-flight', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt, holder: admission.holder },\n    );\n  }\n  if (admission.status === 'run-already-settled') {\n    // S5: opt-in (`refuseIfSettled`) refusal -- see its own comment above\n    // for why this exists. Nothing for THIS new attempt was ever created.\n    throw new RunnerConfigError(\n      `executeAssignment: assignment \"${assignmentId}\"'s prior attempt \"${admission.priorRunId}\" (attempt ${admission.priorAttempt}) already settled -- the caller opted into refuseIfSettled and must resume/link that result instead of dispatching a fresh attempt over it`,\n      { code: 'admission-run-already-settled', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt },\n    );\n  }\n\n  const record = admission.record;\n  const runDir = path.join(runsDir, record.attemptStr);",
+          "excerptDigest": "fad4d70ccfd6ff9da04cb17afef36b119bd2a163dc6d9414c726cbf99ad8f62a"
+        },
+        {
+          "path": "src/runner/dispatch/settlement.mjs",
+          "beforeBlob": "bc770e1c9a54c42cb5cec44fd39ab569fff80401",
+          "afterBlob": "8cf6555c531c1b2fb8a1ff4419626d67b31d71dc",
+          "beforeStartLine": 421,
+          "beforeEndLine": 446,
+          "startLine": 442,
+          "endLine": 467,
+          "status": "unchanged-excerpt",
+          "excerpt": "  if (!alreadySettledByUs) {\n    const settlement = settleRunControl(runDir, { controlEpoch, controlToken });\n    if (settlement.status !== 'settled') {\n      publishMutableProjection(supersededJsonPath, runResult);\n      throw new RunnerConfigError(\n        `executeAssignment: control token for Run \"${runId}\" (epoch ${controlEpoch}) is no longer current (settlement status: \"${settlement.status}\") -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,\n        { code: 'run-control-superseded', phase: 'post-admission' },\n      );\n    }\n    if (typeof _afterControlSettlement === 'function') {\n      _afterControlSettlement({ runDir, runId, controlEpoch, controlToken });\n    }\n  }\n\n  const published = publishImmutableProof(resultJsonPath, runResult);\n  if (!published) {\n    if (alreadySettledByUs) {\n      // Our own prior attempt already reached the authoritative publish\n      // (possibly a concurrent duplicate call, or a retry that raced its own\n      // still-running earlier attempt) -- rehydrate rather than treat as\n      // superseded.\n      try {\n        const existing = interpretRunResult(resultJsonPath, { expectedRunId: runId });\n        if (existing && !existing.corrupt && !existing.contractCorrupt && !existing.resultCorrupt\n          && existing.classification?.provenance !== 'contract-corrupt') {\n          return Object.freeze(existing);",
+          "excerptDigest": "16262eca7438f7741dd6f3f83f4b96cd4c79179da07cef159b759a8e066654f0"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "beforeBlob": "7f90571424dd6fded8e890d1494c522f180ea153",
+          "afterBlob": "09c15586c0bdb771bc1fed5142df6bfe3671fd4a",
+          "beforeStartLine": 1023,
+          "beforeEndLine": 1046,
+          "startLine": 948,
+          "endLine": 971,
+          "status": "unchanged-excerpt",
+          "excerpt": "  const runMetaPath = path.join(stagingDir, 'run.json');\n  fs.writeFileSync(runMetaPath, `${JSON.stringify(runMeta, null, 2)}\\n`);\n  fsyncFileBestEffort(runMetaPath);\n\n  if (buildDispatchPlan) {\n    const dispatchPlan = buildDispatchPlan(record);\n    if (dispatchPlan) {\n      const dispatchPlanPath = path.join(stagingDir, 'dispatch-plan.json');\n      fs.writeFileSync(dispatchPlanPath, `${JSON.stringify(dispatchPlan, null, 2)}\\n`);\n      fsyncFileBestEffort(dispatchPlanPath);\n    }\n  }\n\n  if (buildEffectiveContractOpt) {\n    const effectiveContract = buildEffectiveContractOpt(record);\n    if (effectiveContract) {\n      const contractPath = path.join(stagingDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);\n      publishMutableProjection(contractPath, effectiveContract);\n    }\n  }\n  fsyncDirBestEffort(stagingDir);\n\n  try {\n    fs.renameSync(stagingDir, runDir);",
+          "excerptDigest": "7f27cce5363aa80780f510cad748a286208913e4cb9370a6644cba1fdd28c4a5"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_eb4f9f793cdbefbf6465ae8c571bf941",
+      "priorRef": {
+        "claimId": "claim_eb4f9f793cdbefbf6465ae8c571bf941",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+        "reviewedAt": "2026-10-12",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+        "reviewMode": "ordinary",
+        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_59bb3e40fdbbd3291ce08be605dcaea9; bytes equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/evidence-attribution.mjs",
+          "beforeBlob": "73dc6379b50bc0a02dc9742873607d89ad4a1056",
+          "afterBlob": "e09504371a539816e5195f4b33a87f0c158c07ad",
+          "beforeStartLine": 31,
+          "beforeEndLine": 83,
+          "startLine": 33,
+          "endLine": 85,
+          "status": "unchanged-excerpt",
+          "excerpt": "export function attributeWorkspaceChanges({\n  preLaunchDirt = [],\n  postRunDirt = [],\n  dirtyBeforeHashes = {},\n  postRunHashes = {},\n  declaredCoverage = null,\n  adapterAttestation = null,\n} = {}) {\n  const records = [];\n  const preDirtSet = new Set(preLaunchDirt || []);\n  const postDirtSet = new Set(postRunDirt || []);\n\n  const allPaths = Array.from(new Set([...preDirtSet, ...postDirtSet])).sort();\n\n  for (const filePath of allPaths) {\n    const wasPre = preDirtSet.has(filePath);\n    const isPost = postDirtSet.has(filePath);\n\n    if (wasPre && isPost) {\n      const preHash = dirtyBeforeHashes[filePath];\n      const postHash = postRunHashes[filePath];\n\n      if (preHash && postHash && preHash === postHash) {\n        // Pre-existing dirt unchanged during run -> excluded\n        records.push({\n          path: filePath,\n          firstObserved: 'pre-launch',\n          level: 'excluded',\n          basis: ['dirty-before-hash-match'],\n          coverageMatched: false,\n        });\n      } else if (preHash && postHash && preHash !== postHash) {\n        // Pre-existing dirt mutated during run -> correlated (or proven if covered)\n        const isCovered = checkCoverage(filePath, declaredCoverage);\n        const hasPositiveAttestation = checkAttestation(filePath, adapterAttestation);\n        records.push({\n          path: filePath,\n          firstObserved: 'pre-launch',\n          level: hasPositiveAttestation && isCovered ? 'proven' : 'correlated',\n          basis: hasPositiveAttestation && isCovered\n            ? ['adapter-confinement-attestation', 'pre-existing-dirt-mutated']\n            : ['pre-existing-dirt-mutated', 'pre-post-git-snapshot'],\n          coverageMatched: isCovered,\n        });\n      } else {\n        // Hashes missing but present in both -> excluded by default timing unless mutatedDirtyBeforeFiles says otherwise\n        records.push({\n          path: filePath,\n          firstObserved: 'pre-launch',\n          level: 'excluded',\n          basis: ['pre-launch-git-status'],\n          coverageMatched: false,\n        });",
+          "excerptDigest": "fdff7cd499c0b8c6010af6e6c900a72cbb2e915f2810f7b7fedc3a6a22416b0a"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_057f9c8cb4fef4cce1ca3f05007755d5",
+      "priorRef": {
+        "claimId": "claim_057f9c8cb4fef4cce1ca3f05007755d5",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+        "reviewedAt": "2026-10-12",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+        "reviewMode": "ordinary",
+        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_3b5b33fcec9481881f386c93533cbbef; bytes equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/evidence-attribution.mjs",
+          "beforeBlob": "73dc6379b50bc0a02dc9742873607d89ad4a1056",
+          "afterBlob": "e09504371a539816e5195f4b33a87f0c158c07ad",
+          "beforeStartLine": 31,
+          "beforeEndLine": 83,
+          "startLine": 33,
+          "endLine": 85,
+          "status": "unchanged-excerpt",
+          "excerpt": "export function attributeWorkspaceChanges({\n  preLaunchDirt = [],\n  postRunDirt = [],\n  dirtyBeforeHashes = {},\n  postRunHashes = {},\n  declaredCoverage = null,\n  adapterAttestation = null,\n} = {}) {\n  const records = [];\n  const preDirtSet = new Set(preLaunchDirt || []);\n  const postDirtSet = new Set(postRunDirt || []);\n\n  const allPaths = Array.from(new Set([...preDirtSet, ...postDirtSet])).sort();\n\n  for (const filePath of allPaths) {\n    const wasPre = preDirtSet.has(filePath);\n    const isPost = postDirtSet.has(filePath);\n\n    if (wasPre && isPost) {\n      const preHash = dirtyBeforeHashes[filePath];\n      const postHash = postRunHashes[filePath];\n\n      if (preHash && postHash && preHash === postHash) {\n        // Pre-existing dirt unchanged during run -> excluded\n        records.push({\n          path: filePath,\n          firstObserved: 'pre-launch',\n          level: 'excluded',\n          basis: ['dirty-before-hash-match'],\n          coverageMatched: false,\n        });\n      } else if (preHash && postHash && preHash !== postHash) {\n        // Pre-existing dirt mutated during run -> correlated (or proven if covered)\n        const isCovered = checkCoverage(filePath, declaredCoverage);\n        const hasPositiveAttestation = checkAttestation(filePath, adapterAttestation);\n        records.push({\n          path: filePath,\n          firstObserved: 'pre-launch',\n          level: hasPositiveAttestation && isCovered ? 'proven' : 'correlated',\n          basis: hasPositiveAttestation && isCovered\n            ? ['adapter-confinement-attestation', 'pre-existing-dirt-mutated']\n            : ['pre-existing-dirt-mutated', 'pre-post-git-snapshot'],\n          coverageMatched: isCovered,\n        });\n      } else {\n        // Hashes missing but present in both -> excluded by default timing unless mutatedDirtyBeforeFiles says otherwise\n        records.push({\n          path: filePath,\n          firstObserved: 'pre-launch',\n          level: 'excluded',\n          basis: ['pre-launch-git-status'],\n          coverageMatched: false,\n        });",
+          "excerptDigest": "fdff7cd499c0b8c6010af6e6c900a72cbb2e915f2810f7b7fedc3a6a22416b0a"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_ad5d6c50833838b291a8afa244710000",
+      "priorRef": {
+        "claimId": "claim_ad5d6c50833838b291a8afa244710000",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of 2269f2d27:candidate-classifications-agent-coordination-recovery.json receipt; object equal after restoring evidence pins; 2 cited ranges byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 748,
+          "beforeEndLine": 790,
+          "startLine": 770,
+          "endLine": 812,
+          "status": "unchanged-excerpt",
+          "excerpt": "/**\n * The `herdr-spawn` executor adapter: run the worker as a real interactive\n * agent in a pane a person can watch, and conclude nothing about the work\n * from anything except a file the worker itself wrote.\n *\n * Three things this adapter refuses to do, each because doing it failed in\n * production:\n *\n * 1. It never types the prompt as a shell command. The old path quoted the\n *    prompt into an argv string and let `herdr pane run` type it as\n *    keystrokes, which corrupts every multi-line prompt there is -- and a\n *    real implementation prompt is always multi-line. The prompt goes to\n *    disk; one line pointing at it goes through the terminal.\n *\n * 2. It never treats `agent_status` as completion. That reading was wrong\n *    twice in measured production: `idle` before the agent had started at\n *    all, and an `idle`-looking dip between two tool calls of one turn.\n *    Completion is `outbox/result-<round>.json` existing, nothing else.\n *\n * 3. It never closes the pane on failure. A failed dispatch's pane is the\n *    only place the reason is still legible, so it stays open and the error\n *    carries its id.\n *\n * HARD CONSTRAINT (tsk-1nih, live evidence): always a FRESH pane, never a\n * reused one. Delivering a dispatch into a finished worker's pane sends it\n * as chat to an idle REPL.\n *\n * Startup goes through `herdr agent start`, which returns only once herdr\n * has confirmed a ready agent in the pane -- that is what absorbs the shell\n * boot race the old path had to poll around, and it fails by name\n * (`agent_not_ready`) instead of hanging.\n */\nfunction herdrSpawnInteractiveAdapter(invocation, opts) {\n  const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery, permissionMode, confinement } = invocation;\n  const { exitCommand, kind, usageLimitPatterns, trustStore } = interactiveMode;\n  const {\n    cwd, timeoutMs, idleTimeoutMs, workId, tier, model,\n    herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir,\n    // An automated sweep may close the panes of failed rounds. It never\n    // closes one paused on a provider limit -- that screen is the only place\n    // the reset time is written.\n    closeAlways = false,\n    // A pane already sitting in the caller's own tab (one lead's coding panel",
+          "excerptDigest": "b679003cd19161a05914a0adbfae3d83da9a5854d59b81cb92e5c61e2a91799b"
+        },
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 915,
+          "beforeEndLine": 923,
+          "startLine": 937,
+          "endLine": 945,
+          "status": "unchanged-excerpt",
+          "excerpt": "export function herdrSpawnAdapter(invocation, opts) {\n  if (invocation.interactiveMode) {\n    return herdrSpawnInteractiveAdapter(invocation, opts);\n  }\n  return Promise.reject(new DispatchError(\n    'invalid-config',\n    `executor for work \"${opts?.workId}\" refused: herdr-spawn adapter requires interactiveMode to be configured -- it no longer supports a non-interactive dispatch path.`,\n    { workId: opts?.workId, tier: opts?.tier, model: opts?.model },\n  ));",
+          "excerptDigest": "a8d68b734f0a5656c2187d8542146814c7394b144b74b1a22842a530d294ea12"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_093256d8e4834a042c5d3bca090debfa",
+      "priorRef": {
+        "claimId": "claim_093256d8e4834a042c5d3bca090debfa",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of 2269f2d27:candidate-classifications-agent-coordination-recovery.json receipt; object equal after restoring evidence pins; 2 cited ranges byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 748,
+          "beforeEndLine": 790,
+          "startLine": 770,
+          "endLine": 812,
+          "status": "unchanged-excerpt",
+          "excerpt": "/**\n * The `herdr-spawn` executor adapter: run the worker as a real interactive\n * agent in a pane a person can watch, and conclude nothing about the work\n * from anything except a file the worker itself wrote.\n *\n * Three things this adapter refuses to do, each because doing it failed in\n * production:\n *\n * 1. It never types the prompt as a shell command. The old path quoted the\n *    prompt into an argv string and let `herdr pane run` type it as\n *    keystrokes, which corrupts every multi-line prompt there is -- and a\n *    real implementation prompt is always multi-line. The prompt goes to\n *    disk; one line pointing at it goes through the terminal.\n *\n * 2. It never treats `agent_status` as completion. That reading was wrong\n *    twice in measured production: `idle` before the agent had started at\n *    all, and an `idle`-looking dip between two tool calls of one turn.\n *    Completion is `outbox/result-<round>.json` existing, nothing else.\n *\n * 3. It never closes the pane on failure. A failed dispatch's pane is the\n *    only place the reason is still legible, so it stays open and the error\n *    carries its id.\n *\n * HARD CONSTRAINT (tsk-1nih, live evidence): always a FRESH pane, never a\n * reused one. Delivering a dispatch into a finished worker's pane sends it\n * as chat to an idle REPL.\n *\n * Startup goes through `herdr agent start`, which returns only once herdr\n * has confirmed a ready agent in the pane -- that is what absorbs the shell\n * boot race the old path had to poll around, and it fails by name\n * (`agent_not_ready`) instead of hanging.\n */\nfunction herdrSpawnInteractiveAdapter(invocation, opts) {\n  const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery, permissionMode, confinement } = invocation;\n  const { exitCommand, kind, usageLimitPatterns, trustStore } = interactiveMode;\n  const {\n    cwd, timeoutMs, idleTimeoutMs, workId, tier, model,\n    herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir,\n    // An automated sweep may close the panes of failed rounds. It never\n    // closes one paused on a provider limit -- that screen is the only place\n    // the reset time is written.\n    closeAlways = false,\n    // A pane already sitting in the caller's own tab (one lead's coding panel",
+          "excerptDigest": "b679003cd19161a05914a0adbfae3d83da9a5854d59b81cb92e5c61e2a91799b"
+        },
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 915,
+          "beforeEndLine": 923,
+          "startLine": 937,
+          "endLine": 945,
+          "status": "unchanged-excerpt",
+          "excerpt": "export function herdrSpawnAdapter(invocation, opts) {\n  if (invocation.interactiveMode) {\n    return herdrSpawnInteractiveAdapter(invocation, opts);\n  }\n  return Promise.reject(new DispatchError(\n    'invalid-config',\n    `executor for work \"${opts?.workId}\" refused: herdr-spawn adapter requires interactiveMode to be configured -- it no longer supports a non-interactive dispatch path.`,\n    { workId: opts?.workId, tier: opts?.tier, model: opts?.model },\n  ));",
+          "excerptDigest": "a8d68b734f0a5656c2187d8542146814c7394b144b74b1a22842a530d294ea12"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_22c21e333a3e28ce4157a3a8ecb45cc0",
+      "priorRef": {
+        "claimId": "claim_22c21e333a3e28ce4157a3a8ecb45cc0",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of 2269f2d27:candidate-classifications-agent-coordination-recovery.json receipt; object equal after restoring evidence pins; 2 cited ranges byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 748,
+          "beforeEndLine": 790,
+          "startLine": 770,
+          "endLine": 812,
+          "status": "unchanged-excerpt",
+          "excerpt": "/**\n * The `herdr-spawn` executor adapter: run the worker as a real interactive\n * agent in a pane a person can watch, and conclude nothing about the work\n * from anything except a file the worker itself wrote.\n *\n * Three things this adapter refuses to do, each because doing it failed in\n * production:\n *\n * 1. It never types the prompt as a shell command. The old path quoted the\n *    prompt into an argv string and let `herdr pane run` type it as\n *    keystrokes, which corrupts every multi-line prompt there is -- and a\n *    real implementation prompt is always multi-line. The prompt goes to\n *    disk; one line pointing at it goes through the terminal.\n *\n * 2. It never treats `agent_status` as completion. That reading was wrong\n *    twice in measured production: `idle` before the agent had started at\n *    all, and an `idle`-looking dip between two tool calls of one turn.\n *    Completion is `outbox/result-<round>.json` existing, nothing else.\n *\n * 3. It never closes the pane on failure. A failed dispatch's pane is the\n *    only place the reason is still legible, so it stays open and the error\n *    carries its id.\n *\n * HARD CONSTRAINT (tsk-1nih, live evidence): always a FRESH pane, never a\n * reused one. Delivering a dispatch into a finished worker's pane sends it\n * as chat to an idle REPL.\n *\n * Startup goes through `herdr agent start`, which returns only once herdr\n * has confirmed a ready agent in the pane -- that is what absorbs the shell\n * boot race the old path had to poll around, and it fails by name\n * (`agent_not_ready`) instead of hanging.\n */\nfunction herdrSpawnInteractiveAdapter(invocation, opts) {\n  const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery, permissionMode, confinement } = invocation;\n  const { exitCommand, kind, usageLimitPatterns, trustStore } = interactiveMode;\n  const {\n    cwd, timeoutMs, idleTimeoutMs, workId, tier, model,\n    herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir,\n    // An automated sweep may close the panes of failed rounds. It never\n    // closes one paused on a provider limit -- that screen is the only place\n    // the reset time is written.\n    closeAlways = false,\n    // A pane already sitting in the caller's own tab (one lead's coding panel",
+          "excerptDigest": "b679003cd19161a05914a0adbfae3d83da9a5854d59b81cb92e5c61e2a91799b"
+        },
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 915,
+          "beforeEndLine": 923,
+          "startLine": 937,
+          "endLine": 945,
+          "status": "unchanged-excerpt",
+          "excerpt": "export function herdrSpawnAdapter(invocation, opts) {\n  if (invocation.interactiveMode) {\n    return herdrSpawnInteractiveAdapter(invocation, opts);\n  }\n  return Promise.reject(new DispatchError(\n    'invalid-config',\n    `executor for work \"${opts?.workId}\" refused: herdr-spawn adapter requires interactiveMode to be configured -- it no longer supports a non-interactive dispatch path.`,\n    { workId: opts?.workId, tier: opts?.tier, model: opts?.model },\n  ));",
+          "excerptDigest": "a8d68b734f0a5656c2187d8542146814c7394b144b74b1a22842a530d294ea12"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_04708da0808dc431babd8703bca2f6f5",
+      "priorRef": {
+        "claimId": "claim_04708da0808dc431babd8703bca2f6f5",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of 2269f2d27:candidate-classifications-agent-coordination-recovery.json receipt; object equal after restoring evidence pins; 2 cited ranges byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 748,
+          "beforeEndLine": 790,
+          "startLine": 770,
+          "endLine": 812,
+          "status": "unchanged-excerpt",
+          "excerpt": "/**\n * The `herdr-spawn` executor adapter: run the worker as a real interactive\n * agent in a pane a person can watch, and conclude nothing about the work\n * from anything except a file the worker itself wrote.\n *\n * Three things this adapter refuses to do, each because doing it failed in\n * production:\n *\n * 1. It never types the prompt as a shell command. The old path quoted the\n *    prompt into an argv string and let `herdr pane run` type it as\n *    keystrokes, which corrupts every multi-line prompt there is -- and a\n *    real implementation prompt is always multi-line. The prompt goes to\n *    disk; one line pointing at it goes through the terminal.\n *\n * 2. It never treats `agent_status` as completion. That reading was wrong\n *    twice in measured production: `idle` before the agent had started at\n *    all, and an `idle`-looking dip between two tool calls of one turn.\n *    Completion is `outbox/result-<round>.json` existing, nothing else.\n *\n * 3. It never closes the pane on failure. A failed dispatch's pane is the\n *    only place the reason is still legible, so it stays open and the error\n *    carries its id.\n *\n * HARD CONSTRAINT (tsk-1nih, live evidence): always a FRESH pane, never a\n * reused one. Delivering a dispatch into a finished worker's pane sends it\n * as chat to an idle REPL.\n *\n * Startup goes through `herdr agent start`, which returns only once herdr\n * has confirmed a ready agent in the pane -- that is what absorbs the shell\n * boot race the old path had to poll around, and it fails by name\n * (`agent_not_ready`) instead of hanging.\n */\nfunction herdrSpawnInteractiveAdapter(invocation, opts) {\n  const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery, permissionMode, confinement } = invocation;\n  const { exitCommand, kind, usageLimitPatterns, trustStore } = interactiveMode;\n  const {\n    cwd, timeoutMs, idleTimeoutMs, workId, tier, model,\n    herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir,\n    // An automated sweep may close the panes of failed rounds. It never\n    // closes one paused on a provider limit -- that screen is the only place\n    // the reset time is written.\n    closeAlways = false,\n    // A pane already sitting in the caller's own tab (one lead's coding panel",
+          "excerptDigest": "b679003cd19161a05914a0adbfae3d83da9a5854d59b81cb92e5c61e2a91799b"
+        },
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 915,
+          "beforeEndLine": 923,
+          "startLine": 937,
+          "endLine": 945,
+          "status": "unchanged-excerpt",
+          "excerpt": "export function herdrSpawnAdapter(invocation, opts) {\n  if (invocation.interactiveMode) {\n    return herdrSpawnInteractiveAdapter(invocation, opts);\n  }\n  return Promise.reject(new DispatchError(\n    'invalid-config',\n    `executor for work \"${opts?.workId}\" refused: herdr-spawn adapter requires interactiveMode to be configured -- it no longer supports a non-interactive dispatch path.`,\n    { workId: opts?.workId, tier: opts?.tier, model: opts?.model },\n  ));",
+          "excerptDigest": "a8d68b734f0a5656c2187d8542146814c7394b144b74b1a22842a530d294ea12"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_bd150b090a443355048d83d8fe69502e",
+      "priorRef": {
+        "claimId": "claim_bd150b090a443355048d83d8fe69502e",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of 2269f2d27:candidate-classifications-agent-coordination-recovery.json receipt; object equal after restoring evidence pins; 2 cited ranges byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 748,
+          "beforeEndLine": 790,
+          "startLine": 770,
+          "endLine": 812,
+          "status": "unchanged-excerpt",
+          "excerpt": "/**\n * The `herdr-spawn` executor adapter: run the worker as a real interactive\n * agent in a pane a person can watch, and conclude nothing about the work\n * from anything except a file the worker itself wrote.\n *\n * Three things this adapter refuses to do, each because doing it failed in\n * production:\n *\n * 1. It never types the prompt as a shell command. The old path quoted the\n *    prompt into an argv string and let `herdr pane run` type it as\n *    keystrokes, which corrupts every multi-line prompt there is -- and a\n *    real implementation prompt is always multi-line. The prompt goes to\n *    disk; one line pointing at it goes through the terminal.\n *\n * 2. It never treats `agent_status` as completion. That reading was wrong\n *    twice in measured production: `idle` before the agent had started at\n *    all, and an `idle`-looking dip between two tool calls of one turn.\n *    Completion is `outbox/result-<round>.json` existing, nothing else.\n *\n * 3. It never closes the pane on failure. A failed dispatch's pane is the\n *    only place the reason is still legible, so it stays open and the error\n *    carries its id.\n *\n * HARD CONSTRAINT (tsk-1nih, live evidence): always a FRESH pane, never a\n * reused one. Delivering a dispatch into a finished worker's pane sends it\n * as chat to an idle REPL.\n *\n * Startup goes through `herdr agent start`, which returns only once herdr\n * has confirmed a ready agent in the pane -- that is what absorbs the shell\n * boot race the old path had to poll around, and it fails by name\n * (`agent_not_ready`) instead of hanging.\n */\nfunction herdrSpawnInteractiveAdapter(invocation, opts) {\n  const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery, permissionMode, confinement } = invocation;\n  const { exitCommand, kind, usageLimitPatterns, trustStore } = interactiveMode;\n  const {\n    cwd, timeoutMs, idleTimeoutMs, workId, tier, model,\n    herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir,\n    // An automated sweep may close the panes of failed rounds. It never\n    // closes one paused on a provider limit -- that screen is the only place\n    // the reset time is written.\n    closeAlways = false,\n    // A pane already sitting in the caller's own tab (one lead's coding panel",
+          "excerptDigest": "b679003cd19161a05914a0adbfae3d83da9a5854d59b81cb92e5c61e2a91799b"
+        },
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 915,
+          "beforeEndLine": 923,
+          "startLine": 937,
+          "endLine": 945,
+          "status": "unchanged-excerpt",
+          "excerpt": "export function herdrSpawnAdapter(invocation, opts) {\n  if (invocation.interactiveMode) {\n    return herdrSpawnInteractiveAdapter(invocation, opts);\n  }\n  return Promise.reject(new DispatchError(\n    'invalid-config',\n    `executor for work \"${opts?.workId}\" refused: herdr-spawn adapter requires interactiveMode to be configured -- it no longer supports a non-interactive dispatch path.`,\n    { workId: opts?.workId, tier: opts?.tier, model: opts?.model },\n  ));",
+          "excerptDigest": "a8d68b734f0a5656c2187d8542146814c7394b144b74b1a22842a530d294ea12"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_4b558ff641410c3268750f6261d1fc44",
+      "priorRef": {
+        "claimId": "claim_4b558ff641410c3268750f6261d1fc44",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
+        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
+        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
+        "reviewMode": "ordinary",
+        "reviewNote": "evidence re-pin to f4ed59997; cited lines unchanged, cited bytes equal, other receipt fields equal; no truth re-review"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/assignment.mjs",
+          "beforeBlob": "a08af190e9ef6a6a0e45ba3dc56a015da9df6638",
+          "afterBlob": "f8cc0749f0f7920146c2c3fbafd2227713e26a89",
+          "beforeStartLine": 504,
+          "beforeEndLine": 547,
+          "startLine": 539,
+          "endLine": 582,
+          "status": "unchanged-excerpt",
+          "excerpt": "  validateExecutionContract({ contract: rawContract, caller });\n\n  // ADR-007 §1/§2: the domain harness seam fires ONLY when a domain is\n  // resolvable for this call, on a Work at a declared Stage -- a work\n  // attached with its own `domain` field, or an explicit `options.domain`\n  // supplied alongside that same attached work. A standalone inline call\n  // (no work, e.g. mission-lite's own shape) or a work with no `.workflowStep`\n  // yet skips the seam entirely and passes on generic validation alone\n  // (the `validateExecutionContract` call above) -- this is the actual\n  // evidence the foundation boundary does not depend on any domain.\n  // Deliberately NOT the declared path's `resolveDomainName(... ??\n  // DEFAULT_DOMAIN)` silent fold: an inline Work with no explicit\n  // `domain`/`options.domain` skips rather than assuming 'coding'.\n  const resolvedDomain = work?.workflowStep ? (work.domain ?? options.domain) : undefined;\n  // Seam enforcement -- including the ADR-007 §3 `contract.supports`\n  // legality check below -- is per-domain opt-in, gated on that domain\n  // actually having shipped a harness/enrich-and-validate-contract.mjs\n  // file on disk (see DOMAIN_HARNESS_SEAMS above). A domain with a\n  // declared Stage graph but no harness module still resolves a domain\n  // here, but `.get()` returns undefined and the seam is silently\n  // skipped for it -- by design (ADR-007 §4: \"no registry... yet,\n  // additional seams require a second real consumer\"), not a bug.\n  const harnessSeam = resolvedDomain ? DOMAIN_HARNESS_SEAMS.get(resolvedDomain) : undefined;\n\n  let contract = rawContract;\n  let harnessPolicy;\n  if (harnessSeam) {\n    // A call-time throw from the harness (as opposed to an import-time\n    // failure, which IS isolated by the DOMAIN_HARNESS_SEAMS discovery\n    // loop's own try/catch above) propagates uncaught to the caller of\n    // buildAssignment() -- intentional: an unexpected bug in a harness\n    // must surface, not be silently swallowed.\n    const enriched = harnessSeam(rawContract, { domain: resolvedDomain, work });\n    contract = enriched.contract;\n    harnessPolicy = enriched.policy;\n\n    // A harness is forbidden from weakening any field `validateExecutionContract`\n    // already checked once above, against the raw pre-seam contract -- but\n    // nothing enforced that until now. Re-run the same generic validator\n    // against the post-seam contract, closing the gap for every field at\n    // once (role/objective/budget/capabilities/contextRefs/constraints/\n    // expectedOutputs), not just the two fields `stampInlineAssignment`\n    // below re-checks (mutation/evidence.required).\n    validateExecutionContract({ contract, caller });",
+          "excerptDigest": "7cef5ac4cd60f4eacedf8c282e8ec464be815e7cea5a10d13ae394af87a4329d"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_0605d63a7150fccffd52a88a25b08b36",
+      "priorRef": {
+        "claimId": "claim_0605d63a7150fccffd52a88a25b08b36",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
+        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
+        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
+        "reviewMode": "ordinary",
+        "reviewNote": "evidence re-pin to f4ed59997; cited lines unchanged, cited bytes equal, other receipt fields equal; no truth re-review"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/assignment.mjs",
+          "beforeBlob": "a08af190e9ef6a6a0e45ba3dc56a015da9df6638",
+          "afterBlob": "f8cc0749f0f7920146c2c3fbafd2227713e26a89",
+          "beforeStartLine": 504,
+          "beforeEndLine": 547,
+          "startLine": 539,
+          "endLine": 582,
+          "status": "unchanged-excerpt",
+          "excerpt": "  validateExecutionContract({ contract: rawContract, caller });\n\n  // ADR-007 §1/§2: the domain harness seam fires ONLY when a domain is\n  // resolvable for this call, on a Work at a declared Stage -- a work\n  // attached with its own `domain` field, or an explicit `options.domain`\n  // supplied alongside that same attached work. A standalone inline call\n  // (no work, e.g. mission-lite's own shape) or a work with no `.workflowStep`\n  // yet skips the seam entirely and passes on generic validation alone\n  // (the `validateExecutionContract` call above) -- this is the actual\n  // evidence the foundation boundary does not depend on any domain.\n  // Deliberately NOT the declared path's `resolveDomainName(... ??\n  // DEFAULT_DOMAIN)` silent fold: an inline Work with no explicit\n  // `domain`/`options.domain` skips rather than assuming 'coding'.\n  const resolvedDomain = work?.workflowStep ? (work.domain ?? options.domain) : undefined;\n  // Seam enforcement -- including the ADR-007 §3 `contract.supports`\n  // legality check below -- is per-domain opt-in, gated on that domain\n  // actually having shipped a harness/enrich-and-validate-contract.mjs\n  // file on disk (see DOMAIN_HARNESS_SEAMS above). A domain with a\n  // declared Stage graph but no harness module still resolves a domain\n  // here, but `.get()` returns undefined and the seam is silently\n  // skipped for it -- by design (ADR-007 §4: \"no registry... yet,\n  // additional seams require a second real consumer\"), not a bug.\n  const harnessSeam = resolvedDomain ? DOMAIN_HARNESS_SEAMS.get(resolvedDomain) : undefined;\n\n  let contract = rawContract;\n  let harnessPolicy;\n  if (harnessSeam) {\n    // A call-time throw from the harness (as opposed to an import-time\n    // failure, which IS isolated by the DOMAIN_HARNESS_SEAMS discovery\n    // loop's own try/catch above) propagates uncaught to the caller of\n    // buildAssignment() -- intentional: an unexpected bug in a harness\n    // must surface, not be silently swallowed.\n    const enriched = harnessSeam(rawContract, { domain: resolvedDomain, work });\n    contract = enriched.contract;\n    harnessPolicy = enriched.policy;\n\n    // A harness is forbidden from weakening any field `validateExecutionContract`\n    // already checked once above, against the raw pre-seam contract -- but\n    // nothing enforced that until now. Re-run the same generic validator\n    // against the post-seam contract, closing the gap for every field at\n    // once (role/objective/budget/capabilities/contextRefs/constraints/\n    // expectedOutputs), not just the two fields `stampInlineAssignment`\n    // below re-checks (mutation/evidence.required).\n    validateExecutionContract({ contract, caller });",
+          "excerptDigest": "7cef5ac4cd60f4eacedf8c282e8ec464be815e7cea5a10d13ae394af87a4329d"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_a2a8446112a1203bd413ab67e787ac52",
+      "priorRef": {
+        "claimId": "claim_a2a8446112a1203bd413ab67e787ac52",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
+        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
+        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
+        "reviewMode": "ordinary",
+        "reviewNote": "evidence re-pin to f4ed59997; cited lines unchanged, cited bytes equal, other receipt fields equal; no truth re-review"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/assignment.mjs",
+          "beforeBlob": "a08af190e9ef6a6a0e45ba3dc56a015da9df6638",
+          "afterBlob": "f8cc0749f0f7920146c2c3fbafd2227713e26a89",
+          "beforeStartLine": 504,
+          "beforeEndLine": 547,
+          "startLine": 539,
+          "endLine": 582,
+          "status": "unchanged-excerpt",
+          "excerpt": "  validateExecutionContract({ contract: rawContract, caller });\n\n  // ADR-007 §1/§2: the domain harness seam fires ONLY when a domain is\n  // resolvable for this call, on a Work at a declared Stage -- a work\n  // attached with its own `domain` field, or an explicit `options.domain`\n  // supplied alongside that same attached work. A standalone inline call\n  // (no work, e.g. mission-lite's own shape) or a work with no `.workflowStep`\n  // yet skips the seam entirely and passes on generic validation alone\n  // (the `validateExecutionContract` call above) -- this is the actual\n  // evidence the foundation boundary does not depend on any domain.\n  // Deliberately NOT the declared path's `resolveDomainName(... ??\n  // DEFAULT_DOMAIN)` silent fold: an inline Work with no explicit\n  // `domain`/`options.domain` skips rather than assuming 'coding'.\n  const resolvedDomain = work?.workflowStep ? (work.domain ?? options.domain) : undefined;\n  // Seam enforcement -- including the ADR-007 §3 `contract.supports`\n  // legality check below -- is per-domain opt-in, gated on that domain\n  // actually having shipped a harness/enrich-and-validate-contract.mjs\n  // file on disk (see DOMAIN_HARNESS_SEAMS above). A domain with a\n  // declared Stage graph but no harness module still resolves a domain\n  // here, but `.get()` returns undefined and the seam is silently\n  // skipped for it -- by design (ADR-007 §4: \"no registry... yet,\n  // additional seams require a second real consumer\"), not a bug.\n  const harnessSeam = resolvedDomain ? DOMAIN_HARNESS_SEAMS.get(resolvedDomain) : undefined;\n\n  let contract = rawContract;\n  let harnessPolicy;\n  if (harnessSeam) {\n    // A call-time throw from the harness (as opposed to an import-time\n    // failure, which IS isolated by the DOMAIN_HARNESS_SEAMS discovery\n    // loop's own try/catch above) propagates uncaught to the caller of\n    // buildAssignment() -- intentional: an unexpected bug in a harness\n    // must surface, not be silently swallowed.\n    const enriched = harnessSeam(rawContract, { domain: resolvedDomain, work });\n    contract = enriched.contract;\n    harnessPolicy = enriched.policy;\n\n    // A harness is forbidden from weakening any field `validateExecutionContract`\n    // already checked once above, against the raw pre-seam contract -- but\n    // nothing enforced that until now. Re-run the same generic validator\n    // against the post-seam contract, closing the gap for every field at\n    // once (role/objective/budget/capabilities/contextRefs/constraints/\n    // expectedOutputs), not just the two fields `stampInlineAssignment`\n    // below re-checks (mutation/evidence.required).\n    validateExecutionContract({ contract, caller });",
+          "excerptDigest": "7cef5ac4cd60f4eacedf8c282e8ec464be815e7cea5a10d13ae394af87a4329d"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_8d1098aad227478a4ecfba67e29f6a69",
+      "priorRef": {
+        "claimId": "claim_8d1098aad227478a4ecfba67e29f6a69",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of 2269f2d27:candidate-classifications-agent-coordination-recovery.json receipt; object equal after restoring evidence pins; 2 cited ranges byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 748,
+          "beforeEndLine": 790,
+          "startLine": 770,
+          "endLine": 812,
+          "status": "unchanged-excerpt",
+          "excerpt": "/**\n * The `herdr-spawn` executor adapter: run the worker as a real interactive\n * agent in a pane a person can watch, and conclude nothing about the work\n * from anything except a file the worker itself wrote.\n *\n * Three things this adapter refuses to do, each because doing it failed in\n * production:\n *\n * 1. It never types the prompt as a shell command. The old path quoted the\n *    prompt into an argv string and let `herdr pane run` type it as\n *    keystrokes, which corrupts every multi-line prompt there is -- and a\n *    real implementation prompt is always multi-line. The prompt goes to\n *    disk; one line pointing at it goes through the terminal.\n *\n * 2. It never treats `agent_status` as completion. That reading was wrong\n *    twice in measured production: `idle` before the agent had started at\n *    all, and an `idle`-looking dip between two tool calls of one turn.\n *    Completion is `outbox/result-<round>.json` existing, nothing else.\n *\n * 3. It never closes the pane on failure. A failed dispatch's pane is the\n *    only place the reason is still legible, so it stays open and the error\n *    carries its id.\n *\n * HARD CONSTRAINT (tsk-1nih, live evidence): always a FRESH pane, never a\n * reused one. Delivering a dispatch into a finished worker's pane sends it\n * as chat to an idle REPL.\n *\n * Startup goes through `herdr agent start`, which returns only once herdr\n * has confirmed a ready agent in the pane -- that is what absorbs the shell\n * boot race the old path had to poll around, and it fails by name\n * (`agent_not_ready`) instead of hanging.\n */\nfunction herdrSpawnInteractiveAdapter(invocation, opts) {\n  const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery, permissionMode, confinement } = invocation;\n  const { exitCommand, kind, usageLimitPatterns, trustStore } = interactiveMode;\n  const {\n    cwd, timeoutMs, idleTimeoutMs, workId, tier, model,\n    herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir,\n    // An automated sweep may close the panes of failed rounds. It never\n    // closes one paused on a provider limit -- that screen is the only place\n    // the reset time is written.\n    closeAlways = false,\n    // A pane already sitting in the caller's own tab (one lead's coding panel",
+          "excerptDigest": "b679003cd19161a05914a0adbfae3d83da9a5854d59b81cb92e5c61e2a91799b"
+        },
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 915,
+          "beforeEndLine": 923,
+          "startLine": 937,
+          "endLine": 945,
+          "status": "unchanged-excerpt",
+          "excerpt": "export function herdrSpawnAdapter(invocation, opts) {\n  if (invocation.interactiveMode) {\n    return herdrSpawnInteractiveAdapter(invocation, opts);\n  }\n  return Promise.reject(new DispatchError(\n    'invalid-config',\n    `executor for work \"${opts?.workId}\" refused: herdr-spawn adapter requires interactiveMode to be configured -- it no longer supports a non-interactive dispatch path.`,\n    { workId: opts?.workId, tier: opts?.tier, model: opts?.model },\n  ));",
+          "excerptDigest": "a8d68b734f0a5656c2187d8542146814c7394b144b74b1a22842a530d294ea12"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_b36b3352394e5987921d8ca3fab02023",
+      "priorRef": {
+        "claimId": "claim_b36b3352394e5987921d8ca3fab02023",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
+        "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-repins.md",
+        "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+        "reviewMode": "ordinary",
+        "reviewNote": "machine re-pin of 2269f2d27:candidate-classifications-agent-coordination-recovery.json receipt; object equal after restoring evidence pins; 2 cited ranges byte-equal, excerptDigest equal; evidence digest recomputed equal"
+      },
+      "changedCitations": [
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 748,
+          "beforeEndLine": 790,
+          "startLine": 770,
+          "endLine": 812,
+          "status": "unchanged-excerpt",
+          "excerpt": "/**\n * The `herdr-spawn` executor adapter: run the worker as a real interactive\n * agent in a pane a person can watch, and conclude nothing about the work\n * from anything except a file the worker itself wrote.\n *\n * Three things this adapter refuses to do, each because doing it failed in\n * production:\n *\n * 1. It never types the prompt as a shell command. The old path quoted the\n *    prompt into an argv string and let `herdr pane run` type it as\n *    keystrokes, which corrupts every multi-line prompt there is -- and a\n *    real implementation prompt is always multi-line. The prompt goes to\n *    disk; one line pointing at it goes through the terminal.\n *\n * 2. It never treats `agent_status` as completion. That reading was wrong\n *    twice in measured production: `idle` before the agent had started at\n *    all, and an `idle`-looking dip between two tool calls of one turn.\n *    Completion is `outbox/result-<round>.json` existing, nothing else.\n *\n * 3. It never closes the pane on failure. A failed dispatch's pane is the\n *    only place the reason is still legible, so it stays open and the error\n *    carries its id.\n *\n * HARD CONSTRAINT (tsk-1nih, live evidence): always a FRESH pane, never a\n * reused one. Delivering a dispatch into a finished worker's pane sends it\n * as chat to an idle REPL.\n *\n * Startup goes through `herdr agent start`, which returns only once herdr\n * has confirmed a ready agent in the pane -- that is what absorbs the shell\n * boot race the old path had to poll around, and it fails by name\n * (`agent_not_ready`) instead of hanging.\n */\nfunction herdrSpawnInteractiveAdapter(invocation, opts) {\n  const { command, args, argsTemplate, prompt, env: rawEnv, interactiveMode, promptDelivery, permissionMode, confinement } = invocation;\n  const { exitCommand, kind, usageLimitPatterns, trustStore } = interactiveMode;\n  const {\n    cwd, timeoutMs, idleTimeoutMs, workId, tier, model,\n    herdrBin: optsHerdrBin, onChunk, runDir: optsRunDir,\n    // An automated sweep may close the panes of failed rounds. It never\n    // closes one paused on a provider limit -- that screen is the only place\n    // the reset time is written.\n    closeAlways = false,\n    // A pane already sitting in the caller's own tab (one lead's coding panel",
+          "excerptDigest": "b679003cd19161a05914a0adbfae3d83da9a5854d59b81cb92e5c61e2a91799b"
+        },
+        {
+          "path": "src/runner/dispatch/transport.mjs",
+          "beforeBlob": "acd13397a165d98cf3b5ef3d55b90ce9cf05db93",
+          "afterBlob": "f806a07c208793bf5717dfd9a553ff87f6f6ef5c",
+          "beforeStartLine": 915,
+          "beforeEndLine": 923,
+          "startLine": 937,
+          "endLine": 945,
+          "status": "unchanged-excerpt",
+          "excerpt": "export function herdrSpawnAdapter(invocation, opts) {\n  if (invocation.interactiveMode) {\n    return herdrSpawnInteractiveAdapter(invocation, opts);\n  }\n  return Promise.reject(new DispatchError(\n    'invalid-config',\n    `executor for work \"${opts?.workId}\" refused: herdr-spawn adapter requires interactiveMode to be configured -- it no longer supports a non-interactive dispatch path.`,\n    { workId: opts?.workId, tier: opts?.tier, model: opts?.model },\n  ));",
+          "excerptDigest": "a8d68b734f0a5656c2187d8542146814c7394b144b74b1a22842a530d294ea12"
+        }
+      ]
+    }
+  ]
+}
