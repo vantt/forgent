@@ -1,3 +1,22 @@
+# Latest resume state — Root authorities continuation
+
+Date: 2026-10-14
+Executor: codex-session:16@2026-10-14
+Session counter: 16
+Step: 5
+State: in progress
+Resume HEAD: 4f99b9ec9
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Registry stop line: 90,000,000 bytes; compact one-line JSON only.
+Scope: apply nine ordinary ok verdicts pinned to 4f99b9ec9, rerun both-prior D/scoped E/native equality; SC-1 first, then mapped root decisions pending, A28 list and truth sample, bounded review packs of about 80 rows. AGENTS/CLAUDE deferred to Step 10. No promotion, Step 6, push, rebase, main write or protected tool/baseline edits.
+Next: apply exact report notes, refresh persisted registry, prove conservation. Reviewer cosmetic words left unchanged to preserve reviewed decision objects.
+Blockers: none established.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Root authorities A31 boundary review request
 
 Date: 2026-10-14
