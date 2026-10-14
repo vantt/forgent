@@ -4,7 +4,7 @@ Date: 2026-10-14
 Executor: codex-session:22@2026-10-14
 Session counter: 22
 Step: 5
-State: ready-for-review / publication 3 of 3
+State: ready-for-review / all three bounded requests committed
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
 Final content pin: cd82746a8ba169600d987eeb0f5ca274304712f3
@@ -33,7 +33,9 @@ Final verification and complete reproducible commands/helpers: root-source-compl
 
 Remaining Step 5 closure: independent verdicts on all three requests; five native generated backlog rows (already regenerate-from-source, still pending); six historical gaps; fresh independent 30-unit truth draw over the 350-unit population; independent 50-block invented-claim sample and hostile pass; reader key/two fresh readers/three scenarios; link preview/draft aliases; final batch-boundary sync/accounting and reruns; batch report/owner effort checkpoint with explicit holds, exceptions, duplicate groups and cutover residuals. Root holds/identical-owner exceptions are empty in final E; earlier area holds/exception groups and A34 residuals unchanged. No new owner question.
 
-Current commits before this publication: f0efa3330 (resume), b50a08bc8 (verdict application), 86ce0d284 (carriage), cd82746a8 (two truth fragments), de742ae91 (pending rows/native registry), 90484a740 (final population), 5209441cd06c657907ae18f079959b17e01f8b35, 8df184c9cf76e4b6577d318990009732c7136753.
+Current-turn commits before this final progress commit: f0efa3330 (resume), b50a08bc8 (verdict application), 86ce0d284 (carriage), cd82746a8 (two truth fragments), de742ae91 (pending rows/native registry), 90484a740 (final population), 5209441cd06c657907ae18f079959b17e01f8b35, 8df184c9cf76e4b6577d318990009732c7136753.
+Final publication: 0518eb00db82a095e4526f3813846692f3d58f95 (third bounded request); this progress commit follows. All three request/pack/sidecar sets are tracked; working tree was clean after their publication.
+All committed pack pins: 5209441cd06c657907ae18f079959b17e01f8b35, 8df184c9cf76e4b6577d318990009732c7136753, 0518eb00db82a095e4526f3813846692f3d58f95.
 Blockers: no technical blocker, no unexplained failing proof, no format-blocked Lead row. Explained scratch obstacles: explicit add needed for untracked application evidence; new-gap membership compares gap sets (not all known IDs); legacy Pilot source prefixes remain unchanged while full shown native digests verify them; historical-gap equality uses the ledger overlay. No checker/gate/baseline/vocabulary/extractor change.
 Next action: STOP. Owner starts independent Lead review of the three bounded requests and fresh final truth draw; resume only to apply committed verdicts and finish listed closure obligations.
 No promotion, push, rebase, main write/merge, Step 6, protected-tool edit or secret-file read.
