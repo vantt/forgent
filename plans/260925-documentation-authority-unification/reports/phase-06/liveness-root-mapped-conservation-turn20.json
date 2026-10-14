@@ -1,0 +1,1251 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:20@2026-10-14",
+  "sourceCommit": "ad2ca83e245bbd76c0d275cc30366457b26c8df3",
+  "scanBeforeCommittedCarriage": true,
+  "scan": "rg -n -F each source across src/bin/apps/packages/core/domains/docs and root readers; candidate carriers excluded",
+  "files": [
+    {
+      "source": "docs/templates/decision.md",
+      "target": "docs/platform/documentation/history/templates/decision.md",
+      "kind": "History",
+      "references": [
+        {
+          "path": "docs/architect/documentation-system-discussion.md",
+          "line": 1244,
+          "text": "- `docs/templates/decision.md`",
+          "liveness": "design/history reference; not implementation consumer"
+        }
+      ],
+      "classification": "history per frozen map; source retained and references unchanged",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/templates/discussion.md",
+      "target": "docs/platform/documentation/history/templates/discussion.md",
+      "kind": "History",
+      "references": [
+        {
+          "path": "docs/architect/documentation-system-discussion.md",
+          "line": 1246,
+          "text": "- `docs/templates/discussion.md`",
+          "liveness": "design/history reference; not implementation consumer"
+        }
+      ],
+      "classification": "history per frozen map; source retained and references unchanged",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/templates/generated.md",
+      "target": "docs/platform/documentation/history/templates/generated.md",
+      "kind": "History",
+      "references": [
+        {
+          "path": "docs/architect/documentation-system-discussion.md",
+          "line": 1247,
+          "text": "- `docs/templates/generated.md`",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/generated/README.md",
+          "line": 17,
+          "text": "- `docs/templates/generated.md`",
+          "liveness": "live implementation/instruction"
+        }
+      ],
+      "classification": "history per frozen map; source retained and references unchanged",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/templates/intent-preservation-ledger.md",
+      "target": "docs/platform/documentation/history/templates/intent-preservation-ledger.md",
+      "kind": "History",
+      "references": [],
+      "classification": "history per frozen map; source retained and references unchanged",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/templates/spec.md",
+      "target": "docs/platform/documentation/history/templates/spec.md",
+      "kind": "History",
+      "references": [
+        {
+          "path": "docs/architect/documentation-system-discussion.md",
+          "line": 1241,
+          "text": "- `docs/templates/spec.md`",
+          "liveness": "design/history reference; not implementation consumer"
+        }
+      ],
+      "classification": "history per frozen map; source retained and references unchanged",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/templates/subcomponent-readme.md",
+      "target": "docs/platform/documentation/history/templates/subcomponent-readme.md",
+      "kind": "History",
+      "references": [],
+      "classification": "history per frozen map; source retained and references unchanged",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/templates/verification.md",
+      "target": "docs/platform/documentation/history/templates/verification.md",
+      "kind": "History",
+      "references": [
+        {
+          "path": "docs/architect/documentation-system-discussion.md",
+          "line": 1245,
+          "text": "- `docs/templates/verification.md`",
+          "liveness": "design/history reference; not implementation consumer"
+        }
+      ],
+      "classification": "history per frozen map; source retained and references unchanged",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/templates/vision.md",
+      "target": "docs/platform/documentation/history/templates/vision.md",
+      "kind": "History",
+      "references": [],
+      "classification": "history per frozen map; source retained and references unchanged",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/coexistence.md",
+      "target": "docs/platform/coexistence/spec.md",
+      "kind": "Spec",
+      "references": [
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 68,
+          "text": "| Coexistence | legacy-current | maintained-authority | `docs/coexistence.md` | `src/install/coexist.mjs` | Living doctrine for running alongside foreign agent harnesses. |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 78,
+          "text": "| `docs/coexistence.md` | legacy-current | maintained-authority | Living doctrine for non-interference with foreign agent harnesses. |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/distribution.md",
+          "line": 38,
+          "text": "  coexistence area — see `docs/coexistence.md`.",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/distribution.md",
+          "line": 386,
+          "text": "- `docs/coexistence.md` — what happens after install, at `fgos init` time.",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/distribution-vision.md",
+          "line": 19,
+          "text": "`docs/coexistence.md` (doctrine chạy cạnh harness khác). Một số điểm dưới đây",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/work-state.md",
+          "line": 15,
+          "text": "- `fgos init` → khởi tạo kho work-state rỗng tại thư mục làm việc hiện hành (nhật ký rỗng + bản chiếu rỗng); đồng thời quét READ-ONLY project tìm marker của harness agent khác đã có mặt (thư mục dấu ấn như `.bee/`, `.claude/`, `.codex/`, `.cursor/`, và khối managed trong `AGENTS.md` khi file đó tồn tại — `init` không bao giờ tạo/sửa `AGENTS.md`), ghi kết quả phát hiện ra output + vào manifest `.fgos/coexistence.json`; lỗi phát hiện không bao giờ chặn `init` (fail-safe), re-init lặp lại ghi manifest nhất quán (idempotent) — doctrine đầy đủ: `docs/coexistence.md`",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/work-state.md",
+          "line": 831,
+          "text": "  đầy đủ (lãnh địa, một-nhạc-trưởng-mỗi-phiên, Known Gaps): `docs/coexistence.md`.",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/work-state.md",
+          "line": 1190,
+          "text": "- **RUL31 (lãnh địa fgos tường minh, `init` chỉ đọc-và-ghi-nhận).** Lãnh địa ghi/khóa của fgos là CHÍNH XÁC `.fgos/` (data dir theo cwd) + worktree tmpdir + nhánh `fgw/*`, cộng đúng hai cửa có chủ (merge-sau-duyệt cổng review, và source repo khi một runner worker được giao việc) — mọi thứ fgos làm với file của một harness khác là READ-ONLY, không bao giờ ghi/sửa/xóa. `init` quét marker harness khác (thư mục dấu ấn + khối managed AGENTS.md) chỉ để GHI NHẬN vào manifest `.fgos/coexistence.json`, không bao giờ tạo/sửa `AGENTS.md` của host; lỗi phát hiện không chặn `init` (fail-safe), re-init idempotent (per install-coexistence / f1715488; doctrine đầy đủ: `docs/coexistence.md`).",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/work-state.md",
+          "line": 1292,
+          "text": "- Trong một project mà bee đang nghỉ (phase terminal), guard hiện tại của bee chặn ghi trực tiếp vào `.fgos/` (cổng idle-intake theo-phase, allowlist tĩnh không biết territory manifest) VÀ vào worktree tmpdir (containment phi-phase, không quan tâm phase) — hai cơ chế độc lập, không nhắm riêng fgos; luồng qua verb CLI `fgos <verb>` (Bash) không bị chặn bởi cả hai. Gap thuộc cây bee, không sửa trong feature này; friction đã file (`.bee/backlog.jsonl`, severity P2) làm địa chỉ flip khi bee sửa (per install-coexistence / 8788e9bb; canary pin sự thật này — `docs/coexistence.md` Known Gaps, `docs/history/install-coexistence/reports/canary-run.md`).",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/work-state.md",
+          "line": 1328,
+          "text": "- `docs/coexistence.md` — doctrine đầy đủ record ADR0009 (lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn, manifest schema, Known Gaps)",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/reading-map.md",
+          "line": 20,
+          "text": "- `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record ADR0009 (chống giao thoa lúc cài — fgOS khi cài không giao thoa tiến trình với harness khác)): lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn lúc `init`, manifest `.fgos/coexistence.json`, Known Gaps chưa flip; `src/install/coexist.mjs` — cài đặt detection + manifest (read-only, không đè)",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/history/global-project-config-awareness/plan.md",
+          "line": 119,
+          "text": "- `docs/coexistence.md` — likely untouched; that doc governs",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/global-project-config-awareness/CONTEXT.md",
+          "line": 89,
+          "text": "- `docs/coexistence.md` — phạm vi liên quan (harness khác), KHÔNG phải phạm vi item",
+          "liveness": "design/history reference; not implementation consumer"
+        }
+      ],
+      "classification": "current candidate carriage; no truth certification",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/id-systems-audit.md",
+      "target": "docs/platform/documentation/history/id-systems-audit.md",
+      "kind": "History",
+      "references": [
+        {
+          "path": "docs/architecture-map.md",
+          "line": 74,
+          "text": "   `RUL<n>`), theo `docs/id-systems-audit.md` #6. Đổi tên thuần — không đổi",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/architecture-map.md",
+          "line": 525,
+          "text": "| `docs/id-systems-audit.md` (nguồn) / Phụ lục B (file này, bản tóm tắt) | mọi id/tên gọi **KÝ HIỆU GÌ** (prefix, hình dạng, hệ nào sống ở đâu) | sổ đăng ký 13 hệ id/naming (STR47) |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/architecture-map.md",
+          "line": 549,
+          "text": "Bản tóm tắt — nguồn đầy đủ + bằng chứng file:line: `docs/id-systems-audit.md`.",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/architecture-map.md",
+          "line": 638,
+          "text": "`docs/id-systems-audit.md` (STR47) rà soát toàn bộ hệ đặt tên/đánh mã đang chạy",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/architecture-map.md",
+          "line": 688,
+          "text": "`docs/id-systems-audit.md` (STR47, thảo luận đầu 2026-07-18) rà soát 13 hệ",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/architecture-map.md",
+          "line": 717,
+          "text": "   `docs/id-systems-audit.md` (nguồn) và `docs/architecture-map.md` Phụ lục B",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "core/skills/_shared/citation-format.md",
+          "line": 34,
+          "text": "                            (docs/id-systems-audit.md) but not this",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "core/skills/_shared/citation-format.md",
+          "line": 51,
+          "text": "(`docs/id-systems-audit.md` §5), already locked, previously unenforced.",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 82,
+          "text": "| `docs/id-systems-audit.md` | non-authority | history-evidence | Audit and rationale for identifier systems; non-authority evidence. |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/reading-map.md",
+          "line": 27,
+          "text": "- `docs/id-systems-audit.md` — audit + quyết định hình dạng mọi hệ id/mã đang sống trong hệ thống (work.id/kind/Story/ADR/Rule/Contract phía fgOS; D-hex/D-local/cell-id/feature-slug/severity phía bee) — nguồn cho `work.id`'s `tsk-<hash>` và các migration STR53-STR58 (tất cả đã `done`); boundary appendix: `docs/architecture-map.md` Phụ lục B",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/history/tsk-1lv-4/iron-law-evidence.md",
+          "line": 115,
+          "text": "  `docs/how-to/*.md`, `docs/backlog.md`, `docs/id-systems-audit.md`,",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/backlog.md",
+          "line": 103,
+          "text": "- [STR53] **`work.id` bỏ slug-title, đổi sang `TSK<hash>`** (chốt tại `docs/id-systems-audit.md` §1/§2, thảo luận 2026-07-18, làm ĐẦU TIÊN trong nhóm STR53-STR58 — độc lập kỹ thuật, không phụ thuộc STR54-STR58): `generateId()` (`classify.mjs:124`) hiện sinh `slugify(title,≤40 ký tự)+hash` — dài, gần như chép nguyên title (ví dụ thật 44 ký tự trong `.fgos/events.jsonl`). Đổi thành hash-only ngắn (base36 6-8 ký tự), giữ nguyên cơ chế chống trùng đã có. Con (sinh qua `decompose.mjs:245`) dùng `<parentId>-<n>` (n = thứ tự trong lứa con, đệ quy theo `parent` — an toàn tuyệt đối vì `parent` KHÔNG nằm trong `EDITABLE_FIELDS`, `store.mjs:184,232`, không bao giờ đổi sau khi tạo). `TSK` dùng CHUNG cho mọi `kind` — KHÔNG mã hoá kind vào tiền tố, vì `kind` CÓ trong `EDITABLE_FIELDS` (sửa được qua `fgos edit`), mã hoá vào id bất biến sẽ khiến id nói dối sau khi edit; cũng khớp decision ADR0002 (flat work-item model — one item kind, one FSM, loại việc là field, không phải shape id riêng). id CŨ trong log giữ nguyên, không backfill (bất biến). Muốn hiển thị dễ hiểu (đọc nhanh là việc gì) thì ghép slug(title) lúc RENDER (CLI list/trích dẫn), không lưu vào id. — done",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/backlog.md",
+          "line": 104,
+          "text": "- [STR54] **`C1`-`C9` contract → `CTR<n>`** (chốt tại `docs/id-systems-audit.md`, làm SỚM trong nhóm docs-rename — rẻ nhất, dùng để validate mẫu tiền tố trước khi làm STR56/STR57 tốn hơn): đổi bảng registry `architecture-map.md` §7 (`:330-340`) + mermaid diagram liên quan + mọi chỗ trích (`reading-map.md`, các spec) từ `C1..C9` sang `CTR1..CTR9`, qua decision record + version bump theo đúng luật riêng của map (`architecture-map.md:436-437`) — done",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/backlog.md",
+          "line": 105,
+          "text": "- [STR55] **Chuẩn hoá trích dẫn rút gọn ADR → `ADR<n>`** (chốt tại `docs/id-systems-audit.md`, làm cùng đợt rẻ với STR54): tên file đầy đủ `NNNN-slug.md` giữ nguyên, không đổi; mọi trích dẫn RÚT GỌN trong văn xuôi (hiện có chỗ viết bare số, ví dụ \"0013\") đổi thành ADR0013 (kênh báo-cáo-không-ghi cho discovered-from). `docs/decisions/0000-index.md` ghi rõ quy ước trích dẫn mới — done",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/backlog.md",
+          "line": 106,
+          "text": "- [STR56] **`R#` business rule → `RUL<n>`** (chốt tại `docs/id-systems-audit.md`, làm SAU STR54/STR55 để mẫu tiền tố đã chạy trơn): `runner.md` (R1-R43) + 4 spec khác đang có `R#` riêng (`platform-foundations.md`, `distribution.md`, `work-state.md`, và spec còn lại) đều đổi tiền tố. Bước đầu BẮT BUỘC: liệt kê ĐỦ mọi chỗ `R[0-9]+` xuất hiện (định nghĩa lẫn trích dẫn) trước khi đổi, không chỉ sửa định nghĩa gốc — đây là migration có quy mô, không phải rename 1 chỗ. `R#` vẫn KHÔNG unique toàn cục sau đổi tên (mỗi spec tự đếm riêng) — trích dẫn NGOÀI spec gốc phải kèm tên area (vd `RUL42 (STANCE trí-tuệ-giao-việc) (runner)`) — done",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/backlog.md",
+          "line": 107,
+          "text": "- [STR57] **Story (đổi tên khỏi \"PBI\") `P<n>` → `STR<n>`** (chốt tại `docs/id-systems-audit.md`, làm SAU CÙNG trong nhóm docs-rename — rủi ro/chi phí cao nhất, đụng ID đang SỐNG): đổi ID mọi dòng `docs/backlog.md` hiện có (P1..P52) sang `STR<n>` giữ nguyên số, cập nhật quy ước sinh id tại `.claude/skills/bee-scribing/references/scribing-reference.md:297,303`, quét mọi trích dẫn \"P<n>\" trong `docs/specs/*.md`, `docs/architecture-map.md`, `docs/history/*/CONTEXT.md` đổi theo. Giải quyết dứt điểm va chạm ký tự với severity `P1/P2/P3` (không cần đổi severity, xem `docs/id-systems-audit.md` #11) — done",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/backlog.md",
+          "line": 108,
+          "text": "- [STR58] **Script `next-doc-id` cho họ \"next free integer thủ công\"** (Story/Rule/ADR — chốt tại `docs/id-systems-audit.md`, mục gen-id; KHÔNG chặn STR53-STR57, làm sau hoặc song song): tránh trùng khi 2 phiên cùng tự tay chọn số kế tiếp. Đặt trong `repo/scripts/` (fgOS tự sở hữu, không đặt trong bee — theo khung \"fgOS tự vận hành\" trong `docs/id-systems-audit.md` §Bối cảnh, decision ADR0004 (phạm vi & non-goal — domain đầu là work-state của chính forgent) + STR50), 1 script tham số hoá đọc 1 file + pattern, trả số free kế tiếp; KHÔNG áp dụng cho CTR001-CTR009 (chỉ 9 slot cố định, không cần) — done",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/history/self-contained-id-references/CONTEXT.md",
+          "line": 57,
+          "text": "- `docs/id-systems-audit.md` line 49 (§5): RUL is NOT globally unique —",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/self-contained-id-references/DISCUSSION.md",
+          "line": 52,
+          "text": "| 2 | Rõ | Quy ước hiện có cho ADR: viết `ADR<n>` thay vì số trần (`docs/decisions/0000-index.md` dòng 22-25). Quy ước hiện có cho RUL: **không unique toàn cục — khi trích ngoài spec gốc phải kèm tên area**, vd `RUL42 (runner)` (`docs/id-systems-audit.md` dòng 49, mục #5). Quy ước hiện có cho D-local: **khoá cứng — D-local KHÔNG BAO GIỜ được trích dẫn ngoài chính file `CONTEXT.md` gốc của nó** (quyết định `0017`, `docs/id-systems-audit.md` §5 dòng 152). Cả ba đều đã thành văn — vấn đề không phải \"chưa có luật\" mà là (a) luật chỉ sửa hình thức chữ, không đòi tóm tắt nội dung đi kèm, và (b) luật D-local đang bị phá ở diện rộng (xem #3). |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/self-contained-id-references/DISCUSSION.md",
+          "line": 70,
+          "text": "  D-local, hệ RUL không unique toàn cục), `docs/id-systems-audit.md` §5 (định",
+          "liveness": "design/history reference; not implementation consumer"
+        }
+      ],
+      "classification": "history per frozen map; source retained and references unchanged",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/operator-runbook-herdr-cockpit.md",
+      "target": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md",
+      "kind": "Guide / Runbook",
+      "references": [
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 61,
+          "text": "| Herdr gateway and web dashboard | legacy-current | maintained-authority | `docs/specs/herdr-web-dashboard.md` | `docs/operator-runbook-herdr-cockpit.md`, `docs/specs/runner.md` | Spec owns web dashboard client behavior; runbook owns cockpit operations. |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 84,
+          "text": "| `docs/operator-runbook-herdr-cockpit.md` | legacy-current | maintained-authority | Supported operator procedures for herdr cockpit. |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 995,
+          "text": "- **RUL40 (đã xây — STR40, `scripts/herdr-cockpit.sh` + `scripts/herdr-cockpit-notify.mjs`).** Vận hành qua herdr là chế độ được hỗ trợ chính thức (D d3dbe7f5, supersedes D ef6ed305 — chốt 2026-07-18, user xác nhận đổi tmux→herdr): một phiên chuẩn bốn pane — (1) vòng runner lặp (`fgos-runner --once` trong shell loop, đứng trên `runner.lock` + idempotent, không flag mới), (2) theo dõi output live từng việc (`tail -F .fgos/logs/*.log`, đứng trên RUL39 (đã xây — backlog STR39, cell live-worker-log-1)), (3) cửa thao tác của người (nộp/trả lời/duyệt, shell tương tác thuần), (4) bảng trạng thái + chuông chờ-người gộp một pane (`herdr-cockpit-notify.mjs`: poll `fgos list --json`, in dòng trạng thái + gọi `herdr notification show` đúng MỘT LẦN khi một việc MỚI vào `awaiting-human` — không lặp lại khi việc vẫn đứng yên ở trạng thái đó, gọi lại nếu việc rời rồi quay lại) — kèm một trang runbook trong docs sản phẩm (`docs/operator-runbook-herdr-cockpit.md`). **LUẬT CỨNG (re-scope 2026-09-06 — decision \"RUL40 (herdr là transport và failure detector cho Dispatch, không bao giờ là nguồn sự thật hay receipt) re-scope\", scope `runner`, `supersedes:d3dbe7f5`; phát biểu cũ dưới đây giữ làm lịch sử):** herdr KHÔNG BAO GIỜ là nguồn sự thật hay delivery receipt cho bất kỳ trạng thái fgOS hay kết quả Run nào — trạng thái Work luôn qua fgOS CLI (`fgos list`/`rollup`/`triage`), kết quả Run luôn qua file do chính worker ghi (ack/result trong outbox của Run) cộng liveness ladder. Trong phạm vi đó, Dispatch ĐƯỢC dùng agent API của herdr (`agent start`, `agent prompt --wait`, `agent wait`, `agent read`, `pane process-info`) làm **transport** và **failure detector** (`agent_not_ready`, `agent_prompt_stalled`, `blocked`, agent vắng mặt); `agent_status` idle/working/done không bao giờ được đọc thành \"xong\" hay \"đã nhận prompt\". Cockpit chrome (`pane split`/`pane run`/`pane read`/`tab create`/`notification show`) giữ nguyên. **Ladder và outcome (dispatch visibility V0):** một vòng dispatch interactive kết thúc theo đúng thứ tự — file result do chính worker ghi (thắng mọi tín hiệu khác, kể cả process đã biến mất), rồi `blocked`, rồi `died` (nhiều lần absent LIÊN TIẾP; một lần `unknown` reset bộ đếm, và đọc liveness hỏng luôn trả `unknown` chứ không bao giờ `absent`), rồi trần tuyệt đối, cuối cùng mới tới đứng-im. Bảy outcome có tên (`settled`, `blocked`, `died`, `timed-out-idle`, `timed-out-ceiling`, `paused-limit`, cộng `unsignaled` của ladder cũ cho adapter không tự khai) thay cho một chữ timeout chung; chỉ `settled` mới đóng pane, `paused-limit` giữ pane kể cả khi caller bật close-always. Màn hình chỉ đọc khi tiến độ đã ngừng, không phải mỗi tick. Chi tiết + lý do: docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md. Lý do re-scope + evidence: `docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md` §3.3, §4, §14 H1. *Phát biểu cũ (D d3dbe7f5, 2026-07-18, đã superseded):* herdr CHỈ dùng làm chrome — KHÔNG BAO GIỜ gọi `herdr agent start` hay đọc `agent_status` làm tín hiệu quyết định; vi phạm từng gây bug thật (\"idle giết agent\", dogfood airemote) — bug đó đến từ việc tin `idle` là hoàn thành, không phải từ việc gọi API, và chính điều đó là ranh giới luật mới giữ lại. Đa phiên chung checkout (STR35, đã đóng): herdr tự thương lượng qua `herdr terminal attach --takeover` — hành vi có sẵn của herdr, không phải code mới của cockpit.",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/knowledge/how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrom/fgos-terminal-pane-rename.md",
+          "line": 20,
+          "text": "   fgOS state at all (STR40, `docs/operator-runbook-herdr-cockpit.md`:",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+          "line": 42,
+          "text": "`docs/operator-runbook-herdr-cockpit.md`: every real status signal comes",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/doer-report.md",
+          "line": 237,
+          "text": "  `docs/history/**`, `docs/operator-runbook-herdr-cockpit.md`,",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/detect-changes-vs-head~2.log",
+          "line": 12,
+          "text": "  Symbol Operator runbook — herdr cockpit → docs/operator-runbook-herdr-cockpit.md",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/detect-changes-vs-head~2.log",
+          "line": 13,
+          "text": "  Symbol Hard rule → docs/operator-runbook-herdr-cockpit.md",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/orchestrator-worker-slots/DISCUSSION.md",
+          "line": 69,
+          "text": "| D2 | **Engine sở hữu sự thật về \"đang chạy gì\"** — occupancy là state fgOS, không phải state của tool/launcher. Hệ quả bắt buộc: nhãn/label KHÔNG BAO GIỜ được gánh state của orchestrator; nhãn chỉ để cho người đọc. Khớp hard rule của `docs/operator-runbook-herdr-cockpit.md`. Cơ chế thay thế đã có sẵn: `tsk-3ni` D1/D4. |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/orchestrator-worker-slots/plan.md",
+          "line": 381,
+          "text": "     `docs/operator-runbook-herdr-cockpit.md` cấm đọc. Đang focus thì lấy",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-terminal-pane-rename/plan.md",
+          "line": 42,
+          "text": "  `docs/operator-runbook-herdr-cockpit.md`), resolves `fg.ssid`",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/herdr-fgos-tui-plugin/CONTEXT.md",
+          "line": 28,
+          "text": "| D2 | Ships independent/parallel to the existing STR40 bash cockpit (`scripts/herdr-cockpit.sh` + `scripts/herdr-cockpit-notify.mjs`, `docs/operator-runbook-herdr-cockpit.md`) — neither existing file changes. The operator ends up with both; this plugin is a new, separate pane/tool, not a replacement. |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/herdr-fgos-tui-plugin/CONTEXT.md",
+          "line": 43,
+          "text": "- `docs/operator-runbook-herdr-cockpit.md` + `scripts/herdr-cockpit.sh` + `scripts/herdr-cockpit-notify.mjs` — the existing STR40 cockpit: 4 bash-orchestrated herdr panes (runner-loop, tail-log, human-door, dashboard). The dashboard pane today is `formatStatusLine()` — one compact status-count line, not a full item list or TUI. Hard rule documented there: never read herdr's `agent_status` as a decision signal (decision `d3dbe7f5`, real production incident cited; superseded 2026-09-06 by \"RUL40 re-scope\" — the \"never truth\" half stands, the API ban is lifted).",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-terminal-pane-rename/CONTEXT.md",
+          "line": 11,
+          "text": "   `docs/operator-runbook-herdr-cockpit.md` gate), and if so renames the",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-terminal-pane-rename/CONTEXT.md",
+          "line": 22,
+          "text": "see `docs/operator-runbook-herdr-cockpit.md`); a new `fgos` CLI verb (D2",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-terminal-pane-rename/CONTEXT.md",
+          "line": 35,
+          "text": "- **chrome-only** — STR40's hard rule (`docs/operator-runbook-herdr-cockpit.md`):",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-terminal-pane-rename/CONTEXT.md",
+          "line": 59,
+          "text": "- `docs/operator-runbook-herdr-cockpit.md` — STR40's chrome-only hard",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/tsk-1zq/plan.md",
+          "line": 31,
+          "text": "- `docs/operator-runbook-herdr-cockpit.md` §Hard rule — ranh giới",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/tsk-1zq/plan.md",
+          "line": 114,
+          "text": "| Đọc `agent_status` của herdr để biết pane rỗi | `docs/operator-runbook-herdr-cockpit.md` §Hard rule cấm dứt khoát: nó từng là nguồn sự thật thứ hai và đã gây bug thật (\"idle killed an agent\") |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/herdr-cockpit-project-root/CONTEXT.md",
+          "line": 99,
+          "text": "- `docs/operator-runbook-herdr-cockpit.md` — cockpit bash STR40.",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/herdr-cockpit-pane-guard-reuse-and-boot-window/context-tsk-4ry.md",
+          "line": 32,
+          "text": "  `docs/operator-runbook-herdr-cockpit.md`'s Hard rule (cited in",
+          "liveness": "design/history reference; not implementation consumer"
+        }
+      ],
+      "classification": "current candidate carriage; no truth certification",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/routing-handoff-contract.md",
+      "target": "docs/platform/runner/contracts/routing-handoff.md",
+      "kind": "Contract",
+      "references": [
+        {
+          "path": "AGENTS.md",
+          "line": 12,
+          "text": "- docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 59,
+          "text": "3. **What contract does it touch?** `docs/routing-handoff-contract.md` for",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/architecture-map.md",
+          "line": 368,
+          "text": "| **CTR006** | agent ↔ agent | routing-handoff contract + trust boundary | **designed** — spec đầy đủ, chưa có code implement | `docs/routing-handoff-contract.md` |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 55,
+          "text": "| Runner / dispatch / merge lifecycle | legacy-current | maintained-authority | `docs/specs/runner.md` | `docs/routing-handoff-contract.md` | `docs/specs/runner.md` owns runner loop, dispatch, merge gate, and worker log. Agent-to-agent boundary owned by `docs/routing-handoff-contract.md`. |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 87,
+          "text": "| `docs/routing-handoff-contract.md` | legacy-current | maintained-authority | Canonical agent-to-agent handoff contract and trust boundary. |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/confinement-authority.md",
+          "line": 1399,
+          "text": "- `docs/routing-handoff-contract.md`: worktree containment không phải sandbox.",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "line": 402,
+          "text": " * `docs/routing-handoff-contract.md`'s three locked invariants",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 1227,
+          "text": "- `docs/routing-handoff-contract.md` — hợp đồng handoff + ranh giới tin cậy",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 2959,
+          "text": "trước (`docs/routing-handoff-contract.md`: containment chỉ là chỉ-dẫn +",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 3157,
+          "text": "  4. Không mở rộng quyền đọc của worker (xem \"Ranh giới tin cậy\" ở `docs/routing-handoff-contract.md`); không đổi ranh giới component.",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/reading-map.md",
+          "line": 18,
+          "text": "- `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/explanation/d3-goal-check-rationale-trace.md",
+          "line": 2,
+          "text": "authoritative_for: docs/routing-handoff-contract.md's D3 (never trust worker self-report, always independently re-run verify) citing a deleted docs/history/phase-2-routing/CONTEXT.md; real fgOS-specific rationale is unintentional worker drift (agy cwd bug, fanout worktree race), not the upstream beehive adversarial-swarm threat model",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/explanation/d3-goal-check-rationale-trace.md",
+          "line": 7,
+          "text": "`docs/routing-handoff-contract.md`'s D3 (never trust a worker's own",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+          "line": 22,
+          "text": "   (`docs/routing-handoff-contract.md`); reverted the no-op check,",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+          "line": 76,
+          "text": "| Fix Round 3 (trust-boundary reframe, final) | src/runner/dispatch/assignment-runner.mjs (`assertInlineMutatingAssignmentAuthorized` now fails closed unless the caller explicitly asserts `opts.isReadOnlyMode === false`; Fix Round 1's R2/R3 re-check kept unchanged as mistake-proofing, its doc comment rewritten to state the trust boundary plainly, citing `docs/routing-handoff-contract.md`'s three locked invariants and `dispatch/config.mjs`'s TRUSTED-CONFIG NOTE); `docs/specs/runner.md`'s \"Lịch sử quyết định\" (new decision entry 0035 recording the trust-boundary scope) | `test/runner/coordination-mutation-unlock.test.mjs` \"Fix round: the SAME direct buildAssignment + executeAssignment call, with isReadOnlyMode: false explicitly asserted...\" (proceeds) + \"the LEGITIMATE path...\" (runExecutorAttempt already asserts `isReadOnlyMode: false` for real mutating dispatch, confirmed by a real test, not just reasoning) | \"Fix round: a direct buildAssignment + executeAssignment call satisfying R2/R3... is STILL refused when isReadOnlyMode is OMITTED from opts\" (zero fs side effect) + the 3 pre-existing R2/R3 negative tests, now with `isReadOnlyMode: false` explicitly asserted so they exercise R2/R3 rather than the new fail-closed gate | real, run, passing; `test/architecture.test.mjs`'s R6b enumeration test confirmed still green, unchanged; `operation-choice.mjs`'s call site confirmed unaffected (never builds inline Assignments, R6c) | done |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+          "line": 221,
+          "text": "`docs/routing-handoff-contract.md`'s three locked invariants and",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+          "line": 740,
+          "text": "- `docs/routing-handoff-contract.md` (the \"Ranh giới tin cậy\" section):",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+          "line": 1316,
+          "text": "Read `docs/routing-handoff-contract.md` directly (lines 54-75): the exact",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+          "line": 1497,
+          "text": "  (`docs/routing-handoff-contract.md`'s three locked invariants —",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+          "line": 1842,
+          "text": "- `docs/routing-handoff-contract.md:58-76` — three EXPLICITLY LOCKED",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/retire-fgos-runner-json-fallback/plan.md",
+          "line": 17,
+          "text": "(`docs/routing-handoff-contract.md` names `.fgos/config.json`'s `runner`",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/retire-fgos-runner-json-fallback/plan.md",
+          "line": 162,
+          "text": "    `docs/routing-handoff-contract.md`'s explicit fallback clause (the",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/rul11-tum-lum-doctrine-anchor/plan.md",
+          "line": 5,
+          "text": "API/handoff-contract change (`docs/routing-handoff-contract.md` untouched),",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/retire-fgos-runner-json-fallback/CONTEXT.md",
+          "line": 114,
+          "text": "also enumerated in tsk-5hv's description (`docs/routing-handoff-contract.md`,",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/d3-goal-check-rationale-trace/RESEARCH.md",
+          "line": 5,
+          "text": "**Asked:** does `docs/routing-handoff-contract.md`'s D3 citation still point at",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/d3-goal-check-rationale-trace/RESEARCH.md",
+          "line": 10,
+          "text": "**Checked — `docs/routing-handoff-contract.md`:**",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/d3-goal-check-rationale-trace/RESEARCH.md",
+          "line": 75,
+          "text": "wants added. `docs/routing-handoff-contract.md` itself is not a",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/d3-goal-check-rationale-trace/RESEARCH.md",
+          "line": 83,
+          "text": "to its Hệ quả), and `docs/routing-handoff-contract.md:81`'s dead citation",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/d3-goal-check-rationale-trace/plan.md",
+          "line": 25,
+          "text": "2. `docs/routing-handoff-contract.md:81`'s `## Tham chiếu` line: replace",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/d3-goal-check-rationale-trace/plan.md",
+          "line": 37,
+          "text": "- *Give `docs/routing-handoff-contract.md` its own new `## Lịch sử quyết",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/d3-goal-check-rationale-trace/plan.md",
+          "line": 47,
+          "text": "| `docs/routing-handoff-contract.md:81` edit | light — one dead citation swapped for a live one | `verify` command greps that the dead path is gone |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/d3-goal-check-rationale-trace/plan.md",
+          "line": 62,
+          "text": "2. `docs/routing-handoff-contract.md` (line 81) — edited second, now that",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/d3-goal-check-rationale-trace/plan.md",
+          "line": 77,
+          "text": "`docs/routing-handoff-contract.md:81` for a pointer at that same ADR-0005",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/codebase-scatter-consolidation-roadmap/RESEARCH.md",
+          "line": 49,
+          "text": "5. Where the roadmap doc belongs. No Plan Location section exists in docs/routing-handoff-contract.md (checked, not found). This repo actual live convention (dozens of examples under docs/history/feature-name/) is a feature-named folder holding CONTEXT.md / plan.md / RESEARCH.md. This item own deliverable (roadmap plus notes on what NOT to consolidate) fits that shape directly -- no new convention needed.",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-marketing-domain-foundation/DISCUSSION.md",
+          "line": 234,
+          "text": "  `docs/routing-handoff-contract.md`. Kết luận chính: work item phẳng với",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-marketing-domain-foundation/CONTEXT.md",
+          "line": 91,
+          "text": "- `docs/routing-handoff-contract.md`, `docs/specs/work-state.md`,",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/tsk-34o5-attestation-level-2-enforcement-halt/plan.md",
+          "line": 76,
+          "text": "| Same check wired into **approve** (`src/verbs/merge/approve.mjs`, before `mergeRunnerItem` at lines ~533/706) | high — this is the actual merge gate; a false halt here blocks the exact place `docs/routing-handoff-contract.md`'s trust boundary lives | Integration test in `test/cli/fgos-approve.test.mjs` and/or `test/verbs/merge/approve.test.mjs`: same divergence fixture at approve time → park `blocked`, typed reason, no merge commit created; existing green-path approve tests stay green |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/backlog-execution-reconciliation/RECONCILIATION.md",
+          "line": 103,
+          "text": "`docs/routing-handoff-contract.md` still carries no version field of any",
+          "liveness": "design/history reference; not implementation consumer"
+        }
+      ],
+      "classification": "current candidate carriage; no truth certification",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/distribution-vision.md",
+      "target": "docs/platform/packaging-distribution/history/distribution-vision.md",
+      "kind": "History",
+      "references": [
+        {
+          "path": "AGENTS.md",
+          "line": 112,
+          "text": "`docs/distribution-vision.md` sets the direction for this repo's own",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "AGENTS.md",
+          "line": 124,
+          "text": "  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "src/setup/registrations.mjs",
+          "line": 3057,
+          "text": "// docs/distribution-vision.md's \"context 3\") is just as valid a pass as a",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 56,
+          "text": "| Packaging-distribution | promoted | maintained-authority + retained-source | `docs/platform/packaging-distribution/README.md` | `docs/specs/distribution.md`, `docs/distribution-vision.md`, `docs/architect/packaging-distribution/**` | Portal owns active navigation and implementation-alignment; legacy specs are consulted only in roles assigned by portal. |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 79,
+          "text": "| `docs/distribution-vision.md` | non-authority | retained-source | Historical vision; superseded for active navigation by Packaging-Distribution portal. |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/architect/packaging-distribution/rewrite-plan.md",
+          "line": 30,
+          "text": "| `docs/distribution-vision.md` | Vision and rationale for install/setup/doctor becoming stable, reusable, self-fixing, global/project aware, and CI-backed. | Preserve as rationale; reconcile outdated statements against newer implementation and architecture docs. |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/packaging-distribution/rewrite-plan.md",
+          "line": 253,
+          "text": "| `docs/distribution-vision.md` | hand-curated vision | rationale | history or architecture rationale links | reconcile |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/packaging-distribution/migration-map.md",
+          "line": 65,
+          "text": "| `docs/distribution-vision.md` | Hand-curated vision/rationale | Rationale; partly superseded by later implementation | `docs/platform/packaging-distribution/history/distribution-vision.md` or rationale links from architecture/spec | Reconcile dated claims; mark which open questions are now implemented. |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "src/runner/worktree.mjs",
+          "line": 624,
+          "text": " * `docs/distribution-vision.md`'s \"installed into other repos\" story).",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/platform-foundations.md",
+          "line": 279,
+          "text": "README's mission statement và `docs/distribution-vision.md`'s tự thừa",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/reading-map.md",
+          "line": 16,
+          "text": "- `docs/distribution-vision.md` — tầm nhìn nền tảng lịch sử: cài đặt/setup/doctor ổn định + tái dùng được (không cần clone, global/project không xung đột — project ghi đè global, doctor/setup tự fix hạ tầng + merge config thiếu, module mới tự đăng ký năng lực config, CI như một phần của setup); đã được promote/supersede từng phần vào `docs/platform/packaging-distribution/vision.md`.",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/distribution.md",
+          "line": 280,
+          "text": "  `docs/distribution-vision.md` §3's trụ cột 3.",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/knowledge/why-the-fgos-interface-daemon-combines-gateway-and-orchestra/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md",
+          "line": 90,
+          "text": "settles a previously open question in `docs/distribution-vision.md:112`",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/history/project-instability-scan/plan.md",
+          "line": 110,
+          "text": "| 6 | distribution + spec/code drift | `docs/specs/distribution.md`, `docs/distribution-vision.md` | `src/setup/`, `docs/specs/` vs the code they describe |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
+          "line": 5,
+          "text": "**Nguồn:** docs/distribution-vision.md §2 trụ cột 3, §5 câu hỏi mở 3, §7",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/doctor-fix-gate-bypass/CONTEXT.md",
+          "line": 88,
+          "text": "- `docs/distribution-vision.md` §2 trụ cột 3, §3, §5 câu hỏi mở 3, §7.",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/plugin-skill-cli-path-fallback/CONTEXT.md",
+          "line": 95,
+          "text": "- `docs/distribution-vision.md` §2 pillars 3/4/6 (setup/doctor",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md",
+          "line": 14,
+          "text": "distribution-vision pillars (`docs/distribution-vision.md`) had no",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/knowledge/how-to-register-a-fixable-doctor-check-in-fgos/register-a-fixable-doctor-check-in-fgos.md",
+          "line": 129,
+          "text": "`docs/distribution-vision.md` §3, not drift. Without `--fix`, behavior is",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/history/discover-stage-graph-and-skill-layering/FINDINGS.md",
+          "line": 564,
+          "text": "| `docs/distribution-vision.md:151-152` | như trên |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P03.1.md",
+          "line": 258,
+          "text": "**Nothing new was registered with `src/setup/checks.mjs`/`docs/distribution-vision.md`.**",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-plugin-dev-skill-packaging-gap/plan.md",
+          "line": 61,
+          "text": "- `docs/distribution-vision.md`, `docs/specs/distribution.md` — before/",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-plugin-dev-skill-packaging-gap/plan.md",
+          "line": 77,
+          "text": "4. Update `docs/distribution-vision.md`/`docs/specs/distribution.md` (D6)",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-plugin-dev-skill-packaging-gap/CONTEXT.md",
+          "line": 25,
+          "text": "| D1 | Fix scope combines two of the three researched candidate directions, per explicit human decision (2026-08-12, tsk-32b's `awaiting-human` round): (a) physically copy/package the coding-domain dev-skills into `plugins/fgOS/`, with an *enforced* sync mechanism; and (c) document today's (and post-fix) dev-skill dispatch posture in `docs/distribution-vision.md`/`docs/specs/distribution.md`, plus a doctor check that fails loudly. (b) — a runtime fallback where a plugin skill catches `Unknown skill` and Reads the target SKILL.md directly — is explicitly OUT of scope: it only band-aids the case where a forgentX checkout happens to be reachable from the calling session's own machine (this item's own reproduction case), not a real fix for a genuine plugin-only consumer with no forgentX checkout anywhere. |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-plugin-dev-skill-packaging-gap/CONTEXT.md",
+          "line": 30,
+          "text": "| D6 | The distribution-doc update (also part of D1's (c)) states the posture explicitly in both `docs/distribution-vision.md` and `docs/specs/distribution.md`: before this fix, `/fgOS:cook`/`/fgOS:discover`/`/fgOS:plan`/`/fgOS:pick`'s own dev-skill dispatch only worked from a forgentX checkout; after, a plugin-only install also works. Exact wording/section placement is left to `fgos-coding-planning`. |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-plugin-dev-skill-packaging-gap/CONTEXT.md",
+          "line": 54,
+          "text": "- `docs/distribution-vision.md`, `docs/specs/distribution.md`",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/knowledge/whether-fgos-uninstall-remove-package-can-reliably-remove-it/fgos-self-uninstall-package-removal-spike.md",
+          "line": 55,
+          "text": "  transfer. `docs/distribution-vision.md`'s CI pillar (`tsk-3nx`) still",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/history/tsk-4xg-plugin-marketplace-doctor-check/plan.md",
+          "line": 11,
+          "text": "  enumerates the fixed check list per `docs/distribution-vision.md` §3) —",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/tsk-4xg-plugin-marketplace-doctor-check/plan.md",
+          "line": 71,
+          "text": "  own dev-checkout self-hosting case, `docs/distribution-vision.md`",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/tsk-4xg-plugin-marketplace-doctor-check/CONTEXT.md",
+          "line": 27,
+          "text": "| D3 | The check/fix targets the marketplace by its GitHub source (`vantt/forgent`), not an absolute local path. Grounded in `package.json`'s `\"files\"` field: it ships `bin`, `src`, `README.md`, `LICENSE`, and a few `docs/` subpaths only — `plugins/` and `.claude-plugin/` are NOT in the npm package. A local-path marketplace add would only ever work from a dev-checkout of this repo (context 3 per `docs/distribution-vision.md` §2 trụ cột 6); it would silently fail for the actual npm-global-install target audience (`npm install -g github:vantt/forgent`, trụ cột 1). A GitHub source works uniformly regardless of which of the three install contexts (global/project/dev-checkout) invoked `doctor`. |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/tsk-4xg-plugin-marketplace-doctor-check/CONTEXT.md",
+          "line": 54,
+          "text": "- `docs/distribution-vision.md` §2 (7 trụ cột) + §6 (milestone roadmap,",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/tsk-4xg-plugin-marketplace-doctor-check/CONTEXT.md",
+          "line": 74,
+          "text": "  distribution vehicle covered by `docs/distribution-vision.md`.",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/agy-permission-capability-allowlist/plan.md",
+          "line": 102,
+          "text": "(`docs/distribution-vision.md`'s config-merge model). Revisit only if a",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/iron-law-gate-human-ux/DISCUSSION.md",
+          "line": 85,
+          "text": "  `docs/distribution-vision.md` không nhắc Iron Law một chữ. Chạy thật",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-interface-daemon/CONTEXT.md",
+          "line": 32,
+          "text": "| D5 | Global per-machine daemon state (lock, project registry, listening port/config) lives at **`~/.fgos/config.json`** (and sibling files under `~/.fgos/`). This settles `docs/distribution-vision.md:112`'s own open question (\"fgOS đọc config global ở đâu (`~/.fgos/config.json`?...)\" — previously unresolved, now decided here). |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-interface-daemon/CONTEXT.md",
+          "line": 71,
+          "text": "- `docs/distribution-vision.md:112`",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/spec-docs-lifecycle-realignment/RESEARCH.md",
+          "line": 216,
+          "text": "`docs/distribution-vision.md`:",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/spec-docs-lifecycle-realignment/plan-tsk-1xn.md",
+          "line": 37,
+          "text": "2. `docs/distribution-vision.md`",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/spec-docs-lifecycle-realignment/plan-tsk-1xn.md",
+          "line": 170,
+          "text": "### Phase 2 — `docs/distribution-vision.md`",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/spec-docs-lifecycle-realignment/plan-tsk-1xn.md",
+          "line": 235,
+          "text": "npm test && ! grep -qE 'fgos-(planning|validating|code-implement)' docs/tutorials/walking-a-heavy-item-through-a-3-child-split.md && ! grep -q 'fgos-planning' docs/distribution-vision.md && ! grep -q 'stage `clarify`, <not-started>' docs/distribution-vision.md",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/spec-docs-lifecycle-realignment/plan.md",
+          "line": 162,
+          "text": "   `:161`, `:177`), `docs/distribution-vision.md` (`:152`, and `:157`/`:160`/",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/spec-docs-lifecycle-realignment/plan-tsk-2t5.md",
+          "line": 31,
+          "text": "specs, the non-spec end-user docs, docs/backlog.md, docs/distribution-vision.md",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/tsk-jtb-pin-fgos-install-to-semver-release/CONTEXT.md",
+          "line": 68,
+          "text": "- `docs/distribution-vision.md` §3 — the vision doc's own note that no",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/setup-doctor-config-registry/plan.md",
+          "line": 104,
+          "text": "first real registry consumer (`docs/distribution-vision.md` §7: \"làm ĐÚNG như",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/setup-doctor-config-registry/CONTEXT.md",
+          "line": 5,
+          "text": "**Nguồn:** docs/distribution-vision.md §2 trụ cột 4 + §5 câu hỏi mở 1",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/setup-doctor-config-registry/CONTEXT.md",
+          "line": 89,
+          "text": "- `docs/distribution-vision.md` §2 trụ cột 4, §5 câu hỏi mở 1, §6 (tsk-2cs =",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/tsk-2jc/CONTEXT.md",
+          "line": 18,
+          "text": "  và `docs/distribution-vision.md` §3 trụ cột 3.",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/tsk-386-baseref-detecttrunk/plan.md",
+          "line": 11,
+          "text": "repo, per `docs/distribution-vision.md` — not itself a hard-gate flag.",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/gate-bypass/DISCUSSION.md",
+          "line": 54,
+          "text": "self-hosting\" (`docs/distribution-vision.md` §2 trụ cột 6, updated",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/gate-bypass/DISCUSSION.md",
+          "line": 115,
+          "text": "  directly maps to `docs/distribution-vision.md`'s three install",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/gate-bypass/CONTEXT.md",
+          "line": 102,
+          "text": "- (D8) `docs/distribution-vision.md` §2 trụ cột 6 (updated 2026-08-01) —",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/eventlog-tier-a-multifile-content-hash/DISCUSSION.md",
+          "line": 229,
+          "text": "  distribution thật (theo Install/setup/doctor gate + docs/distribution-vision.md),",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/global-project-config-awareness/plan.md",
+          "line": 35,
+          "text": "(`docs/distribution-vision.md` §3: \"Gộp vào scope `tsk-2ta` (không tách",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/global-project-config-awareness/plan.md",
+          "line": 140,
+          "text": "(`docs/distribution-vision.md` §3, verbatim: \"Gộp vào scope `tsk-2ta`",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-mission-boundary/DISCUSSION.md",
+          "line": 84,
+          "text": "- Đọc `docs/distribution-vision.md` §1 — tự thừa nhận: \"fgOS đang được",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/global-project-config-awareness/CONTEXT.md",
+          "line": 17,
+          "text": "**Nguồn:** docs/distribution-vision.md §2 trụ cột 6, §3, §5 câu hỏi mở 2 + 2b",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/global-project-config-awareness/CONTEXT.md",
+          "line": 87,
+          "text": "- `docs/distribution-vision.md` §2 trụ cột 6, §3 (đối chiếu distribution.md), §5",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-mission-boundary/CONTEXT.md",
+          "line": 76,
+          "text": "- `docs/distribution-vision.md` §1 — self-acknowledges current",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-plugin-cli-resolution/DISCUSSION.md",
+          "line": 49,
+          "text": "`docs/distribution-vision.md`.",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-plugin-cli-resolution/DISCUSSION.md",
+          "line": 67,
+          "text": "| D2 | Pillar 6 (global/project/dev-checkout coexistence, `docs/distribution-vision.md` §2 trụ cột 6) đã code xong và có hiệu lực vận hành thật — không phải gap cần thiết kế. Bằng chứng: `src/config/global-config.mjs` (`loadGlobalConfig`/`mergeWithGlobalConfig`/`describeConfigAwareness`, test thật `test/config/global-config.test.mjs`), wire thật vào `src/runner/dispatch.mjs`'s `loadRunnerConfigFromDir`/`ensureRunnerConfigForDir` (đường mọi `fgos`/`fgos-runner` chạy qua), doctor check `config-awareness`, và `scripts/fgos-shell-integration.sh`'s D2 fallback (đã fix). `tsk-1ri` thu hẹp còn đúng 1 gap cụ thể: `fgos setup` chưa init `~/.fgos/config.json` (chỉ `doctor` đọc, không ai ghi/khởi tạo) — cộng sửa `docs/history/global-project-config-awareness/CONTEXT.md` đang stale (mục \"Chưa làm\" của nó nói sai, việc đã xong). Loại bỏ nốt 2 \"Outstanding cũ\" cũ của CONTEXT.md đó khỏi phạm vi thật: migrate `.fgos-runner.json` cũ đã moot (fallback bị xoá hẳn từ tsk-5hv D1, không còn cơ chế đọc file cũ nào để migrate). |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/shared-project-config-file/CONTEXT.md",
+          "line": 93,
+          "text": "- `docs/distribution-vision.md` §2 trụ cột 6, §3, §5 câu hỏi mở 2/2b — nguồn",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/dispatch-concept-boundary/DISCUSSION.md",
+          "line": 1453,
+          "text": "Ô trống đó **latent, không giả thuyết**: `docs/distribution-vision.md` cho phép",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/ci-install-packaging-matrix/plan.md",
+          "line": 17,
+          "text": "| weak proof around the area | yes | This item's entire purpose (`docs/distribution-vision.md` §3) is replacing a local-only proof with CI-enforced proof — the area was already flagged weak. |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/ci-install-packaging-matrix/CONTEXT.md",
+          "line": 14,
+          "text": "`docs/distribution-vision.md` §6's rollout, chosen to land first because",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/ci-install-packaging-matrix/CONTEXT.md",
+          "line": 25,
+          "text": "| D4 | Workflow also adds a **fresh-runner `fgos doctor` clean-run check**, settling `docs/distribution-vision.md` §5 open question 4 in this item rather than deferring it. |",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/ci-install-packaging-matrix/CONTEXT.md",
+          "line": 32,
+          "text": "  packaging/install surface (`docs/distribution-vision.md` §3).",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/ci-install-packaging-matrix/CONTEXT.md",
+          "line": 110,
+          "text": "- `docs/distribution-vision.md` §2 pillar 7, §3, §5 open question 4, §6",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-setup-global-config-init/CONTEXT.md",
+          "line": 11,
+          "text": "Pillar 6 of `docs/distribution-vision.md` (global/project/dev-checkout",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-uninstall/CONTEXT.md",
+          "line": 12,
+          "text": "cluster (`docs/distribution-vision.md`, `docs/specs/distribution.md`),",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-uninstall/CONTEXT.md",
+          "line": 61,
+          "text": "- `docs/distribution-vision.md` §6/§7: `tsk-4bc`'s MVP formally targets",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/fgos-uninstall/CONTEXT.md",
+          "line": 82,
+          "text": "- `docs/distribution-vision.md` (7 pillars, no uninstall pillar yet)",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/install-setup-external-project-reliability/DISCUSSION.md",
+          "line": 28,
+          "text": "thần 3 trụ cột của `docs/distribution-vision.md` (setup/doctor tự sửa",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/install-setup-external-project-reliability/CONTEXT.md",
+          "line": 15,
+          "text": "`docs/distribution-vision.md`'s three pillars (setup/doctor self-fix,",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/install-setup-external-project-reliability/CONTEXT.md",
+          "line": 91,
+          "text": "- `docs/distribution-vision.md` — the 3-pillar vision this item's design",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/history/tsk-516-approve-reverify-scope/CONTEXT.md",
+          "line": 120,
+          "text": "- `docs/distribution-vision.md`, `docs/specs/distribution.md` — nền cho D6.",
+          "liveness": "design/history reference; not implementation consumer"
+        }
+      ],
+      "classification": "history per frozen map; source retained and references unchanged",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/transitional-switchboard.md",
+      "target": "docs/platform/documentation/switchboard.md",
+      "kind": "Switchboard doc",
+      "references": [
+        {
+          "path": "docs/doc-governance.md",
+          "line": 17,
+          "text": "- `docs/transitional-switchboard.md`",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/specs/reading-map.md",
+          "line": 4,
+          "text": "> (hoặc tra cứu nhanh tại `docs/transitional-switchboard.md`), rồi dùng mapping current-source tường minh của",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/reading-map.md",
+          "line": 17,
+          "text": "- `docs/transitional-switchboard.md`",
+          "liveness": "live implementation/instruction"
+        }
+      ],
+      "classification": "current candidate carriage; no truth certification",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    },
+    {
+      "source": "docs/README.md",
+      "target": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "kind": "Portal",
+      "references": [
+        {
+          "path": "docs/architect/documentation-system-discussion.md",
+          "line": 1236,
+          "text": "- `docs/README.md`",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/documentation-system-discussion.md",
+          "line": 1608,
+          "text": "  - Possible compromise: `docs/README.md` or `docs/index.md` as a top-level",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/documentation-system-design.md",
+          "line": 21,
+          "text": "`docs/reading-map.md`, `docs/README.md`, `docs/platform/README.md`, and",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/architect/documentation-system-design.md",
+          "line": 658,
+          "text": "3. Create or update `docs/README.md`, `docs/reading-map.md`, and",
+          "liveness": "design/history reference; not implementation consumer"
+        },
+        {
+          "path": "docs/distillery/sources/claudekit-engineer.md",
+          "line": 121,
+          "text": "- **Where:** `claude/hooks/managed-hooks.json`, `claude/settings.json`, `claude/hooks/docs/README.md`",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/user/README.md",
+          "line": 17,
+          "text": "- `docs/README.md`",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 75,
+          "text": "| `docs/README.md` | legacy-current | maintained-authority | Top-level documentation overview. |",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/reading-map.md",
+          "line": 42,
+          "text": "1. `docs/README.md`",
+          "liveness": "live implementation/instruction"
+        },
+        {
+          "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p01.md",
+          "line": 43,
+          "text": "- **Issue:** The explicit run instruction regex accepted any `.md` file (`run docs/README.md`, `execute CHANGELOG.md`), promoting general markdown runs to `planned-multi-cell`, which contradicted CE5 prose restricting the rule to `plan.md` or `phase-NN-*.md`-shaped files outside `plans/`.",
+          "liveness": "design/history reference; not implementation consumer"
+        }
+      ],
+      "classification": "current candidate carriage; no truth certification",
+      "reason": "Frozen map controls placement. References are recorded, not used to infer obsolescence; no source retirement or consumer edit."
+    }
+  ]
+}

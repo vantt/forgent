@@ -501,15 +501,21 @@
       "targetAnchor": "unheaded-block-32",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Whole source unit is carried. Besides replacing the coordination example with run, the diff replaces the fgos --help --json deferral with explicit current assertions: COMMAND_REGISTRY is the source, 15 verbs carry externalEffect: true, and coordination is absent. The review/approve/run examples, dispatch executor qualifier, other bullets and field definitions are conserved; no approval carries.",
       "authoredBy": "codex-session:1@2026-10-09",
+      "reviewNote": "Diff of docs/io-contract.md block 19 to the target shows exactly what the rationale lists: the example swap to review/approve/run and the \"Xem fgos --help --json cho\" deferral rewritten into COMMAND_REGISTRY, 15 verbs, no coordination, which the live manifest confirms; full source sha256 is 39e4ab1f30a6acc99de534a9fd16bd348b9ef8c1827664c0a7a50487f0587c0c, the sidecar carries only its 16-hex prefix.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-rework.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ]
+      ],
+      "reviewReportCommit": "a5b13d6dfdad6400b8230f22a6e0f19060df5e41"
     },
     {
       "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "inventoryCommit": "11b84b1ae6dede3cd9f46e2c4c84a7fff1460e93",
+  "inventoryCommit": "ad2ca83e245bbd76c0d275cc30366457b26c8df3",
   "mapSources": [
     "docs/architecture-manifest.json",
     "docs/coexistence.md",
@@ -38,8 +38,8 @@
   "total": 1072,
   "byStatus": {
     "blocking": 559,
-    "pending": 7,
-    "reviewed": 506
+    "pending": 5,
+    "reviewed": 508
   },
   "byDisposition": {
     "unknown-blocking": 559,
@@ -53,7 +53,7 @@
     "archive-with-reason": 58
   },
   "remainingUndecided": 559,
-  "pendingConservationReview": 7,
+  "pendingConservationReview": 5,
   "rows": [
     {
       "claimId": "claim_4b96f4f42ea417623dcc794155fa17ce",

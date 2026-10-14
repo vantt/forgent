@@ -1307,9 +1307,15 @@
       "sourceUnitDigest": "6d5ef0e9fd38ab9de5b8bbb92f352e17a9232c8182e4298939aa23ccce892548",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:18@2026-10-14",
-      "rationale": "Frozen root map records the user-facing documentation portal outside internal platform authority. The complete source stays byte-identical at docs/user/README.md, including Diataxis paths and migration clauses; no carrier or cutover is created."
+      "rationale": "Frozen root map records the user-facing documentation portal outside internal platform authority. The complete source stays byte-identical at docs/user/README.md, including Diataxis paths and migration clauses; no carrier or cutover is created.",
+      "reviewNote": "Source unit unheaded-block-4 (lines 29-31) of docs/user/README.md; docs/user/README.md blob 8fdeba93 is identical at map pin fd6c9ab9e and HEAD with no diff and no carrier; unit digest recomputed equal; out-of-scope reclassification matches the map row and the vocabulary entry (no target owner); block 4 is the migration clause (existing roots stay active), labelled navigation; accepted because the text is untouched.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-templates.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "a5b13d6dfdad6400b8230f22a6e0f19060df5e41"
     }
   ],
   "files": [
