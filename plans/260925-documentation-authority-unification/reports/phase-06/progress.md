@@ -1,3 +1,18 @@
+# Latest resume state — Accepted conservation and authorized truth corrections
+
+Date: 2026-10-14
+Executor: codex-session:21@2026-10-14
+Session counter: 21
+Step: 5
+State: resumed / applying committed reviews
+Review pin: 729bea758; owner authorization A35/A36 at b65e0d23d.
+Required worktree and branch verified; starting tree clean. Read progress first. Apply 240 ok source rows plus list/gap verdicts in ordinary mode with verbatim notes; fix the rescope citation. Then correct only A35 Findings sentences and mechanical A22 consequences, author remaining Step 5 rows in bounded packs under A36, and propose the historical switchboard-gap disposition. AGENTS.md/CLAUDE.md wait for Step 10. Refresh D/E from both priors and native equality, persist compact registry below 90 MB. Prepare final truth population only if all remaining source rows are decided; no author draw.
+No main writes/merge, promotion, push, rebase, Step 6, protected tool edits or secret read. Next: validate and apply committed reviews.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Bounded mapped root conservation requests
 
 Date: 2026-10-14
