@@ -1,3 +1,62 @@
+# Native registry refreshed — bounded re-review ready, closure open
+
+Date: 2026-10-15. Executor: codex-session:41@2026-10-15. Assignment: unit-run-1792019068370-953b7af2/producer/1. Session counter: 41. Step 6 ready-for-review, not closed.
+Content/native pin: `2c228f69c85f3ab3176e71ff3ad9ae2a07603890`. B0: `dbe5c432852837ea01e6025b35868bcb7271495d`. SYNC: `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`. Last D-green source remains `f0d4d030b06d36e3e9f55f7a1e3e5df623cc9860`; current D is red. Output proof/request commit is the actual runner settlement, not yet known.
+
+Read progress first, wrote it early and again here. Native sync ran once in background with own polled log, 1188.027s. Registry persisted compact one-line, 60,237,399 bytes (<90 MB). Both-prior D: 9 fatal; whole-system scoped E red: claims-not-reviewed=11, identical-units-multiple-owners=2, candidate-blocks-unreferenced=82. Known/live/native full equality and all four complete list equalities pass before/after persistence, root=830, agent=572, packaging=694, whole=82; no ID lost or fabricated.
+
+One bounded re-review set pinned to content `2c228f69c85f3ab3176e71ff3ad9ae2a07603890`: 68 changed/receipt/exception/native/status-metadata entries, 24 A36 differing pairs, plus refreshed full candidate-unverified list (82 entries). Full shown text, full 64-hex digests, corrected portal truth evidence and exact predecessor/current carrier witnesses included. All 17 substantive changed decisions and 15 portal refs since 48da12f2b covered; 819 approval-only changes stay accepted. Request paths/counts:
+
+| Request | Entries |
+|---|---:|
+| [review-request-261015-0607-whole-system-rereview-01.md](review-request-261015-0607-whole-system-rereview-01.md) | 68 |
+| [review-request-261015-0625-whole-system-rereview-candidates-01.md](review-request-261015-0625-whole-system-rereview-candidates-01.md) | 80 |
+| [review-request-261015-0625-whole-system-rereview-candidates-02.md](review-request-261015-0625-whole-system-rereview-candidates-02.md) | 2 |
+
+Receipt refs pin the real corrected artifact at `2c228f69c85f3ab3176e71ff3ad9ae2a07603890`; 14 current identities match, one historical block receipt remains a real gap with actual successor claim_2c69afcc45e403c70c550a3934d0443c shown as proposal. An authorized writer must commit/apply that successor receipt and bind its actual artifact commit; no false pin/approval. Four A31 formal classification protocol debts remain explicit. Native list reconciliation restores 15 portal units and five History frame/wrapper units (whole 62 → 82), plus the four Agent protocol-debt tuples (568 → 572); root drops the now-bound manifest tuple (831 → 830). Two identical-unit exceptions pending. No source/gap decision content changed.
+
+Three inherited Agent list file-status metadata objects were also reconciled from unrouted to the actual native candidate status. Their prior eligibility reviews are retained in history; current metadata is pending in the 68-entry pack. All 1,173 supplied optional status metadata records now validate against pinned headers, constitution and native authority status. The initial scratch comparator incorrectly treated those optional enrichments as native tuple fields; corrected verification checks the real native tuple and status metadata separately. No checker or source/gap decision changed.
+
+Current D blocker(s):
+
+- docs/platform/README.md: retired claim claim_15fb4071e9767dd5f80acc30bdee53fa (area-portals) has no vocabulary disposition, so its removal is not recorded
+- docs/platform/README.md: retired claim claim_25738169c8abaf752373ce1b1c0732be (cross-area-intentions) has no vocabulary disposition, so its removal is not recorded
+- docs/platform/README.md: retired claim claim_ef6c0254e5aadc24f40f019fd8d80810 (cross-area-proposals) has no vocabulary disposition, so its removal is not recorded
+- docs/platform/README.md: retired claim claim_f1497619fab3b38741e7a8b5c163a80a (other-architecture-drafts) has no vocabulary disposition, so its removal is not recorded
+- docs/platform/README.md: retired claim claim_f323732392f348ef8f622d71f49cb37d (unheaded-block-13) has no vocabulary disposition, so its removal is not recorded
+- docs/platform/README.md: retired claim claim_d8aff6d952f0124b500969cdb34f8790 (unheaded-block-14) has no vocabulary disposition, so its removal is not recorded
+- docs/platform/README.md: retired claim claim_df4971d4daf3dbb4a99a91a17ca7c5ae (unheaded-block-15) has no vocabulary disposition, so its removal is not recorded
+- docs/platform/README.md: retired claim claim_e11d9541dc49ef78a20e7b57d1cccb36 (unheaded-block-16) has no vocabulary disposition, so its removal is not recorded
+- docs/specs/runner.md: modified maintained file has exception but digest mismatch (expected 10b2de40c7668c98cf84a93785a7933a280e2fe7683328f97742c09365090e8b, got dcad9c1729e181668f15130635114ed452dd89ba55dd359a8ab416ac6914d564)
+
+Next: Lead independently reviews this single bounded set, then authorized writer applies accepted verdicts/native successor and formal classification bindings using real commits and reruns both-prior D/E/full equality. Lead handles the eight newly retired carriage dispositions and prohibited runner ratchet correction separately; this producer did not edit decision content. Step 6 closure still owes the reviewer-selected 30-unit truth sample, red-team, stratified 50-block sample, committed fresh-reader key/two readers, checkpoint review with **reviewer-held sensitivity pack**, consumer/alias preview and final batch/effort report. Preserve Rings holds, A34 residuals, owner queue and all remaining truth/navigation/promotion/consumer/alias/native-gap/cutover obligations. No new owner question, sensitivity pack, Step 7 or promotion.
+
+Validation: initial tests 53/54 (fixture selection failure), isolated retry 1/1, full confirmation 54/54; all env -u CLAUDE_CODE_SESSION_ID. Candidate status zero, placement 537/536/one existing exception, A/B/C/I/protected preservation pass. No git write, docs bytes/decision content/protected artifacts/workspace .fgos mutation or secret read. Required external result is the explicit exception. Markdown preview unavailable within scope.
+
+Evidence: [verification-261015-0632-whole-system-rereview.md](verification-261015-0632-whole-system-rereview.md), [native-rereview-verification.json](native-rereview-verification.json).
+
+---
+
+# Native registry persisted — post-persistence verification running
+
+Session 41, 2026-10-15. Content pin 2c228f69c85f3ab3176e71ff3ad9ae2a07603890. One background native sync completed in 1188.027s; registry persisted compact one-line, 60,237,399 bytes. Before-persistence known/live full tuple equality and full list union equality pass: root=830, agent=572, packaging=694, whole=82. D has nine fatal findings (eight actually retired carriage IDs lack dispositions; existing runner ratchet mismatch). Union-scoped E remains red. No decision content/checker/docs/baseline edit. Post-persistence D, whole-system scoped E and full equality checks now running from complete native cache, no second sync.
+
+Bounded re-review requests ready, all content pinned to 2c228f69c; full shown text and digests, 24 differing pairs, portal evidence, contextual exceptions and actual native consequences:
+
+- plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0607-whole-system-rereview-01.md — 65 entries
+- plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0625-whole-system-rereview-candidates-01.md — 80 entries
+- plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-0625-whole-system-rereview-candidates-02.md — 2 entries
+
+Closing checkpoint sensitivity pack remains reviewer-held. Author supplied only pending native supersede/receipt successor proposals in the request; live decisions unchanged. Four formal machine-classification debts and remaining Step 6 closure obligations preserved. Final proof/journal follows post checks.
+
+---
+
+# Native sync and bounded re-review — running
+
+Session 41, 2026-10-15. Assignment unit-run-1792019068370-953b7af2/producer/1. Content pin 2c228f69c85f3ab3176e71ff3ad9ae2a07603890. Read progress first; native sync once from persisted registry starts in background with scratch log. Step 6 remains open. No git write, docs/decision-content/protected artifact edit or workspace .fgos mutation.
+
+---
+
 # Portal status corrected — native sync and bounded independent re-review next
 
 Date: 2026-10-15. Executor: codex-session:40@2026-10-15. Assignment: unit-run-1792018768541-038ef4c5/producer/1. Session counter: 40.

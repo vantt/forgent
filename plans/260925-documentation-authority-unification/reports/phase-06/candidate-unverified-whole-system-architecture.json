@@ -675,6 +675,111 @@
       "reviewNote": "deep: labelled Added in candidate carriage unit unheaded-block-200 in component-boundary.md; it names the right source path, commit 69dd3ee7 and the blob I confirmed, claims no authority, and the file declares Design status Draft with switchboard authority candidate so A28 holds; shown text digest 8d6eec3640a155c73aafb3fdb2868e4e9747da8885c6c2b4b8a779146f44569a"
     },
     {
+      "claimId": "claim_33cab447f5d37437033c2024d39072cc",
+      "path": "docs/platform/README.md",
+      "anchor": "platform-documentation",
+      "unitDigest": "8fc9c0389780b881695ab47666312083822592c77e4e6e7edc4ab35da7c1299e",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b45c04655f2d6427c8dcb5ee6579e3dd",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "de17bdcf6470426386de3e75549ce8239a1e535e747842facdc53dd258fb1479",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_026114d1153a519da8c725be403babc1",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "efc34ef6f5aa655035efac51a724089ce84dd17cd231f6dacdef63f5d1356c05",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b4cf0df2f8bcb0d3daa27b5fc3bfdadb",
+      "path": "docs/platform/README.md",
+      "anchor": "1-platform-wide-anchors",
+      "unitDigest": "a50bb1654cb8fda3fd30a1d4de47465b15870f24a5a7034d6c003f6ee386612c",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_0ce4eb1bfa6b34e3831ae06a72ae3542",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "b91459b47f7a7aec45a0e03afc29342b26e9cdba66f334988a648ac9acf6e4bd",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_8f3435494fd3ab6edecb312621fd044d",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_1898cdafa7835d675526173d39eb5cd2",
+      "path": "docs/platform/README.md",
+      "anchor": "2-area-registry",
+      "unitDigest": "c1c8d66852c686b940eb0ceab00d7f6abde4f143be360919f223176afeae88d1",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_cb178b2f0832cfa84b1cbd611e0f7e3a",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "ca9b55008482c55a9c860c3c957855a19075bdd07ef9e882435be2c6d2413069",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_ec78621ff44b9fe7fa47ce85bd84bfa6",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "f2d3701022f39f5669ec2aa50aa078458032d0aad4398630e3aaf3dcc5b353ca",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_e6c39f56c4d05238618e1a7fb7004af1",
+      "path": "docs/platform/README.md",
+      "anchor": "3-decision-surface",
+      "unitDigest": "4f71dfe83dabcb8db41496b7f6ef054a9c8241d3847dd590731f03430e017ccb",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_2c69afcc45e403c70c550a3934d0443c",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_6143f65cb5e3d4d41e7b957306ab6e4e",
+      "path": "docs/platform/README.md",
+      "anchor": "4-how-to-change-platform-docs",
+      "unitDigest": "26ba4bbb4020dfcf0e9c7691d01fae431c0ade4e92ec48d9e28793ac84ccd34b",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_471738010525b3b6490003c96f408273",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "e4046fd7c27a762982d49241b30e3f99899719586530455fb4e9dfc7fbb6734f",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_cf06097fa740bba9d230af78ec04463d",
+      "path": "docs/platform/README.md",
+      "anchor": "5-related-files",
+      "unitDigest": "c216275c70704b3851ca22c07410a6743b69a249a0fda11cf67bc8b848cce2a5",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b9ae3399674ba8e92c79e75b7b35c6c3",
+      "path": "docs/platform/README.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "233073464aa7a066ec6812e54a3bbc87f523a2f83c8b0a1c87d09448296f8c74",
+      "status": "candidate-unverified"
+    },
+    {
       "claimId": "claim_a5bea09289d356820c12b650f473b9a5",
       "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
       "anchor": "unheaded-block-1",
@@ -843,6 +948,41 @@
       "reviewNote": "mechanical: Added in candidate migration note unheaded-block-2 in system-architecture/architecture/workspace-topology.md, labelled and with Design status Candidate and Canonical for Nothing until promotion, so A28 holds and nothing here is an unlabelled source claim. Shown text digest d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae"
     },
     {
+      "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
+      "path": "docs/platform/system-architecture/history/architect-readme.md",
+      "anchor": "architect-readme-source-carriage",
+      "unitDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+      "path": "docs/platform/system-architecture/history/architect-readme.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_4ea489ceb9de68fc157a43c0496640a8",
+      "path": "docs/platform/system-architecture/history/architect-readme.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "96eb59d9375ec91faaeefbab04aaacafe4dbb77d3b7b850eba1b2e4466b0afc0",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_e88d54e093c0cbc64cf8a291109760aa",
+      "path": "docs/platform/system-architecture/history/architect-readme.md",
+      "anchor": "added-in-candidate-readme-source-carriage",
+      "unitDigest": "7ae95d9a526d22db68c323a88db9e35e1ec667750e5a4616445c67012f0669e8",
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_fdf5951f6ac14750049b17bc79477f9c",
+      "path": "docs/platform/system-architecture/history/architect-readme.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "921a04d4bd874a25f9f0f4abb48bb704c8eb0203baacd7b5b20407d268aa1638",
+      "status": "candidate-unverified"
+    },
+    {
       "claimId": "claim_0dc85618100636a09598f0d426315ac8",
       "path": "docs/platform/system-overview/spec.md",
       "anchor": "unheaded-block-1",
@@ -885,19 +1025,23 @@
       "reviewNote": "deep: frontmatter provenance label unheaded-block-3 in system-overview/spec.md, labelled and with Design status Candidate and Canonical for Nothing until promotion, so A28 holds and nothing here is an unlabelled source claim. Shown text digest c14e6d885d8ddd0d15c5c8e447c051e813669cf0889523b27d14ab00267a9ea8"
     }
   ],
-  "count": 62,
-  "previousCount": 79,
-  "authoredCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
+  "count": 82,
+  "previousCount": 62,
+  "authoredCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
   "nativeRebinding": {
     "fullNativeTupleEquality": true,
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
-    "verifiedCommit": "a8a10abc1a24218518a14764f68c8d86f4810f91",
-    "verification": "reports/phase-06/whole-system-native-verification.json",
+    "verifiedCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+    "verification": "reports/phase-06/native-rereview-verification.json",
     "reviewStatus": "candidate-unverified; no approval or truth certification",
     "meaning": "Actual native conservation output; all newly allocated identities and predecessor gaps retained without graft or invented disposition."
   },
-  "nativeEquality": "not claimed after carriage relocation; next native sync refreshes actual full tuple population",
+  "nativeEquality": {
+    "contentCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+    "fullTupleEquality": true,
+    "meaning": "Native identity/list equality only; no classification or truth acceptance."
+  },
   "portalCorrection": {
     "reportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
     "removedRows": [

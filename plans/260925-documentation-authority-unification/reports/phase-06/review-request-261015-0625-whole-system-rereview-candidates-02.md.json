@@ -1,0 +1,72 @@
+{
+  "pin": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890",
+  "status": "candidate-unverified",
+  "rows": [
+    {
+      "claimId": "claim_bb7cef766e9e315e8d571c2439266591",
+      "path": "docs/platform/system-overview/spec.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "status": "candidate-unverified",
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0507-whole-system-candidates-01.md",
+      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+      "reviewMode": "ordinary",
+      "reviewNote": "deep: Added in candidate migration note unheaded-block-2 in system-overview/spec.md, labelled and with Design status Candidate and Canonical for Nothing until promotion, so A28 holds and nothing here is an unlabelled source claim. Shown text digest d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "declaredFileStatus": "Candidate",
+      "shownText": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion.",
+      "shownTextDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 23,
+        "endLine": 23,
+        "textDigest": "d271d4fcfcf426a2cff79383dbd15a8a19929eb653442fb4b5081a97adfc11ae",
+        "sample": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Curren",
+        "identityFingerprint": "13fbdbccd37af4d8cf83c4e828a422e45d84868d0e5a604f625e063b5372d4d4",
+        "ancestry": [
+          "Spec: System Overview"
+        ],
+        "text": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion."
+      }
+    },
+    {
+      "claimId": "claim_ac724d4356d7b0991556746868bdf769",
+      "path": "docs/platform/system-overview/spec.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "c14e6d885d8ddd0d15c5c8e447c051e813669cf0889523b27d14ab00267a9ea8",
+      "status": "candidate-unverified",
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0507-whole-system-candidates-01.md",
+      "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+      "reviewMode": "ordinary",
+      "reviewNote": "deep: frontmatter provenance label unheaded-block-3 in system-overview/spec.md, labelled and with Design status Candidate and Canonical for Nothing until promotion, so A28 holds and nothing here is an unlabelled source claim. Shown text digest c14e6d885d8ddd0d15c5c8e447c051e813669cf0889523b27d14ab00267a9ea8",
+      "declaredFileStatus": "Candidate",
+      "shownText": "Added in candidate: original source frontmatter (verbatim provenance).",
+      "shownTextDigest": "c14e6d885d8ddd0d15c5c8e447c051e813669cf0889523b27d14ab00267a9ea8",
+      "nativeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "c14e6d885d8ddd0d15c5c8e447c051e813669cf0889523b27d14ab00267a9ea8",
+        "sample": "Added in candidate: original source frontmatter (verbatim provenance).",
+        "identityFingerprint": "8b31b94e584a59d450c62335804ac88da2f858fcdf5b241a6ccc9de960a4ec7f",
+        "ancestry": [
+          "Spec: System Overview"
+        ],
+        "text": "Added in candidate: original source frontmatter (verbatim provenance)."
+      }
+    }
+  ]
+}

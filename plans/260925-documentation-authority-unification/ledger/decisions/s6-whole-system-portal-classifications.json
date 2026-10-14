@@ -11,105 +11,120 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_b45c04655f2d6427c8dcb5ee6579e3dd",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_026114d1153a519da8c725be403babc1",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_b4cf0df2f8bcb0d3daa27b5fc3bfdadb",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_0ce4eb1bfa6b34e3831ae06a72ae3542",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_8f3435494fd3ab6edecb312621fd044d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_1898cdafa7835d675526173d39eb5cd2",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_cb178b2f0832cfa84b1cbd611e0f7e3a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_ec78621ff44b9fe7fa47ce85bd84bfa6",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_e6c39f56c4d05238618e1a7fb7004af1",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:40@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "A22 corrected unit; next turn reconcile actual native identity and pin this receipt to the actual runner output commit; independent review pending, no approval carry"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:40@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "A22 corrected unit; next turn reconcile actual native identity and pin this receipt to the actual runner output commit; independent review pending, no approval carry"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_6143f65cb5e3d4d41e7b957306ab6e4e",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_471738010525b3b6490003c96f408273",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_cf06097fa740bba9d230af78ec04463d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     },
     {
       "claimId": "claim_b9ae3399674ba8e92c79e75b7b35c6c3",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
       "authoredBy": "codex-session:39@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "Committed corrected receipt artifact; independent review pending. Actual native identity reconciliation is enumerated in the bounded re-review; no approval carry.",
+      "receiptCommit": "2c228f69c85f3ab3176e71ff3ad9ae2a07603890"
     }
   ],
   "amendedBy": "codex-session:40@2026-10-15"
