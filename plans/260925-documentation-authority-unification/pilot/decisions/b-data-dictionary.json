@@ -621,25 +621,19 @@
     },
     {
       "claimId": "claim_e9322d0e436e48b5d231ccd1b8bd441d",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "sourceUnitDigest": "2961cc00969bd31a",
+      "authoredBy": "codex-session:21@2026-10-14",
+      "sourceUnitDigest": "2961cc00969bd31a1052857896a0fcb43cd23deb44255c61d05f92ee7ff8926b",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "human-gate-record",
       "claimKind": "specification",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Source H3 human gate record becomes the H3 \"Human Gate Record\"; only the title differs.",
-      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L217-217 (heading \"Bản ghi cổng-người (gate) — câu hỏi / câu trả lời / ảnh chụp gốc\") -> spec.md#human-gate-record L192-192; targetOwner/targetAnchor spec.md#human-gate-record. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "2904ab915782c373f2b068423862e8bb1e517e006fa150db1abe68996e11c0e8",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Source H3 human gate record becomes the H3 \"Human Gate Record\"; only the title differs. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
+      "targetUnitDigest": "b10cf2bd9decaf289a3d1855118efec41de9d8b40ceeed1b56d699b500ca17a0",
       "targetAncestry": [
         "Work State Specification",
         "4. Capture And Evidence Records"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+      ]
     },
     {
       "claimId": "claim_e9dddaee950b4f57b89587a1087c3ed1",
@@ -666,26 +660,20 @@
     },
     {
       "claimId": "claim_0735ed9860115c04597c2ce9dab4dbfc",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "sourceUnitDigest": "896856e1509a8492",
+      "authoredBy": "codex-session:21@2026-10-14",
+      "sourceUnitDigest": "896856e1509a84929acc35bbf336ab20a94a6f95415423205fa32a2bfe54d45c",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-22",
       "claimKind": "specification",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "The G-row gate field table is carried verbatim; line-set match gives block 22 (lines 199-204), not the locator hint of block 7.",
-      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L224-229 (unheaded-block-26) -> spec.md#unheaded-block-22 L199-204; targetOwner/targetAnchor spec.md#unheaded-block-22. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "896856e1509a84929acc35bbf336ab20a94a6f95415423205fa32a2bfe54d45c",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "The G-row gate field table is carried verbatim; line-set match gives block 22 (lines 199-204), not the locator hint of block 7. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
+      "targetUnitDigest": "412aa1ea6671a21153e7a478836be52612dd86b48e8f06ac59cc3add3f4f720a",
       "targetAncestry": [
         "Work State Specification",
         "4. Capture And Evidence Records",
         "Human Gate Record"
-      ],
-      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+      ]
     },
     {
       "claimId": "claim_fefa9cbccf0ff78f6ab65866bf0419a0",
@@ -2036,5 +2024,6 @@
       "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+  "exact": []
 }

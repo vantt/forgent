@@ -58,3 +58,7 @@ Before editing, affected reviewed source rows: `claim_4eeb2f406288458e61bad21531
 ## Governance navigation correction
 
 Author: codex-session:18@2026-10-14. Lead conservation report at 563247893 requires the documentation portal link in Related Files to be `[README.md](../README.md)`. The two affected decisions were already pending; no approved decision is carried into changed text. Other reviewed units are unchanged. Exact before/current text and native binding consequences are in the bounded root conservation rework request. Truth report and sample remain untouched.
+
+## Authorized sampled truth corrections — 2026-10-14
+
+A35 authorizes only the false sentences enumerated under Findings in review-5-root-authorities-truth.md. Candidate docs/platform/work-state/spec.md will correct U3, U8, U19, U20 and the listed parts of U26. Mechanical A22 consequences are rebound to pending with no approval carry. Actual store.mjs:1417 retains a statusAtAsk fallback for legacy gates; corrected prose must preserve that exception and clamp doing to todo. Full before/after fragments, unit texts, digests and code evidence will be published in the bounded truth request. No remainder of work-state is swept.
