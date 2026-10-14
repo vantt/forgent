@@ -44,7 +44,8 @@
         "reviewedAt": "2026-10-14",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
         "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
-        "reviewMode": "ordinary"
+        "reviewMode": "ordinary",
+        "reviewer": "reviewer:claude-session:a4954387@2026-10-14"
       }
     },
     {
@@ -559,7 +560,8 @@
         "reviewedAt": "2026-10-14",
         "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
         "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
-        "reviewMode": "ordinary"
+        "reviewMode": "ordinary",
+        "reviewer": "reviewer:claude-session:a4954387@2026-10-14"
       }
     },
     {
