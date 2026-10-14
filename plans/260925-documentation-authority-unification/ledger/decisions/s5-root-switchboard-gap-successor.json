@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "shard": "s5-root-switchboard-gap-successor.json",
+  "authorSession": "codex-session:21@2026-10-14",
+  "authorshipRequired": true,
+  "sources": [],
+  "claims": [],
+  "registryGaps": [
+    {
+      "claimId": "claim_334a8ede523cc86a70852c42b9db587c",
+      "sourcePath": "docs/transitional-switchboard.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceUnitDigest": "560b636f8fe9010bd9e2dc1036ebf2532111e0925f9c452c19d32dea42b7bff8",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/documentation/switchboard.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "130d01325ca439a9c92832cb477fc845a32ef7d393c7b2d584dcf348ff298902",
+      "authoredBy": "codex-session:21@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "Historical switchboard area-routes table at 08a0fd2d2ed988db996980332054a9b4559eab18 is superseded by the explicit f5a1a2dda route-table change and its whole same-subject current candidate table. Old/current full text and diff show additive candidate topology routes with existing area/authority facts retained. Current source row claim_3a0662d27a8829517966d15cf279af44 independently carries the current source table to this exact target (review 729bea758); that approval does not approve this predecessor. No identity graft, gap waiver or authority promotion."
+    }
+  ]
+}

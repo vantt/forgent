@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "beforePin": "08a0fd2d2ed988db996980332054a9b4559eab18",
+  "editCommit": "f5a1a2ddaca29e82ac6f6c3362114b51233c64a7",
+  "source": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 48,
+    "endLine": 69,
+    "textDigest": "560b636f8fe9010bd9e2dc1036ebf2532111e0925f9c452c19d32dea42b7bff8",
+    "sample": "| Area / surface | authorityStatus | fileClass | Current Route / Canonical Owner | Retained / Subordinate Sources | Role / Scope Summary |\n|---|---|---|---|---|---|\n| Platform laws",
+    "identityFingerprint": "97a483c571ee20c111ad4653e2ce5f7902d06766c373bddefc6af321bdb5dcb6",
+    "path": "docs/transitional-switchboard.md"
+  },
+  "target": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 47,
+    "endLine": 68,
+    "textDigest": "130d01325ca439a9c92832cb477fc845a32ef7d393c7b2d584dcf348ff298902",
+    "sample": "| Area / surface | authorityStatus | fileClass | Current Route / Canonical Owner | Retained / Subordinate Sources | Role / Scope Summary |\n|---|---|---|---|---|---|\n| Platform laws",
+    "identityFingerprint": "3e763ddf4a621a01069219f4d53b3368093517e359b4c6ba0ec43205588a803f",
+    "path": "docs/platform/documentation/switchboard.md"
+  },
+  "gap": {
+    "sourcePath": "docs/transitional-switchboard.md",
+    "unitDigest": "97a483c571ee20c111ad4653e2ce5f7902d06766c373bddefc6af321bdb5dcb6",
+    "identityFingerprint": "97a483c571ee20c111ad4653e2ce5f7902d06766c373bddefc6af321bdb5dcb6",
+    "claimId": "claim_334a8ede523cc86a70852c42b9db587c",
+    "sourceAnchor": "unheaded-block-4",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "560b636f8fe9010bd9e2dc1036ebf2532111e0925f9c452c19d32dea42b7bff8",
+    "claimKind": "navigation",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-4 is not a stable heading anchor"
+  },
+  "decision": {
+    "claimId": "claim_334a8ede523cc86a70852c42b9db587c",
+    "sourcePath": "docs/transitional-switchboard.md",
+    "sourceAnchor": "unheaded-block-4",
+    "sourceUnitDigest": "560b636f8fe9010bd9e2dc1036ebf2532111e0925f9c452c19d32dea42b7bff8",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/documentation/switchboard.md",
+    "targetAnchor": "unheaded-block-4",
+    "targetUnitDigest": "130d01325ca439a9c92832cb477fc845a32ef7d393c7b2d584dcf348ff298902",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewStatus": "pending",
+    "rationale": "Historical switchboard area-routes table at 08a0fd2d2ed988db996980332054a9b4559eab18 is superseded by the explicit f5a1a2dda route-table change and its whole same-subject current candidate table. Old/current full text and diff show additive candidate topology routes with existing area/authority facts retained. Current source row claim_3a0662d27a8829517966d15cf279af44 independently carries the current source table to this exact target (review 729bea758); that approval does not approve this predecessor. No identity graft, gap waiver or authority promotion."
+  },
+  "reviewStatus": "pending"
+}
