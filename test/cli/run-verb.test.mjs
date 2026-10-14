@@ -279,3 +279,10 @@ test('fgos run refuses a prompt together with --unit or --resume', () => {
   const tmp = setupTestRepo();
   assert.match(failCli(['Check it', '--unit', 'x.yaml', '--dir', tmp], tmp), /either a "<prompt>", --unit or --resume/);
 });
+
+test('fgos run "<prompt>" --writes with a --worktree that is the main checkout is refused before any unit run exists', () => {
+  const tmp = setupTestRepo();
+  const out = failCli(['Write notes', '--capability', 'docs:write', '--writes', 'notes.md', '--worktree', tmp, '--dir', tmp], tmp);
+  assert.match(out, /--writes needs a linked worktree/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});

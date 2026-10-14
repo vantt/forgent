@@ -440,7 +440,7 @@ async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }
     throw new StoreError('validation', 'fgos run "<prompt>" needs a non-empty prompt');
   }
   const writes = parseListFlag(flags.writes);
-  if (writes.length > 0 && flags.worktree === undefined && !isLinkedWorktree) {
+  if (writes.length > 0 && !isLinkedWorktree()) {
     throw new StoreError('validation', 'fgos run "<prompt>" --writes needs a linked worktree: create one with `git worktree add <path>` and pass --worktree <path> (or run from inside it)');
   }
   const prefer = parseListFlag(flags.provider);
@@ -2766,7 +2766,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // Everything about the one-liner is checked here, before runUnit creates a unit run.
       const unitData = prompt === undefined ? undefined : await adhocUnitFromPrompt(prompt, flags, {
         mainRoot: repoRoot ? path.resolve(repoRoot) : resolveGitRoots(process.cwd()).mainCheckoutRoot,
-        isLinkedWorktree: resolveGitRoots(process.cwd()).isLinkedWorktree,
+        // Where a writing unit would run: --worktree, else here. Only a linked worktree may be written.
+        isLinkedWorktree: () => resolveGitRoots(worktree ? path.resolve(worktree) : process.cwd()).isLinkedWorktree,
       });
 
       return attachDirWarning(await runUnit({
