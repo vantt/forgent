@@ -1,0 +1,134 @@
+---
+title: "Hai cửa, một runUnit: đường Doer xanh, xoá cửa thô, tách Work khỏi dispatch"
+description: "R0-R3 theo hội đồng mở lại r4 + quyết định Lead 2026-10-14: fgos run và fgos workflow start là hai cửa trên một ranh giới runUnit; dispatch là tầng thấp; Work chỉ là bên dùng. Mốc M1 = N1+N2 dùng được thật; M2 = xoá cửa cũ + cắt Work."
+status: pending
+priority: P1
+effort: "~17d tổng công; M1 ~4.5 ngày lịch, M2 ~6 ngày lịch sau M1 (~10.5 ngày lịch tổng)"
+branch: main
+tags: [runner, dispatch, rununit, work-separation, doer]
+created: 2026-10-14
+---
+
+# Hai cửa, một runUnit
+
+## Trạng thái
+
+pending (2026-10-14, bản sửa 2 sau validate + red-team). Chỉ là tài liệu plan, chưa có code. Lead: phiên điều phối; owner: anh vantt.
+
+## Nguồn và quyết định đã chốt
+
+- Gói hội đồng r4 (nguồn chính): [reports/council-reopen-r4-packet.json.md](reports/council-reopen-r4-packet.json.md), [explanation](reports/council-reopen-r4-explanation.md), [reviewer](reports/council-reopen-r4-reviewer.md), [red-team](reports/council-reopen-r4-red-team.md).
+- Review bản plan 1: [validate-plan-against-code.md](reports/validate-plan-against-code.md), [red-team-plan.md](reports/red-team-plan.md). Cách xử lý từng phát hiện ở mục [Disposition review](#disposition-review).
+- Hội đồng trước và bản đồ cửa: [council-261014-1231](../261014-1033-dispatch-operator-improvements/reports/council-261014-1231-dispatch-one-door-conclusion.md), [scout-261014-1045](../261014-1033-dispatch-operator-improvements/reports/scout-261014-1045-dispatch-door-map.md). Plan cũ [261014-1033](../261014-1033-dispatch-operator-improvements/plan.md) bị plan này thay.
+- 11 quyết định trong brief 2026-10-14 của Lead và 11 quyết định trong brief sửa plan (lịch M1/M2, cơ chế chạy lane, glob, spike C1/H1/H2, preflight H3/H4, `--units` ghi, route Rust, test subject, test thứ 4 của P00, activate, câu hỏi owner) là đầu vào cố định.
+- Giao thức chung (cơ chế lane, worktree, test, cổng, merge, file dùng chung): [protocol.md](protocol.md).
+
+## Lịch: hai mốc
+
+### M1 — N1+N2 dùng được thật
+
+| Bước | Phase (lane) chạy song song | Phụ thuộc | Ước lượng |
+|---|---|---|---|
+| S0 | Lead commit thư mục plan lên main (`git commit -- plans/261014-1400-two-doors-one-rununit`) | — | 0.1d |
+| A | [00](phase-00-land-finished-lanes.md) gom lane cũ (L0) ‖ [01](phase-01-write-scope-and-unit-contract.md) matcher `writes` + hợp đồng Unit `prefer`/`persona` (L1) ‖ [08](phase-08-work-cut-design-spike.md) spike cắt Work, chỉ đọc (L8) | 01 rebase sau khi 00 merge | 1d |
+| B | [02](phase-02-scoped-runner-commit.md) commit theo `writes`, preflight lúc launch, resume chỉ commit (L2) ‖ [03](phase-03-brief-and-coverage.md) brief + coverage (L3) ‖ [04](phase-04-run-one-liner-and-soft-prefer.md) `bind()` mềm + one-liner + `--effort` (L4) ‖ [05](phase-05-workflow-units.md) phần lõi `--units` (L5) | 01 | 1.5d |
+| C | 05 phần CLI (L5, sau khi 04 merge) ‖ [07a](phase-07a-doctrine-additive.md) doctrine chỉ cộng thêm + decision 0060/0061 (L7) | 04 (với 05-CLI); 02-05 (với 07a) | 0.5d |
+| D | Cổng gộp **G-M1** = G0 + G1 (ở [phase-07a](phase-07a-doctrine-additive.md#cổng-g-m1-lead)) | B, C | 0.5d |
+| E | Activate release cho repo forgentX (ở [phase-07a](phase-07a-doctrine-additive.md#mốc-e-activate-release-cho-forgentx-lead)) | D | 0.25d |
+
+**M1 ≈ 4.5 ngày lịch** (đã gồm ~0.6d cho review, red-team và các lượt suite ~11 phút mỗi lần). M1 là ranh giới "chỉ cộng thêm": chưa xoá cửa nào.
+
+### M2 — xoá cửa cũ + cắt Work
+
+| Bước | Phase (lane) | Phụ thuộc | Ước lượng |
+|---|---|---|---|
+| F | [06](phase-06-delete-old-doors-and-guard.md) chỉ xoá cửa + guard (L6), [07b](phase-07b-doctrine-remove-old-doors.md) gỡ doctrine cửa cũ (L7); **06 rebase lên 07b, ff MỘT lần** ‖ [09](phase-09-work-loop-and-fanout-on-rununit.md) bước 09a (helper `workUnitFor`) | M1, spike 08 đã duyệt | 1.25d |
+| G | 09 (D7 + fanout qua runUnit, L9) ‖ [10](phase-10-driver-operation-on-rununit.md) (D8, L10) | 09a merge; 10 cần spike trả lời C1/H1/H2 | 3.5d |
+| H | [11](phase-11-dispatch-generic-inputs-and-guard.md) gỡ input Work + guard ngữ nghĩa + cổng **G-M2** (L11) | 06, 09, 10 | 1.25d |
+
+**M2 ≈ 6 ngày lịch sau M1.** Đường găng của M2 là 09a → 10 → 11 → G-M2. Activate cho các project khác: mặc định sau M2, chờ owner (câu hỏi 2).
+
+**Đường găng toàn plan:** S0 → 00 → 01 → 02 → 07a → G-M1 → E → 09a → 10 → 11 → G-M2, khoảng **10.5 ngày lịch**. Mọi ước lượng đều là ước đoán, chưa đo (UNPROVEN).
+
+## Bảng lane × file
+
+| Bước | Lane | Các file lane được sửa |
+|---|---|---|
+| A | L0 | mọi file trong diff của 3 nhánh lane cũ; `src/runner/operation-choice.mjs` (nhánh tiến Work); `test/runner/operation-choice.test.mjs`; `docs/specs/runner.md`; `CHANGELOG.md`; 3 plan cũ |
+| A | L1 | NEW `src/runner/dispatch/write-scope.mjs`; `src/runner/execution/unit.mjs`; `src/workflow/definition.mjs` (chỉ khối `writes`); `src/runner/execution/run.mjs` (chỉ chỗ dựng `unitRecord` và `assignment.writes`); `src/runner/dispatch/config.mjs`; `src/setup/registrations.mjs` (một check); `docs/architecture-manifest.json` |
+| A | L8 | chỉ `reports/` |
+| B | L2 | `src/runner/execution/commit-unit-work.mjs`; `src/runner/execution/run.mjs` (preflight, khối commit, resume chỉ commit); `src/runner/loop.mjs` (chỉ `commitWorkerChanges`); `src/runner/fanout-batch.mjs` (chỉ lời gọi commit); 4 test khoá subject |
+| B | L3 | `src/runner/dispatch/{assignment,effective-execution-contract,settlement,evidence-attribution,agent-result-claim-contract,assignment-runner}.mjs` |
+| B | L4 | `src/runner/execution/bind.mjs`; `bin/fgos.mjs` (case `run`); `src/cli/command-registry.mjs` |
+| B | L5 | `src/workflow/{definition,runner,index}.mjs`; NEW `src/workflow/units-source.mjs`; manifest (row mới); `integrate.mjs` chỉ đọc |
+| C | L5 | `bin/fgos.mjs` (case `workflow`); `command-registry.mjs` |
+| C | L7 | `AGENTS.md`; `core/skills/fgos-run/SKILL.md`; `core/skills/_shared/capability-matching.md` (chỉ cộng thêm); các bản render; `docs/specs/runner.md`; `docs/decisions/index.md`; `CHANGELOG.md`; `docs/specs/reading-map.md` |
+| F | L6 | `src/runner/dispatch/cli.mjs`; `src/runner/dispatch.mjs`; DELETE `src/runner/dispatch-log.mjs`; `src/runner/fanout-batch.mjs` (chỉ thêm lối vào `node`); `bin/fgos.mjs`; `scripts/dispatch-decide-hook.mjs`; `command-registry.mjs`; `test/architecture.test.mjs`; manifest |
+| F | L7 | `AGENTS.md`; `core/skills/**` (các file dạy cửa cũ); `domains/coding/.../return-mechanics.md`; các bản render; `docs/specs/runner.md`; index; `CHANGELOG.md` |
+| F→G | L9 | `src/runner/work-dispatch.mjs`; `src/runner/loop.mjs`; `src/runner/fanout-batch.mjs` (sau khi 06 merge); allowlist trong `test/architecture.test.mjs` (sau khi 06 merge) |
+| G | L10 | `src/runner/operation-choice.mjs`; `src/verbs/state/step.mjs`; `src/runner/execution/run.mjs`; `assignment-runner.mjs`; `settlement.mjs`; `run-result.mjs`; test `:337` trong `test/architecture.test.mjs` (sau khi 09 merge) |
+| H | L11 | `dispatch/{plan,assignment,assignment-policy,assignment-runner,cli}.mjs`; `src/runner/work-dispatch.mjs`; `bin/fgos.mjs`; `test/architecture.test.mjs`; `docs/specs/runner.md`; index; `CHANGELOG.md` |
+
+Người giữ các file dùng chung theo từng bước được ghi ở [protocol.md](protocol.md#file-dùng-chung).
+
+## Acceptance (đo được)
+
+1. **G-M1:** ca 1-8 đạt (ca 9 đạt hoặc ghi UNPROVEN) theo [phase-07a](phase-07a-doctrine-additive.md#cổng-g-m1-lead) đạt, có transcript đã đọc: probe Doer dương/âm; one-liner ghi/đọc/bị từ chối; one-liner `--effort`; `--units` read-only 2 provider; `--units` 2 unit ghi phụ thuộc nhau; preset `--seats`; preflight foreign-index từ chối trước khi spawn.
+2. **E:** `fgos` trần (release đã activate) ở repo này chạy được one-liner read-only và preset; `fgos doctor` sạch.
+3. **G-M2:** cửa đã xoá trả lỗi chỉ đường sang cửa mới; doctrine và các bản render (`.agents`, `plugins`, `.claude/skills`) không còn dạy cửa cũ; guard import, guard call-site và guard ngữ nghĩa xanh, không còn allowlist; chu trình Work→runUnit→Work đọc lại verdict, chặn plan cũ (stale-plan) và giữ rigor (không bị hạ) đều xanh.
+4. Mỗi bước: `env -u CLAUDE_CODE_SESSION_ID npm test` xanh trên main sau merge; có review độc lập; có red-team cho 00, 01+02, 04, 06, 09, 10, 11.
+
+## Rủi ro chính
+
+| Rủi ro | Khả năng × Tác động | Giảm thiểu |
+|---|---|---|
+| D8 qua runUnit làm Work mất dấu verdict, hash `plan.md` lệch gốc, rigor bị hạ (C1/H1/H2) | H × H | Spike 08 phải trả lời trước; P10 không bắt đầu khi spike chưa trả lời; test chu trình đầy đủ |
+| Commit theo `writes` gom cả file người đang sửa dở / lỗi index chỉ lộ sau lượt agent (H3/H4) | M × H | Preflight lúc launch; `preExistingInScope` không tự commit; resume chỉ commit lại |
+| `--units` có ghi: unit sau không thấy thay đổi của unit trước (H5) | M × M | Unit phụ thuộc dùng nhánh của unit trước làm base. Nếu lớn quá 0.5d thì M1 chỉ hứa read-only + mutating độc lập |
+| Bản render ở project khác vẫn dạy cửa đã xoá (H7) | M × M | Checklist activate cho từng project; rollback bằng `fgctl repair` |
+| Gom 3 nhánh cũ (P00) gây lệch ngữ nghĩa | L × H | Mô phỏng của validator: không xung đột code; vẫn `npm test` sau mỗi nhánh; có red-team cho 00 |
+| Lane song song ghi nhầm checkout | M × M | Mỗi lane là phiên interactive trong worktree riêng; `pwd`/`git -C` trước mỗi lần commit; Lead kiểm nhánh trước khi merge |
+| `npm test` không hermetic trong phiên agent | H × L | Luôn `env -u CLAUDE_CODE_SESSION_ID` |
+
+## Câu hỏi còn mở (cần owner)
+
+1. **Khi nào activate cho project khác (mcp-skill-hub, mdview, ...)?** Mặc định của plan: sau G-M2, để mỗi project đổi doctrine một lần. Checklist và rollback ở [phase-07b](phase-07b-doctrine-remove-old-doors.md#activate-cho-project-khác-chờ-owner). Phạm vi câu trả lời: chỉ thời điểm, không đổi nội dung.
+
+Đã chốt, không hỏi lại: one-liner có `--writes` mà không có worktree thì từ chối. Việc tự tạo worktree là item riêng sau M1 (Lead quyết #11).
+
+## Disposition review
+
+V = [validate-plan-against-code.md](reports/validate-plan-against-code.md), R = [red-team-plan.md](reports/red-team-plan.md).
+
+| ID | Mức | Phát hiện | Disposition |
+|---|---|---|---|
+| V-H1 / R-M5 | High | Thư mục plan chưa commit | Sửa: bước S0; protocol yêu cầu commit báo cáo lane/cổng trước khi tạo worktree cho bước sau |
+| V-H2 / R-H6 | High | Verb `fanout-batch` mới thiếu route Rust; `fgos step` không tồn tại | Sửa: fanout không thêm verb. 06 thêm lối vào `node src/runner/fanout-batch.mjs`, 09 đổi phần ruột sang runUnit. Protocol thêm luật: phase nào thêm/xoá verb top-level phải sinh lại `command-routes.json` + annotations bằng `scripts/export-command-selectors.mjs` và chạy `test/rust-host/command-routes.test.mjs` (plan này không thêm verb). G-M2 dùng `fgos plan <id> --validate` |
+| V-H3 | High | Subject conventional làm đỏ 4 test | Sửa: P02 liệt kê 4 test, đổi kỳ vọng có chủ đích, kèm lý do |
+| R-C1 | Critical | Work không tìm lại verdict validate-plan | Sửa: spike 08 câu 8; P10 bị chặn tới khi spike trả lời; thêm test chu trình đầy đủ |
+| R-H1 | High | `pinInputs` không rõ gốc | Sửa: spike 08 câu 2. Mặc định: đường dẫn tuyệt đối do Work phân giải theo `resolveContentRoot`; dispatch chỉ băm, gốc được phép là `mainRoot` + các worktree git liệt kê. P10 có ca "plan.md chỉ có trong worktree item" |
+| R-H2 | High | Rigor bị hạ (risk heavy, opPolicy) | Sửa: spike 08 câu 3 liệt kê mọi nguồn rigor; `dispatchBound` ghi `assignment.rigor`; mỗi nguồn một test |
+| R-H3 | High | Commit gom file dở dang trong phạm vi | Sửa (Lead #5): P02 chụp `preExistingInScope` lúc launch, không tự commit các file này, trả cho caller |
+| R-H4 | High | Foreign index chỉ lộ sau lượt agent | Sửa: P02 preflight trước spawn; resume chỉ commit lại cho `foreign-staged-index`/`staged-set-mismatch`; `committed-set-mismatch` thì resume từ chối, kèm hướng dẫn |
+| R-H5 | High | `--units` ghi không tích hợp | Sửa: P05 cho unit ghi phụ thuộc lấy nhánh của unit trước làm base, output liệt kê nhánh/worktree. Có lối lùi về read-only + độc lập; G-M1 ca 6 |
+| R-H7 | High | Render ở project khác; rollback mức release | Sửa: checklist trong 07b; rollback `fgctl repair`; activate project khác chờ owner |
+| R-H8 | High | Chặn `[ ] { } ! ?` | Sửa (Lead #3): chỉ `*`/`**` là glob, ký tự khác là nghĩa đen; ca `app/[slug]/page.tsx` |
+| R-H9 | High | N1/N2 chưa dùng thật khi chưa activate | Sửa: mốc E activate cho forgentX sau G-M1 |
+| R-H10 | High | Không nói lane chạy bằng gì | Sửa (Lead #2): phiên Claude interactive, mỗi lane một pane herdr. Bác đề xuất "lane chạy bằng `fgos run --unit`" vì Lead #2 đã chốt cơ chế |
+| V-M1 | Medium | Coverage chỉ nối một lời gọi; `inScope` riêng | Sửa: P03 nối cả hai lời gọi `attributeWorkspaceChanges`, thay `inScope` trong `evaluateAttributionPolicy` bằng matcher chung |
+| V-M2 | Medium | Đường provenance G1 sai | Sửa: kiểm `binding.provenance.executor.source`; P04 gắn `source` cho từng ứng viên |
+| V-M3 | Medium | Đã có test call-site `:337` | Sửa: 06 mở rộng test `:337`; 10 sửa `expectedFiles` và nhánh posture |
+| V-M4 | Medium | Ba lane tự dựng `unitData` | Sửa: helper `workUnitFor` ở 09a, 09 và 10 dùng chung |
+| V-M5 | Medium | 05 phụ thuộc `unit.mjs` của 04 | Sửa: phần `prefer`/`persona` của `unit.mjs` chuyển sang 01 |
+| V-M6 | Medium | Decision ID cấp muộn | Sửa: 0060 (commit/brief/coverage) và 0061 (Unit prefer, one-liner, `--units`) ở 07a; 0062 (xoá cửa) ở 07b; 0063 (input generic) ở 11 |
+| V-M7 | Medium | Regex guard sót `work?.`, tham số `work`, `work` của `executeExecutorCli` | Sửa: P11 regex `\bwork\??\.` + bắt destructure; inventory 08 thêm `cli.mjs:382,506,784` |
+| V-M8 | Medium | `rg` doctrine sót `dispatch.mjs" execute`, `.claude/skills` | Sửa: regex mới, thêm `.claude/skills` ở 07b và G-M2 |
+| V-M9 | Medium | `fgos step` không tồn tại | Sửa: `fgos plan <id> --validate` (P10, G-M2) |
+| R-M1 | Medium | Test thứ 4 của P00 bị đổi kỳ vọng ngược với tên test | Sửa (Lead #9): reason riêng `validation-correlated-mutation-do-not-advance-work`, đổi tên test kèm lý do |
+| R-M2 | Medium | ff 07 rồi 06 thành hai lần | Sửa: 06 rebase lên 07b, ff một lần |
+| R-M3 | Medium | Red-team/cổng có phần nghi thức | Sửa: thêm red-team cho 00 và 04; danh sách đòn chỉ là sàn; G-M1 thêm `--seats`, `--effort`, `--units` ghi; chỉ tính đạt khi đã đọc transcript |
+| R-M4 | Medium | Key mặc định tự ghi vào config được track | Bác một phần: AGENTS.md "Install/setup/doctor gate" bắt mọi config default đi qua setup config-merge, và mọi key `runner.*` hiện có đều theo đường này (`registrations.mjs:2396`). Giữ đường đó; Lead commit dòng `generatedPaths: []` trên main ngay khi 01 merge để nó không thành diff lạ |
+| R-M6 | Medium | Ước lượng lạc quan | Sửa: tính lại M1/M2, có thời gian suite và review |
+| R-M7 | Medium | 09 thiếu đòn | Sửa: thêm transport herdr không có `stdout.log`, reap nhầm home, khoá cwd treo |
+| R-M8 | Medium | Re-export `loop.mjs:1902` | Sửa: L9 sở hữu cả `loop.mjs` lẫn phần ruột fanout |
+| V-L1..L11, R-L1..L4 | Low | Đường test, bảng file, dòng test stale-plan, shape `bindings`, reading-map/doc-registry, config tự ghi, lớp lỗi, commit followups/lane A, tập `executeThroughConfinement`, `origin` giả được, phép đếm `adhoc`, đường dẫn heredoc, TOCTOU, expand thô | Đã sửa trong phase tương ứng (01, 02, 05, 07a/b, 10, 11, 00). Riêng TOCTOU (R-L3) và expand thô (R-L4) ghi là residual, chấp nhận |

@@ -1,6 +1,6 @@
 # Cải tiến cửa dispatch cho người điều phối
 
-Status: in-progress (2026-10-14). Lead: phiên e9e8fb82 (pane wS:p4T5).
+Status: superseded (2026-10-14 14:00) by plans/261014-1400-two-doors-one-rununit — lanes A–D folded into that plan.
 
 ## Nguồn
 
