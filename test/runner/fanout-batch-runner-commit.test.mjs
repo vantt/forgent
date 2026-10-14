@@ -74,7 +74,7 @@ test('fanout batch: a worker that only edits files is committed by the runner, s
   assert.equal(result.fired.length, 1);
   assert.equal(result.fired[0].errorClass, null);
   assert.equal(listWork(fgosDir).work.cand1.status, 'awaiting-approval');
-  assert.equal(branchSubjects(repoRoot), 'cand1: Produce the file');
+  assert.equal(branchSubjects(repoRoot), 'chore(cand1): Produce the file');
 });
 
 test('fanout batch: a worker that committed itself is not committed twice', async () => {

@@ -120,6 +120,10 @@ export async function fanoutBatchExecutorCli(
           worktree: wtPath,
           unitId: candidateId,
           summary: `${candidateId}: ${workItem.title}`,
+          // A Work item declares no write scope: everything outside .fgos is the worker's.
+          scope: ['**'],
+          changedFiles: null,
+          excludePaths: [],
         });
         if (commit.status === 'failed') {
           throw new Error(`runner commit of the worker's changes failed: ${commit.error}`);

@@ -16,7 +16,7 @@ import { resolvePattern } from './patterns/presets.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
-import { commitUnitWork } from './commit-unit-work.mjs';
+import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
 import { dispatchLockFile, parseCompositePidIdentity } from '../main-checkout-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
@@ -134,6 +134,45 @@ export function snapshotRunnerConfig(mainCheckoutRoot) {
   };
 }
 
+/** The last attempt of each role/round: the one a resume continues from. */
+function lastAttempts(unitRecord) {
+  return Object.values(unitRecord.bindings ?? {}).map((attempts) => attempts[attempts.length - 1]).filter(Boolean);
+}
+
+/**
+ * A producer attempt whose agent turn passed but whose runner commit failed: a resume commits it
+ * again without spawning the agent. Not when the failed commit is still on the branch carrying
+ * paths outside the scope; a person has to take that commit off first.
+ */
+function commitPending(attempt, worktree) {
+  const commit = attempt?.commit;
+  if (commit?.status !== 'failed') return false;
+  return !(commit.reason === 'committed-set-mismatch' && commit.sha && commitOnBranch(worktree, commit.sha));
+}
+
+/** A resume cannot go past a commit that landed holding paths outside the unit's write scope. */
+function assertNoStrayCommit(unitRunId, unitRecord) {
+  for (const attempt of lastAttempts(unitRecord)) {
+    const commit = attempt.commit;
+    if (commit?.status !== 'failed' || commit.reason !== 'committed-set-mismatch' || !commit.sha) continue;
+    if (!commitOnBranch(unitRecord.worktree, commit.sha)) continue;
+    const diff = [
+      ...(commit.unexpected ?? []).map((p) => `+${p}`),
+      ...(commit.missing ?? []).map((p) => `-${p}`),
+    ].join(', ');
+    throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": commit ${commit.sha} is already on the branch but does not hold exactly the files of its write scope (${diff}; + is outside the scope, - is missing); inspect it and take it off the branch by hand (git reset HEAD~1 keeps its files in the worktree), then resume`);
+  }
+}
+
+function foreignIndexRefusal(role, round, paths) {
+  return {
+    outcome: 'policy-refusal',
+    role,
+    round,
+    refused: { reason: 'foreign-staged-index', detail: foreignIndexDetail(paths), paths },
+  };
+}
+
 /**
  * Main headless unit execution entrypoint.
  *
@@ -207,6 +246,7 @@ export async function runUnit(options = {}) {
         throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": another process (PID ${pid}) holds lock at "${lockPath}"`);
       }
     }
+    assertNoStrayCommit(unitRunId, unitRecord);
   } else {
     let raw;
     if (options.unitData) {
@@ -300,7 +340,15 @@ export async function runUnit(options = {}) {
   let executionSettled = false;
   try {
 
-  const history = () => readUnitRunHistory(unitDir);
+  // A producer round whose commit is still pending is not settled yet: the pattern asks for it
+  // again, and runRole commits it without spawning the agent.
+  const pendingCommitKeys = () => new Set(Object.entries(unitRecord.bindings ?? {})
+    .filter(([, attempts]) => commitPending(attempts[attempts.length - 1], unitRecord.worktree))
+    .map(([key]) => key));
+  const history = () => {
+    const pending = pendingCommitKeys();
+    return readUnitRunHistory(unitDir).filter((h) => !pending.has(`${h.role}/${h.round ?? 1}`));
+  };
 
   // Which executors played which role; `independentOf` role names resolve through it (see role-ledger.mjs).
   const roleLedger = createRoleExecutorLedger();
@@ -447,6 +495,31 @@ export async function runUnit(options = {}) {
     // other in this same tick, so each sees the executors its siblings were just given.
     noteRoleExecutor(role, bound.executor);
 
+    const writeScope = unitRecord.writeScope ?? unit.writes ?? [];
+    const commitWork = (summarySource, runResult, excludePaths) => commitUnitWork({
+      worktree: unitRecord.worktree,
+      unitId: summarySource.id,
+      summary: runResult?.agentClaim?.summary,
+      scope: writeScope,
+      changedFiles: runResult?.evidence?.changedFiles ?? null,
+      excludePaths,
+      needsWrites: runResult?.agentClaim?.needsWrites,
+    });
+
+    // The agent already did this round's work and only the runner commit failed: commit again,
+    // never spawn the agent a second time.
+    const lastRecorded = recorded[recorded.length - 1];
+    if (!readOnly && commitPending(lastRecorded, unitRecord.worktree)) {
+      const { foreignStaged } = preflightUnitWorktree({ worktree: unitRecord.worktree, scope: writeScope });
+      if (foreignStaged.length > 0) return foreignIndexRefusal(role, round, foreignStaged);
+      const prior = readUnitRunHistory(unitDir).find((h) => h.role === role && (h.round ?? 1) === round);
+      const commit = commitWork(rUnit || unit, prior?.runResult, lastRecorded.preExistingInScope ?? []);
+      lastRecorded.commit = commit;
+      lastRecorded.outcome = commit.status === 'failed' ? 'execution-failure' : 'pass';
+      persistUnitRecord();
+      return { outcome: lastRecorded.outcome, role, round, runResult: prior?.runResult, binding: lastRecorded.binding, commit };
+    }
+
     if (bound.mechanism === 'inline') {
       if (role !== 'producer') {
         throw new RunnerConfigError(`checker role "${role}" cannot be bound inline (G2 / Q-A violation)`);
@@ -467,6 +540,16 @@ export async function runUnit(options = {}) {
         round,
         pendingInline: { nonce, role, round },
       };
+    }
+
+    // Before a mutating producer is spawned: an index someone else staged refuses the run (the
+    // runner stages only what it chose), and files already dirty in scope are recorded so the
+    // runner never commits them. A resumed attempt keeps what its first launch saw.
+    let preExistingInScope = [];
+    if (!readOnly) {
+      const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, scope: writeScope });
+      if (preflight.foreignStaged.length > 0) return foreignIndexRefusal(role, round, preflight.foreignStaged);
+      preExistingInScope = recorded[0]?.preExistingInScope ?? preflight.preExistingInScope;
     }
 
     // Out-of-process dispatch, with provider-limit failover: when the agent stops on a provider
@@ -494,6 +577,7 @@ export async function runUnit(options = {}) {
             : bound.provenance?.fallbackFrom?.kind === 'account-rotation' ? (attempts[attemptNo - 1]?.skipCandidateIndex ?? -1)
               : (attempts[attemptNo - 1]?.binding?.candidateIndex ?? -1),
           candidateIndex: bound.candidateIndex ?? null,
+          ...(readOnly ? {} : { preExistingInScope }),
           boundAt: new Date().toISOString(),
         });
         persistUnitRecord();
@@ -501,14 +585,11 @@ export async function runUnit(options = {}) {
 
       const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs, objective: (rUnit || unit).objective });
 
-      // The worker only writes files; this trusted code, outside the confinement, commits them.
-      // No change is recorded as such, and a commit that cannot be made fails the round.
+      // The worker only writes files; this trusted code, outside the confinement, commits the
+      // ones inside the write scope. No change is recorded as such, and a commit that cannot be
+      // made fails the round. Paths changed outside the scope are reported, never committed.
       if (!readOnly && result.outcome === 'pass') {
-        const commit = commitUnitWork({
-          worktree: unitRecord.worktree,
-          unitId: (rUnit || unit).id,
-          summary: result.runResult?.agentClaim?.summary,
-        });
+        const commit = commitWork(rUnit || unit, result.runResult, attempts[attemptNo].preExistingInScope ?? preExistingInScope);
         result.commit = commit;
         attempts[attemptNo].commit = commit;
         if (commit.status === 'failed') result.outcome = 'execution-failure';

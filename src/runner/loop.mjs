@@ -375,6 +375,10 @@ function commitWorkerChanges(item, worktree, headBeforeWorker, workerOutput) {
     worktree,
     unitId: item.id,
     summary: workerResultSummary(workerOutput) ?? `${item.id}: ${item.title}`,
+    // A Work item declares no write scope: everything outside .fgos is the worker's.
+    scope: ['**'],
+    changedFiles: null,
+    excludePaths: [],
   });
   if (result.status === 'failed') {
     const err = new Error(`runner commit of the worker's changes failed: ${result.error}`);

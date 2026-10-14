@@ -1082,8 +1082,8 @@ test('a worker that only edits files is committed by the runner before goal-chec
   assert.equal(fileAtRef(repoRoot, branch, 'output.txt'), true, 'the runner committed the worker file');
   assert.equal(
     execFileSync('git', ['log', '--format=%s', `HEAD..${branch}`], { cwd: repoRoot, encoding: 'utf8' }).trim(),
-    'item-nocommit: Produce the output file',
-    'subject falls back to "<id>: <title>" when the worker reported no Result summary',
+    'chore(item-nocommit): Produce the output file',
+    'subject falls back to chore(<id>): <title> when the worker reported no Result summary',
   );
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
 });
