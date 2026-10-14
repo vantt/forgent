@@ -4481,7 +4481,7 @@ function handleVerbHelp(verb, flags, positional) {
   const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
   if (!entry) return null;
   // `--help <word>` hands the word to the flag as its value.
-  const words = [...(typeof flags.help === 'string' ? [flags.help] : []), ...positional.filter((p) => p !== '-h')];
+  const words = [...(typeof flags.help === 'string' ? [flags.help] : []), ...positional].filter((w) => w !== '-h');
   printVerbHelp(verb, entry.subcommands ? words[0] : undefined, flags.json !== undefined);
   return true;
 }

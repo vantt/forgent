@@ -195,3 +195,23 @@ test('an exact -h/--help token is help even where it would be a flag value (same
     assert.equal(JSON.parse(result.stdout).name, verb, args.join(' '));
   }
 });
+
+// Red-team: a help token right after a flag the parser gives a value to
+// (`--json -h`, `--dir -h`) once let the verb run -- init created a store,
+// session start a real worktree.
+test('a help token after a value-taking flag still never runs the verb', () => {
+  const cwd = tmpCwd();
+  for (const args of [
+    ['init', '--json', '-h'],
+    ['init', '--foo', '-h'],
+    ['init', '--', '-h'],
+    ['init', '--dir', '-h'],
+    ['session', 'start', '--json', '-h'],
+    ['dispatch', 'decide', '--help', '-h'],
+  ]) {
+    const result = run(cwd, args);
+    assert.equal(result.status, 0, `${args.join(' ')}: ${result.stderr}`);
+    assert.doesNotMatch(result.stdout, /"contract":\s*"fgos\.v1"/, args.join(' '));
+  }
+  assert.deepEqual(fs.readdirSync(cwd), [], 'help wrote into the working directory');
+});
