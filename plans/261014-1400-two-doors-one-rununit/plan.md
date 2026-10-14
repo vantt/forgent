@@ -13,7 +13,7 @@ created: 2026-10-14
 
 ## Trạng thái
 
-M1 đóng 2026-10-14 19:30. M2 đang chạy. Lead: phiên điều phối; owner: anh vantt.
+completed 2026-10-15 02:05. M1 đóng 2026-10-14 19:30; M2 đóng với cổng [gate-m2-261015-0205](reports/gate-m2-261015-0205.md) (bước 3 đường Work thật UNPROVEN, có bằng chứng fixture). Thêm ngoài plan, owner duyệt: lane account, help, timeout, sync. Lead: phiên điều phối; owner: anh vantt.
 
 - M1 = đợt A-E, cộng hai lane ngoài phase (gitparse, các fix khoá resume / pin persona / invocation `prefer` của Lead).
 - Cổng G-M1: [gate-m1-261014-1857](reports/gate-m1-261014-1857.md); ca 2 và ca 8 đổi kỳ vọng (mục để ngỏ). Ma trận provider 6/6 sau khi Lead thêm provider `deepseek` vào `~/.fgos/config.json` (owner cho phép; backup `config.json.bak-20261014-deepseek`).
