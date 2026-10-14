@@ -184,3 +184,15 @@ F6 resolution (owner-decided 2026-10-14, option A of the Step 4 decision, follow
 1. The installed-default removal trigger for npm `bin.fgos` is superseded by the 2026-09-15 coordinator decision (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`, with the `architecture/release-boundaries.md:35` row): the Rust host is the installed default from the preview, and the Node fallback is deprecated and supported for 30 calendar days, earliest removal 2026-10-18. The disposition cites that decision as its successor.
 2. Removing or redirecting `bin.fgos` after the window stays an owed obligation, owned by Packaging-distribution (release-owner decision). The disposition text says so; nothing is removed now.
 3. The rationale says "superseded by decision" and drops the "no intentional retirement is inferred from absence" wording. The FLAGGED-obsolete verbatim retention may now be resolved consistently with this verdict. The runner mapping and source-entry ownership header stay.
+
+A35 (owner-decided 2026-10-14, option B of the Step 5 truth escalation, following `review-5-root-authorities-truth.md`, 5 of 30 sampled units false, 16.7%): stale carried work-state text.
+1. Correct every false sentence that report lists (about 20, verbatim with the correct fact and file:line) under A19, rebind under A22, and send the corrected units to independent truth re-review. No approval carries.
+2. Add the work-state spec carriers to the candidate-unverified list with the note "known stale carried sentences; full truth check owed at promotion". Do not sweep the rest of the work-state spec (including the unchecked part of the RUL1 to RUL66 block) against code in Phase 6; that full check is the A28 item 3(b) promotion review.
+3. Step 5 closes on the corrected units plus a fresh 30-unit truth draw over the final Step 5 population (A28 item 3(a)); the 10% rule applies to that new draw.
+4. Scope: this escalation only. A later batch whose truth sample exceeds 10% asks the owner again.
+
+A36 (owner-decided 2026-10-14, option B of the review-cost question): sampled deep review for the remaining Phase 6 conservation packs, replacing the 100% read for Weak-exact and Judgment rows in A28 item 1 from the next pack on.
+1. The reviewer still writes one ordinary verdict row for every submitted claim, so the existing applier and validator stay unchanged. Every row gets the mechanical checks: full digest recompute, anchor check, shard/pack equality.
+2. A seeded random sample of at least 15% of the pack's Weak-exact and Judgment rows (minimum 10 rows, all if fewer), plus every row whose source and target digests differ, is read in full in both directions with its diff. The seed and the sampled IDs are recorded in the report; each row's note says `deep` or `mechanical`.
+3. If more than 3% of the deep-read rows need rework, the reviewer reads the whole pack in full before reporting.
+4. Unchanged: checkpoint reviews (Steps 6 and 10) with their sensitivity packs, truth samples (A28 item 3), merge reviews (A31), owner holds and the closure conditions.
