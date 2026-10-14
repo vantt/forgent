@@ -11,7 +11,7 @@ import {
   reconcileCliSpawnRun,
   snapshotDirtyBeforeFiles,
 } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { findMutatedDirtyBeforeFiles } from '../../src/runner/dispatch/settlement.mjs';
+import { findMutatedDirtyBeforeFiles, safeGitStatusFiles, safeGitCommittedDiffFiles } from '../../src/runner/dispatch/settlement.mjs';
 import { sha256FileSync } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { validateRunResultV2, validateRunResultV3, runOutcome } from '../../src/runner/dispatch/run-result.mjs';
 import { interpretAssignmentRunResult } from '../../src/runner/operation-choice.mjs';
@@ -1653,7 +1653,7 @@ test('done findings survive both settlement branches; verified mutating work sti
 
 // A round's changes are matched against the scope its assignment declared: inside it they are
 // covered, outside it they warn. Without a declared scope, coverage was never checked at all.
-function scopedWriteRun({ writes, claim, stage = 'executing', operation = 'implement-item' }) {
+function scopedWriteRun({ writes, claim, stage = 'executing', operation = 'implement-item', files = { 'docs/guide/a.md': 'inside\n', 'src/out.mjs': 'outside\n' } }) {
   const tempDir = mkTempDir();
   execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempDir, stdio: 'ignore' });
@@ -1666,10 +1666,10 @@ function scopedWriteRun({ writes, claim, stage = 'executing', operation = 'imple
     import fs from 'node:fs';
     import path from 'node:path';
     const cwd = process.cwd();
-    fs.mkdirSync(path.join(cwd, 'docs', 'guide'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, 'docs', 'guide', 'a.md'), 'inside\\n');
-    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, 'src', 'out.mjs'), 'outside\\n');
+    for (const [rel, body] of Object.entries(${JSON.stringify(files)})) {
+      fs.mkdirSync(path.dirname(path.join(cwd, rel)), { recursive: true });
+      fs.writeFileSync(path.join(cwd, rel), body);
+    }
     const runsDir = path.join(cwd, '.fgos', 'assignments');
     for (const asgn of fs.readdirSync(runsDir)) {
       const runDir = path.join(runsDir, asgn, 'runs', '01');
@@ -1727,4 +1727,57 @@ test('a read-only seat that carries its unit\'s writes gets no coverage from the
   assert.equal(result.evidence.operationMutability ?? 'read-only', 'read-only');
   assert.ok(result.evidence.attribution.every((a) => a.coverageMatched === false));
   assert.ok((result.warnings ?? []).some((w) => w.code === 'read-only-mutation-correlated'));
+});
+
+// git quotes a path with a non-ASCII byte, a quote or a control character (core.quotePath) and
+// pads nothing, but a line-split read kept the quoted spelling and trimmed edge spaces: such a file
+// matched no write scope, so an in-scope change went unseen and a missing one settled as a pass.
+function quotedNameRepo() {
+  const dir = mkTempDir();
+  const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'ignore' });
+  git('init');
+  git('config', 'user.email', 'test@example.com');
+  git('config', 'user.name', 'Tester');
+  git('config', 'core.quotePath', 'true');
+  fs.writeFileSync(path.join(dir, 'a b.md'), 'seed\n');
+  fs.writeFileSync(path.join(dir, 'cũ.md'), 'seed\n');
+  git('add', '.');
+  git('commit', '-m', 'seed');
+  return { dir, git };
+}
+
+test('safeGitStatusFiles reads Vietnamese names, spaces, edge spaces and renames byte for byte', () => {
+  const { dir, git } = quotedNameRepo();
+  fs.writeFileSync(path.join(dir, 'a b.md'), 'changed\n');
+  fs.mkdirSync(path.join(dir, 'tài liệu'));
+  fs.writeFileSync(path.join(dir, 'tài liệu', 'ghi chú.md'), 'new\n');
+  fs.writeFileSync(path.join(dir, ' lề .md'), 'new\n');
+  fs.writeFileSync(path.join(dir, 'tab\there.md'), 'new\n');
+  git('mv', 'cũ.md', 'mới.md');
+  fs.mkdirSync(path.join(dir, '.fgos'));
+  fs.writeFileSync(path.join(dir, '.fgos', 'state.json'), '{}\n');
+  assert.deepEqual(safeGitStatusFiles(dir).sort(), [' lề .md', 'a b.md', 'mới.md', 'tab\there.md', 'tài liệu/ghi chú.md'].sort());
+});
+
+test('safeGitCommittedDiffFiles reads a committed Vietnamese name with spaces byte for byte', () => {
+  const { dir, git } = quotedNameRepo();
+  const before = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
+  fs.writeFileSync(path.join(dir, 'đã commit.md'), 'x\n');
+  fs.writeFileSync(path.join(dir, ' lề .md'), 'x\n');
+  git('add', '.');
+  git('commit', '-m', 'more');
+  const after = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
+  assert.deepEqual(safeGitCommittedDiffFiles(dir, before, after).sort(), [' lề .md', 'đã commit.md'].sort());
+});
+
+test('a Vietnamese name with spaces reaches changedFiles byte for byte and is covered by its scope', async () => {
+  const result = await scopedWriteRun({
+    writes: ['tài liệu'],
+    claim: DONE_CLAIM,
+    files: { 'tài liệu/ghi chú.md': 'mới\n', 'ngoài phạm vi.md': 'x\n' },
+  });
+  assert.deepEqual(result.evidence.changedFiles, ['ngoài phạm vi.md', 'tài liệu/ghi chú.md']);
+  const byPath = Object.fromEntries(result.evidence.attribution.map((a) => [a.path, a]));
+  assert.equal(byPath['tài liệu/ghi chú.md'].coverageMatched, true);
+  assert.deepEqual((result.warnings ?? []).filter((w) => w.code === 'outside-write-scope-correlated').map((w) => w.paths), [['ngoài phạm vi.md']]);
 });
