@@ -272,7 +272,7 @@ lộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó
 PR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái
 fgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`
 (verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb
-có bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (dispatch executor thật tính là effect ngoài `.fgos/`);
+có bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);
 `review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể
 cả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều
 phối hay xác danh; cổng "ai được nói verb nào" vẫn là việc riêng sau này
@@ -287,7 +287,8 @@ phối hay xác danh; cổng "ai được nói verb nào" vẫn là việc riên
   sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù
   bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest
   `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có
-  `coordination` (dispatch executor thật tính là effect ngoài `.fgos/`).
+  `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật
+  tính là effect ngoài `.fgos/`).
 - `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng.
 
 Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa
