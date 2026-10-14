@@ -61,7 +61,8 @@ import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolveTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
-import { normalizeProviderFamily, checkProviderDisallowed } from './provider-adapter.mjs';
+import { normalizeProviderFamily, checkProviderDisallowed, collectModelWarnings } from './provider-adapter.mjs';
+import { explicitReasoningEffort } from './assignment-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -2065,6 +2066,9 @@ export async function executeAssignment(assignment, opts = {}) {
 
   const startTime = Date.now();
   let rawResult;
+  // What the launch rendered for effort and model, whichever spawn path ran.
+  let launchModelCheck = null;
+  let launchReasoningEffort;
   let executionError = null;
 
   const executorId = resolvedExecutorId;
@@ -2317,6 +2321,8 @@ export async function executeAssignment(assignment, opts = {}) {
         resolvedCmd = resolveExecutorCommand(cfg, {
           prompt,
           model: effectivePolicy.model,
+          requestedModel: opts.cliOverride?.model,
+          reasoningEffort: explicitReasoningEffort(effectivePolicy),
           tier: effectivePolicy.tier,
           executorId: resolvedExecutorId,
           fgosDir,
@@ -2332,6 +2338,8 @@ export async function executeAssignment(assignment, opts = {}) {
           // source; neither pins anything for the unsubstituted
           invocationId: (hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : undefined) ?? fallbackInvocationId,
         });
+        launchModelCheck = resolvedCmd.modelCheck;
+        launchReasoningEffort = resolvedCmd.reasoningEffort;
       } catch (err) {
         const commandOutcome = {
           kind: 'submission-refused',
@@ -2597,6 +2605,8 @@ export async function executeAssignment(assignment, opts = {}) {
           repoRoot: root,
           runnerConfig: cfg,
           model: effectivePolicy.model,
+          requestedModel: opts.cliOverride?.model,
+          reasoningEffort: explicitReasoningEffort(effectivePolicy),
           tier: effectivePolicy.tier,
           timeoutMs,
           onChunk: opts.onChunk,
@@ -2686,6 +2696,9 @@ export async function executeAssignment(assignment, opts = {}) {
       executorId,
     };
 
+    const modelWarnings = launchModelCheck
+      ? collectModelWarnings(launchModelCheck, { stdout: rawResult?.stdout, stderr: rawResult?.stderr })
+      : (rawResult?.modelWarnings ?? []);
     const outcome = await settleRunOutcome({
       runDir,
       runMeta,
@@ -2712,6 +2725,8 @@ export async function executeAssignment(assignment, opts = {}) {
       resolvedExecutorId,
       effectivePolicy,
       executorRedirected,
+      reasoningEffort: launchReasoningEffort ?? rawResult?.reasoningEffort,
+      modelWarnings,
       providerCapacitySelection,
       providerCapacityEvidence,
       fallbackEvidence,

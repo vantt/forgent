@@ -38,6 +38,7 @@ import { markRunSettled } from './visibility-session.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { buildDispatchResult } from './result-ladder.mjs';
+import { collectModelWarnings } from './provider-adapter.mjs';
 import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs';
 import { createCredentialProbe } from './provider-credential-probe.mjs';
 import { runAccountProbe } from './provider-account-probe.mjs';
@@ -372,6 +373,11 @@ export async function executeExecutorCli(
     repoRoot,
     runnerConfig,
     model: modelOverride,
+    // The model the caller asked for, when `model` above is what policy made of
+    // it (an Assignment's redirect can replace it); defaults to `model` itself.
+    requestedModel,
+    // A canonical reasoning-effort level for this one run (`--effort`).
+    reasoningEffort,
     tier: tierOverride,
     rigor: rigorOverride,
     for: purposeArg,
@@ -445,7 +451,7 @@ export async function executeExecutorCli(
   const purpose = purposeArg;
   if (!executorIdArg && !purpose) {
     throw new RunnerConfigError(
-      'executeExecutorCli requires an executorIdArg or a `for` purpose (the CLI\'s own `execute` subcommand only ever supplies executorIdArg positionally -- `for` is a programmatic-caller-only parameter, e.g. spawnWorker\'s own work-item-derived purpose; usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access])',
+      'executeExecutorCli requires an executorIdArg or a `for` purpose (the CLI\'s own `execute` subcommand only ever supplies executorIdArg positionally -- `for` is a programmatic-caller-only parameter, e.g. spawnWorker\'s own work-item-derived purpose; usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--effort <low|medium|high|max>] [--tier <name>] [--carries <class>] [--has-live-task-access])',
     );
   }
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
@@ -702,9 +708,11 @@ export async function executeExecutorCli(
   const resolvedAgentType = agentType ?? null;
   // Same reason as `spawnWorker`: a confinement the profile declares has to
   // reach the adapter, or the invariant that accepted the profile is fiction.
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, resourceBindings } = resolveExecutorCommand(cfg, {
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, resourceBindings, reasoningEffort: effortApplied, modelCheck } = resolveExecutorCommand(cfg, {
     prompt,
     model,
+    requestedModel: requestedModel ?? modelOverride,
+    reasoningEffort,
     tier,
     executorId,
     fgosDir,
@@ -906,7 +914,13 @@ export async function executeExecutorCli(
       attestation: result?.attestation,
       ...(strayWarning ? { warnings: [strayWarning] } : {}),
     };
-    const base = buildDispatchResult({ mechanism, result: resultToBuild, headBefore, headAfter, lostUncommittedPaths, provider, command });
+    const built = buildDispatchResult({ mechanism, result: resultToBuild, headBefore, headAfter, lostUncommittedPaths, provider, command });
+    const modelWarnings = collectModelWarnings(modelCheck, execResult ?? {});
+    const base = {
+      ...built,
+      ...(effortApplied ? { reasoningEffort: effortApplied } : {}),
+      ...(modelWarnings.length > 0 ? { modelWarnings } : {}),
+    };
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
     if (heartbeat) clearInterval(heartbeat);
@@ -1144,7 +1158,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
     return value;
   };
   // R9: "Reject duplicate/conflicting flags ... before launch" -- applies to
-  // every `cliOverride` flag (`--executor`/`--model`/`--tier`), not just
+  // every `cliOverride` flag (`--executor`/`--model`/`--tier`/`--effort`), not just
   // `--executor`. Returns the first duplicated flag name found, or null.
   // Walks `rest` left to right, exactly mirroring `flagValue()`'s own
   // convention that the token immediately after a flag name is that flag's
@@ -1156,7 +1170,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
   // `includes` scan, counts every flag position regardless of where in
   // `rest` it falls, including the very last token.
   const findDuplicateOverrideFlag = () => {
-    const flagNames = new Set(['--executor', '--model', '--tier']);
+    const flagNames = new Set(['--executor', '--model', '--tier', '--effort']);
     const counts = new Map();
     let i = 0;
     while (i < rest.length) {
@@ -1167,7 +1181,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         i += 1;
       }
     }
-    for (const name of ['--executor', '--model', '--tier']) {
+    for (const name of ['--executor', '--model', '--tier', '--effort']) {
       if ((counts.get(name) ?? 0) > 1) return name;
     }
     return null;
@@ -1283,6 +1297,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         if (flagValue('--model')) cliOverride.model = flagValue('--model');
         if (flagValue('--tier')) cliOverride.tier = flagValue('--tier');
         if (flagValue('--executor')) cliOverride.preferExecutor = flagValue('--executor');
+        if (flagValue('--effort')) cliOverride.reasoningEffort = flagValue('--effort');
         try {
           const result = await executeAssignment(asgnObj, {
             cwd: flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd(),
@@ -1463,6 +1478,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
           if (flagValue('--model')) cliOverride.model = flagValue('--model');
           if (flagValue('--tier')) cliOverride.tier = flagValue('--tier');
           if (flagValue('--executor')) cliOverride.preferExecutor = flagValue('--executor');
+          if (flagValue('--effort')) cliOverride.reasoningEffort = flagValue('--effort');
           const result = await executeAssignment(assignment, {
             cwd,
             repoRoot: root,
@@ -1530,6 +1546,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
           timeoutMs,
           idleTimeoutMs,
           model: flagValue('--model'),
+          reasoningEffort: flagValue('--effort'),
           tier: flagValue('--tier'),
           carries: flagValue('--carries'),
           cwd: flagValue('--cwd') ?? flagValue('--dir'),
@@ -1676,7 +1693,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     default: {
-      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--for <capability>] [--prompt <text>|--prompt-file <path>] [--model <name>] [--tier <name>] [--carries <class>] [--timeout-ms <ms>] [--idle-timeout-ms <ms>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>] | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]\n`;
+      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--for <capability>] [--prompt <text>|--prompt-file <path>] [--model <name>] [--effort <low|medium|high|max>] [--tier <name>] [--carries <class>] [--timeout-ms <ms>] [--idle-timeout-ms <ms>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>] | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]\n`;
       if (returnResult) throw new StoreError('validation', msg.trim());
       process.stderr.write(msg);
       process.exitCode = 1;

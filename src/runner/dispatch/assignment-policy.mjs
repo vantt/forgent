@@ -21,7 +21,7 @@
 // this resolver's own generic `{scope: 'cliOverride'}` label. Existing callers
 // omit `policyProvenance`, so the field is purely additive.
 
-import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES, DEFAULT_RIGOR_TO_TIER } from './config.mjs';
+import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES, DEFAULT_RIGOR_TO_TIER, assertReasoningEffort } from './config.mjs';
 import { resolveTierModel, deriveProviderFamily } from './resolve.mjs';
 import { REPEAT_MODE_VALUES } from './execution-contract.mjs';
 import { checkProviderDisallowed } from './provider-adapter.mjs';
@@ -47,6 +47,18 @@ export { RIGOR_VALUES, RIGOR_RANK };
 // re-exported here unchanged so every existing caller of this module keeps
 // working byte-identically.
 export { REASONING_EFFORT_VALUES };
+/**
+ * The reasoningEffort a resolved policy asks the provider CLI to run at, or
+ * undefined when nobody asked: an explicit level (a `--effort` override or an
+ * operation policy) is rendered into the launch; one merely derived from rigor
+ * is not, because no dispatch has ever been launched with it and turning it on
+ * would change every run's cost at once.
+ */
+export function explicitReasoningEffort(policy) {
+  const scope = policy?.provenance?.reasoningEffort?.source?.scope;
+  return scope && scope !== 'derived' ? policy.reasoningEffort : undefined;
+}
+
 export const REASONING_EFFORT_DEFAULT_FROM_RIGOR = Object.freeze({
   low: 'low',
   standard: 'medium',
@@ -350,10 +362,7 @@ export function resolveAssignmentDispatchPolicy({
   let reasoningEffort;
   let reasoningEffortSource;
   if (explicitReasoningEffort !== undefined) {
-    if (!REASONING_EFFORT_VALUES.includes(explicitReasoningEffort)) {
-      throw new RunnerConfigError(`invalid reasoningEffort "${explicitReasoningEffort}". Valid values: [${REASONING_EFFORT_VALUES.join(', ')}]`);
-    }
-    reasoningEffort = explicitReasoningEffort;
+    reasoningEffort = assertReasoningEffort(explicitReasoningEffort);
     reasoningEffortSource = cliOverride.reasoningEffort ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId };
   } else {
     reasoningEffort = REASONING_EFFORT_DEFAULT_FROM_RIGOR[effectiveRigor] ?? 'medium';

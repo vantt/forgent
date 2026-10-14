@@ -473,6 +473,23 @@ export const EXECUTOR_CARRIES = Object.freeze(['user-text', 'repo-content']);
 export const REASONING_EFFORT_VALUES = Object.freeze(['low', 'medium', 'high', 'max']);
 
 /**
+ * The one validation every requested reasoningEffort goes through, whichever
+ * door asked for it: the canonical vocabulary first, then the levels the
+ * executor itself declares in `supports.reasoningEffort` (a narrower list
+ * there is a deliberate limit, never bypassed by a command-line flag).
+ * Returns the value unchanged when it passes.
+ */
+export function assertReasoningEffort(value, { supported, executorId } = {}) {
+  if (!REASONING_EFFORT_VALUES.includes(value)) {
+    throw new RunnerConfigError(`invalid reasoningEffort "${value}". Valid values: [${REASONING_EFFORT_VALUES.join(', ')}]`);
+  }
+  if (Array.isArray(supported) && !supported.includes(value)) {
+    throw new RunnerConfigError(`executor "${executorId}" supports reasoningEffort [${supported.join(', ')}], not "${value}"`);
+  }
+  return value;
+}
+
+/**
  * CLI commands recognized as staying within the Claude ecosystem for
  * cross-provider governance (D2, tsk-32n). Deliberately NOT
  * `KNOWN_ASSISTANT_CLI_NAMES` (above) — that list is "assistant CLIs this

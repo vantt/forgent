@@ -490,6 +490,9 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
 
   return {
     ...executor,
+    // The executor's declared capabilities (e.g. which reasoningEffort levels
+    // it accepts) live on the entry, not on the invocation picked above.
+    ...(executorEntry?.supports && !executor.supports ? { supports: executorEntry.supports } : {}),
     governance,
   };
 }

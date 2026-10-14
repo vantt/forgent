@@ -241,6 +241,144 @@ export function extractPolicyShapedFlags(args, providerFamily) {
 }
 
 /**
+ * How each provider CLI takes a reasoning-effort level, keyed by the spawned
+ * command's own name: the CLI decides the flag, not the provider family (pi
+ * runs openai and deepseek models alike; the claude CLI also fronts z-ai).
+ * Levels are fgOS's canonical vocabulary (config.mjs REASONING_EFFORT_VALUES);
+ * `native` maps one onto a different CLI word where the CLI names it
+ * differently. Verified against the installed CLIs' --help (2026-10-14):
+ * claude/agy `--effort low|medium|high|xhigh|max`, pi/omp `--thinking
+ * off|minimal|low|medium|high|xhigh|max`; codex has no flag and reads
+ * `model_reasoning_effort` from its config, which `-c key=value` overrides
+ * for one run (it accepts any string without checking, so fgOS checks).
+ */
+const REASONING_EFFORT_CONTROLS = Object.freeze({
+  claude: { flag: '--effort' },
+  agy: { flag: '--effort' },
+  pi: { flag: '--thinking' },
+  omp: { flag: '--thinking' },
+  codex: { configKey: 'model_reasoning_effort', native: { max: 'xhigh' } },
+});
+
+/**
+ * Renders a canonical reasoning-effort level into an invocation's args
+ * template (before `{prompt}`/`{model}` substitution, so an adapter that
+ * rebuilds argv from the template sees the same flag). A level the template
+ * already hard-codes is replaced, never duplicated. Returns null when the
+ * command has no effort control fgOS knows how to set.
+ *
+ * @returns {null | { args: string[], control: { command: string, flag: string, native: string, replaced?: string } }}
+ */
+export function renderReasoningEffortArgs({ command, args = [], effort }) {
+  const name = path.basename(String(command ?? ''));
+  const control = REASONING_EFFORT_CONTROLS[name];
+  if (!control) return null;
+  const native = control.native?.[effort] ?? effort;
+  const out = [...args];
+  let replaced;
+  let flag;
+  if (control.configKey) {
+    flag = `-c ${control.configKey}`;
+    const prefix = `${control.configKey}=`;
+    const idx = out.findIndex((arg, i) => i > 0 && out[i - 1] === '-c' && typeof arg === 'string' && arg.startsWith(prefix));
+    if (idx !== -1) {
+      replaced = out[idx].slice(prefix.length);
+      out[idx] = `${prefix}${native}`;
+    } else {
+      // Options follow the `exec` subcommand when there is one.
+      out.splice(out[0] === 'exec' ? 1 : 0, 0, '-c', `${prefix}${native}`);
+    }
+  } else {
+    flag = control.flag;
+    const idx = out.indexOf(control.flag);
+    if (idx !== -1 && idx + 1 < out.length) {
+      replaced = out[idx + 1];
+      out[idx + 1] = native;
+    } else {
+      out.unshift(control.flag, native);
+    }
+  }
+  return { args: out, control: { command: name, flag, native, ...(replaced !== undefined ? { replaced } : {}) } };
+}
+
+/**
+ * What the spawned CLI itself says about the model, read from its output.
+ * Each pattern is a message the real CLI printed (2026-10-14): codex prints a
+ * `model: <id>` header line and warns `Model metadata for \`<id>\` not
+ * found` for a model it does not know; agy refuses with `model <id> is not
+ * recognized as a known model`; pi refuses with `Model "<id>" not found`.
+ */
+const MODEL_REFUSAL_PATTERNS = [
+  /model (\S+) is not recognized as a known model/,
+  /Model "([^"]+)" not found/,
+  /Model metadata for `([^`]+)` not found/,
+];
+const MODEL_REPORT_PATTERN = /^model: (\S+)$/m;
+
+/**
+ * Pre-spawn half of the model check, computed where the argv is built:
+ * `requested` is the model the caller asked for (a `--model` flag), and
+ * `launched` the model the invocation is actually given after policy
+ * (a redirect to another provider re-derives it from that provider's tier).
+ */
+export function checkLaunchedModel({ requested, launched, args = [] }) {
+  const warnings = [];
+  if (requested && launched && requested !== launched) {
+    warnings.push({
+      code: 'model-overridden',
+      requested,
+      launched,
+      message: `requested model "${requested}" was replaced by "${launched}" before launch`,
+    });
+  }
+  // Only a model the caller asked for is worth a warning: an executor that
+  // never takes a model (an MCP tool, a pane driver) is not ignoring one.
+  if (requested && launched && !args.some((arg) => typeof arg === 'string' && arg.includes(launched))) {
+    warnings.push({
+      code: 'model-not-passed',
+      launched,
+      message: `the invocation's argv never carries model "${launched}"; the CLI runs whatever model its own config names`,
+    });
+  }
+  return { ...(requested ? { requested } : {}), ...(launched ? { launched } : {}), warnings };
+}
+
+/**
+ * Post-run half: the pre-spawn warnings plus what the CLI's own output says
+ * (it refused or did not know the model, or reported running another one).
+ * Returns the structured warning list a dispatch result carries; empty when
+ * nothing disagrees.
+ */
+export function collectModelWarnings(modelCheck, { stdout = '', stderr = '' } = {}) {
+  if (!modelCheck) return [];
+  const warnings = [...(modelCheck.warnings ?? [])];
+  const text = `${typeof stderr === 'string' ? stderr : ''}\n${typeof stdout === 'string' ? stdout : ''}`;
+  for (const pattern of MODEL_REFUSAL_PATTERNS) {
+    const match = text.match(pattern);
+    if (match) {
+      warnings.push({
+        code: 'model-unsupported',
+        model: match[1],
+        message: `the provider CLI does not recognize model "${match[1]}"`,
+        evidence: match[0],
+      });
+      break;
+    }
+  }
+  // The header goes to stderr; a worker's own stdout may print any text.
+  const reported = (typeof stderr === 'string' ? stderr : '').match(MODEL_REPORT_PATTERN)?.[1];
+  if (reported && modelCheck.launched && reported !== modelCheck.launched) {
+    warnings.push({
+      code: 'model-reported-different',
+      launched: modelCheck.launched,
+      reported,
+      message: `launched with model "${modelCheck.launched}" but the CLI reports running "${reported}"`,
+    });
+  }
+  return warnings;
+}
+
+/**
  * Base ProviderAdapter defining common pure rendering contract and option resolution.
  */
 export class BaseProviderAdapter {

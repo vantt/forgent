@@ -45,9 +45,9 @@ import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
 import { spawn, execFileSync } from 'node:child_process';
-import { RunnerConfigError } from './config.mjs';
+import { RunnerConfigError, assertReasoningEffort } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
-import { resolveVerifiedProviderArgs, recordShadowBinderDivergence } from './provider-adapter.mjs';
+import { resolveVerifiedProviderArgs, recordShadowBinderDivergence, renderReasoningEffortArgs, checkLaunchedModel } from './provider-adapter.mjs';
 import { runHerdrRound } from './herdr-round.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 import { startDetachedRunSupervisorProcess } from './detached-run-supervisor.mjs';
@@ -148,7 +148,7 @@ function captureDispatchAttestation(fgosDir, attestRoot) {
   };
 }
 
-export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries, resolvedAgentType, invocationId } = {}) {
+export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries, resolvedAgentType, invocationId, reasoningEffort, requestedModel } = {}) {
   // Captured BEFORE resolveExecutorConfig, not after (D3) — cheap and
   // unconditional so the same call site works regardless of whether the
   // resolved executor turns out to be same-provider or cross-provider;
@@ -166,7 +166,24 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
       `runner config declares unknown executor adapter "${adapter}" (known: ${Object.keys(EXECUTOR_ADAPTERS).join(', ')}).`,
     );
   }
-  const legacyArgs = executor.args.map((arg) => {
+  // A requested reasoning-effort level, for every door that builds argv here:
+  // validated once (canonical vocabulary, then the executor's own declared
+  // levels) and rendered into the template, so an adapter that rebuilds argv
+  // from the template carries it too.
+  let argsTemplate = executor.args;
+  let effortApplied;
+  if (reasoningEffort !== undefined) {
+    assertReasoningEffort(reasoningEffort, { supported: executor.supports?.reasoningEffort, executorId });
+    const rendered = renderReasoningEffortArgs({ command: executor.command, args: executor.args, effort: reasoningEffort });
+    if (!rendered) {
+      throw new RunnerConfigError(
+        `executor "${executorId}" runs "${path.basename(String(executor.command))}", which has no reasoning-effort control fgOS can set -- drop --effort or pick an invocation whose CLI takes one (claude, codex, agy, pi, omp).`,
+      );
+    }
+    argsTemplate = rendered.args;
+    effortApplied = { requested: reasoningEffort, ...rendered.control };
+  }
+  const legacyArgs = argsTemplate.map((arg) => {
     if (typeof arg !== 'string') {
       throw new RunnerConfigError('runner config "executor.args" entries must all be strings.');
     }
@@ -186,7 +203,7 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     const { args: verifiedArgs, divergence } = resolveVerifiedProviderArgs({
       providerFamily: executor.governance.providerFamily,
       command: executor.command,
-      baseArgs: executor.args,
+      baseArgs: argsTemplate,
       promptPlaceholder: prompt,
       model,
       legacyArgs,
@@ -216,7 +233,7 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     // and the `{prompt}` placeholder says so precisely where string-matching
     // the substituted result only guesses. Additive: every existing caller
     // destructures a subset of this object and is unaffected.
-    argsTemplate: executor.args,
+    argsTemplate,
     env: executor.env,
     liveOutput: executor.liveOutput,
     interactiveMode: executor.interactiveMode,
@@ -256,6 +273,11 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     headers: executor.headers,
     body: executor.body,
     resourceBindings: executor.resourceBindings,
+    // What the effort flag rendered to, when one was requested.
+    ...(effortApplied ? { reasoningEffort: effortApplied } : {}),
+    // The pre-spawn half of the model check; collectModelWarnings adds what
+    // the CLI's own output says once the run ends.
+    modelCheck: checkLaunchedModel({ requested: requestedModel, launched: model, args }),
   };
 }
 
