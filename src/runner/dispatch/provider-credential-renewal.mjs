@@ -648,26 +648,16 @@ function listLeftovers(accountDir) {
 const hasLeftovers = (accountDir) => listLeftovers(accountDir).length > 0;
 
 /**
- * Accounts whose pending copies exceed MAX_PENDING_COPIES, `[{provider, accountId, count}]`. Nothing is
- * dropped to get back under the limit unless it is a redundant duplicate, so an account can stay over it.
+ * Accounts whose pending copies exceed MAX_PENDING_COPIES, `[{provider, accountId, count, storeDir,
+ * stranded}]`. Nothing is dropped to get back under the limit unless it is a redundant duplicate, so an
+ * account can stay over it. `stranded` is judged as in inspectRetainedCredentialCopies.
  */
-export function inspectPendingCopiesOverLimit({ runtimeDir }) {
+export function inspectPendingCopiesOverLimit({ runtimeDir, inventory } = {}) {
   const found = [];
-  const root = path.join(runtimeDir, 'account-locks');
-  const subdirs = (dir) => {
-    try { return fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); } catch { return []; }
-  };
-  for (const provider of subdirs(root)) {
-    for (const accountId of subdirs(path.join(root, provider))) {
-      const accountDir = path.join(root, provider, accountId);
-      // An account with one login store per CLI keeps each store's pending copies under stores/<cli>.
-      const storeDirs = [accountDir, ...subdirs(path.join(accountDir, 'stores')).map((cli) => path.join(accountDir, 'stores', cli))];
-      for (const storeDir of storeDirs) {
-        let count = 0;
-        try { count = fs.readdirSync(path.join(storeDir, PENDING_DIR)).filter((n) => !n.startsWith('.')).length; } catch { /* none */ }
-        if (count > MAX_PENDING_COPIES) found.push({ provider, accountId, count });
-      }
-    }
+  for (const { provider, accountId, storeDir, stranded } of listCredentialStoreDirs(runtimeDir, inventory)) {
+    let count = 0;
+    try { count = fs.readdirSync(path.join(storeDir, PENDING_DIR)).filter((n) => !n.startsWith('.')).length; } catch { /* none */ }
+    if (count > MAX_PENDING_COPIES) found.push({ provider, accountId, count, storeDir, stranded });
   }
   return found;
 }
@@ -681,10 +671,31 @@ export function inspectPendingCopiesOverLimit({ runtimeDir }) {
  * With the provider account `inventory`, each copy also says whether it is `stranded`: it sits in a store
  * directory the account's current layout never reads (the account root after the account moved to one
  * store per CLI, `stores/<cli>` after it went back to one store or dropped that CLI, or an account the
- * inventory no longer lists), so no dispatch will ever apply it. `storeDir` names that directory. Without
- * an inventory nothing is judged stranded.
+ * inventory no longer lists), so no dispatch will ever apply it, and it is listed at any age. `storeDir`
+ * names that directory. Without an inventory nothing is judged stranded.
  */
 export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), minAgeMs = 0, inventory } = {}) {
+  const found = [];
+  const tornIn = (dir) => { try { return fs.readdirSync(path.join(dir, TORN_DIR)).filter((n) => !n.startsWith('.')).map((n) => path.join(dir, TORN_DIR, n)); } catch { return []; } };
+  for (const { provider, accountId, storeDir, stranded } of listCredentialStoreDirs(runtimeDir, inventory)) {
+    for (const dir of [...listLeftovers(storeDir), ...tornIn(storeDir)]) {
+      const name = path.basename(dir);
+      const staged = /^(\d{15})-/.exec(name);
+      let at;
+      if (staged) at = Number(staged[1]);
+      else { try { at = fs.statSync(dir).mtimeMs; } catch { continue; } }
+      const ageMs = now - at;
+      const torn = path.basename(path.dirname(dir)) === TORN_DIR;
+      if (ageMs >= minAgeMs || torn || stranded) found.push({ provider, accountId, kind: torn ? 'torn' : staged ? 'pending' : 'scratch', ageMs, storeDir, stranded });
+    }
+  }
+  return found;
+}
+
+// Every store directory under the runtime's account locks: the account directory, and `stores/<cli>` under
+// it for an account that keeps one store per CLI. With an inventory each says whether the account's current
+// layout reads it (`stranded: false`) or never does (`stranded: true`); without one nothing is stranded.
+function listCredentialStoreDirs(runtimeDir, inventory) {
   const found = [];
   const root = path.join(runtimeDir, 'account-locks');
   const subdirs = (dir) => {
@@ -693,26 +704,18 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
   for (const provider of subdirs(root)) {
     for (const accountId of subdirs(path.join(root, provider))) {
       const accountDir = path.join(root, provider, accountId);
-      // An account with one login store per CLI keeps each store's copies under stores/<cli>.
       const storeDirs = [accountDir, ...subdirs(path.join(accountDir, 'stores')).map((cli) => path.join(accountDir, 'stores', cli))];
-      const readStoreDirs = inventory === undefined ? null : layoutStoreDirs(accountDir, inventory?.[provider]?.accounts?.[accountId]);
-      const tornIn = (dir) => { try { return fs.readdirSync(path.join(dir, TORN_DIR)).filter((n) => !n.startsWith('.')).map((n) => path.join(dir, TORN_DIR, n)); } catch { return []; } };
-      for (const storeDir of storeDirs) {
-        const stranded = readStoreDirs !== null && !readStoreDirs.has(storeDir);
-        for (const dir of [...listLeftovers(storeDir), ...tornIn(storeDir)]) {
-          const name = path.basename(dir);
-          const staged = /^(\d{15})-/.exec(name);
-          let at;
-          if (staged) at = Number(staged[1]);
-          else { try { at = fs.statSync(dir).mtimeMs; } catch { continue; } }
-          const ageMs = now - at;
-          const torn = path.basename(path.dirname(dir)) === TORN_DIR;
-          if (ageMs >= minAgeMs || torn) found.push({ provider, accountId, kind: torn ? 'torn' : staged ? 'pending' : 'scratch', ageMs, storeDir, stranded });
-        }
-      }
+      const readStoreDirs = inventory === undefined ? null : layoutStoreDirs(accountDir, inventoryAccount(inventory, provider, accountId));
+      for (const storeDir of storeDirs) found.push({ provider, accountId, storeDir, stranded: readStoreDirs !== null && !readStoreDirs.has(storeDir) });
     }
   }
   return found;
+}
+
+// An inventory account by its own keys only: an id such as "constructor" never resolves to a built-in.
+function inventoryAccount(inventory, provider, accountId) {
+  const accounts = inventory && Object.hasOwn(inventory, provider) ? inventory[provider]?.accounts : null;
+  return accounts && Object.hasOwn(accounts, accountId) ? accounts[accountId] : null;
 }
 
 // The store directories a dispatch reads for an inventory account: the account directory for one store,
