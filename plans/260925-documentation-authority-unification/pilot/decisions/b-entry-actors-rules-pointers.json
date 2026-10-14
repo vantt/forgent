@@ -163,13 +163,19 @@
       "targetAnchor": "11-business-rules",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source heading \"Business Rules\" is represented by frozen heading \"11. Business Rules\"; only the numbering prefix differs. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. Closure correction: restore only the two A35-named RUL59 sentences while conserving every untouched source clause (R5-4); current real target digest and ancestry rebound under A22, pending independent re-review with no approval carry.",
       "authoredBy": "codex-session:34@2026-10-15",
+      "reviewNote": "deep: Business Rules heading unit rebound to 18139e7c (its digest depends on the section payload), pending, no approval carry; rationale true and long but accurate about what changed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0340-root-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "18139e7cf11d2b16a88ed2badee889c8538fd67ce330706031f4556f2b401002",
       "targetAncestry": [
         "Work State Specification"
-      ]
+      ],
+      "reviewReportCommit": "6dadbb3685126542e6a2cecd64bcbae035b4fb58"
     },
     {
       "claimId": "claim_904f21e704c3d43d63ae2a762bf9791c",

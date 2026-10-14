@@ -1,3 +1,45 @@
+# Accepted closure verdicts — native conservation proof blocked
+
+Date: 2026-10-15
+Executor: codex-session:35@2026-10-15
+Session counter: 35
+Assignment: unit-run-1792010759631-a0318ce4/producer/1
+Step: 5
+State: reader-runs / independent closure corrections accepted; Step 5 open, native proof blocked
+Input HEAD / immutable Lead report pin: 6dadbb3685126542e6a2cecd64bcbae035b4fb58
+Last full native source proof: 04e476784ed528970ae33b13dbd220bff9948a5a
+Last historical passing D: 6fbb5aed0493b2afb99552ef5bd5cefac897e551
+Current D: red, 28 fatal findings from persisted-pin/current-HEAD mismatch
+Persisted registry/inventory pin: 7e9fd4bd5d9eff9ef748190256cbe182c5ace00c
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Current-turn commit: none; runner commits declared files.
+
+Resume: progress read first (at its phase-report path), then the phase resume protocol and full committed Lead closure-fix review including Notes. Initial tree clean; input HEAD descends from the last native source proof. Assignment narrows this turn to plan files only, scratch in /tmp/fgos-work/root-closure-acceptance/, no git write, docs bytes, workspace .fgos mutation, secret read, protected tool/vocabulary/extractor/baseline edit or full native sync. Required external result outbox is the explicit exception.
+
+All four ok verdicts applied through unchanged ordinary applyReviewVerdicts, notes verbatim, report pinned to the full commit above: boundary claim claim_9be8a10f, boundary gap claim_3d2d87a2, Pilot B claim claim_477a30f4, AGENTS partial-carry gap claim_5c520fcb. No rework or hold; no new review request/pack. A34 representation acceptance binds the unchanged source/primary-target/residual digests and full residual SHA256; the residual file itself stays byte-identical, including its historical pending label. All unrelated reviewed rows remain unchanged. Step 5 s5 rows: 722 claims / 73 gaps reviewed, zero pending; current mapped population 1,074 reviewed, zero pending/undecided.
+
+Batch report corrected per Lead Notes 2/5: RUL59 does not keep exactly the legacy wording except a truth substitution; its second replaced sentence drops two still-true explicit priority-write clauses. Those and the retained stale intent-failure / 0–100 prompt clauses owe a promotion wording pass. Lead Note 3 is explicit: old template/block-93 digests in working-identity-registry.json and root-boundary-native-verification.json must be rebound at the next native pin, first Step 6 turn. No current native equality is inferred from the historical proof.
+
+D and scoped E were rerun through the unchanged `checkInventory` API, using the persisted working registry and both prior registries together; no carry-forward, registry persistence or full native sync was run. Current-HEAD `generateInventory` refuses the unchanged registry because its pin `7e9fd4bd5d9eff9ef748190256cbe182c5ace00c` precedes the two edited candidate files. A read-only inventory was therefore generated at that actual persisted pin (4,404 items / 87,368 claims), with freshness explicitly checked against HEAD; the old pin was not represented as current.
+
+**D is red: 28 fatal findings** — 25 `decision-review-report-missing`, two `decision-target-drift`, one `inventory-stale`. All 25 report bindings separately pass `validateManualReview` at current HEAD; their committed reports are newer than the persisted inventory, so this diagnostic is an ancestry mismatch, not a missing reviewer verdict. The two target drifts are the current RUL block and Business Rules source decisions against the old target snapshot.
+
+**Scoped strict E is red: 31 fatal findings**, comprising the same 28 invariant/freshness findings plus the three expected open categories. Its conservation-open data has one Packaging A34 partial carry, three identical-unit exception groups and 830 candidate-unverified rows; there are zero scoped source not-reviewed/unknown-blocking/application/T9 open categories. The Packaging partial's exact ID/source/target digests and residual SHA256 recompute, and all three identical-owner groups have exactly the earlier source/owner membership. The independently accepted AGENTS residual is outside these source scopes and is separately verified through its new binding.
+
+Candidate ID/path/anchor membership equals the deduplicated Root/Packaging lists, but **full digest-tuple equality fails for exactly the five reviewed templates README units**: inventory still yields their old digests, while the committed candidate list has the accepted new ones. The other 825 tuples agree. Seven exact stale native registry tuples (these five, block-93 and Business Rules heading) are listed with full old/current digests in the sidecar. No list is reverted to conceal this mismatch.
+
+**Step 5 remains open, blocked on native pin/conservation proof.** Independent review, the four ordinary applications and the report corrections are complete; the required D-green/full-tuple proof is not. The assignment explicitly forbids full native sync here and schedules rebinding for the first Step 6 turn. That boundary turn must run the existing native pin, resolve its genuine identity/binding consequences, rerun D/E and list equality, then close Step 5 before authoring Step 6 candidates. No new owner question, truth draw, waiver or review pack is created. The first Step 6 actions below remain the exact handoff, including reviewer-held checkpoint sensitivity proof.
+
+
+Validation: 39/39 unchanged review/apply tests pass, no failures/cancel/skips/todo, with env -u CLAUDE_CODE_SESSION_ID. Ratchet clean, placement 529/528 with one recorded exception, candidate-status zero findings. All 95,000 IDs conserved against both priors. Registry remains 59,808,373 bytes / SHA256 ed56c7750b36ee68ececea9399d6852f6ca07c41aa903d908102fb4666d8bce8; protected bytes, docs, extractor, authority statuses and reader links unchanged. Eight historical A allowlist observations are disclosed (Phase 6 checklist obligations now also present; Lead Notes 4); no gate/baseline is weakened. No full-suite, current-truth or installed-release proof is claimed.
+
+Evidence: [verification](verification-261015-0347-root-closure-acceptance.md), [machine sidecar](verification-261015-0347-root-closure-acceptance.md.json), [batch report](step-05-report.md). Preserve existing Coordination Rings holds, A34 Host/Packaging/AGENTS cutover obligations, candidate-unverified lists, A35/A37 promotion truth, navigation merge, consumer/alias/native-gap and metadata/effort debts. No product-direction blocker or new owner queue item.
+
+Next action: the boundary turn runs the native pin and conservation/list proof first, closes Step 5 only when that proof passes, then resumes the exact Step 6 sequence in the batch report: read phase Step 6/whole-system map/review brief, Plan B main sync/blob comparisons/re-pin before affected sources, author against existing component-boundary and architecture-map, record boundary impact, and finish with scoped E/second checkpoint refresh/effort. Step 6 checkpoint sensitivity pack is reviewer-held and cannot use ordinary review or an author-made seed. No Step 6 authoring, promotion, main merge or push this turn. MDView preview unavailable within write scope.
+
+---
+
 # Closure corrections complete in files — bounded independent re-review next
 
 Date: 2026-10-15
