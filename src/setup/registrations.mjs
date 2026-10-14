@@ -90,7 +90,7 @@ import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
 import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory, commandCli, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
-import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
+import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -5438,9 +5438,10 @@ export function checkCredentialCopiesRetained({
   now = Date.now(),
   minAgeMs = RETAINED_COPY_REPORT_AFTER_MS,
   inventory,
+  inventoryUnreadable,
 } = {}) {
   const copies = inspectRetainedCredentialCopies({ runtimeDir, now, minAgeMs, inventory });
-  const stranded = copies.filter((c) => c.stranded && c.kind !== 'torn');
+  const stranded = copies.filter((c) => c.stranded);
   // A kept home under a root no reaper or dispatch retries (a registered backend's own root) never counts its
   // own attempts up, so it is held from the start: doctor fails naming it and --fix settles it. A root nested
   // inside another lists a home twice; it is counted once.
@@ -5451,28 +5452,34 @@ export function checkCredentialCopiesRetained({
     .map((home) => ({ ...home, ageMs: home.since ? now - Date.parse(home.since) : 0 }));
   const held = homes.filter((home) => home.held);
   const retrying = homes.filter((home) => !home.held);
-  const overLimit = inspectPendingCopiesOverLimit({ runtimeDir });
+  const overLimit = inspectPendingCopiesOverLimit({ runtimeDir, inventory });
   if (copies.length === 0 && homes.length === 0 && overLimit.length === 0) {
     return { passed: true, message: 'no login copy is being retained past its dispatch' };
   }
   // Each of these may hold the only valid refresh token, so none is ever deleted for its age. A held home is
   // a failure (nothing but the owner or a repair clears it); copies waiting for a renewal are a warning. A copy
-  // in a store directory the account's layout no longer reads is never applied, so it fails like a held home,
-  // and it is only named, never applied to the new layout's stores or dropped.
+  // in a store directory the account's layout no longer reads is never applied, so it fails like a held home
+  // at any age, and it is only named, never applied to the new layout's stores or dropped.
   const problems = [
-    ...overLimit.map((a) => `${a.provider}/${a.accountId}${a.store ? ` (store ${a.store})` : ''}: ${a.count} pending login copies waiting, over the limit of ${MAX_PENDING_COPIES} (the limit drops only copies identical to another, never one that may be the only valid login; a dispatch for that account re-checks them, and if the source stays unreadable recover the logins by hand)`),
-    ...strandedByStore(stranded),
+    ...overLimit.map((a) => (a.stranded
+      ? `${a.provider}/${a.accountId}: ${a.count} pending login copies at ${a.storeDir}, over the limit of ${MAX_PENDING_COPIES}, in a directory the account's login store layout no longer reads (no dispatch re-checks or drops them; recover the logins by hand)`
+      : `${a.provider}/${a.accountId}${a.store ? ` (store ${a.store})` : ''}: ${a.count} pending login copies waiting, over the limit of ${MAX_PENDING_COPIES} (the limit drops only copies identical to another, never one that may be the only valid login; a dispatch for that account re-checks them, and if the source stays unreadable recover the logins by hand)`)),
+    ...strandedByStore(stranded.filter((c) => c.kind !== 'torn'), 'login copy(ies) that no dispatch applies'),
+    ...strandedByStore(stranded.filter((c) => c.kind === 'torn'), 'half-written login copy(ies) kept for hand recovery'),
     ...summarizeByAccount(copies.filter((c) => c.kind !== 'torn' && c.kind !== 'staging' && !c.stranded), 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)'),
     ...summarizeByAccount(copies.filter((c) => c.kind === 'staging' && !c.stranded), 'interrupted staging(s) of a login copy (a crash cut the copy short; "fgos doctor --fix" removes one that is empty, identical to a copy already kept, or shown by the source login of the account to be no newer, any other stays for hand recovery)'),
-    ...summarizeByAccount(copies.filter((c) => c.kind === 'torn'), 'half-written login copy(ies) kept for hand recovery (never applied or dropped automatically)'),
+    ...summarizeByAccount(copies.filter((c) => c.kind === 'torn' && !c.stranded), 'half-written login copy(ies) kept for hand recovery (never applied or dropped automatically)'),
     ...held.map((home) => `${home.provider}/${home.accountId}: private home held ${home.attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS ? 'after repeated staging failures' : 'under a root that nothing retries by itself'}, ${formatAge(home.ageMs)} old, at ${home.dir} ("fgos doctor --fix" re-checks it and removes it once its login is shown to be applied or obsolete; otherwise recover the login from it by hand)`),
     ...summarizeByAccount(retrying, 'private home(s) kept after a staging failure, retried by the reaper'),
+    ...(inventory === undefined && copies.length + overLimit.length > 0
+      ? [`login store layout not checked (${inventoryUnreadable ?? 'no provider account inventory read'}), so a copy no dispatch reads is not told apart`]
+      : []),
   ];
   const text = problems.join('; ');
-  return held.length > 0 || stranded.length > 0 ? { passed: false, message: text } : { passed: true, message: `warning: ${text}` };
+  return held.length > 0 || stranded.length > 0 || overLimit.some((a) => a.stranded) ? { passed: false, message: text } : { passed: true, message: `warning: ${text}` };
 }
 
-function strandedByStore(copies) {
+function strandedByStore(copies, what) {
   const groups = new Map();
   for (const copy of copies) {
     const group = groups.get(copy.storeDir) ?? { provider: copy.provider, accountId: copy.accountId, count: 0, oldestMs: 0 };
@@ -5480,7 +5487,20 @@ function strandedByStore(copies) {
     group.oldestMs = Math.max(group.oldestMs, copy.ageMs);
     groups.set(copy.storeDir, group);
   }
-  return [...groups].map(([dir, g]) => `${g.provider}/${g.accountId}: ${g.count} login copy(ies) that no dispatch applies, oldest ${formatAge(g.oldestMs)}, at ${dir} (the account's login store layout in the provider inventory no longer reads this directory; recover the login from them by hand, they are never applied or dropped automatically)`);
+  return [...groups].map(([dir, g]) => `${g.provider}/${g.accountId}: ${g.count} ${what}, oldest ${formatAge(g.oldestMs)}, at ${dir} (the account's login store layout in the provider inventory no longer reads this directory; recover the login from them by hand, they are never applied or dropped automatically)`);
+}
+
+/**
+ * The machine-global provider account inventory the doctor judges store layouts by: `{ inventory }`, or
+ * `{ inventoryUnreadable }` with the reason when the global config cannot be read or is invalid. The
+ * inventory lives only in the global config, so this never depends on the directory doctor runs in.
+ */
+export function readDoctorProviderInventory(globalConfigPath) {
+  try {
+    return { inventory: providerAccountInventory(loadGlobalConfig(globalConfigPath)?.runner ?? {}) };
+  } catch (err) {
+    return { inventoryUnreadable: `provider account inventory not readable: ${err.message}` };
+  }
 }
 
 // What an interrupted staging is judged against: the source login of the store it sits in, `'stranded'` when the
@@ -5488,7 +5508,7 @@ function strandedByStore(copies) {
 function stagingStoreResolver(inventory, runtimeDir) {
   if (inventory === undefined) return undefined;
   return ({ provider, accountId, store }) => {
-    const account = inventory?.[provider]?.accounts?.[accountId];
+    const account = inventoryAccount(inventory, provider, accountId);
     if (!account) return 'stranded';
     const source = store ? account.credentialSources?.[store] : (account.credentialSources ? undefined : account.credentialSource);
     if (!source) return 'stranded';
@@ -5516,20 +5536,12 @@ export function fixCredentialCopiesRetained({ roots = credentialScanRoots(), ret
 registerCheck({
   id: 'credential-copies-retained',
   description: 'no login copy (pending, scratch, or a kept private home) that may hold the only valid refresh token is left unapplied',
-  check: (cwd) => {
-    let inventory;
-    try { inventory = providerAccountInventory(loadRunnerConfigFromDir(cwd)); } catch { inventory = undefined; }
-    return checkCredentialCopiesRetained({ inventory });
-  },
+  check: () => checkCredentialCopiesRetained(readDoctorProviderInventory()),
 });
 
 registerFix({
   id: 'credential-copies-retained',
-  fix: (cwd) => {
-    let inventory;
-    try { inventory = providerAccountInventory(loadRunnerConfigFromDir(cwd)); } catch { inventory = undefined; }
-    return fixCredentialCopiesRetained({ inventory });
-  },
+  fix: () => fixCredentialCopiesRetained({ inventory: readDoctorProviderInventory().inventory }),
 });
 
 export function checkConfinementBwrapPlatform() {

@@ -1922,7 +1922,7 @@ test('retained-copy inspection reports torn and over-limit pending copies kept p
     const kinds = inspectRetainedCredentialCopies({ runtimeDir, now: Date.now() }).map((c) => c.kind);
     assert.ok(kinds.includes('torn'), 'a torn copy under stores/<cli> is reported');
     assert.equal(kinds.filter((k) => k === 'pending').length, 6, 'pending copies under stores/<cli> are listed');
-    assert.deepEqual(inspectPendingCopiesOverLimit({ runtimeDir }), [{ provider: 'openai', accountId: 'acct', store: 'codex', count: 6 }]);
+    assert.deepEqual(inspectPendingCopiesOverLimit({ runtimeDir }).map(({ provider, accountId, count, stranded }) => ({ provider, accountId, count, stranded })), [{ provider: 'openai', accountId: 'acct', count: 6, stranded: false }]);
   } finally {
     fs.rmSync(runtimeDir, { recursive: true, force: true });
   }
