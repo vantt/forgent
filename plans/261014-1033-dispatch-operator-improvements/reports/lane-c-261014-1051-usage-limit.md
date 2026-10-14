@@ -64,3 +64,27 @@ Hai test này ghim shape `providerLimit{}` / `failure.retryAt`, mà shape thuộ
 - Chưa có mẫu đo câu reset theo ngày/tuần của codex (chuyên môn còn thiếu).
 - Chưa kiểm resume sau commit dở khi xoay account.
 - Dọn dẹp: worktree `dispatch-usage-limit-panel` để lại cho Lead tra cứu, xoá cùng lúc khi kết thúc. Pane herdr của panel do Workflow tự quản.
+
+## Sau hội đồng một-cửa (2026-10-14 12:45)
+
+Rebase lên main `f69a446f0`. Phạm vi theo mục "Cập nhật sau hội đồng một-cửa" của brief lane C.
+
+- **Thay đổi** (commit `945f48006`):
+  - Lượt cli-spawn exit khác 0, không claim, có câu hạn mức ở 5 dòng stderr cuối → `provider-limit` + `failure.cause: quota`, không cần lease. Đây là stderr độ tin cậy cao theo RUL65b, không đọc stdout.
+  - Có lease: account bị quarantine `quota-limit` tới giờ reset provider ghi (dùng `until` sẵn có).
+  - `classifyProviderCapacityFault` đọc cùng danh sách ở đuôi stderr thay vì quét toàn bộ.
+- **Không cần đọc stdout:** câu codex nằm ở stderr. Vì vậy không có điểm nào phải dừng để hỏi Lead.
+- **Bỏ:**
+  - cửa `execute` thô: theo council, thêm classifier ở đó là cơ chế song song. Test đỏ cho `buildDispatchResult` đã bỏ, không commit;
+  - trường `retryAt`;
+  - tự hẹn chạy lại.
+- **Impact (GitNexus):** `settleRunOutcome` CRITICAL (2 caller trực tiếp, 9 luồng: `executeAssignment`, `dispatchBound`, `runRole`, `reconcileCliSpawnRun`, `dispatchClaimedItem`...). Thay đổi chỉ chạm nhánh exit khác 0 + không claim + câu quota ở đuôi. `classifyProviderCapacityFault` báo 0 caller nhưng index stale (b334695); grep cho thấy caller là `settlement.mjs` và re-export ở `dispatch.mjs`, `assignment-runner.mjs`.
+- **Test:**
+  - đỏ→xanh: 2 test failover (xoay account; không lease thì đi candidate kế), 2 test matcher (câu codex thật; câu trích trong văn bản hoặc nằm xa trong log thì không khớp);
+  - `provider-capacity.test.mjs` 33/33 xanh;
+  - `npm test` (`env -u CLAUDE_CODE_SESSION_ID`): 7367 test, 0 fail, exit 0.
+- **Còn mở:**
+  - mới có một mẫu câu codex; dạng reset theo ngày/tuần chưa đo;
+  - `QUOTA_PATTERN` rộng trong `provider-account-probe.mjs` / `provider-credential-probe.mjs` (chỉ dùng chẩn đoán) chưa gom về một danh sách. Theo RUL11 nên là item riêng;
+  - nhánh credential quét toàn stderr ở `provider-capacity.mjs:1194-1199` chưa đổi;
+  - cửa thô vẫn trả `unsignaled` + exit 0 cho lượt hết hạn mức; phần này được đóng bằng doctrine bước 3 (Lead).
