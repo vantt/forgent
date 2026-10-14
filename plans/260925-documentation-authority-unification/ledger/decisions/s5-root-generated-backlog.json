@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "shard": "s5-root-generated-backlog.json",
+  "authorSession": "codex-session:23@2026-10-14",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/backlog.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+      "sourceUnitDigest": "800732106a25d1de145c1e71fdda4347cf26f60d8625771d1f42c540228cfc0a",
+      "claimKind": "navigation",
+      "disposition": "regenerate-from-source",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:23@2026-10-14",
+      "rationale": "The complete product-backlog unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+    },
+    {
+      "claimId": "claim_c295c4c899afa37544bda841421c92e4",
+      "sourceUnitDigest": "8311fcb74e3e13baa695bd62a6077eaba69a7a78ecf0448414e4f240a345188a",
+      "claimKind": "procedure",
+      "disposition": "regenerate-from-source",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:23@2026-10-14",
+      "rationale": "The complete unheaded-block-1 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+    },
+    {
+      "claimId": "claim_d7660c15ae6c2d2e7d610c1aa571101c",
+      "sourceUnitDigest": "57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86",
+      "claimKind": "historical-context",
+      "disposition": "regenerate-from-source",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:23@2026-10-14",
+      "rationale": "The complete unheaded-block-2 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+    },
+    {
+      "claimId": "claim_743cde02b9562c5f8e4724512ee6fc8f",
+      "sourceUnitDigest": "10c0d318f58b298007a8542c4f027f45383236691ef788a521c249c3a49f398c",
+      "claimKind": "navigation",
+      "disposition": "regenerate-from-source",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:23@2026-10-14",
+      "rationale": "The complete done-declined unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+    },
+    {
+      "claimId": "claim_56db2b3b7a6258289e1ab13f5c69d47f",
+      "sourceUnitDigest": "2d178e51f8fe1a5c85ac2d34c157fbfda0cf33be4f71ddd9edcf39898e154861",
+      "claimKind": "historical-context",
+      "disposition": "regenerate-from-source",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:23@2026-10-14",
+      "rationale": "The complete unheaded-block-3 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion."
+    }
+  ]
+}

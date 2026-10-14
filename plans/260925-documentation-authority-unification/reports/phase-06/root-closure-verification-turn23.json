@@ -1,0 +1,778 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:23@2026-10-14",
+  "assignment": "unit-run-1791984989472-59e9c5c2/producer/1",
+  "inputCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3",
+  "proofInventoryCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3",
+  "proofLimit": "HEAD input inventory plus working-tree decision overlay; no new content commit exists in this turn. This is not a committed-content pack, review request or closure certification. Refresh at the runner-produced commit before packs.",
+  "B0": "dbe5c432852837ea01e6025b35868bcb7271495d",
+  "SYNC": "48e3a992be1cd74a0960df953af16b5dae4275e4",
+  "verdictApplication": {
+    "bindingRows": 105,
+    "sourceRows": 99,
+    "registryGaps": 6,
+    "truthFragmentAcceptances": 2,
+    "accountingOccurrences": 40,
+    "listVerdicts": 1,
+    "totalOrdinaryOkOccurrences": 170,
+    "reportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3",
+    "notesVerbatim": true,
+    "repeatedStableHeadingNotesPreserved": true,
+    "finalTruthSampleOkReceipts": 22,
+    "truthDrawStillFailed": true
+  },
+  "sourceRows": {
+    "total": 1072,
+    "reviewed": 1067,
+    "pending": 5,
+    "undecided": 0
+  },
+  "defaultD": {
+    "bothExit": 0,
+    "fatal": 0,
+    "fullOutputEquality": true
+  },
+  "scopedE": {
+    "bothExit": 1,
+    "expectedRed": true,
+    "fullOutputEquality": true,
+    "open": [
+      {
+        "type": "claims-not-reviewed",
+        "message": "claim rows whose reviewStatus is not reviewed",
+        "count": 5,
+        "examples": [
+          "docs/backlog.md#product-backlog",
+          "docs/backlog.md#unheaded-block-1",
+          "docs/backlog.md#unheaded-block-2",
+          "docs/backlog.md#done-declined",
+          "docs/backlog.md#unheaded-block-3"
+        ]
+      },
+      {
+        "type": "candidate-blocks-unreferenced",
+        "message": "candidate conservation units not named by a source decision",
+        "count": 830,
+        "examples": [
+          "docs/platform/coexistence/spec.md#unheaded-block-1",
+          "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+          "docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1",
+          "docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate",
+          "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1"
+        ]
+      }
+    ],
+    "fullCandidateTupleEquality": true,
+    "rootIdenticalOwnerGroups": 0,
+    "rootHolds": 0,
+    "closed": false,
+    "pendingHistoricalGapDecisions": [
+      {
+        "claimId": "claim_56ee14864e75c42f80dc9903aa1c53e9",
+        "disposition": "retain-as-evidence",
+        "reviewStatus": "pending",
+        "sourceUnitDigest": "5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664",
+        "targetUnitDigest": null
+      },
+      {
+        "claimId": "claim_b6f28092c03285c2745234912da0f2ab",
+        "disposition": "retain-as-evidence",
+        "reviewStatus": "pending",
+        "sourceUnitDigest": "6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e",
+        "targetUnitDigest": null
+      },
+      {
+        "claimId": "claim_0956ea2eadf0a32787b7fd0e51d693a6",
+        "disposition": "regenerate-from-source",
+        "reviewStatus": "pending",
+        "sourceUnitDigest": "8af4c326a8034fa8b4584cb6795459a32d8e9c0afbc616540092a7d8400382c1",
+        "targetUnitDigest": null
+      },
+      {
+        "claimId": "claim_53b01784413095d74305b7367e9054fb",
+        "disposition": "retain-as-evidence",
+        "reviewStatus": "pending",
+        "sourceUnitDigest": "9d2bbd0b5bf3c812c67c3ac860daf4a91f6505e7ccf8a1a8e2a5ce36d25213d3",
+        "targetUnitDigest": null
+      },
+      {
+        "claimId": "claim_b92ac199356ff830e5554647ab143a90",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "sourceUnitDigest": "e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5",
+        "targetUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8"
+      },
+      {
+        "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "sourceUnitDigest": "74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6",
+        "targetUnitDigest": "4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a"
+      }
+    ],
+    "pendingGapNote": "The native gate overlays pending gap dispositions and omits them from registry-gaps-without-disposition. All six still owe independent review; absence from strict open categories is no acceptance."
+  },
+  "nativeEquality": {
+    "allKnownIdsRetained": true,
+    "knownBefore": 94865,
+    "knownCurrent": 94865,
+    "allKnownFullTuplesEqual": true,
+    "activeFullTupleEquality": true,
+    "newGaps": 0,
+    "newRetired": 0,
+    "candidateCount": 830,
+    "fullReverseTupleEquality": true,
+    "compactOneLine": true,
+    "nativeByteEqual": true,
+    "registryBytes": 59723017,
+    "registrySHA256": "7b7e8645cf9609688ae83d43ac821d5f0c093755845bcf712102d3c210b04ec0",
+    "registryContentChanged": false
+  },
+  "pendingAuthored": {
+    "historicalGaps": 6,
+    "generatedRows": 5,
+    "duplicateGroups": 2,
+    "identicalUnitResolution": "0 root groups; pending explicit no-exception resolution",
+    "aliasEntries": 347,
+    "retainedPathDecisions": 7,
+    "previewInboundEdges": 25081,
+    "aliasValidation": {
+      "findings": [],
+      "count": 347
+    }
+  },
+  "preservation": {
+    "extractorUnchanged": true,
+    "fiveFrozenFilesUnchanged": true,
+    "witnessAndPayloadTreesUnchanged": true,
+    "authorityStatusesUnchanged": true,
+    "readerLinksUnchanged": true,
+    "checks": [
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-legacy-docs-ratchet.mjs"
+        ],
+        "exit": 0,
+        "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-doc-constitution.mjs",
+          "--no-ledger",
+          "--check-placement"
+        ],
+        "exit": 0,
+        "stdout": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 529 files, 528 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-doc-candidate-status.mjs",
+          "--json"
+        ],
+        "exit": 0,
+        "stdout": "{\n  \"counts\": {\n    \"files\": 529,\n    \"byStatus\": {\n      \"promoted\": 3,\n      \"candidate\": 135,\n      \"legacy-current\": 0,\n      \"non-authority\": 1,\n      \"unrouted\": 390\n    },\n    \"exemptUnrouted\": 302,\n    \"checked\": 138,\n    \"findings\": 0,\n    \"byType\": {}\n  },\n  \"findings\": []\n}\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "allowlist": {
+    "newViolations": [],
+    "existingExactExemptions": [
+      [
+        "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+        "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+      ],
+      [
+        "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"
+      ]
+    ]
+  },
+  "tests": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs",
+    "passed": 39,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "firstRun": {
+      "passed": 38,
+      "failed": 1,
+      "reason": "Existing random nonce in seedReviewPack shuffles mutation candidates; the fixture has scarce bullet units, an earlier mutation can consume them before deleted-list-item (scripts/propose-doc-decisions.mjs:280-300). Independent fixture content, no source/test/checker edit. Complete unmodified rerun passes.",
+      "log": "\u2714 review pack contains full source and target units and reverse unmatched candidate blocks (18.395603ms)\n\u2714 seeded review uses six real text mutations and scores missed defects and false flags (69.420932ms)\n\u2714 review application binds current digest and keeps rework and hold pending without inventing approval (31.810865ms)\n\u2714 valid source digest prefixes survive pack and review application with full seen-text bindings (13.656096ms)\n\u2714 verdict table names the reviewer and requires an explicit verdict and own note for each row (4.419562ms)\n\u2714 unknown dispositions remain blocking after a hold verdict and pass decision validation (13.04476ms)\n\u2714 unknown dispositions remain blocking after a rework verdict and pass decision validation (8.862759ms)\n\u2714 the same reviewer session on another date is still the author session (0.715936ms)\n\u2714 pre-reviewed hand rows without committed evidence are rejected instead of skipped (4.508184ms)\n\u2714 a public seeded pack does not expose its replay inputs or retain original mutated digests (11.014109ms)\n\u2714 review application requires a passing sensitivity result for the exact shown pack (6.788276ms)\n\u2714 approval cannot attach to target text or heading ancestry changed after the pack (7.023588ms)\n\u2714 approved rows retain the seen unit binding and their own report across review rounds (4.47943ms)\n\u2714 sensitivity controls must belong to the bound batch even when the sensitivity score passes (4.131306ms)\n\u2714 reviewers receive full text and a unified diff in Markdown with safely nested fences (236.946097ms)\n\u2716 the public seeded Markdown can be scored without exposing the seed or private selection key (520.404567ms)\n\u2714 script-proven carries supply batch sensitivity controls without reopening accepted decisions (707.009065ms)\n\u2714 a new shard cannot claim legacy compatibility by deleting author fields (150.665533ms)\n\u2714 ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (464.527613ms)\n\u25b6 ordinary reviews cannot approve a changed digest, an unauthored row or their own session\n  \u2714 target-digest (212.288199ms)\n  \u2714 source-digest (204.345119ms)\n  \u2714 authoredBy (208.360619ms)\n  \u2714 authorSession (197.580884ms)\n  \u2714 same-session (209.484012ms)\n\u2714 ordinary reviews cannot approve a changed digest, an unauthored row or their own session (1034.247159ms)\n\u25b6 checkpoint reports cannot use the ordinary channel to omit sensitivity proof\n  \u2714 checkpoint 3 (443.931579ms)\n  \u2714 checkpoint 6 (399.384528ms)\n  \u2714 checkpoint 10 (389.490626ms)\n\u2714 checkpoint reports cannot use the ordinary channel to omit sensitivity proof (1233.832831ms)\n\u2714 the review lint accepts a well-formed ordinary report before application and writes nothing (205.858096ms)\n\u2714 the review lint uses the recorded target digest of an applied shard without an inventory (299.784153ms)\n\u25b6 the review lint names the line and claim of each malformed verdict row\n  \u2714 source-digest-not-64-hex (201.443592ms)\n  \u2714 wrong-cell-count (194.32955ms)\n  \u2714 non-bare-first-cell (201.264541ms)\n  \u2714 target-digest-mismatch (207.883236ms)\n  \u2714 source-digest-mismatch (210.235574ms)\n  \u2714 bad-verdict (205.015763ms)\n\u2714 the review lint names the line and claim of each malformed verdict row (1221.725609ms)\n\u2714 the review lint allows labelled non-claim rows but reports unknown claims and missing headers (612.085569ms)\n\u2139 tests 39\n\u2139 suites 0\n\u2139 pass 38\n\u2139 fail 1\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 6965.639336\n\n\u2716 failing tests:\n\ntest at test/scripts/doc-review-format.test.mjs:42:1\n\u2716 the public seeded Markdown can be scored without exposing the seed or private selection key (520.404567ms)\n  AssertionError [ERR_ASSERTION]: propose-doc-decisions: insufficient eligible rows for deleted-list-item\n  \n  \n  1 !== 0\n  \n      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-format.test.mjs:52:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1325:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)\n      at Test.postRun (node:internal/test_runner/test:1465:19)\n      at Test.run (node:internal/test_runner/test:1390:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: 1,\n    expected: 0,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n"
+    },
+    "finalLog": "\u2714 review pack contains full source and target units and reverse unmatched candidate blocks (9.74151ms)\n\u2714 seeded review uses six real text mutations and scores missed defects and false flags (34.331352ms)\n\u2714 review application binds current digest and keeps rework and hold pending without inventing approval (24.053594ms)\n\u2714 valid source digest prefixes survive pack and review application with full seen-text bindings (14.206399ms)\n\u2714 verdict table names the reviewer and requires an explicit verdict and own note for each row (1.484035ms)\n\u2714 unknown dispositions remain blocking after a hold verdict and pass decision validation (14.982718ms)\n\u2714 unknown dispositions remain blocking after a rework verdict and pass decision validation (4.703862ms)\n\u2714 the same reviewer session on another date is still the author session (0.448031ms)\n\u2714 pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.919782ms)\n\u2714 a public seeded pack does not expose its replay inputs or retain original mutated digests (13.516576ms)\n\u2714 review application requires a passing sensitivity result for the exact shown pack (6.603961ms)\n\u2714 approval cannot attach to target text or heading ancestry changed after the pack (16.138049ms)\n\u2714 approved rows retain the seen unit binding and their own report across review rounds (7.00809ms)\n\u2714 sensitivity controls must belong to the bound batch even when the sensitivity score passes (12.010076ms)\n\u2714 reviewers receive full text and a unified diff in Markdown with safely nested fences (259.608802ms)\n\u2714 the public seeded Markdown can be scored without exposing the seed or private selection key (870.834651ms)\n\u2714 script-proven carries supply batch sensitivity controls without reopening accepted decisions (969.473903ms)\n\u2714 a new shard cannot claim legacy compatibility by deleting author fields (273.483989ms)\n\u2714 ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (632.31285ms)\n\u25b6 ordinary reviews cannot approve a changed digest, an unauthored row or their own session\n  \u2714 target-digest (290.12569ms)\n  \u2714 source-digest (294.382319ms)\n  \u2714 authoredBy (256.821773ms)\n  \u2714 authorSession (234.595335ms)\n  \u2714 same-session (254.882076ms)\n\u2714 ordinary reviews cannot approve a changed digest, an unauthored row or their own session (1332.918206ms)\n\u25b6 checkpoint reports cannot use the ordinary channel to omit sensitivity proof\n  \u2714 checkpoint 3 (571.85074ms)\n  \u2714 checkpoint 6 (580.097561ms)\n  \u2714 checkpoint 10 (594.695579ms)\n\u2714 checkpoint reports cannot use the ordinary channel to omit sensitivity proof (1747.670483ms)\n\u2714 the review lint accepts a well-formed ordinary report before application and writes nothing (279.489427ms)\n\u2714 the review lint uses the recorded target digest of an applied shard without an inventory (345.177413ms)\n\u25b6 the review lint names the line and claim of each malformed verdict row\n  \u2714 source-digest-not-64-hex (284.621611ms)\n  \u2714 wrong-cell-count (241.450848ms)\n  \u2714 non-bare-first-cell (230.651877ms)\n  \u2714 target-digest-mismatch (281.161909ms)\n  \u2714 source-digest-mismatch (248.720398ms)\n  \u2714 bad-verdict (253.208399ms)\n\u2714 the review lint names the line and claim of each malformed verdict row (1545.108342ms)\n\u2714 the review lint allows labelled non-claim rows but reports unknown claims and missing headers (709.033685ms)\n\u2139 tests 39\n\u2139 suites 0\n\u2139 pass 39\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 9310.841471\n"
+  },
+  "immutableFiles": [
+    "owner-answers.md",
+    "root-authorities-truth-population.json",
+    "root-authorities-truth-sample.json",
+    "review-5-root-authorities-truth.md",
+    "truth-population-261014-1950-root-authorities-final.md",
+    "truth-population-261014-1950-root-authorities-final.md.json",
+    "candidate-unverified-root-authorities.json",
+    "candidate-unverified-agent-coordination.json",
+    "candidate-unverified-host-invocation-routing.json",
+    "candidate-unverified-packaging-distribution.json",
+    "holds.md",
+    "identical-unit-exceptions.md"
+  ],
+  "allCurrentTruthBytesUnchanged": true,
+  "truthBlocker": {
+    "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-final.md",
+    "reportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3",
+    "falseUnits": 8,
+    "drawSize": 30,
+    "falsePercent": 26.7,
+    "ownerDecisionPending": true,
+    "correctionsAuthorizedThisTurn": false
+  },
+  "reviewPacksMade": 0,
+  "reviewRequestsMade": 0,
+  "technicalBlockers": [],
+  "batchClosed": false,
+  "noPromotion": true,
+  "noPush": true,
+  "noMainMerge": true,
+  "noStep6": true,
+  "noGitWrite": true,
+  "noProtectedToolChange": true,
+  "noSecretRead": true,
+  "commands": [
+    {
+      "label": "D-first",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "plans/260925-documentation-authority-unification/reports/phase-06/.turn23-tmp/application-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1157,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22384,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22615,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22384,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2092,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "D-second",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "plans/260925-documentation-authority-unification/reports/phase-06/.turn23-tmp/application-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1157,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22384,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22615,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22384,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2092,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "E-first",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "plans/260925-documentation-authority-unification/reports/phase-06/.turn23-tmp/application-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architecture-manifest.json",
+        "--scope",
+        "docs/coexistence.md",
+        "--scope",
+        "docs/contracts/fgos-gateway-api-v1.yaml",
+        "--scope",
+        "docs/doc-governance.md",
+        "--scope",
+        "docs/doc-registry.json",
+        "--scope",
+        "docs/io-contract.md",
+        "--scope",
+        "docs/operator-runbook-herdr-cockpit.md",
+        "--scope",
+        "docs/platform-foundations.md",
+        "--scope",
+        "docs/reading-map.md",
+        "--scope",
+        "docs/README.md",
+        "--scope",
+        "docs/routing-handoff-contract.md",
+        "--scope",
+        "docs/specs/reading-map.md",
+        "--scope",
+        "docs/specs/work-state.md",
+        "--scope",
+        "docs/templates/architecture.md",
+        "--scope",
+        "docs/templates/area-readme.md",
+        "--scope",
+        "docs/templates/contract.md",
+        "--scope",
+        "docs/templates/decision.md",
+        "--scope",
+        "docs/templates/discussion.md",
+        "--scope",
+        "docs/templates/generated.md",
+        "--scope",
+        "docs/templates/intent-preservation-ledger.md",
+        "--scope",
+        "docs/templates/spec.md",
+        "--scope",
+        "docs/templates/subcomponent-readme.md",
+        "--scope",
+        "docs/templates/verification.md",
+        "--scope",
+        "docs/templates/vision.md",
+        "--scope",
+        "docs/transitional-switchboard.md",
+        "--scope",
+        "docs/user/README.md",
+        "--scope",
+        "docs/distribution-vision.md",
+        "--scope",
+        "docs/id-systems-audit.md",
+        "--scope",
+        "docs/work-item-lifecycle-vision.md",
+        "--scope",
+        "docs/backlog.md",
+        "--scope",
+        "docs/platform/proposals/documentation-system-unification.md",
+        "--scope",
+        "docs/decisions/index.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "fatalFindings": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "5 claim rows whose reviewStatus is not reviewed (e.g. docs/backlog.md#product-backlog, docs/backlog.md#unheaded-block-1, docs/backlog.md#unheaded-block-2, docs/backlog.md#done-declined, docs/backlog.md#unheaded-block-3)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "830 candidate conservation units not named by a source decision (e.g. docs/platform/coexistence/spec.md#unheaded-block-1, docs/platform/coexistence/spec.md#source-metadata-added-in-candidate, docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1, docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate, docs/platform/documentation/history/templates/architecture.md#unheaded-block-1)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 5,
+          "examples": [
+            "docs/backlog.md#product-backlog",
+            "docs/backlog.md#unheaded-block-1",
+            "docs/backlog.md#unheaded-block-2",
+            "docs/backlog.md#done-declined",
+            "docs/backlog.md#unheaded-block-3"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 830,
+          "examples": [
+            "docs/platform/coexistence/spec.md#unheaded-block-1",
+            "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1",
+            "docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "E-second",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "plans/260925-documentation-authority-unification/reports/phase-06/.turn23-tmp/application-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architecture-manifest.json",
+        "--scope",
+        "docs/coexistence.md",
+        "--scope",
+        "docs/contracts/fgos-gateway-api-v1.yaml",
+        "--scope",
+        "docs/doc-governance.md",
+        "--scope",
+        "docs/doc-registry.json",
+        "--scope",
+        "docs/io-contract.md",
+        "--scope",
+        "docs/operator-runbook-herdr-cockpit.md",
+        "--scope",
+        "docs/platform-foundations.md",
+        "--scope",
+        "docs/reading-map.md",
+        "--scope",
+        "docs/README.md",
+        "--scope",
+        "docs/routing-handoff-contract.md",
+        "--scope",
+        "docs/specs/reading-map.md",
+        "--scope",
+        "docs/specs/work-state.md",
+        "--scope",
+        "docs/templates/architecture.md",
+        "--scope",
+        "docs/templates/area-readme.md",
+        "--scope",
+        "docs/templates/contract.md",
+        "--scope",
+        "docs/templates/decision.md",
+        "--scope",
+        "docs/templates/discussion.md",
+        "--scope",
+        "docs/templates/generated.md",
+        "--scope",
+        "docs/templates/intent-preservation-ledger.md",
+        "--scope",
+        "docs/templates/spec.md",
+        "--scope",
+        "docs/templates/subcomponent-readme.md",
+        "--scope",
+        "docs/templates/verification.md",
+        "--scope",
+        "docs/templates/vision.md",
+        "--scope",
+        "docs/transitional-switchboard.md",
+        "--scope",
+        "docs/user/README.md",
+        "--scope",
+        "docs/distribution-vision.md",
+        "--scope",
+        "docs/id-systems-audit.md",
+        "--scope",
+        "docs/work-item-lifecycle-vision.md",
+        "--scope",
+        "docs/backlog.md",
+        "--scope",
+        "docs/platform/proposals/documentation-system-unification.md",
+        "--scope",
+        "docs/decisions/index.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "fatalFindings": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "5 claim rows whose reviewStatus is not reviewed (e.g. docs/backlog.md#product-backlog, docs/backlog.md#unheaded-block-1, docs/backlog.md#unheaded-block-2, docs/backlog.md#done-declined, docs/backlog.md#unheaded-block-3)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "830 candidate conservation units not named by a source decision (e.g. docs/platform/coexistence/spec.md#unheaded-block-1, docs/platform/coexistence/spec.md#source-metadata-added-in-candidate, docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1, docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate, docs/platform/documentation/history/templates/architecture.md#unheaded-block-1)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 5,
+          "examples": [
+            "docs/backlog.md#product-backlog",
+            "docs/backlog.md#unheaded-block-1",
+            "docs/backlog.md#unheaded-block-2",
+            "docs/backlog.md#done-declined",
+            "docs/backlog.md#unheaded-block-3"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 830,
+          "examples": [
+            "docs/platform/coexistence/spec.md#unheaded-block-1",
+            "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1",
+            "docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1"
+          ]
+        }
+      ]
+    }
+  ],
+  "helperSources": {
+    "apply.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';\nimport {loadProposalContext,parseReviewVerdicts,applyReviewVerdicts} from '../../../../../scripts/propose-doc-decisions.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s='plans/260925-documentation-authority-unification/reports/phase-06/.turn23-tmp/',pin=execFileSync('git',['rev-parse','9f087f37d'],{encoding:'utf8'}).trim(),read=f=>JSON.parse(fs.readFileSync(f)),ctx=loadProposalContext(s+'application-inventory.json',process.cwd()),reg=read(s+'identity-registry.json'),known=new Map(['units','retiredUnits','identityGaps'].flatMap(k=>reg[k]).map(x=>[x.claimId,x])),applied=[],truth=[];\nfor(const report of ['review-5-root-truth-rework2.md','review-5-root-source-completion-01.md','review-5-root-source-completion-02.md']){\n const reportPath=r+report,text=execFileSync('git',['show',pin+':'+reportPath],{encoding:'utf8'});assert.equal(text,fs.readFileSync(reportPath,'utf8'));const reviewer=text.match(/^Reviewer:\\s*(.+)$/m)[1].trim(),verdicts=parseReviewVerdicts(text,reviewer).filter(v=>v.verdict==='ok'),ids=new Set(verdicts.map(v=>v.claimId));let count=0;\n for(const path of ['ledger/decisions','pilot/decisions'].flatMap(d=>fs.readdirSync(p+d).filter(x=>x.endsWith('.json')).map(f=>p+d+'/'+f))){const j=read(path);let dirty=false;for(const kind of ['claims','registryGaps']){const rows=(j[kind]||[]).filter(x=>ids.has(x.claimId));if(!rows.length)continue;const sources=rows.map(x=>known.get(x.claimId));assert(sources.every(Boolean));const work={...j,claims:rows,registryGaps:[]},context={...ctx,inventory:{...ctx.inventory,claimLedger:[...ctx.inventory.claimLedger,...sources.filter(x=>!ctx.inventory.claimLedger.some(y=>y.claimId===x.claimId))]}};\n const result=applyReviewVerdicts(context,work,{verdicts:verdicts.filter(v=>rows.some(x=>x.claimId===v.claimId)),reviewer,reportPath,ordinaryReview:true,reviewedAt:'2026-10-14'});\n for(const row of result.claims){row.reviewReportCommit=pin;assert.equal(row.reviewNote,verdicts.find(v=>v.claimId===row.claimId).note);const i=j[kind].findIndex(x=>x.claimId===row.claimId);applied.push({shardPath:path,entryKind:kind,before:j[kind][i],after:row});j[kind][i]=row;ids.delete(row.claimId);count++;}dirty=true;\n }if(dirty)fs.writeFileSync(path,JSON.stringify(j,null,2)+'\\n');}\n for(const id of ids){truth.push({...verdicts.find(v=>v.claimId===id),reviewer,reportPath,reportCommit:pin,meaning:report.includes('truth-rework2')?'Independent acceptance of corrected fragments only; no full-unit truth certification.':'Independent native accounting acceptance only; no invented source decision.'});}\n console.log(report,count,'bindings',ids.size,'truth');\n}\nassert.equal(applied.length,105);assert.equal(truth.length,40);fs.writeFileSync(r+'root-closure-review-application-turn23.json',JSON.stringify({version:1,authorSession:'codex-session:23@2026-10-14',reviewMode:'ordinary',reportCommit:pin,notesVerbatim:true,rows:applied,truthAcceptances:truth,nonBlockingNits:'Accepted nits unchanged. Accounting/list verdicts retained verbatim outside source decisions. Truth-final has no application or correction.'},null,2)+'\\n');\n",
+    "find-old.mjs": "import fs from 'node:fs';import {execFileSync} from 'node:child_process';import * as g from '../../../../../scripts/check-doc-inventory-gates.mjs';\nconst r='plans/260925-documentation-authority-unification/reports/phase-06/',s=r+'.turn23-tmp/',rows=JSON.parse(fs.readFileSync(r+'root-source-open-historical-gaps-turn22.json')).rows,found=[];\nfor(const path of new Set(rows.map(x=>x.sourcePath))){let need=rows.filter(x=>x.sourcePath===path);const commits=execFileSync('git',['log','--all','--format=%H','--',path],{encoding:'utf8'}).trim().split('\\n');for(const commit of commits){const units=g.buildConservationUnitLookup(process.cwd(),commit)(path)||[];for(const row of need){const u=units.find(x=>x.textDigest===row.sourceUnitDigest);if(u){found.push({gap:row,sourceCommit:commit,sourceBlob:execFileSync('git',['rev-parse',commit+':'+path],{encoding:'utf8'}).trim(),source:{...u,path}});console.log(row.claimId,commit.slice(0,10),u.anchor,u.text.length);}}need=need.filter(x=>!found.some(y=>y.gap.claimId===x.claimId));if(!need.length)break;}if(need.length)console.log('NOT FOUND',need.map(x=>x.claimId));}\nfs.writeFileSync(s+'historical-source-units.json',JSON.stringify(found,null,2)+'\\n');\n",
+    "author.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';import * as g from '../../../../../scripts/check-doc-inventory-gates.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s=r+'.turn23-tmp/',read=f=>JSON.parse(fs.readFileSync(f)),write=(f,x)=>fs.writeFileSync(f,JSON.stringify(x,null,2)+'\\n'),pin=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),inv=g.loadInventory(s+'application-inventory.json',{}),units=g.buildConservationUnitLookup(process.cwd(),pin),authoredBy='codex-session:23@2026-10-14',old=read(s+'historical-source-units.json'),entries=[];\nassert.equal(old.length,6);\nfor(const x of old){const gap=x.gap,isIO=gap.sourcePath==='docs/io-contract.md',isBacklog=gap.sourcePath==='docs/backlog.md';let target=null,decision={claimId:gap.claimId,sourcePath:gap.sourcePath,sourceAnchor:gap.sourceAnchor,sourceUnitDigest:gap.sourceUnitDigest,disposition:isIO?'supersede':isBacklog?'regenerate-from-source':'retain-as-evidence',reviewStatus:'pending',authoredBy};\n if(isIO){const current=units(gap.sourcePath).find(u=>u.anchor===gap.sourceAnchor);assert(current);const owner='docs/platform/work-state/contracts/cli-io-contract.md';target=units(owner).find(u=>u.text===current.text||(gap.sourceAnchor==='unheaded-block-15'&&u.text.startsWith(x.source.text)));assert(target);decision={...decision,targetOwner:owner,targetAnchor:target.anchor,targetUnitDigest:target.textDigest,targetAncestry:target.ancestry};decision.rationale=gap.sourceAnchor==='unheaded-block-14'?'The historical four-stream introduction is replaced by the already-reviewed current five-stream introduction in the mapped CLI I/O contract. All four original exception categories remain in the adjoining complete successor list; merged upstream explicitly adds the agent hook transport as the fifth category. This is historical-count supersession with full old/current text and immutable source provenance, not deletion inferred from absence or truth correction. The native predecessor identity stays intact, and independent acceptance of this gap disposition is still required.':'The complete historical four-item exception list remains word-for-word at the beginning of the already-reviewed current five-item list. The merged upstream addition is the agent-hook exception only; the four original rationales, progress trace and stop lifecycle clause are conserved. The historical native predecessor is superseded by this exact mapped current unit, with real digest/ancestry and no identity graft, approval carry or truth certification.';\n }else if(isBacklog){decision.rationale='This identity is a historical version of the generated active PBI block, not an unaccounted maintained platform claim. The source header explicitly labels the backlog GENERATED FILE and names bee backlog render from event-sourced PBI records. Preserve the exact old projection in its immutable source blob and the supplied full-text evidence; the five current backlog units remain pending regenerate-from-source decisions outside platform authority under the frozen product-backlog exception. No historical status is asserted current, no PBI is deleted or archived here, and regeneration or source-store availability is not claimed.';\n }else{const owner=gap.sourcePath.endsWith('.json')?'docs/platform/contracts/architecture-manifest.json':'docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml';const current=units(owner).find(u=>u.anchor==='file-block');assert(current);target={...current,path:owner};decision.rationale=`Retain this exact historical whole-contract version as immutable evidence at ${gap.sourcePath} at ${x.sourceCommit} (blob ${x.sourceBlob}, full unit SHA256 ${gap.sourceUnitDigest}). It predates merged upstream contract edits; the current source bytes are carried byte-identically at ${owner}, independently accepted by review-5-root-source-completion-02.md at ${pin}. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed.`;\n }\n entries.push({...x,decision,class:'Judgment',currentSource:{...units(gap.sourcePath).find(u=>u.anchor===gap.sourceAnchor),path:gap.sourcePath},...(target?{informationalSuccessor:{...target,path:target.path||decision.targetOwner},...(isIO?{target:{...target,path:decision.targetOwner}}:{})}:{}),targetRequired:isIO,historicalIdentityPreserved:true});\n}\nconst shard='s5-root-historical-gaps.json';write(p+'ledger/decisions/'+shard,{version:1,shard,authorSession:authoredBy,authorshipRequired:true,sources:[...new Set(old.map(x=>x.gap.sourcePath))],claims:[],registryGaps:entries.map(x=>x.decision)});\nconst generated=inv.claimLedger.filter(x=>x.sourcePath==='docs/backlog.md');assert.equal(generated.length,5);const gen=generated.map(x=>({claimId:x.claimId,sourceUnitDigest:x.sourceUnitDigest,claimKind:['product-backlog','done-declined'].includes(x.sourceAnchor)?'navigation':x.sourceAnchor==='unheaded-block-1'?'procedure':'historical-context',disposition:'regenerate-from-source',targetOwner:null,targetAnchor:null,reviewStatus:'pending',authoredBy,rationale:`The complete ${x.sourceAnchor} unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion.`}));\nconst gs='s5-root-generated-backlog.json';write(p+'ledger/decisions/'+gs,{version:1,shard:gs,authorSession:authoredBy,authorshipRequired:true,sources:['docs/backlog.md'],claims:gen});\nwrite(r+'root-closure-dispositions-turn23.json',{version:1,authorSession:authoredBy,inputCommit:pin,state:'pending',reviewPackOwedFromNextContentCommit:true,noCurrentTurnContentPin:true,gaps:entries,generated:gen.map((decision,i)=>({decision,class:'Judgment',source:{...units('docs/backlog.md').find(u=>u.anchor===generated[i].sourceAnchor),path:'docs/backlog.md'},target:null})),frozenMapPins:old.filter(x=>!x.gap.sourcePath.endsWith('.md')).map(x=>({source:x.gap.sourcePath,frozenMapBlob:x.gap.sourcePath.endsWith('.json')?'626eeaddf3761cfc563b4a1269baa9a12126acf4':'8818e5724b9cd12daceaed17ffc2b3e873e1330e',currentBlob:execFileSync('git',['rev-parse',pin+':'+x.gap.sourcePath],{encoding:'utf8'}).trim(),meaning:'Placement only: historical map blob predates upstream changes, current bytes already independently carried. No frozen map or baseline edit.'})),noIdentityGraft:true,noTruthChange:true});\nconsole.log({historicalGaps:entries.length,generatedPending:gen.length});\n",
+    "preview.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';import * as g from '../../../../../scripts/check-doc-inventory-gates.mjs';import {validateAliasTable} from '../../../../../scripts/doc-alias-resolver.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s=r+'.turn23-tmp/',read=f=>JSON.parse(fs.readFileSync(f)),write=(f,x)=>fs.writeFileSync(f,JSON.stringify(x,null,2)+'\\n'),pin=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),inv=g.loadInventory(s+'application-inventory.json',{}),scope=read(r+'candidate-unverified-root-authorities.json').scope,shards=[...g.loadDecisionShards(p+'pilot/decisions'),...g.loadDecisionShards(p+'ledger/decisions')],byId=new Map(inv.claimLedger.map(x=>[x.claimId,x])),units=g.buildConservationUnitLookup(process.cwd(),pin),authoredBy='codex-session:23@2026-10-14',bindings=[],entries=[],retained=[];\nconst add=(fromPath,toOwner,toAnchor,kind,evidenceRef,binding)=>{const aliasId='root-authorities-draft-'+String(entries.length+1).padStart(4,'0');entries.push({aliasId,fromPath,toOwner,toAnchor,kind,evidenceRef,immutableRefs:[],recordedAt:'2026-10-14'});bindings.push({aliasId,...binding,authoredBy,reviewStatus:'pending',rationale:'Preview only: exact reviewed disposition identifies the owner; browser navigation uses a real containing heading while the native decision anchor/digest remain in this binding. Consumer files and the active alias table stay untouched. At cutover revalidate source/target bytes and independent review before activating this proposal.'});};\nfor(const src of scope){const ds=shards.flatMap(j=>(j.claims||[]).map(d=>({d,shard:p+(fs.existsSync(p+'ledger/decisions/'+(j.shard.endsWith('.json')?j.shard:j.shard+'.json'))?'ledger':'pilot')+'/decisions/'+(j.shard.endsWith('.json')?j.shard:j.shard+'.json')}))).filter(x=>byId.get(x.d.claimId)?.sourcePath===src),carried=ds.filter(x=>x.d.targetOwner&&x.d.reviewStatus==='reviewed'),owners=[...new Set(carried.map(x=>x.d.targetOwner))];\n if(!owners.length){retained.push({path:src,authoredBy,reviewStatus:'pending',action:'retain-path-no-alias',rationale:src==='docs/decisions/index.md'?'N1 retains this generated projection at its existing path. No platform retirement or alternate alias owner is proposed.':src==='docs/specs/reading-map.md'?'Retained navigation merge obligation: the reviewed source decisions retain historical reading-map units without platform targets. Queue a navigation merge into the approved singleton docs/reading-map.md at cutover; the platform alias schema cannot target that non-platform singleton. Keep current lookup and record this explicit no-alias reason.':'Frozen root-map non-platform/retained exception: no reviewed platform target exists. Keep the original lookup; do not fabricate source-to-self proof or a platform alias. Generated backlog decisions still need independent review.',claimIds:ds.map(x=>x.d.claimId)});continue;}\n const split=owners.length>1;const owner=split?(src==='docs/specs/work-state.md'?'docs/platform/work-state/README.md':'docs/platform/documentation/history/templates/README.md'):owners[0];assert(fs.existsSync(owner));add(src,owner,null,split?'merged':'moved',carried[0].shard,{sourcePath:src,splitRouting:split,ownerAlternatives:owners,decisionClaimIds:carried.map(x=>x.d.claimId)});\n for(const {d,shard} of carried){const row=byId.get(d.claimId),su=units(src).find(x=>x.anchor===row.sourceAnchor);if(su?.unitKind!=='heading')continue;const us=units(d.targetOwner),tu=us.find(x=>x.anchor===d.targetAnchor);assert(tu&&tu.textDigest.startsWith(d.targetUnitDigest));const browser=tu.unitKind==='heading'?tu:us.filter(x=>x.unitKind==='heading'&&x.startLine<tu.startLine).at(-1);assert(browser);add(src+'#'+row.sourceAnchor,d.targetOwner,browser.anchor,split?'split':'redirected',d.reviewReport||shard,{claimId:d.claimId,sourcePath:src,sourceAnchor:row.sourceAnchor,sourceUnitDigest:row.sourceUnitDigest,targetOwner:d.targetOwner,targetNativeAnchor:d.targetAnchor,targetUnitDigest:d.targetUnitDigest,targetBrowserAnchor:browser.anchor,reviewReport:d.reviewReport,reviewReportCommit:d.reviewReportCommit});}\n}\nconst table={version:1,description:'Pending Root authority aliases derived from accepted rows at the input commit. Activate only after independent review and cutover; native anchor bindings and retained-path reasons are in root-link-alias-preview-inputs-turn23.json. This is no content pin for this turn.',entries};const findings=validateAliasTable(table,{repoRoot:process.cwd(),constitution:read(p+'minimum-constitution.json')});assert.deepEqual(findings,[]);write(r+'draft-alias-root-authorities.json',table);\nconst bySource=new Map(entries.filter(x=>!x.fromPath.includes('#')).map(x=>[x.fromPath,x])),edgeRows=inv.consumerEdges.filter(x=>scope.includes(x.targetPath)).map(e=>{const immutable=/^(archive\\/|plans\\/|\\.fgos\\/|docs\\/history\\/)/.test(e.path)||e.path==='CHANGELOG.md',frozen=scope.includes(e.path)||/^docs\\/(architect|specs)\\//.test(e.path),kept=retained.find(x=>x.path===e.targetPath),alias=bySource.get(e.targetPath),code=!e.path.endsWith('.md');return {...e,authoredBy,reviewStatus:'pending',category:immutable?'immutable-history':frozen?'frozen-source':code?'code-or-data':'mutable-doc',action:kept?'retain-path-no-alias':immutable?'alias-only-preserve-bytes':frozen?'queue-cutover-rewrite':code?'queue-consumer-contract-review':'queue-doc-rewrite',draftAliasId:alias?.aliasId||null,rationale:kept?kept.rationale:immutable?'Immutable historical edge: preserve its exact bytes, resolve lineage with a separately reviewed alias at cutover.':frozen?'Source is frozen for the candidate phase; queue the reviewed owner destination for the cutover link pass, with rebinding/re-review of any changed carried units.':code?'Executable or data consumer needs contract-aware rewrite at cutover; the alias is documentation navigation only and cannot certify code consumer compatibility.':'Mutable documentation navigation waits for the authorized link pass and the destination authority transition; no reader points to new candidates in this turn.'};});\nconst groups=inv.duplicateContentGroups.filter(x=>x.paths.some(q=>scope.includes(q))).map(x=>{const target=x.paths.find(q=>q.startsWith('docs/platform/'));assert(target);const src=x.paths.find(q=>!q.startsWith('docs/platform/'));assert(fs.readFileSync(src).equals(fs.readFileSync(target)));const d=shards.flatMap(j=>j.claims||[]).find(d=>byId.get(d.claimId)?.sourcePath===src);assert(d?.reviewStatus==='reviewed');return {...x,authoredBy,reviewStatus:'pending',resolution:'One mapped platform owner; preserve the legacy source until atomic cutover.',rule:'Whole-file byte equality establishes one payload; the frozen root map and accepted source decision establish its sole platform owner. Consumer rewrite and historical lookup use that owner; no second authority is inferred from a retained source copy.',owner:target,sourceClaimId:d.claimId,sourceUnitDigest:d.sourceUnitDigest,targetUnitDigest:d.targetUnitDigest,reviewReport:d.reviewReport,reviewReportCommit:d.reviewReportCommit,rationale:'Existing independent review accepted exact group membership and payload carriage. This pending resolution projection records the sole owner and a cutover done condition; no source deletion or authority switch occurs.',doneCondition:'Independent acceptance of this projection, all inbound mutable consumers rewritten or explicitly queued, immutable references covered by reviewed aliases, and atomic cutover retirement of the legacy source.'};});assert.equal(groups.length,2);write(p+'ledger/root-duplicate-resolutions-pending.json',{version:1,authorSession:authoredBy,inputCommit:pin,reviewStatus:'pending',groups,identicalUnitResolution:{reviewStatus:'pending',rationale:'The final scoped strict E reports no Root identical-units-multiple-owners group. Preserve all earlier area exceptions unchanged, introduce no root exception and choose no competing owner. Follow-up at the new content commit must reconfirm native scoped membership before requesting acceptance.',expectedRootGroups:0,reviewPackOwed:true}});\nfs.writeFileSync(r+'link-rewrite-preview-root-authorities.json',JSON.stringify({version:1,inputCommit:pin,draft:true,reviewStatus:'pending',consumerFilesChanged:0,coverageScope:scope,counts:edgeRows.reduce((a,x)=>(a[x.category]=(a[x.category]||0)+1,a),{}),edges:edgeRows})+'\\n');\nwrite(r+'root-link-alias-preview-inputs-turn23.json',{version:1,inputCommit:pin,authorSession:authoredBy,reviewStatus:'pending',noCurrentTurnContentPin:true,followup:'Refresh all input identities/edges at the runner-produced content commit before making bounded review packs and requests. New artifacts from this turn are not in the pinned input inventory.',scope,aliasTable:r+'draft-alias-root-authorities.json',preview:r+'link-rewrite-preview-root-authorities.json',pendingAliasBindings:bindings,retainedPathDecisions:retained,aliasValidation:{findings,count:entries.length},inboundEdgeCount:edgeRows.length,scopeInputSHA256:crypto.createHash('sha256').update(JSON.stringify(scope)).digest('hex'),zeroConsumersEdited:true,zeroActiveAliasesChanged:true});\nconsole.log({pendingGroups:groups.length,pendingAliases:entries.length,retainedPathDecisions:retained.length,inboundEdges:edgeRows.length,aliasFindings:findings.length});\n",
+    "gates-new.py": "import json,pathlib,subprocess,sys\ns=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-06/.turn23-tmp');p='plans/260925-documentation-authority-unification';stage=sys.argv[1];inv=sys.argv[2] if len(sys.argv)>2 else str(s/'inventory.json');scopes=json.loads(pathlib.Path(p+'/reports/phase-06/candidate-unverified-root-authorities.json').read_text())['scope'];results=[]\nfor strict in [False,True]:\n for label,prior in [('first','reports/identity-registry.json'),('second','reports/phase-02-identity-registry.json')]:\n  label=('E' if strict else 'D')+'-'+label\n  cmd=['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-doc-inventory-gates.mjs','--inventory',inv,'--identity-registry',p+'/reports/phase-06/working-identity-registry.json','--decisions',p+'/pilot/decisions','--decisions',p+'/ledger/decisions','--previous-registry',p+'/'+prior,'--json']\n  if strict:\n   cmd+=['--strict']\n   for scope in scopes:cmd+=['--scope',scope]\n  out=s/(stage+'-'+label+'.json')\n  with out.open('w') as f:z=subprocess.run(cmd,stdout=f,stderr=subprocess.PIPE,text=True)\n  d=json.loads(out.read_text());record={'label':label,'command':cmd,'exit':z.returncode,'stderr':z.stderr,'fatalFindings':d['fatalFindings'],'conservationOpen':d['conservationOpen']};results.append(record);(s/(stage+'-gates.json')).write_text(json.dumps(results,indent=2)+'\\n');print(stage,label,z.returncode,'fatal',len(d['fatalFindings']),[(x['type'],x['count']) for x in d['conservationOpen']],flush=True)\n  if not strict:assert z.returncode==0 and not d['fatalFindings'],d['fatalFindings'][:10]\n",
+    "preserve.py": "import json,pathlib,subprocess,hashlib,re\np=pathlib.Path('plans/260925-documentation-authority-unification');r=p/'reports/phase-06';s=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-06/.turn23-tmp');git=lambda *args:subprocess.check_output(['git',*args],text=True).strip()\nexpected={line.split()[0]:line.split()[1] for line in (r/'extractor-blobs.txt').read_text().splitlines()};assert all(git('rev-parse','HEAD:'+f)==v for f,v in expected.items())\nfor f in ['AGENTS.md','CLAUDE.md','docs/specs/reading-map.md','docs/reading-map.md','docs/platform-foundations.md']:\n assert pathlib.Path(f).read_bytes()==subprocess.check_output(['git','show','5a1b26a02:'+f])\nassert git('ls-tree','-r','HEAD','--','docs/architect/agent-coordination/verification')==git('ls-tree','-r','5a1b26a02','--','docs/architect/agent-coordination/verification')\nassert git('ls-tree','-r','HEAD','--','docs/platform/agent-coordination/verification')==git('ls-tree','-r','5a1b26a02','--','docs/platform/agent-coordination/verification')\na=json.loads(subprocess.check_output(['git','show','48e3a992b:'+str(p/'transitional-switchboard.json')],text=True));b=json.load(open(p/'transitional-switchboard.json'));assert [(u['area'],u['authorityStatus']) for u in a['areas']]==[(u['area'],u['authorityStatus']) for u in b['areas']]\nlinks=set()\nfor f in ['AGENTS.md','CLAUDE.md','README.md','docs/README.md','docs/reading-map.md','docs/specs/reading-map.md']:links.update(re.findall(r'docs/platform/[^ )`|>\"\\n]*',pathlib.Path(f).read_text()))\nassert sorted(links)==sorted((r/'reader-links-baseline.txt').read_text().splitlines())\nresults=[]\nfor cmd in [['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-legacy-docs-ratchet.mjs'],['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-doc-constitution.mjs','--no-ledger','--check-placement'],['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-doc-candidate-status.mjs','--json']]:\n z=subprocess.run(cmd,capture_output=True,text=True);results.append(dict(command=cmd,exit=z.returncode,stdout=z.stdout,stderr=z.stderr));assert z.returncode==0,(cmd,z.stdout,z.stderr)\nassert json.loads(results[-1]['stdout'])['findings']==[]\n(s/'preservation.json').write_text(json.dumps(dict(extractorUnchanged=True,fiveFrozenFilesUnchanged=True,witnessAndPayloadTreesUnchanged=True,authorityStatusesUnchanged=True,readerLinksUnchanged=True,checks=results),indent=2)+'\\n');print('Preservation passes')\n",
+    "verify.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';import * as g from '../../../../../scripts/check-doc-inventory-gates.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s=r+'.turn23-tmp/',read=f=>JSON.parse(fs.readFileSync(f)),pin=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sha=x=>crypto.createHash('sha256').update(x).digest('hex'),tuple=x=>[x.claimId,x.sourcePath,x.sourceAnchor,x.sourceUnitDigest].join('\\0'),ct=x=>[x.claimId,x.path,x.anchor,x.unitDigest].join('\\0'),inv=g.loadInventory(s+'application-inventory.json',{}),old=read(s+'old-registry.json'),reg=read(s+'identity-registry.json'),known=j=>['units','retiredUnits','identityGaps'].flatMap(k=>j[k]);\nassert.deepEqual(known(old).map(tuple).sort(),known(reg).map(tuple).sort());assert.deepEqual(inv.claimLedger.map(tuple).sort(),reg.units.map(tuple).sort());const bytes=fs.readFileSync(s+'identity-registry.json');assert(bytes.length<90000000);assert.equal(bytes.toString().trim().split('\\n').length,1);fs.writeFileSync(r+'working-identity-registry.json',bytes);assert(bytes.equals(fs.readFileSync(r+'working-identity-registry.json')));\nconst app=read(r+'root-closure-review-application-turn23.json');assert.equal(app.rows.length,105);for(const x of app.rows){const actual=read(x.shardPath)[x.entryKind].find(y=>y.claimId===x.after.claimId);assert.deepEqual(actual,x.after);assert.equal(actual.reviewReportCommit,pin);assert.equal(actual.reviewStatus,'reviewed');assert.equal(actual.reviewNote,x.after.reviewNote);}\nconst D=['first','second'].map(x=>read(s+'application-D-'+x+'.json')),E=['first','second'].map(x=>read(s+'application-E-'+x+'.json'));assert.deepEqual(D[0],D[1]);assert.deepEqual(E[0],E[1]);assert(D.every(x=>!x.fatalFindings.length));const list=read(r+'candidate-unverified-root-authorities.json');assert.equal(list.count,830);assert.deepEqual(E[0].explicitOpenFindings.unreferencedCandidateRows.map(ct).sort(),list.rows.map(ct).sort());assert.deepEqual(E[0].conservationOpen.map(x=>[x.type,x.count]),[['claims-not-reviewed',5],['candidate-blocks-unreferenced',830]]);\nconst shards=[...g.loadDecisionShards(p+'pilot/decisions'),...g.loadDecisionShards(p+'ledger/decisions')],units=g.buildConservationUnitLookup(process.cwd(),pin),applied=g.applyDecisions(inv,shards,{vocabulary:read(p+'claim-and-disposition-vocabulary.json'),registry:reg,repoRoot:process.cwd(),unitsOf:units,targetAnchorsOf:path=>new Set(units(path)?.map(x=>x.anchor)),targetUnitDigestOf:(path,a)=>units(path)?.find(x=>x.anchor===a)?.textDigest});assert.deepEqual(applied.findings,[]);\nconst scope=list.scope,sourceRows=applied.inventory.claimLedger.filter(x=>scope.includes(x.sourcePath));assert.equal(sourceRows.length,1072);const reviewed=sourceRows.filter(x=>x.reviewStatus==='reviewed');assert.equal(reviewed.length,1067);const gapShard=read(p+'ledger/decisions/s5-root-historical-gaps.json');assert.equal(gapShard.registryGaps.length,6);assert(gapShard.registryGaps.every(x=>x.reviewStatus==='pending'&&!x.reviewedBy));const genShard=read(p+'ledger/decisions/s5-root-generated-backlog.json');assert.equal(genShard.claims.length,5);assert(genShard.claims.every(x=>x.reviewStatus==='pending'&&!x.reviewedBy&&x.claimKind!=='unclassified'));\nconst fixed=['owner-answers.md','root-authorities-truth-population.json','root-authorities-truth-sample.json','review-5-root-authorities-truth.md','truth-population-261014-1950-root-authorities-final.md','truth-population-261014-1950-root-authorities-final.md.json','candidate-unverified-root-authorities.json','candidate-unverified-agent-coordination.json','candidate-unverified-host-invocation-routing.json','candidate-unverified-packaging-distribution.json','holds.md','identical-unit-exceptions.md'];for(const name of fixed)assert(fs.readFileSync(r+name).equals(execFileSync('git',['show',pin+':'+r+name],{maxBuffer:100e6})),name);\nconst changed=execFileSync('git',['diff','--name-only'],{encoding:'utf8'}).trim().split('\\n').filter(Boolean);assert(changed.every(x=>x.startsWith(p)));assert(!changed.some(x=>x.startsWith('docs/')));const roots=['AGENTS.md','CLAUDE.md','docs/specs/reading-map.md','docs/reading-map.md','docs/platform-foundations.md'];for(const f of roots)assert(fs.readFileSync(f).equals(execFileSync('git',['show',pin+':'+f])));\nconst pendingGroups=read(p+'ledger/root-duplicate-resolutions-pending.json'),preview=read(r+'root-link-alias-preview-inputs-turn23.json'),aliases=read(r+'draft-alias-root-authorities.json');assert.equal(aliases.entries.length,347);assert.equal(pendingGroups.groups.length,2);assert.equal(E[0].explicitOpenFindings.identicalUnitMultipleOwnerGroups?.length||0,0);\nconst tests=fs.readFileSync(s+'tests-retry.log','utf8');assert(/pass 39/.test(tests)&&/fail 0/.test(tests));const oldProof=read(r+'root-source-completion-verification-turn22.json'),exemptions=new Set(oldProof.allowlist.existingExactExemptions.map(x=>x.join('\\0'))),allowed=read(r+'allowed-paths.json'),history=execFileSync('git',['log','--first-parent','--no-merges','--format=COMMIT %H','--name-only','dbe5c432852837ea01e6025b35868bcb7271495d..HEAD'],{encoding:'utf8'});let c;const violations=[],used=[];for(const line of history.split('\\n')){if(line.startsWith('COMMIT '))c=line.slice(7);else if(line&&!allowed.some(x=>line===x||line.startsWith(x))){if(exemptions.has(c+'\\0'+line))used.push([c,line]);else violations.push([c,line]);}}assert.deepEqual(violations,[]);\nconst proof={version:1,authorSession:'codex-session:23@2026-10-14',assignment:'unit-run-1791984989472-59e9c5c2/producer/1',inputCommit:pin,proofInventoryCommit:inv.commit,proofLimit:'HEAD input inventory plus working-tree decision overlay; no new content commit exists in this turn. This is not a committed-content pack, review request or closure certification. Refresh at the runner-produced commit before packs.',B0:'dbe5c432852837ea01e6025b35868bcb7271495d',SYNC:'48e3a992be1cd74a0960df953af16b5dae4275e4',verdictApplication:{bindingRows:105,sourceRows:99,registryGaps:6,truthFragmentAcceptances:2,accountingOccurrences:40,listVerdicts:1,totalOrdinaryOkOccurrences:148,reportCommit:pin,notesVerbatim:true,repeatedStableHeadingNotesPreserved:true},sourceRows:{total:1072,reviewed:1067,pending:5,undecided:0},defaultD:{bothExit:0,fatal:0,fullOutputEquality:true},scopedE:{bothExit:1,expectedRed:true,fullOutputEquality:true,open:E[0].conservationOpen,fullCandidateTupleEquality:true,rootIdenticalOwnerGroups:0,rootHolds:0,closed:false,pendingHistoricalGapDecisions:gapShard.registryGaps.map(x=>({claimId:x.claimId,disposition:x.disposition,reviewStatus:x.reviewStatus,sourceUnitDigest:x.sourceUnitDigest,targetUnitDigest:x.targetUnitDigest||null})),pendingGapNote:'The native gate overlays pending gap dispositions and omits them from registry-gaps-without-disposition. All six still owe independent review; absence from strict open categories is no acceptance.'},nativeEquality:{allKnownIdsRetained:true,knownBefore:known(old).length,knownCurrent:known(reg).length,allKnownFullTuplesEqual:true,activeFullTupleEquality:true,newGaps:0,newRetired:0,candidateCount:830,fullReverseTupleEquality:true,compactOneLine:true,nativeByteEqual:true,registryBytes:bytes.length,registrySHA256:sha(bytes),registryContentChanged:!bytes.equals(fs.readFileSync(s+'old-registry.json'))},pendingAuthored:{historicalGaps:6,generatedRows:5,duplicateGroups:2,identicalUnitResolution:'0 root groups; pending explicit no-exception resolution',aliasEntries:347,retainedPathDecisions:preview.retainedPathDecisions.length,previewInboundEdges:25081,aliasValidation:preview.aliasValidation},preservation:read(s+'preservation.json'),allowlist:{newViolations:violations,existingExactExemptions:used},tests:{command:'env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs',passed:39,failed:0,cancelled:0,skipped:0,todo:0,firstRun:{passed:38,failed:1,reason:'Existing random nonce in seedReviewPack shuffles mutation candidates; the fixture has scarce bullet units, an earlier mutation can consume them before deleted-list-item (scripts/propose-doc-decisions.mjs:280-300). Independent fixture content, no source/test/checker edit. Complete unmodified rerun passes.',log:fs.readFileSync(s+'tests.log','utf8')},finalLog:tests},immutableFiles:fixed,allCurrentTruthBytesUnchanged:true,truthBlocker:{report:r+'review-5-root-truth-final.md',reportCommit:pin,falseUnits:8,drawSize:30,falsePercent:26.7,ownerDecisionPending:true,correctionsAuthorizedThisTurn:false},reviewPacksMade:0,reviewRequestsMade:0,technicalBlockers:[],batchClosed:false,noPromotion:true,noPush:true,noMainMerge:true,noStep6:true,noGitWrite:true,noProtectedToolChange:true,noSecretRead:true,commands:read(s+'application-gates.json'),helperSources:Object.fromEntries(['apply.mjs','find-old.mjs','author.mjs','preview.mjs','gates-new.py','preserve.py','verify.mjs'].map(x=>[x,fs.readFileSync(s+x,'utf8')]))};fs.writeFileSync(r+'root-closure-verification-turn23.json',JSON.stringify(proof,null,2)+'\\n');console.log({D:'both zero fatal and identical',E:proof.scopedE.open,source:proof.sourceRows,pendingGaps:6,registryBytes:bytes.length,tests:'39/39',native:'all full tuples equal'});\n"
+  }
+}

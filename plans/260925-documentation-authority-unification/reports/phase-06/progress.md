@@ -1,3 +1,78 @@
+# Latest resume state — Completion verdicts applied; pending closure dispositions authored
+
+Date: 2026-10-14
+Executor: codex-session:23@2026-10-14
+Session counter: 23
+Assignment: unit-run-1791984989472-59e9c5c2/producer/1
+Step: 5
+State: authoring / file-only handoff awaiting runner-produced commit
+Input HEAD and Lead report pin: 9f087f37d134366bd2057af2fac831ed18a9b3c3
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Previous committed green proof inventory: de742ae91dce1430aa727a8feaf1ad1f96f85001
+Current proof inventory: input HEAD above, with working-tree decision overlay only.
+Current-turn content commit: none; the fgos run runner commits these files after this assignment.
+
+Resume verified a clean tree at the committed Lead reviews and ancestry from the previous green proof. No git write was run. This assignment overrides the historical intermediate-commit, main-sync and scratch-location instructions: no inventory, review pack or review request requiring this turn's future content pin was published. Temporary input-HEAD refresh artifacts were made within the authorized plan directory and removed after proof; no .fgos path in this workspace was touched. The required assignment result is the explicitly authorized outbox exception.
+
+## Applied verdicts
+
+The three conservation reports and final truth report are pinned to 9f087f37d134366bd2057af2fac831ed18a9b3c3, with notes verbatim:
+
+- review-5-root-truth-rework2.md: 10 ok occurrences — eight conservation bindings and two corrected-fragment truth acceptances.
+- review-5-root-source-completion-01.md: 75 source bindings ok.
+- review-5-root-source-completion-02.md: 22 bindings ok (20 source, two header predecessors), 40 accounting occurrences ok, and the 830-tuple list ok.
+
+The existing applyReviewVerdicts ordinary applier updated 105 bindings: 99 source and six registry-gap rows. Two truth-fragment acceptances, all 40 accounting occurrences and the labelled list verdict are recorded as receipts in root-closure-review-application-turn23.json, without fabricated source decisions. The report repeats the two stable-heading IDs as candidate accounting IDs; both occurrence notes/digests are preserved, even though parseReviewVerdicts indexes unique IDs. The 22 ok units of review-5-root-truth-final.md are also retained verbatim as bounded sample receipts, with its reviewer and the same committed report pin. Its eight reworks remain untouched and the complete draw still fails the >10% rule. Total raw ordinary ok occurrences across all four reports: 170 (105 bindings, two corrected fragments, 22 final-sample ok units, 40 accounting and one list verdict). Accepted rationale/format nits remain unchanged. The application evidence retains before/after rows and exact committed report text cells.
+
+Root source population: all 1,072 rows decided, 1,067 reviewed / five pending / zero undecided. The five pending rows are now explicitly authored generated-backlog decisions rather than unauthored native defaults. root-authorities-remaining-source-rows.json records this working-tree overlay, not a new committed inventory.
+
+## Pending closure authoring
+
+Every item below remains pending, authored by codex-session:23@2026-10-14. No review approval is carried into these proposals.
+
+1. ledger/decisions/s5-root-historical-gaps.json: dispositions for all six historical native gaps, with complete old source units, exact immutable commit/blob/digest, current text and actual successor evidence in root-closure-dispositions-turn23.json.
+   - claim_56ee14864e75c42f80dc9903aa1c53e9 and claim_b6f28092c03285c2745234912da0f2ab (architecture manifest), plus claim_53b01784413095d74305b7367e9054fb (gateway YAML): retain-as-evidence for the exact historical whole-contract versions. Current mapped contract payloads were independently accepted byte-equal to the current sources; their owners are informational successors, not a claim that every old field survives. Historical native identities and complete old text stay intact. The two frozen-map source blob pins predate upstream edits; the map is placement evidence, not a current-content pin. No frozen map/baseline changed.
+   - claim_0956ea2eadf0a32787b7fd0e51d693a6 (backlog): regenerate-from-source, as an old generated PBI projection retained in immutable evidence; no old PBI status is asserted current or removed here.
+   - claim_b92ac199356ff830e5554647ab143a90 and claim_6a8087a3f502f37f9c7b729e871bee9c (IO): supersede to actual mapped current introduction/list. The four historical exception categories and every original list clause remain; the merged upstream hook exception extends the list to five. This is predecessor conservation, not a new truth correction.
+2. ledger/decisions/s5-root-generated-backlog.json: all five current generated rows are pending regenerate-from-source, with full rationale, full source digests and concrete claim kinds. The backlog header explicitly names its renderer and input; no renderer invocation, source-store freshness or platform carrier is claimed. N1's decisions index remains generated and retained at its current path; no new generated-index row was invented.
+3. ledger/root-duplicate-resolutions-pending.json: two exact whole-file duplicate groups, one mapped platform owner each, with source review pins, group membership, payload digests, full rationale and cutover done conditions. The projection is kept separate from the active conflict-resolution file until independent acceptance. The same file authors an explicit pending identical-unit resolution: zero Root multiple-owner groups, no new exception, all earlier area exceptions unchanged. Native scoped E must reconfirm that zero at the next content commit.
+4. draft-alias-root-authorities.json plus root-link-alias-preview-inputs-turn23.json: 347 pending alias proposals and seven explicit retained-path/no-alias decisions, with review-bound native decision anchors/digests and actual browser headings. Split-document lookup routes through an existing appropriate portal; source heading lookup follows its reviewed owner. The retained legacy reading map remains a navigation-merge obligation into docs/reading-map.md, which is outside the platform alias owner's permitted topology. No active alias entry or reader link changed.
+5. link-rewrite-preview-root-authorities.json: all 25,081 inbound input-inventory edges classified with pending action and rationale, split into immutable history, frozen source, mutable docs and code/data consumers. Immutable references retain bytes; frozen/candidate navigation and executable/data consumers queue the proper cutover pass. These are preview inputs, not rewritten consumers. Inputs use 9f087f37d; new artifacts from this turn are absent from that input inventory and must be included on the follow-up refresh.
+
+## Proof and limits
+
+root-closure-verification-turn23.json stores commands, helper sources, proof limitations and results. The actual persisted compact registry was copied to scratch, natively refreshed at the input HEAD, and written back byte-equal in compact one-line form. No carry-forward was needed because all current source/candidate bytes already exist at that input commit.
+
+- D against both prior registries: exit 0, zero fatal findings, entire parsed outputs identical.
+- Full-map scoped E against both priors: exit 1, entire parsed outputs identical; exactly claims-not-reviewed 5 and candidate-blocks-unreferenced 830. No Root hold, unknown source row or multiple-owner exception group. All 830 full (claim ID, path, anchor, unit digest) tuples equal the unchanged committed candidate list, with no missing/extra tuple.
+- All 94,865 known native IDs and full tuples retained; active inventory/registry tuples equal. Zero new gaps, zero new retired units, zero identity graft. The native gate overlays pending gap dispositions, so the six pending historical proposals disappear from its gap-without-disposition category; this is not independent acceptance. All six remain explicit review obligations here and in the proof.
+- Compact registry: 59,723,017 bytes, one line, SHA256 7b7e8645cf9609688ae83d43ac821d5f0c093755845bcf712102d3c210b04ec0, unchanged from the input persisted registry and below the 90 MB stop line.
+- Preservation A/B/C/F/G/H/I: passes with the same seven exact prior A exemptions; extractor, frozen roots, witness/payload trees, area authority statuses and reader links unchanged. Ratchet 995/25/1; placement 529/528/one existing exception; H zero findings.
+- Alias resolver: 347 entries, zero schema/owner/browser-anchor findings. Both new duplicate payload pairs are byte-equal and have exactly one mapped owner.
+- Relevant unmodified tests: env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs; final complete run 39/39, zero fail/cancel/skip/todo. The first run was 38/39: seedReviewPack's existing random nonce let an earlier mutation consume the fixture's scarce bullet units before deleted-list-item, causing insufficient eligible rows. The independent fixture and checker bytes were unchanged; one complete rerun passed. Both logs and the exact explanation are retained in the verification.
+
+No full-suite, installed-release, gateway, promotion, new-commit freshness or full truth certification is claimed. No docs bytes, truth ledger/population, checker, gate, vocabulary, extractor, baseline, active conflict resolution or active alias table changed.
+
+## Owner blocker and exact next turn
+
+Step 5 truth closure is blocked outside this assignment: review-5-root-truth-final.md at 9f087f37d reports eight false units of 30 (26.7%, 13 false sentences reported). The owner has that question. This turn neither corrects those sentences nor changes any truth population. A35 covered the earlier escalation only; no new truth-fix scope is inferred for this later failed draw. No new question is added to the owner queue.
+
+After the runner commits this assignment's files, the follow-up executor must:
+
+1. Read this progress first, confirm a clean tree and resolve the runner-produced HEAD as the new content commit. Check ancestry from 9f087f37d. Copy the persisted compact working registry directly, refresh natively at that new commit, and rerun both-prior D/scoped E/full native equality and preservation. Never rebuild from a seed. Compare any new report/plan consumer edges against the 25,081 input edges; preserve existing tuples and account every addition/removal without silently replacing lineage. Keep compact JSON; stop before 90 MB.
+2. Rebind/check the 11 pending source/gap decisions against actual full old/current text at that new commit. Keep the three contract historical-evidence dispositions targetless, with their informational successors separately labelled. Show complete historical/current text and full digests, not digest-prefix abbreviations. The five generated rows have no platform target; list those absent-target rows explicitly under A36.
+3. Make bounded committed-content packs only now. One closure pack can contain the six historical gaps, five generated rows, two duplicate projections and zero-group identical-resolution accounting (14 entries total). Give the ordinary decision rows the standard five-column verdict contract; group/zero-group accounting must not fabricate a claim ID. Include all full text, membership and done conditions. This closure pack/request is owed from this turn's commit, not authored here.
+4. Refresh the alias/preview inputs from the new inventory before packing. Partition the 347 alias bindings into packs of at most 75 (75/75/75/75/47); the seven retained-path proposals may join the last pack (54 entries). Partition the complete edge appendix by those packs' source membership, including retained and generated-index sources, with unique edge IDs/full identity fields, hashes, counts and explicit rewrite/alias/retain/contract-review rationale. Check union equality to the refreshed native inbound edge population; no missing or duplicate edge and no executable consumer treated as documentation-only alias compatibility. Publish bounded requests with A36 mechanical equality for every submitted decision, seeded deep samples and every differing-digest row read in full. Alias/group accounting is pending until independently accepted.
+5. Keep the final truth draw/report/population unchanged while awaiting the owner's committed direction. If the owner authorizes fixes, follow only that exact scope, record before/after evidence, rebind affected rows under A22 without approval carry, and request independent re-review. Do not assume that the >10% draw is closed by conservation approvals.
+6. After independent verdicts, apply notes verbatim via the existing applier, then rerun D/E/native equality. Remaining batch obligations are still owed: independent 50-block invented-claim sample and hostile pass; committed fresh-reader key, two independent readers and three scenarios; owner-approved batch-boundary sync/accounting under A31; final report with prior holds/exceptions/A34 partial-carry residuals, pending cutover consumers and effort checkpoint. No batch closure until these and the owner's truth disposition are satisfied.
+
+No new review pack/request or review-population draw was produced this turn. No promotion, push, main merge/write, Step 6 work, git add/commit/stash/checkout/reset or secret-file read. Technical blockers: none; all proof failures are explained. The existing owner truth decision blocks eventual batch closure, not the completed file-only assignment.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — All root source rows decided; bounded review handoff
 
 Date: 2026-10-14

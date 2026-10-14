@@ -37,11 +37,15 @@
   ],
   "total": 1072,
   "byStatus": {
-    "pending": 104,
-    "reviewed": 968
+    "reviewed": 1067,
+    "pending": 5
   },
   "remainingUndecided": 0,
-  "pendingConservationReview": 104,
+  "pendingConservationReview": 5,
   "rows": [],
-  "AGENTSAndCLAUDE": "Deferred to Step 10, excluded."
+  "AGENTSAndCLAUDE": "Deferred to Step 10, excluded.",
+  "inputInventoryCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3",
+  "pendingGeneratedRows": 5,
+  "pendingHistoricalGapDecisions": 6,
+  "state": "Working-tree decision overlay; refresh at runner-produced commit before review packs."
 }
