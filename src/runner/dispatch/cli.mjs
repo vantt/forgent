@@ -21,7 +21,7 @@ class StoreError extends Error {
 }
 
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, loadRunnerConfigFromDir, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily, resolveCapabilityDetailsFromHints } from './resolve.mjs';
 import { resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
@@ -314,6 +314,30 @@ function readOnlyDoors(executorId) {
 }
 
 /**
+ * The `fgos run` command a caller uses instead of dispatching `executorId` directly, read from
+ * the config at `cwd` without writing it. `--provider` names agent executors only, and only as a
+ * preference bind may override; a tool executor has no run door, so the hint says to call the
+ * tool itself. `capability` is kept when it is a registered one.
+ */
+export function runDoorHint({ cwd = process.cwd(), executorId, capability } = {}) {
+  let cfg = null;
+  try {
+    cfg = loadRunnerConfigFromDir(resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));
+  } catch { /* no readable config: the hint names no executor */ }
+  const executor = executorId && cfg?.executors && Object.hasOwn(cfg.executors, executorId) ? cfg.executors[executorId] : null;
+  const isAgent = executor !== null && (executor.kind ?? 'agent') === 'agent';
+  const registeredCapability = capability && cfg ? resolveRegisteredCapability(cfg, capability) : undefined;
+  const command = ['fgos run "<prompt>"'];
+  if (isAgent) command.push(`--provider ${executorId}`);
+  if (registeredCapability) command.push(`--capability ${registeredCapability}`);
+  command.push('[--writes <paths> --worktree <path>]');
+  const hint = `\`${command.join(' ')}\``;
+  if (isAgent) return `${hint} (--provider is a preference: bind may choose another executor that serves the capability)`;
+  if (executor) return `${hint}; "${executorId}" is a ${executor.kind} executor, which fgos run cannot name -- call that tool directly instead`;
+  return hint;
+}
+
+/**
  * Run one executor (tsk-5tm-3 D5) — the transport step under runUnit's
  * assignment runner (it once also backed a raw `execute` CLI subcommand): matching marketing-cockpit's `run_task()`
  * contract (`task-executor.py:550-611`) — self-execute for every case that
@@ -409,8 +433,6 @@ export async function executeExecutorCli(
     // Names which `via:"cli"` invocation of the executor runs (bind() pins the
     // herdr-spawn one when herdr is the transport). Unset keeps the first cli one.
     invocationId,
-    // The CLI door sets this: an agent executor named without `for` is refused
-    // instead of running under a guessed posture.
     // The confinement requirement the caller already resolved (an Assignment's
     // posture). Unset leaves it to the capability/invocation declaration.
     requirement,
@@ -1096,14 +1118,10 @@ export function guardCwdRepoRootDivergence(cwd, repoRoot) {
 }
 
 /**
- * CLI entry point body (D7 module split): was an inline `if
- * (import.meta.url === ...)` script guard directly in `dispatch.mjs`
- * before this split — now a named export so the barrel `dispatch.mjs`
- * (the file every existing `node src/runner/dispatch.mjs <subcommand> ...`
- * invocation still names) can call it from its own unchanged script guard.
- * Pure relocation: every line of argv-parsing/dispatch logic below is
- * byte-identical to before the split, only wrapped in a function instead
- * of an `if` block.
+ * Body of `node src/runner/dispatch.mjs <decide|probe-account|reconcile> ...`, called from the
+ * barrel's script guard; `fgos dispatch decide|probe-account` reach it with `returnResult`.
+ * `resolveWork` is the Work lookup `decide --work` needs, handed in by bin; without it
+ * `decide --work` refuses.
  */
 export async function runDispatchCli(argv = process.argv.slice(2), { returnResult = false, resolveWork } = {}) {
   const [subcommand, ...afterSubcommand] = argv;

@@ -5,7 +5,7 @@
 // src/setup/registrations.mjs) use.
 //
 // Dispatch is the low layer under runUnit: this barrel re-exports nothing from the Work
-// layer and imports no Work store. `decide --work` needs a Work lookup, which `fgos
+// layer and imports no Work module directly (test/architecture.test.mjs walks it). `decide --work` needs a Work lookup, which `fgos
 // dispatch decide` hands in from bin; run bare, `node src/runner/dispatch.mjs decide
 // --work` refuses and names that door.
 
@@ -73,7 +73,7 @@ export {
   executeAssignment,
 } from './dispatch/assignment-runner.mjs';
 
-export { runDispatchCli, decideExecutorCli } from './dispatch/cli.mjs';
+export { runDispatchCli, decideExecutorCli, runDoorHint } from './dispatch/cli.mjs';
 
 import { runDispatchCli } from './dispatch/cli.mjs';
 import { isMainModule } from '../../scripts/lib/is-main-module.mjs';

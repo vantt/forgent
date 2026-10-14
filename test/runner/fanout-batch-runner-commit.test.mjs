@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
@@ -10,6 +11,8 @@ import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 // The fan-out batch picks an item, runs the worker in its worktree and then
 // `fgos return`s it. The worker only edits files; the runner commits them
 // before return, which demands an advanced branch.
+
+const FANOUT_ENTRY = fileURLToPath(new URL('../../src/runner/fanout-batch.mjs', import.meta.url));
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fanout-commit-'));
@@ -114,9 +117,9 @@ test('fanout batch runs from its own node entry: `node src/runner/fanout-batch.m
     import fs from 'node:fs';
     fs.writeFileSync('output.txt', 'produced\\n');
   `);
-  const entry = path.resolve('src/runner/fanout-batch.mjs');
-
-  const out = spawnSync(process.execPath, [entry, 'cand1'], { cwd: repoRoot, encoding: 'utf8' });
+  const env = { ...process.env };
+  delete env.CLAUDE_CODE_SESSION_ID;
+  const out = spawnSync(process.execPath, [FANOUT_ENTRY, 'cand1'], { cwd: repoRoot, encoding: 'utf8', env });
 
   assert.equal(out.status, 0, out.stderr);
   const result = JSON.parse(out.stdout.trim().split('\n').at(-1));
@@ -126,7 +129,7 @@ test('fanout batch runs from its own node entry: `node src/runner/fanout-batch.m
 });
 
 test('fanout batch node entry with no candidate ids is a usage error, not an empty batch', () => {
-  const out = spawnSync(process.execPath, [path.resolve('src/runner/fanout-batch.mjs')], { cwd: mkTempDir(), encoding: 'utf8' });
+  const out = spawnSync(process.execPath, [FANOUT_ENTRY], { cwd: mkTempDir(), encoding: 'utf8' });
   assert.equal(out.status, 1);
   assert.match(out.stderr, /usage: node src\/runner\/fanout-batch\.mjs "<id>,<id>\.\.\." \[--has-live-task-access\]/);
 });

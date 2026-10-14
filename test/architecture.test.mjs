@@ -13,6 +13,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import YAML from 'yaml';
+import { lexSource } from './helpers/js-source-lexer.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -363,14 +364,11 @@ const RUN_DOOR_HOMES = {
  * dynamic import(), a require() or a namespace member call is caught, not just `symbol(`.
  */
 export function usesSymbol(rawSource, symbol) {
-  // Comments and string text are not uses; a template's ${...} expressions stay.
-  const code = rawSource
-    .replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '')
-    .replace(/`(?:\\.|[^`\\])*`/g, (tpl) => (tpl.match(/\$\{[^}]*\}/g) ?? []).join(' '))
-    .replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"/g, (str) => (/^['"]\.{0,2}\//.test(str) ? str : "''"));
+  // Comments and literal text are not uses; a template's ${...} expressions stay code.
+  const code = lexSource(rawSource).shape;
   const stripped = code
     .replace(new RegExp(`(?:async\\s+)?function\\s+${symbol}\\b`, 'g'), '')
-    .replace(/export\s*\{[^}]*\}\s*from\s*['"][^'"]+['"]/g, (stmt) => (new RegExp(`\\b${symbol}\\s+as\\b`).test(stmt) ? stmt : ''));
+    .replace(/export\s*\{[^}]*\}\s*from\s*['"][^'"]*['"]/g, (stmt) => (new RegExp(`\\b${symbol}\\s+as\\b`).test(stmt) ? stmt : ''));
   return new RegExp(`\\b${symbol}\\b`).test(stripped);
 }
 
@@ -416,6 +414,11 @@ test('run-door call-site guard catches an aliased import, a dynamic import(), a 
   assert.equal(usesSymbol('// executeAssignment(x) used to live here', 'executeAssignment'), false);
   assert.equal(usesSymbol("throw new Error(`executeAssignment: run ${id} is stale`);", 'executeAssignment'), false);
   assert.equal(usesSymbol("const r = `${executeAssignment(a)}`;", 'executeAssignment'), true);
+  // A comment marker or a backtick inside a string must not hide the code after it.
+  assert.equal(usesSymbol("const g = 'docs/*.md';\nexecuteExecutorCli(x);\n/** later */", 'executeExecutorCli'), true);
+  assert.equal(usesSymbol("const u = 'https://x'; executeExecutorCli(x);", 'executeExecutorCli'), true);
+  assert.equal(usesSymbol("const q = 'a`b';\nexecuteExecutorCli(x);\nconst t = `c`;", 'executeExecutorCli'), true);
+  assert.equal(usesSymbol("const r = `${fn({ a: 1 }) + executeAssignment(a)}`;", 'executeAssignment'), true);
   assert.ok(checkRunDoorCallers({ executeExecutorCli: ['src/runner/fanout-batch.mjs', 'src/runner/dispatch/assignment-runner.mjs', 'src/runner/new.mjs'] })
     .some((v) => v.includes('src/runner/new.mjs')));
   assert.ok(checkRunDoorCallers({ commitUnitWork: ['src/runner/execution/run.mjs', 'src/runner/loop.mjs'] })

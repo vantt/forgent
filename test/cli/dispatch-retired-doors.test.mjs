@@ -40,16 +40,50 @@ function eventLines(fgosDir) {
   return fs.readdirSync(dir).reduce((n, f) => n + fs.readFileSync(path.join(dir, f), 'utf8').split('\n').filter(Boolean).length, 0);
 }
 
-test('fgos dispatch execute <executor> is a validation error pointing at fgos run --provider, and spawns nothing', () => {
+function writeConfig(fgosDir) {
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({
+    runner: {
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { blocked: { prefer: 'tool-only' } },
+      executors: {
+        'tool-only': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
+        ag1: { kind: 'agent', command: 'claude', args: ['{prompt}'] },
+      },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 5000,
+    },
+  }));
+}
+
+test('fgos dispatch execute <agent executor> is a validation error pointing at fgos run --provider, and spawns nothing', () => {
   const { root, fgosDir } = mkStore();
+  writeConfig(fgosDir);
   const before = eventLines(fgosDir);
-  const out = run(FGOS, ['dispatch', 'execute', 'codex', '--prompt', 'hi'], root);
+  const out = run(FGOS, ['dispatch', 'execute', 'ag1', '--prompt', 'hi', '--for', 'execute'], root);
   assert.equal(out.status, 4, out.stderr);
   assert.match(out.stderr, /fgos dispatch execute was removed/);
-  assert.match(out.stderr, /fgos run "<prompt>" --provider codex \[--writes <paths> --worktree <path>\]/);
+  assert.match(out.stderr, /fgos run "<prompt>" --provider ag1 --capability execute \[--writes <paths> --worktree <path>\]/);
+  assert.match(out.stderr, /--provider is a preference/);
   assert.match(out.stderr, /fgos run --unit <file>/);
   assert.equal(fs.existsSync(path.join(fgosDir, 'assignments')), false);
   assert.equal(eventLines(fgosDir), before);
+});
+
+test('fgos dispatch execute <tool executor> never suggests --provider for it, which fgos run would refuse', () => {
+  const { root, fgosDir } = mkStore();
+  writeConfig(fgosDir);
+  const out = run(FGOS, ['dispatch', 'execute', 'tool-only', '--prompt', 'hi'], root);
+  assert.equal(out.status, 4, out.stderr);
+  assert.doesNotMatch(out.stderr, /--provider tool-only/);
+  assert.match(out.stderr, /"tool-only" is a tool executor, which fgos run cannot name -- call that tool directly/);
+});
+
+test('fgos dispatch execute <unregistered executor> suggests a plain fgos run', () => {
+  const { root } = mkStore();
+  const out = run(FGOS, ['dispatch', 'execute', 'codex', '--prompt', 'hi'], root);
+  assert.equal(out.status, 4, out.stderr);
+  assert.match(out.stderr, /fgos run "<prompt>" \[--writes <paths> --worktree <path>\]/);
+  assert.doesNotMatch(out.stderr, /--provider codex/);
 });
 
 test('fgos dispatch execute --contract points at fgos run --unit', () => {
@@ -104,17 +138,9 @@ for (const sub of ['execute', 'log', 'fanout-batch']) {
   });
 }
 
-test('fgos hook dispatch-decide (agy payload) denies an out-of-process subagent call and points at fgos run, not dispatch execute', () => {
+test('fgos hook dispatch-decide (agy payload) denies an out-of-process subagent call and points at a door fgos run accepts, not dispatch execute', () => {
   const { root, fgosDir } = mkStore();
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({
-    runner: {
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { blocked: { prefer: 'tool-only' } },
-      executors: { 'tool-only': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 5000,
-    },
-  }));
+  writeConfig(fgosDir);
   const env = { ...process.env };
   delete env.CLAUDE_CODE_SESSION_ID;
   const out = spawnSync(process.execPath, [FGOS, 'hook', 'dispatch-decide', '--format=agy'], {
@@ -126,6 +152,7 @@ test('fgos hook dispatch-decide (agy payload) denies an out-of-process subagent 
   assert.equal(out.status, 0, out.stderr);
   const decision = JSON.parse(out.stdout.trim().split('\n').at(-1));
   assert.equal(decision.decision, 'deny');
-  assert.match(decision.reason, /fgos run "<prompt>" --provider tool-only/);
-  assert.doesNotMatch(decision.reason, /dispatch execute/);
+  assert.match(decision.reason, /fgos run "<prompt>" --capability blocked/);
+  assert.match(decision.reason, /"tool-only" is a tool executor/);
+  assert.doesNotMatch(decision.reason, /dispatch execute|--provider tool-only/);
 });

@@ -61,7 +61,9 @@ test('blocks a real Agent call whose subagent_type resolves to a registered out-
   const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: { subagent_type: 'blocked' }, cwd: repoRoot });
   assert.equal(result.status, 2);
   assert.match(result.stderr, /BLOCKED/);
-  assert.match(result.stderr, /fgos run "<prompt>" --provider tool-only/);
+  assert.match(result.stderr, /fgos run "<prompt>" --capability blocked/);
+  assert.match(result.stderr, /"tool-only" is a tool executor/);
+  assert.doesNotMatch(result.stderr, /--provider tool-only/);
   assert.doesNotMatch(result.stderr, /dispatch execute|dispatch\.mjs execute/);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });

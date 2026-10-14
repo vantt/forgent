@@ -43,7 +43,7 @@ import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs'
 import { rebuildViewFromDir } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, DispatchError } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, runDoorHint, DispatchError } from '../src/runner/dispatch.mjs';
 import { resolveWorkForDispatch } from '../src/runner/work-dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
@@ -959,8 +959,13 @@ function retiredDispatchDoorMessage(sub, positional, flags) {
     if (flags.assignment !== undefined) {
       return 'fgos dispatch execute --assignment was removed: run the unit with `fgos run --unit <file>`, or planned work with `fgos workflow start <preset>|--units <file>`.';
     }
-    const executor = positional[1] && !String(positional[1]).startsWith('--') ? positional[1] : '<executor>';
-    return `fgos dispatch execute was removed: run one task with \`fgos run "<prompt>" --provider ${executor} [--writes <paths> --worktree <path>]\`, or a unit file with \`fgos run --unit <file>\`.`;
+    const executorId = positional[1] && !String(positional[1]).startsWith('--') ? positional[1] : undefined;
+    const hint = runDoorHint({
+      cwd: typeof flags.cwd === 'string' ? flags.cwd : process.cwd(),
+      executorId,
+      capability: typeof flags.for === 'string' ? flags.for : undefined,
+    });
+    return `fgos dispatch execute was removed: run one task with ${hint}, or a unit file with \`fgos run --unit <file>\`.`;
   }
   if (sub === 'log') {
     return 'fgos dispatch log was removed: every run records its own provenance under `.fgos/assignments/<unitRunId>/`; run work through `fgos run` and read it there.';
@@ -4728,7 +4733,7 @@ async function handleHook(rest) {
           process.stdout.write(
             JSON.stringify({
               decision: 'deny',
-              reason: `BLOCKED: this subagent call resolves to out-of-process dispatch (no native in-process handler for "${subagentType}"). Run it through \`fgos run "<prompt>" --provider ${decided.executorId ?? '<executor>'}\` instead.`,
+              reason: `BLOCKED: this subagent call resolves to out-of-process dispatch (no native in-process handler for "${subagentType}"). Run it through ${runDoorHint({ cwd: payloadCwd, executorId: decided.executorId, capability: subagentType })} instead.`,
             }) + '\n',
           );
           process.exit(0);

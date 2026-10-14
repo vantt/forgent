@@ -25,7 +25,7 @@
 // errors).
 
 import fs from 'node:fs';
-import { decideExecutorCli } from '../src/runner/dispatch.mjs';
+import { decideExecutorCli, runDoorHint } from '../src/runner/dispatch.mjs';
 
 const AGENT_TOOL_NAMES = new Set(['Agent', 'Task']);
 
@@ -54,7 +54,7 @@ async function decideBlock() {
     return null;
   }
   if (decided.mechanism === 'in-process') return null;
-  return { toolName, subagentType, executorId: decided.executorId ?? '<executor>' };
+  return { toolName, subagentType, runDoor: runDoorHint({ cwd: payloadCwd, executorId: decided.executorId, capability: subagentType }) };
 }
 
 let blocked = null;
@@ -67,7 +67,7 @@ try {
 if (blocked) {
   process.stderr.write(
     `BLOCKED: this ${blocked.toolName} call resolves to out-of-process dispatch (no native in-process handler for "${blocked.subagentType}"). ` +
-      `Run it through \`fgos run "<prompt>" --provider ${blocked.executorId}\` instead of calling this tool directly -- it runs the task as one unit and hands back the real result. ` +
+      `Run it through ${blocked.runDoor} instead of calling this tool directly -- it runs the task as one unit and hands back the real result. ` +
       `(decided via: decide --for "${blocked.subagentType}" --needs-soul --has-live-task-access)\n`,
   );
   process.exit(2);
