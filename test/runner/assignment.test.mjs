@@ -216,6 +216,32 @@ test('renderAssignmentPrompt includes concrete result artifact paths when runDir
   assert.ok(prompt.includes(path.join(runDir, 'agent-report.md')), 'prompt must contain absolute agent-report.md path');
 });
 
+test('a read-only prompt says the result files are still to be written: a worker read "Write scope: none" as a ban on them and wrote nothing', () => {
+  // Measured: a read-only `execute --contract` dispatch to Codex answered the task, then said the required
+  // result paths "conflict with its explicit read-only, no-write-scope contract" and wrote neither file,
+  // so the round scored no-evidence.
+  const assignment = buildAssignment({ workId: 'tsk-rd-test-ro', stage: 'planning', operation: 'validate-plan' });
+  const runDir = '/tmp/fgos-asgn-rd-test-ro/runs/01';
+  const claimPath = path.join(runDir, 'worker-output', 'outbox', 'agent-result.json');
+  const prompt = renderAssignmentPrompt(assignment, {
+    runDir,
+    effectiveContract: {
+      contract: { id: 'effective-execution-contract', version: 1 },
+      mutation: 'read-only',
+      resultClaim: { path: claimPath },
+      limits: { timeoutMs: 1000 },
+      workspace: { writeScope: [] },
+      enforcementPosture: 'instructed',
+    },
+  });
+  assert.match(prompt, /^- This operation is read-only: change nothing in the workspace\. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only\.$/m);
+  assert.match(prompt, /^- Write scope: none in the workspace \(read-only\); your result files are still required$/m);
+  assert.doesNotMatch(prompt, /\(none - read-only\)/);
+
+  const writing = buildAssignment({ workId: 'tsk-rd-test-rw', stage: 'executing', operation: 'implement-item' });
+  assert.doesNotMatch(renderAssignmentPrompt(writing, { runDir }), /This operation is read-only/);
+});
+
 test('renderAssignmentPrompt states the real agent-result.json status enum -- tsk-5zim: dispatched actors (claude-reviewer x2, codex-cli) wrote status:"DONE"/"objection" and failed schema validation because this was never disclosed', () => {
   const assignment = buildAssignment({
     workId: 'tsk-rd-test-2',
