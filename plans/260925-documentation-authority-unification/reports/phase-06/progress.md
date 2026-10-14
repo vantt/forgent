@@ -1,3 +1,28 @@
+# Latest resume state — Bounded retained conservation publication
+
+Date: 2026-10-14
+Executor: codex-session:21@2026-10-14
+Session counter: 21
+Step: 5
+State: authoring / bounded packs published; final proof in progress
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Content pin: 55ec1e0c4
+Commits: dd029fc38 (resume), 167baed8d (240 accepted source verdicts + two list/gap accounting verdicts), 9bb7e6edb and 55ec1e0c4 (20 A35 sentence fragments / 10 real target units / 10 pending source rebindings), 08854b8ba (224 retained/proposal/navigation decisions and pending switchboard-gap proposal).
+
+Publication: 1/3 retained source packs, 75/224 source entries, all pending Judgment. Requests:
+- review-request-261014-1846-root-retained-conservation-01.md
+
+95 mapped source rows remain undecided (foundations 68, lifecycle vision 25, JSON/YAML contracts 2). AGENTS.md/CLAUDE.md deferred to Step 10. No final truth population or author draw. Independent truth re-review request and gap request still to publish. Every source/none digest difference is explicitly listed for A36 deep read.
+
+Initial both-prior D: 0 fatal; initial scoped E-first exactly 3 historical gaps and 792 candidate-unverified units. Discarded E-second overlapped an intermediate rebinder draft. That draft omitted native ancestry enrichment; restored unchanged approvals and narrowed to the actual 10 affected units before content commit. A preliminary refresh was canceled after a final in-scope sentence adjustment (retain keyword-risk gate and precise test examples); outputs discarded, native refresh restarted serially from the persisted registry at the final content pin. Final D/E/native equality still owed before STOP. Review/applier tests: 29/29; preservation and allowlist pass. GitNexus MCP is unavailable in this session; own edits are docs/data only, no function/class/method edit; explicit path/diff checks substitute for unavailable detect_changes.
+
+A35 carrier note and compact registry persistence still owed. Known stale remainder is not swept. Original truth sample/population and prior area lists remain unchanged; count-nit rationales preserved unchanged, citation corrected to the 693-tuple Packaging closure review. No technical/owner blocker currently; stop after committed final evidence and requests. No promotion, main write/merge, push, rebase, Step 6 or protected tool/secret access.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Accepted conservation and authorized truth corrections
 
 Date: 2026-10-14
