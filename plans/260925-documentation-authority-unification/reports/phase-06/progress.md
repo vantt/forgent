@@ -1,3 +1,20 @@
+# Latest resume state — Boundary verdicts accepted; root authoring next
+
+Date: 2026-10-14
+Executor: codex-session:17@2026-10-14
+Session counter: 17
+Step: 5
+State: authoring
+All nine ordinary ok verdicts at 4f99b9ec9 applied, notes verbatim, exact report pins. Reviewer wording nits left unchanged.
+Both-prior D: exit 0, zero fatal. Both scoped union E: exit 1, exactly 13 unchanged partial carries, three prior held source rows, 346 identical-unit groups, 1,769 candidate-unverified units. All 94,342 known IDs/full tuples retained; active inventory/registry equal; prior A28 lists full-tuple equal both D/E. Compact registry 59,455,506 bytes, unchanged bytes, below 90 MB. Ratchet/placement/candidate status and extractor/reader/authority/witness/payload/frozen-file preservation pass.
+Evidence: root-authorities-boundary-application.json; root-authorities-boundary-acceptance-verification.json.
+Next: list reviewed Pilot B effect-axis section rows before SC-1 edit; re-review all genuine target drift plus both historical SC-1 rows. Author governance as the first bounded root source pack; other mapped rows remain untouched. No promotion, merge, Step 6, push or protected tools/baselines.
+Blockers: none.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Root authorities resumed from checkpoint
 
 Date: 2026-10-14

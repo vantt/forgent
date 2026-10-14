@@ -13,6 +13,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-85",
+      "authoredBy": "codex-session:15@2026-10-14",
+      "reviewStatus": "reviewed",
+      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate.",
+      "reviewNote": "Old candidate unit packaging#85 (0ce5ce17, 7d83c6b63) superseded by the candidate import 648a2fee, which equals main's table verbatim (import diff is rows 7 and 7b only); rationale accurate",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -20,9 +28,7 @@
         "Spec: Distribution",
         "Data Dictionary"
       ],
-      "authoredBy": "codex-session:15@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
     },
     {
       "claimId": "claim_04703f011b22383992b94545055b9e56",
@@ -31,15 +37,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/confinement-authority.md",
       "targetAnchor": "unheaded-block-144",
+      "authoredBy": "codex-session:15@2026-10-14",
+      "reviewStatus": "reviewed",
+      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate.",
+      "reviewNote": "Pre-merge confinement#144 (12018d6d) superseded by f0b5e6c1; main's diff replaces only the word account with the per-store phrase, so nothing is lost; the word candidate in the rationale is boilerplate since no candidate carrier exists here, harmless",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
         "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
       ],
-      "authoredBy": "codex-session:15@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
     },
     {
       "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
@@ -48,14 +60,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/distribution.md",
       "targetAnchor": "unheaded-block-5",
+      "authoredBy": "codex-session:15@2026-10-14",
+      "reviewStatus": "reviewed",
+      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate.",
+      "reviewNote": "Pre-merge distribution#5 (0ce5ce17) superseded by main's 648a2fee in the same file; main diff is only additions to rows 7 and 7b; the earlier reviewed move row for this ID is replaced by this gap plus the new a26a90f9 move; no graft",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
       "targetAncestry": [
         "Spec: Distribution",
         "Data Dictionary"
       ],
-      "authoredBy": "codex-session:15@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
     },
     {
       "claimId": "claim_f033905b059f073c62ec27f0ee6da620",
@@ -64,14 +82,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-92",
+      "authoredBy": "codex-session:15@2026-10-14",
+      "reviewStatus": "reviewed",
+      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate.",
+      "reviewNote": "Pre-merge runner#92 (c331d408) superseded by 4fc5044d; main's diff is pure insertion with no deletion, so the old unit is wholly contained in the successor; candidate wording in rationale is boilerplate, harmless",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4fc5044db3e9bb5826d7ea2dd979fdc39e1190356326c84170e2b3df69d8204e",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
       ],
-      "authoredBy": "codex-session:15@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
     }
   ]
 }

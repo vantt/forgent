@@ -1,0 +1,953 @@
+{
+  "version": 1,
+  "inventoryCommit": "d900d6151c58114cd9d0f8ef519f91daa8b4ded5",
+  "allKnownIdsRetained": true,
+  "knownIds": 94342,
+  "knownFullTupleEquality": true,
+  "activeInventoryRegistryFullTupleEquality": true,
+  "candidateListsFullTupleEqualityBothPriors": true,
+  "strictEOpen": [
+    {
+      "type": "claims-partial-carry",
+      "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+      "count": 13,
+      "examples": [
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+        "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+      ]
+    },
+    {
+      "type": "claims-not-reviewed",
+      "message": "claim rows whose reviewStatus is not reviewed",
+      "count": 3,
+      "examples": [
+        "docs/architect/agent-coordination/vocabulary/concept-relationships.md#coordination-rings",
+        "docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-13",
+        "docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-14"
+      ]
+    },
+    {
+      "type": "identical-units-multiple-owners",
+      "message": "identical source units whose rows name different target owners",
+      "count": 346,
+      "examples": [
+        "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+        "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+        "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+        "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+        "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+      ]
+    },
+    {
+      "type": "candidate-blocks-unreferenced",
+      "message": "candidate conservation units not named by a source decision",
+      "count": 1769,
+      "examples": [
+        "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+        "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+        "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+        "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+        "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+      ]
+    }
+  ],
+  "persistedRegistry": {
+    "bytes": 59455506,
+    "compactOneLine": true,
+    "sha256": "fb3c68ce23070dc9bed114d91d326297512f200ca44ef761499021a8fb2f413b"
+  },
+  "reviewApplication": {
+    "version": 1,
+    "authorSession": "codex-session:17@2026-10-14",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e",
+    "rows": [
+      {
+        "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+        "entryKind": "claims",
+        "before": {
+          "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+          "sourceUnitDigest": "7843e5b171ea17f9bece9456184250e5ef748cb46c1a87d79917c145dbcba539",
+          "targetOwner": "docs/platform/packaging-distribution/spec.md",
+          "targetAnchor": "data-dictionary",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "rationale": "The complete heading from docs/specs/distribution.md#data-dictionary, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#data-dictionary. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+          "targetUnitDigest": "daf68f421dfeceaf353dae3acd35391978f7dd56e9f10b1a0d6d4d0a13d7380b",
+          "targetAncestry": [
+            "Spec: Packaging-Distribution",
+            "Retained Distribution Source Detail",
+            "Spec: Distribution"
+          ]
+        },
+        "after": {
+          "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+          "sourceUnitDigest": "7843e5b171ea17f9bece9456184250e5ef748cb46c1a87d79917c145dbcba539",
+          "targetOwner": "docs/platform/packaging-distribution/spec.md",
+          "targetAnchor": "data-dictionary",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "rationale": "The complete heading from docs/specs/distribution.md#data-dictionary, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#data-dictionary. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+          "reviewNote": "Heading Data Dictionary moved, depth 2 to 4 only; section payload and following-block digests equal on both sides; the new source digest differs from the old only through main's row 7 and 7b edits; anchor ok; rationale accurate, though it does not say the digest drift came from main",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-source.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "daf68f421dfeceaf353dae3acd35391978f7dd56e9f10b1a0d6d4d0a13d7380b",
+          "targetAncestry": [
+            "Spec: Packaging-Distribution",
+            "Retained Distribution Source Detail",
+            "Spec: Distribution"
+          ],
+          "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+        }
+      },
+      {
+        "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+        "entryKind": "claims",
+        "before": {
+          "claimId": "claim_a26a90f97c6a399a30ce1df9207743b0",
+          "sourceUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+          "targetOwner": "docs/platform/packaging-distribution/spec.md",
+          "targetAnchor": "unheaded-block-85",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-5, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-85. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream source successor: complete current table imported verbatim into the existing candidate owner; independent conservation review pending. No implementation truth approval.",
+          "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+          "targetAncestry": [
+            "Spec: Packaging-Distribution",
+            "Retained Distribution Source Detail",
+            "Spec: Distribution",
+            "Data Dictionary"
+          ]
+        },
+        "after": {
+          "claimId": "claim_a26a90f97c6a399a30ce1df9207743b0",
+          "sourceUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+          "targetOwner": "docs/platform/packaging-distribution/spec.md",
+          "targetAnchor": "unheaded-block-85",
+          "claimKind": "specification",
+          "disposition": "move",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-5, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-85. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream source successor: complete current table imported verbatim into the existing candidate owner; independent conservation review pending. No implementation truth approval.",
+          "reviewNote": "Complete table verbatim at packaging#unheaded-block-85: digest 648a2fee equals the main legacy unit, so main's row 7 and 7b additions are carried word for word and nothing is lost; the stale boilerplate phrase about relative-link changes is inert since the unit has none, so no objection; no truth approval implied",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-source.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+          "targetAncestry": [
+            "Spec: Packaging-Distribution",
+            "Retained Distribution Source Detail",
+            "Spec: Distribution",
+            "Data Dictionary"
+          ],
+          "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+        }
+      },
+      {
+        "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+        "entryKind": "registryGaps",
+        "before": {
+          "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+          "sourcePath": "docs/specs/distribution.md",
+          "sourceUnitDigest": "cdf23ebc6949803aa19ec83913121c79ebc370e9ef29134c0fb3bf49af44a99c",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/distribution.md",
+          "targetAnchor": "unheaded-block-5",
+          "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "pending",
+          "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+          "targetAncestry": [
+            "Spec: Distribution",
+            "Data Dictionary"
+          ]
+        },
+        "after": {
+          "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+          "sourcePath": "docs/specs/distribution.md",
+          "sourceUnitDigest": "cdf23ebc6949803aa19ec83913121c79ebc370e9ef29134c0fb3bf49af44a99c",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/distribution.md",
+          "targetAnchor": "unheaded-block-5",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "reviewed",
+          "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+          "reviewNote": "Historical distribution#5 (cdf23ebc, 67a276b0d) superseded by the same-file current table 648a2fee; the diff is wording rewrite plus main's added doctor text, and the cross-reference now points to runner.md; supersede is truthful",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+          "targetAncestry": [
+            "Spec: Distribution",
+            "Data Dictionary"
+          ],
+          "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+        }
+      },
+      {
+        "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+        "entryKind": "registryGaps",
+        "before": {
+          "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceUnitDigest": "f99e0d4d9f055f630281cd3e3aead0de52d35fd8fa152c8d429bf0af333ca246",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/confinement-authority.md",
+          "targetAnchor": "unheaded-block-144",
+          "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "pending",
+          "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
+          "targetAncestry": [
+            "Spec: Agent Confinement Authority",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+          ]
+        },
+        "after": {
+          "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceUnitDigest": "f99e0d4d9f055f630281cd3e3aead0de52d35fd8fa152c8d429bf0af333ca246",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/confinement-authority.md",
+          "targetAnchor": "unheaded-block-144",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "reviewed",
+          "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
+          "reviewNote": "Historical confinement#144 (f99e0d4d, 1f911229f) superseded by f0b5e6c1; the old cap and held-when-full sentences are replaced by the redundant-only drop rule in the same unit, including main's latest per-store wording; same file, no graft",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+          "targetAncestry": [
+            "Spec: Agent Confinement Authority",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+          ],
+          "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+        }
+      },
+      {
+        "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+        "entryKind": "registryGaps",
+        "before": {
+          "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",
+          "sourcePath": "docs/specs/runner.md",
+          "sourceUnitDigest": "95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": "unheaded-block-92",
+          "targetUnitDigest": "4fc5044db3e9bb5826d7ea2dd979fdc39e1190356326c84170e2b3df69d8204e",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "pending",
+          "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ]
+        },
+        "after": {
+          "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",
+          "sourcePath": "docs/specs/runner.md",
+          "sourceUnitDigest": "95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": "unheaded-block-92",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "reviewed",
+          "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
+          "reviewNote": "Historical runner#92 (95e75f7d, 31f676749) superseded by 4fc5044d, which keeps the redundancy rule and syncing sentence and adds the stranded-copy, torn and tmp-staging rules; replaced wording is stated; supersede truthful",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "4fc5044db3e9bb5826d7ea2dd979fdc39e1190356326c84170e2b3df69d8204e",
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ],
+          "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+        }
+      },
+      {
+        "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+        "entryKind": "registryGaps",
+        "before": {
+          "claimId": "claim_970b6ae8bfa6cb7f00a0e4c2d98e4d4d",
+          "sourcePath": "docs/platform/packaging-distribution/spec.md",
+          "sourceUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
+          "disposition": "supersede",
+          "targetOwner": "docs/platform/packaging-distribution/spec.md",
+          "targetAnchor": "unheaded-block-85",
+          "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+          "targetAncestry": [
+            "Spec: Packaging-Distribution",
+            "Retained Distribution Source Detail",
+            "Spec: Distribution",
+            "Data Dictionary"
+          ],
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "pending",
+          "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+        },
+        "after": {
+          "claimId": "claim_970b6ae8bfa6cb7f00a0e4c2d98e4d4d",
+          "sourcePath": "docs/platform/packaging-distribution/spec.md",
+          "sourceUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
+          "disposition": "supersede",
+          "targetOwner": "docs/platform/packaging-distribution/spec.md",
+          "targetAnchor": "unheaded-block-85",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "reviewed",
+          "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate.",
+          "reviewNote": "Old candidate unit packaging#85 (0ce5ce17, 7d83c6b63) superseded by the candidate import 648a2fee, which equals main's table verbatim (import diff is rows 7 and 7b only); rationale accurate",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+          "targetAncestry": [
+            "Spec: Packaging-Distribution",
+            "Retained Distribution Source Detail",
+            "Spec: Distribution",
+            "Data Dictionary"
+          ],
+          "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+        }
+      },
+      {
+        "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+        "entryKind": "registryGaps",
+        "before": {
+          "claimId": "claim_04703f011b22383992b94545055b9e56",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceUnitDigest": "12018d6ddfb98564eca2e0dbd9267ffa859e1e5e69c11db3f506886fa0ab717c",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/confinement-authority.md",
+          "targetAnchor": "unheaded-block-144",
+          "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+          "targetAncestry": [
+            "Spec: Agent Confinement Authority",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+          ],
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "pending",
+          "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+        },
+        "after": {
+          "claimId": "claim_04703f011b22383992b94545055b9e56",
+          "sourcePath": "docs/specs/confinement-authority.md",
+          "sourceUnitDigest": "12018d6ddfb98564eca2e0dbd9267ffa859e1e5e69c11db3f506886fa0ab717c",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/confinement-authority.md",
+          "targetAnchor": "unheaded-block-144",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "reviewed",
+          "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate.",
+          "reviewNote": "Pre-merge confinement#144 (12018d6d) superseded by f0b5e6c1; main's diff replaces only the word account with the per-store phrase, so nothing is lost; the word candidate in the rationale is boilerplate since no candidate carrier exists here, harmless",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+          "targetAncestry": [
+            "Spec: Agent Confinement Authority",
+            "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+            "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+          ],
+          "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+        }
+      },
+      {
+        "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+        "entryKind": "registryGaps",
+        "before": {
+          "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+          "sourcePath": "docs/specs/distribution.md",
+          "sourceUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/distribution.md",
+          "targetAnchor": "unheaded-block-5",
+          "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+          "targetAncestry": [
+            "Spec: Distribution",
+            "Data Dictionary"
+          ],
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "pending",
+          "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+        },
+        "after": {
+          "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+          "sourcePath": "docs/specs/distribution.md",
+          "sourceUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/distribution.md",
+          "targetAnchor": "unheaded-block-5",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "reviewed",
+          "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate.",
+          "reviewNote": "Pre-merge distribution#5 (0ce5ce17) superseded by main's 648a2fee in the same file; main diff is only additions to rows 7 and 7b; the earlier reviewed move row for this ID is replaced by this gap plus the new a26a90f9 move; no graft",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+          "targetAncestry": [
+            "Spec: Distribution",
+            "Data Dictionary"
+          ],
+          "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+        }
+      },
+      {
+        "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+        "entryKind": "registryGaps",
+        "before": {
+          "claimId": "claim_f033905b059f073c62ec27f0ee6da620",
+          "sourcePath": "docs/specs/runner.md",
+          "sourceUnitDigest": "c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": "unheaded-block-92",
+          "targetUnitDigest": "4fc5044db3e9bb5826d7ea2dd979fdc39e1190356326c84170e2b3df69d8204e",
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ],
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "pending",
+          "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+        },
+        "after": {
+          "claimId": "claim_f033905b059f073c62ec27f0ee6da620",
+          "sourcePath": "docs/specs/runner.md",
+          "sourceUnitDigest": "c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917",
+          "disposition": "supersede",
+          "targetOwner": "docs/specs/runner.md",
+          "targetAnchor": "unheaded-block-92",
+          "authoredBy": "codex-session:15@2026-10-14",
+          "reviewStatus": "reviewed",
+          "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate.",
+          "reviewNote": "Pre-merge runner#92 (c331d408) superseded by 4fc5044d; main's diff is pure insertion with no deletion, so the old unit is wholly contained in the successor; candidate wording in rationale is boilerplate, harmless",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "4fc5044db3e9bb5826d7ea2dd979fdc39e1190356326c84170e2b3df69d8204e",
+          "targetAncestry": [
+            "Spec: Runner (vòng tự hành)",
+            "Business Rules"
+          ],
+          "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
+        }
+      }
+    ],
+    "notesVerbatim": true
+  },
+  "gates": [
+    {
+      "label": "D-first",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5/inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1163,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22573,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22804,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22573,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2049,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "D-second",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5/inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1163,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22573,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22804,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22573,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2049,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "E-first",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5/inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architect/agent-coordination",
+        "--scope",
+        "docs/architect/host-invocation-routing",
+        "--scope",
+        "docs/architect/packaging-distribution",
+        "--scope",
+        "docs/specs/distribution.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "fatalFindings": [
+        {
+          "type": "claims-partial-carry",
+          "message": "13 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "3 claim rows whose reviewStatus is not reviewed (e.g. docs/architect/agent-coordination/vocabulary/concept-relationships.md#coordination-rings, docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-13, docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-14)"
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "346 identical source units whose rows name different target owners (e.g. 03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md, 5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md, a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md, 9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md, 930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "1769 candidate conservation units not named by a source decision (e.g. docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane, docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2, docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status, docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3, docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 3,
+          "examples": [
+            "docs/architect/agent-coordination/vocabulary/concept-relationships.md#coordination-rings",
+            "docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-13",
+            "docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-14"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 346,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 1769,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "E-second",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/root-step5/inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architect/agent-coordination",
+        "--scope",
+        "docs/architect/host-invocation-routing",
+        "--scope",
+        "docs/architect/packaging-distribution",
+        "--scope",
+        "docs/specs/distribution.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "fatalFindings": [
+        {
+          "type": "claims-partial-carry",
+          "message": "13 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "3 claim rows whose reviewStatus is not reviewed (e.g. docs/architect/agent-coordination/vocabulary/concept-relationships.md#coordination-rings, docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-13, docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-14)"
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "346 identical source units whose rows name different target owners (e.g. 03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md, 5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md, a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md, 9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md, 930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "1769 candidate conservation units not named by a source decision (e.g. docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane, docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2, docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status, docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3, docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 3,
+          "examples": [
+            "docs/architect/agent-coordination/vocabulary/concept-relationships.md#coordination-rings",
+            "docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-13",
+            "docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-14"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 346,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 1769,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    }
+  ],
+  "preservation": {
+    "extractorUnchanged": true,
+    "fiveFrozenFilesUnchanged": true,
+    "witnessAndPayloadTreesUnchanged": true,
+    "authorityStatusesUnchanged": true,
+    "readerLinksUnchanged": true,
+    "checks": [
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-legacy-docs-ratchet.mjs"
+        ],
+        "exit": 0,
+        "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-doc-constitution.mjs",
+          "--no-ledger",
+          "--check-placement"
+        ],
+        "exit": 0,
+        "stdout": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 509 files, 508 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-doc-candidate-status.mjs",
+          "--json"
+        ],
+        "exit": 0,
+        "stdout": "{\n  \"counts\": {\n    \"files\": 509,\n    \"byStatus\": {\n      \"promoted\": 3,\n      \"candidate\": 115,\n      \"legacy-current\": 0,\n      \"non-authority\": 1,\n      \"unrouted\": 390\n    },\n    \"exemptUnrouted\": 302,\n    \"checked\": 118,\n    \"findings\": 0,\n    \"byType\": {}\n  },\n  \"findings\": []\n}\n",
+        "stderr": ""
+      }
+    ]
+  }
+}

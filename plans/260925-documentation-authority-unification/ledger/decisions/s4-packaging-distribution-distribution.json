@@ -150,15 +150,21 @@
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:15@2026-10-14",
       "rationale": "The complete heading from docs/specs/distribution.md#data-dictionary, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#data-dictionary. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading Data Dictionary moved, depth 2 to 4 only; section payload and following-block digests equal on both sides; the new source digest differs from the old only through main's row 7 and 7b edits; anchor ok; rationale accurate, though it does not say the digest drift came from main",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "daf68f421dfeceaf353dae3acd35391978f7dd56e9f10b1a0d6d4d0a13d7380b",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ]
+      ],
+      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
     },
     {
       "claimId": "claim_a26a90f97c6a399a30ce1df9207743b0",
@@ -167,16 +173,22 @@
       "targetAnchor": "unheaded-block-85",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:15@2026-10-14",
       "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-5, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-85. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream source successor: complete current table imported verbatim into the existing candidate owner; independent conservation review pending. No implementation truth approval.",
+      "reviewNote": "Complete table verbatim at packaging#unheaded-block-85: digest 648a2fee equals the main legacy unit, so main's row 7 and 7b additions are carried word for word and nothing is lost; the stale boilerplate phrase about relative-link changes is inert since the unit has none, so no objection; no truth approval implied",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
     },
     {
       "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",

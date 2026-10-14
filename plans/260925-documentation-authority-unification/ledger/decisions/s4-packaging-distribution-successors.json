@@ -452,15 +452,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/confinement-authority.md",
       "targetAnchor": "unheaded-block-144",
-      "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
       "authoredBy": "codex-session:15@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
+      "reviewNote": "Historical confinement#144 (f99e0d4d, 1f911229f) superseded by f0b5e6c1; the old cap and held-when-full sentences are replaced by the redundant-only drop rule in the same unit, including main's latest per-store wording; same file, no graft",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
         "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
-      ]
+      ],
+      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
     },
     {
       "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",
@@ -469,14 +475,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-92",
-      "targetUnitDigest": "4fc5044db3e9bb5826d7ea2dd979fdc39e1190356326c84170e2b3df69d8204e",
       "authoredBy": "codex-session:15@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
+      "reviewNote": "Historical runner#92 (95e75f7d, 31f676749) superseded by 4fc5044d, which keeps the redundancy rule and syncing sentence and adds the stranded-copy, torn and tmp-staging rules; replaced wording is stated; supersede truthful",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4fc5044db3e9bb5826d7ea2dd979fdc39e1190356326c84170e2b3df69d8204e",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
-      ]
+      ],
+      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
     },
     {
       "claimId": "claim_c2aa4371cc420cd24793da9c23497e42",

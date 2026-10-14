@@ -143,14 +143,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/distribution.md",
       "targetAnchor": "unheaded-block-5",
-      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
       "authoredBy": "codex-session:15@2026-10-14",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "reviewNote": "Historical distribution#5 (cdf23ebc, 67a276b0d) superseded by the same-file current table 648a2fee; the diff is wording rewrite plus main's added doctor text, and the cross-reference now points to runner.md; supersede is truthful",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-authorities-boundary-gaps.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
       "targetAncestry": [
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "4f99b9ec9eaf90f9db38e9073f92ca76c6808d1e"
     },
     {
       "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
