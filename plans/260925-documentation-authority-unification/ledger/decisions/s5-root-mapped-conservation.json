@@ -2452,7 +2452,7 @@
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:20@2026-10-14",
-      "rationale": "Frozen root map assigns docs/operator-runbook-herdr-cockpit.md#unheaded-block-1 to docs/platform/herdr-web-dashboard/operations/operator-runbook.md#unheaded-block-2. Carry the complete unit into its candidate guide / runbook owner. Original metadata is retained verbatim under Source Metadata (Added in candidate), separate from the candidate authority header. Native full unit digests are equal. No source retirement, promotion or component-boundary change."
+      "rationale": "Frozen root map assigns docs/operator-runbook-herdr-cockpit.md#unheaded-block-1 to docs/platform/herdr-web-dashboard/operations/operator-runbook.md#unheaded-block-2. Carry the complete unit into its candidate guide / runbook owner. Native full unit digests are equal. No source retirement, promotion or component-boundary change."
     },
     {
       "claimId": "claim_55c5c9fdaac3fc58dda9cc17283fb8d4",
@@ -2730,7 +2730,7 @@
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:20@2026-10-14",
-      "rationale": "Frozen root map assigns docs/routing-handoff-contract.md#unheaded-block-1 to docs/platform/runner/contracts/routing-handoff.md#unheaded-block-2. Carry the complete unit into its candidate contract owner. Original metadata is retained verbatim under Source Metadata (Added in candidate), separate from the candidate authority header. Native full unit digests are equal. No source retirement, promotion or component-boundary change."
+      "rationale": "Frozen root map assigns docs/routing-handoff-contract.md#unheaded-block-1 to docs/platform/runner/contracts/routing-handoff.md#unheaded-block-2. Carry the complete unit into its candidate contract owner. Native full unit digests are equal. No source retirement, promotion or component-boundary change."
     },
     {
       "claimId": "claim_194eabab7aeaa3830c79a7a855148034",
@@ -3025,7 +3025,7 @@
       "disposition": "archive-with-reason",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:20@2026-10-14",
-      "rationale": "Frozen root map assigns docs/distribution-vision.md#unheaded-block-1 to docs/platform/packaging-distribution/history/distribution-vision.md#unheaded-block-2. Retain the complete source unit as non-canonical history; the source remains active/retained until cutover. Original metadata is retained verbatim under Source Metadata (Added in candidate), separate from the candidate authority header. Native full unit digests are equal. No source retirement, promotion or component-boundary change."
+      "rationale": "Frozen root map assigns docs/distribution-vision.md#unheaded-block-1 to docs/platform/packaging-distribution/history/distribution-vision.md#unheaded-block-2. Retain the complete source unit as non-canonical history; the source remains active/retained until cutover. Native full unit digests are equal. No source retirement, promotion or component-boundary change."
     },
     {
       "claimId": "claim_ca1d4e99958089ae33b304dbfa42e7ed",
