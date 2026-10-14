@@ -36,7 +36,7 @@ function addKeptHome(w, dispatchId, attempts, { provider = 'xai', accountId = 'a
   return dir;
 }
 
-const run = (w, now = Date.now()) => checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot], now });
+const run = (w, now = Date.now()) => checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot], retriedRoots: [w.tempRoot], now });
 
 test('a clean machine passes', () => {
   const w = workspace();
@@ -109,7 +109,7 @@ test('the fix re-checks held homes: one whose login is gone is removed, one that
     const gone = addKeptHome(w, 'disp_gone', CREDENTIAL_KEEP_MAX_ATTEMPTS); // no store file inside: nothing to keep
     const stuck = addKeptHome(w, 'disp_stuck', CREDENTIAL_KEEP_MAX_ATTEMPTS);
     extendOwnershipMarker(stuck, { credentialWriteBack: { provider: '../bad', accountId: 'acct' } });
-    const result = fixCredentialCopiesRetained({ roots: [w.tempRoot] });
+    const result = fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir });
     assert.equal(result.changed, true);
     assert.match(result.message, /1 removed, 1 still held/);
     assert.equal(fs.existsSync(gone), false);
@@ -165,7 +165,7 @@ function addPendingIn(w, provider, accountId, storeSubdir, stagedAtMs) {
 
 const perCliAccount = { credentialSources: { codex: { kind: 'codex-home', home: '/x' }, pi: { kind: 'home-files', home: '/y' } } };
 const singleAccount = { credentialSource: { kind: 'codex-home', home: '/x' } };
-const runWith = (w, inventory, now = Date.now()) => checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot], now, inventory });
+const runWith = (w, inventory, now = Date.now()) => checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot], retriedRoots: [w.tempRoot], now, inventory });
 
 test('copies left at the account root after the account moved to one login store per CLI are named for hand recovery, never as applied by a dispatch', () => {
   const w = workspace();
@@ -258,7 +258,7 @@ test('an interrupted staging is reported with its own wording, and the fix remov
     assert.match(before.message, /xai\/acct: 2 interrupted staging\(s\)/);
     assert.equal(before.message.includes(FAKE_TOKEN), false);
     assert.equal(before.message.includes('ONLY-COPY-BYTES'), false);
-    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], runtimeDir: w.runtimeDir });
+    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir });
     assert.equal(fixed.changed, true);
     assert.match(fixed.message, /interrupted staging\(s\): 1 removed, 1 kept/);
     assert.equal(fs.existsSync(same), false);
@@ -278,7 +278,7 @@ test('a staging in a store the account layout no longer reads is reported once, 
     assert.match(result.message, /openai\/acct: 1 login copy\(ies\) that no dispatch applies/);
     assert.equal(result.message.includes('interrupted staging'), false, 'not a second row for the same directory');
     assert.equal(result.message.split(';').filter((row) => row.includes('openai/acct')).length, 1);
-    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], runtimeDir: w.runtimeDir, inventory });
+    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, inventory });
     assert.equal(fixed.changed, false);
     assert.equal(fs.existsSync(staging), true);
   } finally { w.cleanup(); }
@@ -294,8 +294,14 @@ test('the fix reads each store through the inventory: a staging the source login
     const accountDir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct');
     const older = addStaging(accountDir, `.tmp-${deadPid()}-older`, doc(Date.now() + HOUR, 'FAKE-REFRESH-A'));
     const inventory = { xai: { accounts: { acct: { credentialSource: { kind: 'home-files', home: source, files: ['auth.json'] } } } } };
-    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], runtimeDir: w.runtimeDir, inventory });
+    // A second account whose store has no source login the sweep can read (an unknown layout): the same
+    // staging, judged by nothing, stays.
+    const otherDir = path.join(w.runtimeDir, 'account-locks', 'xai', 'other');
+    const noSource = addStaging(otherDir, `.tmp-${deadPid()}-older`, doc(Date.now() + HOUR, 'FAKE-REFRESH-A'));
+    inventory.xai.accounts.other = { credentialSource: { kind: 'home-files', home: source, files: ['other.json'] } };
+    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, inventory });
     assert.equal(fs.existsSync(older), false, fixed.message);
+    assert.equal(fs.existsSync(noSource), true, 'a store with no source login to judge by keeps its staging');
   } finally { w.cleanup(); }
 });
 
@@ -305,5 +311,44 @@ test('an over-limit store is named by its CLI in the doctor line', () => {
     const storeDir = path.join(w.runtimeDir, 'account-locks', 'openai', 'acct', 'stores', 'codex', 'pending');
     for (let i = 0; i < 6; i += 1) fs.mkdirSync(path.join(storeDir, `${String(1000 + i).padStart(15, '0')}-copy`), { recursive: true });
     assert.match(run(w).message, /openai\/acct \(store codex\): 6 pending login copies waiting, over the limit/);
+  } finally { w.cleanup(); }
+});
+
+test('a kept home under a root nothing retries is held at once: doctor fails naming it, never says it is retried, and the fix settles it', () => {
+  const w = workspace();
+  try {
+    const scanOnly = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-scan-only-root-'));
+    try {
+      const retried = addKeptHome(w, 'disp_retried', 1);
+      const dir = path.join(scanOnly, 'disp_scan_only', 'home');
+      fs.mkdirSync(dir, { recursive: true });
+      writeOwnershipMarker(dir, { dispatchId: 'disp_scan_only' });
+      extendOwnershipMarker(dir, {
+        credentialWriteBack: { provider: 'xai', accountId: 'acct', home: path.join(w.tmp, 'secret-source-home'), layout: 'pi-auth-json', runtimeDir: w.runtimeDir },
+        credentialKept: { attempts: 1, since: new Date(Date.now() - HOUR).toISOString() },
+      });
+      const args = { runtimeDir: w.runtimeDir, roots: [w.tempRoot, scanOnly], retriedRoots: [w.tempRoot] };
+      const result = checkCredentialCopiesRetained(args);
+      assert.equal(result.passed, false);
+      assert.ok(result.message.includes(dir), 'the home under the scan-only root is named');
+      assert.match(result.message, /under a root that nothing retries by itself/);
+      assert.equal(result.message.includes(retried), false, 'the home a reaper retries is still only a note');
+      assert.equal(result.message.split('retried by the reaper').length - 1, 1, 'the wording is kept for the one home a reaper does retry');
+      const fixed = fixCredentialCopiesRetained({ ...args, stagingRuntimeDir: w.runtimeDir });
+      assert.equal(fs.existsSync(dir), false, 'the fix settles it (no store file inside: nothing to keep)');
+      assert.equal(fs.existsSync(retried), true, 'a home that is only being retried is left to its reaper');
+      assert.equal(fixed.changed, true);
+    } finally { fs.rmSync(scanOnly, { recursive: true, force: true }); }
+  } finally { w.cleanup(); }
+});
+
+test('a home reachable through two spellings of one root is counted once', () => {
+  const w = workspace();
+  try {
+    addKeptHome(w, 'disp_twice', CREDENTIAL_KEEP_MAX_ATTEMPTS);
+    const result = checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot, `${w.tempRoot}/`], retriedRoots: [w.tempRoot] });
+    assert.equal(result.message.split('private home held').length - 1, 1);
+    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot, `${w.tempRoot}/`], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir });
+    assert.match(fixed.message, /re-checked 1 held private home/);
   } finally { w.cleanup(); }
 });

@@ -5434,13 +5434,20 @@ function summarizeByAccount(items, label) {
 export function checkCredentialCopiesRetained({
   runtimeDir = defaultProviderCapacityRuntimeDir(),
   roots = credentialScanRoots(),
+  retriedRoots = defaultConfinementTempRoots(),
   now = Date.now(),
   minAgeMs = RETAINED_COPY_REPORT_AFTER_MS,
   inventory,
 } = {}) {
   const copies = inspectRetainedCredentialCopies({ runtimeDir, now, minAgeMs, inventory });
   const stranded = copies.filter((c) => c.stranded && c.kind !== 'torn');
-  const homes = roots.flatMap((root) => listKeptCredentialHomes(root))
+  // A kept home under a root no reaper or dispatch retries (a registered backend's own root) never counts its
+  // own attempts up, so it is held from the start: doctor fails naming it and --fix settles it. A root nested
+  // inside another lists a home twice; it is counted once.
+  const retried = new Set(retriedRoots.map((root) => path.resolve(root)));
+  const seenHomes = new Set();
+  const homes = roots.flatMap((root) => listKeptCredentialHomes(root).map((home) => ({ ...home, held: home.held || !retried.has(path.resolve(root)) })))
+    .filter((home) => { const dir = path.resolve(home.dir); if (seenHomes.has(dir)) return false; seenHomes.add(dir); return true; })
     .map((home) => ({ ...home, ageMs: home.since ? now - Date.parse(home.since) : 0 }));
   const held = homes.filter((home) => home.held);
   const retrying = homes.filter((home) => !home.held);
@@ -5458,7 +5465,7 @@ export function checkCredentialCopiesRetained({
     ...summarizeByAccount(copies.filter((c) => c.kind !== 'torn' && c.kind !== 'staging' && !c.stranded), 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)'),
     ...summarizeByAccount(copies.filter((c) => c.kind === 'staging' && !c.stranded), 'interrupted staging(s) of a login copy (a crash cut the copy short; "fgos doctor --fix" removes one that is empty, identical to a copy already kept, or shown by the source login of the account to be no newer, any other stays for hand recovery)'),
     ...summarizeByAccount(copies.filter((c) => c.kind === 'torn'), 'half-written login copy(ies) kept for hand recovery (never applied or dropped automatically)'),
-    ...held.map((home) => `${home.provider}/${home.accountId}: private home held after repeated staging failures, ${formatAge(home.ageMs)} old, at ${home.dir} ("fgos doctor --fix" re-checks it and removes it once its login is shown to be applied or obsolete; otherwise recover the login from it by hand)`),
+    ...held.map((home) => `${home.provider}/${home.accountId}: private home held ${home.attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS ? 'after repeated staging failures' : 'under a root that nothing retries by itself'}, ${formatAge(home.ageMs)} old, at ${home.dir} ("fgos doctor --fix" re-checks it and removes it once its login is shown to be applied or obsolete; otherwise recover the login from it by hand)`),
     ...summarizeByAccount(retrying, 'private home(s) kept after a staging failure, retried by the reaper'),
   ];
   const text = problems.join('; ');
@@ -5490,15 +5497,13 @@ function stagingStoreResolver(inventory, runtimeDir) {
   };
 }
 
-export function fixCredentialCopiesRetained({ roots = credentialScanRoots(), inventory, ...options } = {}) {
+export function fixCredentialCopiesRetained({ roots = credentialScanRoots(), retriedRoots = defaultConfinementTempRoots(), inventory, stagingRuntimeDir = defaultProviderCapacityRuntimeDir(), ...options } = {}) {
   const total = { settled: 0, held: 0 };
-  const runtimeDir = options.runtimeDir ?? defaultProviderCapacityRuntimeDir();
-  const stagings = sweepInterruptedStagings({ runtimeDir, resolveStore: stagingStoreResolver(inventory, runtimeDir) });
-  for (const root of roots) {
-    const { settled, held } = settleHeldCredentialHomes({ tempRoots: [root], ...options });
-    total.settled += settled;
-    total.held += held;
-  }
+  const stagings = sweepInterruptedStagings({ runtimeDir: stagingRuntimeDir, resolveStore: stagingStoreResolver(inventory, stagingRuntimeDir) });
+  const retried = new Set(retriedRoots.map((root) => path.resolve(root)));
+  const { settled, held } = settleHeldCredentialHomes({ tempRoots: roots, unretriedRoots: roots.filter((root) => !retried.has(path.resolve(root))), ...options });
+  total.settled += settled;
+  total.held += held;
   const homes = total.settled + total.held === 0
     ? 'no held private home to re-check'
     : `re-checked ${total.settled + total.held} held private home(s): ${total.settled} removed, ${total.held} still held`;

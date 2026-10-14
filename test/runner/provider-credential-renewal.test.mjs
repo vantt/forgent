@@ -2109,3 +2109,66 @@ test('a store the account layout no longer reads is never swept, and a symlink i
     } finally { fs.rmSync(outside, { recursive: true, force: true }); }
   } finally { w.cleanup(); }
 });
+
+test('a staging a crashed sweep left under its own name is reported, and is not deleted unless it is provably not needed', () => {
+  const w = interruptedStagingWorkspace();
+  try {
+    const dead = deadPid();
+    const leftover = w.put(`.sweep-${dead}-crashed`, { 'auth.json': 'ONLY-COPY' });
+    const found = inspectRetainedCredentialCopies({ runtimeDir: w.runtimeDir, now: Date.now() });
+    assert.deepEqual(found.map((c) => c.kind), ['staging'], 'it is reported like any interrupted staging');
+    assert.deepEqual(sweepInterruptedStagings({ runtimeDir: w.runtimeDir }), { removed: 0, kept: 1 });
+    const names = fs.readdirSync(w.pendingDir);
+    assert.equal(names.length, 1, 'still there');
+    assert.equal(fs.readFileSync(path.join(w.pendingDir, names[0], 'auth.json'), 'utf8'), 'ONLY-COPY');
+    assert.equal(/^\.(tmp|sweep)-\d+-/.test(names[0]), true, 'and still listed as a staging');
+    assert.equal(fs.existsSync(leftover) || names[0].startsWith('.sweep-'), true);
+  } finally { w.cleanup(); }
+});
+
+test('when the staging cannot be given back its own name, it stays under the sweep\'s name and is still reported', () => {
+  const w = interruptedStagingWorkspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + 6 * HOUR));
+    const original = w.put(`.tmp-${deadPid()}-blocked`, { 'auth.json': JSON.stringify(piDoc(Date.now() + 12 * HOUR, { refresh: 'FAKE-NEWER-REFRESH' })) });
+    const result = sweepInterruptedStagings({
+      runtimeDir: w.runtimeDir,
+      resolveStore: () => ({ layoutName: 'pi-auth-json', sourceHome: w.home }),
+      // While the sweep judges the staging, something else takes its original name: the rename back must fail.
+      tryLock: () => { fs.mkdirSync(original); fs.writeFileSync(path.join(original, 'taken'), 'x'); return { release() {} }; },
+    });
+    assert.deepEqual(result, { removed: 0, kept: 1 });
+    const swept = fs.readdirSync(w.pendingDir).filter((n) => n.startsWith('.sweep-'));
+    assert.equal(swept.length, 1, 'the login is kept under the sweep\'s name');
+    assert.match(fs.readFileSync(path.join(w.pendingDir, swept[0], 'auth.json'), 'utf8'), /FAKE-NEWER-REFRESH/);
+    fs.rmSync(original, { recursive: true });
+    // Once the sweeping process has exited (its id is in the name), the next report names the leftover.
+    fs.renameSync(path.join(w.pendingDir, swept[0]), path.join(w.pendingDir, `.sweep-${deadPid()}-left`));
+    const found = inspectRetainedCredentialCopies({ runtimeDir: w.runtimeDir, now: Date.now() });
+    assert.deepEqual(found.map((c) => c.kind), ['staging'], 'and the next report names it');
+  } finally { w.cleanup(); }
+});
+
+test('a writer whose staging was claimed by the sweep fails its own rename and keeps its private home', () => {
+  const w = workspace();
+  try {
+    writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }], { wal: true }).close();
+    const dir = ompPaneHome(w, 'disp_claimed', 'FAKE-WAL-BYTES');
+    const pendingDir = path.join(w.accountDir, 'pending');
+    let claimed = false;
+    // The staging step reaches for SQLite while the copy is being written: at that moment the sweep claims it.
+    const loadSqlite = () => {
+      const staging = claimed ? undefined : (fs.existsSync(pendingDir) ? fs.readdirSync(pendingDir).find((n) => n.startsWith('.tmp-')) : undefined);
+      if (staging) {
+        claimed = true;
+        fs.renameSync(path.join(pendingDir, staging), path.join(pendingDir, '.sweep-1-claimed'));
+      }
+      return null;
+    };
+    const result = writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite });
+    assert.equal(claimed, true);
+    assert.equal(result.status, 'failed');
+    assert.equal(result.keepHome, true, 'the home stays: its login is not safe anywhere else');
+    assert.equal(fs.existsSync(dir), true);
+  } finally { w.cleanup(); }
+});
