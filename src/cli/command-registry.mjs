@@ -907,11 +907,18 @@ export const COMMAND_REGISTRY = [
   },
   {
     name: 'run',
-    invoke: 'fgos run [--unit <file|->] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--resume <unitRunId>] [--dir <mainRoot>] [--json]',
-    description: 'Single execution door for Unit runs: headless execution of Units through collaboration patterns (solo, reviewed, panel). Also supports "record" for inline producer turns.',
+    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
+    description: 'Single execution door for Unit runs: headless execution of Units through collaboration patterns (solo, reviewed, panel). A "<prompt>" builds the Unit itself (read-only unless --writes). Also supports "record" for inline producer turns.',
     parameters: {
       type: 'object',
+      positional: ['prompt'],
       properties: {
+        prompt: { type: 'string', description: 'One-liner: the objective of a Unit built from the flags below (id adhoc-<slug>-<hex>). Use instead of --unit.' },
+        provider: { type: 'string', description: 'One-liner: comma-separated executor ids the Unit prefers, ahead of the capability\'s pool; still filtered like the pool (governance, independence, posture), and an --override executor still pins.' },
+        persona: { type: 'string', description: 'One-liner: persona name for the Unit; must resolve (fgos/agents, domains/*/agents, core/agents) before the run starts.' },
+        writes: { type: 'string', description: 'One-liner: comma-separated repo-relative paths the Unit may write; needs a linked worktree (--worktree, or run from inside one). Omitted: a read-only Unit.' },
+        capability: { type: 'string', description: 'One-liner: capability the Unit asks for (default "execute").' },
+        rigor: { type: 'string', description: 'One-liner: Unit rigor (low, standard, high, critical).' },
         unit: { type: 'string', description: 'Path to unit YAML/JSON file or "-" for stdin.' },
         pattern: { type: 'string', description: 'Pattern name or preset (solo, reviewed, panel, code-change).' },
         override: { type: 'string', description: 'JSON-encoded array or object of overrides.' },
@@ -932,6 +939,8 @@ export const COMMAND_REGISTRY = [
     examples: [
       'fgos run --unit path/to/unit.yaml --pattern solo',
       'fgos run --unit path/to/unit.yaml --pattern reviewed',
+      'fgos run "Summarize the open review findings" --provider openai',
+      'fgos run "Fix the typo in the README" --writes README.md --worktree ../wt-typo',
     ],
     touchesState: true,
     requiresExistingStore: false,

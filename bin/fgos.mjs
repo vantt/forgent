@@ -429,6 +429,53 @@ function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
   return ensureRunnerConfigForDir(repoRoot).timeoutMs;
 }
 
+/**
+ * The Unit `fgos run "<prompt>"` stands for: the prompt is its objective, `--writes` its write scope
+ * (none: a read-only unit), `--provider` its soft executor preference and `--persona` its persona.
+ * Every flag is checked against the config and the persona tiers here, so a wrong one leaves no
+ * unit run behind. A writing unit needs a linked worktree; this never creates one.
+ */
+async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }) {
+  if (typeof prompt !== 'string' || !prompt.trim()) {
+    throw new StoreError('validation', 'fgos run "<prompt>" needs a non-empty prompt');
+  }
+  const writes = parseListFlag(flags.writes);
+  if (writes.length > 0 && flags.worktree === undefined && !isLinkedWorktree) {
+    throw new StoreError('validation', 'fgos run "<prompt>" --writes needs a linked worktree: create one with `git worktree add <path>` and pass --worktree <path> (or run from inside it)');
+  }
+  const prefer = parseListFlag(flags.provider);
+  if (flags.provider !== undefined) {
+    const executors = ensureRunnerConfigForDir(mainRoot).executors ?? {};
+    const valid = Object.keys(executors).filter((id) => (executors[id]?.kind ?? 'agent') === 'agent');
+    const unknown = prefer.find((id) => !valid.includes(id));
+    if (prefer.length === 0 || unknown !== undefined) {
+      throw new StoreError('validation', `unknown --provider "${unknown ?? ''}"; valid providers: ${valid.join(', ') || '(none registered)'}`);
+    }
+  }
+  if (flags.persona !== undefined) {
+    const persona = requireField(flags.persona, '--persona requires a persona name');
+    const { resolveAgentDefinition } = await import('../src/runner/agent-definitions.mjs');
+    try {
+      resolveAgentDefinition(persona, { projectRoot: mainRoot });
+    } catch (err) {
+      throw new StoreError('validation', err.message);
+    }
+  }
+  const { randomBytes } = await import('node:crypto');
+  // ASCII only, so the id is a safe path segment whatever the prompt's script or punctuation.
+  const slug = prompt.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+/, '').slice(0, 40).replace(/-+$/, '') || 'task';
+  return {
+    id: `adhoc-${slug}-${randomBytes(2).toString('hex')}`,
+    objective: prompt,
+    capability: flags.capability === undefined ? 'execute' : requireField(flags.capability, '--capability requires a capability name'),
+    writes,
+    ...(flags.rigor !== undefined ? { rigor: requireField(flags.rigor, '--rigor requires a level') } : {}),
+    ...(prefer.length > 0 ? { prefer } : {}),
+    ...(flags.persona !== undefined ? { persona: flags.persona } : {}),
+  };
+}
+
 // Minimal argv parser: `--flag value` or bare `--flag` (boolean), plus
 // positional args. No dependency, no dashes-in-values ambiguity handling
 // beyond what this CLI's own verbs need.
@@ -2679,11 +2726,15 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         });
       }
 
-      const { runUnit } = await import('../src/runner/execution/run.mjs');
+      const { runUnit, resolveGitRoots } = await import('../src/runner/execution/run.mjs');
       const unitPath = flags.unit;
       const resumeUnitRunId = flags.resume;
-      if (!unitPath && !resumeUnitRunId) {
-        throw new StoreError('validation', 'fgos run requires --unit <file|-> or --resume <unitRunId>');
+      const prompt = positional[0];
+      if (!unitPath && !resumeUnitRunId && prompt === undefined) {
+        throw new StoreError('validation', 'fgos run requires --unit <file|-> or --resume <unitRunId>, or a "<prompt>"');
+      }
+      if ([unitPath, resumeUnitRunId, prompt].filter((v) => v !== undefined).length > 1) {
+        throw new StoreError('validation', 'fgos run takes either a "<prompt>", --unit or --resume, not more than one');
       }
       const pattern = flags.pattern;
       const overrideStr = flags.override;
@@ -2712,9 +2763,15 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const repoRoot = flags.dir;
       const worktree = flags.worktree;
       const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
+      // Everything about the one-liner is checked here, before runUnit creates a unit run.
+      const unitData = prompt === undefined ? undefined : await adhocUnitFromPrompt(prompt, flags, {
+        mainRoot: repoRoot ? path.resolve(repoRoot) : resolveGitRoots(process.cwd()).mainCheckoutRoot,
+        isLinkedWorktree: resolveGitRoots(process.cwd()).isLinkedWorktree,
+      });
 
       return attachDirWarning(await runUnit({
         unitPath,
+        unitData,
         pattern,
         stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
         overrides,
