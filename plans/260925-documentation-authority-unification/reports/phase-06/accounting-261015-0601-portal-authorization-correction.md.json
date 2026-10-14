@@ -1,0 +1,632 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:40@2026-10-15",
+  "inputCommit": "bd437be1cabb21c0b8c1b03e4d76612fa21d7438",
+  "status": "pending-independent-review",
+  "authorization": "Assignment Lead A19 truth correction; A22 standing binding rule",
+  "portal": {
+    "path": "docs/platform/README.md",
+    "line": 59,
+    "beforeClause": "Phases 00–02 are completed, Phases 03–09 remain unauthorized",
+    "afterClause": "Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized",
+    "beforeSha256": "2aed12ac464558e409827031c72de90fadf67cc8e13dec8b16c11e25e5e3aec1",
+    "afterSha256": "9292a961f62ccb071586f5a1616ad0cda789bcf1aef69f793d06a5fe83e69467",
+    "onlyReplacement": true,
+    "fullBefore": "# Platform Documentation\n\n```txt\nDocument type: Platform portal\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through platform-wide and area-specific fgOS docs\nDesign status: Accepted\nImplementation: Partial\nProvenance: Promoted from documentation-system redesign\nWriter type: Human + agent coauthor\nCanonical for: Platform documentation entry and area registry\nUse this when: You need to understand or change fgOS platform behavior or design\nDo not use this for: User-facing task guidance or generated indexes\nLast reviewed: 2026-09-25\nRelated:\n- `docs/doc-governance.md`\n- `docs/transitional-switchboard.md`\n- `docs/reading-map.md`\n```\n\nThis is the portal for fgOS platform documentation.\n\n## 1. Platform-wide Anchors\n\nThese docs are cross-area authority and live directly under `docs/platform/` in\nthe target structure.\n\n| Target doc | Role | Current source during migration |\n|---|---|---|\n| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](../platform-foundations.md), [../work-item-lifecycle-vision.md](../work-item-lifecycle-vision.md), design discussions |\n| [intent-preservation-ledger.md](intent-preservation-ledger.md) | Whole-platform preserved intent across simplified implementation slices | Documentation-system discussion, [../architect/agent-coordination/intent-preservation-ledger.md](../architect/agent-coordination/intent-preservation-ledger.md) |\n| [platform-foundations.md](platform-foundations.md) | Platform laws and durable constraints | [../platform-foundations.md](../platform-foundations.md), [../specs/platform-foundations.md](../specs/platform-foundations.md) |\n| [architecture-map.md](architecture-map.md) | Whole-system architecture map | [../architecture-map.md](../architecture-map.md) |\n| [component-boundary.md](component-boundary.md) | Layers, parent/child components, responsibilities, authority boundaries | [../architect/component-boundary/](../architect/component-boundary/) |\n| [../contracts/](../contracts/) | Cross-area contracts during migration | [../routing-handoff-contract.md](../routing-handoff-contract.md), [../contracts/](../contracts/) |\n\n## 2. Area Registry\n\nTarget area docs live at `docs/platform/<area>/`.\n\n| Area | Current source during migration |\n|---|---|\n| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |\n| `work-state` | [../specs/work-state.md](../specs/work-state.md) |\n| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |\n| [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |\n| [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |\n| [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |\n| `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |\n| `ui-spec` | [../ui-spec/](../ui-spec/) |\n| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `plans/260825-1841-knowledge-registry/plan.md` |\n\n## 3. Decision Surface\n\n| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–02 are completed, Phases 03–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n\n## 4. How To Change Platform Docs\n\n1. Read `docs/doc-governance.md`.\n2. Read [migration-authoring-rules.md](migration-authoring-rules.md) and [../transitional-switchboard.md](../transitional-switchboard.md).\n3. Read this portal and the relevant area portal/spec.\n4. Read the relevant vision and intent-preservation ledger when the change\n   narrows, stages, or simplifies the full design.\n5. Use a discussion scratchpad for multi-round shaping.\n6. Promote settled content into the right canonical doc.\n7. Update links and verification pointers.\n\n## 5. Related Files\n\n| Relationship | File |\n|---|---|\n| governs docs | [../doc-governance.md](../doc-governance.md) |\n| operative transitional switchboard | [../transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [migration-authoring-rules.md](migration-authoring-rules.md) |\n| routes readers | [../reading-map.md](../reading-map.md) |\n| defines platform direction | [vision.md](vision.md) |\n| preserves platform intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| defines durable laws | [platform-foundations.md](platform-foundations.md) |\n| maps architecture | [architecture-map.md](architecture-map.md) |\n| maps component boundaries | [component-boundary.md](component-boundary.md) |\n| preserves deferred documentation-system architecture | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| proposes full documentation operating system | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) |\n| plans near-term authority unification | `plans/260925-documentation-authority-unification/plan.md` |\n",
+    "fullAfter": "# Platform Documentation\n\n```txt\nDocument type: Platform portal\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Route readers through platform-wide and area-specific fgOS docs\nDesign status: Accepted\nImplementation: Partial\nProvenance: Promoted from documentation-system redesign\nWriter type: Human + agent coauthor\nCanonical for: Platform documentation entry and area registry\nUse this when: You need to understand or change fgOS platform behavior or design\nDo not use this for: User-facing task guidance or generated indexes\nLast reviewed: 2026-09-25\nRelated:\n- `docs/doc-governance.md`\n- `docs/transitional-switchboard.md`\n- `docs/reading-map.md`\n```\n\nThis is the portal for fgOS platform documentation.\n\n## 1. Platform-wide Anchors\n\nThese docs are cross-area authority and live directly under `docs/platform/` in\nthe target structure.\n\n| Target doc | Role | Current source during migration |\n|---|---|---|\n| [vision.md](vision.md) | Whole-platform mission, scope, non-scope, direction | [../platform-foundations.md](../platform-foundations.md), [../work-item-lifecycle-vision.md](../work-item-lifecycle-vision.md), design discussions |\n| [intent-preservation-ledger.md](intent-preservation-ledger.md) | Whole-platform preserved intent across simplified implementation slices | Documentation-system discussion, [../architect/agent-coordination/intent-preservation-ledger.md](../architect/agent-coordination/intent-preservation-ledger.md) |\n| [platform-foundations.md](platform-foundations.md) | Platform laws and durable constraints | [../platform-foundations.md](../platform-foundations.md), [../specs/platform-foundations.md](../specs/platform-foundations.md) |\n| [architecture-map.md](architecture-map.md) | Whole-system architecture map | [../architecture-map.md](../architecture-map.md) |\n| [component-boundary.md](component-boundary.md) | Layers, parent/child components, responsibilities, authority boundaries | [../architect/component-boundary/](../architect/component-boundary/) |\n| [../contracts/](../contracts/) | Cross-area contracts during migration | [../routing-handoff-contract.md](../routing-handoff-contract.md), [../contracts/](../contracts/) |\n\n## 2. Area Registry\n\nTarget area docs live at `docs/platform/<area>/`.\n\n| Area | Current source during migration |\n|---|---|\n| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |\n| `work-state` | [../specs/work-state.md](../specs/work-state.md) |\n| [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |\n| [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |\n| [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |\n| [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |\n| `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |\n| `ui-spec` | [../ui-spec/](../ui-spec/) |\n| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `plans/260825-1841-knowledge-registry/plan.md` |\n\n## 3. Decision Surface\n\n| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n\n## 4. How To Change Platform Docs\n\n1. Read `docs/doc-governance.md`.\n2. Read [migration-authoring-rules.md](migration-authoring-rules.md) and [../transitional-switchboard.md](../transitional-switchboard.md).\n3. Read this portal and the relevant area portal/spec.\n4. Read the relevant vision and intent-preservation ledger when the change\n   narrows, stages, or simplifies the full design.\n5. Use a discussion scratchpad for multi-round shaping.\n6. Promote settled content into the right canonical doc.\n7. Update links and verification pointers.\n\n## 5. Related Files\n\n| Relationship | File |\n|---|---|\n| governs docs | [../doc-governance.md](../doc-governance.md) |\n| operative transitional switchboard | [../transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [migration-authoring-rules.md](migration-authoring-rules.md) |\n| routes readers | [../reading-map.md](../reading-map.md) |\n| defines platform direction | [vision.md](vision.md) |\n| preserves platform intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| defines durable laws | [platform-foundations.md](platform-foundations.md) |\n| maps architecture | [architecture-map.md](architecture-map.md) |\n| maps component boundaries | [component-boundary.md](component-boundary.md) |\n| preserves deferred documentation-system architecture | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| proposes full documentation operating system | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) |\n| plans near-term authority unification | `plans/260925-documentation-authority-unification/plan.md` |\n"
+  },
+  "evidence": {
+    "command": {
+      "command": "node --input-type=module -e 'import fs from '\\''node:fs'\\'';import path from '\\''node:path'\\'';import assert from '\\''node:assert/strict'\\'';import {relativeLinkTargets} from '\\''./scripts/check-doc-candidate-status.mjs'\\'';import {extractMarkdownConservationUnits} from '\\''./scripts/generate-doc-inventory.mjs'\\'';const P='\\''plans/260925-documentation-authority-unification'\\'',portal=fs.readFileSync('\\''docs/platform/README.md'\\'','\\''utf8'\\''),plan=fs.readFileSync(P+'\\''/plan.md'\\'','\\''utf8'\\''),answers=fs.readFileSync(P+'\\''/reports/phase-06/owner-answers.md'\\'','\\''utf8'\\'');const phaseRows=plan.split('\\''\\n'\\'').filter(l=>/^\\| (?:[1-9]|10) \\|/.test(l)&&/\\| 0[0-9] \\|/.test(l));assert.equal(phaseRows.length,10);assert(phaseRows.slice(0,5).every(l=>l.includes('\\''| completed'\\'')));assert(phaseRows[5].includes('\\''| 05 | pending (not authorized)'\\''));assert(answers.includes('\\''Phase 6 authorized: yes (owner, 2026-10-07)'\\''));assert(phaseRows.slice(6).every(l=>l.includes('\\''pending (not authorized)'\\'')));assert(portal.includes('\\''Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized'\\''));assert(!portal.includes('\\''Phases 00–02 are completed, Phases 03–09 remain unauthorized'\\''));const missing=[...new Set(relativeLinkTargets(portal))].filter(p=>!fs.existsSync(path.resolve('\\''docs/platform'\\'',p)));assert.deepEqual(missing,[]);console.log(JSON.stringify({legacyPhaseRows:phaseRows,ownerAuthorization:answers.split('\\''\\n'\\'')[3],planStatusTableStale:true,correctedPortalClause:'\\''Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized'\\'',missingRouteDestinations:missing,changedUnits:extractMarkdownConservationUnits(portal).filter(u=>['\\''3-decision-surface'\\'','\\''unheaded-block-7'\\''].includes(u.anchor)).map(u=>({anchor:u.anchor,unitDigest:u.textDigest}))}));'",
+      "exitCode": 0,
+      "output": "{\"legacyPhaseRows\":[\"| 1 | Correct planning and routing semantics | 00 | completed | [phase-01-correct-planning-and-routing-semantics.md](phase-01-correct-planning-and-routing-semantics.md) |\",\"| 2 | Contain further divergence | 01 | completed | [phase-02-contain-further-divergence.md](phase-02-contain-further-divergence.md) |\",\"| 3 | Build repository-wide inventory and conservation ledger | 02 | completed | [phase-03-build-repository-wide-inventory-and-conservation-ledger.md](phase-03-build-repository-wide-inventory-and-conservation-ledger.md) |\",\"| 4 | Freeze the minimum constitution and migration method | 03 | completed (2026-10-06; commits `3b409a373..7c632737b`) | [phase-04-freeze-the-minimum-constitution-and-migration-method.md](phase-04-freeze-the-minimum-constitution-and-migration-method.md) |\",\"| 5 | Dual pilot: re-audit plus unmigrated mixed area | 04 | completed (2026-10-07, PASS-WITH-AMENDMENTS) | [phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md](phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md) |\",\"| 6 | Transform all platform areas as candidate material | 05 | pending (not authorized) | [phase-06-transform-all-platform-areas-as-candidate-material.md](phase-06-transform-all-platform-areas-as-candidate-material.md) |\",\"| 7 | Cross-area integrity and fresh-reader review | 06 | pending (not authorized) | [phase-07-cross-area-integrity-and-fresh-reader-review.md](phase-07-cross-area-integrity-and-fresh-reader-review.md) |\",\"| 8 | Eliminate switchboard bypasses and prepare consumers | 07 | pending (not authorized) | [phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md](phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md) |\",\"| 9 | Atomic platform-authority cutover | 08 | pending (not authorized) | [phase-09-atomic-platform-authority-cutover.md](phase-09-atomic-platform-authority-cutover.md) |\",\"| 10 | Post-cutover maintenance MVP | 09 | pending (not authorized) | [phase-10-post-cutover-maintenance-mvp.md](phase-10-post-cutover-maintenance-mvp.md) |\"],\"ownerAuthorization\":\"Phase 6 authorized: yes (owner, 2026-10-07)\",\"planStatusTableStale\":true,\"correctedPortalClause\":\"Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized\",\"missingRouteDestinations\":[],\"changedUnits\":[{\"anchor\":\"3-decision-surface\",\"unitDigest\":\"4f71dfe83dabcb8db41496b7f6ef054a9c8241d3847dd590731f03430e017ccb\"},{\"anchor\":\"unheaded-block-7\",\"unitDigest\":\"f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63\"}]}\n",
+      "outputDigest": "911ea456bdcf25b30335d0d865b9786537a007289f87ff2defcb812b8da53e4b",
+      "inputs": [
+        {
+          "path": "scripts/check-doc-candidate-status.mjs",
+          "blobSha": "789bb33eec89ed5dac3736880cc27e95d71ba857"
+        },
+        {
+          "path": "scripts/generate-doc-inventory.mjs",
+          "blobSha": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+        }
+      ],
+      "dataInputs": [
+        {
+          "path": "plans/260925-documentation-authority-unification/plan.md",
+          "blobSha": "8a037a66dcaf1221bf3c804735629f6834d8336f",
+          "scope": "Committed input evidence; progress also gains this turn’s handoff."
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+          "blobSha": "265b2fc433034053c1e93eee8212ad4da840a032",
+          "scope": "Committed input evidence; progress also gains this turn’s handoff."
+        },
+        {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+          "blobSha": "0b46c62f58326bc7050ed52d59b5f703d4af8dfe",
+          "scope": "Committed input evidence; progress also gains this turn’s handoff."
+        },
+        {
+          "path": "docs/platform/README.md",
+          "scope": "Corrected working-tree payload; exact before/after and hashes recorded in accounting, runner output commit not yet known.",
+          "sha256": "9292a961f62ccb071586f5a1616ad0cda789bcf1aef69f793d06a5fe83e69467"
+        }
+      ]
+    },
+    "planNote": "plan.md:15,21,257,276 retain stale unauthorized/not-started statements for the current phase. Deliberately unchanged. Legacy mapping and completed/later rows are authoritative mapping evidence; owner-answers.md:4 and plan.md:374 supply actual authorization.",
+    "ongoingEvidence": "Input progress.md records session 39, Step 6 open, pending receipts and native/review follow-up."
+  },
+  "changedUnits": [
+    {
+      "before": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "3. Decision Surface",
+        "anchor": "3-decision-surface",
+        "githubAnchor": "3-decision-surface",
+        "stableAnchor": "h-c9cbf4401a4b",
+        "startLine": 53,
+        "endLine": 53,
+        "textDigest": "5b577ba76c013ac3079053a37da9764292815a862e3d1519d54172d8d9bf7e3c",
+        "sample": "3. Decision Surface",
+        "sectionPayloadDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+        "followingBlockDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+        "identityFingerprint": "05bac3bdda78f251d2a45cfaa0114f36070f45f5f003deb6c60423140ae6d9b9",
+        "ancestry": [
+          "Platform Documentation"
+        ],
+        "text": "## 3. Decision Surface",
+        "sectionText": "## 3. Decision Surface\n\n| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–02 are completed, Phases 03–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |"
+      },
+      "after": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "3. Decision Surface",
+        "anchor": "3-decision-surface",
+        "githubAnchor": "3-decision-surface",
+        "stableAnchor": "h-c9cbf4401a4b",
+        "startLine": 53,
+        "endLine": 53,
+        "textDigest": "4f71dfe83dabcb8db41496b7f6ef054a9c8241d3847dd590731f03430e017ccb",
+        "sample": "3. Decision Surface",
+        "sectionPayloadDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+        "followingBlockDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+        "identityFingerprint": "0390fab429098b1b77ba9db8341a7dd2dcced03ae8caf31cfdd430570a186286",
+        "ancestry": [
+          "Platform Documentation"
+        ],
+        "text": "## 3. Decision Surface",
+        "sectionText": "## 3. Decision Surface\n\n| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |"
+      }
+    },
+    {
+      "before": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 55,
+        "endLine": 61,
+        "textDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+        "sample": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance",
+        "identityFingerprint": "fe63eaa97a07c7508568bcb6a0773767319b96730cba46d11df8f7f86bf1d4df",
+        "ancestry": [
+          "Platform Documentation",
+          "3. Decision Surface"
+        ],
+        "text": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–02 are completed, Phases 03–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |"
+      },
+      "after": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 55,
+        "endLine": 61,
+        "textDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+        "sample": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance",
+        "identityFingerprint": "0d9bb72bf5a706d30fbae5a95c7ece65f96721f3fcd81594e7562d000a6208a5",
+        "ancestry": [
+          "Platform Documentation",
+          "3. Decision Surface"
+        ],
+        "text": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |"
+      }
+    }
+  ],
+  "receiptChanges": [
+    {
+      "before": {
+        "claimId": "claim_e6c39f56c4d05238618e1a7fb7004af1",
+        "path": "docs/platform/README.md",
+        "anchor": "3-decision-surface",
+        "unitDigest": "5b577ba76c013ac3079053a37da9764292815a862e3d1519d54172d8d9bf7e3c",
+        "shownText": "## 3. Decision Surface\n\n| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–02 are completed, Phases 03–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |",
+        "shownTextDigest": "46d748040e36f776fb8bd024f619ddef4f6bc88c148f0b9f8fa0216ecffbac0a",
+        "class": "candidate-native-content",
+        "authoredBy": "codex-session:39@2026-10-15",
+        "reviewStatus": "pending",
+        "rationale": "Every descriptive assertion of the unchanged portal payload is subject to current-code/behaviour review, not A28 candidate-unverified. Code-assisted route existence, executable Convention operations and actual owner authorization are recorded below. Independent content review owed; no approval supplied.",
+        "currentEvidence": {
+          "commit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+          "finding": "stale",
+          "citations": [
+            {
+              "path": "scripts/check-doc-candidate-status.mjs",
+              "startLine": 1,
+              "endLine": 69,
+              "blobSha": "789bb33eec89ed5dac3736880cc27e95d71ba857"
+            },
+            {
+              "path": "apps/fgos/src/cli_projector.rs",
+              "startLine": 75,
+              "endLine": 86,
+              "blobSha": "fbc44236f38e8052ffaccc52afa3be8d10b8b349"
+            }
+          ],
+          "commands": [
+            {
+              "command": "node --input-type=module -e 'import fs from '\\''node:fs'\\'';import path from '\\''node:path'\\'';import {relativeLinkTargets} from '\\''./scripts/check-doc-candidate-status.mjs'\\'';import {extractMarkdownConservationUnits} from '\\''./scripts/generate-doc-inventory.mjs'\\'';const portal=fs.readFileSync('\\''docs/platform/README.md'\\'','\\''utf8'\\'');const targets=[...new Set(relativeLinkTargets(portal))];const missing=targets.filter(p=>!fs.existsSync(path.resolve('\\''docs/platform'\\'',p)));const units=extractMarkdownConservationUnits(portal);const answer=fs.readFileSync('\\''plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md'\\'','\\''utf8'\\'');const rules=JSON.parse(fs.readFileSync('\\''packages/convention/contracts/convention.rules.v1.json'\\'','\\''utf8'\\''));const impl=fs.readFileSync('\\''packages/convention/rust/src/operations.rs'\\'','\\''utf8'\\'');console.log(JSON.stringify({units:units.map(u=>({anchor:u.anchor,digest:u.textDigest})),linkTargets:targets,missing,areaRootExists:fs.existsSync('\\''docs/platform/system-architecture'\\''),conventionOperations:['\\''convention_name'\\'','\\''convention_path'\\'','\\''check_paths'\\'','\\''classify'\\''].map(n=>({name:n,implemented:impl.includes('\\''pub fn '\\''+n+'\\''('\\'')})),conventionRuleShapes:[...new Set(rules.rules.map(r=>r.shape))],phase6Authorized:/Phase 6 authorized: yes/.test(answer),portalSaysPhases03to09Unauthorized:portal.includes('\\''Phases 03–09 remain unauthorized'\\'')}));if(missing.length)process.exitCode=1;'",
+              "exitCode": 0,
+              "output": "{\"units\":[{\"anchor\":\"platform-documentation\",\"digest\":\"8fc9c0389780b881695ab47666312083822592c77e4e6e7edc4ab35da7c1299e\"},{\"anchor\":\"unheaded-block-1\",\"digest\":\"de17bdcf6470426386de3e75549ce8239a1e535e747842facdc53dd258fb1479\"},{\"anchor\":\"unheaded-block-2\",\"digest\":\"efc34ef6f5aa655035efac51a724089ce84dd17cd231f6dacdef63f5d1356c05\"},{\"anchor\":\"1-platform-wide-anchors\",\"digest\":\"a50bb1654cb8fda3fd30a1d4de47465b15870f24a5a7034d6c003f6ee386612c\"},{\"anchor\":\"unheaded-block-3\",\"digest\":\"b91459b47f7a7aec45a0e03afc29342b26e9cdba66f334988a648ac9acf6e4bd\"},{\"anchor\":\"unheaded-block-4\",\"digest\":\"9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24\"},{\"anchor\":\"2-area-registry\",\"digest\":\"c1c8d66852c686b940eb0ceab00d7f6abde4f143be360919f223176afeae88d1\"},{\"anchor\":\"unheaded-block-5\",\"digest\":\"ca9b55008482c55a9c860c3c957855a19075bdd07ef9e882435be2c6d2413069\"},{\"anchor\":\"unheaded-block-6\",\"digest\":\"f2d3701022f39f5669ec2aa50aa078458032d0aad4398630e3aaf3dcc5b353ca\"},{\"anchor\":\"3-decision-surface\",\"digest\":\"5b577ba76c013ac3079053a37da9764292815a862e3d1519d54172d8d9bf7e3c\"},{\"anchor\":\"unheaded-block-7\",\"digest\":\"d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e\"},{\"anchor\":\"4-how-to-change-platform-docs\",\"digest\":\"26ba4bbb4020dfcf0e9c7691d01fae431c0ade4e92ec48d9e28793ac84ccd34b\"},{\"anchor\":\"unheaded-block-8\",\"digest\":\"e4046fd7c27a762982d49241b30e3f99899719586530455fb4e9dfc7fbb6734f\"},{\"anchor\":\"5-related-files\",\"digest\":\"c216275c70704b3851ca22c07410a6743b69a249a0fda11cf67bc8b848cce2a5\"},{\"anchor\":\"unheaded-block-9\",\"digest\":\"233073464aa7a066ec6812e54a3bbc87f523a2f83c8b0a1c87d09448296f8c74\"}],\"linkTargets\":[\"vision.md\",\"../platform-foundations.md\",\"../work-item-lifecycle-vision.md\",\"intent-preservation-ledger.md\",\"../architect/agent-coordination/intent-preservation-ledger.md\",\"platform-foundations.md\",\"../specs/platform-foundations.md\",\"architecture-map.md\",\"../architecture-map.md\",\"component-boundary.md\",\"../architect/component-boundary/\",\"../contracts/\",\"../routing-handoff-contract.md\",\"../specs/runner.md\",\"../specs/work-state.md\",\"packaging-distribution/README.md\",\"../specs/distribution.md\",\"../distribution-vision.md\",\"../architect/packaging-distribution/\",\"host-invocation-routing/README.md\",\"../architect/host-invocation-routing/\",\"convention/spec.md\",\"agent-coordination/README.md\",\"../architect/agent-coordination/\",\"../../domains/\",\"../../.agents/skills/\",\"../../plugins/fgOS/skills/\",\"../ui-spec/\",\"proposals/documentation-system-unification.md\",\"migration-authoring-rules.md\",\"../transitional-switchboard.md\",\"../doc-governance.md\",\"../reading-map.md\"],\"missing\":[],\"areaRootExists\":true,\"conventionOperations\":[{\"name\":\"convention_name\",\"implemented\":true},{\"name\":\"convention_path\",\"implemented\":true},{\"name\":\"check_paths\",\"implemented\":true},{\"name\":\"classify\",\"implemented\":true}],\"conventionRuleShapes\":[\"name-template\",\"placement-glob\"],\"phase6Authorized\":true,\"portalSaysPhases03to09Unauthorized\":true}\n",
+              "outputDigest": "2460d4dd3ac393bd93bceab9e3ee03e33a84bc471271253f74ee1014fc67ca56",
+              "inputs": [
+                {
+                  "path": "scripts/check-doc-candidate-status.mjs",
+                  "blobSha": "789bb33eec89ed5dac3736880cc27e95d71ba857"
+                },
+                {
+                  "path": "scripts/generate-doc-inventory.mjs",
+                  "blobSha": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+                }
+              ],
+              "dataInputs": [
+                {
+                  "path": "docs/platform/README.md",
+                  "scope": "unchanged pre-carriage prefix at the report pin; appendix removed only"
+                },
+                {
+                  "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+                  "blobSha": "265b2fc433034053c1e93eee8212ad4da840a032"
+                },
+                {
+                  "path": "packages/convention/contracts/convention.rules.v1.json",
+                  "blobSha": "ac399ac8fab84a181d572663a3179fd5a49a73c8"
+                },
+                {
+                  "path": "packages/convention/rust/src/operations.rs",
+                  "blobSha": "460f7839751c97b401f53428c5c26b29ed97319e"
+                }
+              ]
+            }
+          ],
+          "scope": "The statement Phases 03–09 remain unauthorized contradicts the committed Phase 6 owner authorization. Preserve portal bytes per assignment; do not certify or close this receipt until authorized correction and review. Other table entries describe the intended documentation tree and proposal/retention routing, not runtime feature implementation."
+        },
+        "blocker": "Existing canonical portal states Phases 03–09 remain unauthorized, contradicted by Phase 6 authorized: yes. Task requires preserving the pre-carriage portal; this writer cannot truthfully mark that sentence true-and-current."
+      },
+      "after": {
+        "claimId": "claim_e6c39f56c4d05238618e1a7fb7004af1",
+        "path": "docs/platform/README.md",
+        "anchor": "3-decision-surface",
+        "unitDigest": "4f71dfe83dabcb8db41496b7f6ef054a9c8241d3847dd590731f03430e017ccb",
+        "shownText": "## 3. Decision Surface\n\n| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |",
+        "shownTextDigest": "5502924d56671f227b0e6f6338470695e64a42ed4247da4cb2887256eb79d9b1",
+        "class": "candidate-native-content",
+        "authoredBy": "codex-session:40@2026-10-15",
+        "reviewStatus": "pending",
+        "rationale": "A19 Lead-authorized correction of the canonical portal authorization clause, preserving legacy phase numbering and every other byte. A22 mechanical rebind to the actual extracted unit digest and shown text; independent content review pending, no approval carried.",
+        "currentEvidence": {
+          "commit": "bd437be1cabb21c0b8c1b03e4d76612fa21d7438",
+          "finding": "true-and-current",
+          "citations": [
+            {
+              "path": "scripts/check-doc-candidate-status.mjs",
+              "startLine": 1,
+              "endLine": 69,
+              "blobSha": "789bb33eec89ed5dac3736880cc27e95d71ba857"
+            },
+            {
+              "path": "apps/fgos/src/cli_projector.rs",
+              "startLine": 75,
+              "endLine": 86,
+              "blobSha": "fbc44236f38e8052ffaccc52afa3be8d10b8b349"
+            }
+          ],
+          "commands": [
+            {
+              "command": "node --input-type=module -e 'import fs from '\\''node:fs'\\'';import path from '\\''node:path'\\'';import assert from '\\''node:assert/strict'\\'';import {relativeLinkTargets} from '\\''./scripts/check-doc-candidate-status.mjs'\\'';import {extractMarkdownConservationUnits} from '\\''./scripts/generate-doc-inventory.mjs'\\'';const P='\\''plans/260925-documentation-authority-unification'\\'',portal=fs.readFileSync('\\''docs/platform/README.md'\\'','\\''utf8'\\''),plan=fs.readFileSync(P+'\\''/plan.md'\\'','\\''utf8'\\''),answers=fs.readFileSync(P+'\\''/reports/phase-06/owner-answers.md'\\'','\\''utf8'\\'');const phaseRows=plan.split('\\''\\n'\\'').filter(l=>/^\\| (?:[1-9]|10) \\|/.test(l)&&/\\| 0[0-9] \\|/.test(l));assert.equal(phaseRows.length,10);assert(phaseRows.slice(0,5).every(l=>l.includes('\\''| completed'\\'')));assert(phaseRows[5].includes('\\''| 05 | pending (not authorized)'\\''));assert(answers.includes('\\''Phase 6 authorized: yes (owner, 2026-10-07)'\\''));assert(phaseRows.slice(6).every(l=>l.includes('\\''pending (not authorized)'\\'')));assert(portal.includes('\\''Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized'\\''));assert(!portal.includes('\\''Phases 00–02 are completed, Phases 03–09 remain unauthorized'\\''));const missing=[...new Set(relativeLinkTargets(portal))].filter(p=>!fs.existsSync(path.resolve('\\''docs/platform'\\'',p)));assert.deepEqual(missing,[]);console.log(JSON.stringify({legacyPhaseRows:phaseRows,ownerAuthorization:answers.split('\\''\\n'\\'')[3],planStatusTableStale:true,correctedPortalClause:'\\''Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized'\\'',missingRouteDestinations:missing,changedUnits:extractMarkdownConservationUnits(portal).filter(u=>['\\''3-decision-surface'\\'','\\''unheaded-block-7'\\''].includes(u.anchor)).map(u=>({anchor:u.anchor,unitDigest:u.textDigest}))}));'",
+              "exitCode": 0,
+              "output": "{\"legacyPhaseRows\":[\"| 1 | Correct planning and routing semantics | 00 | completed | [phase-01-correct-planning-and-routing-semantics.md](phase-01-correct-planning-and-routing-semantics.md) |\",\"| 2 | Contain further divergence | 01 | completed | [phase-02-contain-further-divergence.md](phase-02-contain-further-divergence.md) |\",\"| 3 | Build repository-wide inventory and conservation ledger | 02 | completed | [phase-03-build-repository-wide-inventory-and-conservation-ledger.md](phase-03-build-repository-wide-inventory-and-conservation-ledger.md) |\",\"| 4 | Freeze the minimum constitution and migration method | 03 | completed (2026-10-06; commits `3b409a373..7c632737b`) | [phase-04-freeze-the-minimum-constitution-and-migration-method.md](phase-04-freeze-the-minimum-constitution-and-migration-method.md) |\",\"| 5 | Dual pilot: re-audit plus unmigrated mixed area | 04 | completed (2026-10-07, PASS-WITH-AMENDMENTS) | [phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md](phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md) |\",\"| 6 | Transform all platform areas as candidate material | 05 | pending (not authorized) | [phase-06-transform-all-platform-areas-as-candidate-material.md](phase-06-transform-all-platform-areas-as-candidate-material.md) |\",\"| 7 | Cross-area integrity and fresh-reader review | 06 | pending (not authorized) | [phase-07-cross-area-integrity-and-fresh-reader-review.md](phase-07-cross-area-integrity-and-fresh-reader-review.md) |\",\"| 8 | Eliminate switchboard bypasses and prepare consumers | 07 | pending (not authorized) | [phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md](phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md) |\",\"| 9 | Atomic platform-authority cutover | 08 | pending (not authorized) | [phase-09-atomic-platform-authority-cutover.md](phase-09-atomic-platform-authority-cutover.md) |\",\"| 10 | Post-cutover maintenance MVP | 09 | pending (not authorized) | [phase-10-post-cutover-maintenance-mvp.md](phase-10-post-cutover-maintenance-mvp.md) |\"],\"ownerAuthorization\":\"Phase 6 authorized: yes (owner, 2026-10-07)\",\"planStatusTableStale\":true,\"correctedPortalClause\":\"Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized\",\"missingRouteDestinations\":[],\"changedUnits\":[{\"anchor\":\"3-decision-surface\",\"unitDigest\":\"4f71dfe83dabcb8db41496b7f6ef054a9c8241d3847dd590731f03430e017ccb\"},{\"anchor\":\"unheaded-block-7\",\"unitDigest\":\"f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63\"}]}\n",
+              "outputDigest": "911ea456bdcf25b30335d0d865b9786537a007289f87ff2defcb812b8da53e4b",
+              "inputs": [
+                {
+                  "path": "scripts/check-doc-candidate-status.mjs",
+                  "blobSha": "789bb33eec89ed5dac3736880cc27e95d71ba857"
+                },
+                {
+                  "path": "scripts/generate-doc-inventory.mjs",
+                  "blobSha": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+                }
+              ],
+              "dataInputs": [
+                {
+                  "path": "plans/260925-documentation-authority-unification/plan.md",
+                  "blobSha": "8a037a66dcaf1221bf3c804735629f6834d8336f",
+                  "scope": "Committed input evidence; progress also gains this turn’s handoff."
+                },
+                {
+                  "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+                  "blobSha": "265b2fc433034053c1e93eee8212ad4da840a032",
+                  "scope": "Committed input evidence; progress also gains this turn’s handoff."
+                },
+                {
+                  "path": "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+                  "blobSha": "0b46c62f58326bc7050ed52d59b5f703d4af8dfe",
+                  "scope": "Committed input evidence; progress also gains this turn’s handoff."
+                },
+                {
+                  "path": "docs/platform/README.md",
+                  "scope": "Corrected working-tree payload; exact before/after and hashes recorded in accounting, runner output commit not yet known.",
+                  "sha256": "9292a961f62ccb071586f5a1616ad0cda789bcf1aef69f793d06a5fe83e69467"
+                }
+              ]
+            }
+          ],
+          "scope": "The complete table retains its existing documentation-layout, open-question and proposal/retention descriptions. Only the phase-status clause changes: plan.md phase table Legacy # rows 1–5 prove legacy 00–04 completed; row 6 maps transformation to legacy 05, while owner-answers.md:4 and plan.md:374 authorize it and the committed progress journal proves ongoing work. Legacy 06–09 remain unauthorized in rows 7–10. The plan status table/summary itself is stale for the current phase and is not used as authorization. This is an authored evidence finding, not independent acceptance. The evidence commit pins unchanged authority/code inputs; corrected portal bytes bind by digest until next turn pins the actual runner commit."
+        }
+      }
+    },
+    {
+      "before": {
+        "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+        "path": "docs/platform/README.md",
+        "anchor": "unheaded-block-7",
+        "unitDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+        "shownText": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–02 are completed, Phases 03–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |",
+        "shownTextDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+        "class": "candidate-native-content",
+        "authoredBy": "codex-session:39@2026-10-15",
+        "reviewStatus": "pending",
+        "rationale": "Every descriptive assertion of the unchanged portal payload is subject to current-code/behaviour review, not A28 candidate-unverified. Code-assisted route existence, executable Convention operations and actual owner authorization are recorded below. Independent content review owed; no approval supplied.",
+        "currentEvidence": {
+          "commit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930",
+          "finding": "stale",
+          "citations": [
+            {
+              "path": "scripts/check-doc-candidate-status.mjs",
+              "startLine": 1,
+              "endLine": 69,
+              "blobSha": "789bb33eec89ed5dac3736880cc27e95d71ba857"
+            },
+            {
+              "path": "apps/fgos/src/cli_projector.rs",
+              "startLine": 75,
+              "endLine": 86,
+              "blobSha": "fbc44236f38e8052ffaccc52afa3be8d10b8b349"
+            }
+          ],
+          "commands": [
+            {
+              "command": "node --input-type=module -e 'import fs from '\\''node:fs'\\'';import path from '\\''node:path'\\'';import {relativeLinkTargets} from '\\''./scripts/check-doc-candidate-status.mjs'\\'';import {extractMarkdownConservationUnits} from '\\''./scripts/generate-doc-inventory.mjs'\\'';const portal=fs.readFileSync('\\''docs/platform/README.md'\\'','\\''utf8'\\'');const targets=[...new Set(relativeLinkTargets(portal))];const missing=targets.filter(p=>!fs.existsSync(path.resolve('\\''docs/platform'\\'',p)));const units=extractMarkdownConservationUnits(portal);const answer=fs.readFileSync('\\''plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md'\\'','\\''utf8'\\'');const rules=JSON.parse(fs.readFileSync('\\''packages/convention/contracts/convention.rules.v1.json'\\'','\\''utf8'\\''));const impl=fs.readFileSync('\\''packages/convention/rust/src/operations.rs'\\'','\\''utf8'\\'');console.log(JSON.stringify({units:units.map(u=>({anchor:u.anchor,digest:u.textDigest})),linkTargets:targets,missing,areaRootExists:fs.existsSync('\\''docs/platform/system-architecture'\\''),conventionOperations:['\\''convention_name'\\'','\\''convention_path'\\'','\\''check_paths'\\'','\\''classify'\\''].map(n=>({name:n,implemented:impl.includes('\\''pub fn '\\''+n+'\\''('\\'')})),conventionRuleShapes:[...new Set(rules.rules.map(r=>r.shape))],phase6Authorized:/Phase 6 authorized: yes/.test(answer),portalSaysPhases03to09Unauthorized:portal.includes('\\''Phases 03–09 remain unauthorized'\\'')}));if(missing.length)process.exitCode=1;'",
+              "exitCode": 0,
+              "output": "{\"units\":[{\"anchor\":\"platform-documentation\",\"digest\":\"8fc9c0389780b881695ab47666312083822592c77e4e6e7edc4ab35da7c1299e\"},{\"anchor\":\"unheaded-block-1\",\"digest\":\"de17bdcf6470426386de3e75549ce8239a1e535e747842facdc53dd258fb1479\"},{\"anchor\":\"unheaded-block-2\",\"digest\":\"efc34ef6f5aa655035efac51a724089ce84dd17cd231f6dacdef63f5d1356c05\"},{\"anchor\":\"1-platform-wide-anchors\",\"digest\":\"a50bb1654cb8fda3fd30a1d4de47465b15870f24a5a7034d6c003f6ee386612c\"},{\"anchor\":\"unheaded-block-3\",\"digest\":\"b91459b47f7a7aec45a0e03afc29342b26e9cdba66f334988a648ac9acf6e4bd\"},{\"anchor\":\"unheaded-block-4\",\"digest\":\"9b4b3a19cc2e07dbd32a971403f26aa29034191bff4c65de59850183866d0e24\"},{\"anchor\":\"2-area-registry\",\"digest\":\"c1c8d66852c686b940eb0ceab00d7f6abde4f143be360919f223176afeae88d1\"},{\"anchor\":\"unheaded-block-5\",\"digest\":\"ca9b55008482c55a9c860c3c957855a19075bdd07ef9e882435be2c6d2413069\"},{\"anchor\":\"unheaded-block-6\",\"digest\":\"f2d3701022f39f5669ec2aa50aa078458032d0aad4398630e3aaf3dcc5b353ca\"},{\"anchor\":\"3-decision-surface\",\"digest\":\"5b577ba76c013ac3079053a37da9764292815a862e3d1519d54172d8d9bf7e3c\"},{\"anchor\":\"unheaded-block-7\",\"digest\":\"d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e\"},{\"anchor\":\"4-how-to-change-platform-docs\",\"digest\":\"26ba4bbb4020dfcf0e9c7691d01fae431c0ade4e92ec48d9e28793ac84ccd34b\"},{\"anchor\":\"unheaded-block-8\",\"digest\":\"e4046fd7c27a762982d49241b30e3f99899719586530455fb4e9dfc7fbb6734f\"},{\"anchor\":\"5-related-files\",\"digest\":\"c216275c70704b3851ca22c07410a6743b69a249a0fda11cf67bc8b848cce2a5\"},{\"anchor\":\"unheaded-block-9\",\"digest\":\"233073464aa7a066ec6812e54a3bbc87f523a2f83c8b0a1c87d09448296f8c74\"}],\"linkTargets\":[\"vision.md\",\"../platform-foundations.md\",\"../work-item-lifecycle-vision.md\",\"intent-preservation-ledger.md\",\"../architect/agent-coordination/intent-preservation-ledger.md\",\"platform-foundations.md\",\"../specs/platform-foundations.md\",\"architecture-map.md\",\"../architecture-map.md\",\"component-boundary.md\",\"../architect/component-boundary/\",\"../contracts/\",\"../routing-handoff-contract.md\",\"../specs/runner.md\",\"../specs/work-state.md\",\"packaging-distribution/README.md\",\"../specs/distribution.md\",\"../distribution-vision.md\",\"../architect/packaging-distribution/\",\"host-invocation-routing/README.md\",\"../architect/host-invocation-routing/\",\"convention/spec.md\",\"agent-coordination/README.md\",\"../architect/agent-coordination/\",\"../../domains/\",\"../../.agents/skills/\",\"../../plugins/fgOS/skills/\",\"../ui-spec/\",\"proposals/documentation-system-unification.md\",\"migration-authoring-rules.md\",\"../transitional-switchboard.md\",\"../doc-governance.md\",\"../reading-map.md\"],\"missing\":[],\"areaRootExists\":true,\"conventionOperations\":[{\"name\":\"convention_name\",\"implemented\":true},{\"name\":\"convention_path\",\"implemented\":true},{\"name\":\"check_paths\",\"implemented\":true},{\"name\":\"classify\",\"implemented\":true}],\"conventionRuleShapes\":[\"name-template\",\"placement-glob\"],\"phase6Authorized\":true,\"portalSaysPhases03to09Unauthorized\":true}\n",
+              "outputDigest": "2460d4dd3ac393bd93bceab9e3ee03e33a84bc471271253f74ee1014fc67ca56",
+              "inputs": [
+                {
+                  "path": "scripts/check-doc-candidate-status.mjs",
+                  "blobSha": "789bb33eec89ed5dac3736880cc27e95d71ba857"
+                },
+                {
+                  "path": "scripts/generate-doc-inventory.mjs",
+                  "blobSha": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+                }
+              ],
+              "dataInputs": [
+                {
+                  "path": "docs/platform/README.md",
+                  "scope": "unchanged pre-carriage prefix at the report pin; appendix removed only"
+                },
+                {
+                  "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+                  "blobSha": "265b2fc433034053c1e93eee8212ad4da840a032"
+                },
+                {
+                  "path": "packages/convention/contracts/convention.rules.v1.json",
+                  "blobSha": "ac399ac8fab84a181d572663a3179fd5a49a73c8"
+                },
+                {
+                  "path": "packages/convention/rust/src/operations.rs",
+                  "blobSha": "460f7839751c97b401f53428c5c26b29ed97319e"
+                }
+              ]
+            }
+          ],
+          "scope": "The statement Phases 03–09 remain unauthorized contradicts the committed Phase 6 owner authorization. Preserve portal bytes per assignment; do not certify or close this receipt until authorized correction and review. Other table entries describe the intended documentation tree and proposal/retention routing, not runtime feature implementation."
+        },
+        "blocker": "Existing canonical portal states Phases 03–09 remain unauthorized, contradicted by Phase 6 authorized: yes. Task requires preserving the pre-carriage portal; this writer cannot truthfully mark that sentence true-and-current."
+      },
+      "after": {
+        "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+        "path": "docs/platform/README.md",
+        "anchor": "unheaded-block-7",
+        "unitDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+        "shownText": "| Status | Question | Where |\n|---|---|---|\n| Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |\n| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |\n| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized |\n| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |\n| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |",
+        "shownTextDigest": "f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63",
+        "class": "candidate-native-content",
+        "authoredBy": "codex-session:40@2026-10-15",
+        "reviewStatus": "pending",
+        "rationale": "A19 Lead-authorized correction of the canonical portal authorization clause, preserving legacy phase numbering and every other byte. A22 mechanical rebind to the actual extracted unit digest and shown text; independent content review pending, no approval carried.",
+        "currentEvidence": {
+          "commit": "bd437be1cabb21c0b8c1b03e4d76612fa21d7438",
+          "finding": "true-and-current",
+          "citations": [
+            {
+              "path": "scripts/check-doc-candidate-status.mjs",
+              "startLine": 1,
+              "endLine": 69,
+              "blobSha": "789bb33eec89ed5dac3736880cc27e95d71ba857"
+            },
+            {
+              "path": "apps/fgos/src/cli_projector.rs",
+              "startLine": 75,
+              "endLine": 86,
+              "blobSha": "fbc44236f38e8052ffaccc52afa3be8d10b8b349"
+            }
+          ],
+          "commands": [
+            {
+              "command": "node --input-type=module -e 'import fs from '\\''node:fs'\\'';import path from '\\''node:path'\\'';import assert from '\\''node:assert/strict'\\'';import {relativeLinkTargets} from '\\''./scripts/check-doc-candidate-status.mjs'\\'';import {extractMarkdownConservationUnits} from '\\''./scripts/generate-doc-inventory.mjs'\\'';const P='\\''plans/260925-documentation-authority-unification'\\'',portal=fs.readFileSync('\\''docs/platform/README.md'\\'','\\''utf8'\\''),plan=fs.readFileSync(P+'\\''/plan.md'\\'','\\''utf8'\\''),answers=fs.readFileSync(P+'\\''/reports/phase-06/owner-answers.md'\\'','\\''utf8'\\'');const phaseRows=plan.split('\\''\\n'\\'').filter(l=>/^\\| (?:[1-9]|10) \\|/.test(l)&&/\\| 0[0-9] \\|/.test(l));assert.equal(phaseRows.length,10);assert(phaseRows.slice(0,5).every(l=>l.includes('\\''| completed'\\'')));assert(phaseRows[5].includes('\\''| 05 | pending (not authorized)'\\''));assert(answers.includes('\\''Phase 6 authorized: yes (owner, 2026-10-07)'\\''));assert(phaseRows.slice(6).every(l=>l.includes('\\''pending (not authorized)'\\'')));assert(portal.includes('\\''Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized'\\''));assert(!portal.includes('\\''Phases 00–02 are completed, Phases 03–09 remain unauthorized'\\''));const missing=[...new Set(relativeLinkTargets(portal))].filter(p=>!fs.existsSync(path.resolve('\\''docs/platform'\\'',p)));assert.deepEqual(missing,[]);console.log(JSON.stringify({legacyPhaseRows:phaseRows,ownerAuthorization:answers.split('\\''\\n'\\'')[3],planStatusTableStale:true,correctedPortalClause:'\\''Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized'\\'',missingRouteDestinations:missing,changedUnits:extractMarkdownConservationUnits(portal).filter(u=>['\\''3-decision-surface'\\'','\\''unheaded-block-7'\\''].includes(u.anchor)).map(u=>({anchor:u.anchor,unitDigest:u.textDigest}))}));'",
+              "exitCode": 0,
+              "output": "{\"legacyPhaseRows\":[\"| 1 | Correct planning and routing semantics | 00 | completed | [phase-01-correct-planning-and-routing-semantics.md](phase-01-correct-planning-and-routing-semantics.md) |\",\"| 2 | Contain further divergence | 01 | completed | [phase-02-contain-further-divergence.md](phase-02-contain-further-divergence.md) |\",\"| 3 | Build repository-wide inventory and conservation ledger | 02 | completed | [phase-03-build-repository-wide-inventory-and-conservation-ledger.md](phase-03-build-repository-wide-inventory-and-conservation-ledger.md) |\",\"| 4 | Freeze the minimum constitution and migration method | 03 | completed (2026-10-06; commits `3b409a373..7c632737b`) | [phase-04-freeze-the-minimum-constitution-and-migration-method.md](phase-04-freeze-the-minimum-constitution-and-migration-method.md) |\",\"| 5 | Dual pilot: re-audit plus unmigrated mixed area | 04 | completed (2026-10-07, PASS-WITH-AMENDMENTS) | [phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md](phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md) |\",\"| 6 | Transform all platform areas as candidate material | 05 | pending (not authorized) | [phase-06-transform-all-platform-areas-as-candidate-material.md](phase-06-transform-all-platform-areas-as-candidate-material.md) |\",\"| 7 | Cross-area integrity and fresh-reader review | 06 | pending (not authorized) | [phase-07-cross-area-integrity-and-fresh-reader-review.md](phase-07-cross-area-integrity-and-fresh-reader-review.md) |\",\"| 8 | Eliminate switchboard bypasses and prepare consumers | 07 | pending (not authorized) | [phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md](phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md) |\",\"| 9 | Atomic platform-authority cutover | 08 | pending (not authorized) | [phase-09-atomic-platform-authority-cutover.md](phase-09-atomic-platform-authority-cutover.md) |\",\"| 10 | Post-cutover maintenance MVP | 09 | pending (not authorized) | [phase-10-post-cutover-maintenance-mvp.md](phase-10-post-cutover-maintenance-mvp.md) |\"],\"ownerAuthorization\":\"Phase 6 authorized: yes (owner, 2026-10-07)\",\"planStatusTableStale\":true,\"correctedPortalClause\":\"Phases 00–04 are completed, Phase 05 is authorized and in progress, Phases 06–09 remain unauthorized\",\"missingRouteDestinations\":[],\"changedUnits\":[{\"anchor\":\"3-decision-surface\",\"unitDigest\":\"4f71dfe83dabcb8db41496b7f6ef054a9c8241d3847dd590731f03430e017ccb\"},{\"anchor\":\"unheaded-block-7\",\"unitDigest\":\"f2fc847dcc06987d76c83c1e8ab5f049b5d6ab9b049241ca047d517d6b1afd63\"}]}\n",
+              "outputDigest": "911ea456bdcf25b30335d0d865b9786537a007289f87ff2defcb812b8da53e4b",
+              "inputs": [
+                {
+                  "path": "scripts/check-doc-candidate-status.mjs",
+                  "blobSha": "789bb33eec89ed5dac3736880cc27e95d71ba857"
+                },
+                {
+                  "path": "scripts/generate-doc-inventory.mjs",
+                  "blobSha": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+                }
+              ],
+              "dataInputs": [
+                {
+                  "path": "plans/260925-documentation-authority-unification/plan.md",
+                  "blobSha": "8a037a66dcaf1221bf3c804735629f6834d8336f",
+                  "scope": "Committed input evidence; progress also gains this turn’s handoff."
+                },
+                {
+                  "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+                  "blobSha": "265b2fc433034053c1e93eee8212ad4da840a032",
+                  "scope": "Committed input evidence; progress also gains this turn’s handoff."
+                },
+                {
+                  "path": "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+                  "blobSha": "0b46c62f58326bc7050ed52d59b5f703d4af8dfe",
+                  "scope": "Committed input evidence; progress also gains this turn’s handoff."
+                },
+                {
+                  "path": "docs/platform/README.md",
+                  "scope": "Corrected working-tree payload; exact before/after and hashes recorded in accounting, runner output commit not yet known.",
+                  "sha256": "9292a961f62ccb071586f5a1616ad0cda789bcf1aef69f793d06a5fe83e69467"
+                }
+              ]
+            }
+          ],
+          "scope": "The complete table retains its existing documentation-layout, open-question and proposal/retention descriptions. Only the phase-status clause changes: plan.md phase table Legacy # rows 1–5 prove legacy 00–04 completed; row 6 maps transformation to legacy 05, while owner-answers.md:4 and plan.md:374 authorize it and the committed progress journal proves ongoing work. Legacy 06–09 remain unauthorized in rows 7–10. The plan status table/summary itself is stale for the current phase and is not used as authorization. This is an authored evidence finding, not independent acceptance. The evidence commit pins unchanged authority/code inputs; corrected portal bytes bind by digest until next turn pins the actual runner commit."
+        }
+      }
+    }
+  ],
+  "classificationReferenceChanges": [
+    {
+      "before": {
+        "claimId": "claim_e6c39f56c4d05238618e1a7fb7004af1",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
+        "authoredBy": "codex-session:39@2026-10-15",
+        "reviewStatus": "pending",
+        "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      },
+      "after": {
+        "claimId": "claim_e6c39f56c4d05238618e1a7fb7004af1",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
+        "authoredBy": "codex-session:40@2026-10-15",
+        "reviewStatus": "pending",
+        "receiptBinding": "A22 corrected unit; next turn reconcile actual native identity and pin this receipt to the actual runner output commit; independent review pending, no approval carry"
+      }
+    },
+    {
+      "before": {
+        "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
+        "authoredBy": "codex-session:39@2026-10-15",
+        "reviewStatus": "pending",
+        "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      },
+      "after": {
+        "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
+        "authoredBy": "codex-session:40@2026-10-15",
+        "reviewStatus": "pending",
+        "receiptBinding": "A22 corrected unit; next turn reconcile actual native identity and pin this receipt to the actual runner output commit; independent review pending, no approval carry"
+      }
+    }
+  ],
+  "sourceOrGapDecisions": {
+    "scannedFiles": 94,
+    "scannedPaths": [
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-carriage-label-classifications.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-closure-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-current-closure-classifications.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-02.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-05.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-files.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-history-closure-classifications.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-log-duplicates.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge-pending.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-02.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-03.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-04.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-05.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-08.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-09.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-10.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-11.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-12.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-13.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-14.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-16.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-17.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-18.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-19.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-20.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-21.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-22.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-23.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-24.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-25.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-26.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-27.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-28.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-reopened-exact.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-binding.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-consumer-project.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-history-evidence.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-user-knowledge.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-generated-projections.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-resolution.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-switchboard-gap-successor.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-template-conservation.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architect-portal.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-intent.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-map.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-portal-classifications.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-roadmap.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-vision-trong-mem-ngoai-cung.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology-audit.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology-roadmap.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json"
+    ],
+    "targetingPortal": [],
+    "changed": [],
+    "explanation": "No current source/gap/exact-row targetOwner is docs/platform/README.md; prior README carriage now targets the separate History carrier. Thus only the two classification references rebind in this turn."
+  },
+  "native": {
+    "run": false,
+    "registryUnchanged": true,
+    "identityAllocation": "Deferred. Keep predecessor claim IDs as historical bindings; next native sync determines actual live/gap identities. No synthetic IDs or native equality asserted."
+  },
+  "review": {
+    "packsCreated": false,
+    "approvalsCarried": 0,
+    "nextTurn": "Run native sync exactly once from runner output commit, reconcile persisted native and receipt/source/gap/list consequences, then package the single bounded independent re-review including both portal corrections and all prior changed rows/receipts/exceptions/machine-reference protocol debt."
+  },
+  "conventionNaming": {
+    "commands": [
+      "target/release/fgos convention name --kind report --type accounting --slug portal-authorization-correction --json",
+      "target/release/fgos convention path --kind report --type accounting --slug portal-authorization-correction --json"
+    ],
+    "generatedName": "accounting-261015-0601-portal-authorization-correction.md",
+    "generatedPath": "plans/reports/accounting-261015-0601-portal-authorization-correction.md",
+    "placement": "Generated report name placed in existing phase-specific reports directory, as established by the phase resume artifacts."
+  },
+  "verification": {
+    "tests": [
+      {
+        "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs test/scripts/doc-authorship.test.mjs",
+        "exitCode": 0,
+        "pass": 39,
+        "fail": 0,
+        "skipped": 0
+      },
+      {
+        "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-authorship.test.mjs test/scripts/doc-candidate-conservation.test.mjs",
+        "exitCode": 0,
+        "pass": 75,
+        "fail": 0,
+        "skipped": 0
+      }
+    ],
+    "candidateStatus": {
+      "exitCode": 0,
+      "files": 537,
+      "findings": 0
+    },
+    "constitutionPlacement": {
+      "exitCode": 0,
+      "files": 537,
+      "matched": 536,
+      "recordedExceptions": 1,
+      "leftover": 0,
+      "ambiguous": 0
+    },
+    "ratchet": {
+      "exitCode": 1,
+      "preExistingUnchanged": true,
+      "path": "docs/specs/runner.md",
+      "expectedSha256": "10b2de40c7668c98cf84a93785a7933a280e2fe7683328f97742c09365090e8b",
+      "actualSha256": "dcad9c1729e181668f15130635114ed452dd89ba55dd359a8ab416ac6914d564",
+      "action": "Lead separately authorized correction remains owed; no checker/exception edit"
+    },
+    "receiptBindings": true,
+    "unaffectedReceiptObjectsEqual": 13,
+    "sourceDecisionFilesScanned": 94,
+    "additionalTargetDecisionRebinds": 0,
+    "writeScope": true,
+    "extractorClosure": true,
+    "switchboardStatuses": true,
+    "readerLinkSet": true,
+    "diffCheck": true,
+    "nativeSyncRun": false,
+    "D_E_G": "Deferred: assignment forbids native sync; no current native certification",
+    "fullSuite": "not run",
+    "markdownPreview": "Unavailable within scope: no mdview MCP; no external application mutation authorized",
+    "persistedRegistrySha256": "aa13f3cb4df8e1fedd8a546ddb8b8101951a45a1ac671c2c70a68d1aba9ed138"
+  }
+}

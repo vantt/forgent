@@ -72,16 +72,16 @@
     {
       "claimId": "claim_e6c39f56c4d05238618e1a7fb7004af1",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
-      "authoredBy": "codex-session:39@2026-10-15",
+      "authoredBy": "codex-session:40@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "A22 corrected unit; next turn reconcile actual native identity and pin this receipt to the actual runner output commit; independent review pending, no approval carry"
     },
     {
       "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal.json",
-      "authoredBy": "codex-session:39@2026-10-15",
+      "authoredBy": "codex-session:40@2026-10-15",
       "reviewStatus": "pending",
-      "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
+      "receiptBinding": "A22 corrected unit; next turn reconcile actual native identity and pin this receipt to the actual runner output commit; independent review pending, no approval carry"
     },
     {
       "claimId": "claim_6143f65cb5e3d4d41e7b957306ab6e4e",
@@ -111,5 +111,6 @@
       "reviewStatus": "pending",
       "receiptBinding": "next turn pins the actual runner commit; no receiptCommit invented"
     }
-  ]
+  ],
+  "amendedBy": "codex-session:40@2026-10-15"
 }
