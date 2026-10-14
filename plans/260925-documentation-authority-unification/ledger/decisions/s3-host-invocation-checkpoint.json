@@ -4502,10 +4502,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
       "targetAnchor": "unheaded-block-24",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:12@2026-10-14",
       "rationale": "Supersede the whole dated installed-default npm-bin removal trigger by the owner-decided 2026-09-15 coordinator 30-day window, earliest removal 2026-10-18. The Checked status names that successor and keeps removing or redirecting bin.fgos after the window owed to Packaging-distribution (release-owner decision). The original source clause is separately retained verbatim in the adjacent fenced block; runner mapping and source-entry ownership header stay. No removal or support extension is implemented by this documentation change.",
-      "reviewNote": "Stored digest has no target match; independent re-review required."
+      "reviewNote": "Document diff is exactly the one Checked status line; source clause digest unchanged, target block-24 recomputes to aa5e2000 and the verbatim fenced clause is still retained in the same section; status names the coordinator window, 2026-10-18, the owed Packaging-distribution removal and keeps runner mapping and header",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-row-binding.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17",
+      "targetAncestry": [
+        "Architecture: Release Boundaries",
+        "Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea"
+      ],
+      "reviewReportCommit": "962968338c8dca06edb6d1437b791c14359fe7e2"
     },
     {
       "claimId": "claim_0b85ea8ddcbd3d505edf8b110e3a42ad",
@@ -9253,5 +9263,5 @@
       "reviewReportCommit": "13322f8a6712df4bb3dd69e7df208e237f32c216"
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-row-binding.md"
 }

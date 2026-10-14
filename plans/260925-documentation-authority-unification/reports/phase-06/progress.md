@@ -1,3 +1,18 @@
+# Latest resume state — Packaging final binding and closure proofs
+
+Date: 2026-10-14
+Executor: codex-session:14@2026-10-14
+Session counter: 14
+Documented Packaging executor sessions: 7 (one interrupted plus six resumes)
+Step: 4 / Packaging-distribution
+State: in progress; applying exact-cell ordinary Lead row at 962968338.
+Scope: compact registry with parsed equality to b842eb2c8 before refresh; refresh from persisted registry; both-prior D/scoped strict E/native equality; Step 4 report only if exact. Stop line 90 MB. No Step 5, promotion, main write, push or protected tool edits.
+Next: verify committed verdict digests, apply note verbatim and rerun closure proofs.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Packaging ordinary row binding request
 
 Date: 2026-10-14

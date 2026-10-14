@@ -254,10 +254,23 @@
   "nativeTextChanged": false,
   "machineSourceApprovalWithheld": {
     "claimId": "claim_6a37273a0a45d24c53e344928c3edf22",
-    "status": "pending",
+    "status": "resolved",
     "reason": "Immutable report first cell has Host source prefix; existing ordinary checker requires exact claim ID",
     "finding": "decision-review-report-missing",
-    "newIndependentReviewRowRequired": true
+    "newIndependentReviewRowRequired": false
   },
-  "batchClosed": false
+  "batchClosed": false,
+  "exactCellBinding": {
+    "claimId": "claim_6a37273a0a45d24c53e344928c3edf22",
+    "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-row-binding.md",
+    "reportCommit": "962968338c8dca06edb6d1437b791c14359fe7e2",
+    "reportSha256": "1714cee78cbee9a556a8b8203e474d55bbe9a3f21b4b0408c425489d6581f846",
+    "reviewer": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewMode": "ordinary",
+    "note": "Document diff is exactly the one Checked status line; source clause digest unchanged, target block-24 recomputes to aa5e2000 and the verbatim fenced clause is still retained in the same section; status names the coordinator window, 2026-10-18, the owed Packaging-distribution removal and keeps runner mapping and header",
+    "sourceDigest": "6f959e9066321a5afcbb3c6ae57d46b03fa8da3ae18f7ce0b5454eff36ba701e",
+    "targetDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17",
+    "noteAndDigestsEqualClosureResolution": true,
+    "allOtherHostSourceObjectsUnchanged": true
+  }
 }
