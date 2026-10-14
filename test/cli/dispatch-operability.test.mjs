@@ -104,10 +104,12 @@ test('dispatch reconcile plan with --assignment without --action exits 4 with ac
   assert.match(result.stderr, /dispatch reconcile plan with --run or --assignment requires --action/);
 });
 
-test('fgos dispatch --help correctly renders compound positional fields sub, run-id', () => {
+test('fgos dispatch --help renders the sub-verb positional, and run-id under the sub-verbs that take it', () => {
   const result = runFgos(['dispatch', '--help']);
   assert.equal(result.status, 0);
-  assert.ok(result.stdout.includes('positional: sub, run-id'), `help output missing positional: sub, run-id:\n${result.stdout}`);
+  assert.ok(result.stdout.includes('    positional: sub\n'), `help output missing positional: sub:\n${result.stdout}`);
+  const showRun = result.stdout.split('    fgos dispatch ').find((block) => block.startsWith('show-run\n'));
+  assert.ok(showRun?.includes('positional: run-id'), `show-run block missing positional: run-id:\n${result.stdout}`);
 });
 
 test('dispatch entry in command-registry declares touchesState: true and externalEffect: true, rendered as [write+external] in help (F2)', async () => {
@@ -121,7 +123,7 @@ test('dispatch entry in command-registry declares touchesState: true and externa
   assert.equal(helpResult.status, 0);
   assert.match(
     helpResult.stdout,
-    /fgos dispatch <show-run\|inspect\|watch\|recover\|reconcile\|decide\|probe-account> \[runId\] \[write\+external\]/,
+    /fgos dispatch <show-run\|inspect\|watch\|recover\|reconcile\|decide\|probe-account> \[args\] \[write\+external\]/,
   );
 });
 

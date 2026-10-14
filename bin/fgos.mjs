@@ -4347,17 +4347,34 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 // `--help --json`.
 
 function publicManifestEntries() {
-  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, touchesState, externalEffect, paginated, deprecated }) => ({
+  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, subcommands, touchesState, externalEffect, paginated, deprecated }) => ({
     name,
     invoke,
     description,
     parameters,
     examples,
+    ...(subcommands ? { subcommands } : {}),
     touchesState,
     externalEffect,
     paginated,
     deprecated,
   }));
+}
+
+// A required param that can be supplied positionally (mixed) or ONLY
+// positionally (e.g. submit's text, session's sub) is never a real `--flag`
+// on the command line — printing it as `required: --name` would be actively
+// wrong for the positional-only case (STR77) and misleading for the mixed
+// case. Split required into the two shapes so each renders in its own idiom;
+// only the flag-only remainder still gets the `--name` form.
+function renderParameterLines(parameters, indent) {
+  const lines = [];
+  const required = parameters?.required || [];
+  const positional = parameters?.positional || [];
+  const flagRequired = required.filter((r) => !positional.includes(r));
+  if (positional.length) lines.push(`${indent}positional: ${positional.join(', ')}`);
+  if (flagRequired.length) lines.push(`${indent}required: ${flagRequired.map((r) => `--${r}`).join(', ')}`);
+  return lines;
 }
 
 function renderHelpText(entries = publicManifestEntries()) {
@@ -4374,19 +4391,12 @@ function renderHelpText(entries = publicManifestEntries()) {
     const label = labelFor(entry.touchesState, entry.externalEffect);
     lines.push(`${entry.invoke} [${label}]`);
     lines.push(`    ${entry.description}`);
-    const required = entry.parameters?.required || [];
-    const positional = entry.parameters?.positional || [];
-    // A required param that can be supplied positionally (mixed) or ONLY
-    // positionally (e.g. submit's text, session's sub) is never a real
-    // `--flag` on the command line — printing it as `required: --name`
-    // would be actively wrong for the positional-only case (STR77) and
-    // misleading for the mixed case. Split required into the two shapes so
-    // each renders in its own idiom; only the flag-only remainder still
-    // gets the `--name` form.
-    const positionalRequired = required.filter((r) => positional.includes(r));
-    const flagRequired = required.filter((r) => !positional.includes(r));
-    if (positional.length) lines.push(`    positional: ${positional.join(', ')}`);
-    if (flagRequired.length) lines.push(`    required: ${flagRequired.map((r) => `--${r}`).join(', ')}`);
+    lines.push(...renderParameterLines(entry.parameters, '    '));
+    for (const [sub, spec] of Object.entries(entry.subcommands ?? {})) {
+      lines.push(`    fgos ${entry.name} ${sub}`);
+      lines.push(`        ${spec.description}`);
+      lines.push(...renderParameterLines(spec.parameters, '        '));
+    }
     const deprecationText = formatDeprecation(entry.deprecated);
     if (deprecationText) {
       lines.push(`    DEPRECATED — ${deprecationText}`);
@@ -4396,7 +4406,60 @@ function renderHelpText(entries = publicManifestEntries()) {
   return `${lines.join('\n').trimEnd()}\n`;
 }
 
-function handleHelp(json) {
+// Help is the manifest door: metadata about the CLI's own verb surface, never
+// a verb's data payload, so it is NEVER wrapped in the fgos.v1 envelope
+// (CTR001's documented exception, the same distinction bee.mjs draws for its
+// own `--help --json`), and it never runs a verb (no side effects, e.g.
+// `init --help` must never call initStore). A refused help request writes one
+// stderr line and exits 4 (validation), with nothing on stdout.
+function refuseHelp(message) {
+  process.stderr.write(`fgos: ${message}\n`);
+  process.exitCode = 4;
+}
+
+// One verb's help: its manifest entry, narrowed to one sub-verb when `sub` is
+// given. Returns false when the request is refused (already reported).
+function printVerbHelp(verb, sub, json) {
+  const entry = publicManifestEntries().find((e) => e.name === verb);
+  if (!entry) {
+    refuseHelp(`unknown verb "${verb}". Usage: fgos --help [<verb> [<sub>]] [--json]`);
+    return false;
+  }
+  let shown = entry;
+  if (sub !== undefined) {
+    if (!entry.subcommands) {
+      refuseHelp(`${verb} takes no sub-verb (got "${sub}"). Usage: fgos ${verb} --help [--json]`);
+      return false;
+    }
+    if (!Object.hasOwn(entry.subcommands, sub)) {
+      refuseHelp(`unknown ${verb} sub-verb "${sub}" (known: ${Object.keys(entry.subcommands).join(', ')}).`);
+      return false;
+    }
+    shown = { ...entry, subcommands: { [sub]: entry.subcommands[sub] } };
+  }
+  process.stdout.write(json ? `${JSON.stringify(shown, null, 2)}\n` : renderHelpText([shown]));
+  return true;
+}
+
+// `fgos --help|-h [<verb> [<sub>]] [--json]`: the whole manifest, or one
+// verb's entry. Anything else on the line is refused rather than ignored.
+function handleHelp(args) {
+  const json = args.includes('--json');
+  // A repeated help token (`fgos -h --help`) asks the same thing.
+  const words = args.filter((a) => a !== '--json' && a !== '--help' && a !== '-h');
+  const option = words.find((a) => a.startsWith('-'));
+  if (option !== undefined) {
+    refuseHelp(`unknown option "${option}" for --help. Usage: fgos --help [<verb> [<sub>]] [--json]`);
+    return;
+  }
+  if (words.length > 2) {
+    refuseHelp(`too many words for --help: "${words.join(' ')}". Usage: fgos --help [<verb> [<sub>]] [--json]`);
+    return;
+  }
+  if (words.length > 0) {
+    printVerbHelp(words[0], words[1], json);
+    return;
+  }
   if (json) {
     const manifest = { schema_version: MANIFEST_SCHEMA_VERSION, commands: publicManifestEntries() };
     process.stdout.write(`${JSON.stringify(manifest, null, 2)}\n`);
@@ -4405,22 +4468,17 @@ function handleHelp(json) {
   }
 }
 
-// Per-verb `fgos <verb> --help` (STR79/D3): same "one door" idiom as the
-// top-level `--help` special-case above, one level down — prints only that
-// verb's own manifest entry (not the full command list) and returns true so
-// the caller exits before runVerb ever dispatches (no side effects, e.g.
-// `init --help` must never call initStore). Unknown verb -> false, so the
+// Per-verb `fgos <verb> [<sub>] --help|-h [--json]` (STR79/D3): the same door
+// one level down. For a verb with sub-verbs, the first positional names the
+// sub-verb to narrow to; any other verb's positionals are its own arguments
+// (e.g. run's prompt) and are ignored. An unknown verb returns null so the
 // normal dispatch path still produces its usual "unknown verb" error.
-// Text-mode only (D3/CONTEXT out-of-scope note): the caller gates this on
-// `!flags.json`, so `<verb> --help --json` is left to fall through unchanged.
-// Same documented exception as the full manifest above, not a separate one —
-// this reuses renderHelpText/publicManifestEntries scoped to one verb, so it
-// is never wrapped in the fgos.v1 envelope for the same reason: metadata
-// about the CLI's own verb surface, not a verb's data payload.
-function handleVerbHelp(verb) {
-  const entry = publicManifestEntries().find((e) => e.name === verb);
-  if (!entry) return false;
-  process.stdout.write(renderHelpText([entry]));
+function handleVerbHelp(verb, flags, positional) {
+  const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
+  if (!entry) return null;
+  // `--help <word>` hands the word to the flag as its value.
+  const words = [...(typeof flags.help === 'string' ? [flags.help] : []), ...positional.filter((p) => p !== '-h')];
+  printVerbHelp(verb, entry.subcommands ? words[0] : undefined, flags.json !== undefined);
   return true;
 }
 
@@ -4819,15 +4877,19 @@ async function handleHook(rest) {
 
 async function main() {
   const [, , verb, ...rest] = process.argv;
+  // `hook` keeps the agent's raw argv, but its help is still the manifest door.
+  if (verb === 'hook' && (rest.includes('--help') || rest.includes('-h'))) {
+    handleVerbHelp(verb, { help: true, ...(rest.includes('--json') ? { json: true } : {}) }, []);
+    return;
+  }
   if (verb === 'hook') {
     await handleHook(rest);
     return;
   }
 
 
-  if (verb === '--help') {
-    handleHelp(rest.includes('--json'));
-    process.exitCode = 0;
+  if (verb === '--help' || verb === '-h') {
+    handleHelp(rest);
     return;
   }
 
@@ -4844,8 +4906,7 @@ async function main() {
   try {
     const { flags, positional } = parseArgs(rest);
 
-    if (flags.help && !flags.json && handleVerbHelp(verb)) {
-      process.exitCode = 0;
+    if ((flags.help !== undefined || positional.includes('-h')) && handleVerbHelp(verb, flags, positional)) {
       return;
     }
 

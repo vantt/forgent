@@ -19,7 +19,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SRC_DIR = path.resolve(__dirname, '../../src');
 
 /** Every prose string a reader of `fgos --help`/`--help --json` can see:
- * the verb's own description plus each parameter's. */
+ * the verb's own description plus each parameter's, and the same for each sub-verb. */
 function describedStrings() {
   const out = [];
   for (const entry of COMMAND_REGISTRY) {
@@ -27,6 +27,14 @@ function describedStrings() {
     for (const [param, schema] of Object.entries(entry.parameters?.properties ?? {})) {
       if (typeof schema?.description === 'string') {
         out.push({ where: `${entry.name}.${param}.description`, text: schema.description });
+      }
+    }
+    for (const [sub, spec] of Object.entries(entry.subcommands ?? {})) {
+      out.push({ where: `${entry.name}.${sub}.description`, text: spec.description });
+      for (const [param, schema] of Object.entries(spec.parameters?.properties ?? {})) {
+        if (typeof schema?.description === 'string') {
+          out.push({ where: `${entry.name}.${sub}.${param}.description`, text: schema.description });
+        }
       }
     }
   }

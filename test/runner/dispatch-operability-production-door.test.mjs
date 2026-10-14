@@ -285,7 +285,7 @@ test('reconcile production routes refuse recovery semantics through CLI, operati
 
   const dispatchEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'dispatch');
   assert.ok(dispatchEntry, 'dispatch command registry entry exists');
-  assert.deepEqual(dispatchEntry.parameters.properties.action.description.match(/clear-cwd-lock|collect-result|clear-assignment-claim|repair-projection/g), [
+  assert.deepEqual(dispatchEntry.subcommands.reconcile.parameters.properties.action.description.match(/clear-cwd-lock|collect-result|clear-assignment-claim|repair-projection/g), [
     'clear-cwd-lock',
     'collect-result',
     'clear-assignment-claim',
