@@ -1,3 +1,52 @@
+# Latest resume state — Conservation proofs sealed; bounded requests publishing
+
+Date: 2026-10-14
+Executor: codex-session:18@2026-10-14
+Session counter: 18
+Step: 5
+State: ready-for-review / publishing requests
+Last green content and inventory pin: 7833bb4c11125394ea5482fdc781ccd1cf8e4e1d
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Current turn commits: e52fac3e4 (resume), dfbbd1de9 (liveness evidence), 17d9464fc (template history), 1157b7243 (77 ordinary verdicts and seven corrections), 7833bb4c1 (pending bindings and historical index). Material/proof and request commits follow.
+All 77 ordinary ok verdicts at 563247893 applied: 75 decision rows and two native/list accounting verdicts, notes verbatim and report pin exact. Truth report is not applied; original sample/population remain byte-identical.
+Seven reworks remain pending after accurate rationales and the documentation portal link ../README.md. No approval carries; one native table gap and one stable heading digest consequence are fully shown. The unverified table gap remains explicit global open data, with its real successor; its conservation accounting goes to Lead alongside the two Related Files rows, never a waiver.
+New source decisions: 63 pending (58 historical-template, 5 unchanged non-platform user-portal); Unit-exact 10 / Weak-exact 35 / Judgment 18. Three former templates are preserved with original metadata and fenced verbatim placeholder tables; an Added-in-candidate history index routes to them. Backlog unchanged; AGENTS/CLAUDE remain Step 10; no component-boundary change.
+Root map: 1,072 rows, 440 reviewed / 73 pending / 559 undecided. Both-prior D 0 fatal. Both nine-source scoped strict E exit 1: exactly 68 pending source rows, two unchanged historical IO gaps, 70 candidate-unverified units. E is red and Step 5 remains incomplete. Native tuples and list equality pass against both outputs; 59 prior reverse tuples unchanged and 11 new eligible history units shown. Prior Agent/Host/Packaging lists and 13 A34 residuals unchanged/equal.
+Registry native-byte-equal compact one-line JSON: 59,529,541 bytes, SHA256 3e0e5b8386cf29a6e546b6bb57d7ea15eb0f21607709180e8d1beb3640496d13, below 90 MB. All 94,424 starting and 94,489 intermediate IDs retained; 94,494 current. All old tuples unchanged except the disclosed native heading, one new gap, zero retired units. Extractor, frozen sources, witness/payload trees, authority and reader-link sets preserved; A has only the prior A3/A21 exact exemptions. Ratchet clean; placement 514/513/one exception; H zero findings. Tests 29/29 with env -u CLAUDE_CODE_SESSION_ID, zero fail/cancel/skip/todo. GitNexus own scope low risk and zero processes. No full-suite or truth certification.
+Two sealed bounded requests (texts/hashes in root-conservation-turn18-verification.json):
+- review-request-261014-1548-root-conservation-rework.md: exactly seven rework decisions and their directly affected native table/heading accounting; full shown text, digests and diffs.
+- review-request-261014-1548-root-template-conservation.md: 63 source decisions plus 11 new candidate eligibility/list units, 74 entries; full shown text and digests.
+Remaining publication: both requests. After each pack update progress, then final report-only native refresh and STOP. No further source authoring this turn.
+Blockers: no unexplained technical/proof failure. Owner truth decision (5/30 false, A28) remains parked and no truth sentence is corrected. Lead conservation review is pending. Native table gap accounting stays owed and is shown, not silently approved. No promotion, Step 6, push, main write/merge, protected tool or baseline edit.
+Next: publish the two requests, final native checkpoint, STOP. Subsequent work applies independent conservation verdicts and continues the 559 undecided source rows; truth corrections wait for the owner's Lead brief.
+
+Earlier progress follows intact.
+
+---
+
+# Latest resume state — Conservation decisions bounded for review
+
+Date: 2026-10-14
+Executor: codex-session:18@2026-10-14
+Session counter: 18
+Step: 5
+State: authoring / preparing bounded requests
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Applied all 77 ordinary ok verdicts from the three conservation reports at 563247893: 75 decision rows and two native/list accounting verdicts, exact notes retained. Truth report/sample/population unchanged; 5/30 false units await owner instruction.
+Seven reworks fixed: one documentation portal destination ../README.md; accurate nine-link account; two boilerplate removals; SC-1 deferral rewrite and two intermediate-predecessor example-only rationales. All seven remain pending, no approval carries. Native README correction creates one unverified table gap with real successor and one disclosed stable-heading digest change; both shown for conservation review, old IDs retained.
+New source decisions: 63 pending rows (58 historical-template rows, 5 unchanged non-platform user-portal rows); Unit-exact 10 / Weak-exact 35 / Judgment 18. Backlog already decided and untouched. Template link placeholders are fenced verbatim, and a labelled historical index routes to the three carriers.
+Current root map: 1,072 rows, 440 reviewed / 73 pending / 559 undecided. AGENTS/CLAUDE remain Step 10. No new truth sample.
+Proof before final historical index: both-prior D 0 fatal; expanded nine-source E red with 68 pending rows, two unchanged IO gaps, 65 candidate-unverified units. Native registry retains all 94,424 old IDs; 94,489 current known IDs, one new gap, zero retired, all tuples equal except disclosed native heading. Compact registry 59,531,223 bytes. Final refresh for the added navigation index and equality checks are running; these preliminary numbers do not certify the final index.
+Requests being sealed: review-request-261014-1548-root-conservation-rework.md (7 rows plus their direct native consequences); review-request-261014-1548-root-template-conservation.md (63 rows plus new candidate list delta). Both full shown text/digests/diffs, below 80 entries. Final proofs/evidence follow before publication. Tests 29/29 pass under env -u CLAUDE_CODE_SESSION_ID. No protected tool or baseline edits.
+Resolved obstacles: proposal file-level key was source instead of path, causing four D findings; corrected data only. Placeholder markdown links produced 29 H findings; fenced original tables verbatim, H zero. Native accounting helper quadratic lookup replaced by a map, no checker change.
+Next: finish final D/E/native equality, commit two bounded requests with progress after each, STOP. Owner truth decision remains parked; conservation has no unexplained blocker. No promotion, push, main write/merge, Step 6.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Root conservation review continuation
 
 Date: 2026-10-14

@@ -2,7 +2,7 @@
   "version": 1,
   "batch": "root-authorities",
   "authorization": "A28",
-  "authoredCommit": "1157b7243ed3c4b2f9dfe67597f3908f6f881ec9",
+  "authoredCommit": "7833bb4c11125394ea5482fdc781ccd1cf8e4e1d",
   "scope": [
     "docs/specs/work-state.md",
     "docs/io-contract.md",
@@ -16,7 +16,7 @@
   ],
   "scopeLimit": "Bounded governance/SC1 and three historical templates plus user portal only; not final Step 5 closure.",
   "meaning": "Exact native reverse-open list; candidate-unverified, no truth approval.",
-  "count": 65,
+  "count": 70,
   "rows": [
     {
       "claimId": "claim_e35633c457b88d1fbdb23ac9da437dd8",
@@ -93,6 +93,76 @@
       "path": "docs/platform/documentation/history/templates/contract.md",
       "anchor": "source-metadata-added-in-candidate",
       "unitDigest": "f42d20f0e04293688863594f51cacf68ea5d591aa349cb9ec515c97b1e698b1e",
+      "fileStatus": {
+        "kind": "history",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_a3b6c92bcb720f9335d5b0af77804543",
+      "path": "docs/platform/documentation/history/templates/README.md",
+      "anchor": "historical-authoring-templates",
+      "unitDigest": "0919348d846470c18e0c1e9e3294096e29dd9029e908d45636d463d0f4bd14a8",
+      "fileStatus": {
+        "kind": "history",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_0e8ec4eb8b34858d8ad510637f86dcba",
+      "path": "docs/platform/documentation/history/templates/README.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "4a84bb3eeb287c99b007c5ed250e48ebff09a1358bf3d73681a1305693bb5412",
+      "fileStatus": {
+        "kind": "history",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_6caa447ebc68c115c4beab1c64e06d4f",
+      "path": "docs/platform/documentation/history/templates/README.md",
+      "anchor": "template-index-added-in-candidate",
+      "unitDigest": "f927348ffeca4b4dee880a824e0c1662b50f3a43dd9fb317eb12d725802f14b6",
+      "fileStatus": {
+        "kind": "history",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_b433273df822ece051bf33b9a3f1ee52",
+      "path": "docs/platform/documentation/history/templates/README.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "34d41c242c241425114e92e65e9eb2b96560a326d58803f3c6f3e858f8decec5",
+      "fileStatus": {
+        "kind": "history",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_dae5c70a732ac4bb4c77bec7ad441513",
+      "path": "docs/platform/documentation/history/templates/README.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "a05c0d40c3bd28f3cfa7023faa051ddfecccc94dcb17a554e31fd3f69f0f2e2b",
       "fileStatus": {
         "kind": "history",
         "authorityStatus": "candidate",

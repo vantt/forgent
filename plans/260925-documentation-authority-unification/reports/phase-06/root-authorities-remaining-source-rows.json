@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "inventoryCommit": "1157b7243ed3c4b2f9dfe67597f3908f6f881ec9",
+  "inventoryCommit": "7833bb4c11125394ea5482fdc781ccd1cf8e4e1d",
   "mapSources": [
     "docs/architecture-manifest.json",
     "docs/coexistence.md",
