@@ -45,7 +45,6 @@ export function assertSyncResumable(unitRunId, unitRecord, mainRoot) {
   if (state === 'done') {
     sync.status = 'merged';
     sync.commit = { by: 'outside' };
-    narrowScope(unitRecord);
     return;
   }
   const what = state === 'not-started'
@@ -54,16 +53,20 @@ export function assertSyncResumable(unitRunId, unitRecord, mainRoot) {
   throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": the merge of ${sync.ref} (${sync.sha}) it left for the worker ${what}; start a new run`);
 }
 
-/** Once the merge is concluded, the conflicted paths it added leave the write scope again. */
-function narrowScope(unitRecord) {
-  const added = new Set(unitRecord.sync?.scopeAdded ?? []);
-  if (added.size > 0) unitRecord.writeScope = (unitRecord.writeScope ?? []).filter((p) => !added.has(p));
+/**
+ * The scope a writing seat of this unit may write now: the stored `writeScope`, plus the conflicted
+ * paths it does not cover while, and only while, a merge of this run is open for the worker
+ * (`sync.status === 'conflicted'`). `writeScope` itself never holds them.
+ */
+export function effectiveWriteScope(unitRecord) {
+  const scope = unitRecord.writeScope ?? unitRecord.unit?.writes ?? [];
+  return unitRecord.sync?.status === 'conflicted' ? [...scope, ...(unitRecord.sync.scopeAdded ?? [])] : scope;
 }
 
 /**
  * Run the merge a pending (or failed) sync still owes. Returns null when the unit goes on to its
  * pattern, or the outcome that ends the run here: a refusal, or `pass` for a sync-only unit whose
- * merge needed no worker. A conflicted merge widens `writeScope` by the conflicted paths it does
+ * merge needed no worker. A conflicted merge widens the effective scope by the conflicted paths it does
  * not already cover.
  */
 export function runPendingSync(unitRecord, mainRoot, persist) {
@@ -81,15 +84,15 @@ export function runPendingSync(unitRecord, mainRoot, persist) {
   unitRecord.sync = result;
   persist();
   if (result.status === 'failed') {
-    // Git failing, or a commit that landed holding the wrong set, is a failure; anything else refused to start.
+    // Git failing, or a commit that landed holding the wrong set, is a failure; anything else (a
+    // pre-commit hook's `hook-refused` included) refused to start, and left no merge open.
     const outcome = ['git-error', 'committed-set-mismatch'].includes(result.reason) ? 'execution-failure' : 'policy-refusal';
     return { outcome, results: [{ outcome, role: 'producer', round: 1, refused: { reason: result.reason, detail: result.error } }] };
   }
   if (result.status === 'conflicted') {
-    // In scope only until the merge is concluded (commitRoundWithSync takes them out again).
+    // In scope only while the merge is open (effectiveWriteScope); writeScope is left as declared.
     const scope = unitRecord.writeScope ?? unitRecord.unit.writes ?? [];
     result.scopeAdded = result.conflicts.filter((p) => !matchesWriteScope(p, scope));
-    unitRecord.writeScope = [...scope, ...result.scopeAdded];
     persist();
     return null;
   }
@@ -132,7 +135,6 @@ export function commitRoundWithSync(unitRecord, mainRoot, commitWork, excludePat
   }
   sync.status = 'merged';
   sync.commit = merge.status === 'committed' ? { sha: merge.sha, subject: merge.subject, files: merge.files } : { by: 'outside' };
-  narrowScope(unitRecord);
   return { ...commitWork(), sync: merge };
 }
 

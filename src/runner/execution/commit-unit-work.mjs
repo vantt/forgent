@@ -84,7 +84,7 @@ export function gitContext({ worktree, repoRoot }) {
   if (hooksPath && !path.isAbsolute(hooksPath) && !hooksPath.startsWith('~')) {
     prefix.push('-c', `core.hooksPath=${path.resolve(mainRoot, hooksPath)}`);
   }
-  return { cwd: workTree, prefix: ['--git-dir', gitDir, '--work-tree', workTree, ...prefix] };
+  return { cwd: workTree, gitDir, prefix: ['--git-dir', gitDir, '--work-tree', workTree, ...prefix] };
 }
 
 function git(ctx, args, { env, input } = {}) {
@@ -315,8 +315,11 @@ export function commitOnBranch(worktree, sha, repoRoot) {
 // clean merge is committed at once; a conflicted one is left in progress for the worker, whose
 // only job is to edit the conflicted files; `finishSyncMerge` then concludes the merge commit.
 // The shape follows `performCatchUp` (merge --no-commit --no-ff, list `--diff-filter=U`, commit or
-// abort, `.fgos/` conflicts take the base side); its code is not reused because it runs plain git
-// in its own throwaway worktree.
+// abort); its code is not reused because it runs plain git in its own throwaway worktree. Unlike
+// it, a sync never brings the base side of `.fgos/` in: fgOS state is written through its own door
+// and a branch never carries it (ADR0020 (a worker branch never commits `.fgos/`)), the policy of
+// `fgos-write-rejected` at approve, which takes the target's side of a `.fgos/` path the branch
+// left unchanged.
 
 /**
  * A line git writes to open, split or close a conflict hunk, at the default size or a larger
@@ -383,14 +386,57 @@ export function resolveSyncBase({ worktree, repoRoot, ref }) {
   }
 }
 
-/** A conflict under `.fgos/` takes the base side: a worker branch never decides fgOS state. */
-function takeBaseSide(ctx, p) {
-  const stages = git(ctx, ['ls-files', '-u', '-z', '--', p], { env: { GIT_LITERAL_PATHSPECS: '1' } });
-  if (/^\d+ [0-9a-f]+ 3\t/m.test(stages.replace(/\0/g, '\n'))) {
-    git(ctx, ['checkout', '--theirs', '--', p], { env: { GIT_LITERAL_PATHSPECS: '1' } });
-    git(ctx, ['add', '--', p], { env: { GIT_LITERAL_PATHSPECS: '1' } });
-  } else {
-    git(ctx, ['rm', '-q', '--', p], { env: { GIT_LITERAL_PATHSPECS: '1' } });
+/**
+ * Every `.fgos/` path the merge staged or left conflicted goes back to the branch side (HEAD): kept
+ * as HEAD has it, a path the base deleted included, and a path only the base has is not taken.
+ */
+function keepBranchSideOfStore(ctx) {
+  const literal = { env: { GIT_LITERAL_PATHSPECS: '1' } };
+  const touched = new Set([...stagedPaths(ctx), ...unmergedPaths(ctx)].filter((p) => !outsideStore(p)));
+  for (const p of touched) {
+    let onBranch = true;
+    try { git(ctx, ['cat-file', '-e', `HEAD:${p}`]); } catch { onBranch = false; }
+    if (onBranch) git(ctx, ['checkout', 'HEAD', '--', p], literal);
+    else git(ctx, ['rm', '-q', '-f', '--', p], literal);
+  }
+}
+
+/**
+ * Commit what is staged. A refusal is told apart from a git failure by running the pre-commit hook
+ * git would run (the trusted hooks path) once more as git runs it: when it fails on its own, the
+ * result is `hook-refused` with its words. Returns null when the commit landed.
+ */
+function commitStaged(ctx, subject) {
+  try {
+    git(ctx, ['commit', '-q', '--no-edit', '-m', subject], { env: commitIdentity(ctx) });
+    return null;
+  } catch (err) {
+    const words = preCommitRefusal(ctx);
+    if (words !== null) return { reason: 'hook-refused', error: `the pre-commit hook refused the commit: ${words}` };
+    return { reason: 'git-error', error: String(err.stderr || err.message).trim() };
+  }
+}
+
+/** What the pre-commit hook prints when it refuses the index as it stands; null when it passes or there is none. */
+function preCommitRefusal(ctx) {
+  let hook;
+  try {
+    hook = path.resolve(ctx.cwd, git(ctx, ['rev-parse', '--git-path', 'hooks/pre-commit']).trim());
+    fs.accessSync(hook, fs.constants.X_OK);
+  } catch {
+    return null;
+  }
+  try {
+    execFileSync(hook, [], {
+      cwd: ctx.cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: cleanEnv({ GIT_DIR: ctx.gitDir, GIT_WORK_TREE: ctx.cwd, GIT_INDEX_FILE: path.join(ctx.gitDir, 'index') }),
+    });
+    return null;
+  } catch (err) {
+    const words = `${err.stderr ?? ''}${err.stdout ?? ''}`.trim() || err.message;
+    return words.length > 4000 ? `${words.slice(0, 4000)}…` : words;
   }
 }
 
@@ -408,7 +454,9 @@ function abortMerge(ctx) {
  * - `failed`: nothing is left in progress; `reason` is `untrusted-worktree`, `merge-in-progress`
  *   (a merge someone else started), `foreign-staged-index`, `merge-refused` (git would not start,
  *   e.g. a dirty file it would overwrite), `unscopable-conflict-path` (a conflicted path a write
- *   scope cannot name literally) or `git-error`.
+ *   scope cannot name exactly), `hook-refused` (the pre-commit hook refused the clean merge commit;
+ *   `error` carries its words), `committed-set-mismatch` (the commit landed holding more than the
+ *   merge) or `git-error`.
  */
 export function startSyncMerge({ worktree, repoRoot, ref, sha, adoptOpenMerge = false }) {
   const failed = (reason, error, extra = {}) => ({ status: 'failed', reason, error, ref, sha, ...extra });
@@ -440,7 +488,7 @@ export function startSyncMerge({ worktree, repoRoot, ref, sha, adoptOpenMerge = 
       }
     }
 
-    for (const p of unmergedPaths(ctx).filter((u) => !outsideStore(u))) takeBaseSide(ctx, p);
+    keepBranchSideOfStore(ctx);
     const conflicts = unmergedPaths(ctx);
     const unscopable = conflicts.filter((p) => !scopableConflictPath(p));
     if (unscopable.length > 0) {
@@ -454,11 +502,10 @@ export function startSyncMerge({ worktree, repoRoot, ref, sha, adoptOpenMerge = 
 
     const subject = syncSubject(ref);
     const staged = stagedPaths(ctx);
-    try {
-      git(ctx, ['commit', '-q', '--no-edit', '-m', subject], { env: commitIdentity(ctx) });
-    } catch (err) {
+    const refused = commitStaged(ctx, subject);
+    if (refused) {
       abortMerge(ctx);
-      return failed('git-error', `the clean merge of ${ref} could not be committed: ${String(err.stderr || err.message).trim()}`);
+      return failed(refused.reason, `the clean merge of ${ref} could not be committed: ${refused.error}`);
     }
     const merged = mergeCommitCheck(ctx, { head, sha, staged });
     if (merged.error) {
@@ -556,7 +603,8 @@ export function finishSyncMerge({ worktree, repoRoot, sync }) {
     const left = unmergedPaths(ctx);
     if (left.length > 0) return failed('staged-set-mismatch', `paths are still unmerged after staging: ${left.join(', ')}`, { unexpected: left });
     const subject = syncSubject(sync.ref);
-    git(ctx, ['commit', '-q', '--no-edit', '-m', subject], { env: commitIdentity(ctx) });
+    const refused = commitStaged(ctx, subject);
+    if (refused) return failed(refused.reason, refused.error);
     const merged = mergeCommitCheck(ctx, { head: sync.head, sha: sync.sha, staged });
     if (merged.error) return failed('committed-set-mismatch', `merge commit ${merged.sha} is on the branch but ${merged.error}`, { sha: merged.sha, subject, ...merged.detail });
     return { status: 'committed', sha: merged.sha, subject, files: merged.files };

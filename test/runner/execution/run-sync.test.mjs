@@ -38,15 +38,16 @@ function commitFile(cwd, rel, content, message) {
  * after the fork. `worker` is the body of the worker script: it runs with `files` (path -> content
  * to write), `prompt` and `runDir` (where its result goes) in scope.
  */
-function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'mine.txt': 'from branch\n' } } = {}) {
+function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'mine.txt': 'from branch\n' }, forkFiles = {}, branch = 'wt-branch' } = {}) {
   const repoRoot = makeFixtureDir('fgos-sync-');
   gitIn(repoRoot, 'init', '-q', '-b', 'main');
   gitIn(repoRoot, 'config', 'user.name', 'Sync Test');
   gitIn(repoRoot, 'config', 'user.email', 'sync@test.local');
   commitFile(repoRoot, 'README.md', 'line one\nline two\nline three\n', 'initial');
+  for (const [rel, content] of Object.entries(forkFiles)) commitFile(repoRoot, rel, content, `fork: ${rel}`);
   const worktree = makeFixtureDir('fgos-sync-wt-');
   fs.rmSync(worktree, { recursive: true, force: true });
-  gitIn(repoRoot, 'worktree', 'add', '-q', '-b', 'wt-branch', worktree);
+  gitIn(repoRoot, 'worktree', 'add', '-q', '-b', branch, worktree);
   for (const [rel, content] of Object.entries(mainFiles)) commitFile(repoRoot, rel, content, `main: ${rel}`);
   for (const [rel, content] of Object.entries(branchFiles)) commitFile(worktree, rel, content, `branch: ${rel}`);
 
@@ -259,6 +260,8 @@ test('a worker that fails over a conflicted merge leaves the merge for the resum
   assert.equal(mergeHeadOf(worktree), headOf(repoRoot));
   assert.equal(first.sync.status, 'conflicted');
   assert.deepEqual(first.sync.conflicts, ['README.md']);
+  // The conflicted path is in scope through the open merge only, never stored into writeScope.
+  assert.deepEqual(unitRecordOf(repoRoot, first.unitRunId).writeScope, ['docs']);
 
   writeWorker(script, { files: { 'README.md': 'line one\nresolved\nline three\n' } });
   const resumed = await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktree });
@@ -267,16 +270,91 @@ test('a worker that fails over a conflicted merge leaves the merge for the resum
   assert.equal(mergeHeadOf(worktree), null);
 });
 
-test('a conflict under .fgos/ takes the base side and never reaches the worker', async () => {
+// The repository's own pre-commit hook (`.githooks/pre-commit`), wired the way `npm run
+// setup:hooks` wires it, refuses any staged `.fgos/` change on a `fgw/*` branch and any staged
+// `.fgos/` deletion (ADR0020 (a worker branch never commits `.fgos/`)).
+const REAL_HOOKS = path.resolve('.githooks');
+
+test('a sync never brings the base side of .fgos/ in: every .fgos path keeps the branch side, through the real hook on a fgw/* branch', async () => {
   const { repoRoot, worktree, script } = setup({
-    mainFiles: { '.fgos/tracked.json': '{"from":"main"}\n' },
-    branchFiles: { '.fgos/tracked.json': '{"from":"branch"}\n' },
+    branch: 'fgw/item-sync',
+    forkFiles: { '.fgos/state.json': '{"v":"fork"}\n', '.fgos/gone.json': 'kept\n' },
+    mainFiles: { 'base.txt': 'from main\n', '.fgos/state.json': '{"v":"main"}\n', '.fgos/new.json': 'only on main\n' },
+    branchFiles: { 'mine.txt': 'from branch\n' },
   });
+  gitIn(repoRoot, 'rm', '-q', '.fgos/gone.json');
+  gitIn(repoRoot, 'commit', '-q', '-m', 'main: drop gone.json');
+  gitIn(repoRoot, 'config', 'core.hooksPath', REAL_HOOKS);
   writeWorker(script);
+  const ours = headOf(worktree);
   const res = await runUnit({ unitData: { id: 'u-sync-fgos', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
-  assert.equal(res.outcome, 'pass');
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]?.refused ?? res.sync));
   assert.equal(producerSpawns(repoRoot, res.unitRunId), 0);
-  assert.equal(gitIn(worktree, 'show', 'HEAD:.fgos/tracked.json'), '{"from":"main"}\n');
+  assert.deepEqual(parentsOf(worktree), [ours, headOf(repoRoot)]);
+  assert.equal(gitIn(worktree, 'show', 'HEAD:base.txt'), 'from main\n');
+  assert.equal(gitIn(worktree, 'show', 'HEAD:.fgos/state.json'), '{"v":"fork"}\n');
+  assert.equal(gitIn(worktree, 'show', 'HEAD:.fgos/gone.json'), 'kept\n', 'a .fgos path the base deleted is kept');
+  assert.throws(() => gitIn(worktree, 'show', 'HEAD:.fgos/new.json'), 'a .fgos path only the base has is not brought in');
+  assert.equal(gitIn(worktree, 'status', '--porcelain'), '');
+});
+
+test('a .fgos conflict keeps the branch side and never reaches the worker, through the real hook on a fgw/* branch', async () => {
+  const { repoRoot, worktree, script } = setup({
+    branch: 'fgw/item-sync-c',
+    mainFiles: { '.fgos/tracked.json': '{"from":"main"}\n', 'README.md': 'line one\nmain says two\nline three\n' },
+    branchFiles: { '.fgos/tracked.json': '{"from":"branch"}\n', 'README.md': 'line one\nbranch says two\nline three\n' },
+  });
+  gitIn(repoRoot, 'config', 'core.hooksPath', REAL_HOOKS);
+  writeWorker(script, { files: { 'README.md': 'line one\nboth\nline three\n' } });
+  const res = await runUnit({ unitData: { id: 'u-sync-fgos-c', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]?.commit ?? res.results[0]?.refused));
+  assert.deepEqual(res.sync.conflicts, ['README.md']);
+  assert.equal(gitIn(worktree, 'show', 'HEAD:.fgos/tracked.json'), '{"from":"branch"}\n');
+  assert.equal(parentsOf(worktree).length, 2);
+});
+
+/** A pre-commit hook in the main checkout's hooksPath that refuses every commit with `message`. */
+function refusingHook(repoRoot, message) {
+  const hooks = path.join(repoRoot, 'refusing-hooks');
+  fs.mkdirSync(hooks, { recursive: true });
+  fs.writeFileSync(path.join(hooks, 'pre-commit'), `#!/bin/sh\necho "${message}" >&2\nexit 1\n`, { mode: 0o755 });
+  gitIn(repoRoot, 'config', 'core.hooksPath', hooks);
+  return () => gitIn(repoRoot, 'config', '--unset', 'core.hooksPath');
+}
+
+test('a pre-commit hook refusing the clean merge commit ends the run hook-refused with its words, leaves no merge open, and a resume tries once more', async () => {
+  const { repoRoot, worktree, script } = setup();
+  writeWorker(script);
+  refusingHook(repoRoot, 'not on a friday');
+  const before = headOf(worktree);
+  const res = await runUnit({ unitData: { id: 'u-hook-clean', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
+  assert.equal(res.outcome, 'policy-refusal');
+  assert.equal(res.results[0].refused.reason, 'hook-refused');
+  assert.match(res.results[0].refused.detail, /not on a friday/);
+  assert.equal(headOf(worktree), before);
+  assert.equal(mergeHeadOf(worktree), null);
+  const again = await runUnit({ resumeUnitRunId: res.unitRunId, repoRoot, cwd: worktree });
+  assert.equal(again.results[0].refused.reason, 'hook-refused');
+  assert.equal(producerSpawns(repoRoot, res.unitRunId), 0);
+});
+
+test('a pre-commit hook refusing the conclusion of a conflicted merge is hook-refused, keeps the merge, and the resume only commits once the hook lets it', async () => {
+  const { repoRoot, worktree, script } = conflicting();
+  writeWorker(script, { files: { 'README.md': 'line one\nresolved\nline three\n' } });
+  const unhook = refusingHook(repoRoot, 'tests are red');
+  const first = await runUnit({ unitData: { id: 'u-hook-c', capability: 'docs:write', writes: ['docs'], syncBase: 'main' }, repoRoot, cwd: worktree });
+  assert.equal(first.outcome, 'execution-failure');
+  assert.equal(first.results[0].commit.reason, 'hook-refused');
+  assert.match(first.results[0].commit.error, /tests are red/);
+  assert.equal(mergeHeadOf(worktree), headOf(repoRoot));
+  const still = await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktree });
+  assert.equal(still.results[0].commit.reason, 'hook-refused');
+  assert.equal(producerSpawns(repoRoot, first.unitRunId), 1);
+  unhook();
+  const done = await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktree });
+  assert.equal(done.outcome, 'pass');
+  assert.equal(producerSpawns(repoRoot, first.unitRunId), 1);
+  assert.equal(parentsOf(worktree).length, 2);
 });
 
 // ---------------------------------------------------------------------------------------------

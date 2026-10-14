@@ -21,7 +21,7 @@ import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
-import { assertSyncResumable, commitRoundWithSync, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
+import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { resolveAgentDefinition } from '../agent-definitions.mjs';
 import { dispatchLockFile, parseCompositePidIdentity } from '../main-checkout-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
@@ -589,7 +589,7 @@ export async function runUnit(options = {}) {
       },
       expectedOutputs: unit.expectedOutputs || [],
       contextRefs,
-      writes: unitRecord.writeScope ?? unit.writes ?? [],
+      writes: effectiveWriteScope(unitRecord),
       // The conflicted files of a merge the runner left open for this writing seat: settlement
       // counts the seat's edits to them as its evidence, though they were dirty at launch.
       ...(!readOnly && unitRecord.sync?.status === 'conflicted' ? { syncConflicts: [...unitRecord.sync.conflicts] } : {}),
@@ -681,7 +681,7 @@ export async function runUnit(options = {}) {
     // other in this same tick, so each sees the executors its siblings were just given.
     noteRoleExecutor(role, bound.executor);
 
-    const writeScope = unitRecord.writeScope ?? unit.writes ?? [];
+    const writeScope = effectiveWriteScope(unitRecord);
     // A merge a sync left open for this round is concluded first (unit-sync.mjs), then the rest.
     const commitWork = (summarySource, runResult, excludePaths) => {
       const commit = commitRoundWithSync(unitRecord, mainRoot, () => commitUnitWork({
