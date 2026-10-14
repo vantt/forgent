@@ -411,18 +411,6 @@
       "authoredBy": "codex-session:12@2026-10-14",
       "reviewStatus": "pending",
       "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
-    },
-    {
-      "claimId": "claim_d301f741817cf5afb1da6637ea19c3c7",
-      "sourcePath": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
-      "sourceUnitDigest": "6587193ed55d77e09a42126a76fde7bb74560bb4d554440f4b09983a4fc8fc00",
-      "disposition": "supersede",
-      "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
-      "targetAnchor": "unheaded-block-6",
-      "targetUnitDigest": "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b",
-      "authoredBy": "codex-session:12@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
     }
   ],
   "stableHeadingBindings": [
@@ -545,8 +533,31 @@
       }
     }
   ],
-  "registryBytes": 59452674,
-  "registrySha256": "27956ce386fc016b459455b34b055a46105c340855b36bf4de49c745f242f99a",
+  "registryBytes": 59453707,
+  "registrySha256": "7733334b6a3d9b24821b0a493d41ef8e40c9388b76f40cade30b8abdc9178b47",
   "persistedInputSha256": "ff3b8e1ced4306cdb94dfcc943de16f2312c0d36b31889b8347aa96ce8bfa4e3",
-  "identityGraft": false
+  "identityGraft": false,
+  "retiredDisposition": {
+    "sourcePath": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+    "unitDigest": "f2a0ec231f67323d2042097f88df85c256ec79d966058ae67b79b0695b86d4a7",
+    "identityFingerprint": "f2a0ec231f67323d2042097f88df85c256ec79d966058ae67b79b0695b86d4a7",
+    "claimId": "claim_d301f741817cf5afb1da6637ea19c3c7",
+    "sourceAnchor": "unheaded-block-5",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6587193ed55d77e09a42126a76fde7bb74560bb4d554440f4b09983a4fc8fc00",
+    "claimKind": "decision",
+    "status": "removed-pending-disposition",
+    "priorStatus": "future",
+    "retiredAtCommit": "cfd4cffc17caae2e4b28417487f967f35ebae845",
+    "retiredReason": "no counterpart in current source",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+    "targetAnchor": "unheaded-block-6",
+    "targetUnitDigest": "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b",
+    "authoredBy": "codex-session:12@2026-10-14",
+    "reviewStatus": "pending",
+    "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review.",
+    "dispositionRationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+  },
+  "explainedObstacle": "Fresh D rejected the retired proposal paragraph under registryGaps; the existing checker accepts only identityGaps there. Its pending successor disposition is now stored on the native retired registry row, preserving all identity fields. No gate or identity-format change."
 }

@@ -41,18 +41,6 @@
       "authoredBy": "codex-session:12@2026-10-14",
       "reviewStatus": "pending",
       "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
-    },
-    {
-      "claimId": "claim_d301f741817cf5afb1da6637ea19c3c7",
-      "sourcePath": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
-      "sourceUnitDigest": "6587193ed55d77e09a42126a76fde7bb74560bb4d554440f4b09983a4fc8fc00",
-      "disposition": "supersede",
-      "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
-      "targetAnchor": "unheaded-block-6",
-      "targetUnitDigest": "13d3f19b6e6edbc74136133f416e17eb74f8ad39d5e90b8660f9efad5125cf4b",
-      "authoredBy": "codex-session:12@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
     }
   ]
 }
