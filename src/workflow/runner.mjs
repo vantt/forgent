@@ -180,14 +180,12 @@ function unitPatternOf(template) {
 }
 
 /**
- * The overrides a unit implies. `persona` binds that persona on every seat of the unit, as the
- * `--override` JSON `{"scope":{"unit":"<id>"},"persona":"<name>"}` would; the origin says the
- * Workflow definition set it, not a person at the CLI.
+ * The overrides a unit implies. A template's `persona` is not one of them: it travels on the Unit
+ * itself (unitData.persona), which bind() ranks below an override and above the capability's.
  *
- * A `--seats` run also binds each named persona to its own seat of every panel unit, scoped by role,
- * with the persona text pinned at start. bind() takes the first override whose scope matches, so the
- * seat entries come ahead of the unit-wide one: the named seat keeps its persona, every other role
- * (the synthesizer included) falls through to the unit's own.
+ * A `--seats` run binds each named persona to its own seat of every panel unit, scoped by role,
+ * with the persona text pinned at start: the named seat keeps its persona, every other role (the
+ * synthesizer included) has no matching override and falls through to the unit's own persona.
  *
  * A run started with `--effort` asks every role for that reasoning effort, the way `fgos run --effort`
  * does: on every entry above, and as a trailing unscoped `human-cli` override that a role no entry
@@ -202,10 +200,8 @@ function unitOverridesOf(unit, seatPersonas = [], effort = null) {
       origin: 'workflow',
     }))
     : [];
-  const persona = unit.template.persona;
-  const overrides = [...seatScoped, ...(persona ? [{ scope: { unit: unit.id }, persona, origin: 'workflow' }] : [])];
-  if (!effort) return overrides;
-  return [...overrides.map((ov) => ({ ...ov, reasoningEffort: effort })), { origin: 'human-cli', reasoningEffort: effort }];
+  if (!effort) return seatScoped;
+  return [...seatScoped.map((ov) => ({ ...ov, reasoningEffort: effort })), { origin: 'human-cli', reasoningEffort: effort }];
 }
 
 /**

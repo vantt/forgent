@@ -1265,7 +1265,7 @@ function useDistinctFamilies(tmp, names) {
   fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
 }
 
-test('a unit template persona and params reach the binding and the per-role objective like a CLI override', async () => {
+test('a unit template persona and params reach the binding and the per-role objective', async () => {
   const tmp = setupTestRepo();
   useDistinctFamilies(tmp, ['alpha', 'beta', 'gamma']);
 
@@ -1304,13 +1304,15 @@ test('a unit template persona and params reach the binding and the per-role obje
   // params.roleTasks reached roleUnit: the synthesizer was given the workflow's own task text.
   assert.match(readAssignment(panelRunId, 'synthesizer').objective, /^WORKFLOW-SYNTH-TASK for: Review the design/);
 
-  // persona reached bind() as an override scoped to the unit, so its seats carry the persona.
+  // persona travels on the Unit itself, which bind() reads below an override: every seat carries
+  // it with provenance "unit", and no override is made up for it.
   for (const role of ['panelist-1', 'panelist-2']) {
     assert.equal(readAssignment(panelRunId, role).policy.preferPersona, 'panelist', role);
+    assert.equal(readAssignment(panelRunId, role).binding.provenance.persona.source, 'unit', role);
   }
   const unitRecord = JSON.parse(fs.readFileSync(path.join(runDir(panelRunId), 'unit.json'), 'utf8'));
-  assert.equal(unitRecord.overrides[0].origin, 'workflow');
-  assert.deepEqual(unitRecord.overrides[0].scope, { unit: 'p' });
+  assert.equal(unitRecord.unit.persona, 'panelist');
+  assert.deepEqual(unitRecord.overrides, []);
 
   // a unit that declares no persona gets none from the workflow.
   const soloRunId = state.steps.plain.units.s.unitRunId;
@@ -1946,11 +1948,12 @@ test('a named persona lands on its own seat only, mixed with a lens and an insta
   assert.deepEqual(statusWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp }).seats.personas, expected);
 
   const unitRunId = state.steps.opinions.units.panel.unitRunId;
-  // The seat entries come ahead of the unit-wide persona, which still serves every other role.
+  // Only the named seats are overrides; the unit's own persona travels on the Unit and serves every other role.
   const unitRecord = JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
   assert.deepEqual(unitRecord.overrides.map((o) => [o.scope.role ?? null, o.persona]), [
-    ['panelist-2', 'finance-controller'], ['panelist-3', 'council-assumptions'], [null, 'panelist'],
+    ['panelist-2', 'finance-controller'], ['panelist-3', 'council-assumptions'],
   ]);
+  assert.equal(unitRecord.unit.persona, 'panelist');
   const personaOf = (role) => seatAssignment(tmp, unitRunId, role).policy.preferPersona;
   assert.equal(personaOf('panelist-1'), 'panelist', 'a lens seat keeps the unit-wide persona');
   assert.equal(personaOf('panelist-2'), 'finance-controller');
