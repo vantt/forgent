@@ -10,7 +10,10 @@ Last green commit: 11b84b1ae6dede3cd9f46e2c4c84a7fff1460e93
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
 Resume tree clean on required worktree and branch. Apply the two corrected ordinary verdicts, refresh both-prior D/scoped E/native equality, then author up to 240 mapped rows in bounded packs. Persist compact registry below 90 MB. Truth report/sample untouched; owner 5/30 decision parked. No promotion, main merge/write, push, Step 6 or protected tool edits.
-Next: native resume proofs and exact-note application, then source packs with progress after each.
+Applied both corrected ordinary verdicts at a5b13d6df with verbatim notes; provenance 18962827a retained. Application native equality: all 94,494 known IDs/full tuples retained, no gaps or retired additions, root pending 5 / reviewed 508 / undecided 559 before new authoring. Resume scoped E after application has exactly two historical IO gaps and 70 candidate-unverified units, no pending source row in its nine scopes. Resume D runs both pass, but the first preceded applying the two rows; final both-prior proof will use the same final shard state.
+Commits so far: ad2ca83e2 (resume), bb43198ba (corrected verdicts and liveness), 23062c2ce (15 mapped carriers).
+Authored 240 mapped source decisions, all pending: 104 Unit-exact / 83 Weak-exact / 53 Judgment. Corrected a data-only invalid claimKind from behavior to specification, using the existing vocabulary; no checker change. Final native equality/D/E and bounded publication are running.
+Next: final proof, compact registry commit and four bounded packs, progress after each; STOP.
 
 Earlier progress follows intact.
 
