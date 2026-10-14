@@ -1,0 +1,709 @@
+{
+  "contentCommit": "7833bb4c11125394ea5482fdc781ccd1cf8e4e1d",
+  "rows": [
+    {
+      "claimId": "claim_049328a09ba2129e3fcf91723d32a4e2",
+      "entryKind": "claims",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "beforeDecision": {
+        "claimId": "claim_049328a09ba2129e3fcf91723d32a4e2",
+        "sourceUnitDigest": "f4b2fe939e035e0720bfed27c889b6a74904d570b8e1bf8860cbef0115ef9afb",
+        "targetOwner": "docs/platform/governance.md",
+        "targetAnchor": "13-migration-rule",
+        "targetUnitDigest": "c75402a1584a65fe82b7c8343d1694feb1ac4af353095ac1e3a7c46356d01100",
+        "targetAncestry": [
+          "Documentation Governance"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:17@2026-10-14",
+        "rationale": "Whole source unit docs/doc-governance.md#13-migration-rule is retained at docs/platform/governance.md#13-migration-rule; only relative navigation spelling changes to preserve the same absolute repository destinations. The future component-boundary target is a plain path under the later-batch rule. Every prose clause, rule and list item is retained; shown full text and diff must be checked independently. No new governance rule or authority cutover."
+      },
+      "decision": {
+        "claimId": "claim_049328a09ba2129e3fcf91723d32a4e2",
+        "sourceUnitDigest": "f4b2fe939e035e0720bfed27c889b6a74904d570b8e1bf8860cbef0115ef9afb",
+        "targetOwner": "docs/platform/governance.md",
+        "targetAnchor": "13-migration-rule",
+        "targetUnitDigest": "c75402a1584a65fe82b7c8343d1694feb1ac4af353095ac1e3a7c46356d01100",
+        "targetAncestry": [
+          "Documentation Governance"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:17@2026-10-14",
+        "rationale": "Whole Migration Rule section is retained; only two relative link spellings change, to ../transitional-switchboard.md and migration-authoring-rules.md, preserving the original repository destinations. Every prose clause and obligation is retained. No governance rule or authority changes."
+      },
+      "sourceUnitDigest": "f4b2fe939e035e0720bfed27c889b6a74904d570b8e1bf8860cbef0115ef9afb",
+      "targetUnitDigest": "c75402a1584a65fe82b7c8343d1694feb1ac4af353095ac1e3a7c46356d01100",
+      "source": {
+        "path": "docs/doc-governance.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "13. Migration Rule",
+        "anchor": "13-migration-rule",
+        "githubAnchor": "13-migration-rule",
+        "stableAnchor": "h-04fd4f7ac918",
+        "startLine": 447,
+        "endLine": 447,
+        "textDigest": "f4b2fe939e035e0720bfed27c889b6a74904d570b8e1bf8860cbef0115ef9afb",
+        "sample": "13. Migration Rule",
+        "sectionPayloadDigest": "6b29924e74aeacbb1b95618a6c9418029d0a8495333b0fd6b72382413d3c6ad6",
+        "followingBlockDigest": "426abc17fc8695a142ead7ec695212122655219c4a6f7a7566a729084eb08448",
+        "identityFingerprint": "d099bdfa8ee3ca21fdde391afa5016deafc452263b5a6c8f6904c1cf561dede7",
+        "ancestry": [
+          "Documentation Governance"
+        ],
+        "text": "## 13. Migration Rule",
+        "sectionText": "## 13. Migration Rule\n\nDo not bulk-move old docs before classifying them by type, authority, lifecycle,\nprovenance, and claim ownership. Content may be transformed and reviewed one\narea at a time, but the authorized migration program must declare whether\npromotion is per-area or repository-wide; transformation order alone never\nchanges authority.\n\nUntil a newer program is explicitly accepted, each area portal's current-source\nmapping controls, operationalized through [transitional-switchboard.md](transitional-switchboard.md).\nAuthors during migration must follow [platform/migration-authoring-rules.md](platform/migration-authoring-rules.md)\n(one claim, one canonical owner, never dual-author prose, ratchet enforcement on legacy roots).\nA target marked partial/candidate does not outrank that map, and readers must surface\nconflicts rather than infer authority from path or date. Any redirect/stub must be\nexplicitly read-only and temporary. The proposed repository-wide normalization and\nalias-based retirement model is documented in\n`platform/proposals/documentation-system-unification.md` and is not active merely\nbecause its plan exists."
+      },
+      "target": {
+        "path": "docs/platform/governance.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "13. Migration Rule",
+        "anchor": "13-migration-rule",
+        "githubAnchor": "13-migration-rule",
+        "stableAnchor": "h-e8c13c59c658",
+        "startLine": 448,
+        "endLine": 448,
+        "textDigest": "c75402a1584a65fe82b7c8343d1694feb1ac4af353095ac1e3a7c46356d01100",
+        "sample": "13. Migration Rule",
+        "sectionPayloadDigest": "bd262eea39366947f51de2e60dcd64b8d0ec82e4b3aa6524c691df8f4200030f",
+        "followingBlockDigest": "426abc17fc8695a142ead7ec695212122655219c4a6f7a7566a729084eb08448",
+        "identityFingerprint": "c39c390097c568dfa8cb247072039b67b9fa7b30a6130a43d52c738ff4fa7f07",
+        "ancestry": [
+          "Documentation Governance"
+        ],
+        "text": "## 13. Migration Rule",
+        "sectionText": "## 13. Migration Rule\n\nDo not bulk-move old docs before classifying them by type, authority, lifecycle,\nprovenance, and claim ownership. Content may be transformed and reviewed one\narea at a time, but the authorized migration program must declare whether\npromotion is per-area or repository-wide; transformation order alone never\nchanges authority.\n\nUntil a newer program is explicitly accepted, each area portal's current-source\nmapping controls, operationalized through [transitional-switchboard.md](../transitional-switchboard.md).\nAuthors during migration must follow [platform/migration-authoring-rules.md](migration-authoring-rules.md)\n(one claim, one canonical owner, never dual-author prose, ratchet enforcement on legacy roots).\nA target marked partial/candidate does not outrank that map, and readers must surface\nconflicts rather than infer authority from path or date. Any redirect/stub must be\nexplicitly read-only and temporary. The proposed repository-wide normalization and\nalias-based retirement model is documented in\n`platform/proposals/documentation-system-unification.md` and is not active merely\nbecause its plan exists."
+      }
+    },
+    {
+      "claimId": "claim_25f06d2e833c0241a324a4898781bc4a",
+      "entryKind": "claims",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "beforeDecision": {
+        "claimId": "claim_25f06d2e833c0241a324a4898781bc4a",
+        "sourceUnitDigest": "9e852420cafcc284db1d2e3d60aab4dce51818638cfa79ebdf0554732f0edd03",
+        "targetOwner": "docs/platform/governance.md",
+        "targetAnchor": "unheaded-block-59",
+        "targetUnitDigest": "fb5565f1a415763fd84e9474b968e9780d3cf1ede3d0bdc242c58b499f90bfc3",
+        "targetAncestry": [
+          "Documentation Governance",
+          "13. Migration Rule"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:17@2026-10-14",
+        "rationale": "Whole source unit docs/doc-governance.md#unheaded-block-59 is retained at docs/platform/governance.md#unheaded-block-59; only relative navigation spelling changes to preserve the same absolute repository destinations. The future component-boundary target is a plain path under the later-batch rule. Every prose clause, rule and list item is retained; shown full text and diff must be checked independently. No new governance rule or authority cutover."
+      },
+      "decision": {
+        "claimId": "claim_25f06d2e833c0241a324a4898781bc4a",
+        "sourceUnitDigest": "9e852420cafcc284db1d2e3d60aab4dce51818638cfa79ebdf0554732f0edd03",
+        "targetOwner": "docs/platform/governance.md",
+        "targetAnchor": "unheaded-block-59",
+        "targetUnitDigest": "fb5565f1a415763fd84e9474b968e9780d3cf1ede3d0bdc242c58b499f90bfc3",
+        "targetAncestry": [
+          "Documentation Governance",
+          "13. Migration Rule"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:17@2026-10-14",
+        "rationale": "Whole Migration Rule block is retained; only two relative link spellings change, to ../transitional-switchboard.md and migration-authoring-rules.md, preserving the original repository destinations. Every prose clause and obligation is retained. No governance rule or authority changes."
+      },
+      "sourceUnitDigest": "9e852420cafcc284db1d2e3d60aab4dce51818638cfa79ebdf0554732f0edd03",
+      "targetUnitDigest": "fb5565f1a415763fd84e9474b968e9780d3cf1ede3d0bdc242c58b499f90bfc3",
+      "source": {
+        "path": "docs/doc-governance.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-59",
+        "githubAnchor": "unheaded-block-59",
+        "stableAnchor": "unheaded-block-59",
+        "title": "Unheaded block 59",
+        "startLine": 455,
+        "endLine": 464,
+        "textDigest": "9e852420cafcc284db1d2e3d60aab4dce51818638cfa79ebdf0554732f0edd03",
+        "sample": "Until a newer program is explicitly accepted, each area portal's current-source\nmapping controls, operationalized through [transitional-switchboard.md](transitional-switchboard.md)",
+        "identityFingerprint": "01875b06d505b5f741384ae9bdf3f0d9b35a9579a711f73ae3cabf200e2207d0",
+        "ancestry": [
+          "Documentation Governance",
+          "13. Migration Rule"
+        ],
+        "text": "Until a newer program is explicitly accepted, each area portal's current-source\nmapping controls, operationalized through [transitional-switchboard.md](transitional-switchboard.md).\nAuthors during migration must follow [platform/migration-authoring-rules.md](platform/migration-authoring-rules.md)\n(one claim, one canonical owner, never dual-author prose, ratchet enforcement on legacy roots).\nA target marked partial/candidate does not outrank that map, and readers must surface\nconflicts rather than infer authority from path or date. Any redirect/stub must be\nexplicitly read-only and temporary. The proposed repository-wide normalization and\nalias-based retirement model is documented in\n`platform/proposals/documentation-system-unification.md` and is not active merely\nbecause its plan exists."
+      },
+      "target": {
+        "path": "docs/platform/governance.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-59",
+        "githubAnchor": "unheaded-block-59",
+        "stableAnchor": "unheaded-block-59",
+        "title": "Unheaded block 59",
+        "startLine": 456,
+        "endLine": 465,
+        "textDigest": "fb5565f1a415763fd84e9474b968e9780d3cf1ede3d0bdc242c58b499f90bfc3",
+        "sample": "Until a newer program is explicitly accepted, each area portal's current-source\nmapping controls, operationalized through [transitional-switchboard.md](../transitional-switchboard.",
+        "identityFingerprint": "4c0a8897b5baf045341386ed54c2ebe23673627d8a5a97edf6f9842366dfe2dc",
+        "ancestry": [
+          "Documentation Governance",
+          "13. Migration Rule"
+        ],
+        "text": "Until a newer program is explicitly accepted, each area portal's current-source\nmapping controls, operationalized through [transitional-switchboard.md](../transitional-switchboard.md).\nAuthors during migration must follow [platform/migration-authoring-rules.md](migration-authoring-rules.md)\n(one claim, one canonical owner, never dual-author prose, ratchet enforcement on legacy roots).\nA target marked partial/candidate does not outrank that map, and readers must surface\nconflicts rather than infer authority from path or date. Any redirect/stub must be\nexplicitly read-only and temporary. The proposed repository-wide normalization and\nalias-based retirement model is documented in\n`platform/proposals/documentation-system-unification.md` and is not active merely\nbecause its plan exists."
+      }
+    },
+    {
+      "claimId": "claim_66f7be3b79ca1fe458ce0416ba1adf89",
+      "entryKind": "claims",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "beforeDecision": {
+        "claimId": "claim_66f7be3b79ca1fe458ce0416ba1adf89",
+        "sourceUnitDigest": "b94c5cec93998f88a549a7613a90fbb1c4f111181aacf0faffc469528603bf9f",
+        "targetOwner": "docs/platform/governance.md",
+        "targetAnchor": "14-related-files",
+        "targetUnitDigest": "fee84962ef28aa9f7435ec5dd77a474a013bc2f2595a9d34f403da53411cdbc9",
+        "targetAncestry": [
+          "Documentation Governance"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:17@2026-10-14",
+        "rationale": "Whole source unit docs/doc-governance.md#14-related-files is retained at docs/platform/governance.md#14-related-files; only relative navigation spelling changes to preserve the same absolute repository destinations. The future component-boundary target is a plain path under the later-batch rule. Every prose clause, rule and list item is retained; shown full text and diff must be checked independently. No new governance rule or authority cutover."
+      },
+      "decision": {
+        "claimId": "claim_66f7be3b79ca1fe458ce0416ba1adf89",
+        "sourceUnitDigest": "b94c5cec93998f88a549a7613a90fbb1c4f111181aacf0faffc469528603bf9f",
+        "targetOwner": "docs/platform/governance.md",
+        "targetAnchor": "14-related-files",
+        "targetUnitDigest": "e589d54d9c81da5e926e98fa5cecf502a3fbe44355a75963d71242b42ef55edb",
+        "targetAncestry": [
+          "Documentation Governance"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:17@2026-10-14",
+        "rationale": "Whole Related Files section is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes."
+      },
+      "sourceUnitDigest": "b94c5cec93998f88a549a7613a90fbb1c4f111181aacf0faffc469528603bf9f",
+      "targetUnitDigest": "e589d54d9c81da5e926e98fa5cecf502a3fbe44355a75963d71242b42ef55edb",
+      "source": {
+        "path": "docs/doc-governance.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "14. Related Files",
+        "anchor": "14-related-files",
+        "githubAnchor": "14-related-files",
+        "stableAnchor": "h-268a79605190",
+        "startLine": 466,
+        "endLine": 466,
+        "textDigest": "b94c5cec93998f88a549a7613a90fbb1c4f111181aacf0faffc469528603bf9f",
+        "sample": "14. Related Files",
+        "sectionPayloadDigest": "f42764566cc00268ec5f1cf4ab8d130764ffe3dc3a367881640633c3c876b083",
+        "followingBlockDigest": "f42764566cc00268ec5f1cf4ab8d130764ffe3dc3a367881640633c3c876b083",
+        "identityFingerprint": "757f5bf6bfafc526942f30385eb0d77534e3ff50eeca6b70e13725c6e6415d19",
+        "ancestry": [
+          "Documentation Governance"
+        ],
+        "text": "## 14. Related Files",
+        "sectionText": "## 14. Related Files\n\n| Relationship | File |\n|---|---|\n| documentation portal | [README.md](README.md) |\n| reader routing | [reading-map.md](reading-map.md) |\n| operative transitional switchboard | [transitional-switchboard.md](transitional-switchboard.md) |\n| migration authoring rules | [platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) |\n| platform portal | [platform/README.md](platform/README.md) |\n| source design discussion | [architect/documentation-system-design.md](architect/documentation-system-design.md) |"
+      },
+      "target": {
+        "path": "docs/platform/governance.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "14. Related Files",
+        "anchor": "14-related-files",
+        "githubAnchor": "14-related-files",
+        "stableAnchor": "h-0bbdbfcf2ed4",
+        "startLine": 467,
+        "endLine": 467,
+        "textDigest": "e589d54d9c81da5e926e98fa5cecf502a3fbe44355a75963d71242b42ef55edb",
+        "sample": "14. Related Files",
+        "sectionPayloadDigest": "0729946d01afffc2b5800527271a368947d3971968759a447bd51eec81f15f5b",
+        "followingBlockDigest": "0729946d01afffc2b5800527271a368947d3971968759a447bd51eec81f15f5b",
+        "identityFingerprint": "79106d7dc90dd0812b27974f1392e78190495833abe57e4cfdbcf024f35be975",
+        "ancestry": [
+          "Documentation Governance"
+        ],
+        "text": "## 14. Related Files",
+        "sectionText": "## 14. Related Files\n\n| Relationship | File |\n|---|---|\n| documentation portal | [README.md](../README.md) |\n| reader routing | [reading-map.md](../reading-map.md) |\n| operative transitional switchboard | [transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n| platform portal | [platform/README.md](README.md) |\n| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |"
+      }
+    },
+    {
+      "claimId": "claim_5f99956630d0cb78499c2a3542d2e5e3",
+      "entryKind": "claims",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "beforeDecision": {
+        "claimId": "claim_5f99956630d0cb78499c2a3542d2e5e3",
+        "sourceUnitDigest": "f42764566cc00268ec5f1cf4ab8d130764ffe3dc3a367881640633c3c876b083",
+        "targetOwner": "docs/platform/governance.md",
+        "targetAnchor": "unheaded-block-60",
+        "targetUnitDigest": "4aad7684bd5ff59163cf2e9cfc405f7b897c2a9b3a6fc678531b179c343e305f",
+        "targetAncestry": [
+          "Documentation Governance",
+          "14. Related Files"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:17@2026-10-14",
+        "rationale": "Whole source unit docs/doc-governance.md#unheaded-block-60 is retained at docs/platform/governance.md#unheaded-block-60; only relative navigation spelling changes to preserve the same absolute repository destinations. The future component-boundary target is a plain path under the later-batch rule. Every prose clause, rule and list item is retained; shown full text and diff must be checked independently. No new governance rule or authority cutover."
+      },
+      "decision": {
+        "claimId": "claim_5f99956630d0cb78499c2a3542d2e5e3",
+        "sourceUnitDigest": "f42764566cc00268ec5f1cf4ab8d130764ffe3dc3a367881640633c3c876b083",
+        "targetOwner": "docs/platform/governance.md",
+        "targetAnchor": "unheaded-block-60",
+        "targetUnitDigest": "0729946d01afffc2b5800527271a368947d3971968759a447bd51eec81f15f5b",
+        "targetAncestry": [
+          "Documentation Governance",
+          "14. Related Files"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:17@2026-10-14",
+        "rationale": "Whole Related Files table is retained. Nine relative link spellings are adjusted across governance.md to preserve the original repository destinations, including the documentation portal README.md now written ../README.md (docs/README.md), distinct from the platform portal. This unit contains no component-boundary plain path. No governance rule or authority changes."
+      },
+      "sourceUnitDigest": "f42764566cc00268ec5f1cf4ab8d130764ffe3dc3a367881640633c3c876b083",
+      "targetUnitDigest": "0729946d01afffc2b5800527271a368947d3971968759a447bd51eec81f15f5b",
+      "source": {
+        "path": "docs/doc-governance.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-60",
+        "githubAnchor": "unheaded-block-60",
+        "stableAnchor": "unheaded-block-60",
+        "title": "Unheaded block 60",
+        "startLine": 468,
+        "endLine": 475,
+        "textDigest": "f42764566cc00268ec5f1cf4ab8d130764ffe3dc3a367881640633c3c876b083",
+        "sample": "| Relationship | File |\n|---|---|\n| documentation portal | [README.md](README.md) |\n| reader routing | [reading-map.md](reading-map.md) |\n| operative transitional switchboard | [tr",
+        "identityFingerprint": "9573f3fb3d5a217ca75e0ce2ba6c7f93f1e9198ced63f290e856874d8e91aa37",
+        "ancestry": [
+          "Documentation Governance",
+          "14. Related Files"
+        ],
+        "text": "| Relationship | File |\n|---|---|\n| documentation portal | [README.md](README.md) |\n| reader routing | [reading-map.md](reading-map.md) |\n| operative transitional switchboard | [transitional-switchboard.md](transitional-switchboard.md) |\n| migration authoring rules | [platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) |\n| platform portal | [platform/README.md](platform/README.md) |\n| source design discussion | [architect/documentation-system-design.md](architect/documentation-system-design.md) |"
+      },
+      "target": {
+        "path": "docs/platform/governance.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-60",
+        "githubAnchor": "unheaded-block-60",
+        "stableAnchor": "unheaded-block-60",
+        "title": "Unheaded block 60",
+        "startLine": 469,
+        "endLine": 476,
+        "textDigest": "0729946d01afffc2b5800527271a368947d3971968759a447bd51eec81f15f5b",
+        "sample": "| Relationship | File |\n|---|---|\n| documentation portal | [README.md](../README.md) |\n| reader routing | [reading-map.md](../reading-map.md) |\n| operative transitional switchboard",
+        "identityFingerprint": "febba28a75f0ffc2e795142eade83b9409275a4ac349bcbe6634d92bad1f689d",
+        "ancestry": [
+          "Documentation Governance",
+          "14. Related Files"
+        ],
+        "text": "| Relationship | File |\n|---|---|\n| documentation portal | [README.md](../README.md) |\n| reader routing | [reading-map.md](../reading-map.md) |\n| operative transitional switchboard | [transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n| platform portal | [platform/README.md](README.md) |\n| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |"
+      }
+    },
+    {
+      "claimId": "claim_4a023fa2faa879fb0e1dfd8bc5c051e7",
+      "entryKind": "registryGaps",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "beforeDecision": {
+        "claimId": "claim_4a023fa2faa879fb0e1dfd8bc5c051e7",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "857ad2167a0283ad4b9f08a4493f324f899b84211e10234b9d0eddfb9683c63f",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-31",
+        "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "authoredBy": "codex-session:17@2026-10-14",
+        "reviewStatus": "pending",
+        "rationale": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-31 at 9881f8622 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry."
+      },
+      "decision": {
+        "claimId": "claim_4a023fa2faa879fb0e1dfd8bc5c051e7",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "857ad2167a0283ad4b9f08a4493f324f899b84211e10234b9d0eddfb9683c63f",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-31",
+        "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "authoredBy": "codex-session:17@2026-10-14",
+        "reviewStatus": "pending",
+        "rationale": "The predecessor block 31 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The only delta to the real same-file successor is adding review/approve/run examples. All other wording is retained, including field definitions, review rationale and STR38 clause. Native predecessor identity is conserved without graft or approval carry."
+      },
+      "sourceUnitDigest": "857ad2167a0283ad4b9f08a4493f324f899b84211e10234b9d0eddfb9683c63f",
+      "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+      "source": {
+        "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-31",
+        "githubAnchor": "unheaded-block-31",
+        "stableAnchor": "unheaded-block-31",
+        "title": "Unheaded block 31",
+        "startLine": 269,
+        "endLine": 279,
+        "textDigest": "857ad2167a0283ad4b9f08a4493f324f899b84211e10234b9d0eddfb9683c63f",
+        "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+        "identityFingerprint": "16e50845e03a9aa5d11b62573eb9e9332174f9a8038a3ffd0a2311fd99f7645c",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38).",
+        "commit": "9881f8622732e3ba7c8e203097d42674b8aba36d"
+      },
+      "target": {
+        "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-31",
+        "githubAnchor": "unheaded-block-31",
+        "stableAnchor": "unheaded-block-31",
+        "title": "Unheaded block 31",
+        "startLine": 269,
+        "endLine": 279,
+        "textDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+        "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+        "identityFingerprint": "abdaf7574d8107b6e5d325a95cb8c7327dac1248939788580176154fa990dace",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+      }
+    },
+    {
+      "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+      "entryKind": "registryGaps",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "beforeDecision": {
+        "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "authoredBy": "codex-session:17@2026-10-14",
+        "reviewStatus": "pending",
+        "rationale": "The native predecessor docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-32 at 9881f8622 is superseded by the complete same-file effect-axis unit. It preserves the field definitions, review/--github rationale where present, every list item and the external dispatch qualifier, adds explicit COMMAND_REGISTRY/15/no-coordination manifest wording, and keeps the valid review/approve/run examples. Whole source and target are shown; no identity graft or approval carry."
+      },
+      "decision": {
+        "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+        "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "sourceUnitDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "authoredBy": "codex-session:17@2026-10-14",
+        "reviewStatus": "pending",
+        "rationale": "The predecessor block 32 at 9881f8622 already states COMMAND_REGISTRY, 15 externalEffect verbs and no coordination. The only delta to the real same-file successor is adding review/approve/run examples. All other wording, list items and dispatch executor qualifier are retained. Native predecessor identity is conserved without graft or approval carry."
+      },
+      "sourceUnitDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+      "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+      "source": {
+        "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 291,
+        "textDigest": "5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "2911a2b03dc981b527055f9a4217c22644d3515eb10ecf138e73aba0a0831662",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (dispatch executor thật tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng.",
+        "commit": "9881f8622732e3ba7c8e203097d42674b8aba36d"
+      },
+      "target": {
+        "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 292,
+        "textDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "30875a14838a5fce1721d0dcfdf932a096ec6d0afd6aab7c550003f7ec804fb4",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật\n  tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      }
+    },
+    {
+      "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
+      "entryKind": "claims",
+      "shard": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "beforeDecision": {
+        "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
+        "sourceUnitDigest": "39e4ab1f30a6acc9",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "rationale": "Code is truth for the whole effect-axis field list. Owner A15 resolves SC-1: replace the retired coordination example with run, preserving every other entry-field definition and qualifier. The actual current machine-readable manifest has 15 externalEffect verbs including run and no coordination verb; both candidate examples now agree. This corrected whole-unit carry supersedes the stale source example, not a claim of verbatim copying or a silent partial carry. Independent review is pending.",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ]
+      },
+      "decision": {
+        "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
+        "sourceUnitDigest": "39e4ab1f30a6acc9",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "unheaded-block-32",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "rationale": "Whole source unit is carried. Besides replacing the coordination example with run, the diff replaces the fgos --help --json deferral with explicit current assertions: COMMAND_REGISTRY is the source, 15 verbs carry externalEffect: true, and coordination is absent. The review/approve/run examples, dispatch executor qualifier, other bullets and field definitions are conserved; no approval carries.",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "targetAncestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ]
+      },
+      "sourceUnitDigest": "39e4ab1f30a6acc9",
+      "targetUnitDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+      "source": {
+        "path": "docs/io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-19",
+        "githubAnchor": "unheaded-block-19",
+        "stableAnchor": "unheaded-block-19",
+        "title": "Unheaded block 19",
+        "startLine": 127,
+        "endLine": 137,
+        "textDigest": "39e4ab1f30a6acc99de534a9fd16bd348b9ef8c1827664c0a7a50487f0587c0c",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "6b0f42533c4fbfd6b576f52b1115cc0f8067f63c26b1dd14f1030d857dfa5289",
+        "ancestry": [
+          "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+          "Sổ verb máy-đọc — CLI tự mô tả"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Xem `fgos --help --json` cho\n  danh sách hiện hành mang `externalEffect: true` (ví dụ `review`, `approve`,\n  `coordination` — dispatch executor thật tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      },
+      "target": {
+        "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-32",
+        "githubAnchor": "unheaded-block-32",
+        "stableAnchor": "unheaded-block-32",
+        "title": "Unheaded block 32",
+        "startLine": 281,
+        "endLine": 292,
+        "textDigest": "e1577e3b51decf45fde9d2754d740429b7714340ec90baf7e5e4156b316e33d1",
+        "sample": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `unde",
+        "identityFingerprint": "30875a14838a5fce1721d0dcfdf932a096ec6d0afd6aab7c550003f7ec804fb4",
+        "ancestry": [
+          "CLI I/O Contract",
+          "7. Machine-Readable Verb Registry",
+          "Entry Fields And Effect Axes"
+        ],
+        "text": "- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`\n  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata\n  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).\n- **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và\n  **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục\n  độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,\n  sai cho `review`: nó khai `mutation` chỉ vì `--github` tạo PR thật, dù\n  bản thân `review` không hề ghi trạng thái). Danh sách hiện hành mang `externalEffect: true` lấy từ manifest\n  `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có\n  `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật\n  tính là effect ngoài `.fgos/`).\n- `paginated` (xem trên) và `multiValueFormat` (dưới) khi áp dụng."
+      }
+    }
+  ],
+  "nativeConsequences": {
+    "gaps": [
+      {
+        "identityGap": {
+          "sourcePath": "docs/platform/governance.md",
+          "unitDigest": "e22049e06c0ec6c9ec58b06a1bd677264589d16ba887e8c95685c05fd2073a82",
+          "identityFingerprint": "e22049e06c0ec6c9ec58b06a1bd677264589d16ba887e8c95685c05fd2073a82",
+          "claimId": "claim_a01d870cf693e19d3ee3b376a2c99093",
+          "sourceAnchor": "unheaded-block-60",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "4aad7684bd5ff59163cf2e9cfc405f7b897c2a9b3a6fc678531b179c343e305f",
+          "claimKind": "unclassified",
+          "status": "future",
+          "origin": "added-since-9881f8622732e3ba7c8e203097d42674b8aba36d",
+          "identityStatus": "identity-gap",
+          "gapReason": "edited unit whose anchor unheaded-block-60 is not a stable heading anchor"
+        },
+        "beforeIdentity": {
+          "sourcePath": "docs/platform/governance.md",
+          "unitDigest": "e22049e06c0ec6c9ec58b06a1bd677264589d16ba887e8c95685c05fd2073a82",
+          "identityFingerprint": "e22049e06c0ec6c9ec58b06a1bd677264589d16ba887e8c95685c05fd2073a82",
+          "claimId": "claim_a01d870cf693e19d3ee3b376a2c99093",
+          "sourceAnchor": "unheaded-block-60",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "4aad7684bd5ff59163cf2e9cfc405f7b897c2a9b3a6fc678531b179c343e305f",
+          "claimKind": "unclassified",
+          "status": "future",
+          "origin": "added-since-9881f8622732e3ba7c8e203097d42674b8aba36d"
+        },
+        "nativeSuccessor": {
+          "sourcePath": "docs/platform/governance.md",
+          "unitDigest": "febba28a75f0ffc2e795142eade83b9409275a4ac349bcbe6634d92bad1f689d",
+          "identityFingerprint": "febba28a75f0ffc2e795142eade83b9409275a4ac349bcbe6634d92bad1f689d",
+          "claimId": "claim_c810411255d8383db9a186eb780c0b44",
+          "sourceAnchor": "unheaded-block-60",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "0729946d01afffc2b5800527271a368947d3971968759a447bd51eec81f15f5b",
+          "claimKind": "unclassified",
+          "status": "future",
+          "origin": "added-since-c8b2d948d6dd0b408011b294fd67aea59870749b"
+        },
+        "sourceCommit": "c8b2d948d6dd0b408011b294fd67aea59870749b",
+        "targetCommit": "1157b7243ed3c4b2f9dfe67597f3908f6f881ec9",
+        "sourceUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-60",
+          "githubAnchor": "unheaded-block-60",
+          "stableAnchor": "unheaded-block-60",
+          "title": "Unheaded block 60",
+          "startLine": 469,
+          "endLine": 476,
+          "textDigest": "4aad7684bd5ff59163cf2e9cfc405f7b897c2a9b3a6fc678531b179c343e305f",
+          "sample": "| Relationship | File |\n|---|---|\n| documentation portal | [README.md](README.md) |\n| reader routing | [reading-map.md](../reading-map.md) |\n| operative transitional switchboard | ",
+          "identityFingerprint": "e22049e06c0ec6c9ec58b06a1bd677264589d16ba887e8c95685c05fd2073a82",
+          "ancestry": [
+            "Documentation Governance",
+            "14. Related Files"
+          ],
+          "text": "| Relationship | File |\n|---|---|\n| documentation portal | [README.md](README.md) |\n| reader routing | [reading-map.md](../reading-map.md) |\n| operative transitional switchboard | [transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n| platform portal | [platform/README.md](README.md) |\n| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |"
+        },
+        "targetUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-60",
+          "githubAnchor": "unheaded-block-60",
+          "stableAnchor": "unheaded-block-60",
+          "title": "Unheaded block 60",
+          "startLine": 469,
+          "endLine": 476,
+          "textDigest": "0729946d01afffc2b5800527271a368947d3971968759a447bd51eec81f15f5b",
+          "sample": "| Relationship | File |\n|---|---|\n| documentation portal | [README.md](../README.md) |\n| reader routing | [reading-map.md](../reading-map.md) |\n| operative transitional switchboard",
+          "identityFingerprint": "febba28a75f0ffc2e795142eade83b9409275a4ac349bcbe6634d92bad1f689d",
+          "ancestry": [
+            "Documentation Governance",
+            "14. Related Files"
+          ],
+          "text": "| Relationship | File |\n|---|---|\n| documentation portal | [README.md](../README.md) |\n| reader routing | [reading-map.md](../reading-map.md) |\n| operative transitional switchboard | [transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n| platform portal | [platform/README.md](README.md) |\n| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |"
+        },
+        "status": "pending-native-conservation-accounting",
+        "reason": "One real native table identity gap follows the README destination correction; old ID retained, no graft or approval carry. Independent reviewer checks this consequence together with the two corrected Related Files source rows."
+      }
+    ],
+    "newRetiredUnits": [],
+    "stableHeadings": [
+      {
+        "before": {
+          "sourcePath": "docs/platform/governance.md",
+          "unitDigest": "1c3e89b21a688b9a640ad96348b2207ec9fe815768986e54f122a17c5072b382",
+          "identityFingerprint": "da6c4f70e7e3f9dc60b96ba395e7baf1ecbfc6b41984147d6c293f07071c8d93",
+          "claimId": "claim_5dae6eed87e8f69f3c3530f0d203b7fa",
+          "sourceAnchor": "14-related-files",
+          "unitKind": "heading",
+          "sourceUnitDigest": "fee84962ef28aa9f7435ec5dd77a474a013bc2f2595a9d34f403da53411cdbc9",
+          "claimKind": "unclassified",
+          "status": "future",
+          "origin": "added-since-9881f8622732e3ba7c8e203097d42674b8aba36d"
+        },
+        "after": {
+          "sourcePath": "docs/platform/governance.md",
+          "unitDigest": "15b1a809afa5ae010c563289cb139415947fb5e15a7fd1aad855316684c30a49",
+          "identityFingerprint": "79106d7dc90dd0812b27974f1392e78190495833abe57e4cfdbcf024f35be975",
+          "claimId": "claim_5dae6eed87e8f69f3c3530f0d203b7fa",
+          "sourceAnchor": "14-related-files",
+          "unitKind": "heading",
+          "sourceUnitDigest": "e589d54d9c81da5e926e98fa5cecf502a3fbe44355a75963d71242b42ef55edb",
+          "claimKind": "unclassified",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "c8b2d948d6dd0b408011b294fd67aea59870749b",
+            "fromUnitDigest": "1c3e89b21a688b9a640ad96348b2207ec9fe815768986e54f122a17c5072b382",
+            "toUnitDigest": "15b1a809afa5ae010c563289cb139415947fb5e15a7fd1aad855316684c30a49",
+            "fromSourceUnitDigest": "fee84962ef28aa9f7435ec5dd77a474a013bc2f2595a9d34f403da53411cdbc9",
+            "toSourceUnitDigest": "e589d54d9c81da5e926e98fa5cecf502a3fbe44355a75963d71242b42ef55edb"
+          }
+        },
+        "beforeUnit": {
+          "unitKind": "heading",
+          "level": 2,
+          "title": "14. Related Files",
+          "anchor": "14-related-files",
+          "githubAnchor": "14-related-files",
+          "stableAnchor": "h-0bbdbfcf2ed4",
+          "startLine": 467,
+          "endLine": 467,
+          "textDigest": "fee84962ef28aa9f7435ec5dd77a474a013bc2f2595a9d34f403da53411cdbc9",
+          "sample": "14. Related Files",
+          "sectionPayloadDigest": "4aad7684bd5ff59163cf2e9cfc405f7b897c2a9b3a6fc678531b179c343e305f",
+          "followingBlockDigest": "4aad7684bd5ff59163cf2e9cfc405f7b897c2a9b3a6fc678531b179c343e305f",
+          "identityFingerprint": "da6c4f70e7e3f9dc60b96ba395e7baf1ecbfc6b41984147d6c293f07071c8d93",
+          "ancestry": [
+            "Documentation Governance"
+          ],
+          "text": "## 14. Related Files",
+          "sectionText": "## 14. Related Files\n\n| Relationship | File |\n|---|---|\n| documentation portal | [README.md](README.md) |\n| reader routing | [reading-map.md](../reading-map.md) |\n| operative transitional switchboard | [transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n| platform portal | [platform/README.md](README.md) |\n| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |"
+        },
+        "currentUnit": {
+          "unitKind": "heading",
+          "level": 2,
+          "title": "14. Related Files",
+          "anchor": "14-related-files",
+          "githubAnchor": "14-related-files",
+          "stableAnchor": "h-0bbdbfcf2ed4",
+          "startLine": 467,
+          "endLine": 467,
+          "textDigest": "e589d54d9c81da5e926e98fa5cecf502a3fbe44355a75963d71242b42ef55edb",
+          "sample": "14. Related Files",
+          "sectionPayloadDigest": "0729946d01afffc2b5800527271a368947d3971968759a447bd51eec81f15f5b",
+          "followingBlockDigest": "0729946d01afffc2b5800527271a368947d3971968759a447bd51eec81f15f5b",
+          "identityFingerprint": "79106d7dc90dd0812b27974f1392e78190495833abe57e4cfdbcf024f35be975",
+          "ancestry": [
+            "Documentation Governance"
+          ],
+          "text": "## 14. Related Files",
+          "sectionText": "## 14. Related Files\n\n| Relationship | File |\n|---|---|\n| documentation portal | [README.md](../README.md) |\n| reader routing | [reading-map.md](../reading-map.md) |\n| operative transitional switchboard | [transitional-switchboard.md](../transitional-switchboard.md) |\n| migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |\n| platform portal | [platform/README.md](README.md) |\n| source design discussion | [architect/documentation-system-design.md](../architect/documentation-system-design.md) |"
+        }
+      }
+    ]
+  }
+}
