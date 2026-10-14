@@ -54,7 +54,7 @@ import { execFileSync } from 'node:child_process';
 import { bind } from '../execution/bind.mjs';
 import { credentialFaultFamilies } from '../execution/account-rotation.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
-import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveContentRoot } from '../paths.mjs';
+import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 import { executeExecutorCli } from './cli.mjs';
@@ -447,7 +447,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
     const recomputed = bind(
       {
         unit: unitRecord.unit,
-        role: asgn.role,
+        role: seatRoleOf(asgn),
         readOnly: false,
         overrides: unitRecord.overrides || [],
       },
@@ -1169,8 +1169,14 @@ function attemptProviderCapacityFallback({
  * Anything else (first attempt, unknown assignment, earlier attempt not limited) binds from
  * the start of the pool, exactly as before.
  */
+// The seat a unit-run assignment fills: a unit running a Work step operation stamps the
+// operation's role on the assignment and keeps the seat's own name in provenance.
+function seatRoleOf(asgn) {
+  return asgn.provenance?.kind === 'unit-run' ? (asgn.provenance.role ?? asgn.role) : asgn.role;
+}
+
 function fallbackSkipIndex(unitRecord, asgn) {
-  const attempts = unitRecord.bindings?.[`${asgn.role}/${asgn.round}`];
+  const attempts = unitRecord.bindings?.[`${seatRoleOf(asgn)}/${asgn.round}`];
   if (!Array.isArray(attempts)) return -1;
   const at = attempts.findIndex((attempt) => attempt?.assignmentId === asgn.assignmentId);
   return skipIndexOfAttempt(attempts, at);
@@ -1178,7 +1184,7 @@ function fallbackSkipIndex(unitRecord, asgn) {
 
 // When the runner bound this attempt, from its own persisted record; null when it recorded none.
 function attemptBoundAt(unitRecord, asgn) {
-  const attempts = unitRecord.bindings?.[`${asgn.role}/${asgn.round}`];
+  const attempts = unitRecord.bindings?.[`${seatRoleOf(asgn)}/${asgn.round}`];
   const bound = Date.parse(attempts?.find((attempt) => attempt?.assignmentId === asgn.assignmentId)?.boundAt);
   return Number.isFinite(bound) ? bound : -Infinity;
 }
@@ -1221,6 +1227,52 @@ function releaseSelectedProviderLease(selection, runId, runtimeDir) {
   } catch (err) {
     process.stderr.write(`fgos: could not release the provider lease of ${selection.provider}/${selection.accountId} for ${runId}: ${err?.message ?? err}\n`);
   }
+}
+
+/** Real paths of the main checkout and of every worktree git lists for it. */
+function allowedInputRoots(mainRoot) {
+  const roots = new Set();
+  const add = (p) => { try { roots.add(fs.realpathSync(p)); } catch { /* a listed root that is gone holds nothing */ } };
+  add(mainRoot);
+  try {
+    // `-z` is not in every git this runs on; a worktree path holding a newline is then unlisted
+    // and its inputs get a null digest, which only ever fails closed.
+    const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], {
+      cwd: mainRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    for (const field of listing.split('\n')) {
+      if (field.startsWith('worktree ')) add(field.slice('worktree '.length));
+    }
+  } catch { /* no git: only the main checkout is allowed */ }
+  return [...roots];
+}
+
+/**
+ * Hash each pinned input before the worker starts. An input is read only when its real path
+ * lies inside the main checkout or a worktree git lists for it; anything else (outside, a
+ * symlink pointing out, missing) is recorded with `sha256: null` and never read. `rel` is the
+ * path inside the root that holds it, so a consumer compares the same file across checkouts.
+ *
+ * @param {string[]|undefined} pinInputs absolute paths
+ * @param {string} mainRoot main checkout root
+ * @returns {Array<{path: string, root?: string, rel?: string, sha256: string|null, warning?: string}>}
+ */
+export function digestPinnedInputs(pinInputs, mainRoot) {
+  if (!Array.isArray(pinInputs) || pinInputs.length === 0) return [];
+  const roots = allowedInputRoots(mainRoot);
+  return pinInputs.map((p) => {
+    let real;
+    try { real = fs.realpathSync(p); } catch { return { path: p, sha256: null, warning: 'pin-missing' }; }
+    const root = roots.find((r) => real === r || real.startsWith(`${r}${path.sep}`));
+    if (!root) return { path: p, sha256: null, warning: 'pin-outside-allowed-roots' };
+    const rel = path.relative(root, real).split(path.sep).join('/');
+    try {
+      if (!fs.statSync(real).isFile()) return { path: p, root, rel, sha256: null, warning: 'pin-not-a-file' };
+      return { path: p, root, rel, sha256: crypto.createHash('sha256').update(fs.readFileSync(real)).digest('hex') };
+    } catch {
+      return { path: p, root, rel, sha256: null, warning: 'pin-unreadable' };
+    }
+  });
 }
 
 export async function executeAssignment(assignment, opts = {}) {
@@ -1446,24 +1498,11 @@ export async function executeAssignment(assignment, opts = {}) {
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
   const startedAt = new Date().toISOString();
 
-  // Plan content identity, recorded runner-side BEFORE the worker runs: the
-  // sha256 of the Work's plan.md at dispatch time. Cross-pass consumption
-  // recomputes this hash so a verdict computed against an older plan
-  // revision is never consumed, even when the worker hides the edit by
-  // rewinding file mtimes (the worker controls mtimes; it never controls
-  // this runner-recorded hash).
-  let planContentHash = null;
-  if (effectiveAssignment.workId && opts.work?.docsRef) {
-    try {
-      const planContentRoot = resolveContentRoot(root, effectiveAssignment.workId, opts.work.docsRef);
-      const planInputPath = path.join(planContentRoot, opts.work.docsRef, 'plan.md');
-      if (fs.existsSync(planInputPath)) {
-        planContentHash = crypto.createHash('sha256').update(fs.readFileSync(planInputPath)).digest('hex');
-      }
-    } catch {
-      planContentHash = null;
-    }
-  }
+  // Input identity, recorded runner-side BEFORE the worker runs: the sha256 of
+  // every file the Work layer pinned (its plan.md). Cross-pass consumption
+  // recomputes it so a verdict computed against older bytes is never consumed,
+  // even when the worker hides the edit by rewinding file mtimes.
+  const inputDigests = digestPinnedInputs(opts.pinInputs, root);
 
   // Atomic admission (replaces the prior readdirSync + max-attempt scan --
   // see admitRunAttempt's own doc comment for the full commit algorithm).
@@ -1538,7 +1577,7 @@ export async function executeAssignment(assignment, opts = {}) {
       ...(templateResolution ? { template: templateResolution.templateProvenance } : (effectiveAssignment.provenance?.template ? { template: effectiveAssignment.provenance.template } : {})),
       ...(compiledPlan ? { dispatchPlanPath: path.relative(root, path.join(runsDir, record.attemptStr, 'dispatch-plan.json')) } : {}),
       effectiveContractPath: path.relative(root, path.join(runsDir, record.attemptStr, EFFECTIVE_EXECUTION_CONTRACT_FILE)),
-      ...(planContentHash ? { planContentHash } : {}),
+      ...(inputDigests.length ? { inputDigests } : {}),
       cwd,
       startedAt,
       timeoutMs,
@@ -2718,7 +2757,7 @@ export async function executeAssignment(assignment, opts = {}) {
       dirtyBefore,
       dirtyAfter: safeGitStatusFiles(effectiveCwd),
       dirtyBeforeSnapshots,
-      planContentHash,
+      inputDigests,
       resolvedExecutorId,
       effectivePolicy,
       executorRedirected,

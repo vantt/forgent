@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 import { execFileSync, execSync } from 'node:child_process';
 import {
   chooseStageOperation,
-  executeDriverOperationChoice,
+  executeDriverOperationChoice as driverExecute,
   hasPlanMd,
   interpretAssignmentRunResult,
   deriveCandidateReviewRefs,
@@ -18,11 +18,76 @@ import {
 import { operationsForStep, getDomain } from '../../src/state/domain-registry.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { runOnce } from '../../src/runner/loop.mjs';
+import { resolveRunWorkerArtifactPath } from '../../src/runner/dispatch/settlement.mjs';
+import { listAssignmentRuns } from '../../src/runner/dispatch/assignment-layout.mjs';
+import { runOnce as loopRunOnce } from '../../src/runner/loop.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
+import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
+// A driver operation runs as a Unit (runUnit): its worker runs confined (bwrap), and the Unit
+// reads its runner config from the repo's own .fgos/config.json, never from the caller's memory.
+seedFileLocalBwrapRegistry();
+
+const UNIT_CAPABILITIES = ['review', 'coding:review', 'implement', 'code:implement'];
+
+/** A runner config a confined Unit can bind with: each executor (the global `executor` too) under
+ * a `fixture-` id -- a bare `claude` id would pick up the real CLI from the machine's global
+ * config -- with a bwrap-confined cli invocation, and a pool for each driver capability. */
+function confinedUnitConfig(config = {}) {
+  const source = { ...(config.executors ?? {}) };
+  if (config.executor && !source.claude) source.claude = { ...config.executor };
+  const executors = {};
+  for (const [id, entry] of Object.entries(source)) {
+    executors[`fixture-${id}`] = Array.isArray(entry.invocations) && entry.invocations.length > 0 ? entry : {
+      kind: 'agent',
+      allowCrossProvider: true,
+      providerModel: 'node',
+      ...entry,
+      invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: entry.command, args: entry.args ?? [] }],
+    };
+  }
+  const first = Object.keys(executors)[0];
+  const capabilities = { ...(config.capabilities ?? {}) };
+  for (const cap of UNIT_CAPABILITIES) capabilities[cap] ??= { prefer: [{ executor: first }] };
+  const modelPolicies = { ...(config.modelPolicies ?? {}) };
+  modelPolicies.node ??= modelPolicies.claude ?? { standard: 'test-model' };
+  const { executor, ...rest } = config;
+  void executor;
+  return { ...rest, executors, capabilities, modelPolicies };
+}
+
+/** Make `opts.repoRoot` a git repo holding the confined config on disk, as runUnit needs it. */
+function unitReady(opts = {}) {
+  const root = opts.repoRoot ?? opts.cwd;
+  if (root && opts.runnerConfig) {
+    try {
+      execFileSync('git', ['rev-parse', '--git-dir'], { cwd: root, stdio: 'ignore' });
+    } catch {
+      execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: root });
+      execFileSync('git', ['config', 'user.name', 'test'], { cwd: root });
+      execFileSync('git', ['config', 'user.email', 'test@test'], { cwd: root });
+      execFileSync('git', ['commit', '-q', '--allow-empty', '-m', 'initial commit'], { cwd: root });
+    }
+    const file = path.join(root, '.fgos', 'config.json');
+    let existing = {};
+    try { existing = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { /* none yet */ }
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, JSON.stringify({ ...existing, runner: confinedUnitConfig(opts.runnerConfig) }, null, 2));
+  }
+  return opts;
+}
+
+const executeDriverOperationChoice = (work, choice, opts) => driverExecute(work, choice, unitReady(opts));
+// The loop's driver steps read the same on-disk config; the loop itself keeps the config it was given.
+const runOnce = (options) => {
+  unitReady({ repoRoot: options.repoRoot, runnerConfig: options.config });
+  return loopRunOnce(options);
+};
+
+// Outside /tmp: a confined worker sees a private tmpfs there, not these files.
 function mkTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-op-choice-test-'));
+  return fs.realpathSync.native(makeFixtureDir('fgos-op-choice-test-'));
 }
 
 function initRepo(dir) {
@@ -161,8 +226,9 @@ function assertAssignmentRunFiles(root, assignmentId) {
   assert.ok(fs.existsSync(path.join(assignmentDir, 'assignment.json')), 'assignment.json must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'run.json')), 'run.json must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'dispatch-plan.json')), 'dispatch-plan.json must exist');
-  assert.ok(fs.existsSync(path.join(runDir, 'agent-result.json')), 'agent-result.json must exist');
-  assert.ok(fs.existsSync(path.join(runDir, 'agent-report.md')), 'agent-report.md must exist');
+  // A confined worker writes only its run's outbox; the runner reads its artifacts from there.
+  assert.ok(fs.existsSync(resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json')), 'agent-result.json must exist');
+  assert.ok(fs.existsSync(resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md')), 'agent-report.md must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'evidence.json')), 'evidence.json must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'result.json')), 'result.json must exist');
 }
@@ -1356,7 +1422,7 @@ test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker 
   assert.equal(item.workflowStep, 'planning');
 });
 
-test('driver loop runOnce: validate-plan modifying dirty-before plan.md is reported as a correlated mutation and does not advance Work', async () => {
+test('driver loop runOnce: a confined validate-plan worker cannot modify the dirty-before plan.md and Work does not advance', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -1394,20 +1460,13 @@ test('driver loop runOnce: validate-plan modifying dirty-before plan.md is repor
   const item = listWork(tempDir).work['tsk-driver-recorded'];
   assert.equal(item.workflowStep, 'planning');
 
-  // The dispatch round itself is accepted; the change it saw travels as a warning.
-  const assignmentsDir = path.join(tempDir, '.fgos', 'assignments');
-  const storedResults = fs.readdirSync(assignmentsDir).flatMap((asgn) => {
-    const runsDir = path.join(assignmentsDir, asgn, 'runs');
-    return fs.existsSync(runsDir)
-      ? fs.readdirSync(runsDir).map((run) => path.join(runsDir, run, 'result.json')).filter((f) => fs.existsSync(f))
-      : [];
-  });
+  // The round runs as a Unit: its worker is confined read-only, so the edit it tried never
+  // reaches plan.md, and the round still settled a result of its own.
+  assert.equal(fs.readFileSync(path.join(docsDir, 'plan.md'), 'utf8'), '# Mode: tiny\nPlan with constraints.\n');
+  const storedResults = [...listAssignmentRuns(path.join(tempDir, '.fgos'))]
+    .map((run) => path.join(run.runDir, 'result.json'))
+    .filter((f) => fs.existsSync(f));
   assert.ok(storedResults.length > 0, 'the validate-plan round must have settled a result.json');
-  const warningCodes = storedResults.flatMap((f) => (JSON.parse(fs.readFileSync(f, 'utf8')).warnings ?? []).map((w) => w.code));
-  assert.ok(
-    warningCodes.includes('read-only-mutation-correlated') || warningCodes.includes('mutated-dirty-before-correlated'),
-    `expected a correlated-mutation warning, got ${JSON.stringify(warningCodes)}`,
-  );
 });
 
 test('interpretAssignmentRunResult maps REJECTED verdict to NOT READY - RETURN TO PLANNING (Finding 3)', () => {
@@ -1492,7 +1551,7 @@ test('Step 06 executing.scout-blast-radius report with fake executor stores all 
   assert.equal(work.workflowStep, 'executing');
 });
 
-test('executing.scout-blast-radius mutating repository state is reported as a correlated mutation and stops driver execution', async () => {
+test('executing.scout-blast-radius that tries to write the repository is refused by its sandbox and stops driver execution', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   seedTaskSpecs(tempDir, ['scout-blast-radius']);
@@ -1536,12 +1595,14 @@ test('executing.scout-blast-radius mutating repository state is reported as a co
     runnerConfig: runnerConfigFor(executorScript),
   });
 
+  // The operation runs as a confined read-only Unit: the write fails inside the sandbox, the
+  // worker exits non-zero, and nothing lands in the checkout.
   assert.equal(outcome.executed, true);
-  assert.equal(outcome.runResult.confidence, 'reported');
-  assert.ok((outcome.runResult.warnings ?? []).some((w) => w.code === 'read-only-mutation-correlated'));
+  assert.equal(fs.existsSync(path.join(tempDir, 'accidental.txt')), false);
+  assert.equal(outcome.runResult.confidence, 'failed');
   assert.equal(outcome.canAdvanceEdge, false);
   assert.equal(outcome.stop, true);
-  assert.equal(outcome.reason, 'assignment-scout-blast-radius-correlated-mutation');
+  assert.equal(outcome.reason, 'assignment-scout-blast-radius-failed');
 });
 
 test('Step 06 executing.scoped-subtask requires verified confidence (changed-file evidence) to proceed', () => {

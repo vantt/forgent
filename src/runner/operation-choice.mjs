@@ -1,12 +1,12 @@
 // runner/operation-choice.mjs — Work-layer operation selection for a Work item's current step.
 // Dispatch never looks a step's operations up: this module resolves them from the
-// item's Workflow (domain-registry.mjs) and hands them to buildAssignment.
+// item's Workflow (domain-registry.mjs) and hands them to runUnit as the declared operation.
 //
 // Pure helper:
 // - chooseStageOperation: resolves the legal operations of the current step via operationsForStep and
 //   selects either the primary stage owner path or a secondary Assignment operation.
-// - executeDriverOperationChoice: executes chosen stage operation (builds/executes Assignment
-//   if requested) and consumes hardened RunResult conservatively.
+// - executeDriverOperationChoice: executes chosen stage operation (runs it as a Unit through
+//   runUnit if requested) and consumes hardened RunResult conservatively.
 // - Never mutates Work lifecycle state directly as a side effect.
 
 import fs from 'node:fs';
@@ -17,15 +17,14 @@ import { DEFAULT_DOMAIN, resolveDomainName, getDomain, operationsForStep } from 
 import { resolveContentRoot } from '../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity, buildPrompt } from './work-compat.mjs';
-import { workDispatchContext } from './work-dispatch.mjs';
-import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './dispatch/assignment.mjs';
-import { executeAssignment, isSubstantiveReportText, resolveRunWorkerArtifactPath } from './dispatch/assignment-runner.mjs';
-import { createCredentialProbe } from './dispatch/provider-credential-probe.mjs';
-import { createConfinementCredentialRenewal } from './dispatch/confinement/cleanup.mjs';
-import { defaultConfinementTempRoots } from './dispatch/confinement/backend-registry.mjs';
+import { workUnitFor } from './work-dispatch.mjs';
+import { isReadOnlyAssignment, validateAgentResultClaim } from './dispatch/assignment.mjs';
+import { isSubstantiveReportText, resolveRunWorkerArtifactPath } from './dispatch/assignment-runner.mjs';
+import { runUnit, snapshotRunnerConfig } from './execution/run.mjs';
 import { interpretRunResult, runOutcome } from './dispatch/run-result.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { detectTrunk } from './worktree.mjs';
+import { listAssignmentRuns } from './dispatch/assignment-layout.mjs';
 
 // Non-enumerable stamp the cross-pass scan attaches to a consumed runResult:
 // the dispatched member dir the result was physically read from. Evidence
@@ -94,6 +93,27 @@ export function hasPlanConstraints({ work, docsRef, repoRoot }) {
   return false;
 }
 
+/**
+ * Whether a validate-plan result was computed against the plan.md bytes the item holds now.
+ * The runner recorded, at launch, the digest of each pinned input with its path inside the
+ * checkout that held it (`inputDigests[].rel`); the current plan is compared by that path and
+ * digest, so the same bytes match across the item worktree and the main checkout. A result
+ * from before pinned inputs carries `planContentHash` instead. Returns `null` when the result
+ * records neither.
+ */
+function pinnedDigestFor(runResult, planRel) {
+  return Array.isArray(runResult?.inputDigests) ? runResult.inputDigests.find((e) => e && e.rel === planRel) ?? null : null;
+}
+
+function planEvidenceMatches(runResult, currentPlanBytes, planRel) {
+  const current = crypto.createHash('sha256').update(currentPlanBytes).digest('hex');
+  const entry = pinnedDigestFor(runResult, planRel);
+  if (entry) return typeof entry.sha256 === 'string' && entry.sha256 !== '' && entry.sha256 === current;
+  const legacy = typeof runResult?.planContentHash === 'string' ? runResult.planContentHash : '';
+  if (legacy) return legacy === current;
+  return null;
+}
+
 // ADR-006 R5: candidates are filtered by the Assignment's own stamped
 // `resultKind` field, not the `operation` id -- default matches the sole
 // caller's `validate-plan` intent (`assignment-normalizer.mjs`'s stamp for
@@ -101,7 +121,12 @@ export function hasPlanConstraints({ work, docsRef, repoRoot }) {
 // stance as the pre-existing `operation` filter it replaces: an assignment.json
 // written before this field existed (or one whose value is simply absent)
 // is not excluded by this filter alone.
-function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'gate-verdict' }) {
+//
+// Both layouts are read through one walk (`listAssignmentRuns`): a flat
+// `.fgos/assignments/<id>/` and a Unit run's `<unitRunId>/<seat>/<round>/`,
+// whose id is the full relative path. The walk already refuses symlinks and
+// bounds the depth.
+function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'gate-verdict', operation = 'validate-plan' }) {
   if (!work?.id || !repoRoot) return null;
   const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
   if (!fs.existsSync(assignmentsDir)) return null;
@@ -109,12 +134,14 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
   const targetStage = stage ?? work?.workflowStep;
 
   try {
-    const asgnDirs = fs.readdirSync(assignmentsDir);
+    const asgnIds = [...new Set([...listAssignmentRuns(path.join(repoRoot, '.fgos'))]
+      .filter((run) => run.hasAssignmentJson)
+      .map((run) => run.assignmentId))];
     let latestRunResult = null;
     let latestMtime = 0;
 
-    for (const dirName of asgnDirs) {
-      const asgnDir = path.join(assignmentsDir, dirName);
+    for (const asgnId of asgnIds) {
+      const asgnDir = path.join(assignmentsDir, ...asgnId.split('/'));
       const asgnJsonPath = path.join(asgnDir, 'assignment.json');
       if (!fs.existsSync(asgnJsonPath)) continue;
       try {
@@ -122,6 +149,8 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
         if (asgn.workId !== work.id && asgn.work?.id !== work.id) continue;
         if (targetStage && asgn.stage && asgn.stage !== targetStage) continue;
         if (resultKind && asgn.resultKind && asgn.resultKind !== resultKind) continue;
+        // Two operations of one item never stand in for each other.
+        if (operation && asgn.operation && asgn.operation !== operation) continue;
         // evidence -- driver operation choice must never interpret it as a
         // Stage verdict or lifecycle signal. Skip it here, in the same
         // filter chain as the declared-shape checks above (not a
@@ -147,7 +176,6 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
         const dispatchedMarkers = fs.existsSync(dispatchedDir) ? new Set(fs.readdirSync(dispatchedDir)) : null;
         const dispatchedRunsLegacy = Array.isArray(asgn.dispatchedRuns) ? asgn.dispatchedRuns : null;
         if (!dispatchedMarkers && !dispatchedRunsLegacy) continue;
-        const asgnId = path.basename(asgnDir);
 
         const runsDir = path.join(asgnDir, 'runs');
         if (!fs.existsSync(runsDir)) continue;
@@ -353,21 +381,20 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
             const contentRoot = resolveContentRoot(repoRoot, work.id, work.docsRef);
             const planPath = path.join(contentRoot, work.docsRef, 'plan.md');
             if (fs.existsSync(planPath)) {
-              const planStat = fs.statSync(planPath);
-              if (planStat.mtimeMs > stat.mtimeMs) {
+              const planRel = path.posix.join(work.docsRef, 'plan.md');
+              // The mtime pre-filter is for results that predate pinned inputs; a pinned digest
+              // decides alone, so a plan merged byte for byte into another checkout still matches.
+              if (!pinnedDigestFor(runResult, planRel) && fs.statSync(planPath).mtimeMs > stat.mtimeMs) {
                 continue;
               }
-              const recordedHash = typeof runResult.planContentHash === 'string' ? runResult.planContentHash : '';
-              if (!recordedHash) {
-                continue;
-              }
-              let currentPlanHash = null;
+              let planBytes;
               try {
-                currentPlanHash = crypto.createHash('sha256').update(fs.readFileSync(planPath)).digest('hex');
+                planBytes = fs.readFileSync(planPath);
               } catch {
                 continue;
               }
-              if (recordedHash !== currentPlanHash) {
+              // A result that records no plan identity at all is not consumable.
+              if (planEvidenceMatches(runResult, planBytes, planRel) !== true) {
                 continue;
               }
             }
@@ -784,24 +811,23 @@ export function chooseStageOperation({
         const contentRoot = resolveContentRoot(repoRoot, work.id, work.docsRef);
         const planPath = path.join(contentRoot, work.docsRef, 'plan.md');
         if (fs.existsSync(planPath)) {
+          const planRel = path.posix.join(work.docsRef, 'plan.md');
           const planStat = fs.statSync(planPath);
           const rawTime = effectiveLastRunResult.settledAt ?? effectiveLastRunResult.createdAt ?? effectiveLastRunResult.runtime?.settledAt;
           const settledMs = rawTime ? Date.parse(rawTime) : NaN;
-          if (Number.isFinite(settledMs) && settledMs > 0 && planStat.mtimeMs > settledMs) {
+          if (!pinnedDigestFor(effectiveLastRunResult, planRel) && Number.isFinite(settledMs) && settledMs > 0 && planStat.mtimeMs > settledMs) {
             effectiveLastRunResult = null;
-          } else if (typeof effectiveLastRunResult.planContentHash === 'string' && effectiveLastRunResult.planContentHash) {
-            // Results carrying the dispatch-time plan content hash must match
+          } else {
+            // A result carrying the dispatch-time plan identity must match
             // the current plan.md even when the settle time postdates the
             // edit — mtimes line up too easily to be trusted alone.
-            let currentPlanHash = null;
+            let matches = false;
             try {
-              currentPlanHash = crypto.createHash('sha256').update(fs.readFileSync(planPath)).digest('hex');
+              matches = planEvidenceMatches(effectiveLastRunResult, fs.readFileSync(planPath), planRel);
             } catch {
-              currentPlanHash = null;
+              matches = false;
             }
-            if (!currentPlanHash || currentPlanHash !== effectiveLastRunResult.planContentHash) {
-              effectiveLastRunResult = null;
-            }
+            if (matches === false) effectiveLastRunResult = null;
           }
         }
       }
@@ -2276,24 +2302,69 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
   }
 
   if (choice.dispatch === 'assignment') {
-    const assignment = buildAssignment({
-      work,
-      domain: resolveDomainName(work?.domain),
-      workflow: work?.workflow ?? getDomain(work?.domain).defaultWorkflow,
-      stage: choice.stage ?? work.workflowStep,
-      operations: operationsForStep(getDomain(work?.domain), choice.stage ?? work.workflowStep, work?.kind),
+    // The operation runs as a Unit through the one execution door: the Work layer turns the
+    // item into unit data, the declared operation and the plan file its verdict is bound to;
+    // the runner binds, dispatches and (for a mutating operation) commits.
+    const stateRoot = opts.repoRoot ?? opts.cwd;
+    const cfg = opts.runnerConfig ?? snapshotRunnerConfig(stateRoot).runner;
+    const stage = choice.stage ?? work.workflowStep;
+    const built = workUnitFor(work, {
+      cfg,
+      stateRoot,
+      stage,
       operation: choice.operation,
-      contextRefs: choice.contextRefs,
       expectedFiles: choice.expectedFiles,
-      options: opts,
+      // Where the caller already runs this step: the item worktree, or where its plan lives.
+      ...(opts.cwd ? { worktree: opts.cwd } : {}),
     });
+    const callerRefs = (Array.isArray(choice.contextRefs) ? choice.contextRefs : [])
+      .filter((ref) => typeof ref === 'string' && ref.trim() && !ref.startsWith('/') && !ref.split('/').includes('..'));
+    const unitData = { ...built.unitData, inputs: [...new Set([...callerRefs, ...built.unitData.inputs])] };
 
-    const runResult = await executeAssignment(assignment, {
-      ...(work ? workDispatchContext({ work, stage: assignment.stage, cwd: opts.cwd }) : {}),
-      providerCredentialProbe: createCredentialProbe(),
-      providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
-      ...opts,
+    const unitRun = await runUnit({
+      unitData,
+      declared: built.declared,
+      pinInputs: built.pinInputs,
+      repoRoot: stateRoot,
+      cwd: built.worktree,
+      worktree: built.worktree,
+      // A background step: no Lead to fall back on, and the worker runs as a direct spawn.
+      session: { headless: true, herdrPresent: false },
+      ...(opts.onUnitRunCreated ? { onUnitRunCreated: opts.onUnitRunCreated } : {}),
     });
+    // The producer seat's own RunResult (the last attempt, after any fallback), never the
+    // unit's folded outcome: that would lose the correlated-mutation signal.
+    const producer = [...(unitRun.results ?? [])].reverse().find((r) => r?.role === 'producer');
+    const runResult = producer?.runResult ?? null;
+    if (!runResult) {
+      return {
+        executed: true,
+        dispatchType: 'assignment',
+        operation: choice.operation,
+        unitRunId: unitRun.unitRunId,
+        reason: producer?.refused ? `unit-refused-${producer.refused.reason}` : (producer?.pendingInline ? 'unit-pending-inline' : 'unit-produced-no-result'),
+        canAdvanceEdge: false,
+        stop: true,
+      };
+    }
+    let assignment = null;
+    try {
+      assignment = JSON.parse(fs.readFileSync(path.join(stateRoot, '.fgos', 'assignments', ...runResult.assignmentId.split('/'), 'assignment.json'), 'utf8'));
+    } catch {
+      assignment = null;
+    }
+    if (!assignment) {
+      return {
+        executed: true,
+        dispatchType: 'assignment',
+        operation: choice.operation,
+        unitRunId: unitRun.unitRunId,
+        runResult,
+        reason: 'unit-assignment-unreadable',
+        canAdvanceEdge: false,
+        stop: true,
+      };
+    }
     const interpreted = interpretAssignmentRunResult({
       choice: { ...choice, assignment, work: choice?.work ?? work },
       runResult,
@@ -2345,6 +2416,8 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
       assignment,
       runResult,
       verdictPayload,
+      unitRunId: unitRun.unitRunId,
+      ...(unitRun.results?.find((r) => r?.commit) ? { commit: unitRun.results.find((r) => r?.commit).commit } : {}),
       ...interpreted,
     };
   }

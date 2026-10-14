@@ -88,6 +88,12 @@ import {
   writeShortRunnerConfig,
   writeViewFake,
 } from './helpers/fgos-cli-harness.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+
+// `fgos plan --validate` runs validate-plan as a confined Unit; posture checks consult the machine
+// backend registry, kept file-local here (the child CLI inherits the env that points at it).
+seedFileLocalBwrapRegistry();
 
 
 
@@ -105,7 +111,13 @@ test.todo('fgos plan with --verdict and plan.md present directly processes calle
 
 
 test('fgos plan on a standard plan without caller verdict advances Work to executing after READY validation', () => {
-  const cwd = tmpCwdFromTemplate();
+  // validate-plan runs as a Unit: the project is a git repo outside /tmp (a confined worker sees
+  // a private tmpfs there), with a confined executor and a review pool in its runner config.
+  const cwd = fs.realpathSync.native(makeFixtureDir('fgos-cli-plan-validate-'));
+  fs.cpSync(path.join(tmpCwdFromTemplate(), '.fgos'), path.join(cwd, '.fgos'), { recursive: true });
+  for (const args of [['init', '-q', '-b', 'main'], ['config', 'user.name', 't'], ['config', 'user.email', 't@t'], ['commit', '-q', '--allow-empty', '-m', 'init']]) {
+    execFileSync('git', args, { cwd });
+  }
   const id = JSON.parse(run(cwd, ['submit', 'Standard plan validation adoption test']).stdout).data.id;
 
   advanceThroughDiscoveryToPlanning(cwd, id);
@@ -174,14 +186,25 @@ test('fgos plan on a standard plan without caller verdict advances Work to execu
     `,
   );
   const runnerCfg = {
-    executor: {
-      kind: 'cli',
-      command: process.execPath,
-      args: [executorScript],
-      allowCrossProvider: true,
+    executors: {
+      'fixture-validator': {
+        kind: 'agent',
+        command: process.execPath,
+        args: [executorScript],
+        allowCrossProvider: true,
+        providerModel: 'node',
+        invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [executorScript, '{prompt}'] }],
+      },
     },
+    capabilities: {
+      review: { prefer: [{ executor: 'fixture-validator' }] },
+      'coding:review': { prefer: [{ executor: 'fixture-validator' }] },
+    },
+    modelPolicies: { node: { nano: 'n', standard: 's', flagship: 'f', frontier: 'x' } },
   };
-  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: runnerCfg }, null, 2));
+  const configFile = path.join(cwd, '.fgos', 'config.json');
+  const existingConfig = fs.existsSync(configFile) ? JSON.parse(fs.readFileSync(configFile, 'utf8')) : {};
+  fs.writeFileSync(configFile, JSON.stringify({ ...existingConfig, runner: runnerCfg }, null, 2));
 
   // Interactive fgos plan without --verdict
   const res = run(cwd, ['plan', id, '--validate']);
@@ -190,6 +213,12 @@ test('fgos plan on a standard plan without caller verdict advances Work to execu
   const envelope = JSON.parse(res.stdout);
   assert.equal(envelope.data.outcome, 'pass-through');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'executing');
+  // The validation ran through the Unit door: one unit run whose seat carries the operation.
+  const unitRuns = fs.readdirSync(path.join(cwd, '.fgos', 'assignments')).filter((name) => name.startsWith('unit-run-'));
+  assert.equal(unitRuns.length, 1);
+  const asgn = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'assignments', unitRuns[0], 'producer', '1', 'assignment.json'), 'utf8'));
+  assert.equal(asgn.workId, id);
+  assert.equal(asgn.operation, 'validate-plan');
 });
 
 

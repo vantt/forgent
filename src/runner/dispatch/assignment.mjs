@@ -293,6 +293,68 @@ export function buildAssignment(params = {}) {
   return buildDeclaredAssignment(params);
 }
 
+/**
+ * The operation part of a declared Assignment, from the step's operations the Work layer
+ * resolved: role, dispatch mode, task spec, skills, contract template, the normalizer's
+ * mutation/evidence/resultKind/onAdvance stamp and the `provenance.declared` record.
+ * Shared by `buildAssignment` and a Unit run that carries a declared operation, so both
+ * stamp an operation the same way. Throws on an operation the step does not declare, one
+ * without a taskSpec, or (with `taskSpecRoot`) one whose taskSpec file does not exist.
+ *
+ * @param {{ domain: string, workflow?: string|null, stage: string, operation: string,
+ *   operations: object[], role?: string, contractTemplate?: string, taskSpecRoot?: string }} params
+ */
+export function declaredOperationFields({ domain, workflow, stage, operation, operations, role, contractTemplate, taskSpecRoot }) {
+  const matchedOp = Array.isArray(operations) ? operations.find((o) => o?.id === operation) : undefined;
+  if (!matchedOp) {
+    const ids = Array.isArray(operations) ? operations.map((o) => o?.id) : [];
+    throw new RunnerConfigError(
+      `unknown operation "${operation}" for stage "${stage}" in domain "${domain}" (declared operations: [${ids.join(', ')}])`,
+    );
+  }
+  if (!matchedOp.taskSpec) {
+    throw new RunnerConfigError(`operation "${operation}" in stage "${stage}" declares no taskSpec`);
+  }
+  // Step 04 §5.6: refuse runtime dispatch when the taskSpec file does not resolve
+  // to an existing file on disk, so a synthetic compatibility operation (e.g.
+  // 'decompose') is never treated as dispatchable.
+  if (taskSpecRoot !== undefined) {
+    const taskSpecAbsPath = resolveTaskSpecPath(domain, matchedOp.taskSpec, { cwd: taskSpecRoot });
+    if (!fs.existsSync(taskSpecAbsPath)) {
+      throw new RunnerConfigError(
+        `operation "${operation}" in stage "${stage}": taskSpec file does not exist: ${taskSpecAbsPath} — refuse runtime dispatch for missing taskSpec`,
+      );
+    }
+  }
+  const targetRole = role ?? matchedOp.role ?? 'implementer';
+  const template = contractTemplate ?? matchedOp.task?.contractTemplate;
+  const stamped = stampDeclaredAssignment({ role: targetRole, operation: matchedOp.id });
+  return Object.freeze({
+    matchedOp,
+    domain,
+    ...(workflow ? { workflow } : {}),
+    stage,
+    operation: matchedOp.id,
+    role: targetRole,
+    dispatch: matchedOp.dispatch ?? 'assignment',
+    taskSpec: matchedOp.taskSpec,
+    skills: Object.freeze(Array.isArray(matchedOp.skills) ? [...matchedOp.skills] : []),
+    ...(template ? { contractTemplate: template } : {}),
+    mutation: stamped.mutation,
+    evidence: stamped.evidence,
+    resultKind: stamped.resultKind,
+    ...(stamped.onAdvance ? { onAdvance: stamped.onAdvance } : {}),
+    declared: Object.freeze({
+      domain,
+      ...(workflow ? { workflow } : {}),
+      stage,
+      operation: matchedOp.id,
+      taskSpec: matchedOp.taskSpec,
+      legalOperations: Object.freeze(operations.map((o) => o.id)),
+    }),
+  });
+}
+
 function buildDeclaredAssignment({
   work,
   workId,
@@ -333,35 +395,19 @@ function buildDeclaredAssignment({
   const resolvedWorkflow = workflow ?? work?.workflow ?? null;
   const resolvedWorkId = work?.id ?? workId ?? null;
 
-  const matchedOp = operations.find((o) => o.id === operation);
-
-  if (!matchedOp) {
-    throw new RunnerConfigError(
-      `unknown operation "${operation}" for stage "${stage}" in domain "${resolvedDomain}" (declared operations: [${operations.map((o) => o.id).join(', ')}])`,
-    );
-  }
-
-  if (!matchedOp.taskSpec) {
-    throw new RunnerConfigError(`operation "${operation}" in stage "${stage}" declares no taskSpec`);
-  }
-
-  // Step 04 §5.6: refuse runtime dispatch when the taskSpec file does not resolve
-  // to an existing file on disk. This prevents synthetic compatibility operations
-  // (e.g. 'decompose') from being treated as dispatchable assignments when no
-  // task-spec file exists. Pass `options.allowSyntheticCompatibilityOperation: true`
-  // only when the caller explicitly accepts a compatibility-mode dispatch.
-  if (!options.allowSyntheticCompatibilityOperation) {
-    const checkRoot = options.repoRoot ?? options.cwd ?? process.cwd();
-    const taskSpecAbsPath = resolveTaskSpecPath(resolvedDomain, matchedOp.taskSpec, { cwd: checkRoot });
-    if (!fs.existsSync(taskSpecAbsPath)) {
-      throw new RunnerConfigError(
-        `operation "${operation}" in stage "${stage}": taskSpec file does not exist: ${taskSpecAbsPath} — refuse runtime dispatch for missing taskSpec`,
-      );
-    }
-  }
-
-  const targetRole = role ?? matchedOp.role ?? 'implementer';
-  const dispatchMode = matchedOp.dispatch ?? 'assignment';
+  const fields = declaredOperationFields({
+    domain: resolvedDomain,
+    workflow: resolvedWorkflow,
+    stage,
+    operation,
+    operations,
+    role,
+    contractTemplate,
+    taskSpecRoot: options.allowSyntheticCompatibilityOperation ? undefined : (options.repoRoot ?? options.cwd ?? process.cwd()),
+  });
+  const { matchedOp } = fields;
+  const targetRole = fields.role;
+  const dispatchMode = fields.dispatch;
   const opReason = reason ?? matchedOp.reason ?? undefined;
 
   let mergedPolicy;
@@ -386,10 +432,6 @@ function buildDeclaredAssignment({
   });
 
   const defaultObjective = objective ?? `Execute ${stage}.${matchedOp.id} operation`;
-
-  const frozenSkills = Array.isArray(matchedOp.skills)
-    ? Object.freeze([...matchedOp.skills])
-    : Object.freeze([]);
 
   const derivedContextRefs = Array.isArray(contextRefs) ? [...contextRefs] : [];
   if (work) {
@@ -427,7 +469,7 @@ function buildDeclaredAssignment({
   // resolution) already ran above; this only records WHICH validators ran
   // and what the normalizer derived from role/operation -- it does not
   // change any branch above (Step 02-06 golden behavior is unaffected).
-  const stamped = stampDeclaredAssignment({ role: targetRole, operation: matchedOp.id });
+  const stamped = fields;
   const provenanceValidators = Object.freeze([
     'workflow-step-legality',
     ...(options.allowSyntheticCompatibilityOperation ? [] : ['task-spec-existence']),
@@ -443,9 +485,9 @@ function buildDeclaredAssignment({
     role: targetRole,
     dispatch: dispatchMode,
     taskSpec: matchedOp.taskSpec,
-    skills: frozenSkills,
+    skills: fields.skills,
     objective: defaultObjective,
-    ...(contractTemplate ?? matchedOp.task?.contractTemplate ? { contractTemplate: contractTemplate ?? matchedOp.task.contractTemplate } : {}),
+    ...(fields.contractTemplate ? { contractTemplate: fields.contractTemplate } : {}),
     contextRefs: frozenContextRefs,
     expectedOutputs: frozenExpectedOutputs,
     expectedFiles: frozenExpectedFiles,
@@ -458,14 +500,7 @@ function buildDeclaredAssignment({
       contractPolicyVersion: CONTRACT_POLICY_VERSION,
       normalizerVersion: NORMALIZER_VERSION,
       validators: provenanceValidators,
-      declared: Object.freeze({
-        domain: resolvedDomain,
-        ...(resolvedWorkflow ? { workflow: resolvedWorkflow } : {}),
-        stage,
-        operation: matchedOp.id,
-        taskSpec: matchedOp.taskSpec,
-        legalOperations: Object.freeze(operations.map((o) => o.id)),
-      }),
+      declared: fields.declared,
     }),
     mutation: stamped.mutation,
     evidence: stamped.evidence,

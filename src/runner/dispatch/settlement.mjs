@@ -521,7 +521,7 @@ export async function settleRunOutcome({
   dirtyBefore = [],
   dirtyAfter = null,
   dirtyBeforeSnapshots = null,
-  planContentHash,
+  inputDigests,
   resolvedExecutorId,
   effectivePolicy,
   executorRedirected = false,
@@ -775,7 +775,9 @@ export async function settleRunOutcome({
     ...(effectivePolicy ? { policy: withLaunchProvenance(effectivePolicy, { reasoningEffort, modelWarnings }), executorRedirected } : {}),
     settledAt,
     durationMs: typeof durationMs === 'number' ? durationMs : null,
-    ...(planContentHash ? { planContentHash } : {}),
+    // The pinned input digests taken at launch; a run settled by recovery reads them from the
+    // run.json the admission wrote.
+    ...((inputDigests ?? runMeta?.inputDigests)?.length ? { inputDigests: inputDigests ?? runMeta.inputDigests } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports,
     operation: assignment?.operation,

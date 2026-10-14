@@ -17,6 +17,7 @@ import { createRoleExecutorLedger } from './role-ledger.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
+import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
@@ -187,6 +188,53 @@ function assertNoStrayCommit(unitRunId, unitRecord, mainRoot) {
   }
 }
 
+/**
+ * The operation a Work step declared for this unit, checked before anything is dispatched: the
+ * operation must be one the step declares, never human-only, its stamped mutation must agree
+ * with the unit's write scope, and the unit runs `solo` (one assignment for one operation).
+ * Returns the operation fields every producer assignment of the unit carries.
+ */
+function declaredOperationOf(declared, unit, patternName, { taskSpecRoot } = {}) {
+  if (!declared || typeof declared !== 'object') throw new RunnerConfigError('runUnit: declared must be an object');
+  for (const key of ['workId', 'domain', 'stage', 'operation']) {
+    if (typeof declared[key] !== 'string' || !declared[key].trim()) {
+      throw new RunnerConfigError(`runUnit: declared.${key} must be a non-empty string`);
+    }
+  }
+  if (!Array.isArray(declared.operations)) {
+    throw new RunnerConfigError('runUnit: declared.operations must be the step\'s operations');
+  }
+  const fields = declaredOperationFields({
+    domain: declared.domain,
+    workflow: declared.workflow ?? null,
+    stage: declared.stage,
+    operation: declared.operation,
+    operations: declared.operations,
+    taskSpecRoot,
+  });
+  if (fields.dispatch === 'human-only') {
+    throw new RunnerConfigError(`runUnit: operation "${declared.operation}" is human-only and is never dispatched`);
+  }
+  const unitReadOnly = (unit.writes ?? []).length === 0;
+  if ((fields.mutation === 'read-only') !== unitReadOnly) {
+    throw new RunnerConfigError(`runUnit: operation "${declared.operation}" is ${fields.mutation} but the unit ${unitReadOnly ? 'writes nothing' : 'declares writes'}`);
+  }
+  const name = typeof patternName === 'string' ? patternName : patternName?.name;
+  if ((name ?? 'solo') !== 'solo') {
+    throw new RunnerConfigError(`runUnit: a unit carrying operation "${declared.operation}" runs solo, not "${name}"`);
+  }
+  return fields;
+}
+
+/** Absolute paths whose bytes a result is bound to; anything else is refused before the run. */
+function checkedPinInputs(pinInputs) {
+  if (pinInputs === undefined) return [];
+  if (!Array.isArray(pinInputs) || pinInputs.some((p) => typeof p !== 'string' || !path.isAbsolute(p))) {
+    throw new RunnerConfigError('runUnit: pinInputs must be absolute paths');
+  }
+  return [...new Set(pinInputs)];
+}
+
 function foreignIndexRefusal(role, round, paths) {
   return {
     outcome: 'policy-refusal',
@@ -232,6 +280,10 @@ async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
  * @param {string} [options.cwd] Current working directory / worktree
  * @param {string} [options.worktree] Explicit worktree path
  * @param {object} [options.session] Session context { provider, tier, hasNativeAgent, herdrPresent, headless }
+ * @param {object} [options.declared] Work step operation this unit runs: { workId, domain, workflow,
+ *   stage, operation, operations } (operations are the step's operation objects). Stored in unit.json.
+ * @param {string[]} [options.pinInputs] Absolute paths whose bytes the dispatch hashes at launch
+ *   (`inputDigests` of the result). Stored in unit.json.
  * @param {Function} [options.onLog] Log callback
  * @returns {Promise<{unitRunId: string, outcome: string, rounds: number, results: Array}>}
  */
@@ -299,6 +351,9 @@ export async function runUnit(options = {}) {
       what: `cannot resume unit run "${unitRunId}"`,
     });
   } else {
+    if (options.declared === undefined && options.pinInputs !== undefined) {
+      throw new RunnerConfigError('runUnit: pinInputs needs declared');
+    }
     let raw;
     if (options.unitData) {
       raw = options.unitData;
@@ -323,6 +378,12 @@ export async function runUnit(options = {}) {
     }
 
     unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
+    // Checked before the unit directory exists: an operation the step does not allow leaves nothing behind.
+    if (options.declared !== undefined) {
+      const callerPatternName = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
+      declaredOperationOf(options.declared, unit, callerPatternName || unit.pattern || options.pattern || 'solo', { taskSpecRoot: mainRoot });
+    }
+    const pinInputs = options.declared !== undefined ? checkedPinInputs(options.pinInputs) : [];
     const configSnapshot = snapshotRunnerConfig(mainRoot);
     // A pinned account is checked before the unit run exists: every seat it applies to must bind an
     // executor whose provider lists it, and it must not be quarantined now.
@@ -361,6 +422,19 @@ export async function runUnit(options = {}) {
       // Which input each neutral name stands for; only the owner reads this, never a role.
       ...(unit.anonymizeInputs || unit.blind ? { inputMap: resolved.inputMap } : {}),
       worktree: fs.realpathSync(worktreePath),
+      // The Work step operation and the files its verdict is bound to; a resume reads them back
+      // from here and never takes them from its caller again.
+      ...(options.declared !== undefined ? {
+        declared: {
+          workId: options.declared.workId,
+          domain: options.declared.domain,
+          ...(options.declared.workflow ? { workflow: options.declared.workflow } : {}),
+          stage: options.declared.stage,
+          operation: options.declared.operation,
+          operations: options.declared.operations,
+        },
+        pinInputs,
+      } : {}),
       createdBy: process.env.USER || 'system',
       createdAt: new Date().toISOString(),
       execution: { status: 'running' },
@@ -373,6 +447,7 @@ export async function runUnit(options = {}) {
   }
 
   const unitDir = path.join(assignmentsDir, unitRunId);
+  const declaredOp = unitRecord.declared ? declaredOperationOf(unitRecord.declared, unit, unitRecord.pattern) : null;
   if (options.resumeUnitRunId) {
     const summaryFile = path.join(unitDir, 'unit-summary.json');
     try {
@@ -449,11 +524,28 @@ export async function runUnit(options = {}) {
       contextRefs = [...contextRefs, ...copyHandoffsInto(assignmentDir, resolveUnitInputs(unit.inputs, mainRoot, { seat: role }).inputMap)];
     }
 
+    // A unit that runs a Work step operation is that operation's assignment: its seat keeps its
+    // name in provenance.role and its directory, the assignment carries the operation's role and stamp.
+    const operationFields = declaredOp ? {
+      workId: unitRecord.declared.workId,
+      domain: declaredOp.domain,
+      ...(declaredOp.workflow ? { workflow: declaredOp.workflow } : {}),
+      stage: declaredOp.stage,
+      operation: declaredOp.operation,
+      dispatch: declaredOp.dispatch,
+      taskSpec: declaredOp.taskSpec,
+      skills: declaredOp.skills,
+      ...(declaredOp.contractTemplate ? { contractTemplate: declaredOp.contractTemplate } : {}),
+      evidence: declaredOp.evidence,
+      resultKind: declaredOp.resultKind,
+      ...(declaredOp.onAdvance ? { onAdvance: declaredOp.onAdvance } : {}),
+    } : {};
     const assignment = {
       assignmentId,
       unitRunId,
-      role,
+      role: declaredOp ? declaredOp.role : role,
       round,
+      ...operationFields,
       // The role's own task when the pattern gave it a unit of its own (a reviewer is told to
       // review, not to redo the work); otherwise the unit's objective.
       objective,
@@ -465,6 +557,7 @@ export async function runUnit(options = {}) {
         role,
         round,
         binding: bound,
+        ...(declaredOp ? { declared: declaredOp.declared } : {}),
       },
       expectedOutputs: unit.expectedOutputs || [],
       contextRefs,
@@ -474,6 +567,8 @@ export async function runUnit(options = {}) {
         preferExecutor: bound.executor,
         preferInvocation: bound.invocation,
         preferPersona: bound.persona,
+        // The rigor the unit asked for, so the policy's own rigor reads match what bind tiered on.
+        ...(unit.rigor ? { rigor: unit.rigor } : {}),
         // The persona text a caller pinned for this role when it supplied the override: the prompt
         // renders that text, never a file read again at dispatch time.
         ...pinnedPersonaFor(unitRecord, role, bound.persona),
@@ -498,6 +593,7 @@ export async function runUnit(options = {}) {
       },
       isReadOnlyMode: readOnly,
       session,
+      ...(declaredOp ? { operations: unitRecord.declared.operations, pinInputs: unitRecord.pinInputs ?? [] } : {}),
       ...(options.providerCapacityRuntimeDir ? { providerCapacityRuntimeDir: options.providerCapacityRuntimeDir } : {}),
       // Every role of a blind unit is dispatched blind or refused, never run unblind.
       ...(unit.blind ? { blind: true } : {}),

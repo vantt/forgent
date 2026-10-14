@@ -306,15 +306,6 @@ export function checkExecuteAssignmentCallSitePostures(sites) {
       if (!/isReadOnlyMode:\s*assignment\.mutation\s*!==\s*'mutating'/.test(callText)) {
         violations.push(`${file}: runExecutorAttempt's executeAssignment(...) call no longer derives isReadOnlyMode from assignment.mutation -- found: ${callText}`);
       }
-    } else if (file === 'src/runner/operation-choice.mjs') {
-      // Confirmed (R6c): this call's own `assignment` is built two lines
-      // above by the SAME function's one buildAssignment({work, stage,
-      // operation, ...}) call, which never sets `provenance.kind: 'inline'`
-      // -- so it can never carry the inline-forgery risk R6a's stamp gate
-      // protects against, and never needs to set isReadOnlyMode at all.
-      if (/isReadOnlyMode/.test(callText)) {
-        violations.push(`${file}: executeAssignment(...) now sets isReadOnlyMode explicitly -- re-verify R6c's investigation still holds (phase-01-mutation-unlock.md R6c) before accepting this`);
-      }
     } else if (file === 'src/runner/dispatch/cli.mjs') {
       // The one cli.mjs call site left is the read-only probe-account diagnostic:
       // it must keep isReadOnlyMode literally true.
@@ -344,9 +335,7 @@ const RUN_DOOR_CALLERS = {
 };
 // Work-layer callers that still reach these symbols directly until Work runs on runUnit.
 // This list only shrinks: a caller that leaves must leave this list in the same change.
-const R3_PENDING_WORK_CALLERS = {
-  executeAssignment: ['src/runner/operation-choice.mjs'],
-};
+const R3_PENDING_WORK_CALLERS = {};
 // Where each symbol is defined. Its home and the dispatch barrel may define or re-export it; calling it still counts.
 const RUN_DOOR_HOMES = {
   executeAssignment: 'src/runner/dispatch/assignment-runner.mjs',
@@ -479,7 +468,7 @@ test('R6b posture check actually catches a violation (deliberately broken synthe
     checkExecuteAssignmentCallSitePostures([
       { file: 'src/runner/operation-choice.mjs', callText: 'executeAssignment(assignment, { isReadOnlyMode: false })' },
     ]).length > 0,
-    'operation-choice.mjs setting isReadOnlyMode explicitly must be flagged for re-investigation',
+    'operation-choice.mjs runs its operations through runUnit, so any executeAssignment(...) call there is a new site and must be flagged',
   );
   assert.ok(
     checkExecuteAssignmentCallSitePostures([{ file: 'src/runner/some-new-dispatch-file.mjs', callText: 'executeAssignment(x, y)' }]).length > 0,
@@ -491,7 +480,6 @@ test('R6b posture check actually catches a violation (deliberately broken synthe
     checkExecuteAssignmentCallSitePostures([
       { file: 'src/runner/coordination/session-engine.mjs', callText: "executeAssignment(assignment, { ...opts, isReadOnlyMode: assignment.mutation !== 'mutating' })" },
       { file: 'src/runner/dispatch/cli.mjs', callText: 'executeAssignment(assignment, { isReadOnlyMode: true })' },
-      { file: 'src/runner/operation-choice.mjs', callText: 'executeAssignment(assignment, opts)' },
     ]),
     [],
   );
