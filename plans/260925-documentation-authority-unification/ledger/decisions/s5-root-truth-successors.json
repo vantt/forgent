@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "shard": "s5-root-truth-successors.json",
+  "authorSession": "codex-session:21@2026-10-14",
+  "authorshipRequired": true,
+  "sources": [],
+  "claims": [],
+  "registryGaps": [
+    {
+      "claimId": "claim_ac8be2d94e5bad871f26214d7eaac4af",
+      "sourcePath": "docs/platform/work-state/spec.md",
+      "sourceAnchor": "unheaded-block-22",
+      "sourceUnitDigest": "896856e1509a84929acc35bbf336ab20a94a6f95415423205fa32a2bfe54d45c",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "412aa1ea6671a21153e7a478836be52612dd86b48e8f06ac59cc3add3f4f720a",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Human Gate Record"
+      ],
+      "authoredBy": "codex-session:21@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block."
+    },
+    {
+      "claimId": "claim_1a6a7460ede876ae7fa1de7c2e168cfe",
+      "sourcePath": "docs/platform/work-state/spec.md",
+      "sourceAnchor": "unheaded-block-65",
+      "sourceUnitDigest": "96b669468dbe4f3a8fd6eaa112986cead07ae88fa9de2b233f8fbf27314f9d16",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-65",
+      "targetUnitDigest": "72721c54253ba541180f7b7114d858ce2af06671f1fa05f45162063962b681b2",
+      "targetAncestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Add Verb"
+      ],
+      "authoredBy": "codex-session:21@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block."
+    },
+    {
+      "claimId": "claim_64efd51dc50d417f21972188bf57afe9",
+      "sourcePath": "docs/platform/work-state/spec.md",
+      "sourceAnchor": "unheaded-block-75",
+      "sourceUnitDigest": "504b6a5b42d39ff1886b7e1865b5cd54713406e8caff7f6c22e0b3085efb755d",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-75",
+      "targetUnitDigest": "31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c",
+      "targetAncestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Answer Verb"
+      ],
+      "authoredBy": "codex-session:21@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block."
+    },
+    {
+      "claimId": "claim_3b151159fccbac3b57c7ea93fb1d8ca7",
+      "sourcePath": "docs/platform/work-state/spec.md",
+      "sourceAnchor": "unheaded-block-91",
+      "sourceUnitDigest": "27a3ba1515c8ffa4c6db8e9123168b72f583293dd0d4904824848c7187fe2bf1",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-91",
+      "targetUnitDigest": "c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400",
+      "targetAncestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Conflicts Verb"
+      ],
+      "authoredBy": "codex-session:21@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block."
+    },
+    {
+      "claimId": "claim_8d273e8328dac53565eb0286c6a91d65",
+      "sourcePath": "docs/platform/work-state/spec.md",
+      "sourceAnchor": "unheaded-block-93",
+      "sourceUnitDigest": "19f7dcac1af1f366369c2b1b75261b376f12ecaabf4b65f5f0d6f92c191a712d",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-93",
+      "targetUnitDigest": "5c61302d66e78a5c872334e3a00927d6a8230642fd670dc0af923cad3e83f3b8",
+      "targetAncestry": [
+        "Work State Specification",
+        "11. Business Rules"
+      ],
+      "authoredBy": "codex-session:21@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block."
+    }
+  ]
+}

@@ -4,6 +4,54 @@ Date: 2026-10-14
 Executor: codex-session:21@2026-10-14
 Session counter: 21
 Step: 5
+State: ready-for-review / truth request publication
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Last green target/source and native proof pin: 55ec1e0c40410b70b1e4024232a233d4e3d96b3d
+Last publication before this progress commit: 55d249704930cdf21e66948b014822828a8b2f5b
+Review pin: 729bea758; A35/A36 owner authorization b65e0d23d.
+
+Applied all 240 committed ok source verdicts plus two list/gap accounting verdicts in ordinary mode, notes verbatim, exact report pin. Fixed the rescope citation to review-4-packaging-closure-resolution.md (693 tuples). Ten accepted per-row link-count nits remain unchanged: correcting their rationales would reopen review; file-wide 25 is true.
+
+Authored 224 new pending Judgment source decisions (198 already-in-topology non-authority proposal, 23 retained reading-map singleton units, 3 detailed legacy reading-map units). Three committed full-text packs: 75/75/74. Proposal source units retain-as-evidence; file-level recorded non-platform exception reclassify-out-of-platform-scope matches native retained-source (retain-as-evidence is not allowed for that file class). All source bytes are unchanged. Reading maps remain until reviewed navigation merge/consumer rewrite at cutover; no self-carry proof. A36: no paired source/target digests for non-carry rows; absent-target rows explicitly listed, seeded Judgment sample minimum 12 per pack, reviewer draws. AGENTS.md/CLAUDE.md deferred to Step 10.
+
+A35: corrected all 20 listed false sentence fragments in five body units of work-state/spec.md, 10 native units including heading payloads; complete before/after text, native/shown full digests, code file:line excerpts and blob/excerpt digests are published. Actual legacy statusAtAsk fallback preserved, doing clamped to todo; all plan-gate cases retained. No rest-of-spec or unchecked RUL-block sweep. Ten direct source rebindings plus 62 unchanged source rows whose whole-shard frozen Pilot exemption is mechanically invalidated: 72 pending ordinary rows, no approval carry. Full unchanged source/target and ancestry proofs for the 62 are shown. Five new candidate predecessor gaps have real same-file pending successors, no identity graft. One truth request uses bounded packs of 77 binding entries and 5 corrected truth units. Truth scope is the 20 corrected fragments only; untouched sentences still owe promotion truth review. Carrier-level A35 note added for spec.md, cli-io-contract.md and implementation-pointers.md; native reverse tuples unchanged.
+
+Historical switchboard gap claim_334a8ede523cc86a70852c42b9db587c: one pending supersede proposal with exact old source at f5a1a2dda parent and the current mapped candidate table. Full text/digests/diff, no guessed identity, waiver or carried approval. It still needs independent acceptance before closure.
+
+Root map: 1,072 source rows; 676 reviewed / 301 pending / 95 undecided. 296 ordinary pending source rows are this turn's 224 + 72; five existing pending generated rows remain as before. Remaining undecided: foundations 68, lifecycle vision 25, JSON/YAML contract artifacts 2. STOP at bounded committed packs; no final Step 5 population prepared because these 95 are undecided. Original truth sample/population/report untouched, no author draw. Fresh final 30-unit reviewer draw remains owed under A35 after final population completion.
+
+Final both-prior D: exit 0, zero fatal, identical outputs. Final both 27-source scoped E: identical expected red, exactly 296 source rows not reviewed, two unchanged IO historical gaps and 792 candidate-unverified tuples; full tuple equality with native output and committed list. Six pending registry decisions (five A35 predecessors, one switchboard predecessor) are additionally explicit review obligations even where their proposed dispositions remove native open categories. No Step 5 closure claim.
+
+Native equality: all 94,761 old known IDs retained; 94,766 current known IDs. Unaffected full tuples unchanged; five stable-heading digest updates equal exactly the authorized A35 edited units. Full active tuple equality; five new gaps, zero retired additions. Compact one-line working registry persisted native-byte-equal, 59,669,696 bytes (below 90 MB), SHA256 2975fb8d3eb9694d0e5603f7e8cb4c14d39245d82a78170f7850c5775123b44a. Candidate list 792 full rows byte-preserved; no new reverse tuples. Prior Agent/Host/Packaging lists, holds, exceptions, A34 residuals and original truth artifacts unchanged.
+
+Preservation: A passes with the seven exact prior exemptions; extractor closure, five frozen files, witness/payload trees, authority statuses and reader-link sets unchanged. Ratchet 995/25/1; placement 529/528/one existing exception/zero gap; H zero findings. Review/apply tests with env -u CLAUDE_CODE_SESSION_ID: 29/29, zero fail/cancel/skip/todo. GitNexus CLI detect_changes resolved explicitly to this worktree: low risk, zero affected processes, document headings only; no production function/class/method edited. No full-suite, installed-release, gateway or full truth certification.
+
+Resolved obstacles: an intermediate ancestry-less rebinder draft was discarded; the unavoidable whole-shard legacy exemption loss is explicitly quarantined to 62 unchanged rows, with no checker/fingerprint change. Legacy metadata experiments were discarded. Proposal file-class mismatch fixed using an existing recorded-exception disposition. Preliminary refresh canceled after the last sentence refinement and restarted from persisted registry at the final content pin. Evidence end range clamped to classify.mjs actual EOF; excerpt bytes/hashes unchanged. Invalid/transient proof runs are not claimed; final serialized D/E and verification passed.
+
+Requests:
+- review-request-261014-1846-root-retained-conservation-01.md
+- review-request-261014-1846-root-retained-conservation-02.md
+- review-request-261014-1846-root-retained-conservation-03.md
+- review-request-261014-1842-root-authorities-truth-corrections.md
+- review-request-261014-1846-root-switchboard-gap-disposition.md
+Evidence and reproducible proof helpers: root-authorities-turn21-verification.json. Full truth corrections/rebindings/native predecessors: root-authorities-truth-corrections-turn21.json, root-authorities-truth-rebindings-turn21.json, root-authorities-truth-native-successors-turn21.json. Gap evidence: root-switchboard-gap-proposal-turn21.json.
+
+Current-turn commits: dd029fc38 (resume), 167baed8d (accepted verdicts), 9bb7e6edb / 55ec1e0c4 (truth content), 08854b8ba (retained rows and gap proposal), 7b2adcf4a / ad8229717 / 0934568be (three bounded retained packs), 55d249704. This progress commit is the next publication; resolve HEAD after it.
+
+Blockers: no technical blocker or unexplained failing proof. Independent Lead verdicts on the five requests are pending; Step 5 remains open with 95 source rows undecided. Next: Publish switchboard-gap request, final clean-tree check and STOP.
+No promotion, push, rebase, main write/merge, Step 6, protected gate/checker/extractor/vocabulary/baseline edit or secret-file read.
+
+Earlier progress follows intact.
+
+---
+
+# Latest resume state — Authorized truth fixes and bounded conservation handoff
+
+Date: 2026-10-14
+Executor: codex-session:21@2026-10-14
+Session counter: 21
+Step: 5
 State: authoring / final proof green; publishing bounded handoff
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4

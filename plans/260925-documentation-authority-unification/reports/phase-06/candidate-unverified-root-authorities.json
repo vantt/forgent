@@ -2,7 +2,7 @@
   "version": 1,
   "batch": "root-authorities",
   "authorization": "A28",
-  "authoredCommit": "23062c2ce9caaf6711a906673e2dc14c3f345ec3",
+  "authoredCommit": "55ec1e0c40410b70b1e4024232a233d4e3d96b3d",
   "scope": [
     "docs/specs/work-state.md",
     "docs/io-contract.md",
@@ -27,9 +27,12 @@
     "docs/routing-handoff-contract.md",
     "docs/distribution-vision.md",
     "docs/transitional-switchboard.md",
-    "docs/README.md"
+    "docs/README.md",
+    "docs/platform/proposals/documentation-system-unification.md",
+    "docs/reading-map.md",
+    "docs/specs/reading-map.md"
   ],
-  "scopeLimit": "Bounded source packs only; not final Step 5 closure.",
+  "scopeLimit": "Bounded source packs; 95 mapped source rows still undecided, no Step 5 closure.",
   "meaning": "Native reverse-open list; candidate-unverified, no truth approval.",
   "count": 792,
   "rows": [
@@ -11813,6 +11816,26 @@
         "eligibility": "non-promoted Candidate/Draft"
       },
       "status": "candidate-unverified"
+    }
+  ],
+  "workStateSpecCarriers": [
+    {
+      "path": "docs/platform/work-state/spec.md",
+      "note": "known stale carried sentences; full truth check owed at promotion",
+      "authorization": "A35",
+      "meaning": "Carrier-level caveat; tuple population is still the exact native T6 reverse-open set, not a truth receipt."
+    },
+    {
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "note": "known stale carried sentences; full truth check owed at promotion",
+      "authorization": "A35",
+      "meaning": "Carrier-level caveat; tuple population is still the exact native T6 reverse-open set, not a truth receipt."
+    },
+    {
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "note": "known stale carried sentences; full truth check owed at promotion",
+      "authorization": "A35",
+      "meaning": "Carrier-level caveat; tuple population is still the exact native T6 reverse-open set, not a truth receipt."
     }
   ]
 }
