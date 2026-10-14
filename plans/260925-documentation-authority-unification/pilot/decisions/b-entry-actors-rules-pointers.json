@@ -12,14 +12,20 @@
       "targetAnchor": "unheaded-block-98",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "YAML front matter (area, updated, sources, decisions, coverage: partial) carried byte-identical into the provenance block of section 15 of the candidate spec; it is source-slice and decision-hash provenance, not behavior, so the generator kind specification is wrong. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "9635c37a607caab23d8c57b594b11914c8f1bf0e9cd1a2bcc7e952072bca1a36",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: block src lines 1-7 to spec.md#unheaded-block-98 under '15. Source Provenance And Coverage': source and target text identical by recomputed sha256 on both sides, hand-recomputed from file lines; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree; front matter is carried as a provenance block, not behavior, and the rationale says so (seeded sample)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "9635c37a607caab23d8c57b594b11914c8f1bf0e9cd1a2bcc7e952072bca1a36",
       "targetAncestry": [
         "Work State Specification",
         "15. Source Provenance And Coverage"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_36389ecd6a08422af17bd5af68a6fce5",
@@ -28,13 +34,19 @@
       "targetAnchor": "1-purpose-and-scope",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H1 \"Spec: Work-State (tầng quản việc của forgent)\" is represented by the frozen heading \"1. Purpose And Scope\"; only the heading title differs (map section 4 rows 9-11), the title text itself is not carried as a separate heading. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "9d285ca494f440b3261e24c05c801a4a05590ef7e15186066250d2b23016e2ab",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: heading 'Spec: Work-State (tầng quản việc của forgent)' (src line 9) to '1. Purpose And Scope' (target line 19, depth H1 to H2): payload and following-block digests equal on both sides so only the title and depth changes; anchor ok, ancestry recomputed equal, section order kept, target unit and ancestry unchanged vs resume tree; rationale truthful; nit: rationale says only the title differs, depth also goes H1 to H2 (an allowed change), not blocking",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "9d285ca494f440b3261e24c05c801a4a05590ef7e15186066250d2b23016e2ab",
       "targetAncestry": [
         "Work State Specification"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_c613cb5faff29ae8bd2374be9af5b48f",
@@ -43,14 +55,20 @@
       "targetAnchor": "unheaded-block-2",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Purpose paragraph carried line-for-line identical under 1. Purpose And Scope; no wording change. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "d9f06bbaa0ffe5ab3f54dd8fba4e9514ed4e126572c8a570dea57f366837d117",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: block src lines 11-11 to spec.md#unheaded-block-2 under '1. Purpose And Scope': source and target text identical by recomputed sha256 on both sides, hand-recomputed from file lines; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "d9f06bbaa0ffe5ab3f54dd8fba4e9514ed4e126572c8a570dea57f366837d117",
       "targetAncestry": [
         "Work State Specification",
         "1. Purpose And Scope"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_8f6ab9b2c2de71369769d27719a09b8e",
@@ -59,13 +77,19 @@
       "targetAnchor": "2-entry-points-and-triggers",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source heading \"Entry Points & Triggers\" is represented by the frozen heading \"2. Entry Points And Triggers\"; only the title (ampersand and numbering) differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "6e306b169de96db64ba2f8cd2b68bf3640d76bb956db97859d5e627e54ef31f5",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: heading 'Entry Points & Triggers' (src line 13) to '2. Entry Points And Triggers' (target line 23): payload and following-block digests equal on both sides so only the title changes; anchor ok, ancestry recomputed equal, section order kept, target unit and ancestry unchanged vs resume tree; rationale truthful",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "6e306b169de96db64ba2f8cd2b68bf3640d76bb956db97859d5e627e54ef31f5",
       "targetAncestry": [
         "Work State Specification"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_a5326477491a9bc30a98744da8e9bfb9",
@@ -74,14 +98,20 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The 24-line CLI entry-point verb list is identical in the candidate block under 2. Entry Points And Triggers (diff clean); the map keeps it as specification, not contract. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "c8fc6e5bf49179cb6f37f3247ad25c3217a40bd23b96748f5fdf6893dff5581e",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: block src lines 15-38 to spec.md#unheaded-block-3 under '2. Entry Points And Triggers': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "c8fc6e5bf49179cb6f37f3247ad25c3217a40bd23b96748f5fdf6893dff5581e",
       "targetAncestry": [
         "Work State Specification",
         "2. Entry Points And Triggers"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_949f208343809a8ca04870aea74402de",
@@ -90,13 +120,19 @@
       "targetAnchor": "10-actors-and-access",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source heading \"Actors & Access\" is represented by frozen heading \"10. Actors And Access\"; only the title differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "d60d7f1c5d8687c8d48f47902e6fedfdd668b16fe7e812c54c2ab7cb04f89a5f",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: heading 'Actors & Access' (src line 1149) to '10. Actors And Access' (target line 1021): payload and following-block digests equal on both sides so only the title changes; anchor ok, ancestry recomputed equal, section order kept, target unit and ancestry unchanged vs resume tree; rationale truthful",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "d60d7f1c5d8687c8d48f47902e6fedfdd668b16fe7e812c54c2ab7cb04f89a5f",
       "targetAncestry": [
         "Work State Specification"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_f323a5093b365db84b200bcd86a3e019",
@@ -105,14 +141,20 @@
       "targetAnchor": "unheaded-block-92",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Capability-by-actor table carried identical (diff clean) under 10. Actors And Access. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "6d080b8078df1fa4538a1750f5a61c2ad460fc86969fc695517e697388393628",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: block src lines 1151-1156 to spec.md#unheaded-block-92 under '10. Actors And Access': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (seeded sample)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "6d080b8078df1fa4538a1750f5a61c2ad460fc86969fc695517e697388393628",
       "targetAncestry": [
         "Work State Specification",
         "10. Actors And Access"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_477a30f4902261e390c34ab888145dcd",
@@ -152,13 +194,19 @@
       "targetAnchor": "12-edge-cases-settled",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source heading \"Edge Cases Settled\" is represented by frozen heading \"12. Edge Cases Settled\"; only the numbering prefix differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "bbea0adadc95834d9a32460e3b4abeaad6183b5dfb1ae6989a29e1a65ae7e864",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: heading 'Edge Cases Settled' (src line 1215) to '12. Edge Cases Settled' (target line 1087): payload and following-block digests equal on both sides so only the title changes; anchor ok, ancestry recomputed equal, section order kept, target unit and ancestry unchanged vs resume tree; rationale truthful",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "bbea0adadc95834d9a32460e3b4abeaad6183b5dfb1ae6989a29e1a65ae7e864",
       "targetAncestry": [
         "Work State Specification"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_b64e4bcb5061a6c42c0db1d5a1f2887b",
@@ -167,14 +215,20 @@
       "targetAnchor": "unheaded-block-94",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The 66-line settled edge-case list is identical in the candidate (diff clean), kept whole as one unit (map section 11 item 9). A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "dbace0a231a15099a8ff774d2c937cdbeaa8ea0eee650a1262c913f28cadc1ab",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: block src lines 1217-1282 to spec.md#unheaded-block-94 under '12. Edge Cases Settled': source and target text identical by recomputed sha256 on both sides, hand-recomputed from file lines; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "dbace0a231a15099a8ff774d2c937cdbeaa8ea0eee650a1262c913f28cadc1ab",
       "targetAncestry": [
         "Work State Specification",
         "12. Edge Cases Settled"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_d011d26d0e584f25caa838e02c59b613",
@@ -183,13 +237,19 @@
       "targetAnchor": "13-known-gaps-and-deferred-work",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source heading \"Open Gaps\" is represented by frozen heading \"13. Known Gaps And Deferred Work\"; the title differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "a2f7b6b14e08d0b250b4cdb0674d45e52b50616d53521f5c166a568ec80e83b3",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: heading 'Open Gaps' (src line 1284) to '13. Known Gaps And Deferred Work' (target line 1156): payload and following-block digests equal on both sides so only the title changes; anchor ok, ancestry recomputed equal, section order kept, target unit and ancestry unchanged vs resume tree; rationale truthful",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "a2f7b6b14e08d0b250b4cdb0674d45e52b50616d53521f5c166a568ec80e83b3",
       "targetAncestry": [
         "Work State Specification"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_a27bf300f6a6f7901c1c072d5cf9e7da",
@@ -198,14 +258,20 @@
       "targetAnchor": "unheaded-block-95",
       "claimKind": "intent",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Open-gaps bullets list work deliberately deferred or not yet decided (typed gates only when a real consumer needs them, no timeout/reminder, no multi-user permissions, fleet orchestrator, rollup view) with revisit conditions, which matches the vocabulary intent kind (design intent, must-not-preclude constraints, revisit triggers); text carried identical under 13. Known Gaps And Deferred Work. Earlier specification choice followed the map and is corrected after review. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "5ad9c97f20aa0e6f61669617556fca877509f5f250d714cd0ce1527588631ed1",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: block src lines 1286-1297 to spec.md#unheaded-block-95 under '13. Known Gaps And Deferred Work': source and target text identical by recomputed sha256 on both sides, hand-recomputed from file lines; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (seeded sample)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "5ad9c97f20aa0e6f61669617556fca877509f5f250d714cd0ce1527588631ed1",
       "targetAncestry": [
         "Work State Specification",
         "13. Known Gaps And Deferred Work"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_294491cc27c7f037d7b904b6cfb2eddb",
@@ -214,14 +280,20 @@
       "targetAnchor": "unheaded-block-96",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The Da dong note records a gap that was once listed here and has since been fixed (CAS residue, pointing to history), i.e. a retired past observation, so historical-context; text carried identical under 13. Known Gaps And Deferred Work. Earlier specification choice corrected after review. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "d9e8b7000d47817bb9f18c512831b2264db4460c56330dc05898a60d1e8de24d",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: block src lines 1299-1299 to spec.md#unheaded-block-96 under '13. Known Gaps And Deferred Work': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "d9e8b7000d47817bb9f18c512831b2264db4460c56330dc05898a60d1e8de24d",
       "targetAncestry": [
         "Work State Specification",
         "13. Known Gaps And Deferred Work"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_1a9c10544a642b6001a8bacae1b6817b",
@@ -230,13 +302,19 @@
       "targetAnchor": "14-presentation-surface",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source heading \"Visuals\" is represented by frozen heading \"14. Presentation Surface\"; only the title differs. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "267b58ca8eeabc14f6baf905c51e21639d5985d01e2afa253c609993d63701d0",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: heading 'Visuals' (src line 1301) to '14. Presentation Surface' (target line 1173): payload and following-block digests equal on both sides so only the title changes; anchor ok, ancestry recomputed equal, section order kept, target unit and ancestry unchanged vs resume tree; rationale truthful",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "267b58ca8eeabc14f6baf905c51e21639d5985d01e2afa253c609993d63701d0",
       "targetAncestry": [
         "Work State Specification"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_2cfd89083b61b2c263e84f24624a6f3c",
@@ -245,14 +323,20 @@
       "targetAnchor": "unheaded-block-97",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "\"Not applicable - không có màn hình.\" carried identical under 14. Presentation Surface. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: block src lines 1303-1303 to spec.md#unheaded-block-97 under '14. Presentation Surface': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
       "targetAncestry": [
         "Work State Specification",
         "14. Presentation Surface"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_40f7857c31724be3b7ca7a6de1097818",
@@ -261,13 +345,19 @@
       "targetAnchor": "2-implementation-pointers",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source heading \"Pointers (implementation)\" is represented by frozen heading \"2. Implementation Pointers\" in the implementation-pointers document; the title differs and the owner moves out of spec.md. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "648524a55f28a05fe49ed3cd1f7ed91790c0322afc3adb7e1b57b7dbaa255e21",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: heading 'Pointers (implementation)' (src line 1305) to '2. Implementation Pointers' (target line 19): payload and following-block digests equal on both sides so only the title changes; anchor ok, ancestry recomputed equal, section order kept, target unit and ancestry unchanged vs resume tree; rationale truthful",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "648524a55f28a05fe49ed3cd1f7ed91790c0322afc3adb7e1b57b7dbaa255e21",
       "targetAncestry": [
         "Work State Implementation Pointers"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     },
     {
       "claimId": "claim_2e2bc9264b289319dfae5c6487978f99",
@@ -276,14 +366,20 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The 24-bullet module-pointer list is identical in implementation-pointers.md (diff clean); architecture because the bullets state module responsibilities (map section 11 item 5), and its file names may be stale. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
-      "targetUnitDigest": "7542cfb4d64398d37bafa7ce4cb4bc918bd7243c7cc8e2a4a82794055785b0c3",
       "authoredBy": "codex-session:21@2026-10-14",
+      "reviewNote": "deep: block src lines 1307-1330 to implementation-pointers.md#unheaded-block-3 under '2. Implementation Pointers': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "7542cfb4d64398d37bafa7ce4cb4bc918bd7243c7cc8e2a4a82794055785b0c3",
       "targetAncestry": [
         "Work State Implementation Pointers",
         "2. Implementation Pointers"
-      ]
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     }
   ],
   "authorSession": "codex-session:21@2026-10-14"

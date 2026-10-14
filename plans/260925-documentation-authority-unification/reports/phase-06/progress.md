@@ -4,10 +4,10 @@ Date: 2026-10-14
 Executor: codex-session:22@2026-10-14
 Session counter: 22
 Step: 5
-State: resumed / applying committed Lead verdicts
+State: authoring / committed verdict application proved
 Starting HEAD: c3895c140; branch and cwd verified, clean tree. B0: dbe5c432852837ea01e6025b35868bcb7271495d. SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4.
 
-Scope: apply committed ordinary ok verdicts pinned to c3895c140 with verbatim notes; prove D/E/native equality and persist compact registry. Correct U8 required flags and U26 RUL60 under A19; rebind six dependent rows under A22. Decide 95 remaining source rows pending per map/Q5/N1, publish bounded full-text/digest packs under A36, extend native candidate list, and prepare final truth population without drawing. AGENTS.md/CLAUDE.md wait for Step 10. No promotion, push, main merge/write, Step 6 or protected-tool edits. No technical blocker identified.
+Scope: apply committed ordinary ok verdicts pinned to c3895c140 with verbatim notes; prove D/E/native equality and persist compact registry. Correct U8 required flags and U26 RUL60 under A19; rebind six dependent rows under A22. Decide 95 remaining source rows pending per map/Q5/N1, publish bounded full-text/digest packs under A36, extend native candidate list, and prepare final truth population without drawing. AGENTS.md/CLAUDE.md wait for Step 10. No promotion, push, main merge/write, Step 6 or protected-tool edits. Applied 296 ok binding verdicts (292 source, four gaps) with notes verbatim; three fragment-truth ok acceptances recorded separately. Both-prior D zero fatal; both scoped E equal exactly four pending source rows, two existing IO gaps, 792 candidate tuples. Native known/full tuple equality and compact registry persistence pass; 39 tests pass. Seven prior A exemptions retained. No technical blocker identified.
 
 Earlier progress follows intact.
 

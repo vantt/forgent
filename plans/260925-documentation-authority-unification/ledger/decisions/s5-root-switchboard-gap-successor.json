@@ -14,10 +14,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/documentation/switchboard.md",
       "targetAnchor": "unheaded-block-4",
-      "targetUnitDigest": "130d01325ca439a9c92832cb477fc845a32ef7d393c7b2d584dcf348ff298902",
       "authoredBy": "codex-session:21@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "Historical switchboard area-routes table at 08a0fd2d2ed988db996980332054a9b4559eab18 is superseded by the explicit f5a1a2dda route-table change and its whole same-subject current candidate table. Old/current full text and diff show additive candidate topology routes with existing area/authority facts retained. Current source row claim_3a0662d27a8829517966d15cf279af44 independently carries the current source table to this exact target (review 729bea758); that approval does not approve this predecessor. No identity graft, gap waiver or authority promotion."
+      "reviewStatus": "reviewed",
+      "rationale": "Historical switchboard area-routes table at 08a0fd2d2ed988db996980332054a9b4559eab18 is superseded by the explicit f5a1a2dda route-table change and its whole same-subject current candidate table. Old/current full text and diff show additive candidate topology routes with existing area/authority facts retained. Current source row claim_3a0662d27a8829517966d15cf279af44 independently carries the current source table to this exact target (review 729bea758); that approval does not approve this predecessor. No identity graft, gap waiver or authority promotion.",
+      "reviewNote": "deep: old block 560b636f recomputed from 08a0fd2d2 and current 130d0132 from the HEAD target; only the work-state row differs (one appended candidate-route sentence from f5a1a2dda, the sole edit since the pin) and all prior area-authority text is retained; supersede with a named successor is correct and anchor exists; rationale says routes in the plural though exactly one route was added, a wording slip that does not change the disposition",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-switchboard-gap.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "130d01325ca439a9c92832cb477fc845a32ef7d393c7b2d584dcf348ff298902",
+      "targetAncestry": [
+        "Transitional Documentation Authority Switchboard",
+        "2. Area Authority Routes"
+      ],
+      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
     }
   ]
 }

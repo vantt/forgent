@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "contentCommit": "f0efa3330a14d117ad89feba91bdb9b61d768339",
+  "reportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601",
+  "D": {
+    "bothExit": 0,
+    "fatal": 0
+  },
+  "E": {
+    "bothExpectedExit": 1,
+    "open": [
+      {
+        "type": "claims-not-reviewed",
+        "message": "claim rows whose reviewStatus is not reviewed",
+        "count": 4,
+        "examples": [
+          "docs/specs/work-state.md#khai-việc-add-bề-mặt-nội-bộ",
+          "docs/specs/work-state.md#unheaded-block-76",
+          "docs/specs/work-state.md#business-rules",
+          "docs/specs/work-state.md#unheaded-block-104"
+        ]
+      },
+      {
+        "type": "registry-gaps-without-disposition",
+        "message": "registry identity-gap rows with no vocabulary disposition",
+        "count": 2,
+        "examples": [
+          "docs/io-contract.md#unheaded-block-14",
+          "docs/io-contract.md#unheaded-block-15"
+        ]
+      },
+      {
+        "type": "candidate-blocks-unreferenced",
+        "message": "candidate conservation units not named by a source decision",
+        "count": 792,
+        "examples": [
+          "docs/platform/coexistence/spec.md#unheaded-block-1",
+          "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+          "docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1",
+          "docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate",
+          "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1"
+        ]
+      }
+    ]
+  },
+  "allKnownIdsRetained": true,
+  "knownCount": 94766,
+  "allKnownFullTuplesEqual": true,
+  "activeFullTupleEquality": true,
+  "candidateListCount": 792,
+  "candidateFullTupleEquality": true,
+  "registryBytes": 59669696,
+  "registrySHA256": "2975fb8d3eb9694d0e5603f7e8cb4c14d39245d82a78170f7850c5775123b44a",
+  "compactOneLine": true,
+  "nativeByteEqual": true
+}
