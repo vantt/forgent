@@ -3,6 +3,7 @@
 
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
+import { canonicalizeWriteEntry } from '../dispatch/write-scope.mjs';
 
 const DISALLOWED_UNIT_FIELDS = Object.freeze([
   'executor',
@@ -11,9 +12,35 @@ const DISALLOWED_UNIT_FIELDS = Object.freeze([
   'tier',
   'invocation',
   'actors',
-  'prefer',
   'overrides',
 ]);
+
+const PREFER_ENTRY_KEYS = new Set(['executor', 'invocation']);
+
+/**
+ * A unit's soft executor preference, in the shape bind() reads a capability's prefer pool:
+ * an array of "<executorId>" or {executor, invocation?}. Shape only; ids are not looked up here.
+ */
+function normalizePrefer(value) {
+  if (!Array.isArray(value)) {
+    throw new RunnerConfigError('unit.prefer must be an array of executor ids or {executor, invocation?} entries.');
+  }
+  return Object.freeze(value.map((entry, i) => {
+    if (typeof entry === 'string' && entry.trim()) return entry.trim();
+    const isEntryObject = entry && typeof entry === 'object' && !Array.isArray(entry);
+    if (!isEntryObject || typeof entry.executor !== 'string' || !entry.executor.trim()
+      || Object.keys(entry).some((key) => !PREFER_ENTRY_KEYS.has(key))
+      || (entry.invocation !== undefined && (typeof entry.invocation !== 'string' || !entry.invocation.trim()))) {
+      throw new RunnerConfigError(
+        `unit.prefer[${i}] must be a non-empty executor id or {executor, invocation?} with non-empty strings, got: ${JSON.stringify(entry)}.`,
+      );
+    }
+    return Object.freeze({
+      executor: entry.executor.trim(),
+      ...(entry.invocation !== undefined ? { invocation: entry.invocation.trim() } : {}),
+    });
+  }));
+}
 
 const UNIT_RUN_INPUT_PATTERN = /^unit-run:[^/\s]+\/[^/\s]+$/;
 const GATE_ANSWER_INPUT_PATTERN = /^gate-answer:[^/\s]+\/[^/\s]+$/;
@@ -90,7 +117,9 @@ function isValidInput(inp) {
  *   is readable) or is refused, never run unblind
  * - expectedOutputs: array of strings
  * - stanceOptions?: question-local option labels; "other" is reserved; omitted means unmeasured
- * - MUST NOT contain: executor, provider, model, tier, invocation, actors, prefer, overrides (G2)
+ * - prefer?: soft executor preference, array of "<executorId>" or {executor, invocation?}
+ * - persona?: non-empty string
+ * - MUST NOT contain: executor, provider, model, tier, invocation, actors, overrides (G2)
  *
  * @param {unknown} raw
  * @returns {Readonly<{
@@ -101,6 +130,8 @@ function isValidInput(inp) {
  *   writes: readonly string[],
  *   dependsOn: readonly string[],
  *   pattern?: string,
+ *   prefer?: readonly (string|{executor: string, invocation?: string})[],
+ *   persona?: string,
  *   inputs: readonly string[],
  *   expectedOutputs: readonly string[]
  * }>}
@@ -114,7 +145,7 @@ export function validateUnit(raw) {
   for (const field of DISALLOWED_UNIT_FIELDS) {
     if (field in raw && raw[field] !== undefined) {
       throw new RunnerConfigError(
-        `unit violates G2 constraint: contains disallowed field "${field}". Unit contract must not specify execution mechanics (executor, provider, model, tier, invocation, actors, prefer, overrides).`,
+        `unit violates G2 constraint: contains disallowed field "${field}". Unit contract must not specify execution mechanics (${DISALLOWED_UNIT_FIELDS.join(', ')}).`,
       );
     }
   }
@@ -148,21 +179,20 @@ export function validateUnit(raw) {
     rigor = raw.rigor;
   }
 
-  // writes
+  // writes: canonical spelling, so every consumer reads one entry one way
   if (raw.writes !== undefined && !Array.isArray(raw.writes)) {
     throw new RunnerConfigError('unit.writes must be an array of repo-relative paths.');
   }
-  const rawWrites = raw.writes ?? [];
   const writes = [];
-  for (let i = 0; i < rawWrites.length; i += 1) {
-    const w = rawWrites[i];
-    if (!isValidRepoRelativePath(w)) {
-      throw new RunnerConfigError(
-        `unit.writes[${i}] must be a non-empty repo-relative path without leading "/" or "..", got: ${JSON.stringify(w)}.`,
-      );
+  (raw.writes ?? []).forEach((w, i) => {
+    let entry;
+    try {
+      entry = canonicalizeWriteEntry(w);
+    } catch (err) {
+      throw new RunnerConfigError(`unit.writes[${i}] must be a non-empty repo-relative path: ${err.message}`);
     }
-    writes.push(w);
-  }
+    if (!writes.includes(entry)) writes.push(entry);
+  });
 
   // dependsOn
   if (raw.dependsOn !== undefined && !Array.isArray(raw.dependsOn)) {
@@ -213,6 +243,12 @@ export function validateUnit(raw) {
     throw new RunnerConfigError('unit.blind must be a boolean when present.');
   }
 
+  const prefer = raw.prefer !== undefined ? normalizePrefer(raw.prefer) : undefined;
+
+  if (raw.persona !== undefined && (typeof raw.persona !== 'string' || !raw.persona.trim())) {
+    throw new RunnerConfigError('unit.persona must be a non-empty string when present.');
+  }
+
   // expectedOutputs
   if (raw.expectedOutputs !== undefined && !Array.isArray(raw.expectedOutputs)) {
     throw new RunnerConfigError('unit.expectedOutputs must be an array of strings.');
@@ -237,6 +273,8 @@ export function validateUnit(raw) {
     writes: Object.freeze(writes),
     dependsOn: Object.freeze(dependsOn),
     ...(pattern !== undefined ? { pattern } : {}),
+    ...(prefer !== undefined ? { prefer } : {}),
+    ...(raw.persona !== undefined ? { persona: raw.persona.trim() } : {}),
     inputs: Object.freeze(inputs),
     ...(raw.anonymizeInputs === true ? { anonymizeInputs: true } : {}),
     ...(raw.blind === true ? { blind: true } : {}),

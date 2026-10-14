@@ -1,7 +1,8 @@
 // src/runner/dispatch/write-scope.mjs — the one reader of a declared write scope.
 // Every consumer that asks "may this run touch that path?" (staging a commit, attribution coverage,
 // out-of-scope reporting) answers through matchesWriteScope here; git never interprets a scope.
-// Leaf module: knows nothing about Units or Work, imports nothing from the runner.
+// Leaf module (kernel layer, like rigor.mjs): knows nothing about Units or Work and imports nothing,
+// so workflow definitions, the unit contract and dispatch can all share it.
 
 /** A scope entry or generated-path mapping that cannot be read one way only. */
 export class WriteScopeError extends Error {

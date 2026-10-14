@@ -2,6 +2,7 @@
 // Architecture guard: MUST NOT import src/state/** or src/runner/** (kernel layer)
 
 import path from 'node:path';
+import { canonicalizeWrites } from '../runner/dispatch/write-scope.mjs';
 
 /** Thrown for a malformed Workflow definition. Kept free of runner imports so the
  * Work-lifecycle kernel can read step data without depending on dispatch. */
@@ -279,21 +280,14 @@ export function validateWorkflow(raw) {
           throw new WorkflowDefinitionError(`${unitLabel} invalid rigor "${rigor}", must be one of [${[...VALID_RIGORS].join(', ')}]`);
         }
 
-        const writes = Array.isArray(template.writes)
-          ? template.writes.map((w, wIdx) => {
-              if (typeof w !== 'string' || !w.trim()) {
-                throw new WorkflowDefinitionError(`${unitLabel}.writes[${wIdx}] must be a non-empty string`);
-              }
-              const clean = w.trim();
-              if (path.isAbsolute(clean) || clean.startsWith('/') || clean.startsWith('\\')) {
-                throw new WorkflowDefinitionError(`${unitLabel}.writes contains absolute path "${clean}". Must be repo-relative.`);
-              }
-              if (clean.includes('..')) {
-                throw new WorkflowDefinitionError(`${unitLabel}.writes contains path escape ".." in "${clean}". Must be repo-relative.`);
-              }
-              return clean;
-            })
-          : [];
+        let writes = [];
+        if (template.writes !== undefined) {
+          try {
+            writes = canonicalizeWrites(template.writes);
+          } catch (err) {
+            throw new WorkflowDefinitionError(`${unitLabel}.writes: ${err.message}`);
+          }
+        }
 
         const uDependsOn = Array.isArray(u.dependsOn)
           ? u.dependsOn.map((ud) => String(ud).trim()).filter(Boolean)

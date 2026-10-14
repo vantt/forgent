@@ -28,7 +28,7 @@ import {
   preflightWorkflowSeats,
 } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { normalizeContextRefs } from '../../src/workflow/definition.mjs';
+import { normalizeContextRefs, WorkflowDefinitionError } from '../../src/workflow/definition.mjs';
 import { withProviderFamilies } from '../helpers/provider-families.mjs';
 
 // Worktrees created in the default location outlive the test unless removed here.
@@ -132,6 +132,18 @@ test('validateWorkflow enforces schema and rejects G2 infrastructure fields', ()
     () => validateWorkflow({ ...valid, steps: [{ id: 's1', model: 'gpt-4' }] }),
     /G2 constraint/,
   );
+});
+
+test('validateWorkflow: unit writes use the shared canonical form and keep the unit label on refusal', () => {
+  const wf = (writes) => ({ id: 'test/writes', title: 'W', steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', writes } }] }] });
+  assert.deepEqual(validateWorkflow(wf(['./docs', 'docs//', 'app/[slug]/page.tsx'])).steps[0].units[0].template.writes, ['docs', 'app/[slug]/page.tsx']);
+  for (const bad of ['.', '/etc', 'a/../b', ':!x', 'a**', 3]) {
+    assert.throws(
+      () => validateWorkflow(wf([bad])),
+      (err) => err instanceof WorkflowDefinitionError && err.message.includes('Workflow "test/writes" steps[0].units[0].writes'),
+      `bad=${JSON.stringify(bad)}`,
+    );
+  }
 });
 
 test('workflow store: append and project state accurately', () => {

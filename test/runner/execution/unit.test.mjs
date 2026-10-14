@@ -66,7 +66,6 @@ test('validateUnit: G2 check rejects disallowed execution mechanics fields', () 
     'tier',
     'invocation',
     'actors',
-    'prefer',
     'overrides',
   ];
   for (const field of disallowed) {
@@ -222,4 +221,56 @@ test('workflow link is owner-provided normalized metadata, never guessed from un
   assert.equal(normalizeWorkflowLink(undefined), null);
   assert.deepEqual(normalizeWorkflowLink({ runId: ' wf ', stepId: ' s ', unitId: ' u ', ignored: true }), { runId: 'wf', stepId: 's', unitId: 'u' });
   for (const value of ['wf', {}, { runId: 'wf', stepId: 's', unitId: '' }]) assert.throws(() => normalizeWorkflowLink(value), /workflow link/);
+});
+
+test('validateUnit: writes come back canonical, de-duplicated, in first-seen order', () => {
+  const unit = validateUnit({ id: 'u1', objective: 'obj', capability: 'verb', writes: ['./docs', 'docs//', 'src/', 'app/[slug]/page.tsx'] });
+  assert.deepEqual(unit.writes, ['docs', 'src', 'app/[slug]/page.tsx']);
+});
+
+test('validateUnit: writes refuse entries git and the matcher would read differently', () => {
+  for (const bad of ['.', './', ':(top)x', ':!x', 'a\\b', 'a**']) {
+    assert.throws(
+      () => validateUnit({ id: 'u1', objective: 'obj', capability: 'verb', writes: [bad] }),
+      (err) => err instanceof RunnerConfigError && /unit\.writes\[0\] must be a non-empty repo-relative path/.test(err.message),
+      `bad=${JSON.stringify(bad)}`,
+    );
+  }
+});
+
+test('validateUnit: prefer accepts executor ids and {executor, invocation} entries, and is kept', () => {
+  const unit = validateUnit({
+    id: 'u1', objective: 'obj', capability: 'verb',
+    prefer: ['codex', { executor: 'claude', invocation: 'herdr' }, { executor: 'pi' }],
+  });
+  assert.deepEqual(unit.prefer, ['codex', { executor: 'claude', invocation: 'herdr' }, { executor: 'pi' }]);
+  assert.ok(Object.isFrozen(unit.prefer));
+  assert.equal(validateUnit({ id: 'u1', objective: 'obj', capability: 'verb' }).prefer, undefined);
+});
+
+test('validateUnit: prefer refuses a malformed shape', () => {
+  for (const prefer of ['codex', 42, [42], [{}], [{ executor: '' }], [{ executor: 'x', invocation: 3 }], [''], [{ executor: 'x', model: 'y' }]]) {
+    assert.throws(
+      () => validateUnit({ id: 'u1', objective: 'obj', capability: 'verb', prefer }),
+      (err) => err instanceof RunnerConfigError && /unit\.prefer/.test(err.message),
+      `prefer=${JSON.stringify(prefer)}`,
+    );
+  }
+});
+
+test('validateUnit: persona is a non-empty string and is kept', () => {
+  assert.equal(validateUnit({ id: 'u1', objective: 'obj', capability: 'verb', persona: ' skeptic ' }).persona, 'skeptic');
+  for (const persona of ['', '  ', 3, {}]) {
+    assert.throws(
+      () => validateUnit({ id: 'u1', objective: 'obj', capability: 'verb', persona }),
+      (err) => err instanceof RunnerConfigError && /unit\.persona/.test(err.message),
+    );
+  }
+});
+
+test('validateUnit: the G2 message names the mechanics a unit still may not pin', () => {
+  assert.throws(
+    () => validateUnit({ id: 'u1', objective: 'obj', capability: 'verb', executor: 'codex' }),
+    (err) => /executor, provider, model, tier, invocation, actors, overrides\)/.test(err.message) && !/prefer/.test(err.message),
+  );
 });
