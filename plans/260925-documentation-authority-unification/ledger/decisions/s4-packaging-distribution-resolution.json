@@ -15,8 +15,14 @@
       "targetAnchor": "unheaded-block-24",
       "targetUnitDigest": "aa5e200058adad79eeb799e4c5f6057fd8b6fd68ea06e734d7c6125a05b0dd17",
       "authoredBy": "codex-session:12@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+      "reviewStatus": "reviewed",
+      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewNote": "Supersede of the old FLAGGED Checked status by the owner decision is truthful; old text digest d348c7af and current block-24 recompute; the dated clause is kept verbatim so nothing is dropped",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
+      "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_743f0b70132cc6fda8271214be7c061a",
@@ -27,8 +33,14 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "31f20682351c4c470babfddbbf18a71a32190c071d4f6ae659725b6cfcf84dd0",
       "authoredBy": "codex-session:12@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+      "reviewStatus": "reviewed",
+      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewNote": "Metadata fence now records the owner successor and owed removal; replaced fields (Purpose, Implementation, Supersedes, Last reviewed) are the proposal state the owner decision supersedes, and Related spec and Provenance lines are carried unchanged",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
+      "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_34de7c299044ca3ebf49837a0ef7f3bb",
@@ -39,8 +51,14 @@
       "targetAnchor": "unheaded-block-3",
       "targetUnitDigest": "4d3bba9687d0eddb7182380f864742235de0aecae298039ad72043d97098fa14",
       "authoredBy": "codex-session:12@2026-10-14",
-      "reviewStatus": "pending",
-      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review."
+      "reviewStatus": "reviewed",
+      "rationale": "Owner-decided F6 successor replaces the earlier proposal or FLAGGED status with the coordinator 30-day window and the owed end-of-window Packaging-distribution removal or redirect. Original obligation text and current compatibility code evidence are retained. The complete before/current unit is shown for independent conservation review.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewNote": "Old propose-retirement sentence is superseded by the owner verdict at block-3 with both citations true; the old clause to keep the npm mapping is not restated word for word but block-4 and block-5 keep runner mapping, header, nothing removed and no support extension",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
+      "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
+      "reviewMode": "ordinary"
     }
   ]
 }

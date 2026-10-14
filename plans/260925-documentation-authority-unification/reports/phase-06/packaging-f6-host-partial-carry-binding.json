@@ -13,5 +13,13 @@
     "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
   },
   "cutoverObligation": true,
-  "representationReview": "pending independent conservation review; original disposition stays reviewed; no strict or batch closure"
+  "representationReview": {
+    "reviewStatus": "reviewed",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewNote": "Only the restored-section reference differs (digest f032e46c to 81114f62, shown text carries the new status); source e9f47211 and primary target bcaecc76 recompute and are unchanged; earlier residual file stays SHA256 d47aec29 with no diff, so the other 11 rows are untouched",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
+    "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
+    "reviewMode": "ordinary"
+  }
 }

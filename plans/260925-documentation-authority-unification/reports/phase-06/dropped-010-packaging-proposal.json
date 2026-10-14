@@ -8,7 +8,7 @@
       "sourcePath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
       "sourceAnchor": "unheaded-block-14",
       "proposedVerdict": "superseded by decision",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:12@2026-10-14",
       "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
       "targetAnchor": "proposed-disposition",
@@ -48,7 +48,13 @@
         "commit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
         "text": "F6 resolution (owner-decided 2026-10-14, option A of the Step 4 decision, following `review-4-packaging-truth-f6.md` part 2): dropped-010 is superseded by decision, not retired by absence.\n1. The installed-default removal trigger for npm `bin.fgos` is superseded by the 2026-09-15 coordinator decision (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`, with the `architecture/release-boundaries.md:35` row): the Rust host is the installed default from the preview, and the Node fallback is deprecated and supported for 30 calendar days, earliest removal 2026-10-18. The disposition cites that decision as its successor.\n2. Removing or redirecting `bin.fgos` after the window stays an owed obligation, owned by Packaging-distribution (release-owner decision). The disposition text says so; nothing is removed now.\n3. The rationale says \"superseded by decision\" and drops the \"no intentional retirement is inferred from absence\" wording. The FLAGGED-obsolete verbatim retention may now be resolved consistently with this verdict. The runner mapping and source-entry ownership header stay.",
         "shownTextDigest": "f2a190c215efd2f962ba97b71118536ba72fdf316fc27cea30584299c7ab7487"
-      }
+      },
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewNote": "Decision doc, register and proposal row say superseded by decision, name the 2026-09-15 window (line 72 header, line 35 row, both verified) with earliest removal 2026-10-18, record end-of-window removal as owed to Packaging-distribution, drop the no-retirement-from-absence wording (only the owner own phrase not retired by absence remains), keep runner mapping and header, set flaggedObsolete false and keep the clause verbatim; minor: line 72 is the note header with the substance on line 73, and the status text phrase originally line 35 is odd since the row is still at line 35; stale top-level restorationOwner Unassigned and intentional null are historical record fields, left unchanged",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
+      "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
+      "reviewMode": "ordinary"
     }
   ]
 }

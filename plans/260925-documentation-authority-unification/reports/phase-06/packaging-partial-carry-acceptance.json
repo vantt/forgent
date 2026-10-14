@@ -14,5 +14,14 @@
       "cutoverObligation": true
     }
   ],
-  "strictE": "red; partial-carry disposition unchanged; acceptance revoked on any digest drift"
+  "strictE": "red; partial-carry disposition unchanged; acceptance revoked on any digest drift",
+  "representationReview": {
+    "reviewStatus": "reviewed",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewNote": "Residual file SHA256 064d821d matches; remainder block-7 digest 0266dc3b recomputes, equals the source section minus its heading and is a verbatim substring of the source file; source 3b4563ef and primary target 6cc6e399 recompute; acceptance file binds all three; independent ok review exists at 5b1387c7",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
+    "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
+    "reviewMode": "ordinary"
+  }
 }
