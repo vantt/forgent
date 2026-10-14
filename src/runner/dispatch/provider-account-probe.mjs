@@ -143,12 +143,19 @@ export function classifyAccountProbe({ ok = false, text = '', failureCode = null
 
 const ACCOUNT_FAULTS = new Set(['auth', 'quota']);
 
-/** Account fault when every CLI failed the same account-level way; CLI fault when some answered. */
+/**
+ * Account fault when every CLI failed the same account-level way; CLI fault when some answered. Only rows
+ * whose invocation declares its own sandbox count: the read-only door confines every round, and an
+ * invocation that declares none also binds no private home, so its CLI finds its own login directory
+ * mounted read-only and stops before it answers, which says nothing about the account or the CLI.
+ */
 export function accountProbeVerdict(rows) {
   if (!rows.length) return 'nothing-to-probe';
-  if (rows.every((r) => r.outcome === 'ok')) return 'healthy';
-  if (rows.every((r) => ACCOUNT_FAULTS.has(r.outcome))) return 'account-fault';
-  if (rows.some((r) => r.outcome === 'ok')) return 'cli-fault';
+  const counted = rows.filter((r) => r.confined);
+  if (!counted.length) return 'no-confined-cli';
+  if (counted.every((r) => r.outcome === 'ok')) return 'healthy';
+  if (counted.every((r) => ACCOUNT_FAULTS.has(r.outcome))) return 'account-fault';
+  if (counted.some((r) => r.outcome === 'ok')) return 'cli-fault';
   return 'mixed';
 }
 
@@ -247,6 +254,7 @@ export async function runAccountProbe({
       executorId: inv.executorId,
       adapter: inv.adapter,
       confined: inv.confined,
+      inVerdict: inv.confined,
       account: inv.via,
       outcome,
       evidence,
