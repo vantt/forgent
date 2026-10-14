@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "priorPin": "c3895c140",
+  "allSixPreExisting": true,
+  "newThisTurn": 0,
+  "previous27ScopeOpen": 2,
+  "finalFullMapOpen": 6,
+  "newlyIncludedScopes": [
+    "docs/architecture-manifest.json",
+    "docs/contracts/fgos-gateway-api-v1.yaml",
+    "docs/backlog.md"
+  ],
+  "meaning": "Full mapped scope exposes four additional historical gaps, unchanged from the prior registry; not a content-fix consequence or a source-row omission. All remain explicit Step 5 closure obligations, no identity graft or unreviewed waiver.",
+  "rows": [
+    {
+      "sourcePath": "docs/architecture-manifest.json",
+      "unitDigest": "470c4709265d127eac589f6b20f0b5f6c565b352e4fc1a514d44bfd6a59fd0db",
+      "identityFingerprint": "470c4709265d127eac589f6b20f0b5f6c565b352e4fc1a514d44bfd6a59fd0db",
+      "claimId": "claim_56ee14864e75c42f80dc9903aa1c53e9",
+      "sourceAnchor": "file-block",
+      "unitKind": "file-block",
+      "sourceUnitDigest": "5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664",
+      "claimKind": "contract",
+      "status": "future",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor file-block is not a stable heading anchor"
+    },
+    {
+      "sourcePath": "docs/architecture-manifest.json",
+      "unitDigest": "9f8b0661da3157ed1ffc9be7ec1dc4cd77da816cd86b0213744de866062bb18c",
+      "identityFingerprint": "9f8b0661da3157ed1ffc9be7ec1dc4cd77da816cd86b0213744de866062bb18c",
+      "claimId": "claim_b6f28092c03285c2745234912da0f2ab",
+      "sourceAnchor": "file-block",
+      "unitKind": "file-block",
+      "sourceUnitDigest": "6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e",
+      "claimKind": "contract",
+      "status": "future",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor file-block is not a stable heading anchor"
+    },
+    {
+      "sourcePath": "docs/backlog.md",
+      "unitDigest": "aa429b1276d3d9bae0f0f6ddb1e9606ef9aa59b6afb45d1937e97a1dcb6a4cef",
+      "identityFingerprint": "aa429b1276d3d9bae0f0f6ddb1e9606ef9aa59b6afb45d1937e97a1dcb6a4cef",
+      "claimId": "claim_0956ea2eadf0a32787b7fd0e51d693a6",
+      "sourceAnchor": "unheaded-block-2",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "8af4c326a8034fa8b4584cb6795459a32d8e9c0afbc616540092a7d8400382c1",
+      "claimKind": "unclassified",
+      "status": "future",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+    },
+    {
+      "sourcePath": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "unitDigest": "573b667216740400a46fb36bd49f5def41cd3e460338a15c4f57a09bb6917ef2",
+      "identityFingerprint": "573b667216740400a46fb36bd49f5def41cd3e460338a15c4f57a09bb6917ef2",
+      "claimId": "claim_53b01784413095d74305b7367e9054fb",
+      "sourceAnchor": "file-block",
+      "unitKind": "file-block",
+      "sourceUnitDigest": "9d2bbd0b5bf3c812c67c3ac860daf4a91f6505e7ccf8a1a8e2a5ce36d25213d3",
+      "claimKind": "contract",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor file-block is not a stable heading anchor"
+    },
+    {
+      "sourcePath": "docs/io-contract.md",
+      "unitDigest": "965bdb8cc2868325f9b53a4dbf6b1bd70386dcb28bb74a1b05196fa315652ebc",
+      "identityFingerprint": "965bdb8cc2868325f9b53a4dbf6b1bd70386dcb28bb74a1b05196fa315652ebc",
+      "claimId": "claim_b92ac199356ff830e5554647ab143a90",
+      "sourceAnchor": "unheaded-block-14",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5",
+      "claimKind": "contract",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-14 is not a stable heading anchor"
+    },
+    {
+      "sourcePath": "docs/io-contract.md",
+      "unitDigest": "54672da4c0afc227d30bc36d63356cab7a4ac051fe9be3222a6aea4ef03e08c3",
+      "identityFingerprint": "54672da4c0afc227d30bc36d63356cab7a4ac051fe9be3222a6aea4ef03e08c3",
+      "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
+      "sourceAnchor": "unheaded-block-15",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6",
+      "claimKind": "contract",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-15 is not a stable heading anchor"
+    }
+  ]
+}

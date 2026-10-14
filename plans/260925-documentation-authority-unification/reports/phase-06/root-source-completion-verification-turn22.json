@@ -1,0 +1,1582 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:22@2026-10-14",
+  "state": "ready-for-review",
+  "contentCommit": "cd82746a8ba169600d987eeb0f5ca274304712f3",
+  "proofInventoryCommit": "de742ae91dce1430aa727a8feaf1ad1f96f85001",
+  "B0": "dbe5c432852837ea01e6025b35868bcb7271495d",
+  "SYNC": "48e3a992be1cd74a0960df953af16b5dae4275e4",
+  "application": {
+    "sourceRows": 292,
+    "registryGaps": 4,
+    "truthAcceptances": 3,
+    "reportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601",
+    "notesVerbatim": true
+  },
+  "sourceAuthoring": {
+    "newPending": 95,
+    "classes": {
+      "Weak-exact": 74,
+      "Judgment": 21
+    },
+    "total": 1072,
+    "reviewed": 968,
+    "pending": 104,
+    "undecided": 0,
+    "pendingGeneratedRows": 5,
+    "ordinaryPendingSourceRows": 99
+  },
+  "truthCorrection": {
+    "fragments": 2,
+    "dependentRebindings": 6,
+    "conservationRequestRows": 8,
+    "nativeNewPredecessors": 2,
+    "truthRequestUnits": 2,
+    "noOtherTruthSweep": true
+  },
+  "headerAccounting": {
+    "newPredecessors": 2,
+    "stableHeadingChanges": 2,
+    "sourceAndConsumersUnchanged": true
+  },
+  "nativeEquality": {
+    "version": 1,
+    "contentCommit": "cd82746a8ba169600d987eeb0f5ca274304712f3",
+    "knownBefore": 94766,
+    "knownCurrent": 94865,
+    "allKnownIdsRetained": true,
+    "unaffectedKnownFullTuplesEqual": true,
+    "activeFullTupleEquality": true,
+    "changedStableUnits": 4,
+    "newGaps": 4,
+    "newRetired": 0,
+    "sourceStatuses": {
+      "pending": 104,
+      "reviewed": 968
+    },
+    "sourceTotal": 1072,
+    "remainingUndecided": 0,
+    "pending": 104,
+    "candidateList": 830,
+    "reverseRemoved": [],
+    "reverseAdded": [
+      {
+        "claimId": "claim_cc9b0b6baebe1cb598291fbcd80cf899",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "platform-foundations",
+        "unitDigest": "5c759487c5bbaf994cc259125ee951974a5884b5d2ffb76e0c26f321cd77bb8a",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_1e5b959ec4d25da5a56ea4b6dc313e96",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "e768e1726afe9a00c736aedb86cce313a8723f0b9e4e8168808767ea578fb883",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_203299ed2dc9accaa27c5cee541a6c68",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "1-purpose",
+        "unitDigest": "b1812bd18b7b88b58dd1aef1c97a743e50a59994ed395121e0b5fb46a55f1c79",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_2c16dcf7e25396c56c18e719e440b68d",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "5682857e36dbe2f2257da713fe265fe2386dfdfa21da814d538db5e7cdef15da",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_ab7778cdce4955b28736467a541b04b6",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "e167f297f95fde2d645fc8e9d211b27764b38e9f6ed5461bdbb8185cc3abfbae",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_ab6a09abd0c9962aaa111ac673945505",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "2-authority",
+        "unitDigest": "e7977dd467f0763fc10b18e43770b94df399e8205fa2d73c37631fb61ec33560",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_2a6d0d0bf4e4ab6c47ee38c5e4dbc85f",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "760ce813dee38275b7835a75dd4e115a731f5ce1e61749e6a13974f43f848746",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_09f0919c5e299c8c230e0fee70c02c0f",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "unheaded-block-5",
+        "unitDigest": "a0a0e5de1d354fb68d004fe2f754d907f01a2bf6eecaab15c3f42eafa65f5200",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_ec2e75abecc7de3c5fcc2b6bda8c23b9",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "3-law-summary",
+        "unitDigest": "8a9987cf7771997d2ead9b240368d21c35726fd55c7533ea6b93cbb3d157c7ab",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_46c53960c0ca396b4728ba271a4486c5",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "unheaded-block-6",
+        "unitDigest": "264fec538429723ca63f4d609493bde52c077526f20cc4ace32261c0d1ff7e96",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_e7a58711fc263a61319de611617375d5",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "4-design-gate",
+        "unitDigest": "85fcc60218f8b2752e0d5a40393d61e0768f416d388b42dbbf4ec54d0859f676",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_18bc93913b448431a0c855963911fe2b",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "unheaded-block-7",
+        "unitDigest": "e0c8ac3c9a003bc9c5327c935fb9dce93fb8c05bc50c1a197d32333e8fba140c",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_cdd858ddc77eff892c0d7595a2db233a",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "unheaded-block-8",
+        "unitDigest": "bdb17898e7cf55880fca4f9b8f0768512d63cc439553812987b32a4ad461774a",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_01bad959c0d979694ccdbd7766f78e7a",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "5-component-boundary-link",
+        "unitDigest": "7ade7273a7e33013be873ae48162d4851c168e14f09b8b08452fc3cf917634ab",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_b646f1ec8d56851edc383bc50c70482d",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "unheaded-block-9",
+        "unitDigest": "f52b702a1f9d964fd1326c1dcf5f3d0d7b64c19f47d04ee8912714f80819312c",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_dce530f30386e919cbaa50513f29fb1d",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "6-related-docs",
+        "unitDigest": "bd310233f65057b6deebb20219de85727322b6915586e7ae2c24d1b2a3f1f6ab",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_e4f03a34cf0718c43c6faa9baac040ab",
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "unheaded-block-10",
+        "unitDigest": "b8dfcdaaf4850b881b6b58c8f5d30c3ad90b9bf8f0c40c73416cff26ef0102fc",
+        "fileStatus": {
+          "kind": "platform-foundations",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_da74ffc5a39c41249882475145eb2e63",
+        "path": "docs/platform/vision.md",
+        "anchor": "platform-vision",
+        "unitDigest": "ea178ef136591f0a6a9475913040ed7a553a51f0ee7f9b88b4f1e6fae1f51c10",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_e732b70a915be38bc24582c37b8a11d9",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "1354381d3c2de9618825b28b0ebbe1507ec4bc2c63983f90f386e72f6d30be4d",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_599e3b70255a1adae56db008765f98a1",
+        "path": "docs/platform/vision.md",
+        "anchor": "1-purpose",
+        "unitDigest": "41f9f26895a3fd15c1346b4dea51f499b791b07502e3274e42adfa44ac2b1326",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_c8feb2e73a6808945b3e28ecf6291b66",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "333a4b2486599a56bd1b8f8c779963155d9616ed20374dc34e5f14fac1b61836",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_f653c9c029036673c35aeb5ff8ed2ae9",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "37d3dc5d4da6e21ac01d35aa2db581d5f3a7d58449c1f8a26e2d7fba753aec31",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_b6af228ec920c86ed2ca297d1fcd99dc",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-4",
+        "unitDigest": "fcc7271ad97b4e8c16e9069eb29c9b20da361343bde1d1532d28c9a95dc0d0fa",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_efcca1f29fbb7c23724705d6a2980697",
+        "path": "docs/platform/vision.md",
+        "anchor": "2-mission",
+        "unitDigest": "44bf1aa91066c666a57b711d204ea7c350bcb97875c049f215650130a831d38b",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_744dfc7dabdb1afc35f335a71c4dfbcc",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-5",
+        "unitDigest": "57a466fc5e6510e5f79d43250a9365a26d5a6eb239cf50d7ae8f039c58479f6b",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_3762f9bdc9ec0ade5909594d5df7bdfb",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-6",
+        "unitDigest": "d4f74d1a2ba7f80df408ede64e8421ed0a84414c0c5ba2ebc9d9925d992f2b9a",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_6e2947efa7ddeb725aa1d350ddc0cf8a",
+        "path": "docs/platform/vision.md",
+        "anchor": "3-product-priority",
+        "unitDigest": "c39164e45f7ef6e3b519d7fcae12a48540afeb3b071e2676ad6ed1f295037de1",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_494d8e8822be204801bf5ff8eb769ae4",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-7",
+        "unitDigest": "cdba578e364cab804a6697f995d211ff840052b1290102be0ffeadd35a5427d7",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_14ea9b6dc062608fa5b63ed0631b96be",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-8",
+        "unitDigest": "3053f892e107efcb15cf5c0f575f74d7eb1abd5c99a147b68d5b31bc04931a82",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_0ea347963e49153158871a3235afc483",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-9",
+        "unitDigest": "f052f5c431c476ae9020646a613ddd9161c9e97274d52468cbce69b3e4cdbd38",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_204790a9e9721cc754228f6791d4ae15",
+        "path": "docs/platform/vision.md",
+        "anchor": "4-operating-shape",
+        "unitDigest": "5bb304703ee71f6287b3ed62c1698e865404c2fc08ff8650ecb3250172c648f4",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_d46e6059744853141c52690dd123172e",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-10",
+        "unitDigest": "7187b249eb9b0eafb62fbaddb443c1f1b0a2fd491722aaaaf2c907101fc4e3b2",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_97612b7e12b29ed8b81108acdf8a9285",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-11",
+        "unitDigest": "78570f317b86844d5b6bce311cbe8446773d9690ba0d7b83c43e865375aba46b",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_dcde5099b1a9c73ca23fdd0a3c3184f7",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-12",
+        "unitDigest": "f72e0eacbeac76734c5e4959a52864c3e57ce8a82cc1b473003815e5d53ad7b1",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_4b30a105feac3a5125f176b76aafe247",
+        "path": "docs/platform/vision.md",
+        "anchor": "5-design-commitments",
+        "unitDigest": "a64d8219274c479a080a4ab6cd028c02e7ae8de7a509707419313dd52d1ff31a",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_e61a4b569537191f080ca673d3dead6c",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-13",
+        "unitDigest": "dbad144992f606d174d337ca04afe24ff5e6d69f2fff57aa4d8d7b028692e6ea",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_b7c518d75199b375690ee0f92878a42a",
+        "path": "docs/platform/vision.md",
+        "anchor": "6-related-anchors",
+        "unitDigest": "0f1fb36b7b9c371685c7d818752f200a5314fca16a15a2d833730d518e3dd656",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      },
+      {
+        "claimId": "claim_908f25861679e06c2aab8286758c076c",
+        "path": "docs/platform/vision.md",
+        "anchor": "unheaded-block-14",
+        "unitDigest": "47e992413c7b6cbe3b8e2c54b93e7924dc9bb7edd12d047d87c2c368079b4718",
+        "fileStatus": {
+          "kind": "vision",
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        },
+        "status": "candidate-unverified"
+      }
+    ],
+    "unchangedReverseRows": 792,
+    "candidateFullTupleEquality": true,
+    "registryBytes": 59723017,
+    "registrySHA256": "7b7e8645cf9609688ae83d43ac821d5f0c093755845bcf712102d3c210b04ec0",
+    "compactOneLine": true,
+    "nativeByteEqual": true
+  },
+  "defaultD": {
+    "bothExit": 0,
+    "fatalFindings": 0,
+    "fullOutputEquality": true
+  },
+  "scopedE": {
+    "bothExit": 1,
+    "expectedRed": true,
+    "fullOutputEquality": true,
+    "open": [
+      {
+        "type": "claims-not-reviewed",
+        "message": "claim rows whose reviewStatus is not reviewed",
+        "count": 104,
+        "examples": [
+          "docs/architecture-manifest.json#file-block",
+          "docs/backlog.md#product-backlog",
+          "docs/backlog.md#unheaded-block-1",
+          "docs/backlog.md#unheaded-block-2",
+          "docs/backlog.md#done-declined"
+        ]
+      },
+      {
+        "type": "registry-gaps-without-disposition",
+        "message": "registry identity-gap rows with no vocabulary disposition",
+        "count": 6,
+        "examples": [
+          "docs/architecture-manifest.json#file-block",
+          "docs/architecture-manifest.json#file-block",
+          "docs/backlog.md#unheaded-block-2",
+          "docs/contracts/fgos-gateway-api-v1.yaml#file-block",
+          "docs/io-contract.md#unheaded-block-14"
+        ]
+      },
+      {
+        "type": "candidate-blocks-unreferenced",
+        "message": "candidate conservation units not named by a source decision",
+        "count": 830,
+        "examples": [
+          "docs/platform/coexistence/spec.md#unheaded-block-1",
+          "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+          "docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1",
+          "docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate",
+          "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1"
+        ]
+      }
+    ],
+    "fullReverseTupleEquality": true,
+    "pendingNativeDecisions": [
+      {
+        "claimId": "claim_cd630652a03e26ef20dc546ae2eed5bb",
+        "sourceUnitDigest": "ad8150aa7423e01dbc47f52f5793a9a1846659c818215d0c3c2fae297c211dd0",
+        "targetUnitDigest": "e768e1726afe9a00c736aedb86cce313a8723f0b9e4e8168808767ea578fb883",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_795266a5e8c31c6935c7f5f7cea4fcb7",
+        "sourceUnitDigest": "35c468a4c7b109636d7f8ad9b0b5a9906facab0f962acf110609a034acbe0edc",
+        "targetUnitDigest": "1354381d3c2de9618825b28b0ebbe1507ec4bc2c63983f90f386e72f6d30be4d",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_89727d0eb13008ab3f1ed76092044a4f",
+        "sourceUnitDigest": "72721c54253ba541180f7b7114d858ce2af06671f1fa05f45162063962b681b2",
+        "targetUnitDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_8ffb36c0af7a1f88517179b8b1adb0a4",
+        "sourceUnitDigest": "5c61302d66e78a5c872334e3a00927d6a8230642fd670dc0af923cad3e83f3b8",
+        "targetUnitDigest": "f20c0ca6ad7490fa85635d8100333e97787282b0936df18a2f7f7599d5cd3b63",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_1a6a7460ede876ae7fa1de7c2e168cfe",
+        "sourceUnitDigest": "96b669468dbe4f3a8fd6eaa112986cead07ae88fa9de2b233f8fbf27314f9d16",
+        "targetUnitDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
+        "reviewStatus": "pending"
+      },
+      {
+        "claimId": "claim_8d273e8328dac53565eb0286c6a91d65",
+        "sourceUnitDigest": "19f7dcac1af1f366369c2b1b75261b376f12ecaabf4b65f5f0d6f92c191a712d",
+        "targetUnitDigest": "f20c0ca6ad7490fa85635d8100333e97787282b0936df18a2f7f7599d5cd3b63",
+        "reviewStatus": "pending"
+      }
+    ],
+    "closed": false
+  },
+  "truthPopulation": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/truth-population-261014-1950-root-authorities-final.md",
+    "machinePath": "plans/260925-documentation-authority-unification/reports/phase-06/truth-population-261014-1950-root-authorities-final.md.json",
+    "count": 350,
+    "sha256": "dc840481482a4b8215e7a030b5cd5e57e097ec54a4c87afb61f100506b80ae1f",
+    "authorDraw": false,
+    "reviewerDrawOwed": 30
+  },
+  "packs": [
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-1950-root-required-fields-wrapper-rework.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1950-root-required-fields-wrapper-rework.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1950-root-required-fields-wrapper-rework.md.json",
+      "kind": "truth-rework",
+      "conservationRows": 8,
+      "truthFragments": 2,
+      "differingDigestRows": [
+        "claim_b7cdc84d6130cac22511eed0ed6e4e6c",
+        "claim_320ba6224015cc3877738795b80dabb7",
+        "claim_477a30f4902261e390c34ab888145dcd",
+        "claim_9bb5739f68a7b4bafcd959ef59104e6a",
+        "claim_1a6a7460ede876ae7fa1de7c2e168cfe",
+        "claim_8d273e8328dac53565eb0286c6a91d65",
+        "claim_89727d0eb13008ab3f1ed76092044a4f",
+        "claim_8ffb36c0af7a1f88517179b8b1adb0a4"
+      ],
+      "packSHA256": "d0107feaea0417588909636a9aff8bf580693fc3615a89aabd20dfb0b0850849"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-1950-root-source-completion-01.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1950-root-source-completion-01.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1950-root-source-completion-01.md.json",
+      "kind": "source-conservation",
+      "decisions": 75,
+      "sourceRows": 75,
+      "accountingRows": 0,
+      "classCounts": {
+        "Weak-exact": 61,
+        "Judgment": 14
+      },
+      "differingDigestRows": [
+        "claim_6174137a754842159b087cb0c603e8e5",
+        "claim_ccde9f60ec4e4d8e2966bbb92c1dcfc2",
+        "claim_c38928f213e73bffe6542050ab2e37fb",
+        "claim_a0d0d9a42f1c44c5d2dc8d465b4e9694",
+        "claim_7327c094fb15d2cfcaad5a681f690b57",
+        "claim_36e4d6e0f08ff75c793da8266e5e6551",
+        "claim_8e7223e3c622244caac49e5517f1d828",
+        "claim_735be6c96579d25dc9328ea9070c93b3",
+        "claim_7327662d59313d1a000abef634a98c17",
+        "claim_e511b27c8566a61124a52af7bf7898cb",
+        "claim_5cd5728df7506d555fd25a3cf3879dde",
+        "claim_a9cd7e480450c50f17eccd099748cd66",
+        "claim_51c4db831393875bf5c2b9a65dbfaae7",
+        "claim_84e30ba5903bdbc79ecb7e0bcd8c9b4c"
+      ],
+      "packSHA256": "b7b5f1db7e9b5a207b5157badf168b26703a49becc56bb02892e87dd13e58068"
+    },
+    {
+      "request": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261014-1950-root-source-completion-02.md",
+      "pack": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1950-root-source-completion-02.md",
+      "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261014-1950-root-source-completion-02.md.json",
+      "kind": "source-conservation",
+      "decisions": 22,
+      "sourceRows": 20,
+      "accountingRows": 42,
+      "classCounts": {
+        "Weak-exact": 13,
+        "Judgment": 9
+      },
+      "differingDigestRows": [
+        "claim_25856ca74601abef51162fa1336661cd",
+        "claim_61b5b211cd33d2be1871ed589eda69af",
+        "claim_8116a777ce8821f8e5e6abd644aa2f56",
+        "claim_eb9ecb187e1d4d79d553c157e852e57d",
+        "claim_b927ea09f5baef6db3f71fc1fa56c43b",
+        "claim_01cec51e08c6924e05c263d28d1e303a",
+        "claim_29a458dda2e2bf7624ada68a74d28dbe",
+        "claim_cd630652a03e26ef20dc546ae2eed5bb",
+        "claim_795266a5e8c31c6935c7f5f7cea4fcb7"
+      ],
+      "packSHA256": "be451b73cad903bca949ccafc8504d43cb2c3843be7004251f733f7f5685b5f5"
+    }
+  ],
+  "preservation": {
+    "extractorUnchanged": true,
+    "fiveFrozenFilesUnchanged": true,
+    "witnessAndPayloadTreesUnchanged": true,
+    "authorityStatusesUnchanged": true,
+    "readerLinksUnchanged": true,
+    "checks": [
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-legacy-docs-ratchet.mjs"
+        ],
+        "exit": 0,
+        "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-doc-constitution.mjs",
+          "--no-ledger",
+          "--check-placement"
+        ],
+        "exit": 0,
+        "stdout": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 529 files, 528 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "env",
+          "-u",
+          "CLAUDE_CODE_SESSION_ID",
+          "node",
+          "scripts/check-doc-candidate-status.mjs",
+          "--json"
+        ],
+        "exit": 0,
+        "stdout": "{\n  \"counts\": {\n    \"files\": 529,\n    \"byStatus\": {\n      \"promoted\": 3,\n      \"candidate\": 135,\n      \"legacy-current\": 0,\n      \"non-authority\": 1,\n      \"unrouted\": 390\n    },\n    \"exemptUnrouted\": 302,\n    \"checked\": 138,\n    \"findings\": 0,\n    \"byType\": {}\n  },\n  \"findings\": []\n}\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "newCarriersPromotionMetadata": {
+    "canonicalDocuments": 2,
+    "complete": 2,
+    "headerless": 0,
+    "headeredIncomplete": 0,
+    "headeredDocuments": 2,
+    "evidencePayloads": 0,
+    "headerlessPaths": [],
+    "missingByField": {
+      "Document type": 0,
+      "Audience": 0,
+      "Purpose": 0,
+      "Design status": 0,
+      "Implementation": 0,
+      "Provenance": 0,
+      "Writer type": 0,
+      "Canonical for": 0,
+      "Use this when": 0,
+      "Do not use this for": 0,
+      "Last reviewed": 0,
+      "Related": 0,
+      "Supersedes": 0,
+      "Superseded by": 0
+    },
+    "incomplete": []
+  },
+  "intentionalNewDuplicateGroups": [
+    {
+      "blobSha": "11684583c2ac84357168e237f3ac045201377712",
+      "paths": [
+        "docs/contracts/fgos-gateway-api-v1.yaml",
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ]
+    },
+    {
+      "blobSha": "e923fa822dadf885952546d50b29fa88f352147e",
+      "paths": [
+        "docs/architecture-manifest.json",
+        "docs/platform/contracts/architecture-manifest.json"
+      ]
+    }
+  ],
+  "historicalOpenGaps": {
+    "version": 1,
+    "priorPin": "c3895c140",
+    "allSixPreExisting": true,
+    "newThisTurn": 0,
+    "previous27ScopeOpen": 2,
+    "finalFullMapOpen": 6,
+    "newlyIncludedScopes": [
+      "docs/architecture-manifest.json",
+      "docs/contracts/fgos-gateway-api-v1.yaml",
+      "docs/backlog.md"
+    ],
+    "meaning": "Full mapped scope exposes four additional historical gaps, unchanged from the prior registry; not a content-fix consequence or a source-row omission. All remain explicit Step 5 closure obligations, no identity graft or unreviewed waiver.",
+    "rows": [
+      {
+        "sourcePath": "docs/architecture-manifest.json",
+        "unitDigest": "470c4709265d127eac589f6b20f0b5f6c565b352e4fc1a514d44bfd6a59fd0db",
+        "identityFingerprint": "470c4709265d127eac589f6b20f0b5f6c565b352e4fc1a514d44bfd6a59fd0db",
+        "claimId": "claim_56ee14864e75c42f80dc9903aa1c53e9",
+        "sourceAnchor": "file-block",
+        "unitKind": "file-block",
+        "sourceUnitDigest": "5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor file-block is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/architecture-manifest.json",
+        "unitDigest": "9f8b0661da3157ed1ffc9be7ec1dc4cd77da816cd86b0213744de866062bb18c",
+        "identityFingerprint": "9f8b0661da3157ed1ffc9be7ec1dc4cd77da816cd86b0213744de866062bb18c",
+        "claimId": "claim_b6f28092c03285c2745234912da0f2ab",
+        "sourceAnchor": "file-block",
+        "unitKind": "file-block",
+        "sourceUnitDigest": "6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor file-block is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/backlog.md",
+        "unitDigest": "aa429b1276d3d9bae0f0f6ddb1e9606ef9aa59b6afb45d1937e97a1dcb6a4cef",
+        "identityFingerprint": "aa429b1276d3d9bae0f0f6ddb1e9606ef9aa59b6afb45d1937e97a1dcb6a4cef",
+        "claimId": "claim_0956ea2eadf0a32787b7fd0e51d693a6",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8af4c326a8034fa8b4584cb6795459a32d8e9c0afbc616540092a7d8400382c1",
+        "claimKind": "unclassified",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/contracts/fgos-gateway-api-v1.yaml",
+        "unitDigest": "573b667216740400a46fb36bd49f5def41cd3e460338a15c4f57a09bb6917ef2",
+        "identityFingerprint": "573b667216740400a46fb36bd49f5def41cd3e460338a15c4f57a09bb6917ef2",
+        "claimId": "claim_53b01784413095d74305b7367e9054fb",
+        "sourceAnchor": "file-block",
+        "unitKind": "file-block",
+        "sourceUnitDigest": "9d2bbd0b5bf3c812c67c3ac860daf4a91f6505e7ccf8a1a8e2a5ce36d25213d3",
+        "claimKind": "contract",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor file-block is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/io-contract.md",
+        "unitDigest": "965bdb8cc2868325f9b53a4dbf6b1bd70386dcb28bb74a1b05196fa315652ebc",
+        "identityFingerprint": "965bdb8cc2868325f9b53a4dbf6b1bd70386dcb28bb74a1b05196fa315652ebc",
+        "claimId": "claim_b92ac199356ff830e5554647ab143a90",
+        "sourceAnchor": "unheaded-block-14",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5",
+        "claimKind": "contract",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-14 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/io-contract.md",
+        "unitDigest": "54672da4c0afc227d30bc36d63356cab7a4ac051fe9be3222a6aea4ef03e08c3",
+        "identityFingerprint": "54672da4c0afc227d30bc36d63356cab7a4ac051fe9be3222a6aea4ef03e08c3",
+        "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
+        "sourceAnchor": "unheaded-block-15",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6",
+        "claimKind": "contract",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-15 is not a stable heading anchor"
+      }
+    ]
+  },
+  "allowlist": {
+    "newViolations": [],
+    "existingExactExemptions": [
+      [
+        "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+        "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md"
+      ],
+      [
+        "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md"
+      ],
+      [
+        "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"
+      ]
+    ]
+  },
+  "tests": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs",
+    "passed": 39,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "log": "✔ review pack contains full source and target units and reverse unmatched candidate blocks (3.130005ms)\n✔ seeded review uses six real text mutations and scores missed defects and false flags (12.407998ms)\n✔ review application binds current digest and keeps rework and hold pending without inventing approval (5.209226ms)\n✔ valid source digest prefixes survive pack and review application with full seen-text bindings (2.803881ms)\n✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (0.753134ms)\n✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (2.366106ms)\n✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (1.665984ms)\n✔ the same reviewer session on another date is still the author session (0.254869ms)\n✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.398603ms)\n✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (2.098653ms)\n✔ review application requires a passing sensitivity result for the exact shown pack (2.18444ms)\n✔ approval cannot attach to target text or heading ancestry changed after the pack (2.379327ms)\n✔ approved rows retain the seen unit binding and their own report across review rounds (2.226597ms)\n✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (1.715807ms)\n✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (135.836932ms)\n✔ the public seeded Markdown can be scored without exposing the seed or private selection key (292.214857ms)\n✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (305.419183ms)\n✔ a new shard cannot claim legacy compatibility by deleting author fields (81.78964ms)\n✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (196.915776ms)\n▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session\n  ✔ target-digest (79.5905ms)\n  ✔ source-digest (86.545341ms)\n  ✔ authoredBy (89.508512ms)\n  ✔ authorSession (100.060755ms)\n  ✔ same-session (98.113343ms)\n✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (454.701531ms)\n▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof\n  ✔ checkpoint 3 (170.147837ms)\n  ✔ checkpoint 6 (156.06755ms)\n  ✔ checkpoint 10 (164.929777ms)\n✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (491.616529ms)\n✔ the review lint accepts a well-formed ordinary report before application and writes nothing (96.29835ms)\n✔ the review lint uses the recorded target digest of an applied shard without an inventory (149.628756ms)\n▶ the review lint names the line and claim of each malformed verdict row\n  ✔ source-digest-not-64-hex (97.133065ms)\n  ✔ wrong-cell-count (101.645543ms)\n  ✔ non-bare-first-cell (100.64767ms)\n  ✔ target-digest-mismatch (100.519966ms)\n  ✔ source-digest-mismatch (99.300835ms)\n  ✔ bad-verdict (100.698791ms)\n✔ the review lint names the line and claim of each malformed verdict row (600.976582ms)\n✔ the review lint allows labelled non-claim rows but reports unknown claims and missing headers (307.822199ms)\nℹ tests 39\nℹ suites 0\nℹ pass 39\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 3192.812662\n"
+  },
+  "gitnexus": {
+    "command": "node .gitnexus/run.cjs detect_changes --scope compare --base-ref c3895c140 --repo /home/vantt/projects/forgentX-phase00-documentation-authority-unification",
+    "result": "Changes: 26 files, 9 symbols\nAffected processes: 0\nRisk level: low\n\nChanged symbols:\n  Symbol Platform Foundations → docs/platform/platform-foundations.md\n  Symbol 1. Purpose → docs/platform/platform-foundations.md\n  Symbol Platform Vision → docs/platform/vision.md\n  Symbol 1. Purpose → docs/platform/vision.md\n  Symbol Work State Specification → docs/platform/work-state/spec.md\n  Symbol 9. Behaviors And Operations → docs/platform/work-state/spec.md\n  Symbol Add Verb → docs/platform/work-state/spec.md\n  Symbol 11. Business Rules → docs/platform/work-state/spec.md\n  Symbol Execution progress → plans/260925-documentation-authority-unification/reports/phase-06/progress.md\n",
+    "productionSymbolEdits": 0
+  },
+  "registryBytes": 59723017,
+  "registrySHA256": "7b7e8645cf9609688ae83d43ac821d5f0c093755845bcf712102d3c210b04ec0",
+  "immutableFiles": [
+    "owner-answers.md",
+    "root-authorities-truth-population.json",
+    "root-authorities-truth-sample.json",
+    "review-5-root-authorities-truth.md",
+    "candidate-unverified-agent-coordination.json",
+    "candidate-unverified-host-invocation-routing.json",
+    "candidate-unverified-packaging-distribution.json",
+    "holds.md",
+    "identical-unit-exceptions.md"
+  ],
+  "closureItems": [
+    "Independent verdicts for three bounded requests: 95 sources, eight truth-conservation rows, two header predecessors, stable header accounting and 38 new candidate tuples.",
+    "Five pending generated-projection rows remain decided regenerate-from-source; retain separately from 99 ordinary pending rows.",
+    "Six pre-existing historical gaps still have no disposition: two IO, two architecture-manifest, one YAML contract and one backlog (all full tuples unchanged at c3895c140; four exposed only by final full-map scope); root holds and identical-owner exceptions are empty in final scoped E. Prior area holds/exceptions/A34 residuals are unchanged.",
+    "Fresh independent 30-unit truth draw from final 350-unit population under A35, with >10% rule.",
+    "Independent 50-block invented-claim sample and Step 5 hostile pass; fresh-reader key and two readers/three scenarios, link preview/draft aliases, final batch-boundary sync/accounting and reruns, promotion-header check for new Markdown carriers, batch report with risk/proof/learning/effort and explicit cutover residuals, including the two new whole-file duplicate groups (one mapped owner each), resolution projection after independent acceptance and consumer rewrites; owner effort checkpoint."
+  ],
+  "resolvedObstacles": [
+    "Untracked application evidence needed explicit git add before the path-limited commit; no broad add. Legacy Pilot source digest prefixes are preserved; every shown native digest remains full 64-hex and verifies the unchanged prefix.",
+    "Scratch native helper initially compared new gap IDs to all known IDs; corrected to compare old/new gap membership, four actual transitions, no checker change."
+  ],
+  "technicalBlockers": [],
+  "unexplainedProofFailures": [],
+  "batchClosed": false,
+  "noPromotion": true,
+  "noPush": true,
+  "noRebase": true,
+  "noMainWrite": true,
+  "noMainMerge": true,
+  "noStep6": true,
+  "noProtectedToolChange": true,
+  "noSecretRead": true,
+  "commands": [
+    {
+      "label": "D-first",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        ".fgos/runtime/tmp/step5-turn22/final-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1157,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22384,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22714,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22384,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2092,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "D-second",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        ".fgos/runtime/tmp/step5-turn22/final-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1157,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22384,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 13,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22714,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22384,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 347,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2092,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "E-first",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        ".fgos/runtime/tmp/step5-turn22/final-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architecture-manifest.json",
+        "--scope",
+        "docs/coexistence.md",
+        "--scope",
+        "docs/contracts/fgos-gateway-api-v1.yaml",
+        "--scope",
+        "docs/doc-governance.md",
+        "--scope",
+        "docs/doc-registry.json",
+        "--scope",
+        "docs/io-contract.md",
+        "--scope",
+        "docs/operator-runbook-herdr-cockpit.md",
+        "--scope",
+        "docs/platform-foundations.md",
+        "--scope",
+        "docs/reading-map.md",
+        "--scope",
+        "docs/README.md",
+        "--scope",
+        "docs/routing-handoff-contract.md",
+        "--scope",
+        "docs/specs/reading-map.md",
+        "--scope",
+        "docs/specs/work-state.md",
+        "--scope",
+        "docs/templates/architecture.md",
+        "--scope",
+        "docs/templates/area-readme.md",
+        "--scope",
+        "docs/templates/contract.md",
+        "--scope",
+        "docs/templates/decision.md",
+        "--scope",
+        "docs/templates/discussion.md",
+        "--scope",
+        "docs/templates/generated.md",
+        "--scope",
+        "docs/templates/intent-preservation-ledger.md",
+        "--scope",
+        "docs/templates/spec.md",
+        "--scope",
+        "docs/templates/subcomponent-readme.md",
+        "--scope",
+        "docs/templates/verification.md",
+        "--scope",
+        "docs/templates/vision.md",
+        "--scope",
+        "docs/transitional-switchboard.md",
+        "--scope",
+        "docs/user/README.md",
+        "--scope",
+        "docs/distribution-vision.md",
+        "--scope",
+        "docs/id-systems-audit.md",
+        "--scope",
+        "docs/work-item-lifecycle-vision.md",
+        "--scope",
+        "docs/backlog.md",
+        "--scope",
+        "docs/platform/proposals/documentation-system-unification.md",
+        "--scope",
+        "docs/decisions/index.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "fatalFindings": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "104 claim rows whose reviewStatus is not reviewed (e.g. docs/architecture-manifest.json#file-block, docs/backlog.md#product-backlog, docs/backlog.md#unheaded-block-1, docs/backlog.md#unheaded-block-2, docs/backlog.md#done-declined)"
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "6 registry identity-gap rows with no vocabulary disposition (e.g. docs/architecture-manifest.json#file-block, docs/architecture-manifest.json#file-block, docs/backlog.md#unheaded-block-2, docs/contracts/fgos-gateway-api-v1.yaml#file-block, docs/io-contract.md#unheaded-block-14)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "830 candidate conservation units not named by a source decision (e.g. docs/platform/coexistence/spec.md#unheaded-block-1, docs/platform/coexistence/spec.md#source-metadata-added-in-candidate, docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1, docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate, docs/platform/documentation/history/templates/architecture.md#unheaded-block-1)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 104,
+          "examples": [
+            "docs/architecture-manifest.json#file-block",
+            "docs/backlog.md#product-backlog",
+            "docs/backlog.md#unheaded-block-1",
+            "docs/backlog.md#unheaded-block-2",
+            "docs/backlog.md#done-declined"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 6,
+          "examples": [
+            "docs/architecture-manifest.json#file-block",
+            "docs/architecture-manifest.json#file-block",
+            "docs/backlog.md#unheaded-block-2",
+            "docs/contracts/fgos-gateway-api-v1.yaml#file-block",
+            "docs/io-contract.md#unheaded-block-14"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 830,
+          "examples": [
+            "docs/platform/coexistence/spec.md#unheaded-block-1",
+            "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1",
+            "docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "E-second",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        ".fgos/runtime/tmp/step5-turn22/final-inventory.json",
+        "--identity-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architecture-manifest.json",
+        "--scope",
+        "docs/coexistence.md",
+        "--scope",
+        "docs/contracts/fgos-gateway-api-v1.yaml",
+        "--scope",
+        "docs/doc-governance.md",
+        "--scope",
+        "docs/doc-registry.json",
+        "--scope",
+        "docs/io-contract.md",
+        "--scope",
+        "docs/operator-runbook-herdr-cockpit.md",
+        "--scope",
+        "docs/platform-foundations.md",
+        "--scope",
+        "docs/reading-map.md",
+        "--scope",
+        "docs/README.md",
+        "--scope",
+        "docs/routing-handoff-contract.md",
+        "--scope",
+        "docs/specs/reading-map.md",
+        "--scope",
+        "docs/specs/work-state.md",
+        "--scope",
+        "docs/templates/architecture.md",
+        "--scope",
+        "docs/templates/area-readme.md",
+        "--scope",
+        "docs/templates/contract.md",
+        "--scope",
+        "docs/templates/decision.md",
+        "--scope",
+        "docs/templates/discussion.md",
+        "--scope",
+        "docs/templates/generated.md",
+        "--scope",
+        "docs/templates/intent-preservation-ledger.md",
+        "--scope",
+        "docs/templates/spec.md",
+        "--scope",
+        "docs/templates/subcomponent-readme.md",
+        "--scope",
+        "docs/templates/verification.md",
+        "--scope",
+        "docs/templates/vision.md",
+        "--scope",
+        "docs/transitional-switchboard.md",
+        "--scope",
+        "docs/user/README.md",
+        "--scope",
+        "docs/distribution-vision.md",
+        "--scope",
+        "docs/id-systems-audit.md",
+        "--scope",
+        "docs/work-item-lifecycle-vision.md",
+        "--scope",
+        "docs/backlog.md",
+        "--scope",
+        "docs/platform/proposals/documentation-system-unification.md",
+        "--scope",
+        "docs/decisions/index.md"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "fatalFindings": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "104 claim rows whose reviewStatus is not reviewed (e.g. docs/architecture-manifest.json#file-block, docs/backlog.md#product-backlog, docs/backlog.md#unheaded-block-1, docs/backlog.md#unheaded-block-2, docs/backlog.md#done-declined)"
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "6 registry identity-gap rows with no vocabulary disposition (e.g. docs/architecture-manifest.json#file-block, docs/architecture-manifest.json#file-block, docs/backlog.md#unheaded-block-2, docs/contracts/fgos-gateway-api-v1.yaml#file-block, docs/io-contract.md#unheaded-block-14)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "830 candidate conservation units not named by a source decision (e.g. docs/platform/coexistence/spec.md#unheaded-block-1, docs/platform/coexistence/spec.md#source-metadata-added-in-candidate, docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1, docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate, docs/platform/documentation/history/templates/architecture.md#unheaded-block-1)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 104,
+          "examples": [
+            "docs/architecture-manifest.json#file-block",
+            "docs/backlog.md#product-backlog",
+            "docs/backlog.md#unheaded-block-1",
+            "docs/backlog.md#unheaded-block-2",
+            "docs/backlog.md#done-declined"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 6,
+          "examples": [
+            "docs/architecture-manifest.json#file-block",
+            "docs/architecture-manifest.json#file-block",
+            "docs/backlog.md#unheaded-block-2",
+            "docs/contracts/fgos-gateway-api-v1.yaml#file-block",
+            "docs/io-contract.md#unheaded-block-14"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 830,
+          "examples": [
+            "docs/platform/coexistence/spec.md#unheaded-block-1",
+            "docs/platform/coexistence/spec.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/id-systems-audit.md#unheaded-block-1",
+            "docs/platform/documentation/history/id-systems-audit.md#source-metadata-added-in-candidate",
+            "docs/platform/documentation/history/templates/architecture.md#unheaded-block-1"
+          ]
+        }
+      ]
+    }
+  ],
+  "helperSources": {
+    "apply.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';\nimport {loadProposalContext,parseReviewVerdicts,applyReviewVerdicts} from '../../../../scripts/propose-doc-decisions.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s='.fgos/runtime/tmp/step5-turn22/',pin=execFileSync('git',['rev-parse','c3895c140'],{encoding:'utf8'}).trim(),read=f=>JSON.parse(fs.readFileSync(f)),ctx=loadProposalContext(s+'application-inventory.json',process.cwd()),reg=read(s+'identity-registry.json'),known=new Map(['units','retiredUnits','identityGaps'].flatMap(k=>reg[k]).map(x=>[x.claimId,x])),applied=[],truth=[];\nfor(const report of ['review-5-root-retained-conservation.md','review-5-root-switchboard-gap.md','review-5-root-truth-corrections.md']){\n const reportPath=r+report,text=execFileSync('git',['show',pin+':'+reportPath],{encoding:'utf8'});assert.equal(text,fs.readFileSync(reportPath,'utf8'));const reviewer=text.match(/^Reviewer:\\s*(.+)$/m)[1].trim(),verdicts=parseReviewVerdicts(text,reviewer).filter(v=>v.verdict==='ok'),ids=new Set(verdicts.map(v=>v.claimId));let count=0;\n for(const path of ['ledger/decisions','pilot/decisions'].flatMap(d=>fs.readdirSync(p+d).filter(x=>x.endsWith('.json')).map(f=>p+d+'/'+f))){const j=read(path);let dirty=false;for(const kind of ['claims','registryGaps']){const rows=(j[kind]||[]).filter(x=>ids.has(x.claimId));if(!rows.length)continue;const sources=rows.map(x=>known.get(x.claimId));assert(sources.every(Boolean));const work={...j,claims:rows,registryGaps:[]},context={...ctx,inventory:{...ctx.inventory,claimLedger:[...ctx.inventory.claimLedger,...sources.filter(x=>!ctx.inventory.claimLedger.some(y=>y.claimId===x.claimId))]}};\n const result=applyReviewVerdicts(context,work,{verdicts:verdicts.filter(v=>rows.some(x=>x.claimId===v.claimId)),reviewer,reportPath,ordinaryReview:true,reviewedAt:'2026-10-14'});\n for(const row of result.claims){row.reviewReportCommit=pin;assert.equal(row.reviewNote,verdicts.find(v=>v.claimId===row.claimId).note);const i=j[kind].findIndex(x=>x.claimId===row.claimId);applied.push({shardPath:path,entryKind:kind,before:j[kind][i],after:row});j[kind][i]=row;ids.delete(row.claimId);count++;}dirty=true;\n }if(dirty)fs.writeFileSync(path,JSON.stringify(j,null,2)+'\\n');}\n for(const id of ids){assert(['claim_64e14b949f0747d6a608e38b2d0ed08e','claim_543803710edb80a3ec320cdcdb8f880e','claim_c03019a0c5cb7d26def3c7f0d6f12931'].includes(id));truth.push({...verdicts.find(v=>v.claimId===id),reviewer,reportPath,reportCommit:pin,meaning:'Independent acceptance of corrected fragments only; no source disposition or full-unit truth certification.'});}\n console.log(report,count,'bindings',ids.size,'truth');\n}\nassert.equal(applied.length,296);assert.equal(truth.length,3);fs.writeFileSync(r+'root-source-review-application-turn22.json',JSON.stringify({version:1,authorSession:'codex-session:22@2026-10-14',reviewMode:'ordinary',reportCommit:pin,notesVerbatim:true,rows:applied,truthAcceptances:truth,nonBlockingNits:'Accepted rationales unchanged; switchboard added one route; H1/H2 nit retained.'},null,2)+'\\n');\n",
+    "application-native.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';import * as g from '../../../../scripts/check-doc-inventory-gates.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s='.fgos/runtime/tmp/step5-turn22/',read=f=>JSON.parse(fs.readFileSync(f)),old=JSON.parse(execFileSync('git',['show','c3895c140:'+r+'working-identity-registry.json'],{encoding:'utf8',maxBuffer:100e6})),reg=read(s+'identity-registry.json'),inv=g.loadInventory(s+'application-inventory.json',{}),tuple=x=>[x.claimId,x.sourcePath,x.sourceAnchor,x.sourceUnitDigest].join('\\0'),known=j=>['units','retiredUnits','identityGaps'].flatMap(k=>j[k]);assert.deepEqual(known(old).map(tuple).sort(),known(reg).map(tuple).sort());assert.deepEqual(inv.claimLedger.map(tuple).sort(),reg.units.map(tuple).sort());const bytes=fs.readFileSync(r+'working-identity-registry.json');assert(bytes.equals(fs.readFileSync(s+'identity-registry.json')));assert(bytes.length<90000000&&bytes.toString().trim().split('\\n').length===1);\nconst D=['first','second'].map(x=>read(s+'application-D-'+x+'.json')),E=['first','second'].map(x=>read(s+'application-E-'+x+'.json'));assert(D.every(x=>x.fatalFindings.length===0));assert.deepEqual(D[0].fatalFindings,D[1].fatalFindings);assert.deepEqual(E[0].fatalFindings,E[1].fatalFindings);const ct=x=>[x.claimId,x.path,x.anchor,x.unitDigest].join('\\0'),list=read(r+'candidate-unverified-root-authorities.json');assert.deepEqual(E[0].explicitOpenFindings.unreferencedCandidateRows.map(ct).sort(),list.rows.map(ct).sort());\nfs.writeFileSync(r+'root-source-application-proof-turn22.json',JSON.stringify({version:1,contentCommit:inv.commit,reportCommit:execFileSync('git',['rev-parse','c3895c140'],{encoding:'utf8'}).trim(),D:{bothExit:0,fatal:0},E:{bothExpectedExit:1,open:E[0].conservationOpen},allKnownIdsRetained:true,knownCount:known(reg).length,allKnownFullTuplesEqual:true,activeFullTupleEquality:true,candidateListCount:list.count,candidateFullTupleEquality:true,registryBytes:bytes.length,registrySHA256:crypto.createHash('sha256').update(bytes).digest('hex'),compactOneLine:true,nativeByteEqual:true},null,2)+'\\n');console.log('Application native equality passes');\n",
+    "content.py": "from pathlib import Path\nimport subprocess,json,re,hashlib,shutil\nr=Path('plans/260925-documentation-authority-unification/reports/phase-06');s=Path('.fgos/runtime/tmp/step5-turn22');pin=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip();sha=lambda x:hashlib.sha256(x.encode()).hexdigest()\nf=Path('docs/platform/work-state/spec.md');t=f.read_text();fixes=[('gọi điền `--title` và `--description`; `--id` tùy chọn, khi vắng thì `generateId`','gọi điền đủ các cờ bắt buộc `--title`, `--description`, `--kind`, `--risk` và `--verify`; `--id` tùy chọn, khi vắng thì `generateId`','U8 add required flags',[('bin/fgos.mjs',933,964),('src/state/work.mjs',250,305),('src/state/store.mjs',265,281),('src/state/work.mjs',375,381)]),('`/fgOS:submit` bước 6 làm clarify/classify trong phiên sống trên mô tả sau clarify.','Trong phiên tương tác sống, `/fgOS:submit` bước 4 gọi `fgos-clarifying` trên raw text trước khi item tồn tại: helper chỉ phân loại `domain`, có thể trả title/description đã viết lại hoặc câu hỏi làm rõ; không phán lại size/kind/risk. Bước 5 gọi `submit` với text/domain đã chốt; bước 6 chỉ báo kết quả.','U26 RUL60 wrapper ordering',[('plugins/fgOS/skills/submit/SKILL.md',24,45),('plugins/fgOS/skills/submit/SKILL.md',125,163),('plugins/fgOS/skills/submit/SKILL.md',188,197)])];records=[]\nfor before,after,why,refs in fixes:\n assert t.count(before)==1;t=t.replace(before,after);e=[]\n for path,a,b in refs:\n  lines=Path(path).read_text().splitlines();b=min(b,len(lines));text='\\n'.join(lines[a-1:b])+'\\n';e.append(dict(path=path,startLine=a,endLine=b,text=text,sha256=sha(text),blob=subprocess.check_output(['git','rev-parse',pin+':'+path],text=True).strip()))\n records.append(dict(finding=why,before=before,after=after,beforeSHA256=sha(before),afterSHA256=sha(after),evidence=e))\nlog=r/'post-review-edits.md';log.write_text(log.read_text()+'\\n## Authorized current sentence corrections\\n\\nAuthor: codex-session:22@2026-10-14. Pre-edit pin: `'+pin+'`. Review: `c3895c140` / review-5-root-truth-corrections.md. Only U8 required-field fragment and RUL60 wrapper-order fragment in work-state/spec.md change, under A19/A35; dependent bindings return pending under A22. No other truth sweep.\\n')\nf.write_text(t);(r/'root-source-truth-fragments-turn22.json').write_text(json.dumps(dict(version=1,authorSession='codex-session:22@2026-10-14',beforeCommit=pin,corrections=records),ensure_ascii=False,indent=2)+'\\n')\nshutil.copyfile(s/'liveness.json',r/'liveness-root-source-completion-turn22.json')\n# Keep existing candidate stub prose; additive full legacy text makes it a real carrier.\npairs=[('docs/platform-foundations.md','docs/platform/platform-foundations.md','Platform foundations'),('docs/work-item-lifecycle-vision.md','docs/platform/vision.md','Platform vision')];account=[]\nfor source,target,kind in pairs:\n f=Path(target);old=f.read_text();m=re.search(r'```txt\\n(.*?)\\n```',old,re.S);assert m\n extra='\\nImplementation: Partial; carried source truth not certified\\nProvenance: '+source+' at '+pin+'\\nWriter type: Agent draft writer\\nCanonical for: None until independent review and atomic cutover\\nUse this when: Reviewing the full mapped legacy source and its retained direction\\nDo not use this for: Proof that dated claims are currently implemented\\nSupersedes: None; candidate carriage only\\nSuperseded by: None'\n candidate=(old[:m.end(1)]+extra+old[m.end(1):]).replace('Design status: Draft','Design status: Candidate',1).replace('Canonical: Yes, after review','Canonical: No',1)\n sourceText=Path(source).read_text();sourceTitle=sourceText.splitlines()[0]\n # Shift every source heading by one level, preserving all title/payload bytes.\n shifted=re.sub(r'(?m)^(#{1,5})( )',r'\\1#\\2',sourceText)\n candidate+='\\n\\n'+shifted\n f.write_text(candidate)\n account.append(dict(source=source,target=target,kind=kind,operation='additive complete legacy source, heading depths +1; existing stub prose preserved',sourceBlob=subprocess.check_output(['git','rev-parse',pin+':'+source],text=True).strip(),beforeTargetSHA256=sha(old),afterTargetSHA256=sha(candidate),sourceTextSHA256=sha(sourceText),sourceTitle=sourceTitle))\nfor source,target in [('docs/architecture-manifest.json','docs/platform/contracts/architecture-manifest.json'),('docs/contracts/fgos-gateway-api-v1.yaml','docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml')]:\n f=Path(target);assert not f.exists();f.parent.mkdir(parents=True,exist_ok=True);f.write_bytes(Path(source).read_bytes());account.append(dict(source=source,target=target,kind='Contract',operation='whole non-Markdown payload byte-identical',sourceBlob=subprocess.check_output(['git','rev-parse',pin+':'+source],text=True).strip(),sourceSHA256=hashlib.sha256(Path(source).read_bytes()).hexdigest()))\n(r/'root-source-carriage-turn22.json').write_text(json.dumps(dict(version=1,authorSession='codex-session:22@2026-10-14',beforeCommit=pin,pairs=account,sourceAndConsumersUnchanged=True,noLawChange=True,noTruthSweep=True,priorArt='Existing target summary anchors created at 23fb220e3; kept in place and extended with the complete mapped source, no new parallel owner.'),ensure_ascii=False,indent=2)+'\\n')\n",
+    "author.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';import {loadProposalContext} from '../../../../scripts/propose-doc-decisions.mjs';import {classifyExactCarry} from '../../../../scripts/check-doc-inventory-gates.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s='.fgos/runtime/tmp/step5-turn22/',read=f=>JSON.parse(fs.readFileSync(f)),ctx=loadProposalContext(s+'content-inventory.json',process.cwd()),oldCtx=loadProposalContext(s+'application-inventory.json',process.cwd()),author='codex-session:22@2026-10-14',carry=read(r+'root-source-carriage-turn22.json'),claims=[],shown=[];\nfor(const a of carry.pairs){const su=ctx.unitsOf(a.source),tu=ctx.unitsOf(a.target);for(const row of ctx.inventory.claimLedger.filter(x=>x.sourcePath===a.source)){const src=su.find(x=>x.anchor===row.sourceAnchor&&x.textDigest===row.sourceUnitDigest);assert(src);let matches=tu.filter(x=>x.text===src.text);if(!matches.length&&src.unitKind==='heading')matches=tu.filter(x=>x.text.replace(/^#+ /,'')===src.text.replace(/^#+ /,''));assert.equal(matches.length,1,a.source+'#'+src.anchor);const target=matches[0],equal=src.textDigest===target.textDigest,exact=classifyExactCarry(su,tu,row),isHeading=src.unitKind==='heading';\n const d={claimId:row.claimId,sourceUnitDigest:row.sourceUnitDigest,claimKind:row.claimKind==='unclassified'?(a.kind==='Contract'?'contract':'specification'):row.claimKind,disposition:equal?'move':'supersede',reviewStatus:'pending',authoredBy:author,targetOwner:a.target,targetAnchor:target.anchor,targetUnitDigest:target.textDigest,targetAncestry:target.ancestry,rationale:'Frozen root map assigns '+a.source+'#'+src.anchor+' to '+a.target+'#'+target.anchor+'. '+(a.kind==='Contract'?'The complete non-Markdown contract payload is copied byte-identically; no runtime consumer or embedded paths are rewritten. ':'The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. ')+(isHeading?'This heading binds its complete unchanged following source payload at depth +1. ':equal?'Full native source/target unit digests are equal; heading ancestry may differ. ':'Whole shown text and full diff are submitted. ')+'This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion.'};claims.push(d);shown.push({entryKind:'source-decision',decision:d,source:{...src,path:a.source},target:{...target,path:a.target},class:exact.class==='Unit-exact'?'Weak-exact':exact.class,classReason:exact.class==='Unit-exact'?'Kept pending for bounded independent conservation review; no script approval requested.':exact.reason});}}\nassert.equal(claims.length,95);const shard='s5-root-source-completion.json';fs.writeFileSync(p+'ledger/decisions/'+shard,JSON.stringify({version:1,shard,authorSession:author,authorshipRequired:true,sources:carry.pairs.map(x=>x.source),claims,files:carry.pairs.map(x=>({path:x.source,targets:[x.target],disposition:'supersede',rationale:'Complete frozen-map source retained in candidate owner; no retirement, implementation or truth certification.'}))},null,2)+'\\n');\n// Bind only the four direct source rows and two pre-existing gaps requested by Lead.\nconst sourceIds=['claim_b7cdc84d6130cac22511eed0ed6e4e6c','claim_320ba6224015cc3877738795b80dabb7','claim_477a30f4902261e390c34ab888145dcd','claim_9bb5739f68a7b4bafcd959ef59104e6a'],gapIds=['claim_1a6a7460ede876ae7fa1de7c2e168cfe','claim_8d273e8328dac53565eb0286c6a91d65'],bindings=[];\nfor(const folder of ['pilot/decisions','ledger/decisions'])for(const file of fs.readdirSync(p+folder).filter(x=>x.endsWith('.json'))){const path=p+folder+'/'+file,j=read(path);let dirty=false;for(const kind of ['claims','registryGaps'])for(const d of j[kind]||[]){if(![...sourceIds,...gapIds].includes(d.claimId))continue;const before=structuredClone(d),target=ctx.unitsOf(d.targetOwner).find(x=>x.anchor===d.targetAnchor);assert(target);assert.notEqual(target.textDigest,before.targetUnitDigest);assert.deepEqual(target.ancestry,before.targetAncestry);d.targetUnitDigest=target.textDigest;d.targetAncestry=target.ancestry;d.authoredBy=author;d.reviewStatus='pending';for(const key of ['reviewedBy','reviewedAt','reviewReport','reviewReportCommit','reviewMode','reviewPackCommit','reviewPackId','seedScoreId'])delete d[key];d.rationale+=' The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries.';const sourceRow=oldCtx.inventory.claimLedger.find(x=>x.claimId===d.claimId);let source=sourceRow&&oldCtx.unitsOf(sourceRow.sourcePath).find(x=>x.anchor===sourceRow.sourceAnchor);if(!source){const prev=read(r+'root-authorities-truth-native-successors-turn21.json').pairs.find(x=>x.decision.claimId===d.claimId);assert(prev);source=prev.source;}bindings.push({entryKind:kind,shardPath:path,before,decision:structuredClone(d),source:{...source,path:source.path||sourceRow.sourcePath},oldTarget:{...oldCtx.unitsOf(d.targetOwner).find(x=>x.anchor===d.targetAnchor),path:d.targetOwner},target:{...target,path:d.targetOwner},class:'Judgment',reason:'Lead rework, direct binding consequence of the authorized two-fragment correction.'});dirty=true;}if(dirty)fs.writeFileSync(path,JSON.stringify(j,null,2)+'\\n');}\nassert.equal(bindings.length,6);fs.writeFileSync(s+'shown-completion.json',JSON.stringify({version:1,contentCommit:ctx.inventory.commit,authorSession:author,rows:shown},null,2)+'\\n');fs.writeFileSync(s+'shown-rebindings.json',JSON.stringify({version:1,contentCommit:ctx.inventory.commit,authorSession:author,rows:bindings},null,2)+'\\n');console.log({sourceRows:95,bindings:6,classes:shown.reduce((a,x)=>(a[x.class]=(a[x.class]||0)+1,a),{})});\n",
+    "native.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';import * as g from '../../../../scripts/check-doc-inventory-gates.mjs';import {classifyPath,headerFields} from '../../../../scripts/check-doc-constitution.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s='.fgos/runtime/tmp/step5-turn22/',read=f=>JSON.parse(fs.readFileSync(f)),inv=g.loadInventory(s+'content-inventory.json',{}),reg=read(s+'identity-registry.json'),old=JSON.parse(execFileSync('git',['show','c3895c140:'+r+'working-identity-registry.json'],{encoding:'utf8',maxBuffer:100e6})),units=g.buildConservationUnitLookup(process.cwd(),inv.commit),oldUnits=g.buildConservationUnitLookup(process.cwd(),read(r+'root-source-truth-fragments-turn22.json').beforeCommit),known=j=>new Map(['units','retiredUnits','identityGaps'].flatMap(k=>j[k]).map(x=>[x.claimId,x])),tuple=x=>[x.claimId,x.sourcePath,x.sourceAnchor,x.sourceUnitDigest].join('\\0'),ct=x=>[x.claimId,x.path,x.anchor,x.unitDigest].join('\\0'),sha=x=>crypto.createHash('sha256').update(x).digest('hex'),o=known(old),n=known(reg),allowed=new Set(['docs/platform/work-state/spec.md','docs/platform/platform-foundations.md','docs/platform/vision.md']),drifts=[],newGaps=reg.identityGaps.filter(x=>!old.identityGaps.some(y=>y.claimId===x.claimId)),newRetired=reg.retiredUnits.filter(x=>!old.retiredUnits.some(y=>y.claimId===x.claimId)),pairs=[];\nfor(const[id,u]of o){assert(n.has(id),'Lost '+id);const v=n.get(id);if(tuple(u)!==tuple(v)){assert(allowed.has(u.sourcePath),id);const before=oldUnits(u.sourcePath).find(x=>x.anchor===u.sourceAnchor&&x.textDigest===u.sourceUnitDigest),after=units(v.sourcePath).find(x=>x.anchor===v.sourceAnchor&&x.textDigest===v.sourceUnitDigest);assert(before&&after);drifts.push({claimId:id,beforeIdentity:u,currentIdentity:v,beforeUnit:{...before,path:u.sourcePath},currentUnit:{...after,path:v.sourcePath},reason:u.sourcePath.includes('/work-state/')?'Exact authorized U8/RUL60 heading-payload consequence':'Only candidate header expanded; original summary payload conserved, no truth change.'});}}\nassert.deepEqual(inv.claimLedger.map(tuple).sort(),reg.units.map(tuple).sort());assert.equal(newRetired.length,0);assert.equal(newGaps.length,4);assert.equal(drifts.length,4);\nfor(const gap of newGaps){assert(allowed.has(gap.sourcePath));const source=oldUnits(gap.sourcePath).find(x=>x.anchor===gap.sourceAnchor&&x.textDigest===gap.sourceUnitDigest);assert(source);const target=units(gap.sourcePath).find(x=>x.anchor===gap.sourceAnchor);assert(target);assert.deepEqual(target.ancestry,source.ancestry);const truth=gap.sourcePath.includes('/work-state/'),decision={claimId:gap.claimId,sourcePath:gap.sourcePath,sourceAnchor:gap.sourceAnchor,sourceUnitDigest:gap.sourceUnitDigest,disposition:'supersede',targetOwner:gap.sourcePath,targetAnchor:target.anchor,targetUnitDigest:target.textDigest,targetAncestry:target.ancestry,authoredBy:'codex-session:22@2026-10-14',reviewStatus:'pending',rationale:truth?'Authorized U8/RUL60 second-fragment correction under A19 creates a native predecessor gap. Exact old/current same-file units are shown; A22 requires this real successor pending, no truth approval or identity graft.':'The existing candidate header adds required orientation fields and explicitly remains non-canonical Candidate. Exact old/current same-file header is shown; original summary prose remains untouched. Native predecessor identity retained, successor pending, no approval carry or authority change.'};pairs.push({entryKind:'registry-gap',gap,decision,source:{...source,path:gap.sourcePath},target:{...target,path:gap.sourcePath},class:'Judgment',reason:decision.rationale});}\nconst shard='s5-root-source-native-successors.json';fs.writeFileSync(p+'ledger/decisions/'+shard,JSON.stringify({version:1,shard,authorSession:'codex-session:22@2026-10-14',authorshipRequired:true,sources:[],claims:[],registryGaps:pairs.map(x=>x.decision)},null,2)+'\\n');fs.writeFileSync(r+'root-source-native-accounting-turn22.json',JSON.stringify({version:1,contentCommit:inv.commit,allKnownIdsRetained:true,knownBefore:o.size,knownCurrent:n.size,activeFullTupleEquality:true,drifts,newGaps:pairs,newRetired:[],noIdentityGraft:true},null,2)+'\\n');\nconst bytes=fs.readFileSync(s+'identity-registry.json');assert(bytes.length<90000000&&bytes.toString().trim().split('\\n').length===1);fs.writeFileSync(r+'working-identity-registry.json',bytes);\nconst shards=[...g.loadDecisionShards(p+'pilot/decisions'),...g.loadDecisionShards(p+'ledger/decisions')],app=g.applyDecisions(inv,shards,{vocabulary:read(p+'claim-and-disposition-vocabulary.json'),registry:reg,repoRoot:process.cwd(),unitsOf:units,targetAnchorsOf:path=>new Set((units(path)||[]).map(x=>x.anchor)),targetUnitDigestOf:(path,a)=>units(path)?.find(x=>x.anchor===a)?.textDigest});fs.writeFileSync(s+'application-findings-final.json',JSON.stringify(app.findings,null,2)+'\\n');assert.deepEqual(app.findings,[]);\nconst prev=read(r+'candidate-unverified-root-authorities.json'),scope=read(r+'root-authorities-remaining-source-rows.json').mapSources,reverse=g.unreferencedCandidateRows(app.inventory,shards,{scope,repoRoot:process.cwd()}),prior=new Map(prev.rows.map(x=>[ct(x),x])),constitution=read(p+'minimum-constitution.json'),status=path=>{const text=execFileSync('git',['show',inv.commit+':'+path],{encoding:'utf8',maxBuffer:50e6}),kind=classifyPath(path,constitution,{header:text}).kind,design=text.match(/^Design status:\\s*(.+)$/m)?.[1]?.trim(),canonical=/^Canonical:\\s*(?:yes|true)\\s*$/im.test(text),authority=inv.items.find(u=>u.path===path)?.authorityStatus,history=kind==='history'||path.includes('/history/');assert(history||(['Candidate','Draft'].includes(design)&&!canonical&&authority!=='promoted'),path);return {kind,authorityStatus:authority,designStatus:design,canonical,eligibility:history?'history':'non-promoted Candidate/Draft'};},rows=reverse.map(x=>prior.has(ct(x))?prior.get(ct(x)):{...x,fileStatus:status(x.path),status:'candidate-unverified'}),set=new Set(rows.map(ct)),removed=prev.rows.filter(x=>!set.has(ct(x))),added=rows.filter(x=>!prior.has(ct(x)));\nfor(const u of removed)assert(pairs.some(x=>x.source.path===u.path&&x.source.anchor===u.anchor&&x.source.textDigest===u.unitDigest),u.claimId);\nfs.writeFileSync(r+'candidate-unverified-root-authorities.json',JSON.stringify({...prev,authoredCommit:inv.commit,scope,scopeLimit:'Final mapped Step 5 source population; AGENTS.md/CLAUDE.md deferred to Step 10. Review and other closure obligations remain open.',count:rows.length,rows},null,2)+'\\n');\nconst sourceRows=app.inventory.claimLedger.filter(x=>scope.includes(x.sourcePath)),remaining=sourceRows.filter(x=>x.disposition==='unknown-blocking'),pending=sourceRows.filter(x=>x.reviewStatus!=='reviewed'&&x.disposition!=='unknown-blocking'),byStatus=sourceRows.reduce((a,x)=>(a[x.reviewStatus]=(a[x.reviewStatus]||0)+1,a),{});assert.equal(remaining.length,0);assert.equal(sourceRows.length,1072);fs.writeFileSync(r+'root-authorities-remaining-source-rows.json',JSON.stringify({version:1,inventoryCommit:inv.commit,mapSources:scope,total:sourceRows.length,byStatus,remainingUndecided:0,pendingConservationReview:pending.length,rows:[],AGENTSAndCLAUDE:'Deferred to Step 10, excluded.'},null,2)+'\\n');\nconst proof={version:1,contentCommit:inv.commit,knownBefore:o.size,knownCurrent:n.size,allKnownIdsRetained:true,unaffectedKnownFullTuplesEqual:true,activeFullTupleEquality:true,changedStableUnits:drifts.length,newGaps:newGaps.length,newRetired:0,sourceStatuses:byStatus,sourceTotal:sourceRows.length,remainingUndecided:0,pending:pending.length,candidateList:rows.length,reverseRemoved:removed,reverseAdded:added,unchangedReverseRows:rows.length-added.length,candidateFullTupleEquality:true,registryBytes:bytes.length,registrySHA256:sha(bytes),compactOneLine:true,nativeByteEqual:true};fs.writeFileSync(s+'final-native-proof.json',JSON.stringify(proof,null,2)+'\\n');fs.writeFileSync(s+'reverse-new-shown.json',JSON.stringify(added.map(x=>({...x,source:{...units(x.path).find(u=>u.anchor===x.anchor&&u.textDigest===x.unitDigest),path:x.path}})),null,2)+'\\n');console.log({...proof,reverseAdded:added.length,reverseRemoved:removed.length});\n",
+    "population.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';import * as g from '../../../../scripts/check-doc-inventory-gates.mjs';import {headerFields} from '../../../../scripts/check-doc-constitution.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s='.fgos/runtime/tmp/step5-turn22/',read=f=>JSON.parse(fs.readFileSync(f)),inv=g.loadInventory(s+'content-inventory.json',{}),units=g.buildConservationUnitLookup(process.cwd(),inv.commit),sha=x=>crypto.createHash('sha256').update(x).digest('hex'),scope=read(r+'root-authorities-remaining-source-rows.json').mapSources,shards=[...g.loadDecisionShards(p+'pilot/decisions'),...g.loadDecisionShards(p+'ledger/decisions')],targets=new Set();\nfor(const j of shards){for(const row of j.claims||[]){const src=inv.claimLedger.find(x=>x.claimId===row.claimId);if(src&&scope.includes(src.sourcePath)&&row.targetOwner?.startsWith('docs/platform/'))targets.add(row.targetOwner);}for(const file of j.files||[])if(scope.includes(file.path))for(const path of file.targets||[])if(path.startsWith('docs/platform/'))targets.add(path);}\nconst rows=[],exclusions=[];for(const path of [...targets].sort()){if(/\\/(history|reports|decisions)\\//.test(path)){exclusions.push({path,reason:'Historical/design-decision evidence, excluded from current-content truth sample.'});continue;}const text=execFileSync('git',['show',inv.commit+':'+path],{encoding:'utf8',maxBuffer:50e6}),fields=path.endsWith('.md')?headerFields(text):{};if(fields?.['Document type']==='History'){exclusions.push({path,reason:'History kind.'});continue;}for(const u of units(path)||[]){if(u.unitKind==='heading'||/^```txt\\n(?:Document type|Legacy status)/.test(u.text)||/^---\\narea:/.test(u.text)||/^Added in candidate[: —]/.test(u.text)||u.ancestry.includes('Source Metadata (Added in candidate)')){exclusions.push({path,anchor:u.anchor,unitDigest:u.textDigest,reason:'Heading, orientation metadata or labelled scaffolding; no current factual assertion sample.'});continue;}const native=inv.claimLedger.find(x=>x.sourcePath===path&&x.sourceAnchor===u.anchor&&x.sourceUnitDigest===u.textDigest);assert(native);rows.push({claimId:native.claimId,path,anchor:u.anchor,unitDigest:u.textDigest,text:u.text,shownTextDigest:sha(u.text),unitKind:u.unitKind,ancestry:u.ancestry,scope:'Current-content or explicitly dated intent; reviewer distinguishes current assertions from retained direction.'});}}\nassert(rows.length>=30);const names=read(s+'names.json'),data={version:1,authorSession:'codex-session:22@2026-10-14',authorization:'A35 item 3 / A28 item 3(a)',contentCommit:inv.commit,sourcePopulation:1072,sourceUndecided:0,scope,targets:[...targets].sort(),count:rows.length,populationSHA256:sha(JSON.stringify(rows)),rows,exclusions,drawnByAuthor:false,authorTruthVerdicts:0,reviewerInstruction:'Draw 30 current-content units from this final frozen population using an independently chosen recorded seed. Check every current assertion against code, distinguish explicitly dated vision/design. The >10% false-unit rule applies to the new draw; no use of the old draw as closure proof. Full promotion truth review remains owed.'};fs.writeFileSync(r+names.population+'.json',JSON.stringify(data,null,2)+'\\n');let md='# Final root authorities truth population\\n\\nAuthor session: '+data.authorSession+'\\nContent commit: '+inv.commit+'\\nAuthorization: A35 item 3 / A28 item 3(a)\\n\\nAll 1,072 mapped Step 5 source rows are decided; '+rows.length+' current-content units below bind the final bytes. Population SHA256 (compact JSON rows): `'+data.populationSHA256+'`. No author draw or truth verdict is supplied. The independent reviewer draws 30, records seed and selected IDs, checks every asserted current fact and applies the >10% rule. Dated law rationale and intended vision are preserved; distinguish them from current implementation claims. The original population/sample/review stay untouched as historical evidence.\\n\\nMachine population and exclusion accounting: ['+names.population+'.json]('+names.population+'.json).\\n\\n';for(const x of rows){const n=Math.max(3,...[...x.text.matchAll(/`{3,}/g)].map(m=>m[0].length+1)),f='`'.repeat(n);md+='## '+x.claimId+'\\n\\n`'+x.path+'#'+x.anchor+'`\\nUnit SHA256: `'+x.unitDigest+'`\\nShown SHA256: `'+x.shownTextDigest+'`\\n\\n'+f+'text\\n'+x.text+'\\n'+f+'\\n\\n';}fs.writeFileSync(r+names.population,md);console.log({population:rows.length,paths:targets.size,files:[names.population,names.population+'.json']});\n",
+    "packs.py": "from pathlib import Path\nimport json,hashlib,re,difflib,math,subprocess\ns=Path('.fgos/runtime/tmp/step5-turn22');r=Path('plans/260925-documentation-authority-unification/reports/phase-06');read=lambda p:json.loads(p.read_text());sha=lambda t:hashlib.sha256(t.encode()).hexdigest();names=read(s/'names.json');proof=read(s/'final-native-proof.json');pin=proof['contentCommit'];author='codex-session:22@2026-10-14'\ndef fence(t,lang='text'):\n n=max([3]+[len(x)+1 for x in re.findall('`{3,}',t)]);return '`'*n+lang+'\\n'+t+'\\n'+'`'*n+'\\n'\ndef shown(u):return u.get('sectionText',u['text'])\ndef display(u,label):\n t=shown(u);assert re.fullmatch('[a-f0-9]{64}',u['textDigest']);return label+': `'+u['path']+'#'+u['anchor']+'`\\nNative unit SHA256: `'+u['textDigest']+'`\\nShown text SHA256: `'+sha(t)+'`\\n\\n'+fence(t)+'\\n'\ndef diff(a,b):return fence(''.join(difflib.unified_diff(shown(a).splitlines(True),shown(b).splitlines(True),fromfile=a['path'],tofile=b['path'])),'diff')\ndef block(x):\n d=x['decision'];t='## '+d['claimId']+'\\n\\nEntry kind: '+x['entryKind']+'\\nClass: '+x.get('class','Judgment')+'\\nReason: '+x.get('classReason',x.get('reason',d['rationale']))+'\\n\\n'+fence(json.dumps(d,ensure_ascii=False,indent=2),'json')+'\\n'+display(x['source'],'Complete source/predecessor')\n if x.get('oldTarget'):t+=display(x['oldTarget'],'Complete previous target')\n t+=display(x['target'],'Complete current target')+'Source/current diff:\\n\\n'+diff(x['source'],x['target'])\n if x.get('oldTarget'):t+='Previous/current diff:\\n\\n'+diff(x['oldTarget'],x['target'])\n return t\naccount=read(r/'root-source-native-accounting-turn22.json');source=read(s/'shown-completion.json')['rows'];bindings=read(s/'shown-rebindings.json')['rows'];truthGaps=[x for x in account['newGaps'] if '/work-state/' in x['source']['path']];headerGaps=[x for x in account['newGaps'] if '/work-state/' not in x['source']['path']];assert len(source)==95 and len(bindings)==6 and len(truthGaps)==2\ntruthEntries=bindings+truthGaps;assert len(truthEntries)==8;bodyPairs=[x for x in account['newGaps'] if '/work-state/' in x['source']['path']];fragments=read(r/'root-source-truth-fragments-turn22.json')['corrections'];md='# Required fields and wrapper ordering: bounded re-review\\n\\nAuthor session: '+author+'\\nContent commit: '+pin+'\\n\\nConservation: eight pending rows (four source rebindings, two existing predecessor rebindings, two newly surfaced native predecessors), full old/current units below. Truth: only the two corrected fragments, in complete unit context; untouched assertions owe promotion review.\\n\\n'+''.join(block(x) for x in truthEntries)\nmd+='## Two fragment truth units\\n\\n'\nfor x in bodyPairs:\n current=next(u for u in read(s/'current-registry-units.json') if u['sourcePath']==x['target']['path'] and u['sourceAnchor']==x['target']['anchor'] and u['sourceUnitDigest']==x['target']['textDigest']);md+='### Current truth unit '+current['claimId']+'\\n\\n'+display(x['source'],'Complete before')+display(x['target'],'Complete corrected unit')+diff(x['source'],x['target'])\nfor x in fragments:\n md+='### '+x['finding']+'\\n\\nBefore fragment SHA256: `'+x['beforeSHA256']+'`\\nAfter fragment SHA256: `'+x['afterSHA256']+'`\\n\\nBefore:\\n\\n'+fence(x['before'])+'\\nAfter:\\n\\n'+fence(x['after'])+'\\n'\n for e in x['evidence']:\n  actual='\\n'.join(Path(e['path']).read_text().splitlines()[e['startLine']-1:e['endLine']])+'\\n';assert actual==e['text'] and sha(actual)==e['sha256'];md+='Evidence: `'+e['path']+':'+str(e['startLine'])+'-'+str(e['endLine'])+'`, git blob `'+e['blob']+'`, excerpt SHA256 `'+e['sha256']+'`\\n\\n'+fence(actual)\ntruthPath=r/names['truth_pack'];truthPath.write_text(md);Path(str(truthPath)+'.json').write_text(json.dumps(dict(version=1,contentCommit=pin,authorSession=author,packSHA256=sha(md),rows=truthEntries,truthUnits=bodyPairs,corrections=fragments),ensure_ascii=False,indent=2)+'\\n');different=[x['decision']['claimId'] for x in truthEntries if x['source']['textDigest']!=x['target']['textDigest']];assert len(different)==8\nrequest='# Independent re-review: required fields and submit ordering\\n\\nAuthor session: '+author+'\\nContent commit: '+pin+'\\nReview mode: ordinary\\nState: ready-for-review; Step 5 remains open\\n\\nRead A19/A22/A35 and review-5-root-truth-corrections.md at c3895c140. Only U8 required flags and U26 RUL60 wrapper-order fragments change. `add` requires --title, --description, --kind, --risk, --verify; --id remains optional. Live submit wrapper step 4 reads raw text before item creation, returns optional rewritten title/description and domain (or a question), never re-judges size/kind/risk; step 5 submits and step 6 reports. Real discovery judgment remains where the unit already says. Every other sentence is unchanged.\\n\\nPack: ['+names['truth_pack']+']('+names['truth_pack']+'), SHA256 `'+sha(md)+'`; machine full-text sidecar at the same path plus .json. Conservation: eight entries, all pending; four source rows, two existing gaps, two new native block gaps. Truth: two corrected fragments with complete before/after unit text and full digests, file:line, git blob and excerpt SHA256 evidence. Read both fragments against code in full; do not certify untouched RUL clauses. Native four stable headings are accounted in root-source-native-accounting-turn22.json; only the two work-state headings belong to this correction.\\n\\nA36: every eight conservation row has differing source/target digests, so all eight are mandatory deep reads; all are Judgment and minimum sample is all eight. Reviewer records seed even though all are deep, recomputes full digests/anchors and shard/pack equality. Differing set:\\n'+''.join('- `'+i+'`\\n' for i in different)+'\\nOrdinary tables use Reviewer, Author session, Review mode headers and Claim | Verdict | Note | Source digest | Target digest, full 64-hex cells, notes marked deep/mechanical. Write one row for each of the eight conservation entries and separate current native truth-unit rows for the two fragments (Source digest = complete current unit digest, Target = none); use the actual current IDs from the pack. Shards: pilot b-behaviors and b-entry-actors-rules-pointers (four source bindings), ledger s5-root-truth-successors (two old gaps), s5-root-source-native-successors (two new gaps). No approval carry. The lint currently indexes claims only; unknown-claim for a genuine gap/native truth unit is an explained limitation, not a report defect.\\n\\nBoth-prior D/E and native identity equality: root-source-completion-verification-turn22.json. Final fresh 30-unit reviewer draw is separately owed over '+names['population']+'. No promotion, main merge/write, push, Step 6 or protected tool change.\\n'\n(r/names['truth_request']).write_text(request)\n# New native wrappers are A28 candidate-unverified list accounting, not truth receipts.\nreverse=read(s/'reverse-new-shown.json');chunks=[source[:75],source[75:]+headerGaps];stable=[x for x in account['drifts'] if '/work-state/' not in x['beforeUnit']['path']];assert len(stable)==2\npaths=[dict(request=str(r/names['truth_request']),pack=str(truthPath),sidecar=str(truthPath)+'.json',kind='truth-rework',conservationRows=8,truthFragments=2,differingDigestRows=different,packSHA256=sha(md))]\nfor i,entries in enumerate(chunks,1):\n pack=names['source_pack'+str(i)];req=names['source_request'+str(i)];md='# Root source completion: conservation pack '+str(i)+'\\n\\nAuthor session: '+author+'\\nContent commit: '+pin+'\\n\\n'+''.join(block(x) for x in entries);extra=[]\n if i==2:\n  for x in stable:md+='## Stable native heading '+x['claimId']+'\\n\\nAccounting only; native ID retained, header payload digest changes, no approval carried.\\n\\n'+display(x['beforeUnit'],'Complete before heading payload')+display(x['currentUnit'],'Complete current heading payload')+diff(x['beforeUnit'],x['currentUnit']);extra.append(dict(entryKind='stable-heading-accounting',row=x))\n  for x in reverse:md+='## Candidate-unverified '+x['claimId']+'\\n\\nA28 eligibility/equality only; no per-unit truth receipt.\\n\\n'+fence(json.dumps({k:v for k,v in x.items() if k!='source'},ensure_ascii=False,indent=2),'json')+'\\n'+display(x['source'],'Complete new reverse-open unit');extra.append(dict(entryKind='candidate-unverified',row=x))\n assert len(entries)+len(extra)<=80,(i,len(entries),len(extra))\n (r/pack).write_text(md);(r/(pack+'.json')).write_text(json.dumps(dict(version=1,contentCommit=pin,authorSession=author,packSHA256=sha(md),rows=entries,accounting=extra),ensure_ascii=False,indent=2)+'\\n');different=[x['decision']['claimId'] for x in entries if x['source']['textDigest']!=x['target']['textDigest']];classes={k:sum(x.get('class','Judgment')==k for x in entries) for k in ['Weak-exact','Judgment']};sample=min(len(entries),max(10,math.ceil(.15*len(entries))))\n request='# Independent conservation review: root source completion '+str(i)+'\\n\\nAuthor session: '+author+'\\nContent commit: '+pin+'\\nReview mode: ordinary\\nState: ready-for-review; Step 5 remains open\\n\\nReview exactly '+str(len(entries))+' pending decisions in this pack, plus '+str(len(extra))+' accounting/list entries. Pack: ['+pack+']('+pack+'), SHA256 `'+sha(md)+'`, full source/current target text, full 64-hex native and shown digests, diff and decision JSON; sidecar at pack path plus .json. The two packs decide all remaining 95 Step 5 source rows: foundations 68, lifecycle vision 25, JSON/YAML contracts 2. Source and consumers unchanged; AGENTS.md/CLAUDE.md wait for Step 10. Foundations/vision extend their existing summary owner with complete source text; only heading depths shift +1. Retain every law threshold, dated design claim, unresolved vision question and previous summary payload. No truth rewriting, law change or new platform owner. JSON/YAML targets copy entire source bytes; embedded paths are not rewritten. Q5/N1 retained singleton/generated decisions remain unchanged.\\n\\nClasses (all pending; no script approval): '+json.dumps(classes)+'. A36: mechanically recompute all full unit/shown digests, anchors and shard/pack equality. Reviewer draws seeded 15% sample, minimum '+str(sample)+' rows, plus every differing-digest row below; record seed and sampled IDs, notes deep/mechanical. If >3% of deep reads rework, read entire pack. Differing-digest rows ('+str(len(different))+'):\\n'+(''.join('- `'+id+'`\\n' for id in different) or 'None.\\n')+'\\nShards: ledger/decisions/s5-root-source-completion.json (source rows); s5-root-source-native-successors.json (two header predecessors in pack 2). Write ordinary Reviewer/Author session/Review mode headers and Claim | Verdict | Note | Source digest | Target digest. Every decision has one bare-ID row with complete digests. Stable heading and A28 list accounting use labelled non-claim rows so they do not invent source approvals/classification receipts. Accepted prior source rationales, holds, exact exceptions and A34 residuals stay unchanged. Header source digests and new tuple accounting are shown in pack 2; no native ID lost or grafted.\\n\\nFinal D/E/native proof: root-source-completion-verification-turn22.json; compact persisted registry below 90 MB. candidate-unverified-root-authorities.json is the exact extended native reverse-open population; pack 2 shows every new tuple and affected previous header tuples. This is eligibility/conservation only. Final truth population: '+names['population']+'; no author draw. Required-field/submit-order rework request is separate. Review all needed rows before claiming source conservation accepted; no batch closure, promotion, main merge/write, push or Step 6.\\n'\n (r/req).write_text(request);paths.append(dict(request=str(r/req),pack=str(r/pack),sidecar=str(r/(pack+'.json')),kind='source-conservation',decisions=len(entries),sourceRows=sum(x['entryKind']=='source-decision' for x in entries),accountingRows=len(extra),classCounts=classes,differingDigestRows=different,packSHA256=sha(md)))\n(s/'pack-paths.json').write_text(json.dumps(paths,indent=2)+'\\n');print([(x['kind'],x.get('decisions',x.get('conservationRows')),x['request']) for x in paths])\n",
+    "pack-groups.py": "import json,pathlib,hashlib\ns=pathlib.Path('.fgos/runtime/tmp/step5-turn22');r=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-06');paths=json.load(open(s/'pack-paths.json'));x=paths[-1];p=pathlib.Path(x['pack']);t=p.read_text().split('\\n## Two intentional whole-file duplicate groups')[0];side=json.load(open(x['sidecar']));groups=json.load(open(s/'duplicate-groups.json'));records=[]\nfor g in groups:\n row=next(u for u in side['rows'] if u['source']['path']==g['paths'][0]);data={**g,'sourceClaimId':row['decision']['claimId'],'sourceUnitSHA256':row['source']['textDigest'],'targetUnitSHA256':row['target']['textDigest'],'wholeFileSHA256':hashlib.sha256(pathlib.Path(g['paths'][0]).read_bytes()).hexdigest(),'fullShownText':'Complete source/target file-block shown above in sourceClaimId section; source and target bytes equal.'};records.append(data)\nt+='\\n## Two intentional whole-file duplicate groups\\n\\nThe JSON/YAML carrier source decisions above preserve whole payloads byte-identically. Each new native duplicate-content group has exactly one mapped platform owner. Source rows remain pending. Review membership, full source/target bytes already shown at the named source claim and sole target owner as conservation accounting; resolution projection and cutover consumer rewrites remain final batch obligations after independent acceptance.\\n\\n'+''.join('### Duplicate blob '+g['blobSha']+'\\n\\n```json\\n'+json.dumps(g,ensure_ascii=False,indent=2)+'\\n```\\n\\n' for g in records)\np.write_text(t);sha=hashlib.sha256(t.encode()).hexdigest();side['packSHA256']=sha;side['accounting']=[u for u in side['accounting'] if u['entryKind']!='intentional-duplicate-group']+[{'entryKind':'intentional-duplicate-group','row':g} for g in records];pathlib.Path(x['sidecar']).write_text(json.dumps(side,ensure_ascii=False,indent=2)+'\\n');req=pathlib.Path(x['request']);text=req.read_text().replace(x['packSHA256'],sha);req.write_text(text);x['packSHA256']=sha;x['accountingRows']=len(side['accounting']);(s/'pack-paths.json').write_text(json.dumps(paths,indent=2)+'\\n')\n",
+    "historical-gaps.py": "import json,pathlib,subprocess,glob\ns=pathlib.Path('.fgos/runtime/tmp/step5-turn22');r=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-06');reg=json.load(open(s/'identity-registry.json'));old=json.loads(subprocess.check_output(['git','show','c3895c140:'+str(r/'working-identity-registry.json')],text=True));scope=json.load(open(r/'candidate-unverified-root-authorities.json'))['scope'];dec={d['claimId'] for path in glob.glob('plans/260925-documentation-authority-unification/*/decisions/*.json') for d in json.load(open(path)).get('registryGaps',[])};rows=[x for x in reg['identityGaps'] if x['sourcePath'] in scope and x.get('disposition') is None and x['claimId'] not in dec];assert len(rows)==6\nfor x in rows:\n before=next(y for y in old['identityGaps'] if y['claimId']==x['claimId']);assert [(x.get(k),before.get(k)) for k in ['claimId','sourcePath','sourceAnchor','sourceUnitDigest']] == [(x.get(k),x.get(k)) for k in ['claimId','sourcePath','sourceAnchor','sourceUnitDigest']]\nout={'version':1,'priorPin':'c3895c140','allSixPreExisting':True,'newThisTurn':0,'previous27ScopeOpen':2,'finalFullMapOpen':6,'newlyIncludedScopes':['docs/architecture-manifest.json','docs/contracts/fgos-gateway-api-v1.yaml','docs/backlog.md'],'meaning':'Full mapped scope exposes four additional historical gaps, unchanged from the prior registry; not a content-fix consequence or a source-row omission. All remain explicit Step 5 closure obligations, no identity graft or unreviewed waiver.','rows':rows};(r/'root-source-open-historical-gaps-turn22.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\\n')\nf=r/'progress.md';t=f.read_text().replace('two IO historical gaps, fresh 30-unit','six pre-existing historical gaps (two IO, two architecture-manifest, one YAML contract, one backlog; final full map adds four previously excluded gaps), fresh 30-unit',1);f.write_text(t)\n",
+    "gates-new.py": "import json,pathlib,subprocess,sys\ns=pathlib.Path('.fgos/runtime/tmp/step5-turn22');p='plans/260925-documentation-authority-unification';stage=sys.argv[1];inv=sys.argv[2] if len(sys.argv)>2 else str(s/'inventory.json');scopes=json.loads(pathlib.Path(p+'/reports/phase-06/candidate-unverified-root-authorities.json').read_text())['scope'];results=[]\nfor strict in [False,True]:\n for label,prior in [('first','reports/identity-registry.json'),('second','reports/phase-02-identity-registry.json')]:\n  label=('E' if strict else 'D')+'-'+label\n  cmd=['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-doc-inventory-gates.mjs','--inventory',inv,'--identity-registry',p+'/reports/phase-06/working-identity-registry.json','--decisions',p+'/pilot/decisions','--decisions',p+'/ledger/decisions','--previous-registry',p+'/'+prior,'--json']\n  if strict:\n   cmd+=['--strict']\n   for scope in scopes:cmd+=['--scope',scope]\n  out=s/(stage+'-'+label+'.json')\n  with out.open('w') as f:z=subprocess.run(cmd,stdout=f,stderr=subprocess.PIPE,text=True)\n  d=json.loads(out.read_text());record={'label':label,'command':cmd,'exit':z.returncode,'stderr':z.stderr,'fatalFindings':d['fatalFindings'],'conservationOpen':d['conservationOpen']};results.append(record);(s/(stage+'-gates.json')).write_text(json.dumps(results,indent=2)+'\\n');print(stage,label,z.returncode,'fatal',len(d['fatalFindings']),[(x['type'],x['count']) for x in d['conservationOpen']],flush=True)\n  if not strict:assert z.returncode==0 and not d['fatalFindings'],d['fatalFindings'][:10]\n",
+    "preserve.py": "import json,pathlib,subprocess,hashlib,re\np=pathlib.Path('plans/260925-documentation-authority-unification');r=p/'reports/phase-06';s=pathlib.Path('.fgos/runtime/tmp/step5-turn22');git=lambda *args:subprocess.check_output(['git',*args],text=True).strip()\nexpected={line.split()[0]:line.split()[1] for line in (r/'extractor-blobs.txt').read_text().splitlines()};assert all(git('rev-parse','HEAD:'+f)==v for f,v in expected.items())\nfor f in ['AGENTS.md','CLAUDE.md','docs/specs/reading-map.md','docs/reading-map.md','docs/platform-foundations.md']:\n assert pathlib.Path(f).read_bytes()==subprocess.check_output(['git','show','5a1b26a02:'+f])\nassert git('ls-tree','-r','HEAD','--','docs/architect/agent-coordination/verification')==git('ls-tree','-r','5a1b26a02','--','docs/architect/agent-coordination/verification')\nassert git('ls-tree','-r','HEAD','--','docs/platform/agent-coordination/verification')==git('ls-tree','-r','5a1b26a02','--','docs/platform/agent-coordination/verification')\na=json.loads(subprocess.check_output(['git','show','48e3a992b:'+str(p/'transitional-switchboard.json')],text=True));b=json.load(open(p/'transitional-switchboard.json'));assert [(u['area'],u['authorityStatus']) for u in a['areas']]==[(u['area'],u['authorityStatus']) for u in b['areas']]\nlinks=set()\nfor f in ['AGENTS.md','CLAUDE.md','README.md','docs/README.md','docs/reading-map.md','docs/specs/reading-map.md']:links.update(re.findall(r'docs/platform/[^ )`|>\"\\n]*',pathlib.Path(f).read_text()))\nassert sorted(links)==sorted((r/'reader-links-baseline.txt').read_text().splitlines())\nresults=[]\nfor cmd in [['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-legacy-docs-ratchet.mjs'],['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-doc-constitution.mjs','--no-ledger','--check-placement'],['env','-u','CLAUDE_CODE_SESSION_ID','node','scripts/check-doc-candidate-status.mjs','--json']]:\n z=subprocess.run(cmd,capture_output=True,text=True);results.append(dict(command=cmd,exit=z.returncode,stdout=z.stdout,stderr=z.stderr));assert z.returncode==0,(cmd,z.stdout,z.stderr)\nassert json.loads(results[-1]['stdout'])['findings']==[]\n(s/'preservation.json').write_text(json.dumps(dict(extractorUnchanged=True,fiveFrozenFilesUnchanged=True,witnessAndPayloadTreesUnchanged=True,authorityStatusesUnchanged=True,readerLinksUnchanged=True,checks=results),indent=2)+'\\n');print('Preservation passes')\n",
+    "allowlist.py": "import subprocess,json,pathlib\nr=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-06');s=pathlib.Path('.fgos/runtime/tmp/step5-turn22');old=json.loads(pathlib.Path('/tmp/fgos-work/root-step5-turn19/allowlist.json').read_text());exceptions={tuple(x) for x in old['existingExactExemptions']};allowed=json.loads((r/'allowed-paths.json').read_text());raw=subprocess.check_output(['git','log','--first-parent','--no-merges','--format=COMMIT %H','--name-only','dbe5c432852837ea01e6025b35868bcb7271495d..HEAD'],text=True);commit=None;violations=[];used=[]\nfor line in raw.splitlines():\n if line.startswith('COMMIT '):commit=line[7:]\n elif line.strip() and not any(line==x or line.startswith(x) for x in allowed):\n  pair=(commit,line)\n  if pair in exceptions:used.append(pair)\n  else:violations.append(pair)\nassert not violations,violations;(s/'allowlist.json').write_text(json.dumps(dict(newViolations=violations,existingExactExemptions=used),indent=2)+'\\n');print('A passes with existing exact exemptions:',len(used))\n",
+    "verify.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';import * as g from '../../../../scripts/check-doc-inventory-gates.mjs';\nconst p='plans/260925-documentation-authority-unification/',r=p+'reports/phase-06/',s='.fgos/runtime/tmp/step5-turn22/',read=f=>JSON.parse(fs.readFileSync(f)),sha=x=>crypto.createHash('sha256').update(x).digest('hex'),ct=x=>[x.claimId,x.path,x.anchor,x.unitDigest].join('\\0'),tuple=x=>[x.claimId,x.sourcePath,x.sourceAnchor,x.sourceUnitDigest].join('\\0'),native=read(s+'final-native-proof.json'),paths=read(s+'pack-paths.json'),names=read(s+'names.json'),reg=read(r+'working-identity-registry.json'),inv=g.loadInventory(s+'final-inventory.json',{}),units=g.buildConservationUnitLookup(process.cwd(),inv.commit),list=read(r+'candidate-unverified-root-authorities.json'),application=read(r+'root-source-review-application-turn22.json');\nassert.equal(application.rows.length,296);assert.equal(application.truthAcceptances.length,3);for(const x of application.rows){const j=read(x.shardPath),d=j[x.entryKind].find(u=>u.claimId===x.after.claimId);assert.equal(d.reviewStatus,'reviewed');assert.equal(d.reviewNote,x.after.reviewNote);assert.equal(d.reviewReportCommit,application.reportCommit);assert.equal(d.targetUnitDigest,x.after.targetUnitDigest);}\nconst allShards=[...g.loadDecisionShards(p+'pilot/decisions'),...g.loadDecisionShards(p+'ledger/decisions')],decisions=new Map(allShards.flatMap(j=>[...(j.claims||[]),...(j.registryGaps||[])].map(x=>[x.claimId,x])));let sourceCount=0,bindings=0,newHeaders=0;for(const x of paths){assert.equal(sha(fs.readFileSync(x.pack)),x.packSHA256);const side=read(x.sidecar);assert.equal(side.packSHA256,x.packSHA256);assert.equal(side.contentCommit,native.contentCommit);for(const e of side.rows){const d=e.decision,actual=decisions.get(d.claimId);assert.deepEqual(actual,d);assert.equal(d.reviewStatus,'pending');assert(e.source.textDigest.startsWith(d.sourceUnitDigest));assert.equal(e.target.textDigest,d.targetUnitDigest);assert.deepEqual(e.target.ancestry,d.targetAncestry);const t=units(d.targetOwner).find(u=>u.anchor===d.targetAnchor);assert(t);assert.equal(t.textDigest,e.target.textDigest);assert.equal(t.text,e.target.text);assert.equal(t.sectionText,e.target.sectionText);const source=e.source;if(e.entryKind==='source-decision'){const row=inv.claimLedger.find(u=>u.claimId===d.claimId);assert(row);const su=units(row.sourcePath).find(u=>u.anchor===row.sourceAnchor);assert.equal(su.textDigest,source.textDigest);assert.equal(su.text,source.text);assert.equal(su.sectionText,source.sectionText);sourceCount++;}else if(x.kind==='truth-rework')bindings++;else newHeaders++;}const differing=side.rows.filter(e=>e.source.textDigest!==e.target.textDigest).map(e=>e.decision.claimId);assert.deepEqual(differing,x.differingDigestRows);}\nassert.equal(sourceCount,95);assert.equal(bindings,8);assert.equal(newHeaders,2);const D=['first','second'].map(x=>read(s+'final-D-'+x+'.json')),E=['first','second'].map(x=>read(s+'final-E-'+x+'.json'));assert(D.every(x=>x.fatalFindings.length===0));assert.deepEqual(D[0],D[1]);assert.deepEqual(E[0],E[1]);assert.deepEqual(E[0].explicitOpenFindings.unreferencedCandidateRows.map(ct).sort(),list.rows.map(ct).sort());assert.equal(list.rows.length,830);assert.deepEqual(inv.claimLedger.map(tuple).sort(),reg.units.map(tuple).sort());\nconst population=read(r+names.population+'.json');assert.equal(population.contentCommit,native.contentCommit);assert.equal(population.count,350);assert.equal(population.drawnByAuthor,false);assert.equal(population.populationSHA256,sha(JSON.stringify(population.rows)));for(const x of population.rows){const u=units(x.path).find(u=>u.anchor===x.anchor);assert(u);assert.equal(u.textDigest,x.unitDigest);assert.equal(u.text,x.text);assert.equal(sha(x.text),x.shownTextDigest);}\nconst bytes=fs.readFileSync(r+'working-identity-registry.json');assert(bytes.equals(fs.readFileSync(s+'identity-registry.json')));assert(bytes.length<90000000&&bytes.toString().trim().split('\\n').length===1);const tests=fs.readFileSync(s+'tests.log','utf8');assert(/pass 39/.test(tests)&&/fail 0/.test(tests));const frozen=['owner-answers.md','root-authorities-truth-population.json','root-authorities-truth-sample.json','review-5-root-authorities-truth.md','candidate-unverified-agent-coordination.json','candidate-unverified-host-invocation-routing.json','candidate-unverified-packaging-distribution.json','holds.md','identical-unit-exceptions.md'].filter(x=>fs.existsSync(r+x));for(const path of frozen)assert(fs.readFileSync(r+path).equals(execFileSync('git',['show','c3895c140:'+r+path],{maxBuffer:100e6})),path);\nconst evidence={version:1,authorSession:'codex-session:22@2026-10-14',state:'ready-for-review',contentCommit:native.contentCommit,proofInventoryCommit:inv.commit,B0:'dbe5c432852837ea01e6025b35868bcb7271495d',SYNC:'48e3a992be1cd74a0960df953af16b5dae4275e4',application:{sourceRows:292,registryGaps:4,truthAcceptances:3,reportCommit:application.reportCommit,notesVerbatim:true},sourceAuthoring:{newPending:95,classes:{'Weak-exact':74,Judgment:21},total:1072,reviewed:968,pending:104,undecided:0,pendingGeneratedRows:5,ordinaryPendingSourceRows:99},truthCorrection:{fragments:2,dependentRebindings:6,conservationRequestRows:8,nativeNewPredecessors:2,truthRequestUnits:2,noOtherTruthSweep:true},headerAccounting:{newPredecessors:2,stableHeadingChanges:2,sourceAndConsumersUnchanged:true},nativeEquality:native,defaultD:{bothExit:0,fatalFindings:0,fullOutputEquality:true},scopedE:{bothExit:1,expectedRed:true,fullOutputEquality:true,open:E[0].conservationOpen,fullReverseTupleEquality:true,pendingNativeDecisions:allShards.flatMap(j=>j.registryGaps||[]).filter(x=>x.reviewStatus!=='reviewed'&&['s5-root-truth-successors.json','s5-root-source-native-successors.json'].some(y=>allShards.find(j=>(j.registryGaps||[]).includes(x))?.shard===y)).map(x=>({claimId:x.claimId,sourceUnitDigest:x.sourceUnitDigest,targetUnitDigest:x.targetUnitDigest,reviewStatus:x.reviewStatus})),closed:false},truthPopulation:{path:r+names.population,machinePath:r+names.population+'.json',count:350,sha256:population.populationSHA256,authorDraw:false,reviewerDrawOwed:30},packs:paths,preservation:read(s+'preservation.json'),newCarriersPromotionMetadata:read(s+'new-carriers-promotion.json'),intentionalNewDuplicateGroups:read(s+'duplicate-groups.json'),historicalOpenGaps:read(r+'root-source-open-historical-gaps-turn22.json'),allowlist:read(s+'allowlist.json'),tests:{command:'env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs',passed:39,failed:0,cancelled:0,skipped:0,todo:0,log:tests},gitnexus:{command:'node .gitnexus/run.cjs detect_changes --scope compare --base-ref c3895c140 --repo /home/vantt/projects/forgentX-phase00-documentation-authority-unification',result:fs.readFileSync(s+'gitnexus-final.txt','utf8'),productionSymbolEdits:0},registryBytes:bytes.length,registrySHA256:sha(bytes),immutableFiles:frozen,closureItems:['Independent verdicts for three bounded requests: 95 sources, eight truth-conservation rows, two header predecessors, stable header accounting and 38 new candidate tuples.','Five pending generated-projection rows remain decided regenerate-from-source; retain separately from 99 ordinary pending rows.','Six pre-existing historical gaps still have no disposition: two IO, two architecture-manifest, one YAML contract and one backlog (all full tuples unchanged at c3895c140; four exposed only by final full-map scope); root holds and identical-owner exceptions are empty in final scoped E. Prior area holds/exceptions/A34 residuals are unchanged.','Fresh independent 30-unit truth draw from final 350-unit population under A35, with >10% rule.','Independent 50-block invented-claim sample and Step 5 hostile pass; fresh-reader key and two readers/three scenarios, link preview/draft aliases, final batch-boundary sync/accounting and reruns, promotion-header check for new Markdown carriers, batch report with risk/proof/learning/effort and explicit cutover residuals, including the two new whole-file duplicate groups (one mapped owner each), resolution projection after independent acceptance and consumer rewrites; owner effort checkpoint.'],resolvedObstacles:['Untracked application evidence needed explicit git add before the path-limited commit; no broad add. Legacy Pilot source digest prefixes are preserved; every shown native digest remains full 64-hex and verifies the unchanged prefix.','Scratch native helper initially compared new gap IDs to all known IDs; corrected to compare old/new gap membership, four actual transitions, no checker change.'],technicalBlockers:[],unexplainedProofFailures:[],batchClosed:false,noPromotion:true,noPush:true,noRebase:true,noMainWrite:true,noMainMerge:true,noStep6:true,noProtectedToolChange:true,noSecretRead:true,commands:read(s+'final-gates.json'),helperSources:Object.fromEntries(['apply.mjs','application-native.mjs','content.py','author.mjs','native.mjs','population.mjs','packs.py','pack-groups.py','historical-gaps.py','gates-new.py','preserve.py','allowlist.py','verify.mjs'].map(x=>[x,fs.readFileSync(s+x,'utf8')]))};fs.writeFileSync(r+'root-source-completion-verification-turn22.json',JSON.stringify(evidence,null,2)+'\\n');console.log({D:'both zero fatal',E:E[0].conservationOpen,sourceCount,truthConservationRows:bindings,headerPredecessors:newHeaders,population:350,registryBytes:bytes.length});\n"
+  }
+}

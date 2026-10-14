@@ -1,13 +1,42 @@
-# Latest resume state — Finish Step 5 source work
+# Latest resume state — All root source rows decided; bounded review handoff
 
 Date: 2026-10-14
 Executor: codex-session:22@2026-10-14
 Session counter: 22
 Step: 5
-State: authoring / all mapped source rows decided; final proof pending
-Starting HEAD: c3895c140; branch and cwd verified, clean tree. B0: dbe5c432852837ea01e6025b35868bcb7271495d. SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4.
+State: ready-for-review / publication 1 of 3
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Final content pin: cd82746a8ba169600d987eeb0f5ca274304712f3
+Last green both-prior D/E/native proof inventory: de742ae91dce1430aa727a8feaf1ad1f96f85001
+Lead reports: c3895c140; notes verbatim, ordinary mode.
 
-Scope: apply committed ordinary ok verdicts pinned to c3895c140 with verbatim notes; prove D/E/native equality and persist compact registry. Correct U8 required flags and U26 RUL60 under A19; rebind six dependent rows under A22. Decide 95 remaining source rows pending per map/Q5/N1, publish bounded full-text/digest packs under A36, extend native candidate list, and prepare final truth population without drawing. AGENTS.md/CLAUDE.md wait for Step 10. No promotion, push, main merge/write, Step 6 or protected-tool edits. Applied 296 ok binding verdicts (292 source, four gaps) with notes verbatim; three fragment-truth ok acceptances recorded separately. Both-prior D zero fatal; both scoped E equal exactly four pending source rows, two existing IO gaps, 792 candidate tuples. Native known/full tuple equality and compact registry persistence pass; 39 tests pass. Seven prior A exemptions retained. Source work now decides all 1,072 rows: 968 reviewed / 104 pending / zero undecided. New 95 rows are 74 Weak-exact and 21 Judgment, all pending. Six dependent bindings rebound; four new native predecessor gaps and four stable heading payload updates explicitly accounted. Native 94,766 -> 94,865 known IDs, none lost; 830 candidate tuples (792 unchanged + 38 new). Compact registry 59,723,017 bytes, below 90 MB. Final truth population of 350 units is published as truth-population-261014-1950-root-authorities-final.md and its .json sidecar, pinned to cd82746a8 final content. No author draw. Both extended Markdown carriers pass promotion-metadata completeness; global report-only gaps remain for later steps. Requests prepared but not yet published. Remaining closure: pending source/native reviews, five generated rows, two IO historical gaps, fresh 30-unit independent truth draw, sampled blocks/hostile pass, reader/alias/link preview and final batch report/checkpoint obligations. No holds in root hold list; earlier area exceptions/residuals unchanged. No technical blocker identified.
+Applied 296 ok binding verdicts (292 source, four gaps); three corrected-fragment truth ok acceptances recorded separately. Accepted count/depth nits unchanged. U8 now names all five required flags (--title, --description, --kind, --risk, --verify), --id optional. RUL60 now describes live wrapper step 4 on raw text before item creation, domain-only classification and optional rewritten title/description/question; step 5 submits, step 6 reports, discovery judges real values. Only those two fragments change; evidence has exact file:line, git blobs and excerpt hashes. Six dependent rebindings plus two newly surfaced native fragment predecessors = eight pending conservation rows in the truth request. No approval carry or other truth sweep.
+
+All 1,072 mapped source rows decided: 968 reviewed / 104 pending / zero undecided. New 95 rows: foundations 68, lifecycle vision 25, JSON/YAML contracts 2; 74 Weak-exact / 21 Judgment, all pending. Existing candidate summary prose preserved; complete legacy laws/vision added with heading depth +1, all wording/thresholds/open questions intact. Whole contract payloads byte-equal. Sources/consumers unchanged; AGENTS.md/CLAUDE.md wait for Step 10. Both extended Markdown carriers have complete promotion metadata; no promotion performed. Two intentional new duplicate-content groups, exactly one mapped owner each, shown in pack 2; their resolution projection and consumer rewrites remain batch obligations after independent acceptance.
+
+Final both-prior D: exit 0, zero fatal, entire outputs identical. Final full-map scoped E: identical expected red, exactly 104 not-reviewed rows, six historical gaps without disposition and 830 candidate-unverified tuples. 104 = 99 ordinary source rows (95 new + four direct truth rebindings) plus five existing native generated backlog rows. Six gaps all pre-exist c3895c140 with unchanged full tuples: two architecture-manifest, one YAML contract, one backlog and two IO. The final full-map scope exposes four that the prior 27-source subset excluded; no new source gap is introduced or silently waived. Full IDs/digests: root-source-open-historical-gaps-turn22.json. Six pending native predecessor decisions (two older truth, two new truth, two header) are separately enumerated even where pending dispositions remove a native open category. No Step 5 closure claim.
+
+Native equality: 94,766 old known IDs retained, 94,865 current known IDs; unaffected full tuples unchanged, active registry/inventory full tuples equal. Four stable heading digest updates and four native predecessor gaps correspond exactly to the authorized two fragments and two candidate headers; zero new retired units, no identity graft. Candidate list 830 = all 792 prior full rows preserved + 38 newly included native tuples, all eligible under A28. Prior area lists/holds/exceptions/A34 residuals and original truth artifacts unchanged. Compact persisted registry native-byte-equal, one line, 59,723,017 bytes, SHA256 7b7e8645cf9609688ae83d43ac821d5f0c093755845bcf712102d3c210b04ec0 (below 90 MB).
+
+Final truth population committed at 90484a740: truth-population-261014-1950-root-authorities-final.md and its .json sidecar, 350 current-content units over final bytes; no author draw. Reviewer draws 30 under A35/A28, records seed and IDs, checks every current assertion and applies >10% rule. Original sample/population/report untouched. Full promotion truth review remains owed.
+
+Preservation A/B/C/F/H/I passes, exactly seven prior A exemptions; frozen source files/extractor/witnesses/payloads/statuses/reader links unchanged. Ratchet 995/25/1; placement 529/528/one existing exception/zero gaps; H zero findings. Relevant tests with env -u CLAUDE_CODE_SESSION_ID: 39/39, zero fail/cancel/skip/todo. GitNexus own scope LOW, zero affected processes, no production symbol edit. No full-suite, installed-release, gateway or full truth certification.
+
+Bounded requests (all shown before/after text and full native/shown 64-hex digests; A36 differing sets listed; reviewer draws samples):
+- review-request-261014-1950-root-required-fields-wrapper-rework.md — two truth fragments and eight conservation rows.
+- review-request-261014-1950-root-source-completion-01.md — 75 source rows, 14 differing-digest rows.
+- review-request-261014-1950-root-source-completion-02.md — 20 source rows, two header predecessors, 42 accounting entries (two stable headings, 38 candidate tuples, two duplicate groups): 64 total; nine differing-digest decisions.
+Published this update: review-request-261014-1950-root-required-fields-wrapper-rework.md
+Earlier published packs: none
+Final verification and complete reproducible commands/helpers: root-source-completion-verification-turn22.json. Source/fragment/native accounting: root-source-conservation-turn22.json, root-source-bindings-turn22.json, root-source-truth-fragments-turn22.json, root-source-native-accounting-turn22.json.
+
+Remaining Step 5 closure: independent verdicts on all three requests; five native generated backlog rows (already regenerate-from-source, still pending); six historical gaps; fresh independent 30-unit truth draw over the 350-unit population; independent 50-block invented-claim sample and hostile pass; reader key/two fresh readers/three scenarios; link preview/draft aliases; final batch-boundary sync/accounting and reruns; batch report/owner effort checkpoint with explicit holds, exceptions, duplicate groups and cutover residuals. Root holds/identical-owner exceptions are empty in final E; earlier area holds/exception groups and A34 residuals unchanged. No new owner question.
+
+Current commits before this publication: f0efa3330 (resume), b50a08bc8 (verdict application), 86ce0d284 (carriage), cd82746a8 (two truth fragments), de742ae91 (pending rows/native registry), 90484a740 (final population), no pack yet.
+Blockers: no technical blocker, no unexplained failing proof, no format-blocked Lead row. Explained scratch obstacles: explicit add needed for untracked application evidence; new-gap membership compares gap sets (not all known IDs); legacy Pilot source prefixes remain unchanged while full shown native digests verify them; historical-gap equality uses the ledger overlay. No checker/gate/baseline/vocabulary/extractor change.
+Next action: Publish the remaining bounded pack(s), updating progress after each; then STOP.
+No promotion, push, rebase, main write/merge, Step 6, protected-tool edit or secret-file read.
 
 Earlier progress follows intact.
 
