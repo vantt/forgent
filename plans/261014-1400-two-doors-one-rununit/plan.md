@@ -134,6 +134,15 @@ Người giữ các file dùng chung theo từng bước được ghi ở [proto
   - R4b (guard A4 chưa thấy `import()` động / `createRequire`, ví dụ `dispatch/assignment.mjs:99` nạp harness của domain) chuyển sang phase 11.
   - `node src/runner/dispatch.mjs decide --work` vẫn có thể ghi config mặc định trước khi từ chối. Mức Low, có từ trước.
 
+- Activate sau G-M2 (2026-10-15 02:05), release `sha256:fee5e262…` build từ main `cb0acb254`:
+  - forgentX: `previousArtifactDigest` `0f0d988e…`; qua `fgos` trần: `--help --json` 3.0, `dispatch execute` báo đã xoá, one-liner đọc `unit-run-1792004798347-1422b4d7` pass.
+  - mdview: `fgos setup`, không còn chỗ dạy cửa cũ, doctor 101/108 (đỏ có từ trước), one-liner đọc pass (`unit-run-1792004621503-1eab1147`).
+  - mcp-skill-hub: `fgos setup`, không còn chỗ dạy cửa cũ, doctor 104/108 (đỏ có từ trước). One-liner ban đầu bị `posture-unavailable`, vì config riêng (local, không track) chỉ có `openai` kiểu cũ: không `id`, không confine, và `modelPolicies` thiếu tier. Lead chép bộ executor agent và `modelPolicies` của mdview sang (backup `.fgos/config.json.bak-20261015-before-executors`); one-liner pass (`unit-run-1792004730344-5fb50674`). Rollback cả hai: `fgctl repair` về `bbea6dba…` rồi `fgos setup`.
+- Item riêng, phát hiện khi activate:
+  - `~/.fgos/config.json` chỉ có `openai`/`pi` kiểu cũ (không confine). Project nào không tự khai executor có confine thì `fgos run` không chạy được.
+  - `fgos doctor` chưa có check "không executor nào mang được posture read-only/workspace-write". Lỗi này chỉ lộ khi chạy thật.
+  - Từ lane timeout: `workflow start` chưa có `--timeout`. Từ lane sync: Q2 (`--sync` bắt buộc `--writes`) và Q3 (producer inline).
+
 ## Disposition review
 
 V = [validate-plan-against-code.md](reports/validate-plan-against-code.md), R = [red-team-plan.md](reports/red-team-plan.md).
