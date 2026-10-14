@@ -275,11 +275,18 @@ test('a mutating unit-run brief names the write scope, leaves the commit to the 
     effectiveContract: UNIT_RUN_CONTRACT('mutating'),
   });
   assert.match(prompt, /^- Write only files inside this scope \(repo-relative\):\n {2}- docs\n {2}- src\/runner\/\*\*\/\*\.mjs$/m);
-  assert.match(prompt, /^- Do not run `git add` or `git commit`: the runner commits after the round passes, and only the files inside the scope\.$/m);
+  assert.match(prompt, /^- Do not run `git add` or `git commit`, even if the task above asks you to: the runner commits after the round passes, and only the files inside the scope\.$/m);
+  assert.match(prompt, /^- Your result files \(agent-result\.json and its report, named below\) are the exception: they sit outside the workspace, writing them is required, and they never go in "needsWrites"\.$/m);
   assert.match(prompt, /^- The first line of "summary" is the commit subject, in conventional form: `type\(scope\): \.\.\.`\.$/m);
   assert.match(prompt, /^- Need to write a file outside the scope\? Do not write it: list it in "needsWrites": \[<path>, \.\.\.\] in agent-result\.json and say why in "summary"\.$/m);
   // The mount is the whole worktree; the line naming it must not read as leave to write anywhere in it.
   assert.match(prompt, /^- Write scope: docs, src\/runner\/\*\*\/\*\.mjs \(the workspace mount \/tmp\/fgos-unit-brief\/worktree is wider; write only inside the scope\)$/m);
+});
+
+test('a mutating unit-run seat that is not named producer gets the same runner-commit lines: the runner commits any passing mutating round', () => {
+  const prompt = renderAssignmentPrompt(unitRunAssignment({ role: 'author', writes: ['docs'] }), { runDir: '/tmp/fgos-unit-brief/runs/01' });
+  assert.match(prompt, /^- Write only files inside this scope \(repo-relative\):\n {2}- docs$/m);
+  assert.match(prompt, /the runner commits after the round passes/);
 });
 
 test('a read-only unit-run brief and a declared Work brief carry none of the runner-commit lines', () => {

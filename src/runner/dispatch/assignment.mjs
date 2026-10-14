@@ -879,9 +879,10 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     lines.push('Write scope:');
     lines.push('- Write only files inside this scope (repo-relative):');
     lines.push(...(scope.length > 0 ? scope.map((entry) => `  - ${entry}`) : ['  - (none declared: the runner commits nothing)']));
-    lines.push('- Do not run `git add` or `git commit`: the runner commits after the round passes, and only the files inside the scope.');
+    lines.push('- Do not run `git add` or `git commit`, even if the task above asks you to: the runner commits after the round passes, and only the files inside the scope.');
     lines.push('- The first line of "summary" is the commit subject, in conventional form: `type(scope): ...`.');
     lines.push('- Need to write a file outside the scope? Do not write it: list it in "needsWrites": [<path>, ...] in agent-result.json and say why in "summary".');
+    lines.push('- Your result files (agent-result.json and its report, named below) are the exception: they sit outside the workspace, writing them is required, and they never go in "needsWrites".');
   }
 
   // Step 04 §5.1: include concrete result artifact paths when runDir is known.

@@ -710,7 +710,8 @@ export async function settleRunOutcome({
 
   // The scope the assignment declared (a unit's writes): a change inside it is covered, one outside
   // it warns. Coverage says "inside the declared scope", never "written by this run".
-  const declaredWrites = Array.isArray(assignment?.writes) && assignment.writes.length > 0 ? assignment.writes : null;
+  // A read-only seat in a writing unit carries the unit's writes too, but none of them are its own.
+  const declaredWrites = !isReadOnly && Array.isArray(assignment?.writes) && assignment.writes.length > 0 ? assignment.writes : null;
   const declaredCoverage = declaredWrites ? { paths: declaredWrites } : null;
   const evidenceData = {
     operationMutability: isReadOnly ? 'read-only' : 'mutates-repo',

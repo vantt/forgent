@@ -1653,7 +1653,7 @@ test('done findings survive both settlement branches; verified mutating work sti
 
 // A round's changes are matched against the scope its assignment declared: inside it they are
 // covered, outside it they warn. Without a declared scope, coverage was never checked at all.
-function scopedWriteRun({ writes, claim }) {
+function scopedWriteRun({ writes, claim, stage = 'executing', operation = 'implement-item' }) {
   const tempDir = mkTempDir();
   execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempDir, stdio: 'ignore' });
@@ -1682,9 +1682,10 @@ function scopedWriteRun({ writes, claim }) {
     modelPolicies: { claude: { standard: 'test-model' } },
     timeoutMs: 5000,
   };
-  const declared = buildAssignment({ workId: `tsk-scoped-${path.basename(tempDir).slice(-6).toLowerCase()}`, stage: 'executing', operation: 'implement-item' });
+  const declared = buildAssignment({ workId: `tsk-scoped-${path.basename(tempDir).slice(-6).toLowerCase()}`, stage, operation });
   const assignment = writes === undefined ? declared : { ...declared, writes };
-  return executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+  return executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig })
+    .finally(() => fs.rmSync(executorScript, { force: true }));
 }
 
 const DONE_CLAIM = {
@@ -1707,7 +1708,8 @@ test('a change inside the declared writes is covered and only the one outside wa
 
 test('needsWrites leaves a claim valid and reaches the RunResult agentClaim unchanged', async () => {
   const result = await scopedWriteRun({ writes: ['docs/**/*.md'], claim: DONE_CLAIM });
-  assert.notEqual(result.classification.outcome.category, 'failed');
+  assert.equal(result.classification.outcome.category, 'ok', 'a claim made invalid by needsWrites would settle failed');
+  assert.equal(result.classification.execution.status, 'completed');
   assert.deepEqual(result.agentClaim.needsWrites, ['src/out.mjs']);
   const byPath = Object.fromEntries(result.evidence.attribution.map((a) => [a.path, a]));
   assert.equal(byPath['docs/guide/a.md'].coverageMatched, true, 'a glob entry covers a file it matches whole');
@@ -1718,4 +1720,11 @@ test('an assignment without writes keeps the old attribution: nothing covered, n
   assert.ok(result.evidence.attribution.length >= 2);
   assert.ok(result.evidence.attribution.every((a) => a.coverageMatched === false));
   assert.equal((result.warnings ?? []).some((w) => w.code === 'outside-write-scope-correlated'), false);
+});
+
+test('a read-only seat that carries its unit\'s writes gets no coverage from them: none of them are its own', async () => {
+  const result = await scopedWriteRun({ writes: ['docs'], claim: DONE_CLAIM, stage: 'planning', operation: 'validate-plan' });
+  assert.equal(result.evidence.operationMutability ?? 'read-only', 'read-only');
+  assert.ok(result.evidence.attribution.every((a) => a.coverageMatched === false));
+  assert.ok((result.warnings ?? []).some((w) => w.code === 'read-only-mutation-correlated'));
 });
