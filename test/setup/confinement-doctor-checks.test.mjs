@@ -19,6 +19,7 @@ import {
   checkConfinementOrphanedResourcesReaped,
   fixConfinementOrphanedResourcesReaped,
   defaultConfinementTempRoots,
+  credentialScanRoots,
 } from '../../src/setup/registrations.mjs';
 import { writeOwnershipMarker, reapOrphanedConfinementResources } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 
@@ -618,4 +619,46 @@ test('N2: fixConfinementBackendRegistryReadable returns skipped contract on corr
     delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+function withRegistry(doc, fn) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-roots-registry-'));
+  const previous = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  try {
+    const registryPath = path.join(dir, 'confinement-backends.json');
+    fs.writeFileSync(registryPath, JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: doc(dir) }));
+    process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = registryPath;
+    return fn(dir);
+  } finally {
+    if (previous === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = previous;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+test('credentialScanRoots adds the tempRoot and privateHomeRoot a registered backend declares, absolute and without duplicates', () => {
+  withRegistry((dir) => ({ bwrap: { type: 'bwrap', tempRoot: `${dir}/temp/`, privateHomeRoot: `${dir}/homes` } }), (dir) => {
+    const roots = credentialScanRoots();
+    assert.ok(roots.includes(path.join(dir, 'temp')), 'a trailing slash does not make a second root');
+    assert.ok(roots.includes(path.join(dir, 'homes')));
+    assert.ok(roots.includes(path.join(os.tmpdir(), 'fgos-confinement')), 'the default root stays');
+    assert.equal(new Set(roots).size, roots.length);
+    assert.ok(roots.every((root) => path.isAbsolute(root)));
+  });
+});
+
+test('the orphan reaper and the root-mode check do not reach a registry root: only the credential scan reads it', () => {
+  withRegistry((dir) => ({ bwrap: { type: 'bwrap', tempRoot: path.join(dir, 'temp'), privateHomeRoot: path.join(dir, 'homes') } }), (dir) => {
+    assert.equal(defaultConfinementTempRoots().some((root) => root.startsWith(dir)), false, 'the reaper list names no registry root');
+    const homes = path.join(dir, 'homes');
+    fs.mkdirSync(path.join(homes, 'unrelated-empty-subdir'), { recursive: true });
+    fs.chmodSync(homes, 0o775);
+    const longAgo = (Date.now() - 48 * 60 * 60 * 1000) / 1000;
+    fs.utimesSync(path.join(homes, 'unrelated-empty-subdir'), longAgo, longAgo);
+    const fixed = fixConfinementOrphanedResourcesReaped();
+    assert.equal(typeof fixed.changed, 'boolean');
+    assert.equal(fs.existsSync(path.join(homes, 'unrelated-empty-subdir')), true, 'nothing is removed from the registry root');
+    assert.equal(fs.statSync(homes).mode & 0o777, 0o775, 'its mode is not tightened');
+    assert.equal(checkConfinementOrphanedResourcesReaped().message.includes(homes), false);
+  });
 });

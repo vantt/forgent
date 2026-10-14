@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { bwrapDriver } from './drivers/bwrap.mjs';
-import { resolveConfinementTempRoot } from './cleanup.mjs';
+import { resolveConfinementTempRoot, canonicalRoot } from './cleanup.mjs';
 
 export class ConfinementBackendRegistryError extends Error {
   constructor(message) {
@@ -343,7 +343,8 @@ export function ensureMachineBackendRegistryDefaults(registryPath = resolveMachi
 /**
  * Every temp root private homes can live under: the default one plus each registered backend's own
  * `tempRoot`. An unreadable or malformed registry is reported by its own doctor check; the default root
- * alone is used meanwhile.
+ * alone is used meanwhile. This list also drives the orphan reaper and the root-mode tightening, so it
+ * names only roots fgOS owns.
  */
 export function defaultConfinementTempRoots() {
   const roots = new Set([resolveConfinementTempRoot()]);
@@ -353,5 +354,25 @@ export function defaultConfinementTempRoots() {
       if (instance?.config?.tempRoot) roots.add(instance.config.tempRoot);
     }
   } catch { /* the default root only */ }
+  return [...roots];
+}
+
+/**
+ * Every root a private home with a retained login can live under, for the read-only scan of kept homes: the
+ * roots above plus each registered backend's `tempRoot` and `privateHomeRoot` (a registered instance is its
+ * own config, spec §6.2; resources.mjs allocates a home under `privateHomeRoot` first). Absolute and without
+ * duplicates, so `/x` and `/x/` are one root. Nothing deletes or re-modes these roots: they are scanned for
+ * kept logins only.
+ */
+export function credentialScanRoots() {
+  const roots = new Set(defaultConfinementTempRoots().map(canonicalRoot));
+  try {
+    const registry = loadMachineBackendRegistry();
+    for (const instance of Object.values(registry?.confinementBackends || {})) {
+      for (const root of [instance?.tempRoot, instance?.privateHomeRoot]) {
+        if (typeof root === 'string' && root.trim()) roots.add(canonicalRoot(root));
+      }
+    }
+  } catch { /* the default roots only */ }
   return [...roots];
 }

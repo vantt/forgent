@@ -20,7 +20,7 @@ Phase 01 keeps a login that may hold the only valid refresh token in `pending/` 
 - The staged file, its directory and the pending directory are synced before the home may go; the test checks each sync on its own.
 - A held home settled into the pending copies no longer reads the source twice to decide: nothing depends on that decision any more.
 - A login store a probe left half-written is kept under `torn/` for hand recovery, outside the copies that are applied or dropped, and is reported by the doctor check. Basis: pi rewrites its store in place; omp commits through SQLite (plan question 4).
-- Not in this phase: the `.tmp-*` staging directories left by a crash, and homes under `privateHomeRoot`.
+- Done in the follow-up (2026-10-14): the `.tmp-*` staging directories left by a crash are reported and swept only when provably unneeded, homes under `privateHomeRoot` are scanned, the over-limit line names its store, and staging no longer copies `-shm`.
 
 ## Files
 

@@ -398,8 +398,10 @@ function ompEntries(db) {
 const ompLayout = {
   name: 'omp-agent-db',
   files: ['agent.db'],
-  // Written beside the store while it is open (write-ahead log, or rollback journal in another mode); a login
-  // renewed after the last checkpoint lives only here. The shared-memory index (`-shm`) carries no data.
+  // Written beside the store while it is open. A login renewed after the last checkpoint lives only in the
+  // write-ahead log. A hot rollback journal holds the pages as they were before the transaction, so it is kept
+  // for the files it guards, not for a newer login: a copy staged with one stays for hand recovery. The
+  // shared-memory index (`-shm`) carries no data, and SQLite rebuilds it from the log.
   sidecars: ['agent.db-wal', 'agent.db-journal'],
   read(home, { loadSqlite }) {
     const file = path.join(home, 'agent.db');
@@ -464,7 +466,7 @@ const ompLayout = {
     if (snapshotSqliteFile(path.join(copyHome, 'agent.db'), destination, { loadSqlite })) return;
     // No snapshot (the module is unavailable, or the file cannot be opened): the files as they are, write-ahead
     // log and rollback journal included. The pane's processes are already stopped, so nothing is writing to them.
-    for (const suffix of ['', '-wal', '-journal', '-shm']) {
+    for (const suffix of ['', '-wal', '-journal']) {
       const from = path.join(copyHome, `agent.db${suffix}`);
       try {
         fs.statSync(from);
@@ -648,11 +650,117 @@ function listLeftovers(accountDir) {
 const hasLeftovers = (accountDir) => listLeftovers(accountDir).length > 0;
 
 /**
- * Accounts whose pending copies exceed MAX_PENDING_COPIES, `[{provider, accountId, count}]`. Nothing is
- * dropped to get back under the limit unless it is a redundant duplicate, so an account can stay over it.
+  * Login stores whose pending copies exceed MAX_PENDING_COPIES, `[{provider, accountId, store, count, storeDir,
+  * stranded}]` (`store`: the CLI of a per-CLI store, null for an account's single store). Nothing is
+  * dropped to get back under the limit unless it is a redundant duplicate, so an account can stay over it.
+  * `stranded` is judged as in inspectRetainedCredentialCopies.
  */
-export function inspectPendingCopiesOverLimit({ runtimeDir }) {
+export function inspectPendingCopiesOverLimit({ runtimeDir, inventory } = {}) {
   const found = [];
+  for (const { provider, accountId, store, storeDir, stranded } of listCredentialStoreDirs(runtimeDir, inventory)) {
+    let count = 0;
+    try { count = fs.readdirSync(path.join(storeDir, PENDING_DIR)).filter((n) => !n.startsWith('.')).length; } catch { /* none */ }
+    if (count > MAX_PENDING_COPIES) found.push({ provider, accountId, store, count, storeDir, stranded });
+  }
+  return found;
+}
+
+// ---------------------------------------------------------------------------------------------------
+// Interrupted stagings: `pending/.tmp-<pid>-<id>` is a copy being staged. A crash before the rename leaves it
+// behind, possibly part of a login, and the leftover listing skips hidden names, so nothing applies it. It is
+// reported, and removed only when it is provably not needed.
+//
+// The writer stages without the account lock, so the process id in the name is not proof that the writer is
+// gone (another host sharing the runtime directory, another pid namespace). Two guards stand in for it: a
+// staging is touched only when it has not changed for STAGING_MIN_AGE_MS, and the sweep first claims it by
+// renaming it to a name of its own. A writer that is still running then fails its own rename and keeps its
+// private home; a sweep that loses the race leaves the staging alone.
+// ---------------------------------------------------------------------------------------------------
+
+const SWEEP_PREFIX = '.sweep-';
+const STAGING_NAME = /^\.(?:tmp|sweep)-(\d+)-/;
+/** A staging is a few file copies and syncs; one that has not changed for this long is not being written. */
+export const STAGING_MIN_AGE_MS = 10 * 60 * 1000;
+
+function listInterruptedStagings(storeDir) {
+  const pendingDir = path.join(storeDir, PENDING_DIR);
+  try {
+    return fs.readdirSync(pendingDir).filter((n) => STAGING_NAME.test(n)).sort().map((n) => path.join(pendingDir, n));
+  } catch { return []; }
+}
+
+// A staging whose writer is still running is being written, not left behind. The pid is in the name; one that
+// cannot be read or looked up counts as alive, so an unclear case is kept.
+function stagingWriterAlive(dir) {
+  const pid = Number(STAGING_NAME.exec(path.basename(dir))?.[1]);
+  if (!Number.isInteger(pid) || pid <= 0) return true;
+  try { process.kill(pid, 0); return true; } catch (err) { return err?.code !== 'ESRCH'; }
+}
+
+// Whether a staging is old enough to be left behind: its own change time and that of what it holds.
+function stagingAgeMs(dir, now) {
+  try {
+    const entries = fs.readdirSync(dir).map((n) => fs.lstatSync(path.join(dir, n)).mtimeMs);
+    return now - Math.max(fs.lstatSync(dir).mtimeMs, ...entries);
+  } catch { return -Infinity; }
+}
+
+// Digest of every file under `dir` (names and bytes), or null when anything cannot be read or is not a plain
+// file. The shared-memory index (`-shm`) is left out: SQLite creates it inside any copy it opens and it
+// carries no data. In memory only.
+function treeDigest(dir) {
+  const hash = crypto.createHash('sha256');
+  const walk = (current) => {
+    for (const entry of fs.readdirSync(current, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      const full = path.join(current, entry.name);
+      if (entry.isDirectory()) { if (!walk(full)) return false; continue; }
+      if (!entry.isFile()) return false;
+      if (entry.name.endsWith('-shm')) continue;
+      hash.update(path.relative(dir, full)).update('\u0000').update(fs.readFileSync(full)).update('\u0001');
+    }
+    return true;
+  };
+  try { return walk(dir) ? hash.digest('hex') : null; } catch { return null; }
+}
+
+// `{layoutName, sourceHome}` is what a store's source login is judged by. `resolveStore({provider, accountId,
+// store})` returns it, `null` when the store cannot be judged, or `'stranded'` when the account's layout no
+// longer reads that store (nothing there is touched). Without a resolver nothing is judged by the source.
+function sweepOneStaging({ staging, kept, judge, tryLock, runtimeDir, provider, accountId, now, loadSqlite }) {
+  const original = staging;
+  const claimed = path.join(path.dirname(staging), `${SWEEP_PREFIX}${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
+  try { fs.renameSync(staging, claimed); } catch { return 'kept'; }
+  const restore = () => { try { fs.renameSync(claimed, original); } catch { /* stays under the sweep's own name, still reported */ } return 'kept'; };
+  let removable = false;
+  try {
+    if (fs.lstatSync(claimed).isDirectory() && fs.readdirSync(claimed).length === 0) removable = true;
+    if (!removable) {
+      const digest = treeDigest(claimed);
+      if (digest !== null && kept().has(digest)) removable = true;
+    }
+    if (!removable && judge) {
+      // The source's verdict is read under the account lock, like every other judgement of a copy against it.
+      const lock = tryLock({ runtimeDir, provider, accountId });
+      if (lock) {
+        try { removable = judgeCopy({ layout: LAYOUTS[judge.layoutName], provider, sourceHome: judge.sourceHome, copyHome: claimed, now, loadSqlite }) === 'not-newer'; }
+        catch { removable = false; } finally { try { lock.release(); } catch { /* nothing held */ } }
+      }
+    }
+  } catch { removable = false; }
+  if (!removable) return restore();
+  try { fs.rmSync(claimed, { recursive: true, force: true }); return 'removed'; } catch { return restore(); }
+}
+
+/**
+ * Remove the interrupted stagings that are provably not needed. A staging is considered only when its writer
+ * is gone and it has not changed for STAGING_MIN_AGE_MS; it is claimed by rename first. It goes when it is
+ * empty, or has the same files as a copy the store already keeps in `pending/` or `torn/` (the shared-memory
+ * index aside), or, under the account lock, the account's source login proves it is not newer or it is
+ * malformed. Anything else stays for hand recovery. A store the account's layout no longer reads is never
+ * touched. Counts only; no names, no values.
+ */
+export function sweepInterruptedStagings({ runtimeDir, resolveStore, now = Date.now(), minAgeMs = STAGING_MIN_AGE_MS, tryLock = tryAcquireAccountLock, loadSqlite = defaultLoadSqlite } = {}) {
+  const result = { removed: 0, kept: 0 };
   const root = path.join(runtimeDir, 'account-locks');
   const subdirs = (dir) => {
     try { return fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); } catch { return []; }
@@ -660,16 +768,32 @@ export function inspectPendingCopiesOverLimit({ runtimeDir }) {
   for (const provider of subdirs(root)) {
     for (const accountId of subdirs(path.join(root, provider))) {
       const accountDir = path.join(root, provider, accountId);
-      // An account with one login store per CLI keeps each store's pending copies under stores/<cli>.
-      const storeDirs = [accountDir, ...subdirs(path.join(accountDir, 'stores')).map((cli) => path.join(accountDir, 'stores', cli))];
-      for (const storeDir of storeDirs) {
-        let count = 0;
-        try { count = fs.readdirSync(path.join(storeDir, PENDING_DIR)).filter((n) => !n.startsWith('.')).length; } catch { /* none */ }
-        if (count > MAX_PENDING_COPIES) found.push({ provider, accountId, count });
+      const stores = [{ store: null, dir: accountDir }, ...subdirs(path.join(accountDir, 'stores')).map((cli) => ({ store: cli, dir: path.join(accountDir, 'stores', cli) }))];
+      for (const { store, dir: storeDir } of stores) {
+        const stagings = listInterruptedStagings(storeDir);
+        if (stagings.length === 0) continue;
+        const resolved = resolveStore ? resolveStore({ provider, accountId, store }) : null;
+        if (resolved === 'stranded') continue;
+        let keptDigests = null;
+        const kept = () => {
+          if (keptDigests !== null) return keptDigests;
+          keptDigests = new Set();
+          for (const sub of [PENDING_DIR, TORN_DIR]) {
+            let names = [];
+            try { names = fs.readdirSync(path.join(storeDir, sub)).filter((n) => !n.startsWith('.')); } catch { /* none */ }
+            for (const n of names) { const d = treeDigest(path.join(storeDir, sub, n)); if (d !== null) keptDigests.add(d); }
+          }
+          return keptDigests;
+        };
+        for (const staging of stagings) {
+          if (stagingWriterAlive(staging) || stagingAgeMs(staging, now) < minAgeMs) continue;
+          const outcome = sweepOneStaging({ staging, kept, judge: resolved, tryLock, runtimeDir, provider, accountId, now, loadSqlite });
+          if (outcome === 'removed') result.removed += 1; else result.kept += 1;
+        }
       }
     }
   }
-  return found;
+  return result;
 }
 
 /**
@@ -677,8 +801,37 @@ export function inspectPendingCopiesOverLimit({ runtimeDir }) {
  * with the staging time) and scratch homes a dead runner left (age by modification time). Read-only;
  * names, kinds and ages only. Only copies at least `minAgeMs` old are listed: a younger one is simply
  * waiting for the next renewal.
+ *
+ * With the provider account `inventory`, each copy also says whether it is `stranded`: it sits in a store
+ * directory the account's current layout never reads (the account root after the account moved to one
+ * store per CLI, `stores/<cli>` after it went back to one store or dropped that CLI, or an account the
+ * inventory no longer lists), so no dispatch will ever apply it, and it is listed at any age. `storeDir`
+ * names that directory. Without an inventory nothing is judged stranded.
  */
-export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), minAgeMs = 0 }) {
+export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), minAgeMs = 0, inventory } = {}) {
+  const found = [];
+  const tornIn = (dir) => { try { return fs.readdirSync(path.join(dir, TORN_DIR)).filter((n) => !n.startsWith('.')).map((n) => path.join(dir, TORN_DIR, n)); } catch { return []; } };
+  for (const { provider, accountId, storeDir, stranded } of listCredentialStoreDirs(runtimeDir, inventory)) {
+    const interrupted = listInterruptedStagings(storeDir).filter((d) => !stagingWriterAlive(d) && stagingAgeMs(d, now) >= STAGING_MIN_AGE_MS);
+    for (const dir of [...listLeftovers(storeDir), ...tornIn(storeDir), ...interrupted]) {
+      const name = path.basename(dir);
+      const staged = /^(\d{15})-/.exec(name);
+      let at;
+      if (staged) at = Number(staged[1]);
+      else { try { at = fs.statSync(dir).mtimeMs; } catch { continue; } }
+      const ageMs = now - at;
+      const torn = path.basename(path.dirname(dir)) === TORN_DIR;
+      const staging = STAGING_NAME.test(name);
+      if (ageMs >= minAgeMs || torn || staging || stranded) found.push({ provider, accountId, kind: torn ? 'torn' : staging ? 'staging' : staged ? 'pending' : 'scratch', ageMs, storeDir, stranded });
+    }
+  }
+  return found;
+}
+
+// Every store directory under the runtime's account locks: the account directory, and `stores/<cli>` under
+// it for an account that keeps one store per CLI. With an inventory each says whether the account's current
+// layout reads it (`stranded: false`) or never does (`stranded: true`); without one nothing is stranded.
+function listCredentialStoreDirs(runtimeDir, inventory) {
   const found = [];
   const root = path.join(runtimeDir, 'account-locks');
   const subdirs = (dir) => {
@@ -687,21 +840,26 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
   for (const provider of subdirs(root)) {
     for (const accountId of subdirs(path.join(root, provider))) {
       const accountDir = path.join(root, provider, accountId);
-      // An account with one login store per CLI keeps each store's copies under stores/<cli>.
-      const storeDirs = [accountDir, ...subdirs(path.join(accountDir, 'stores')).map((cli) => path.join(accountDir, 'stores', cli))];
-      const tornIn = (dir) => { try { return fs.readdirSync(path.join(dir, TORN_DIR)).filter((n) => !n.startsWith('.')).map((n) => path.join(dir, TORN_DIR, n)); } catch { return []; } };
-      for (const dir of storeDirs.flatMap((storeDir) => [...listLeftovers(storeDir), ...tornIn(storeDir)])) {
-        const name = path.basename(dir);
-        const staged = /^(\d{15})-/.exec(name);
-        let at;
-        if (staged) at = Number(staged[1]);
-        else { try { at = fs.statSync(dir).mtimeMs; } catch { continue; } }
-        const ageMs = now - at;
-        if (ageMs >= minAgeMs || path.basename(path.dirname(dir)) === TORN_DIR) found.push({ provider, accountId, kind: path.basename(path.dirname(dir)) === TORN_DIR ? 'torn' : staged ? 'pending' : 'scratch', ageMs });
-      }
+      const storeDirs = [{ store: null, dir: accountDir }, ...subdirs(path.join(accountDir, 'stores')).map((cli) => ({ store: cli, dir: path.join(accountDir, 'stores', cli) }))];
+      const readStoreDirs = inventory === undefined ? null : layoutStoreDirs(accountDir, inventoryAccount(inventory, provider, accountId));
+      for (const { store, dir: storeDir } of storeDirs) found.push({ provider, accountId, store, storeDir, stranded: readStoreDirs !== null && !readStoreDirs.has(storeDir) });
     }
   }
   return found;
+}
+
+// An inventory account by its own keys only: an id such as "constructor" never resolves to a built-in.
+export function inventoryAccount(inventory, provider, accountId) {
+  const accounts = inventory && Object.hasOwn(inventory, provider) ? inventory[provider]?.accounts : null;
+  return accounts && Object.hasOwn(accounts, accountId) ? accounts[accountId] : null;
+}
+
+// The store directories a dispatch reads for an inventory account: the account directory for one store,
+// `stores/<cli>` for each declared CLI otherwise; none for an account the inventory does not list.
+function layoutStoreDirs(accountDir, account) {
+  if (!account) return new Set();
+  if (account.credentialSources) return new Set(Object.keys(account.credentialSources).map((cli) => path.join(accountDir, 'stores', cli)));
+  return new Set([accountDir]);
 }
 
 function syncPath(target) {
