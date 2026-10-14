@@ -2793,6 +2793,17 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           if (ov.reasoningEffort === undefined) ov.reasoningEffort = effort;
         }
       }
+      // `--account <id>` pins the provider account the same way: an `account` key on every override
+      // that does not name one. runUnit checks it against each seat's bound executor before the unit
+      // run exists; a resumed run keeps the account its bindings already carry.
+      if (flags.account !== undefined) {
+        if (resumeUnitRunId) throw new StoreError('validation', '--account cannot change a resumed unit run: it keeps the account its seats were bound to');
+        const account = requireField(flags.account, '--account requires an account id (an entry of providers.<provider>.accounts in ~/.fgos/config.json)');
+        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({ origin: 'human-cli' });
+        for (const ov of overrides) {
+          if (ov.account === undefined) ov.account = account;
+        }
+      }
       const repoRoot = flags.dir;
       const worktree = flags.worktree;
       const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });

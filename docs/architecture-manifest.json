@@ -224,6 +224,7 @@
     "src/setup/instruction-projections.mjs": "infra",
     "src/runner/execution/unit.mjs": "infra",
     "src/runner/execution/bind.mjs": "infra",
+    "src/runner/execution/account-pin.mjs": "infra",
     "src/runner/execution/account-rotation.mjs": "infra",
     "src/runner/execution/dry-bind.mjs": "infra",
     "src/runner/execution/role-ledger.mjs": "infra",

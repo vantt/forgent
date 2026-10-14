@@ -386,3 +386,70 @@ test('a writing unit with its own prefer passes the mutating gate, also on a wal
   assert.equal(walked.outcome, 'pass', JSON.stringify(walked.results[0]).slice(0, 1500));
   assert.deepEqual(attemptsOf(fy.repoRoot, walked).map((a) => [a.binding.executor, a.outcome]), [['spent', 'provider-limit'], ['beta', 'pass']]);
 });
+
+// An account pinned by an override is hard: the seat runs that account, and a provider limit on it
+// ends the seat instead of rotating to another account or walking to another executor.
+const pin = (accountId) => ({ overrides: [{ origin: 'human-cli', account: accountId }] });
+const unitRuns = (fx) => {
+  const dir = path.join(fx.repoRoot, '.fgos', 'assignments');
+  return fs.existsSync(dir) ? fs.readdirSync(dir).filter((name) => name.startsWith('unit-run-')) : [];
+};
+
+test('a pinned account runs, even when the lease would rank another account first', { skip: SKIP }, async () => {
+  const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live', a2: 'live' } } }, { recentlyUsed: { alpha: ['a2'] } });
+  const res = await run(fx, solo('u-pin'), pin('a2'));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+  assert.equal(selectedAccount(fx.repoRoot, res, '1'), 'a2');
+  const [attempt] = attemptsOf(fx.repoRoot, res);
+  assert.deepEqual(attempt.binding.account, { provider: 'alpha', id: 'a2' });
+  assert.deepEqual(attempt.binding.provenance.account, { value: 'a2', source: 'override:human-cli' });
+});
+
+test('a provider limit on a pinned account ends the seat: no rotation, no other executor', { skip: SKIP }, async () => {
+  const fx = setup(
+    { alpha: { family: 'alpha', logins: { dead1: 'dead', live1: 'live' } }, beta: { family: 'beta' } },
+    { recentlyUsed: { alpha: ['live1'] } },
+  );
+  const res = await run(fx, solo('u-pin-limit'), pin('dead1'));
+  assert.equal(res.outcome, 'provider-limit');
+  assert.deepEqual(attemptsOf(fx.repoRoot, res).map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit']]);
+  const exhausted = res.results[0].fallbackExhausted;
+  assert.equal(exhausted.reason, 'account-pinned');
+  assert.match(exhausted.detail, /dead1/);
+  assert.equal(fs.existsSync(path.join(unitDirOf(fx.repoRoot, res), 'producer', '1-fb1')), false);
+});
+
+test('a quarantined pinned account is refused before any unit run exists, and a resume of a run pinned to it too', { skip: SKIP }, async () => {
+  const fx = setup(
+    { alpha: { family: 'alpha', logins: { spent1: 'quota', live1: 'live' } }, beta: { family: 'beta' } },
+    { recentlyUsed: { alpha: ['live1'] } },
+  );
+  const first = await run(fx, solo('u-pin-quota'), pin('spent1'));
+  assert.equal(first.outcome, 'provider-limit');
+  const until = inspectProviderCapacity({ runnerConfig: fx.runnerConfig, provider: 'alpha', runtimeDir: fx.runtimeDir }).providers.alpha.accounts.spent1.quarantine.until;
+  assert.ok(until);
+
+  const before = unitRuns(fx);
+  await assert.rejects(run(fx, solo('u-pin-quota-again'), pin('spent1')), (err) => {
+    assert.match(err.message, /account "spent1" of provider "alpha" is quarantined/);
+    assert.ok(err.message.includes(until), err.message);
+    return true;
+  });
+  assert.deepEqual(unitRuns(fx), before, 'no unit run was created');
+
+  await assert.rejects(runUnit({
+    resumeUnitRunId: first.unitRunId,
+    repoRoot: fx.repoRoot,
+    cwd: fx.worktreeDir,
+    worktree: fx.worktreeDir,
+    session: { herdrPresent: false, headless: true },
+    providerCapacityRuntimeDir: fx.runtimeDir,
+  }), (err) => err.message.includes('"spent1"') && err.message.includes(until));
+  assert.equal(attemptsOf(fx.repoRoot, first).length, 1, 'the resume dispatched nothing');
+});
+
+test('an account of another provider is refused before any unit run exists', { skip: SKIP }, async () => {
+  const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live' } }, beta: { family: 'beta', logins: { b1: 'live' } } });
+  await assert.rejects(run(fx, solo('u-pin-other'), pin('b1')), /"b1".*providers\.alpha\.accounts/);
+  assert.deepEqual(unitRuns(fx), []);
+});

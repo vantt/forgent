@@ -8,6 +8,7 @@ import { canApplyPosture, resolvePostureInvocation } from '../dispatch/confineme
 import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
 import { MODEL_POLICY_TIERS, assertReasoningEffort } from '../dispatch/config.mjs';
 import { resolveStrongerTier, TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
+import { resolveAccountPin } from './account-pin.mjs';
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
 
@@ -365,6 +366,16 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     }
   }
 
+  // 5b. Account: only an override pins one (`fgos run --account`, or `account` in `--override`).
+  // It must be an account of the chosen executor's own provider; the lease still picks it, from an
+  // inventory narrowed to it, so a quarantine or governance refusal stays where it was.
+  let account = null;
+  if (matchingOverride && matchingOverride.account !== undefined) {
+    const pin = resolveAccountPin(runnerConfig, { executorId, mechanism, accountId: matchingOverride.account });
+    if (pin.refused) return pin;
+    account = pin;
+  }
+
   // 6. Tier & Model (T)
   const unitRigor = unit?.rigor;
   const capRigor = capConfig?.rigor;
@@ -490,6 +501,10 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     };
   }
 
+  if (account) {
+    provenance.account = { value: account.id, source: `override:${matchingOverride.origin ?? 'unknown'}` };
+  }
+
   if (matchingOverride?.origin) {
     provenance.overridesOrigin = { value: matchingOverride.origin, source: 'override' };
   }
@@ -506,6 +521,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
     reasoningEffort,
     mechanism,
     posture,
+    ...(account ? { account } : {}),
     provenance,
   };
 }

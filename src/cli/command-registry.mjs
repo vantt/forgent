@@ -890,7 +890,7 @@ export const COMMAND_REGISTRY = [
   },
   {
     name: 'run',
-    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
+    invoke: 'fgos run ["<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] | --unit <file|-> | --resume <unitRunId>] [--pattern <name|preset>] [--override <json>] [--effort <low|medium|high|max>] [--account <id>] [--worktree <wt>] [--dir <mainRoot>] [--json]',
     description: 'Single execution door for Unit runs: headless execution of Units through collaboration patterns (solo, reviewed, panel). A "<prompt>" builds the Unit itself (read-only unless --writes). Also supports "record" for inline producer turns.',
     parameters: {
       type: 'object',
@@ -906,6 +906,7 @@ export const COMMAND_REGISTRY = [
         pattern: { type: 'string', description: 'Pattern name or preset (solo, reviewed, panel, code-change).' },
         override: { type: 'string', description: 'JSON-encoded array or object of overrides.' },
         effort: { type: 'string', description: 'Reasoning effort for this run (low, medium, high, max), rendered into the provider CLI\'s own flag; a level the bound executor does not declare refuses the binding.' },
+        account: { type: 'string', description: 'Pin the provider account every seat runs on (an id in providers.<provider>.accounts of ~/.fgos/config.json; same as "account" in --override). It must belong to the bound executor\'s provider and not be quarantined, checked before the unit run exists; the lease still takes it, and a provider limit on it ends the seat instead of rotating or failing over. Not with --resume.' },
         resume: { type: 'string', description: 'Unit run ID to resume.' },
         dir: { type: 'string', description: 'Main repository root directory. Storage follows it; workers start in the current directory, so run from inside that project or pass --worktree (a different project than the current directory is warned about as dir-differs-from-cwd).' },
         worktree: { type: 'string', description: 'Target worktree directory.' },

@@ -10,6 +10,8 @@ import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
 import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
 import { bind, nextCandidate, retrySameCandidate, getProviderFamily } from './bind.mjs';
 import { credentialFaultFamilies, inspectAccountRotation, mayRotateAccount } from './account-rotation.mjs';
+import { assertPinnedAccountsUsable, runnerConfigForBinding } from './account-pin.mjs';
+import { simulateUnitBindings } from './dry-bind.mjs';
 import { createRoleExecutorLedger } from './role-ledger.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
@@ -194,6 +196,28 @@ function foreignIndexRefusal(role, round, paths) {
 }
 
 /**
+ * Refuse a pinned account before a unit run exists: each seat an `account` override applies to
+ * (bound the way the run would bind it) must take that account, at least one seat must, and the
+ * account must not be quarantined now.
+ */
+async function assertAccountPinsBeforeRun(unit, runnerConfig, options) {
+  const overrides = options.overrides ?? [];
+  if (!overrides.some((o) => o && typeof o === 'object' && o.account !== undefined)) return;
+  const callerPattern = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
+  const { roles } = await simulateUnitBindings(
+    { ...unit, pattern: callerPattern || unit.pattern || options.pattern || 'solo' },
+    runnerConfig,
+    { session: { ...(options.session ?? {}) }, overrides },
+  );
+  const refused = roles.find((r) => r.refused?.reason?.startsWith('account-pin'));
+  if (refused) throw new RunnerConfigError(`cannot pin the account for role "${refused.role}": ${refused.refused.detail}`);
+  if (!roles.some((r) => r.account)) {
+    throw new RunnerConfigError('the pinned account applies to no seat of this unit: no role its override names binds here');
+  }
+  assertPinnedAccountsUsable(roles, { runnerConfig, runtimeDir: options.providerCapacityRuntimeDir, what: 'cannot start the unit run' });
+}
+
+/**
  * Main headless unit execution entrypoint.
  *
  * @param {object} options
@@ -267,6 +291,11 @@ export async function runUnit(options = {}) {
       }
     }
     assertNoStrayCommit(unitRunId, unitRecord, mainRoot);
+    assertPinnedAccountsUsable(lastAttempts(unitRecord).filter((a) => a.outcome !== 'pass').map((a) => a.binding ?? {}), {
+      runnerConfig: unitRecord.configSnapshot?.runner,
+      runtimeDir: options.providerCapacityRuntimeDir,
+      what: `cannot resume unit run "${unitRunId}"`,
+    });
   } else {
     let raw;
     if (options.unitData) {
@@ -292,6 +321,10 @@ export async function runUnit(options = {}) {
     }
 
     unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
+    const configSnapshot = snapshotRunnerConfig(mainRoot);
+    // A pinned account is checked before the unit run exists: every seat it applies to must bind an
+    // executor whose provider lists it, and it must not be quarantined now.
+    await assertAccountPinsBeforeRun(unit, configSnapshot.runner, options);
     // Resolved before the unit directory exists, so a ref that points nowhere leaves nothing behind.
     unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const unitDir = path.join(assignmentsDir, unitRunId);
@@ -311,7 +344,6 @@ export async function runUnit(options = {}) {
     }
     fs.mkdirSync(unitDir, { recursive: true });
 
-    const configSnapshot = snapshotRunnerConfig(mainRoot);
     const personaPin = unitPersonaPin(unit.persona, mainRoot);
     unitRecord = {
       unit,
@@ -391,7 +423,8 @@ export async function runUnit(options = {}) {
 
   // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
   const dispatchBound = async ({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective }) => {
-    const runnerConfig = unitRecord.configSnapshot.runner;
+    // A pinned account leases from an inventory holding only that account (account-pin.mjs).
+    const runnerConfig = runnerConfigForBinding(unitRecord.configSnapshot.runner, bound);
     fs.mkdirSync(assignmentDir, { recursive: true });
 
     // What the unit names (already resolved to paths), then the accounts of the roles whose
@@ -643,6 +676,24 @@ export async function runUnit(options = {}) {
       // accounts (never a loop on one account), and only then does the walk leave the provider.
       let rotationsSpent = 0;
       for (let at = attemptNo; at > 0 && attempts[at]?.fallbackFrom?.kind === 'account-rotation'; at -= 1) rotationsSpent += 1;
+      // A pinned account is hard: its limit is never answered with another account or executor.
+      const stopRetry = (reason, detail, extra = {}) => {
+        attempts[attemptNo].retryStopped = { reason, ...extra };
+        persistUnitRecord();
+        return {
+          ...result,
+          fallbackExhausted: {
+            from: { executor: bound.executor, invocation: bound.invocation, transport: bound.transport },
+            reason,
+            detail,
+            ...extra,
+            ...(rotationsSpent > 0 ? { accountRotations: rotationsSpent } : {}),
+          },
+        };
+      };
+      if (bound.account) {
+        return stopRetry('account-pinned', `account "${bound.account.id}" of provider "${bound.account.provider}" was pinned, so the seat is not moved to another account or executor; pin another account or wait for this one`);
+      }
       const rotation = inspectAccountRotation({ runnerConfig, executorId: bound.executor, runtimeDir: options.providerCapacityRuntimeDir });
       if (mayRotateAccount(rotation, rotationsSpent)) {
         bound = retrySameCandidate(bound, { provider: rotation.provider, accountsHealthy: rotation.healthy });
