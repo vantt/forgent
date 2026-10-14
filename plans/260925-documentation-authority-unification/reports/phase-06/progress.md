@@ -1,3 +1,31 @@
+# Bounded native resume — verification complete
+
+Date: 2026-10-15
+Executor: codex-session:29@2026-10-15
+Session counter: 29
+Assignment: unit-run-1792000695736-ca9e2f48/producer/1-fb1
+Step: 5
+State: ready-for-review / final native verification complete
+Input checkpoint: c6e51879cf324be3a9f483231f4111f73e8a9e4d
+Last green prior proof: 6c6a65e8543fa72012bd55f8999f13f9ed6193c4
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: da8285e065835dc3136ca0daabb2cd19e05d10fb
+Current-turn commit: none; runner-owned file-only handoff.
+
+All five inherited edits are retained as a finished provenance correction. Two pending alias proposals omitted their source-decision review report paths and immutable report commit pins. The correction synchronizes the Markdown pack, sidecar, request and index hashes and adds exact current-proposal equality to the validation. The complete validator passes all 303 entries (35/18/75/75/75/25); all six committed source/target digest tuples and differing/absent lists are unchanged. No proposal acceptance is carried.
+
+Both-prior D passes with zero fatal. Full union-scoped E retains the exact four prior open categories/counts, so strict closure remains unclaimed. Full native live-tuple equality and known-ID conservation pass. All three individual candidate lists equal their committed full tuples and their union equals full scoped E. The six packs retain all 303 source/target digest tuples and differing/absent lists; the pending-pack hash is corrected solely for missing alias proposal provenance.
+
+Native pipeline started at 2026-10-14T17:59:41Z; duration recorded in verification: 1522.510 seconds. Generation completed at 2026-10-14T18:15:59.802Z: 4,404 files and 87,368 claims, with a complete 1,249,356,242-byte native cache at /tmp/fgos-work/resume-truth/native-sync-cache.bin. Generation log: /tmp/fgos-work/resume-truth/native-final-resumed.log. API-correct checks log: /tmp/fgos-work/resume-truth/native-corrected-checks.log. The inherited helper passed raw priors, whereas the native API requires labelled registry wrappers; its preliminary raw-prior check was stopped and is not proof. The final checks use the unchanged native API with both labelled prior registries. D/E were rerun after registry persistence, completed at 2026-10-14T18:29:35.452Z, followed by a fresh exact tuple/list equality verification against those final outputs. Native individual-batch outputs are reused byte-for-byte because the complete native inventory and persisted registry bytes are identical. Exact timestamps, log contents, helper sources, per-check results and registry byte hashes: [root-boundary-native-verification.json](root-boundary-native-verification.json), finalResume.
+
+Registry: 59,841,534 bytes; compact one-line native output persisted below 90 MB. Review/apply tests with env -u CLAUDE_CODE_SESSION_ID: 39/39 pass, no fail/cancel/skip/todo. No full-suite claim. No checker, gate, extractor, vocabulary or baseline change; no git write, workspace .fgos write, secret read, new pack, promotion, push, main merge or Step 6 work.
+
+MDView preview was attempted once through mdview open; its database is read-only (SQLite error 8), so no new preview URL is claimed. The local progress file and JSON verification remain readable.
+
+Remaining independent reviews and Step 5 closure obligations are unchanged from the prior entry below, indexed by bounded-review-set-resume.json. Owner questions are not altered. Next: Lead independently reviews the existing six requests; apply committed verdicts and rerun native proofs after verdicts, then stop within the existing authorized scope.
+
+---
+
 # Bounded review set validated — final native rerun pending
 
 Date: 2026-10-15
