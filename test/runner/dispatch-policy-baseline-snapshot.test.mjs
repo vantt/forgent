@@ -98,7 +98,7 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
     envKeys: Object.keys(resolvedCmd.env ?? {}),
     resourceBindings: summarizeResourceBindings(resolvedCmd.resourceBindings),
     adapter: resolvedCmd.adapter,
-    promptDelivery: resolvedCmd.promptDelivery ?? (resolvedCmd.adapter === 'herdr-spawn' ? 'file-pointer' : undefined),
+    promptDelivery: resolvedCmd.promptDelivery ?? (resolvedCmd.adapter === 'herdr-spawn' ? 'inline' : undefined),
     confinement: resolvedCmd.confinement?.backend ?? 'none',
     readOnlyMechanism: deriveReadOnlyMechanism(normalizedArgs, resolvedCmd.confinement),
   };
@@ -332,7 +332,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [],
     resourceBindings: [],
     adapter: 'herdr-spawn',
-    promptDelivery: 'file-pointer',
+    promptDelivery: 'inline',
     confinement: 'none',
     readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
@@ -357,7 +357,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [],
     resourceBindings: [],
     adapter: 'herdr-spawn',
-    promptDelivery: 'file-pointer',
+    promptDelivery: 'inline',
     confinement: 'none',
     readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
@@ -382,7 +382,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [],
     resourceBindings: [],
     adapter: 'herdr-spawn',
-    promptDelivery: 'file-pointer',
+    promptDelivery: 'inline',
     confinement: 'none',
     readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
@@ -494,7 +494,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       }
     ],
     adapter: 'herdr-spawn',
-    promptDelivery: 'file-pointer',
+    promptDelivery: 'inline',
     confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
@@ -525,7 +525,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       }
     ],
     adapter: 'herdr-spawn',
-    promptDelivery: 'file-pointer',
+    promptDelivery: 'inline',
     confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
@@ -556,7 +556,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       }
     ],
     adapter: 'herdr-spawn',
-    promptDelivery: 'file-pointer',
+    promptDelivery: 'inline',
     confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
@@ -587,7 +587,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       }
     ],
     adapter: 'herdr-spawn',
-    promptDelivery: 'file-pointer',
+    promptDelivery: 'inline',
     confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
@@ -618,7 +618,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       }
     ],
     adapter: 'herdr-spawn',
-    promptDelivery: 'file-pointer',
+    promptDelivery: 'inline',
     confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
@@ -649,7 +649,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       }
     ],
     adapter: 'herdr-spawn',
-    promptDelivery: 'file-pointer',
+    promptDelivery: 'inline',
     confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
