@@ -98,6 +98,10 @@ fgos run "<PROMPT_TEMPLATE built as below>" --provider <EXECUTOR_ID> --capabilit
 fgos run "<PROMPT_TEMPLATE>" --provider <EXECUTOR_ID> --capability <PURPOSE> --writes <path>[,<path>...] --worktree <linked-worktree> --json
 ```
 
+`--provider` takes an agent executor only. When `<EXECUTOR_ID>` is a
+`kind: "tool"` executor, `fgos run` refuses it as a provider: call that
+tool directly instead (the dispatch-decide hook says the same).
+
 `--capability` is the same `<PURPOSE>` Step A asked `decide` for: left
 out, the Unit runs under the writing capability `execute`, with its own
 executor pool and posture. Without `--writes` the Unit is read-only and runs sandboxed; `--writes`

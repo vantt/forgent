@@ -133,3 +133,22 @@ test('fanout batch node entry with no candidate ids is a usage error, not an emp
   assert.equal(out.status, 1);
   assert.match(out.stderr, /usage: node src\/runner\/fanout-batch\.mjs "<id>,<id>\.\.\." \[--has-live-task-access\]/);
 });
+
+test('the fanout command the fgos-fanout skill teaches runs as written: node src/runner/fanout-batch.mjs "<ids>" --has-live-task-access', () => {
+  const { repoRoot, fgosDir } = setup(`
+    import fs from 'node:fs';
+    fs.writeFileSync('output.txt', 'produced\\n');
+  `);
+  const skill = fs.readFileSync(fileURLToPath(new URL('../../core/skills/fgos-fanout/references/wave-dispatch-mechanics.md', import.meta.url)), 'utf8');
+  assert.match(skill, /^node src\/runner\/fanout-batch\.mjs "<batch-comma-separated>" --has-live-task-access$/m);
+  const env = { ...process.env };
+  delete env.CLAUDE_CODE_SESSION_ID;
+
+  const out = spawnSync(process.execPath, [FANOUT_ENTRY, 'cand1', '--has-live-task-access'], { cwd: repoRoot, encoding: 'utf8', env });
+
+  assert.equal(out.status, 0, out.stderr);
+  const result = JSON.parse(out.stdout.trim().split('\n').at(-1));
+  for (const key of ['fired', 'mechanismChanged', 'unavailable', 'deferred']) assert.ok(Array.isArray(result[key]), key);
+  assert.deepEqual(result.fired.map((f) => [f.id, f.errorClass]), [['cand1', null]]);
+  assert.equal(listWork(fgosDir).work.cand1.status, 'awaiting-approval');
+});
