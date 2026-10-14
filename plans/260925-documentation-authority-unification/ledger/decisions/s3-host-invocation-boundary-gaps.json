@@ -143,20 +143,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/distribution.md",
       "targetAnchor": "unheaded-block-5",
-      "targetUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
-      "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "reviewed",
+      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+      "authoredBy": "codex-session:15@2026-10-14",
+      "reviewStatus": "pending",
       "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
       "targetAncestry": [
         "Spec: Distribution",
         "Data Dictionary"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
-      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
-      "reviewMode": "ordinary",
-      "reviewNote": "ok. distribution.md table (rows 5d, 7, 7b): 5d appends account-locks directory text and a 'now in runner.md' pointer; 7 gains project-fgos-launcher and credential-copies-retained in the check list; 7b swaps in credential-copies-retained in the registered fixes text. All changes are insertions or short tail rewrites from main; three-way equals HEAD."
+      ]
     },
     {
       "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",

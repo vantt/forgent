@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "shard": "s5-root-authorities-boundary-gaps.json",
+  "authorSession": "codex-session:15@2026-10-14",
+  "authorshipRequired": true,
+  "sources": [],
+  "claims": [],
+  "registryGaps": [
+    {
+      "claimId": "claim_970b6ae8bfa6cb7f00a0e4c2d98e4d4d",
+      "sourcePath": "docs/platform/packaging-distribution/spec.md",
+      "sourceUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-85",
+      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "authoredBy": "codex-session:15@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+    },
+    {
+      "claimId": "claim_04703f011b22383992b94545055b9e56",
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceUnitDigest": "12018d6ddfb98564eca2e0dbd9267ffa859e1e5e69c11db3f506886fa0ab717c",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/confinement-authority.md",
+      "targetAnchor": "unheaded-block-144",
+      "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+      ],
+      "authoredBy": "codex-session:15@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+    },
+    {
+      "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
+      "targetAncestry": [
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "authoredBy": "codex-session:15@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+    },
+    {
+      "claimId": "claim_f033905b059f073c62ec27f0ee6da620",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceUnitDigest": "c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-92",
+      "targetUnitDigest": "4fc5044db3e9bb5826d7ea2dd979fdc39e1190356326c84170e2b3df69d8204e",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Business Rules"
+      ],
+      "authoredBy": "codex-session:15@2026-10-14",
+      "reviewStatus": "pending",
+      "rationale": "A31 exact upstream/candidate restoration successor: the old native identity gap is conserved by the complete same-file current unit shown in the main/import diff. No guessed identity graft or carried approval; code truth and the future batch source disposition remain separate."
+    }
+  ]
+}

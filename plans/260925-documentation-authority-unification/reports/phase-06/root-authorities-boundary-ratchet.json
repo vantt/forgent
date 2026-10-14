@@ -1,0 +1,27 @@
+{
+  "merge": "48e3a992be1cd74a0960df953af16b5dae4275e4",
+  "main": "88315d5de971bec51985d4adadbed10338a658db",
+  "rows": [
+    {
+      "path": "docs/specs/confinement-authority.md",
+      "beforeDigest": "d133de2fe47fd8f0f3511e35de8048b2b294c47d40e19e1c8658d9db0a87f2f4",
+      "afterDigest": "435f3ccca09d9383d489efa8961edd7ae2b8bf5a35d063a91486a8a551325ae0",
+      "mainBlob": "63a2cb78586805cfccd765b8f6a814351281c6d5",
+      "mergedBlob": "63a2cb78586805cfccd765b8f6a814351281c6d5"
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "beforeDigest": "295ca823cb25f22d9daab30c8564f738ccfadc01fbb8919d8ec0777c184d4964",
+      "afterDigest": "2ab0c7664267bf1cfd6d0c6700b87e24f7da8f6a71672a743523a081e28c5260",
+      "mainBlob": "766f8691e7181f936d99428ea823844debcf5abc",
+      "mergedBlob": "766f8691e7181f936d99428ea823844debcf5abc"
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "beforeDigest": "cf55bdfc5767e6c5602825a9d483d47c5fe830e3aec5e61ed02f8647e084ae0d",
+      "afterDigest": "b08341e945825032606e49438b3c1e57a2a84d0eb68dd13eb51c9bd13f33275d",
+      "mainBlob": "049e0291137e2ef4b4a3b0ff28b129ed7c62d5fc",
+      "mergedBlob": "049e0291137e2ef4b4a3b0ff28b129ed7c62d5fc"
+    }
+  ]
+}

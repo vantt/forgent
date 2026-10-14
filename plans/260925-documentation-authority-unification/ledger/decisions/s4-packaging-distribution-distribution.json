@@ -145,50 +145,38 @@
     },
     {
       "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
-      "sourceUnitDigest": "435a708389d62d223fbcc5ce309889bf39602872a860d50d09492235de8c4727",
+      "sourceUnitDigest": "7843e5b171ea17f9bece9456184250e5ef748cb46c1a87d79917c145dbcba539",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:15@2026-10-14",
       "rationale": "The complete heading from docs/specs/distribution.md#data-dictionary, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#data-dictionary. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Largest heading unit (18391 chars, 8 data-dictionary rows incl. the allowlist row 3 that changed since the pinned blob); heading plus table payload verified identical except the marker; Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 55-55 to target spec.md line 515; recomputed digest matches",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "54ad2226c42e85402eb5b41e2a5602d0937cd5ac7cffd4648d8a8d83200f4ce7",
+      "targetUnitDigest": "daf68f421dfeceaf353dae3acd35391978f7dd56e9f10b1a0d6d4d0a13d7380b",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
-      "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
-      "sourceUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
+      "claimId": "claim_a26a90f97c6a399a30ce1df9207743b0",
+      "sourceUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-85",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-5, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-85. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "18371-char Data Dictionary table block byte-identical to the current blob content (not the older pinned blob), so the allowlist and fgctl changes are carried as they now read; Block byte-identical (18371 chars), digests equal, source lines 57-73 to target spec.md line 517; recomputed digest matches",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:15@2026-10-14",
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-5, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-85. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation. A31 upstream source successor: complete current table imported verbatim into the existing candidate owner; independent conservation review pending. No implementation truth approval.",
+      "targetUnitDigest": "648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      ]
     },
     {
       "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",

@@ -452,21 +452,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/confinement-authority.md",
       "targetAnchor": "unheaded-block-144",
-      "targetUnitDigest": "12018d6ddfb98564eca2e0dbd9267ffa859e1e5e69c11db3f506886fa0ab717c",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
+      "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+      "authoredBy": "codex-session:15@2026-10-14",
+      "reviewStatus": "pending",
       "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
         "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Old unit equals merge-base and first-parent text, target equals upstream (second-parent) text and merge result, so this is a pure main change; pending cap rewritten to redundant-only drop plus torn/ and byte compare, with the old pending-full home hold dropped as main intends."
+      ]
     },
     {
       "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",
@@ -475,20 +469,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-92",
-      "targetUnitDigest": "c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
+      "targetUnitDigest": "4fc5044db3e9bb5826d7ea2dd979fdc39e1190356326c84170e2b3df69d8204e",
+      "authoredBy": "codex-session:15@2026-10-14",
+      "reviewStatus": "pending",
       "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Same lineage as the Vietnamese twin: old unit equals merge-base and first parent, target equals upstream and merge result; the RUL77 pending-cap sentence is replaced by the redundant-only drop and torn/ rules in main's own diff, nothing plan-side edited."
+      ]
     },
     {
       "claimId": "claim_c2aa4371cc420cd24793da9c23497e42",
