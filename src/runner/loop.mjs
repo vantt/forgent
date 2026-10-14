@@ -39,11 +39,11 @@
 // actually mattered still holds exactly — worker output never lands in a
 // committed/git-tracked path. Verify/goal-check output stays console-only
 // (out of scope).
-// LIVE TEE (P39): each chunk is ALSO persisted the instant it arrives, via
-// spawnWorker's onChunk hook -> appendWorkerLogChunk (same sole-writer
-// facade), so `tail -f` on a work item's log shows output in real time while
-// the worker is still running. The terminal block appended once dispatch
-// settles (below) is unchanged.
+// LIVE LOG: a worker runs as a Unit run, which streams nothing back. The
+// moment the run exists, the item's log gets one line naming it and where its
+// stdout/stderr logs live (`.fgos/assignments/<unitRunId>/...`), so `tail -f`
+// on the item's log points at the live output. The terminal block appended
+// once dispatch settles (below) still carries the worker's full output.
 //
 // REPO ROOT: always derived from the caller's cwd (`git rev-parse
 // --show-toplevel`), never from this file's own location — the runner
@@ -86,7 +86,6 @@ import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
 import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
-import { commitUnitWork } from './execution/commit-unit-work.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, claimRoot, steerFrontier } from './root-affinity.mjs';
 import { resolveRoot, hasOpenDescendant, indexChildrenByParent } from '../state/frontier.mjs';
@@ -118,6 +117,7 @@ const FRICTION_LAYER = Object.freeze({
   'worker-spawn-fail': 'environment',
   'worker-timeout': 'environment',
   'worktree-fail': 'environment',
+  'provider-limit': 'environment',
   'corrupt-log': 'state',
   'stale-doing': 'state',
   'state-conflict': 'state',
@@ -342,54 +342,21 @@ function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
 }
 
-// The worker only edits files; the runner commits what it left. The commit
-// subject is the worker's own fenced-JSON Result `summary` when it reported
-// one, else `<id>: <title>` — never the free prose around it.
-const RESULT_FENCE = /```json[^\n]*\n([\s\S]*?)```/g;
-
-function workerResultSummary(output) {
-  if (typeof output !== 'string' || !output) return null;
-  let summary = null;
-  for (const match of output.matchAll(RESULT_FENCE)) {
-    try {
-      const parsed = JSON.parse(match[1]);
-      if (parsed && typeof parsed === 'object' && typeof parsed.summary === 'string' && parsed.summary.trim()) {
-        summary = parsed.summary;
-      }
-    } catch {
-      // malformed block — keep scanning
-    }
-  }
-  return summary;
+/** The line the item's live log carries for a worker run: the Unit run streams nothing back, so
+ * the log points at the run's own output files instead. */
+function workerRunPointer(unitRunId) {
+  return `fgos-runner: worker running as unit run ${unitRunId}; its output is in .fgos/assignments/${unitRunId}/producer/*/runs/*/stdout.log\n`;
 }
 
-/** Commit whatever the worker left in the item's worktree, before goal-check.
- * A clean tree is not an error: a worker that committed itself (older
- * contract) or changed nothing leaves nothing to commit. Returns how the
- * branch tip moved: `runner` (committed here), `self` (worker committed),
- * `none` (no change at all). A failed commit throws a `worktree-fail`
- * (environment) error so the recovery matrix routes it like any other
- * infrastructure failure. */
-function commitWorkerChanges(repoRoot, item, worktree, headBeforeWorker, workerOutput) {
-  const result = commitUnitWork({
-    worktree,
-    // The gitdir and hooks come from the main checkout, never from the worker-writable worktree.
-    repoRoot,
-    unitId: item.id,
-    summary: workerResultSummary(workerOutput) ?? `${item.id}: ${item.title}`,
-    // A Work item declares no write scope: everything outside .fgos is the worker's.
-    scope: ['**'],
-    changedFiles: null,
-    excludePaths: [],
-  });
-  if (result.status === 'failed') {
-    const err = new Error(`runner commit of the worker's changes failed: ${result.error}`);
-    err.errorClass = 'worktree-fail';
-    throw err;
+/** Where `branch` is checked out in a worktree of `repoRoot`, or null. */
+function checkoutPathOf(repoRoot, branch) {
+  const listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
+  let current = null;
+  for (const line of listing.split('\n')) {
+    if (line.startsWith('worktree ')) current = line.slice('worktree '.length);
+    else if (line === `branch refs/heads/${branch}`) return current;
   }
-  if (result.status === 'committed') return 'runner';
-  const head = git(worktree, ['rev-parse', 'HEAD']).trim();
-  return head === headBeforeWorker ? 'none' : 'self';
+  return null;
 }
 
 /** Branch facts the recovery matrix needs (stale-doing resolution, goal-
@@ -605,6 +572,16 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
         `fgos-runner: keeping ${branch} (0 commits ahead, but a descendant still needs this ref — not yet done/wontfix)`,
       );
       kept.push({ branch, aheadCount, reason: 'descendant-still-needed' });
+      continue;
+    }
+    // A runner killed mid-round leaves its worktree checked out on the branch,
+    // holding the worker's uncommitted files (the runner commits only after a
+    // round settles). Deleting the branch would fail, and removing that
+    // checkout would lose the work, so both stay for a person or a resume.
+    const checkedOut = aheadCount === 0 ? checkoutPathOf(repoRoot, branch) : null;
+    if (checkedOut) {
+      log(`fgos-runner: keeping ${branch} (0 commits, but still checked out at ${checkedOut}; a killed round may have left uncommitted work there)`);
+      kept.push({ branch, aheadCount, reason: 'checked-out', path: checkedOut });
       continue;
     }
     if (aheadCount === 0) {
@@ -1079,80 +1056,54 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         }
       }
 
-      const headBeforeWorker = git(wt.path, ['rev-parse', 'HEAD']).trim();
       const worker = await spawnWorker(item, config, wt.path, {
-        // tsk-62v D6: lets a `kind: "cli"` executor's presence be checked
-        // via `fgos tool query`'s own functions instead of re-probing PATH.
         fgosDir: dir,
         feedback: {
           answer: feedbackView.gates?.[item.id]?.answer,
           reason: feedbackView.work?.[item.id]?.reason,
         },
-        // P39: live tee, chunk by chunk, through worker-log.mjs's sole
-        // writer — so `tail -f .fgos/logs/<id>.log` shows this worker's
-        // output while it is still running. The terminal block below (after
-        // spawnWorker resolves) is unchanged.
-        onChunk: (stream, chunk) => appendWorkerLogChunk(dir, item.id, chunk),
+        // The run's id reaches the item's log the moment the run exists, so a
+        // runner that dies mid-round still leaves the id a resume needs.
+        onUnitRunCreated: (unitRunId) => appendWorkerLogChunk(dir, item.id, workerRunPointer(unitRunId)),
       });
       lastWorkerOutput = worker.stdout ?? ''; // wgi-8: terminal-outcome discovery source (success/verify-miss)
-      log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
+      log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model}, unit run ${worker.unitRunId})`);
       // Executor-aware dispatch announce/audit (D8, tsk-62v): one line to
       // stderr/logs, plus one event appended to this writer's own open
       // file under `.fgos/events/` (`resolveWriterLogPath`, TA-D2/TA-D12)
-      // — never straight to the frozen baseline `events.jsonl`, so a
-      // concurrent dispatch from another writer never contends for the
-      // same physical file. `replay.mjs` ignores unknown event types by
-      // design (see its own doc comment), so this audit-only entry never
-      // participates in the FSM view. Queued through the same
-      // `queue.enqueue()` every other write at this call site already
-      // uses, closing the synthesis report's concurrent-session
-      // write-race concern (§3) for this append too.
+      // — never straight to the frozen baseline `events.jsonl`. `replay.mjs`
+      // ignores unknown event types by design, so this audit-only entry
+      // never participates in the FSM view. Queued through the same
+      // `queue.enqueue()` every other write at this call site uses.
       log(`fgos-runner: ${worker.executorId} — ${worker.provider} — ${worker.model}`);
       await queue.enqueue(async () => {
         appendEvent(resolveWriterLogPath(dir), {
           type: 'executor.dispatch',
-          // baseCommit/headRef (tsk-4hl, D1/D3 of docs/history/parallel-
-          // decomposition-footprint-avoidance/CONTEXT.md — mức 1): the
-          // dispatch-time attestation captured inside spawnWorker, now
-          // actually persisted (independent review after tsk-2ig merged
-          // found it captured then discarded) -- same audit-only,
-          // ignored-by-replay.mjs event this call site already uses for
-          // executorId/provider/model, no new event type invented.
           payload: {
             id: item.id,
+            // The executor bind actually ran, not the step's preferred one.
             executorId: worker.executorId,
             provider: worker.provider,
-            // command (tsk-33w D9): the command actually spawned, alongside
-            // the freely-overridable `provider` label above -- so this audit
-            // entry can never lie about which one really ran (dispatch.mjs's
-            // own resolveExecutorCommand docstring: `provider` is a display
-            // alias, not what gets spawned).
+            // The command actually spawned, beside the freely-overridable
+            // `provider` label, so the audit never lies about what ran.
             command: worker.command,
             model: worker.model,
             baseCommit: worker.baseCommit,
             headRef: worker.headRef,
-            // governance (self-review finding, 2026-08-25): providerFamily
-            // + effective egress{kind,target,content}, threaded from
-            // resolveExecutorConfig through spawnWorker -- previously
-            // computed and then discarded before ever reaching a real
-            // production dispatch event, so no audit entry could ever show
-            // which real dispatches were cross-provider (the stated
-            // purpose of the D1/D2/D6 governance work). Same audit-only,
-            // ignored-by-replay.mjs event this call site already uses.
             governance: worker.governance,
+            // The Unit run that carries this dispatch's binding, logs and result.
+            unitRunId: worker.unitRunId,
           },
         });
       });
-      // Persist the worker's own output for after-the-fact recovery (D1/D3/D4):
-      // right after the spawn resolves, before goal-check — so success AND
-      // verify-miss are both captured (goal-check runs next). The runner
-      // commits the worker's file changes first, so goal-check judges the
-      // committed branch.
-      const commit = commitWorkerChanges(repoRoot, item, wt.path, headBeforeWorker, worker.stdout);
+      // The runner committed the worker's file changes inside the Unit run, so
+      // goal-check judges the committed branch.
+      const commit = worker.commit;
       log(`fgos-runner: commit for "${item.id}": ${commit}`);
       appendWorkerLog(dir, item.id, {
         attempt,
         commit,
+        unitRunId: worker.unitRunId,
         tier: worker.tier,
         model: worker.model,
         templateName: worker.templateName,
@@ -1162,6 +1113,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         stdout: worker.stdout,
         stderr: worker.stderr,
       });
+      for (const warning of worker.warnings ?? []) log(`fgos-runner: warning for "${item.id}": ${warning}`);
 
       const check = await runGoalCheck(item, wt.path, config.timeoutMs);
       const facts = branchFacts(repoRoot, wt.branch);
@@ -1226,6 +1178,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
           attempt,
           errorClass: err.errorClass,
           message: err.message,
+          unitRunId: err.unitRunId,
           tier: err.tier,
           model: err.model,
           templateName: err.templateName,
@@ -1507,7 +1460,6 @@ export async function runOnce(options = {}) {
         try {
           wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
           const feedbackView = listWork(dir);
-          const headBeforeWorker = git(wt.path, ['rev-parse', 'HEAD']).trim();
           const worker = await spawnWorker(item, config, wt.path, {
             fgosDir: dir,
             stage: discoverEntry,
@@ -1515,12 +1467,13 @@ export async function runOnce(options = {}) {
               answer: feedbackView.gates?.[item.id]?.answer,
               reason: feedbackView.work?.[item.id]?.reason,
             },
-            onChunk: (stream, chunk) => appendWorkerLogChunk(dir, item.id, chunk),
+            onUnitRunCreated: (unitRunId) => appendWorkerLogChunk(dir, item.id, workerRunPointer(unitRunId)),
           });
-          log(`fgos-runner: research worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
-          const commit = commitWorkerChanges(repoRoot, item, wt.path, headBeforeWorker, worker.stdout);
+          log(`fgos-runner: research worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model}, unit run ${worker.unitRunId})`);
+          const commit = worker.commit;
           appendWorkerLog(dir, item.id, {
             commit,
+            unitRunId: worker.unitRunId,
             tier: worker.tier,
             model: worker.model,
             templateName: worker.templateName,
@@ -1903,6 +1856,3 @@ export async function runWatch(options = {}) {
     }
   }
 }
-
-// Work Driver layer fanout consolidation (R1 / M10 boundary simplification)
-export { fanoutBatchExecutorCli } from './fanout-batch.mjs';

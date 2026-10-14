@@ -8,7 +8,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { resolveTaskSpecPath, resolveContentRoot } from './paths.mjs';
 import { loadAgentDefs, readTaskSpecHeader } from './agent-roster.mjs';
 import { selectTemplate, hashTemplate } from './prompt-templates.mjs';
@@ -16,16 +16,10 @@ import { RunnerConfigError } from './dispatch/config.mjs';
 import { resolveStrongerRigor, RIGOR_VALUES } from './rigor.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { deriveOperationCapability } from './operation-capability.mjs';
-import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily } from './dispatch/resolve.mjs';
-import { resolveExecutorCommand, DispatchError } from './dispatch/transport.mjs';
-import { executeThroughConfinement, buildConfinementAttestation } from './dispatch/confinement/authority.mjs';
-import { buildConfinementRequest } from './dispatch/confinement/request.mjs';
-import {
-  resolveAgentTypeForTaskSpec,
-  openRunnerRun,
-  watchWritesOutsideWorkspace,
-  strayWriteWarning,
-} from './dispatch/cli.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorConfig } from './dispatch/resolve.mjs';
+import { DispatchError } from './dispatch/dispatch-error.mjs';
+import { resolveAgentTypeForTaskSpec } from './dispatch/cli.mjs';
+import { runUnit, resolveGitRoots } from './execution/run.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHints, buildPrompt } from './work-compat.mjs';
 import { getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';
 import { listWork } from '../state/store.mjs';
@@ -70,230 +64,159 @@ export function resolveAgentTypeForWork(work, cwd, stage) {
 }
 
 /**
- * Run the headless executor for `work` inside `cwd` (the worktree checkout
- * — this function never touches the main working tree itself; the caller
- * decides `cwd`). Builds the prompt, resolves tier -> model, resolves the
- * (possibly per-tier/per-executor, P41/tsk-62v) executor + its C9 v2
- * adapter, substitutes the config template, and delegates the actual spawn
- * to that adapter.
+ * Run the worker for `work` inside `cwd` (the item's dispatch worktree; this function never
+ * touches the main working tree itself) as one Unit through `runUnit`, the same execution door
+ * `fgos run` uses. The Unit comes from `workUnitFor`; bind chooses the executor (the step's
+ * executor is a soft preference), the worker runs confined, and the runner commits what it left
+ * in the worktree. The worker never commits.
  *
- * `opts.fgosDir` (optional, tsk-62v D6): the `.fgos/` directory, needed
- * only so a `kind: "cli"` executor's presence can be checked via
- * `fgos tool query`'s own functions instead of re-probing PATH. Omitted
- * (every pre-tsk-62v call site) skips that check entirely — the item's own
- * `executors`/`executors`/`executor` precedence still resolves exactly as
- * before.
+ * Resolves with the fields the runner loop reads: `status`/`signal` (the worker's exit),
+ * `executorId`/`provider`/`command`/`model`/`tier` (what actually ran), `stdout` (the worker's
+ * output, read back from the run's log), `attestation`, `baseCommit`/`headRef`, `governance`,
+ * `templateName`/`templateHash`, and `unitRunId` plus `commit` (`runner`, `self` or `none`, and
+ * the runner's commit record under `runnerCommit`).
  *
- * Throws `DispatchError('worker-timeout', ...)` when the executor is killed
- * for exceeding `cfg.timeoutMs` (or `opts.timeoutMs`, test-only override),
- * and `DispatchError('worker-spawn-fail', ...)` when the process could not
- * be started at all (e.g. the configured command does not exist). A
- * non-zero exit status from a process that *did* run is NOT an error here —
- * that is the runner's goal-check's concern (per D3: the worker's own exit
- * status/report is never trusted on its own; only `verify` decides).
+ * Rejects with a `DispatchError` whose `errorClass` is recovery-matrix vocabulary:
+ * `worker-timeout`, `worker-spawn-fail`, `provider-limit` (every candidate of the pool hit its
+ * limit), `worktree-fail` (the runner commit failed, or an index someone else staged refused the
+ * launch) and `confinement-policy-error` (nothing may run this Unit). A worker that ran and exited
+ * non-zero is not an error here: per D3 only `verify` decides.
  *
- * `opts.stage` (tsk-5mj D1/D6/D7, optional): threaded straight through to
- * `buildPrompt`'s own `stage` parameter — omitted (every pre-tsk-5mj call
- * site) keeps the default `'executing'` prompt byte-identical.
+ * `opts.stage` names the step (default: the item's own); `opts.feedback` rides into the prompt;
+ * `opts.onUnitRunCreated(unitRunId)` is told the run's id as soon as it exists.
+ *
+ * The loop runs without a pane: `herdrPresent: false` keeps the cli transport even when the
+ * runner itself was started inside herdr.
  */
-export function spawnWorker(work, cfg, cwd, opts = {}) {
-  // Setup stays synchronous and OUTSIDE the adapter call on purpose: a
-  // malformed tier/config (RunnerConfigError, via resolveTierModel/
-  // resolveExecutorCommand) must still throw synchronously, before any
-  // process is spawned — exactly like the spawnSync-based version, and
-  // exactly what dispatch.test.mjs's "throws a RunnerConfigError ... before
-  // any spawn" test pins.
-  const workRigor = work?.rigor ?? (work?.risk === 'heavy' ? 'high' : 'standard');
-  const executorId = executorIdForWork(work, opts.stage);
-  const { executorId: resolvedExecutorId, executor: executorForTier } = executorId ? resolveExecutorAndOverrides(cfg, executorId) : {};
-  const { capability: capabilityName } = resolveCapabilityIdentityDetails({
-    cfg,
-    work,
-    stage: opts.stage,
-    executorId,
-    resolvedExecutor: executorForTier,
-  });
-  const capabilityRigor = capabilityName ? cfg.capabilities?.[capabilityName]?.rigor : undefined;
-  const effectiveRigor = capabilityRigor ? resolveStrongerRigor(workRigor, capabilityRigor) : workRigor;
-  const policyTier = cfg.rigorToTier?.[effectiveRigor] ?? 'standard';
-  const providerFamily = deriveProviderFamily(executorForTier);
-  const model = executorForTier?.model ?? resolveTierModel(cfg, policyTier, providerFamily);
-  const modelSource = { scope: 'placement-policy', id: `${providerFamily}.${policyTier}` };
-  const tier = policyTier;
-  const prompt = buildPrompt(work, opts.feedback, opts.stage);
-  // D20/D22 (review finding H1, tsk-397): only has an observable effect on
-  // a command-less/adapter-less/invocation-less executor with no static
-  // agentType of its own -- see resolveAgentTypeForWork's own doc comment.
-  const resolvedAgentType = resolveAgentTypeForWork(work, cwd, opts.stage);
-  // `permissionMode`/`confinement` are carried the whole way or the config
-  // door's "bypass requires full confinement" invariant is enforced at load
-  // and void at dispatch -- the profile would claim a confined worker and
-  // this call would run an unconfined one in the operator's own session.
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, baseCommit, headRef, governance, method, url, headers, body, resourceBindings } = resolveExecutorCommand(cfg, {
-    prompt,
-    model,
-    tier,
-    executorId,
-    fgosDir: opts.fgosDir,
-    // tsk-4hl: attest THIS worker's own dispatch worktree, never fgosDir's
-    // root (always the main checkout) — see captureDispatchAttestation's
-    // own docstring for why those two roots diverge on a leaf or a retry.
-    attestRoot: cwd,
-    resolvedAgentType,
-  });
-  const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs;
-  const idleTimeoutMs = opts.idleTimeoutMs ?? cfg.idleTimeoutMs;
-  const maxBuffer = opts.maxBuffer ?? 10 * 1024 * 1024;
-
-  // Dispatch chokepoint visibility: one line per real spawn, right before it
-  // happens, so a human watching the runner's own stderr can see which job
-  // (executing-stage skill, executorIdForWork's result — a different axis
-  // than the runner.capabilities catalog, D12) resolved to which executor
-  // (a real cfg.executors entry, or the global executor when none matches),
-  // through which adapter/provider/model/tier. Diagnostic-only: never read
-  // back by any caller, never part of this function's return value.
-  process.stderr.write(
-    `fgos: dispatch job=${executorId} executor=${resolvedExecutorId ?? '(global executor)'} via=${adapter} provider=${provider} model=${model} tier=${tier} modelSource=${modelSource}\n`,
-  );
-
-  // P49: same mechanical selection buildPrompt used internally, called again
-  // here (cheap, deterministic, no duplicated LOGIC) purely so the dispatch
-  // log can record which template + version produced this prompt. tsk-5mj:
-  // threads `opts.stage` through same as buildPrompt's own call, so this
-  // log-only selection never drifts from the template actually rendered.
-  const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain, stage: opts.stage });
+export async function spawnWorker(work, cfg, cwd, opts = {}) {
+  const repoRoot = opts.repoRoot ?? (opts.fgosDir ? path.dirname(opts.fgosDir) : undefined);
+  const { unitData } = workUnitFor(work, { cfg, stage: opts.stage, feedback: opts.feedback, worktree: cwd });
+  const templateName = selectTemplate({ kind: work.kind, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
+  const baseCommit = gitIn(cwd, ['rev-parse', 'HEAD']);
+  const headRef = gitIn(cwd, ['symbolic-ref', '--quiet', '--short', 'HEAD']);
 
-  const { runDir: workerRunDir, closeRun } = openRunnerRun({
-    fgosDir: opts.fgosDir, workId: work?.id, executorId, cwd,
-  });
-
-  const repoRootForWatch = opts.fgosDir ? path.dirname(opts.fgosDir) : undefined;
-  const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: repoRootForWatch, cwd });
-
-  const stageSkill = executorId;
-  const targetStage = opts.stage ?? effectiveStep(work ?? {}, getDomain(work?.domain, { onUnrecognized: () => {} }));
-  const capabilityResolution = resolveCapabilityIdentityDetails({
-    cfg,
-    work,
-    stage: targetStage,
-    executorId,
-    resolvedExecutor: executorForTier,
-  });
-  const { capability, anchorCapability } = capabilityResolution;
-
-  let confinementRequest;
-  try {
-    confinementRequest = buildConfinementRequest({
-      capability,
-      stageSkill,
-      executorId: resolvedExecutorId ?? executorId,
-      fallbackFrom: anchorCapability,
-      anchorCapability,
-      cfg,
-      providerCapacity: opts.providerCapacity,
-      invocation: {
-        command,
-        args,
-        argsTemplate,
-        prompt,
-        env,
-        liveOutput,
-        interactiveMode,
-        promptDelivery,
-        permissionMode,
-        confinement,
-        adapter,
-        method,
-        url,
-        headers,
-        body,
-        resourceBindings,
-      },
-      context: {
-        cwd,
-        repoRoot: repoRootForWatch,
-        runDir: workerRunDir,
-        fgosDir: opts.fgosDir,
-        timeoutMs,
-        idleTimeoutMs,
-        maxBuffer,
-        onChunk: opts.onChunk,
-        workId: work.id,
-        tier,
-        model,
-      },
-    });
-  } catch (err) {
-    closeRun('settled');
-    const dispatchId = `disp_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
-    const refusedAttestation = buildConfinementAttestation({
-      request: {
-        contract: 'confinement-request.v1',
-        dispatchId,
-        capability: capability ?? executorId ?? '(unknown-capability)',
-        stageSkill,
-        executorId: resolvedExecutorId ?? executorId,
-        requirement: { mode: 'required', error: err.message },
-        context: { cwd, runDir: workerRunDir },
-      },
-      phase: 'refused',
-      outcome: 'refused',
-      error: err,
-    });
-    throw new DispatchError(
-      'confinement-policy-error',
-      err.message,
-      {
-        contract: 'confinement-execution.v1',
-        status: 'refused',
-        dispatchId,
-        capability: capability ?? executorId ?? '(unknown-capability)',
-        stageSkill,
-        executorId: resolvedExecutorId ?? executorId,
-        attestation: refusedAttestation,
-        cause: err,
-      },
-    );
-  }
-
-  return executeThroughConfinement(confinementRequest).then(
-    // executorId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl)/command
-    // (tsk-33w D9)/governance (self-review finding, 2026-08-25): additive
-    // only — every field this function already returned stays exactly
-    // where it was.
-    (doorResult) => {
-      closeRun('settled');
-      // Settling says the worker finished. It does not say where.
-      const strayWarning = strayWriteWarning({ repoRoot: repoRootForWatch, strayPaths: outsideWatch.strayPaths() });
-      const execResult = doorResult?.result ?? doorResult;
-      return {
-        ...execResult,
-        attestation: doorResult?.attestation,
-        ...(strayWarning ? { warnings: [strayWarning] } : {}),
-        templateName,
-        templateHash,
-        executorId,
-        provider,
-        command,
-        baseCommit,
-        headRef,
-        governance,
-      };
+  let unitRunId = null;
+  const unit = await runUnit({
+    unitData,
+    worktree: cwd,
+    cwd,
+    ...(repoRoot ? { repoRoot } : {}),
+    session: { headless: true, herdrPresent: false },
+    onUnitRunCreated: (id) => {
+      unitRunId = id;
+      opts.onUnitRunCreated?.(id);
     },
-    (err) => {
-      // `died` is the one failure that says something about the worker's own
-      // process; every other outcome ended the round without establishing
-      // that, so it closes as `settled` -- a statement about the run reaching
-      // its end, never about the work having succeeded.
-      closeRun(err?.outcome === 'died' ? 'died' : 'settled');
-      if (err instanceof DispatchError) {
-        err.templateName = templateName;
-        err.templateHash = templateHash;
-      }
-      throw err;
-    },
+  });
+  unitRunId = unit.unitRunId ?? unitRunId;
+  const mainRoot = repoRoot ?? resolveGitRoots(cwd).mainCheckoutRoot;
+  const seat = unit.results?.[unit.results.length - 1] ?? {};
+  const runResult = seat.runResult ?? null;
+  const binding = seat.binding ?? null;
+  const ran = describeBinding(mainRoot, unitRunId, binding);
+  const stdout = workerOutput(mainRoot, runResult, binding);
+  const stderr = readRunLog(mainRoot, runResult?.runtime?.stderrLog) ?? '';
+  const facts = {
+    unitRunId,
+    executorId: binding?.executor ?? null,
+    provider: ran.provider,
+    command: ran.command,
+    governance: ran.governance,
+    model: binding?.model ?? runResult?.policy?.model ?? null,
+    tier: binding?.tier ?? runResult?.policy?.tier ?? null,
+    status: runResult?.runtime?.exitCode ?? null,
+    signal: runResult?.runtime?.signal ?? null,
+    stdout,
+    stderr,
+    attestation: runResult ? { confinement: runResult.confinement ?? null, adapter: runResult.adapter ?? null, runId: runResult.runId ?? null } : null,
+    baseCommit,
+    headRef,
+    templateName,
+    templateHash,
+    ...(runResult?.warnings?.length ? { warnings: runResult.warnings } : {}),
+  };
+  process.stderr.write(
+    `fgos: dispatch unit=${unitRunId} executor=${facts.executorId ?? '(none)'} via=${binding?.transport ?? '(none)'} model=${facts.model} tier=${facts.tier} outcome=${seat.outcome ?? unit.outcome}\n`,
   );
+
+  const fail = (errorClass, message, extra = {}) => new DispatchError(errorClass, message, { ...facts, ...extra });
+  if (seat.commit?.status === 'failed') {
+    throw fail('worktree-fail', `runner commit of the worker's changes failed: ${seat.commit.error ?? seat.commit.reason}`, { runnerCommit: seat.commit });
+  }
+  const outcome = seat.outcome ?? unit.outcome;
+  if (outcome === 'pass') {
+    const commitStatus = seat.commit?.status;
+    const commit = commitStatus === 'committed' ? 'runner'
+      : gitIn(cwd, ['rev-parse', 'HEAD']) === baseCommit ? 'none' : 'self';
+    return { ...facts, commit, runnerCommit: seat.commit ?? null };
+  }
+  if (outcome === 'policy-refusal') {
+    const refused = seat.refused ?? {};
+    if (refused.reason === 'foreign-staged-index') {
+      throw fail('worktree-fail', `the worktree's index holds changes the runner did not stage: ${refused.detail ?? ''}`.trim(), { refused });
+    }
+    throw fail('confinement-policy-error', `no executor may run this work: ${refused.reason ?? 'refused'}${refused.detail ? ` (${refused.detail})` : ''}`, { refused });
+  }
+  if (outcome === 'provider-limit') {
+    throw fail('provider-limit', `every candidate for this work hit its provider limit${seat.fallbackExhausted?.detail ? `: ${seat.fallbackExhausted.detail}` : ''}`, { fallbackExhausted: seat.fallbackExhausted ?? null });
+  }
+  const failureCode = runResult?.classification?.failure?.code ?? null;
+  if (failureCode === 'execution-timeout') {
+    throw fail('worker-timeout', `the worker ran past its time budget (unit run ${unitRunId})`);
+  }
+  if (!runResult || failureCode === 'supervisor-spawn-fail' || facts.status === 127) {
+    throw fail('worker-spawn-fail', `the worker could not be started (unit run ${unitRunId}${failureCode ? `, ${failureCode}` : ''})`);
+  }
+  // Ran and failed, or reported findings: nothing was committed. Goal-check decides.
+  return { ...facts, commit: 'none', runnerCommit: seat.commit ?? null, outcome };
+}
+
+function gitIn(cwd, args) {
+  try {
+    return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return null;
+  }
+}
+
+/** A run log the runner wrote (path relative to the main checkout), or null when there is none. */
+function readRunLog(mainRoot, rel) {
+  if (typeof rel !== 'string' || !rel) return null;
+  try {
+    return fs.readFileSync(path.resolve(mainRoot, rel), 'utf8');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * What the worker said, for the loop's fenced verdict and discovered-work blocks. A cli run's
+ * stdout log is the worker's own output. A pane run has no terminal output to read (pane text is
+ * never read): its stdout log holds the settled report text instead, so the first source that has
+ * text is used, never several, or a fence would be read twice.
+ */
+function workerOutput(mainRoot, runResult, binding) {
+  const stdoutLog = readRunLog(mainRoot, runResult?.runtime?.stdoutLog);
+  if (binding?.transport !== 'herdr') return stdoutLog ?? '';
+  const reports = (runResult?.settleReports ?? []).map((report) => readRunLog(mainRoot, report?.path)).filter(Boolean).join('\n');
+  return [reports, stdoutLog, runResult?.agentClaim?.summary]
+    .find((text) => typeof text === 'string' && text.trim()) ?? '';
+}
+
+/**
+ * The command, provider label and governance of the executor and invocation bind chose, read from
+ * the config the unit run pinned. Audit only: nothing is resolved again for the launch itself.
+ */
+function describeBinding(mainRoot, unitRunId, binding) {
+  if (!binding?.executor) return { command: null, provider: null, governance: null };
+  try {
+    const record = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
+    const config = record.configSnapshot?.runner ?? {};
+    const resolved = resolveExecutorConfig(config, binding.tier, binding.executor, undefined, undefined, undefined, binding.invocation);
+    return { command: resolved.command ?? null, provider: resolved.provider ?? resolved.command ?? null, governance: resolved.governance ?? null };
+  } catch {
+    return { command: null, provider: null, governance: null };
+  }
 }
 
 /**
@@ -311,7 +234,7 @@ export function resolveWorkForDispatch({ workId, stage, fgosDir }) {
 /**
  * The generic, Work-agnostic inputs a Work-driven dispatch hands dispatch: the Work
  * item as data, the capability hints its step implies, and the agent type its task spec
- * resolves to. Spread into `executeAssignment`/`executeExecutorCli` options.
+ * resolves to. Spread into `executeAssignment` options.
  */
 export function workDispatchContext({ work, stage, cwd, executorId } = {}) {
   return {

@@ -58,6 +58,12 @@
  *                          it. Resolution needs branch-state facts the
  *                          runner already knows (has a commit, did that
  *                          commit's verify pass) — see `resolveStaleDoing`.
+ *   - provider-limit     — every candidate executor of the work's pool hit its
+ *                          provider limit (quota, paused account, refused
+ *                          capacity), after the Unit run already moved to
+ *                          each other account and candidate. Retrying now
+ *                          would meet the same limits, so it parks; the
+ *                          runner keeps serving other items.
  *   - state-conflict     — a CAS conflict on the RUNNER'S OWN write (i.e. the
  *                          runner raced someone else's write to the same
  *                          item). The runner never fights a human for a
@@ -75,6 +81,7 @@ export const ERROR_CLASSES = Object.freeze([
   'state-conflict',
   'dispatch-in-flight',
   'dispatch-depth-exceeded',
+  'provider-limit',
 ]);
 
 /**
@@ -114,6 +121,7 @@ export const RECOVERY = Object.freeze({
   'state-conflict': Object.freeze({ action: 'halt' }),
   'dispatch-in-flight': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),
   'dispatch-depth-exceeded': Object.freeze({ action: 'park' }),
+  'provider-limit': Object.freeze({ action: 'park' }),
 });
 
 /**

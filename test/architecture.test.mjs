@@ -346,9 +346,6 @@ const RUN_DOOR_CALLERS = {
 // This list only shrinks: a caller that leaves must leave this list in the same change.
 const R3_PENDING_WORK_CALLERS = {
   executeAssignment: ['src/runner/operation-choice.mjs'],
-  executeExecutorCli: ['src/runner/fanout-batch.mjs'],
-  commitUnitWork: ['src/runner/loop.mjs', 'src/runner/fanout-batch.mjs'],
-  executeThroughConfinement: ['src/runner/work-dispatch.mjs'],
 };
 // Where each symbol is defined. Its home and the dispatch barrel may define or re-export it; calling it still counts.
 const RUN_DOOR_HOMES = {
@@ -446,7 +443,9 @@ test('run-door call-site guard catches an aliased import, a dynamic import(), a 
   assert.ok(checkRunDoorCallers({ executeExecutorCli: ['src/runner/fanout-batch.mjs', 'src/runner/dispatch/assignment-runner.mjs', 'src/runner/new.mjs'] })
     .some((v) => v.includes('src/runner/new.mjs')));
   assert.ok(checkRunDoorCallers({ commitUnitWork: ['src/runner/execution/run.mjs', 'src/runner/loop.mjs'] })
-    .some((v) => v.includes('fanout-batch.mjs no longer calls it')));
+    .some((v) => v.includes('unexpected caller src/runner/loop.mjs')));
+  assert.ok(checkRunDoorCallers({ executeAssignment: ['src/runner/execution/run.mjs', 'src/runner/dispatch/cli.mjs'] })
+    .some((v) => v.includes('operation-choice.mjs no longer calls it')));
 });
 
 test('executeAssignment(...) isReadOnlyMode posture: only session-engine.mjs\'s runExecutorAttempt may ever resolve it to false', () => {

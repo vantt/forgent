@@ -27,7 +27,7 @@
     "src/runner/dispatch.mjs": "infra",
     "src/runner/operation-capability.mjs": "domain",
     "src/runner/rigor.mjs": "kernel",
-    "src/runner/fanout-batch.mjs": "infra",
+    "src/runner/fanout-batch.mjs": "use-case",
     "src/runner/work-compat.mjs": "infra",
     "src/runner/dispatch/adapters.mjs": "infra",
     "src/runner/dispatch/config.mjs": "infra",
@@ -258,6 +258,6 @@
     "src/state/step-fsm.mjs": "domain",
     "src/verbs/state/step.mjs": "use-case",
     "src/runner/operation-choice.mjs": "use-case",
-    "src/runner/work-dispatch.mjs": "infra"
+    "src/runner/work-dispatch.mjs": "use-case"
   }
 }

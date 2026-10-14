@@ -6,6 +6,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync, spawn } from 'node:child_process';
+import { confinedRunnerConfig } from '../runner/loop-worker-fixture.helper.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+
+// Workers run confined (bwrap) as Unit runs; the runner child inherits this
+// file-local backend registry through its environment.
+seedFileLocalBwrapRegistry();
 
 // e2e — the runner's own binary (bin/fgos-runner.mjs), exercised as a real
 // child process against a real, disposable git repo, alongside the CLI
@@ -23,8 +30,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 const RUNNER = path.resolve(__dirname, '../../bin/fgos-runner.mjs');
 
+// Outside /tmp: a confined worker sees a private tmpfs there, not these files.
 function mkTempDir(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return fs.realpathSync(makeFixtureDir(prefix));
 }
 
 // Pinned to "main" (mirrors merge.test.mjs's initRepo(), and loop.test.mjs's
@@ -139,34 +147,33 @@ function events(cwd) {
   return tagged.map(({ ev }) => ev);
 }
 
+/** The runner config a confined worker binds with: the executor registered
+ * under each loop step's id, with a bwrap-confined cli invocation. */
+function runnerConfigFor(executorScript) {
+  return confinedRunnerConfig({
+    executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'], providerModel: 'claude' },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    timeoutMs: 15000,
+  });
+}
+
 function writeRunnerConfig(repoRoot, executorScript) {
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(
     path.join(repoRoot, '.fgos', 'config.json'),
-    JSON.stringify({
-      runner: {
-        executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-        modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
-        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-        timeoutMs: 15000,
-      },
-    }),
+    JSON.stringify({ runner: runnerConfigFor(executorScript) }),
   );
 }
 
-/** For the explicit `--config <path>` tests below (independent of the
- * shared `.fgos/config.json` -- `--config` names an arbitrary file). */
+/** For the explicit `--config <path>` tests below: `--config` names an
+ * arbitrary file for the loop's own settings. A worker runs as a Unit run,
+ * which binds from the repo's `.fgos/config.json`, so the same config goes
+ * there too. */
 function writeExplicitRunnerConfigFile(repoRoot, executorScript) {
   const configPath = path.join(repoRoot, 'runner-config.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-      modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-      timeoutMs: 15000,
-    }),
-  );
+  fs.writeFileSync(configPath, JSON.stringify(runnerConfigFor(executorScript)));
+  writeRunnerConfig(repoRoot, executorScript);
   return configPath;
 }
 
@@ -217,15 +224,15 @@ function writeCommittingExecutor(scriptDir, produce = 'output.txt') {
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
-execFileSync('git', ['add', ${JSON.stringify(produce)}]);
-execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`)}]);
 `,
   );
   return scriptPath;
 }
 
 /** A fake executor that only edits files and never touches git — the
- * contract: the runner commits what the worker leaves behind. */
+ * contract: the runner commits what the worker leaves behind. With
+ * `summary` it also writes the result claim its Unit run asks for, whose
+ * summary becomes the commit subject. */
 function writeEditOnlyExecutor(scriptDir, produce = 'output.txt', { summary } = {}) {
   const scriptPath = path.join(scriptDir, 'edit-only-executor.mjs');
   fs.writeFileSync(
@@ -233,7 +240,15 @@ function writeEditOnlyExecutor(scriptDir, produce = 'output.txt', { summary } = 
     `
 import fs from 'node:fs';
 ${produce ? `fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');` : ''}
-${summary ? `console.log('\`\`\`json\\n' + JSON.stringify({ summary: ${JSON.stringify(summary)} }) + '\\n\`\`\`');` : ''}
+${summary ? `import path from 'node:path';
+const claim = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '));
+if (claim) {
+  const outbox = path.join(path.dirname(claim[1]), 'worker-output', 'outbox');
+  const dir = fs.existsSync(outbox) ? outbox : path.dirname(claim[1]);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Report\\nWrote the output file the item verify checks for, and checked it exists.\\n');
+  fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: ${JSON.stringify(summary)}, assessment: { verdict: 'pass' } }));
+}` : ''}
 console.log('[DONE]');
 `,
   );
@@ -250,37 +265,37 @@ function writeWrongCommitExecutor(scriptDir) {
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 fs.writeFileSync('junk.txt', 'not what verify wants\\n');
-execFileSync('git', ['add', 'junk.txt']);
-execFileSync('git', ['commit', '-q', '-m', 'worker: junk.txt']);
 `,
   );
   return scriptPath;
 }
 
-/** A fake executor that reproduces a genuine runner crash: it commits the
- * real proof file (so the branch carries a legitimate worker commit), then
- * kills its OWN PARENT (the runner process, still blocked inside
- * `spawnSync` waiting on this very child) before the runner ever gets to
- * write `proposed`. This is not a simulated/hand-built post-crash state —
- * it is a real SIGKILL of the real runner process, mid-dispatch, so
- * whatever the OS/git left behind (worktree checkout included) is exactly
- * what a real crash leaves behind. */
-function writeParentKillingExecutor(scriptDir, produce = 'output.txt') {
-  const scriptPath = path.join(scriptDir, 'parent-killing-executor.mjs');
+/** A fake executor that holds mid-round so the test can kill the runner for
+ * real: it writes the proof file, then `.started` in its worktree, and waits
+ * (up to 20s) for `.go`. A confined worker cannot reach its runner's pid (its
+ * parent is the sandbox launcher), so the test delivers the SIGKILL itself.
+ * Nothing about the post-crash state is hand-built: whatever the OS and git
+ * leave behind is exactly what a real runner crash leaves. */
+function writeHoldingExecutor(scriptDir, produce = 'output.txt') {
+  const scriptPath = path.join(scriptDir, 'holding-executor.mjs');
   fs.writeFileSync(
     scriptPath,
     `
 import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
 fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
-execFileSync('git', ['add', ${JSON.stringify(produce)}]);
-execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`)}]);
-process.kill(process.ppid, 'SIGKILL');
-await new Promise((resolve) => setTimeout(resolve, 200));
-process.exit(1);
+fs.writeFileSync('.started', '');
+const until = Date.now() + 20000;
+while (!fs.existsSync('.go') && Date.now() < until) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
 `,
   );
   return scriptPath;
+}
+
+/** The linked worktree of `repoRoot` whose holding worker has started, or null. */
+function startedWorktree(repoRoot) {
+  const out = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
+  const paths = out.split('\n').filter((l) => l.startsWith('worktree ')).map((l) => l.slice('worktree '.length));
+  return paths.find((p) => fs.realpathSync(p) !== fs.realpathSync(repoRoot) && fs.existsSync(path.join(p, '.started'))) ?? null;
 }
 
 // tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
@@ -312,8 +327,6 @@ const prompt = process.argv[2] ?? '';
 const match = prompt.match(/test -f (\\S+)/);
 const file = match ? match[1] : 'output.txt';
 fs.writeFileSync(file, 'produced by worker\\n');
-execFileSync('git', ['add', file]);
-execFileSync('git', ['commit', '-q', '-m', \`worker: \${file}\`]);
 `,
   );
   return scriptPath;
@@ -366,7 +379,8 @@ test('e2e stage-clarify+stage-decompose (a) clear+pass-through: --once safely no
   const afterDispatch = stateView(repoRoot);
   assert.equal(afterDispatch.work[submitted.id].status, 'awaiting-approval');
   assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true);
-  assert.match(branchLog(repoRoot, `fgw/${submitted.id}`), /worker: output\.txt/);
+  // the worker only wrote the file; its Unit run committed it
+  assert.match(branchLog(repoRoot, `fgw/${submitted.id}`), new RegExp(`chore\\(work-${submitted.id}-`));
 
   // `fgos list` (the public read surface) confirms the same facts.
   const list = envelopeData(fgos(repoRoot, ['list']).stdout);
@@ -511,7 +525,8 @@ test('e2e stage-decompose (b) complex item: an explicit decompose --verdict deco
   assert.equal(third.status, 0, `third --once failed: ${third.stderr}`);
   view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].status, 'awaiting-approval', 'the root lot frontier and proved itself with its own verify (D4)');
-  assert.match(branchLog(repoRoot, `fgw/${submitted.id}`), /worker: root-done\.txt/);
+  assert.match(branchLog(repoRoot, `fgw/${submitted.id}`), new RegExp(`chore\\(work-${submitted.id}-executing\\): `));
+  assert.equal(execFileSync('git', ['show', '--format=', '--name-only', `fgw/${submitted.id}`], { cwd: repoRoot, encoding: 'utf8' }).trim(), 'root-done.txt');
   assert.equal(view.work[childA.id].status, 'done');
   assert.equal(view.work[childB.id].status, 'done');
 });
@@ -562,25 +577,22 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
 // transition exactly like the interactive driver path. -------------------
 
 /** A fake research worker: writes RESEARCH.md under the item's own feature
- * dir, commits it on the dispatch branch (same discipline
- * writeCommittingExecutor already proves for stage:executing), and reports
+ * dir and leaves it for the runner to commit (a confined worker cannot
+ * commit), and reports
  * its verdict via a `fgos-verdict` fence (tsk-4v6) — `clear: true` by
  * default; pass `clear: false` to prove the park path instead. Never that
  * fgos-coding-discovering's own real content shape (nor the
  * fgos-researching helper it calls) is followed (out of this item's
  * scope -- that skill's own job). */
-function writeResearchWorkerExecutor(scriptDir, featureDir, { clear = true, verify = 'test -f later.txt', question = 'Which approach?', selfCommit = true } = {}) {
+function writeResearchWorkerExecutor(scriptDir, featureDir, { clear = true, verify = 'test -f later.txt', question = 'Which approach?' } = {}) {
   const scriptPath = path.join(scriptDir, 'research-worker-executor.mjs');
   const verdictBody = clear ? { clear: true, verify } : { clear: false, question };
   fs.writeFileSync(
     scriptPath,
     `
 import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
 fs.mkdirSync(${JSON.stringify(featureDir)}, { recursive: true });
 fs.writeFileSync(${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}, '## Round 1\\n\\nFound: nothing blocking.\\n');
-${selfCommit ? `execFileSync('git', ['add', ${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}]);
-execFileSync('git', ['commit', '-q', '-m', 'research: round 1']);` : ''}
 process.stdout.write(${JSON.stringify('```fgos-verdict\n' + JSON.stringify(verdictBody) + '\n```\n')});
 `,
   );
@@ -607,7 +619,8 @@ test('e2e stage-discovery: --once dispatches a stage:discovery item to a real wo
   assert.equal(item.status, 'todo', 'discovery dispatch never claims/proposes -- planning is the next stop, not a terminal one');
   assert.equal(item.verify, 'test -f later.txt', "the worker's own proposed verify rode onto the item");
   assert.equal(branchExists(repoRoot, 'fgw/item-research'), true, 'the worker ran on its own real dispatch branch');
-  assert.match(branchLog(repoRoot, 'fgw/item-research'), /research: round 1/);
+  assert.match(branchLog(repoRoot, 'fgw/item-research'), /chore\(work-item-research-discovery\): /);
+  assert.equal(execFileSync('git', ['show', '--format=', '--name-only', 'fgw/item-research'], { cwd: repoRoot, encoding: 'utf8' }).trim(), 'docs/history/discovery-dispatch-item/RESEARCH.md');
 });
 
 test('e2e stage-discovery: a research worker that only writes RESEARCH.md (no git) still advances — the runner commits it', () => {
@@ -616,7 +629,7 @@ test('e2e stage-discovery: a research worker that only writes RESEARCH.md (no gi
   const featureDir = 'docs/history/discovery-edit-only-item';
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir, { selfCommit: false }));
+  writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir));
   add(repoRoot, 'item-research-eo', { workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
 
   const result = runner(repoRoot, ['--once']);
@@ -624,7 +637,7 @@ test('e2e stage-discovery: a research worker that only writes RESEARCH.md (no gi
 
   assert.equal(stateView(repoRoot).work['item-research-eo'].workflowStep, 'planning');
   assert.equal(branchAheadCount(repoRoot, 'fgw/item-research-eo'), 1);
-  assert.match(branchLog(repoRoot, 'fgw/item-research-eo'), /chore\(item-research-eo\): /);
+  assert.match(branchLog(repoRoot, 'fgw/item-research-eo'), /chore\(work-item-research-eo-discovery\): /);
 });
 
 test('e2e stage-discovery: --once advances the item to exploring and parks it in awaiting-human when the real worker reports an unclear verdict (tsk-4v6/tsk-30v)', () => {
@@ -783,7 +796,7 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
 
   // fgw/item1 exists and carries exactly the worker's commit.
   assert.equal(branchExists(repoRoot, 'fgw/item1'), true);
-  assert.match(branchLog(repoRoot, 'fgw/item1'), /worker: output\.txt/);
+  assert.match(branchLog(repoRoot, 'fgw/item1'), /chore\(work-item1-executing\): /);
   assert.equal(branchAheadCount(repoRoot, 'fgw/item1'), 1);
   assert.equal(branchExists(repoRoot, 'fgw/item2'), false, 'item2 was never dispatched');
 
@@ -952,7 +965,7 @@ test('e2e runner commit: a worker that only edits files gets its work committed 
   assert.match(workerLog, /commit runner/);
 });
 
-test('e2e runner commit: with no Result summary the commit subject falls back to "chore(<id>): <title>"', () => {
+test('e2e runner commit: with no result claim the commit subject is the Unit run\'s generic one, under the Unit id', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
 
@@ -962,22 +975,32 @@ test('e2e runner commit: with no Result summary the commit subject falls back to
 
   const result = runner(repoRoot, ['--once']);
   assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
-  assert.match(branchLog(repoRoot, 'fgw/item-fallback'), /chore\(item-fallback\): Produce the file/);
+  assert.match(branchLog(repoRoot, 'fgw/item-fallback'), /chore\(work-item-fallback-executing\): producer changes/);
 });
 
-test('e2e runner commit: a worker that already committed itself (older contract) gets no second commit', () => {
+test('e2e runner commit: a worker cannot commit itself (its git dir is read-only) -- the round fails, nothing is committed, verify-miss', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+  const scriptPath = path.join(scriptDir, 'self-committing-executor.mjs');
+  fs.writeFileSync(scriptPath, `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+fs.writeFileSync('output.txt', 'produced by worker\\n');
+execFileSync('git', ['add', 'output.txt']);
+execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);
+`);
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   add(repoRoot, 'item-self', { verify: 'test -f output.txt' });
-  writeRunnerConfig(repoRoot, writeCommittingExecutor(scriptDir, 'output.txt'));
+  writeRunnerConfig(repoRoot, scriptPath);
 
   const result = runner(repoRoot, ['--once']);
   assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
-  assert.equal(stateView(repoRoot).work['item-self'].status, 'awaiting-approval');
-  assert.equal(branchAheadCount(repoRoot, 'fgw/item-self'), 1);
-  assert.match(`${result.stdout}${result.stderr}`, /commit for "item-self": self/);
+  assert.equal(stateView(repoRoot).work['item-self'].status, 'blocked');
+  assert.equal(branchAheadCount(repoRoot, 'fgw/item-self'), 0);
+  assert.match(`${result.stdout}${result.stderr}`, /commit for "item-self": none/);
+  const actual = events(repoRoot).find((e) => e.type === 'work.outcome' && e.payload.actual);
+  assert.equal(actual.payload.actual.errorClass, 'verify-miss');
 });
 
 test('e2e runner commit: a worker that changes nothing leaves no commit -> verify-miss, parked, never proposed', () => {
@@ -1019,61 +1042,64 @@ test('e2e runner commit: a failing commit (rejecting pre-commit hook) is an infr
 
 // --- case 3: crash-idempotency ----------------------------------------------
 
-test('e2e crash-idempotency: runner killed mid-item (after doing, before proposed) -> a second --once reaps the item to a defined state, exactly one worker commit, no leaked worktree', () => {
+test('e2e crash-idempotency: runner killed mid-round (after doing, before the worker settled) -> nothing was committed, the item log keeps the Unit run id, and a later --once reaps the item to a defined state, keeping the killed round\'s uncommitted checkout', { skip: process.platform === 'win32' && 'SIGKILL of a spawned runner is POSIX-only' }, async () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   add(repoRoot, 'item-crash', { verify: 'test -f output.txt' });
-  const configPath = writeExplicitRunnerConfigFile(repoRoot, writeParentKillingExecutor(scriptDir, 'output.txt'));
+  const configPath = writeExplicitRunnerConfigFile(repoRoot, writeHoldingExecutor(scriptDir, 'output.txt'));
 
-  // First --once: the worker commits, then SIGKILLs its own parent (the
-  // runner) before the runner can write `proposed`. The runner process
-  // dies mid-dispatch — its own worktree teardown (in a `finally`) never
-  // runs, so `fgw/item-crash` is left checked out at whatever path the
-  // runner allocated for this attempt.
-  const first = runner(repoRoot, ['--once', '--config', configPath]);
-  // Killed by SIGKILL: no graceful exit code, no controlled stdout.
-  if (process.platform === 'win32') {
-    assert.ok(first.status !== 0);
-  } else {
-    assert.equal(first.status, null);
-    assert.equal(first.signal, 'SIGKILL');
+  // First --once: while the worker holds mid-round, SIGKILL the runner. Its
+  // worktree teardown (in a `finally`) never runs.
+  const child = spawn(process.execPath, [RUNNER, '--once', '--config', configPath], { cwd: repoRoot, stdio: 'ignore' });
+  const exited = new Promise((resolve) => child.on('exit', (code, signal) => resolve({ code, signal })));
+  let held = null;
+  for (const deadline = Date.now() + 30000; !held && Date.now() < deadline;) {
+    held = startedWorktree(repoRoot);
+    if (!held) await new Promise((r) => setTimeout(r, 50));
   }
+  assert.ok(held, 'the worker started and is holding');
+  child.kill('SIGKILL');
+  const first = await exited;
+  assert.equal(first.signal, 'SIGKILL');
+  // Release the orphaned worker so it exits on its own.
+  fs.writeFileSync(path.join(held, '.go'), '');
 
-  // The claim (todo -> doing) landed before the kill; the item is left
-  // sitting in `doing` with a real commit already on its branch.
+  // The claim landed before the kill; the round never settled, so the runner
+  // committed nothing (it commits only after a round passes).
   assert.equal(stateView(repoRoot).work['item-crash'].status, 'doing');
   assert.equal(branchExists(repoRoot, 'fgw/item-crash'), true);
-  assert.equal(branchAheadCount(repoRoot, 'fgw/item-crash'), 1);
+  assert.equal(branchAheadCount(repoRoot, 'fgw/item-crash'), 0);
+  // The item log named the Unit run the moment it existed, so the run a
+  // person could resume is known; that run was never settled.
+  const log = fs.readFileSync(path.join(repoRoot, '.fgos', 'logs', 'item-crash.log'), 'utf8');
+  const unitRunId = /worker running as unit run (unit-run-\S+);/.exec(log)?.[1];
+  assert.ok(unitRunId, `the item log names the Unit run: ${log}`);
+  const record = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
+  assert.equal(record.execution.status, 'running', 'nothing settled the killed round');
 
   // Second --once: the killed runner left its runner.lock behind, so this
-  // run cleans the stale lock and yields busy (exit 6) — the reclaimer
-  // never acquires on the path it just deleted (clean-and-yield).
+  // run cleans the stale lock and yields busy (exit 6).
   const second = runner(repoRoot, ['--once', '--config', configPath]);
   assert.equal(second.status, 6, `expected busy (stale lock cleaned): ${second.stderr}`);
   assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'runner.lock')), false);
 
   // Third --once: acquires a clean lock; startup reap resolves the stale
-  // `doing` item to a defined state (proposed, since the branch's commit
-  // passes verify) — crash recovery lands within two ticks.
+  // `doing` item. Its branch carries no commit, so it is reclaimed blocked.
   const third = runner(repoRoot, ['--once', '--config', configPath]);
   assert.equal(third.status, 0, `post-clean --once did not recover cleanly: ${third.stderr}`);
+  assert.equal(stateView(repoRoot).work['item-crash'].status, 'blocked');
+  assert.equal(branchAheadCount(repoRoot, 'fgw/item-crash'), 0, 'the reap never re-ran the item');
 
-  const finalStatus = stateView(repoRoot).work['item-crash'].status;
-  assert.ok(
-    finalStatus === 'awaiting-approval' || finalStatus === 'blocked',
-    `expected the crashed item to reap to a defined state (proposed/blocked), got "${finalStatus}"`,
-  );
-
-  // Exactly one worker commit on the branch — the reap must never re-run
-  // (and hence never re-commit) the same item.
-  assert.equal(branchAheadCount(repoRoot, 'fgw/item-crash'), 1);
-
-  // No worktree leak: only the main worktree is still registered against
-  // this repo — the killed first attempt's checkout and the second
-  // attempt's own throwaway reap checkout must both be gone.
-  assert.equal(worktreeCount(repoRoot), 1);
+  // The killed round's checkout still holds the worker's uncommitted file, so
+  // it is kept (never force-removed), and so is the branch it is on; nothing
+  // else leaked.
+  assert.equal(fs.readFileSync(path.join(held, 'output.txt'), 'utf8'), 'produced by worker\n');
+  assert.equal(worktreeCount(repoRoot), 2, 'only the killed round\'s own checkout is left');
+  assert.match(third.stdout + third.stderr, new RegExp(`keeping fgw/item-crash \\(0 commits, but still checked out at `));
+  // The kept checkout lives in the runner's default worktree dir, outside the fixture.
+  execFileSync('git', ['worktree', 'remove', '--force', held], { cwd: repoRoot });
 });
 
 // --- --watch (str7-str8-priority-intent D8) ---------------------------------

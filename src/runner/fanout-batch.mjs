@@ -6,10 +6,9 @@ import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { listWork } from '../state/store.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { compileDispatchPlan } from './dispatch/plan.mjs';
-import { executeExecutorCli } from './dispatch/cli.mjs';
-import { commitUnitWork } from './execution/commit-unit-work.mjs';
-import { buildPrompt, executorIdForWork } from './work-compat.mjs';
-import { workDispatchContext } from './work-dispatch.mjs';
+import { runUnit } from './execution/run.mjs';
+import { executorIdForWork } from './work-compat.mjs';
+import { workUnitFor } from './work-dispatch.mjs';
 import fs from 'node:fs';
 import { resolveFgosBin } from '../setup/bin-discovery.mjs';
 import { isMainModule } from '../../scripts/lib/is-main-module.mjs';
@@ -28,12 +27,16 @@ function resolveBinFgos() {
  *
  * Boundary Note (R1 / M10):
  * Lives in the Work Driver layer (next to loop.mjs) rather than dispatch core.
- * Dispatch core owns compileDispatchPlan and executeExecutorCli; Work lifecycle
- * driving (pick, return, worker slot checking) belongs here in the Work Driver layer.
+ * Dispatch core owns compileDispatchPlan; the worker runs as one Unit through runUnit (the
+ * door `fgos run` uses), which commits what the worker left in the item's worktree. Work
+ * lifecycle driving (pick, return, worker slot checking) belongs here in the Work Driver layer.
  *
  * Fault Tolerance Invariant (R1):
- * If `pick` succeeds but execution throws, the item must be returned with status `blocked`
- * via `fgos return --to blocked` rather than leaving the work item claimed in `doing`.
+ * If `pick` succeeds but the Unit run does not pass (or throws), the item must be returned with
+ * status `blocked` via `fgos return --to blocked` rather than leaving it claimed in `doing`.
+ *
+ * Each `fired` entry is `{ id, unitRunId, outcome, commit }`, plus `error`/`errorClass` when the
+ * item was returned blocked.
  */
 export async function fanoutBatchExecutorCli(
   candidateIdsArg = [],
@@ -94,6 +97,9 @@ export async function fanoutBatchExecutorCli(
 
       let picked = false;
       let wtPath = cwd;
+      let unitRunId = null;
+      let outcome = null;
+      let commit = null;
 
       try {
         const pickStdout = execFgos(['pick', candidateId, '--dir', root], {
@@ -104,54 +110,34 @@ export async function fanoutBatchExecutorCli(
         wtPath = pickedData.data?.worktree?.path || cwd;
         picked = true;
 
-        const execRes = await executeExecutorCli(executorId, {
-          prompt: buildPrompt(workItem),
+        const { unitData } = workUnitFor(workItem, { cfg, worktree: wtPath });
+        const unit = await runUnit({
+          unitData,
+          worktree: wtPath,
           cwd: wtPath,
           repoRoot: root,
-          hasLiveTaskAccess,
-          ...workDispatchContext({ work: workItem, cwd: wtPath, executorId }),
+          session: { headless: true, herdrPresent: false },
+          onUnitRunCreated: (id) => { unitRunId = id; },
         });
-
-        // The worker only edits files; the runner commits them before
-        // `return` (which demands an advanced branch). A clean tree (worker
-        // that committed itself, or changed nothing) is not an error. A
-        // commit failure throws into the catch below, which returns the item
-        // blocked.
-        const commit = commitUnitWork({
-          worktree: wtPath,
-          repoRoot: root,
-          unitId: candidateId,
-          summary: `${candidateId}: ${workItem.title}`,
-          // A Work item declares no write scope: everything outside .fgos is the worker's.
-          scope: ['**'],
-          changedFiles: null,
-          excludePaths: [],
-        });
-        if (commit.status === 'failed') {
-          throw new Error(`runner commit of the worker's changes failed: ${commit.error}`);
+        unitRunId = unit.unitRunId;
+        const seat = unit.results?.[unit.results.length - 1] ?? {};
+        commit = seat.commit ?? null;
+        outcome = unit.outcome;
+        if (outcome !== 'pass') {
+          const refused = seat.refused ? `: ${seat.refused.reason}` : '';
+          const failed = commit?.status === 'failed' ? `: runner commit failed (${commit.reason ?? commit.error})` : '';
+          throw Object.assign(new Error(`unit run ${unitRunId} ended ${outcome}${refused || failed}`), { errorClass: outcome });
         }
 
-        const returnArgs = ['return', candidateId, '--dir', root];
-        // verifiedSha names the worker's own tip; a runner commit moves the
-        // tip past it, so it only applies when the runner committed nothing.
-        if (commit.status !== 'committed' && execRes && execRes.verifiedSha) {
-          returnArgs.push('--worker-verified-sha', execRes.verifiedSha);
-        }
-        execFgos(returnArgs, {
+        // The runner committed inside the Unit run, so `return` judges that commit; the
+        // worker's own tip is never vouched for.
+        execFgos(['return', candidateId, '--dir', root], {
           cwd: wtPath,
           encoding: 'utf8',
           stdio: ['ignore', 'pipe', 'pipe'],
         });
 
-        return {
-          kind: 'fired',
-          entry: {
-            id: candidateId,
-            status: execRes.status ?? 0,
-            signal: execRes.signal ?? null,
-            errorClass: execRes.errorClass ?? null,
-          },
-        };
+        return { kind: 'fired', entry: { id: candidateId, unitRunId, outcome, commit } };
       } catch (err) {
         // R1: If pick succeeded but execute/return threw, return with blocked so item does not hang in doing
         if (picked) {
@@ -179,7 +165,9 @@ export async function fanoutBatchExecutorCli(
           kind: 'fired',
           entry: {
             id: candidateId,
-            status: 1,
+            unitRunId,
+            outcome: outcome ?? 'execution-failure',
+            commit,
             errorClass: err.errorClass || 'error',
             error: err.message,
           },
@@ -200,7 +188,9 @@ export async function fanoutBatchExecutorCli(
       const err = res.reason;
       fired.push({
         id: candidateId,
-        status: 1,
+        unitRunId: null,
+        outcome: 'execution-failure',
+        commit: null,
         errorClass: err?.errorClass || 'error',
         error: err?.message || String(err),
       });
