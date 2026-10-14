@@ -2,18 +2,106 @@
   "version": 1,
   "batch": "root-authorities",
   "authorization": "A28",
-  "authoredCommit": "c8b2d948d6dd0b408011b294fd67aea59870749b",
+  "authoredCommit": "1157b7243ed3c4b2f9dfe67597f3908f6f881ec9",
   "scope": [
     "docs/specs/work-state.md",
     "docs/io-contract.md",
     "docs/doc-governance.md",
     "docs/decisions/index.md",
-    "docs/doc-registry.json"
+    "docs/doc-registry.json",
+    "docs/templates/architecture.md",
+    "docs/templates/area-readme.md",
+    "docs/templates/contract.md",
+    "docs/user/README.md"
   ],
-  "scopeLimit": "First bounded source subset only; not a final Step 5 batch list or closure claim.",
-  "meaning": "Exact native reverse-open units of the submitted first source subset; candidate-unverified, never truth approval.",
-  "count": 59,
+  "scopeLimit": "Bounded governance/SC1 and three historical templates plus user portal only; not final Step 5 closure.",
+  "meaning": "Exact native reverse-open list; candidate-unverified, no truth approval.",
+  "count": 65,
   "rows": [
+    {
+      "claimId": "claim_e35633c457b88d1fbdb23ac9da437dd8",
+      "path": "docs/platform/documentation/history/templates/architecture.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "9d3d9301a94c919b3a8a2a1f3af84f0e8dc8e1971744b98eb69d96c979b20cbd",
+      "fileStatus": {
+        "kind": "history",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_1caa58d05bfac4675072399ed4b16669",
+      "path": "docs/platform/documentation/history/templates/architecture.md",
+      "anchor": "source-metadata-added-in-candidate",
+      "unitDigest": "964c7b53a611bdf26df10e77053bbf0d8c9e840f8c15d3642eae8a32e59f6654",
+      "fileStatus": {
+        "kind": "history",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_7e455f42072ca82811cd8912423f3d04",
+      "path": "docs/platform/documentation/history/templates/area-readme.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "5d2860c727c33ec41ed26844d16ca8926b631d4e3ce0d576eeb0492a7f344754",
+      "fileStatus": {
+        "kind": "history",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_d7539a2408fd46e9afa1a43ed578a9e8",
+      "path": "docs/platform/documentation/history/templates/area-readme.md",
+      "anchor": "source-metadata-added-in-candidate",
+      "unitDigest": "99478823ff5018c971dc005e6e7d7c17519ef0cc5fc365e8baf717debd9bcd33",
+      "fileStatus": {
+        "kind": "history",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_d3d9dd0f6a58c21a15b03c8619e18639",
+      "path": "docs/platform/documentation/history/templates/contract.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "a29fb6664461ad257b3b96c26aed22b2d14185b0a6a30b818cae8af306e9510b",
+      "fileStatus": {
+        "kind": "history",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified"
+    },
+    {
+      "claimId": "claim_6095fa66eca58c47d08161cfbe4d9ad5",
+      "path": "docs/platform/documentation/history/templates/contract.md",
+      "anchor": "source-metadata-added-in-candidate",
+      "unitDigest": "f42d20f0e04293688863594f51cacf68ea5d591aa349cb9ec515c97b1e698b1e",
+      "fileStatus": {
+        "kind": "history",
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "history"
+      },
+      "status": "candidate-unverified"
+    },
     {
       "claimId": "claim_b00f373a151549ef51503fc29e8abd12",
       "path": "docs/platform/governance.md",
@@ -21,7 +109,6 @@
       "unitDigest": "1bdf22f366a423941250211f62e5003e55ddb5430a2b6578a2faa9f6c5b027cd",
       "fileStatus": {
         "kind": "governance",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -36,7 +123,6 @@
       "unitDigest": "8076f3682a1289b266fd074de6eb1ee7842c5905fe9674771792c8d9a53f42a4",
       "fileStatus": {
         "kind": "governance",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -51,7 +137,6 @@
       "unitDigest": "59d4e62bd8b88fb77ea3f20660a18f58df4aca5b5d6c3c6f38a15ae6f48755a4",
       "fileStatus": {
         "kind": "governance",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -66,7 +151,6 @@
       "unitDigest": "cb275b793cfe6299aaa442b4021cce113f2dfeb62fee2397f0680acdcb9b56d8",
       "fileStatus": {
         "kind": "architecture",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -81,7 +165,6 @@
       "unitDigest": "d357d4a5224eaffb265d2bcf57b79347b4d4a7ef3ca5c998d31da3cc9f1d3d5b",
       "fileStatus": {
         "kind": "architecture",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -96,7 +179,6 @@
       "unitDigest": "114d842f28715694851c5df891c32b0f8d524b913fbac3111d80abe5434178c6",
       "fileStatus": {
         "kind": "architecture",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -111,7 +193,6 @@
       "unitDigest": "4e5185bf76d81997933e0c97655c3504c9913d23cecdf0f5ac282aa5f5c701c0",
       "fileStatus": {
         "kind": "architecture",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -126,7 +207,6 @@
       "unitDigest": "0ebfd1d41b3c588f1f469cc28a8884057b30812a24d5870a8a2e44600cf27385",
       "fileStatus": {
         "kind": "architecture",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -141,7 +221,6 @@
       "unitDigest": "08e9731304f9e54ce01edb082f23b13ff6802af280ca8aeb62ff1d2e1a7a0627",
       "fileStatus": {
         "kind": "architecture",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -156,7 +235,6 @@
       "unitDigest": "ace07b86452f1aa48efa0897defdd839191e5d66ea38aacd51db318afb0bc941",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -171,7 +249,6 @@
       "unitDigest": "0987d91c6d782d70b13bae3627e042e262c6f3b3a87dfb82997fba01aa7147fb",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -186,7 +263,6 @@
       "unitDigest": "b52d9c4e6e4bb58f446010e169b1f54d25e916b993a08dc4b3c6cb513897fc4c",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -201,7 +277,6 @@
       "unitDigest": "987e8f9f71703323f0ba7b5ca63c5dbddb7536ba1f69683e432efd4463da6890",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -216,7 +291,6 @@
       "unitDigest": "8789fb7c71d479865e2c6f7c7ade71a6b69867ca1157db3dd424977918db061b",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -231,7 +305,6 @@
       "unitDigest": "befd4c0925c52780e0dff93c01ed25165e6ed23c6bafeba2665f172496b25420",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -246,7 +319,6 @@
       "unitDigest": "54081f4a2370577dc2292bd6f53556e29db67c332a9ce6eeff77b95afc9aca34",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -261,7 +333,6 @@
       "unitDigest": "39837e8811079e85d0b925fa05a05b6cd87150e1610fbe2abb9cfa2ee854fa68",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -276,7 +347,6 @@
       "unitDigest": "6a2cf1b5520ada464d6e35a8eab07b2bd7a2965d511b3cbb46ec1ec993167a81",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -291,7 +361,6 @@
       "unitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -306,7 +375,6 @@
       "unitDigest": "4a338e4d813b275ce1c923da4f814881eaab30a4bdca231382fd7df5c5fe9b4a",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -321,7 +389,6 @@
       "unitDigest": "549dded9fe85b1cfd57f1ec7079141e4feb9e6468a31e93485ab91a2305e79fe",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -336,7 +403,6 @@
       "unitDigest": "a7e0489cd2409eb4b835d3368b5d642409d0183530639510033cb4c2ea70d6df",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -351,7 +417,6 @@
       "unitDigest": "73a072fb1b320f93951e427d5e1af422830f13d626e6564e14bbe403012a389d",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -366,7 +431,6 @@
       "unitDigest": "6238a5e1752c22a8bb4a2801757a1e891ae0902e8cec197d7a44d5f7f9eb8ea0",
       "fileStatus": {
         "kind": "contract",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -381,7 +445,6 @@
       "unitDigest": "b15dec1d66d1ae673352b56ff918b917f9e628294a4ef5124f6face82e91e995",
       "fileStatus": {
         "kind": "decision",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -396,7 +459,6 @@
       "unitDigest": "1a6db74c9548d91671e8677038c8a3d5cbb338157fa78edab6420ad6555257ac",
       "fileStatus": {
         "kind": "decision",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -411,7 +473,6 @@
       "unitDigest": "74b54c3ee9e2379ee592933ee6d9a0358b172f1ddf78d3295db44d78bb060e5a",
       "fileStatus": {
         "kind": "decision",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -426,7 +487,6 @@
       "unitDigest": "004f542a5bde3a173fdcfa6aa53cdbadc1f19970795962fb0bf48e73114759bc",
       "fileStatus": {
         "kind": "decision",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -441,7 +501,6 @@
       "unitDigest": "c98f5791cdbbddca365d9380156be1beab1612a7d572b34ee5d7cda2c2a75a60",
       "fileStatus": {
         "kind": "history",
-        "kindCanonical": false,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -456,7 +515,6 @@
       "unitDigest": "23354ff6d36685c865345ed911d19b95b22c5bac322c47f823fdb279de29be67",
       "fileStatus": {
         "kind": "history",
-        "kindCanonical": false,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -471,7 +529,6 @@
       "unitDigest": "3c47bf821af476b6ef6aeb600c18f3e02e414a584b903989c9166bb5c458944d",
       "fileStatus": {
         "kind": "history",
-        "kindCanonical": false,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -486,7 +543,6 @@
       "unitDigest": "322ff44464a915090c5003dd765463b7d2dc113730c6e49f9a0ca95961f81962",
       "fileStatus": {
         "kind": "history",
-        "kindCanonical": false,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -501,7 +557,6 @@
       "unitDigest": "cf18376a42bddc0e4c1b6fb81faafb0599c3e6c45d5440d61144aca5cabc9bc8",
       "fileStatus": {
         "kind": "history",
-        "kindCanonical": false,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -516,7 +571,6 @@
       "unitDigest": "bec0bee4883c07d780fdb7326d398df733b3d360628904265c1b87d86dbd5251",
       "fileStatus": {
         "kind": "history",
-        "kindCanonical": false,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -531,7 +585,6 @@
       "unitDigest": "2a8b93c172f11f9d2f118fea5a934559964ccb299327b5deb8621632a1d2d98a",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -546,7 +599,6 @@
       "unitDigest": "402fdee5f2de6e3510907b5bcc86080b6b4f8c1f3b40cbec3bc6cb347ea739ea",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -561,7 +613,6 @@
       "unitDigest": "19bf6e1bfdcb178636bc7848a2c7131f85cd93ce2822f4d0d3d8d6db1876aee8",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -576,7 +627,6 @@
       "unitDigest": "565e157d554380e371b36756303e6a49480075fdc1a98ca544b8b5b3d95705d5",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -591,7 +641,6 @@
       "unitDigest": "7928379e01fa7625ab5fe776f09064979906a3269bcaace401926e6f083ecc9f",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -606,7 +655,6 @@
       "unitDigest": "0179e23b52d6975730a1141c8ae453735d17ccf63c8792b0ce9ad7ca41ef9f1d",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -621,7 +669,6 @@
       "unitDigest": "678a5f954ec08ce04c589014638beef17c0a40d257dd87311c833bd711055d91",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -636,7 +683,6 @@
       "unitDigest": "4e6d7bbc90fe594a85b59680da7e9631bdbae1f41127a43db7b03993b2563949",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -651,7 +697,6 @@
       "unitDigest": "efd8ff22ee1d6e3922302215002a4727e69f2722e5507cba54d9e92f94f2fd17",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -666,7 +711,6 @@
       "unitDigest": "4dedd0722088de326bb89be824a5f78fde42fc5a1ec1f8ff50ebabcab5c3464c",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -681,7 +725,6 @@
       "unitDigest": "19916875886c488a79940aadd1b3ab4c61288ef66c148300b483d9cacf94d994",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -696,7 +739,6 @@
       "unitDigest": "4ec367b6fb47b2dc7705caa2b3ae458f74136f697291ee505a2e884233efd793",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -711,7 +753,6 @@
       "unitDigest": "c91a0a9f8d28a1ebc3cee7e8545128407fdc9bea4cc8f20a0e52ad44be626672",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -726,7 +767,6 @@
       "unitDigest": "d329826e03cec87fa8debb4a68909e81621aef1fcef5cec549342c2dbf25c561",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -741,7 +781,6 @@
       "unitDigest": "9a658ef61faf272a7f509a32ce47a8778f94d791140af01f0dbdab633456a4aa",
       "fileStatus": {
         "kind": "spec",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -756,7 +795,6 @@
       "unitDigest": "48be7e1956a052be73118c1dd9f46ea4380226e957820b79e128011e137c6985",
       "fileStatus": {
         "kind": "spec",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -771,7 +809,6 @@
       "unitDigest": "f26008336cbb1037dda0f2ae2290c62963215e24d0301057f1e367e3dcab9bfb",
       "fileStatus": {
         "kind": "spec",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -786,7 +823,6 @@
       "unitDigest": "95acad19943ec3bec0f17e89bd1a2913178b14fa1918abd8a3582102d3547e09",
       "fileStatus": {
         "kind": "spec",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -801,7 +837,6 @@
       "unitDigest": "1f32213caa9b7a362e4f9264696aa1969ced613dc7bf66d3263c74ddca1ac806",
       "fileStatus": {
         "kind": "spec",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -816,7 +851,6 @@
       "unitDigest": "69876b8abcf241ab133b5f7a4e06a3366f94b8ecc9e315ccc249c01b612aaeba",
       "fileStatus": {
         "kind": "spec",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -831,7 +865,6 @@
       "unitDigest": "f4f9e9e9a1350ede402b09ff84e48dfa87b46f7b605cb89788e7bac8d5ca32db",
       "fileStatus": {
         "kind": "spec",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -846,7 +879,6 @@
       "unitDigest": "bf1d6f189051b2a329a87fe64f1be27ea4faec22215c94b6606481ebae6ba06c",
       "fileStatus": {
         "kind": "spec",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -861,7 +893,6 @@
       "unitDigest": "585bb28b7915224df08e4107704e6266f9c81fab514bdf349582be1527b5950b",
       "fileStatus": {
         "kind": "spec",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -876,7 +907,6 @@
       "unitDigest": "9a02e832f3ff3a984664a32119ecc2a14bc98072bf9f867873ebe81e61f6d238",
       "fileStatus": {
         "kind": "spec",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
@@ -891,7 +921,6 @@
       "unitDigest": "43c88a88d0eb57f524b0b2768bb6132b7136f7c04066dbea712d00c731c3d9a4",
       "fileStatus": {
         "kind": "spec",
-        "kindCanonical": true,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,

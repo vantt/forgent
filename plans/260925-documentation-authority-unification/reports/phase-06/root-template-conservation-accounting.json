@@ -1,0 +1,633 @@
+{
+  "version": 1,
+  "contentCommit": "1157b7243ed3c4b2f9dfe67597f3908f6f881ec9",
+  "authorSession": "codex-session:18@2026-10-14",
+  "rows": [
+    {
+      "claimId": "claim_819d8dab402882018e804a2a71dae60a",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "section",
+      "sourceUnitDigest": "8b357c9e9e9789a236fec29d7661c0b0457d431af78ee5dd07e04684b7a47809",
+      "targetAnchor": "section",
+      "targetUnitDigest": "1eee80dd19171f1d68b01343ad594570b1bf8bb729732ef4c65bd7f1d793e4f3"
+    },
+    {
+      "claimId": "claim_ef61d8b48131b82fc49b1f8ea511b5f4",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "unheaded-block-1",
+      "sourceUnitDigest": "119728c70b0ab6245aac2bd845b97832ec7bfc37fb72e85940ff0f6b06006941",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "119728c70b0ab6245aac2bd845b97832ec7bfc37fb72e85940ff0f6b06006941"
+    },
+    {
+      "claimId": "claim_b772f7252cb798e58c22b762f69ec2a6",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "1-problem-and-forces",
+      "sourceUnitDigest": "6d01cb1e0916f512a2f1875072b76b0c78929132c7c4d95ab4140c332d780bcd",
+      "targetAnchor": "1-problem-and-forces",
+      "targetUnitDigest": "6d01cb1e0916f512a2f1875072b76b0c78929132c7c4d95ab4140c332d780bcd"
+    },
+    {
+      "claimId": "claim_ccd34bf56e65689d026d4c1f04e48368",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "2-chosen-shape",
+      "sourceUnitDigest": "9753cb16cecb3f1d9f1a67c230bbabce5ae0bf2e5a81f4a146506eaae38d6ea6",
+      "targetAnchor": "2-chosen-shape",
+      "targetUnitDigest": "9753cb16cecb3f1d9f1a67c230bbabce5ae0bf2e5a81f4a146506eaae38d6ea6"
+    },
+    {
+      "claimId": "claim_69aa83ccbd39391b1c0b3e0de583ef5e",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "3-boundaries-and-responsibilities",
+      "sourceUnitDigest": "f321c6fcf79c508a2ca820fafabf0972577a487bf64b0ec257941d6ddce8bb42",
+      "targetAnchor": "3-boundaries-and-responsibilities",
+      "targetUnitDigest": "f321c6fcf79c508a2ca820fafabf0972577a487bf64b0ec257941d6ddce8bb42"
+    },
+    {
+      "claimId": "claim_c58bd1fe8db77a8a72a9cc8d4b6b6c99",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "2ce9c7e83030a00d7be3e6ad1f94f05b71ca923876d8c15f5cffdf89bef2aa95",
+      "targetAnchor": "unheaded-block-2",
+      "targetUnitDigest": "2ce9c7e83030a00d7be3e6ad1f94f05b71ca923876d8c15f5cffdf89bef2aa95"
+    },
+    {
+      "claimId": "claim_4690e1c5f0e671dc7b0aa542edb9261c",
+      "class": "Unit-exact",
+      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceUnitDigest": "553beda916c35195b2201bd481db35dccdce57161e9f5a3eb4164f5012e3f077",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "553beda916c35195b2201bd481db35dccdce57161e9f5a3eb4164f5012e3f077"
+    },
+    {
+      "claimId": "claim_e0c528593e9859339fc58cb227794cd2",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "4-alternatives-considered",
+      "sourceUnitDigest": "44031f5d971a33d4ea2a7be4cdcebd110004ddafc57706b7e5269e1f5421d28e",
+      "targetAnchor": "4-alternatives-considered",
+      "targetUnitDigest": "44031f5d971a33d4ea2a7be4cdcebd110004ddafc57706b7e5269e1f5421d28e"
+    },
+    {
+      "claimId": "claim_35b9afbf88ed4fbfcb94a7f2f6dbacfa",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "5-trade-offs",
+      "sourceUnitDigest": "46841ff90862ee7bc2892d5298397e3120d75d06a213bde7c135a1a42493ce5f",
+      "targetAnchor": "5-trade-offs",
+      "targetUnitDigest": "46841ff90862ee7bc2892d5298397e3120d75d06a213bde7c135a1a42493ce5f"
+    },
+    {
+      "claimId": "claim_d5fb924e4631760e1d89400d4839bb92",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "6-decision-surface",
+      "sourceUnitDigest": "cc513d6fbe454c73bbc0361ffccb54bd7dd069f4e938455eee45f4c2cd8b23a3",
+      "targetAnchor": "6-decision-surface",
+      "targetUnitDigest": "cc513d6fbe454c73bbc0361ffccb54bd7dd069f4e938455eee45f4c2cd8b23a3"
+    },
+    {
+      "claimId": "claim_f8493f2f277d9616569b9db1f439048e",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "7-consequences",
+      "sourceUnitDigest": "3326183f51f23ef19206b717be46fa923a3b416ce25bdf6813e114ed5b2f7d9d",
+      "targetAnchor": "7-consequences",
+      "targetUnitDigest": "3326183f51f23ef19206b717be46fa923a3b416ce25bdf6813e114ed5b2f7d9d"
+    },
+    {
+      "claimId": "claim_a8f8be0a3b246a7e19c816564b248e53",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "8-contracts-affected",
+      "sourceUnitDigest": "94cc3825f1d95333a4dfd3b112fb8e451b13223a3c43f4b699b8179876653aa2",
+      "targetAnchor": "8-contracts-affected",
+      "targetUnitDigest": "94cc3825f1d95333a4dfd3b112fb8e451b13223a3c43f4b699b8179876653aa2"
+    },
+    {
+      "claimId": "claim_c147afe1777e89235d7adf0542ac0d6e",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "9-implementation-alignment",
+      "sourceUnitDigest": "069c8cc507cbb2354e434c049d318152de3b29dd358451765a7788a53d00288f",
+      "targetAnchor": "9-implementation-alignment",
+      "targetUnitDigest": "069c8cc507cbb2354e434c049d318152de3b29dd358451765a7788a53d00288f"
+    },
+    {
+      "claimId": "claim_04e18a9b29442519335fd1ed060c6cd0",
+      "class": "Unit-exact",
+      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceUnitDigest": "427510a97d8b5f2e6e55fea59a9345fd261d8da13c06d4224217a6a9b21478f1",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "427510a97d8b5f2e6e55fea59a9345fd261d8da13c06d4224217a6a9b21478f1"
+    },
+    {
+      "claimId": "claim_c9a9230b1a5be02d061f6663327e7e46",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "10-verification-expectations",
+      "sourceUnitDigest": "bf7bd6fa98d49facb60d30e16f1a82d1cc4034b9237f8aed7aacc6b5c52900de",
+      "targetAnchor": "10-verification-expectations",
+      "targetUnitDigest": "bf7bd6fa98d49facb60d30e16f1a82d1cc4034b9237f8aed7aacc6b5c52900de"
+    },
+    {
+      "claimId": "claim_bdf818f750a64ccae056c9149279d22d",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "11-related-files",
+      "sourceUnitDigest": "3d2d10016aada1eb217632d776ea2587b6b0c65c6ccf502b41d692df397df9b5",
+      "targetAnchor": "11-related-files",
+      "targetUnitDigest": "374f412a3a56e44fbd3bb0175f5c8ddc408ae4beac4119534757a6973b8c5eac"
+    },
+    {
+      "claimId": "claim_fbc916a829ad90b0fe2b8f54ec745aa5",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/architecture.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceUnitDigest": "5b4fa4bbeb2619d28842d732cc1cd4e1fb1bb476ad9243b21485b3d42e118315",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "a909cb4222689c7ee73015c553ee76c80db70de6a422e88b072ecb2d9860bdd0"
+    },
+    {
+      "claimId": "claim_4281249fd3851022664c50482513754f",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "section",
+      "sourceUnitDigest": "cc6da11fd15204fb2fcc9c89d0e47582ebc904665100302e2bb524c04797d963",
+      "targetAnchor": "section",
+      "targetUnitDigest": "f7ea49fd5a34cdc708eda959cb0a53989322dd123143dc054a1f63c1f2e2de5c"
+    },
+    {
+      "claimId": "claim_bc4c8e10464b5200023267b95c0a87c9",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "unheaded-block-1",
+      "sourceUnitDigest": "97c772ea8ac477c5a9aa90e9dedfaed6883316a2ac07ca4bc7e39a242d5e60c2",
+      "targetAnchor": "unheaded-block-12",
+      "targetUnitDigest": "97c772ea8ac477c5a9aa90e9dedfaed6883316a2ac07ca4bc7e39a242d5e60c2"
+    },
+    {
+      "claimId": "claim_fa97f5b14af242c342675ea7ffb8e393",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "1-what-this-area-owns",
+      "sourceUnitDigest": "e05c16ca6a677a8dfe28be626f7c15ccb6ff348ff152c3db03fcfdc40f65f71b",
+      "targetAnchor": "1-what-this-area-owns",
+      "targetUnitDigest": "e05c16ca6a677a8dfe28be626f7c15ccb6ff348ff152c3db03fcfdc40f65f71b"
+    },
+    {
+      "claimId": "claim_96bf7233e618d91bf7289cc535125790",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "2-current-shape",
+      "sourceUnitDigest": "2fa9c07bd19a25e628590fe57c21a52d6d1f182cb8d95454f1134f68b0b79dc5",
+      "targetAnchor": "2-current-shape",
+      "targetUnitDigest": "2fa9c07bd19a25e628590fe57c21a52d6d1f182cb8d95454f1134f68b0b79dc5"
+    },
+    {
+      "claimId": "claim_f7a065b3aad21e3f3d66625c0d4a5955",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "3-read-first",
+      "sourceUnitDigest": "d45819dc6043212f5a9d8dce3faf1566dcc7c6b4dc52c378ef96fbfb5a755ca0",
+      "targetAnchor": "3-read-first",
+      "targetUnitDigest": "7b4e22b30093323beaf8a5d0ed44f5d78264f3246fc2b91644058df12f9057bb"
+    },
+    {
+      "claimId": "claim_fca3a109fc33727cd5f2d861f54cabbe",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "f2fdffeeee9470375dd9d514159639e3b30b67e8fef299e62504e7b02596b3f0",
+      "targetAnchor": "unheaded-block-2",
+      "targetUnitDigest": "2af785c82b1dc8acea78b28486a8b8f9f09e56ec675bd248c5b2efd9c4e0d7b2"
+    },
+    {
+      "claimId": "claim_3f8670e2092fd63b3ed43610654e575c",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "4-decision-surface",
+      "sourceUnitDigest": "4643094b50be30dc677c94b9669fcc46e8160272dab5781d636f607d42a31daf",
+      "targetAnchor": "4-decision-surface",
+      "targetUnitDigest": "4643094b50be30dc677c94b9669fcc46e8160272dab5781d636f607d42a31daf"
+    },
+    {
+      "claimId": "claim_a548331c0ac8d27dfce509230ae9e80b",
+      "class": "Unit-exact",
+      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceUnitDigest": "c33992a104c2fffa292b3eed0a725e89f0d04336b05077965cc0b37006ddd8c9",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "c33992a104c2fffa292b3eed0a725e89f0d04336b05077965cc0b37006ddd8c9"
+    },
+    {
+      "claimId": "claim_1ff1c07082b0d61b5b2435820c6fabf6",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "5-canonical-documents",
+      "sourceUnitDigest": "a0df3f695d0e401abb801e5c67d3c6d027f01b0efc1aa93cd15f40d0c460dc6b",
+      "targetAnchor": "5-canonical-documents",
+      "targetUnitDigest": "e55adf5b163ffa7372e87a308d6a5022650fdb6ea9bcdf78c3113ba46cab59bf"
+    },
+    {
+      "claimId": "claim_2ba7046e61d14eec1abdbbcf70cf572e",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceUnitDigest": "53a193af9746b5861d80117df6234778c03729ec788caf49345211f12c6ecffc",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "5220223c29e85e624a217f076099074ffcf4af73f94a972d0ba76abe9ede4536"
+    },
+    {
+      "claimId": "claim_64a6762fd324ccf10d76f497d83945d9",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "6-subcomponent-map",
+      "sourceUnitDigest": "dbe38691d2d4bf3016086974a6268ad1a3a4298c1436b714fe2ae7c32c347bbd",
+      "targetAnchor": "6-subcomponent-map",
+      "targetUnitDigest": "dbe38691d2d4bf3016086974a6268ad1a3a4298c1436b714fe2ae7c32c347bbd"
+    },
+    {
+      "claimId": "claim_7e46d6bcbf6ba3a219b5bb83300cb035",
+      "class": "Unit-exact",
+      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceUnitDigest": "3c5dd6e8ad5fd8e9a09e77e4babaca128034a67bb87501f5bc31ee68af97394a",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "3c5dd6e8ad5fd8e9a09e77e4babaca128034a67bb87501f5bc31ee68af97394a"
+    },
+    {
+      "claimId": "claim_390e3d69f979a294f0ce018104552b9d",
+      "class": "Unit-exact",
+      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "unheaded-block-6",
+      "sourceUnitDigest": "88f8d7fa32b9cb827b933718906dc5c66df99cd086544fe402dfd016450451f5",
+      "targetAnchor": "unheaded-block-6",
+      "targetUnitDigest": "88f8d7fa32b9cb827b933718906dc5c66df99cd086544fe402dfd016450451f5"
+    },
+    {
+      "claimId": "claim_9c73735e4b1169dca3b15d6f369145ca",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "7-key-contracts",
+      "sourceUnitDigest": "3f4f8d5c655918107545f3b3fc8cf02ec93fa930878193d6618059299c276d1a",
+      "targetAnchor": "7-key-contracts",
+      "targetUnitDigest": "3f4f8d5c655918107545f3b3fc8cf02ec93fa930878193d6618059299c276d1a"
+    },
+    {
+      "claimId": "claim_a97b4fb0f6b12f30c2e7f5f20c3a7656",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "8-related-areas",
+      "sourceUnitDigest": "11472f32c4f43f5be481125a7e0171bd0c26aa77b6829aaae167a1d709039827",
+      "targetAnchor": "8-related-areas",
+      "targetUnitDigest": "11472f32c4f43f5be481125a7e0171bd0c26aa77b6829aaae167a1d709039827"
+    },
+    {
+      "claimId": "claim_3d31f4852ae0d831f0487cfbf4ae1d59",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "unheaded-block-7",
+      "sourceUnitDigest": "7aad71bc69fe6f13326b8790793f342525fe0e14b343b0b0b30737decadcceb1",
+      "targetAnchor": "unheaded-block-7",
+      "targetUnitDigest": "7aad71bc69fe6f13326b8790793f342525fe0e14b343b0b0b30737decadcceb1"
+    },
+    {
+      "claimId": "claim_39700796390cc329b7cff6b8842e801c",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "9-component-boundary-impact",
+      "sourceUnitDigest": "5657415e4b9e7ca6add3600ee59dd056e6ba2c10e69aa12fadf0c8ebd924f4c8",
+      "targetAnchor": "9-component-boundary-impact",
+      "targetUnitDigest": "5657415e4b9e7ca6add3600ee59dd056e6ba2c10e69aa12fadf0c8ebd924f4c8"
+    },
+    {
+      "claimId": "claim_a530ce45d966ab75410181e9ec95b971",
+      "class": "Unit-exact",
+      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "unheaded-block-8",
+      "sourceUnitDigest": "a717d40783a0ff7cb1c1849c5e89810a6f84e2de4cd7bcf5632e01967ce5b2c2",
+      "targetAnchor": "unheaded-block-8",
+      "targetUnitDigest": "a717d40783a0ff7cb1c1849c5e89810a6f84e2de4cd7bcf5632e01967ce5b2c2"
+    },
+    {
+      "claimId": "claim_a0540a0d9142fde9f32eb1791a9fc803",
+      "class": "Unit-exact",
+      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceUnitDigest": "aa9fca84c56f5fe39ea3ad83b2266bbc33411e5f05cd477248fd18cc0a6ee2d4",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "aa9fca84c56f5fe39ea3ad83b2266bbc33411e5f05cd477248fd18cc0a6ee2d4"
+    },
+    {
+      "claimId": "claim_23435ea8986d7fdd988a35f6a261ea7f",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "10-how-to-change-this-area",
+      "sourceUnitDigest": "d1e6ffc4e3cd35e9ed7127a68351465b76c3158a2af98f01a84a94f18f2e99dd",
+      "targetAnchor": "10-how-to-change-this-area",
+      "targetUnitDigest": "d1e6ffc4e3cd35e9ed7127a68351465b76c3158a2af98f01a84a94f18f2e99dd"
+    },
+    {
+      "claimId": "claim_6c91dfac8904af282d62fdbcb8b2d4f1",
+      "class": "Unit-exact",
+      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "unheaded-block-10",
+      "sourceUnitDigest": "df833cca57ffb5503e2b01dc5bd080840fff98249907eeec7857292032d886d0",
+      "targetAnchor": "unheaded-block-10",
+      "targetUnitDigest": "df833cca57ffb5503e2b01dc5bd080840fff98249907eeec7857292032d886d0"
+    },
+    {
+      "claimId": "claim_94fef218c368c61c0db242f5a250d0c8",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "11-maintenance-notes",
+      "sourceUnitDigest": "2e92974f405bf3e17eddf30117c634ae9720751d05e72f97ff5e9832f6fcbb0a",
+      "targetAnchor": "11-maintenance-notes",
+      "targetUnitDigest": "2e92974f405bf3e17eddf30117c634ae9720751d05e72f97ff5e9832f6fcbb0a"
+    },
+    {
+      "claimId": "claim_a8a8365739a987937252b67793201ffc",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "12-related-files",
+      "sourceUnitDigest": "2e291bd076596797124bc6c1f249f644b48fd68679ab7a7b9c22f392312b684d",
+      "targetAnchor": "12-related-files",
+      "targetUnitDigest": "ee68ed7a1f09e9057fe43d6c2abeade1e82d049ead17d6334f3871c590c1ba9b"
+    },
+    {
+      "claimId": "claim_9830613e938f023e2586c2c95b6d92c3",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/area-readme.md",
+      "sourceAnchor": "unheaded-block-11",
+      "sourceUnitDigest": "4bd5313e8e0b19bc7a2f4981ad2b1399a27a9a7cbad268828adce8b7f45c49d5",
+      "targetAnchor": "unheaded-block-11",
+      "targetUnitDigest": "655b46f437c2d612446088d8f29c313cb358363c31dd890a6105340779ce1952"
+    },
+    {
+      "claimId": "claim_79a4e1d59b5e5879f3b8b2e0ad74580e",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "contract",
+      "sourceUnitDigest": "8a876dad2c0f44906caad82aa62d6d6f98063a046eb6ee9600863d7f89d1dd41",
+      "targetAnchor": "contract",
+      "targetUnitDigest": "f4f963c7ce698ae5aa940718d0b894c08ba2d8000a51ef8471a44883f0c45ae5"
+    },
+    {
+      "claimId": "claim_2701b801e34630c55ddc3d0c39849f50",
+      "class": "Weak-exact",
+      "classReason": "ancestor headings differ",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "unheaded-block-1",
+      "sourceUnitDigest": "da488073301bb9c825fb91507a27538e9c4fe8826406ea5a2e57bbcc97e3f55b",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "da488073301bb9c825fb91507a27538e9c4fe8826406ea5a2e57bbcc97e3f55b"
+    },
+    {
+      "claimId": "claim_9cd16d7330878d01d4f7fe078071b0f7",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "1-status-and-authority",
+      "sourceUnitDigest": "246c4bb63a386dc6e57c08e5b0511af01158e83cce847e6ffda891926af936ab",
+      "targetAnchor": "1-status-and-authority",
+      "targetUnitDigest": "246c4bb63a386dc6e57c08e5b0511af01158e83cce847e6ffda891926af936ab"
+    },
+    {
+      "claimId": "claim_bbd15a6f8d54093f519896a31c7a55ac",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "2-parties",
+      "sourceUnitDigest": "fb6ad8bd725b5b3689902f3356e1b2e8b9aba23b83fd66108eab4daf3c73fcf4",
+      "targetAnchor": "2-parties",
+      "targetUnitDigest": "fb6ad8bd725b5b3689902f3356e1b2e8b9aba23b83fd66108eab4daf3c73fcf4"
+    },
+    {
+      "claimId": "claim_598c15995ca57539d890fc5f381767f8",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "3-definitions",
+      "sourceUnitDigest": "897ecd5f6f50a00d01cb211376f21d07fcd75b2bfe32e4a76f1e33332ac3582d",
+      "targetAnchor": "3-definitions",
+      "targetUnitDigest": "897ecd5f6f50a00d01cb211376f21d07fcd75b2bfe32e4a76f1e33332ac3582d"
+    },
+    {
+      "claimId": "claim_a44e404dea34a137e621f417a195eadb",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "4-rules",
+      "sourceUnitDigest": "85ecf603fec642067fafd7adc1be1e80e52e57e1264a7611073d59716a15db54",
+      "targetAnchor": "4-rules",
+      "targetUnitDigest": "85ecf603fec642067fafd7adc1be1e80e52e57e1264a7611073d59716a15db54"
+    },
+    {
+      "claimId": "claim_8e018df65402260b39f9d4800d60d4dc",
+      "class": "Unit-exact",
+      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "c56c3a1cd6946eb9f6d9597a300b91b71b9269f94b3497bf2fd21769b50ab20a",
+      "targetAnchor": "unheaded-block-2",
+      "targetUnitDigest": "c56c3a1cd6946eb9f6d9597a300b91b71b9269f94b3497bf2fd21769b50ab20a"
+    },
+    {
+      "claimId": "claim_c001314ad1d60481a35c681ad4d595b9",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "5-inputs-and-outputs",
+      "sourceUnitDigest": "66ff03c44a1aad8d7c16628267c59808d939b9c8e0cb6857d84c45273bc329f3",
+      "targetAnchor": "5-inputs-and-outputs",
+      "targetUnitDigest": "66ff03c44a1aad8d7c16628267c59808d939b9c8e0cb6857d84c45273bc329f3"
+    },
+    {
+      "claimId": "claim_c0cde296c06b591a3c8565cd55e093f3",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "6-failure-behavior",
+      "sourceUnitDigest": "ff99edd78668e59634fe9c3aed36f2020294f53213e5caac3295476b20344952",
+      "targetAnchor": "6-failure-behavior",
+      "targetUnitDigest": "ff99edd78668e59634fe9c3aed36f2020294f53213e5caac3295476b20344952"
+    },
+    {
+      "claimId": "claim_8d8c83a0368979baa4e3dab686fc5e0f",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "7-compatibility-and-versioning",
+      "sourceUnitDigest": "59b03e6569029a6540b0b17a55567b32b20a29531b93ede6953c51f2cf02f516",
+      "targetAnchor": "7-compatibility-and-versioning",
+      "targetUnitDigest": "59b03e6569029a6540b0b17a55567b32b20a29531b93ede6953c51f2cf02f516"
+    },
+    {
+      "claimId": "claim_57a28eab863d6d33293dcc46ccee384d",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "8-examples",
+      "sourceUnitDigest": "064e8a06a6fce3777082d82028a9f1c4ba7400139ddbecd6d59cbc4acef84630",
+      "targetAnchor": "8-examples",
+      "targetUnitDigest": "064e8a06a6fce3777082d82028a9f1c4ba7400139ddbecd6d59cbc4acef84630"
+    },
+    {
+      "claimId": "claim_44b45cfb25f10defcd1938ec46b65b5a",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "9-implementation-alignment",
+      "sourceUnitDigest": "1732cc48caf6587d0752208adbf829cebac8a2077a627e3beec8f6c6d0aeda24",
+      "targetAnchor": "9-implementation-alignment",
+      "targetUnitDigest": "1732cc48caf6587d0752208adbf829cebac8a2077a627e3beec8f6c6d0aeda24"
+    },
+    {
+      "claimId": "claim_b54575fa05d450078bcfc24526942510",
+      "class": "Unit-exact",
+      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceUnitDigest": "51c656be29a07a048fc3e11710655e3ca5fa0e05475edf6d88b5c43dcd215bff",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "51c656be29a07a048fc3e11710655e3ca5fa0e05475edf6d88b5c43dcd215bff"
+    },
+    {
+      "claimId": "claim_56e8da8a92f0eccd43bc55d143cb19e0",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "10-verification",
+      "sourceUnitDigest": "2a38e29a27e9f94b79db89a7d3b8762d638c034773d7790173eac788c79fd537",
+      "targetAnchor": "10-verification",
+      "targetUnitDigest": "2a38e29a27e9f94b79db89a7d3b8762d638c034773d7790173eac788c79fd537"
+    },
+    {
+      "claimId": "claim_e5744c46be543b46465b2c41170d436e",
+      "class": "Weak-exact",
+      "classReason": "source unit shorter than 40 characters",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "11-change-procedure",
+      "sourceUnitDigest": "6344dc3b005ea1a179633cfa0f170e70f85edc3ebc35e6c51c5d6b41ac8d959a",
+      "targetAnchor": "11-change-procedure",
+      "targetUnitDigest": "6344dc3b005ea1a179633cfa0f170e70f85edc3ebc35e6c51c5d6b41ac8d959a"
+    },
+    {
+      "claimId": "claim_200bb87faabc56d103a72fb480108dd1",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "12-related-files",
+      "sourceUnitDigest": "d7ab4817c74bc60a2d253dc17f86306ddcd80f48febe2a0697c1a590e17a66cb",
+      "targetAnchor": "12-related-files",
+      "targetUnitDigest": "45f29fb2065435941eb52e7878a83bdd36b92bed94a7ac1887b34e3468f954b6"
+    },
+    {
+      "claimId": "claim_04555e5073e222ceff3ceb264bd90d0c",
+      "class": "Judgment",
+      "classReason": "no target digest match",
+      "sourcePath": "docs/templates/contract.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceUnitDigest": "fb0843352ea12829e155cd45dd6156834ea4123d18e6a859329393ff07a8ee2c",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "b36ce626583c40d8d1101ffc135e96727e22ae1a9b62c69a56e07030144a2ef5"
+    },
+    {
+      "claimId": "claim_637a4e43b0da52e0925c64c0ec9b1647",
+      "class": "Judgment",
+      "classReason": "non-platform scope classification; source retained untouched",
+      "sourcePath": "docs/user/README.md",
+      "sourceAnchor": "user-documentation",
+      "sourceUnitDigest": "5d77147e582614f661f2c566ddedcd4b4b362d719ce7241a06341e93f41f0245"
+    },
+    {
+      "claimId": "claim_bf54f09cd76b40dce5bb0c7ca2e38fc7",
+      "class": "Judgment",
+      "classReason": "non-platform scope classification; source retained untouched",
+      "sourcePath": "docs/user/README.md",
+      "sourceAnchor": "unheaded-block-1",
+      "sourceUnitDigest": "a556158440f7895f126babe0dcedd7e43df6b9402aac503d32b57d6a6f0d42e4"
+    },
+    {
+      "claimId": "claim_01a923cb28cac05c7896422d07c3c11f",
+      "class": "Judgment",
+      "classReason": "non-platform scope classification; source retained untouched",
+      "sourcePath": "docs/user/README.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "5865bfc2f8364f935ef44c56fec270055b30fe47db42a011ca2dae9b91557bfe"
+    },
+    {
+      "claimId": "claim_ecefb56ff29adc37074cec0af7f36312",
+      "class": "Judgment",
+      "classReason": "non-platform scope classification; source retained untouched",
+      "sourcePath": "docs/user/README.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceUnitDigest": "782ad0d8d8b9bebd7baabcaecb18ac84d2a9c660dd85b1d8ea5455e87bd5a4f8"
+    },
+    {
+      "claimId": "claim_ee85a9e312493fde5fa5dfcf8b3eb573",
+      "class": "Judgment",
+      "classReason": "non-platform scope classification; source retained untouched",
+      "sourcePath": "docs/user/README.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceUnitDigest": "6d5ef0e9fd38ab9de5b8bbb92f352e17a9232c8182e4298939aa23ccce892548"
+    }
+  ],
+  "classCounts": {
+    "Judgment": 18,
+    "Weak-exact": 35,
+    "Unit-exact": 10
+  },
+  "allPending": true
+}
