@@ -491,6 +491,101 @@ test('Step 06 planning.validate-plan failed stops safely and does not advance Wo
   assert.equal(work.workflowStep, 'planning');
 });
 
+test('a read-only run that would advance Work stops instead when its result carries a correlated mutation', () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_corr', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const reportPath = path.join(runDir, 'agent-report.md');
+  fs.writeFileSync(
+    reportPath,
+    '# Reality Gate & Feasibility Report\n' +
+      '## Reality Gate Score\n' +
+      '- Mode fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/operation-choice.mjs)\n'
+  );
+
+  const lastRunResult = {
+    status: 'done',
+    confidence: 'reported',
+    runtime: { stdoutLog: path.join(runDir, 'stdout.log') },
+    agentClaim: {
+      status: 'done',
+      verdict: 'READY WITH CONSTRAINTS',
+      summary: 'Proceed only after constraints are captured',
+      realityGate: {
+        'mode-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'repo-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'assumptions-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'smaller-path-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'proof-surface-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'impact-analysis-posture': 'PASS (citation: src/runner/operation-choice.mjs)',
+      },
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
+    },
+    evidence: {
+      artifacts: [reportPath],
+    },
+  };
+
+  const accepted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: lastRunResult,
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.equal(accepted.canAdvanceEdge, true, 'fixture must advance before any mutation is attached');
+
+  for (const code of ['read-only-mutation-correlated', 'mutated-dirty-before-correlated']) {
+    const warned = interpretAssignmentRunResult({
+      choice: { operation: 'validate-plan' },
+      runResult: { ...lastRunResult, warnings: [{ code, level: 'correlated', paths: ['plans/x.md'] }] },
+      contextSignals: { constraintsWritten: true },
+      repoRoot: tempDir,
+    });
+    assert.equal(warned.canAdvanceEdge, false, code);
+    assert.equal(warned.stop, true, code);
+    assert.equal(warned.reason, 'assignment-validate-plan-correlated-mutation', code);
+  }
+
+  // A stored result whose warnings were stripped still re-derives the mutation from its evidence.
+  const stripped = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: { ...lastRunResult, evidence: { ...lastRunResult.evidence, changedFiles: ['docs/plan.md'] } },
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.equal(stripped.canAdvanceEdge, false);
+  assert.equal(stripped.reason, 'assignment-validate-plan-correlated-mutation');
+
+  // A round whose process itself broke keeps its own failure reason.
+  const broke = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan' },
+    runResult: {
+      ...lastRunResult,
+      runtime: { ...(lastRunResult.runtime ?? {}), exitCode: 1 },
+      warnings: [{ code: 'read-only-mutation-correlated', level: 'correlated', paths: ['plans/x.md'] }],
+    },
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.equal(broke.canAdvanceEdge, false);
+  assert.equal(broke.reason, 'assignment-validate-plan-failed');
+
+  // Changed files are a mutating run's expected output, never a correlated mutation.
+  const mutating = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan', assignment: { mutation: 'mutating', resultKind: 'gate-verdict' } },
+    runResult: { ...lastRunResult, evidence: { ...lastRunResult.evidence, changedFiles: ['docs/plan.md'] } },
+    contextSignals: { constraintsWritten: true },
+    repoRoot: tempDir,
+  });
+  assert.notEqual(mutating.reason, 'assignment-validate-plan-correlated-mutation');
+});
+
 test('Step 06 planning.validate-plan READY WITH CONSTRAINTS requires recorded constraints before advancing edge', () => {
   const tempDir = mkTempDir();
   const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_rwc', 'runs', '01');
@@ -1205,7 +1300,7 @@ test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker 
   assert.equal(item.workflowStep, 'planning');
 });
 
-test('driver loop runOnce: validate-plan modifying dirty-before plan.md fails closed and does not advance Work (Finding 2 fix)', async () => {
+test('driver loop runOnce: validate-plan modifying dirty-before plan.md is reported as a correlated mutation and does not advance Work (Finding 2 fix)', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -1242,6 +1337,21 @@ test('driver loop runOnce: validate-plan modifying dirty-before plan.md fails cl
 
   const item = listWork(tempDir).work['tsk-driver-recorded'];
   assert.equal(item.workflowStep, 'planning');
+
+  // The dispatch round itself is accepted; the change it saw travels as a warning.
+  const assignmentsDir = path.join(tempDir, '.fgos', 'assignments');
+  const storedResults = fs.readdirSync(assignmentsDir).flatMap((asgn) => {
+    const runsDir = path.join(assignmentsDir, asgn, 'runs');
+    return fs.existsSync(runsDir)
+      ? fs.readdirSync(runsDir).map((run) => path.join(runsDir, run, 'result.json')).filter((f) => fs.existsSync(f))
+      : [];
+  });
+  assert.ok(storedResults.length > 0, 'the validate-plan round must have settled a result.json');
+  const warningCodes = storedResults.flatMap((f) => (JSON.parse(fs.readFileSync(f, 'utf8')).warnings ?? []).map((w) => w.code));
+  assert.ok(
+    warningCodes.includes('read-only-mutation-correlated') || warningCodes.includes('mutated-dirty-before-correlated'),
+    `expected a correlated-mutation warning, got ${JSON.stringify(warningCodes)}`,
+  );
 });
 
 test('interpretAssignmentRunResult maps REJECTED verdict to NOT READY - RETURN TO PLANNING (Finding 3)', () => {
@@ -1326,7 +1436,7 @@ test('Step 06 executing.scout-blast-radius report with fake executor stores all 
   assert.equal(work.workflowStep, 'executing');
 });
 
-test('Step 06 executing.scout-blast-radius mutating repository state fails closed and stops driver execution', async () => {
+test('Step 06 executing.scout-blast-radius mutating repository state is reported as a correlated mutation and stops driver execution', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   seedTaskSpecs(tempDir, ['scout-blast-radius']);
@@ -1371,10 +1481,11 @@ test('Step 06 executing.scout-blast-radius mutating repository state fails close
   });
 
   assert.equal(outcome.executed, true);
-  assert.equal(outcome.runResult.confidence, 'failed');
+  assert.equal(outcome.runResult.confidence, 'reported');
+  assert.ok((outcome.runResult.warnings ?? []).some((w) => w.code === 'read-only-mutation-correlated'));
   assert.equal(outcome.canAdvanceEdge, false);
   assert.equal(outcome.stop, true);
-  assert.equal(outcome.reason, 'assignment-scout-blast-radius-failed');
+  assert.equal(outcome.reason, 'assignment-scout-blast-radius-correlated-mutation');
 });
 
 test('Step 06 executing.scoped-subtask requires verified confidence (changed-file evidence) to proceed', () => {
@@ -2773,7 +2884,7 @@ test('Positive test: valid structured review-item claim with real findings tied 
   assert.equal(interpreted.reason, 'review-item-approved');
 });
 
-test('Finding 2: executeAssignment fails closed on read-only validate-plan mutations without running automatic rollback', async () => {
+test('Finding 2: executeAssignment reports read-only validate-plan mutations as a warning, Work does not advance on them, and no automatic rollback runs', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -2831,8 +2942,21 @@ test('Finding 2: executeAssignment fails closed on read-only validate-plan mutat
     runnerConfig: cfg,
   });
 
-  assert.equal(runResult.status, 'failed');
-  assert.equal(runResult.confidence, 'failed');
+  // The round is accepted at the dispatch layer: a before/after snapshot cannot
+  // prove the change is the round's own, so it travels as a warning.
+  assert.equal(runResult.status, 'done');
+  assert.ok((runResult.warnings ?? []).some((w) => w.code === 'read-only-mutation-correlated'));
+
+  // Work, the consumer, does not advance on it.
+  const interpreted = interpretAssignmentRunResult({
+    choice: { operation: 'validate-plan', assignment, work: listWork(tempDir).work['tsk-iso-val'] },
+    runResult,
+    work: listWork(tempDir).work['tsk-iso-val'],
+    repoRoot: tempDir,
+  });
+  assert.equal(interpreted.canAdvanceEdge, false);
+  assert.equal(interpreted.stop, true);
+  assert.equal(interpreted.reason, 'assignment-validate-plan-correlated-mutation');
 
   // Verify evidence recorded the mutations
   assert.ok(runResult.evidence.changedFiles.some((f) => f.includes('plan-validation.tmp')));
@@ -5299,7 +5423,7 @@ test('reviewer LOW: a stored failed result from a read-only dirty mutation never
   assert.equal(choice.reason, 'validation-failed-do-not-advance-work', 'the lost dirty-mutation fact may not upgrade the recorded failed verdict');
 });
 
-test('R6/G3: cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles fact and correctly reports failed, not silently downgraded to no-evidence', () => {
+test('R6/G3: cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles fact, reports a correlated mutation and does not advance Work, not silently downgraded to no-evidence', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
@@ -5341,8 +5465,9 @@ test('R6/G3: cross-pass re-derivation reads a persisted mutatedDirtyBeforeFiles 
 
   const choice = choosePlanning(tempDir, planningWorkFor('tsk-r6-dirty-persisted', docsRef));
   assert.equal(choice.canAdvanceEdge, false);
-  assert.equal(choice.reason, 'validation-failed-do-not-advance-work',
-    'the persisted mutatedDirtyBeforeFiles fact must re-derive to failed, not silently downgrade to no-evidence');
+  assert.equal(choice.stop, true);
+  assert.equal(choice.reason, 'validation-correlated-mutation-do-not-advance-work',
+    'the persisted mutatedDirtyBeforeFiles fact must re-derive to a correlated mutation, not silently downgrade to no-evidence');
 });
 
 test('R6/G3: an empty (but present) persisted mutatedDirtyBeforeFiles correctly derives false -- unchanged dirty files never block a legitimate reported verdict', () => {

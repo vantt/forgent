@@ -830,6 +830,16 @@ export function chooseStageOperation({
         });
       }
 
+      if (interpreted.reason === 'assignment-validate-plan-correlated-mutation') {
+        return Object.freeze({
+          operation: 'validate-plan',
+          reason: 'validation-correlated-mutation-do-not-advance-work',
+          dispatch: 'assignment',
+          stop: true,
+          canAdvanceEdge: false,
+        });
+      }
+
       if (interpreted.reason === 'assignment-validate-plan-failed') {
         return Object.freeze({
           operation: 'validate-plan',
@@ -1699,6 +1709,39 @@ function fallbackMutationForAssignment(asgn) {
   }
 }
 
+const CORRELATED_MUTATION_WARNING_CODES = new Set(['read-only-mutation-correlated', 'mutated-dirty-before-correlated']);
+
+// A read-only result counts as carrying a correlated mutation when settle
+// recorded the warning, or -- for a stored result read back from disk, whose
+// warnings are as writable as any other field -- when its evidence still shows
+// changed files or a mutated pre-existing dirty file.
+function runProcessBroke(runResult, outcome) {
+  const runtime = runResult?.runtime && typeof runResult.runtime === 'object' ? runResult.runtime : {};
+  if (runtime.isTimeout === true || (typeof runtime.signal === 'string' && runtime.signal)) return true;
+  if (typeof runtime.exitCode === 'number' && runtime.exitCode !== 0) return true;
+  const family = outcome?.failure?.family ?? runResult?.failure?.family;
+  return family === 'provider' || family === 'resource';
+}
+
+function hasReadOnlyCorrelatedMutation({ choice, runResult }) {
+  if (!runResult || typeof runResult !== 'object') return false;
+  const asgn = choice?.assignment ?? runResult.assignment ?? {};
+  const operation = asgn.operation ?? choice?.operation;
+  const mutation = asgn.mutation === 'read-only' || asgn.mutation === 'mutating'
+    ? asgn.mutation
+    : fallbackMutationForAssignment({ ...asgn, operation });
+  if (!isReadOnlyAssignment({ mutation })) return false;
+  const warnings = Array.isArray(runResult.warnings) ? runResult.warnings : [];
+  if (warnings.some((w) => CORRELATED_MUTATION_WARNING_CODES.has(w?.code))) return true;
+  const changedFiles = Array.isArray(runResult.evidence?.changedFiles)
+    ? runResult.evidence.changedFiles.filter((f) => typeof f === 'string' && f)
+    : [];
+  const mutatedDirtyBefore = Array.isArray(runResult.evidence?.mutatedDirtyBeforeFiles)
+    ? runResult.evidence.mutatedDirtyBeforeFiles.filter((f) => typeof f === 'string' && f)
+    : [];
+  return changedFiles.length > 0 || mutatedDirtyBefore.length > 0;
+}
+
 export function interpretAssignmentRunResult({ choice, runResult, contextSignals = {}, work, repoRoot }) {
   const outcome = runResult?.outcome ?? (runResult ? runOutcome(runResult) : null);
   const confidence = (outcome?.evidence === 'no-evidence' || outcome?.evidence === 'none')
@@ -1713,6 +1756,28 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
   const resultKind = stampedAssignment?.resultKind ?? fallbackResultKindForOperation(operation);
   const evidenceRequired = stampedAssignment?.evidence?.required;
 
+  const isFailed = outcome
+    ? (outcome.infraFailure || outcome.category === 'policy' || confidence === 'failed' || status === 'failed')
+    : false;
+
+  // Dispatch accepts a read-only round whose checkout changed while it ran and
+  // reports the change as a warning, because a before/after snapshot cannot
+  // prove the round made it. Work, the consumer, still refuses to advance on
+  // such a result: the plan or code it would advance on may have been edited
+  // under it. Checked ahead of no-evidence so the operator sees the change
+  // signal instead of a generic missing-evidence stop. A run whose process
+  // itself broke (non-zero exit, signal, timeout, provider/resource failure)
+  // keeps its own failure reason.
+  if (hasReadOnlyCorrelatedMutation({ choice, runResult })) {
+    return Object.freeze({
+      canAdvanceEdge: false,
+      stop: true,
+      reason: runProcessBroke(runResult, outcome)
+        ? `assignment-${operation}-failed`
+        : `assignment-${operation}-correlated-mutation`,
+    });
+  }
+
   if (confidence === 'no-evidence' || status === 'no-evidence') {
     return Object.freeze({
       canAdvanceEdge: false,
@@ -1721,9 +1786,6 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  const isFailed = outcome
-    ? (outcome.infraFailure || outcome.category === 'policy' || confidence === 'failed' || status === 'failed')
-    : false;
   if (isFailed) {
     return Object.freeze({
       canAdvanceEdge: false,
