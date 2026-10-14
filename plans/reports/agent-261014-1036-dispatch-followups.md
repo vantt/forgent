@@ -126,6 +126,32 @@ Chỉ có các trường hợp sau ra usage hoặc lỗi:
 
 **Commit.** `7cd8aa177` test(fgctl): split the download tests of fgctl init into their own file
 
+## Trạng thái giữ lại của việc 2 và việc 3 (theo phiên điều phối, 2026-10-14)
+
+Lead yêu cầu tạm dừng code của việc 2 và việc 3, chờ hội đồng xem lại chuyện dispatch có nhiều cửa chạy. Yêu cầu này đến sau khi cả hai đã được commit. Em giữ nguyên các commit này, không revert, và không thêm code nào cho hai việc nữa. Lúc nhận yêu cầu, nhánh chưa merge.
+
+| Việc | Commit | Có thể chạm vào kết luận của hội đồng |
+|---|---|---|
+| 3 | `5d8b7cdb1` fix(dispatch): tell a read-only worker its result files are still to be written | Câu chữ sửa trong `renderAssignmentPrompt`. Prompt này dùng chung cho cửa `--contract`, cho Assignment door nói chung, và được nhúng vào pane brief của herdr round. Vì vậy câu "result files are still required" áp cho mọi cửa read-only đi qua prompt này, không riêng `--contract`. |
+| 2 | `af132275b` feat(dispatch): run a read-only contract sandboxed on a named provider when it names a confined capability | Thêm một lối vào trên cửa `--contract` (`--for <confined capability>`), không thêm door mới. Run vẫn đi qua `executeAssignment` với binding mà Workflow unit và account probe đã dùng. Dù vậy, về mặt người dùng, đây là thêm một tổ hợp cờ. Nếu hội đồng muốn gộp cửa, có thể revert riêng commit này; nó không phụ thuộc commit nào khác trên nhánh, ngoài việc đổi tên `withProbeBinding` thành `withReadOnlyBinding`. |
+
+Hội đồng có thể dùng các bằng chứng sau:
+
+- Hai run thật trên cùng một contract:
+  - `asgn_2468395_op_009`: không `--for`, finalization ghi backend `none`.
+  - `asgn_2468395_op_010`: có `--for code:review`, chạy `local-bwrap-v1`, lease account `tetnu`.
+- Lần tái hiện việc 3: `asgn_2468395_op_008`. Agent từ chối ghi file kết quả vì prompt ghi "Write scope: none".
+- Trường `confinement` ở cấp đầu của RunResult là `null` cho mọi run qua Assignment door, kể cả khi run đã bị sandbox. Đây là một khác biệt nữa về output giữa các cửa.
+
+Muốn merge việc 1, 4, 5 mà không lấy việc 2 và 3 thì phải lấy từng commit, vì nhánh xếp theo thứ tự:
+
+1. `360aced90` (việc 1)
+2. `5d8b7cdb1` (việc 3)
+3. `af132275b` (việc 2)
+4. `7cd8aa177` (việc 5)
+
+`7cd8aa177` chỉ đụng `test/rust-host/` và docs packaging. `360aced90` và `af132275b` cùng sửa `CHANGELOG.md`, `docs/specs/runner.md` và `src/cli/command-registry.mjs`, nhưng ở các dòng khác nhau, nên cherry-pick riêng sẽ gặp conflict nhẹ ở `CHANGELOG.md`. Điểm này UNPROVEN: em chưa thử cherry-pick.
+
 ## npm test
 
 `env -u CLAUDE_CODE_SESSION_ID npm test` trong worktree, ở HEAD `7cd8aa177`: **7328 test, 7253 pass, 0 fail, 10 skip, 65 todo, exit 0**. Không file nào bị watchdog 600 giây cắt.
