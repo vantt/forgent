@@ -389,6 +389,67 @@ test('settleClaim rejects a different session presenting the correct claimId (wr
   }
 });
 
+// releaseClaim mirrors settleClaim's writer rule: only the writer that
+// acquired a claim may release it. A sibling worker (its own writer id, or one
+// whose lineage points at the owner) is refused loudly with the claim left in
+// place; another writer's claim is released only through the named
+// `adminReason` option, which the release result echoes back.
+test('releaseClaim refuses a different writer, lets the owner release, and allows a named admin release', () => {
+  const dir = makeTmpDir();
+  addWork(dir, { id: 'tsk-1', title: 'Task R', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+  addWork(dir, { id: 'tsk-2', title: 'Task S', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });
+
+  const originalSessionId = process.env.FGOS_SESSION_ID;
+  const originalParent = process.env.FGOS_PARENT_WRITER_ID;
+  try {
+    process.env.FGOS_SESSION_ID = 'session-A';
+    const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo' });
+    const claimFile = path.join(resolveFgosFile(dir, FGOS_FILE.CLAIMS_DIR), 'tsk-1.json');
+    const before = fs.readFileSync(claimFile, 'utf8');
+
+    // sibling B, even naming the right claimId and carrying A as lineage
+    process.env.FGOS_SESSION_ID = 'session-B';
+    process.env.FGOS_PARENT_WRITER_ID = 'session-A';
+    assert.throws(
+      () => releaseClaim(dir, { id: 'tsk-1', claimId: claim.claimId }),
+      (err) => err instanceof ClaimError
+        && err.category === 'conflict'
+        && /writer identity mismatch/.test(err.message)
+        && err.message.includes('session-A')
+        && err.message.includes('session-B'),
+    );
+    assert.equal(fs.readFileSync(claimFile, 'utf8'), before, 'refused release must leave the claim file untouched');
+
+    // an empty admin reason grants nothing
+    assert.throws(
+      () => releaseClaim(dir, { id: 'tsk-1', adminReason: '   ' }),
+      (err) => err instanceof ClaimError && err.category === 'validation',
+    );
+    assert.equal(fs.readFileSync(claimFile, 'utf8'), before);
+    delete process.env.FGOS_PARENT_WRITER_ID;
+
+    // the owner releases its own claim with no extra option
+    process.env.FGOS_SESSION_ID = 'session-A';
+    const own = releaseClaim(dir, { id: 'tsk-1', claimId: claim.claimId });
+    assert.equal(own.released, true);
+    assert.equal(own.admin, undefined);
+    assert.equal(readClaim(dir, 'tsk-1'), null);
+
+    // an explicit admin release of another writer's claim succeeds and says so
+    const other = acquireClaim(dir, { id: 'tsk-2', actor: 'session', preClaimStatus: 'todo' });
+    process.env.FGOS_SESSION_ID = 'session-B';
+    const admin = releaseClaim(dir, { id: 'tsk-2', claimId: other.claimId, adminReason: 'stale-liveness' });
+    assert.equal(admin.released, true);
+    assert.deepEqual(admin.admin, { reason: 'stale-liveness', ownerWriterId: 'session-A', releasedByWriterId: 'session-B' });
+    assert.equal(readClaim(dir, 'tsk-2'), null);
+  } finally {
+    if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = originalSessionId;
+    if (originalParent === undefined) delete process.env.FGOS_PARENT_WRITER_ID;
+    else process.env.FGOS_PARENT_WRITER_ID = originalParent;
+  }
+});
+
 test('settleClaim skips the writer-identity check for a claim written before the field existed (backward compat, never a false positive on old data)', () => {
   const dir = makeTmpDir();
   addWork(dir, { id: 'tsk-1', title: 'Task 10', kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'standard', verify: 'npm test', domain: 'coding' });

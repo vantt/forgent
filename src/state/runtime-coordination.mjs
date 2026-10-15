@@ -254,10 +254,23 @@ export function acquireClaim(fgosDirInput, {
 
 /**
  * Release an active runtime claim record for item `id`.
+ *
+ * Only the writer that acquired the claim may release it — the same exact
+ * `writerId` rule settleClaim (store.mjs) enforces, resolved fresh from this
+ * caller's own session/process. A different writer is refused with a
+ * `conflict` ClaimError and the claim file is left untouched; a parent or
+ * lineage id grants nothing. Releasing another writer's claim (stale-claim
+ * reclaim, operator `unclaim` of an orphaned or dead claim) must name why
+ * through `adminReason`; the result then carries `admin` with that reason and
+ * both writer ids so the caller can record it. A claim written before
+ * `writerId` existed skips the check, as in settleClaim.
  */
-export function releaseClaim(fgosDirInput, { id, claimId } = {}) {
+export function releaseClaim(fgosDirInput, { id, claimId, adminReason } = {}) {
   if (!id || typeof id !== 'string') {
     throw new ClaimError('validation', 'releaseClaim: "id" is required');
+  }
+  if (adminReason !== undefined && (typeof adminReason !== 'string' || !adminReason.trim())) {
+    throw new ClaimError('validation', 'releaseClaim: "adminReason" must be a non-empty string when given');
   }
 
   const fgosDir = getMainFgosDir(fgosDirInput);
@@ -278,13 +291,24 @@ export function releaseClaim(fgosDirInput, { id, claimId } = {}) {
       return { released: false, reason: 'mismatched-claim-id', existingClaimId: existing.claimId };
     }
 
+    let admin;
+    if (existing.writerId !== undefined) {
+      const currentWriterId = String(resolveWriterIdentity(fgosDir).id);
+      if (existing.writerId !== currentWriterId) {
+        if (adminReason === undefined) {
+          throw new ClaimError('conflict', `releaseClaim: writer identity mismatch for "${id}" — claim acquired by writer "${existing.writerId}", releasing as writer "${currentWriterId}".`);
+        }
+        admin = { reason: adminReason.trim(), ownerWriterId: existing.writerId, releasedByWriterId: currentWriterId };
+      }
+    }
+
     try {
       fs.unlinkSync(claimFilePath);
     } catch (err) {
       if (err.code !== 'ENOENT') throw err;
     }
 
-    return { released: true, claim: existing };
+    return admin ? { released: true, claim: existing, admin } : { released: true, claim: existing };
   });
 }
 

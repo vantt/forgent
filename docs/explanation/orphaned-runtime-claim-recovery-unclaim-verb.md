@@ -54,6 +54,11 @@ already-tested primitives rather than adding new mechanism:
   `ClaimError('conflict', ...)` naming the holder and claim age if the
   claim is still genuinely live, or releasing with `{released: true,
   reason: 'stale-liveness'}` if not.
+- Both releases go through `releaseClaim`'s named `adminReason` option,
+  because the claim usually belongs to another (dead) session and a plain
+  release is refused for any writer but the claim's own. When the operator
+  is a different writer, the result adds `admin: {reason, ownerWriterId,
+  releasedByWriterId}`.
 
 This is additive and composes existing primitives (`releaseClaim`,
 `rebuildViewFromDir`, `isReclaimEligible`) rather than duplicating any of

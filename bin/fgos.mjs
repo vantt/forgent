@@ -4145,9 +4145,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (!claim) return { released: false, reason: 'no-claim' };
       const durableView = rebuildViewFromDir(dir);
       const durableStatus = durableView.work[id]?.status;
+      // Operator recovery: the claim may belong to another (often dead)
+      // session, so both release paths name their reason through the admin
+      // option; the owner-only default would refuse them.
       if (durableStatus !== 'doing') {
-        releaseClaim(dir, { id });
-        return { released: true, reason: 'durable-status-mismatch', durableStatus: durableStatus ?? 'not-found' };
+        const rel = releaseClaim(dir, { id, claimId: claim.claimId, adminReason: 'unclaim:durable-status-mismatch' });
+        if (!rel.released) return rel;
+        return { released: true, reason: 'durable-status-mismatch', durableStatus: durableStatus ?? 'not-found', ...(rel.admin ? { admin: rel.admin } : {}) };
       }
       if (!isReclaimEligible(repoRoot, id, claim.claimRole)) {
         const holderDesc = `writer ${claim.writerId ?? 'unknown'}` + (claim.actor ? ` (${claim.actor})` : '');
@@ -4158,8 +4162,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           `unclaim: claim for "${id}" is held by ${holderDesc}, acquired ${ageDesc} ago -- refusing to clear live claim.`,
         );
       }
-      releaseClaim(dir, { id });
-      return { released: true, reason: 'stale-liveness' };
+      const rel = releaseClaim(dir, { id, claimId: claim.claimId, adminReason: 'unclaim:stale-liveness' });
+      if (!rel.released) return rel;
+      return { released: true, reason: 'stale-liveness', ...(rel.admin ? { admin: rel.admin } : {}) };
     }
 
     case 'preflight': {

@@ -15,9 +15,12 @@ import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.m
 const CLAIM_PORT_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/claim-port.mjs');
 const FGOS_BIN = path.resolve(fileURLToPath(import.meta.url), '../../../bin/fgos.mjs');
 
-function runUnclaim(repoRoot, id) {
+// `sessionId` pins the CLI child's writer id (FGOS_SESSION_ID) so a test
+// states whether `unclaim` runs as the claim's own writer or as another one.
+function runUnclaim(repoRoot, id, { sessionId } = {}) {
+  const env = sessionId === undefined ? process.env : { ...process.env, FGOS_SESSION_ID: sessionId };
   try {
-    const stdout = execFileSync(process.execPath, [FGOS_BIN, 'unclaim', id, '--dir', repoRoot], { cwd: repoRoot, encoding: 'utf8' });
+    const stdout = execFileSync(process.execPath, [FGOS_BIN, 'unclaim', id, '--dir', repoRoot], { cwd: repoRoot, encoding: 'utf8', env });
     return { status: 0, json: JSON.parse(stdout) };
   } catch (err) {
     let json = null;
@@ -426,13 +429,26 @@ const HUMAN_MS = 24 * 60 * 60 * 1000;
 test('claimWork transparently reclaims a conclusively-quiet session doing claim via pick, reattaching to the existing branch (D2/D4/D5)', () => {
   const { repoRoot, dir } = setup();
 
-  const first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
-  assert.equal(first.source, 'branch');
+  // The quiet claim belongs to another session: the reclaim releases a
+  // different writer's claim, which only the named admin release allows.
+  const originalSessionId = process.env.FGOS_SESSION_ID;
+  let first;
+  let second;
+  try {
+    process.env.FGOS_SESSION_ID = 'session-A';
+    first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+    assert.equal(first.source, 'branch');
 
-  const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
-  commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
+    const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
+    commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
 
-  const second = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+    process.env.FGOS_SESSION_ID = 'session-B';
+    second = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  } finally {
+    if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = originalSessionId;
+  }
+  assert.equal(readClaim(dir, 'item-a').writerId, 'session-B');
   assert.equal(second.to, 'doing');
   assert.equal(second.source, 'branch');
   assert.equal(second.branch, 'fgw/item-a', 'must reattach to the existing branch, never fork a new one');
@@ -611,12 +627,24 @@ test('fgos unclaim on an id with no claim at all returns {released:false, reason
   assert.deepEqual(res.json.data, { released: false, reason: 'no-claim' });
 });
 
+// Acquire a claim in this test process under a pinned writer id.
+function acquireClaimAs(sessionId, dir, opts) {
+  const original = process.env.FGOS_SESSION_ID;
+  process.env.FGOS_SESSION_ID = sessionId;
+  try {
+    return acquireClaim(dir, opts);
+  } finally {
+    if (original === undefined) delete process.env.FGOS_SESSION_ID;
+    else process.env.FGOS_SESSION_ID = original;
+  }
+}
+
 test('fgos unclaim clears unconditionally with durable-status-mismatch when claim exists but durable status is todo or non-existent (tsk-uio)', () => {
   const { repoRoot, dir } = setup();
-  acquireClaim(dir, { id: 'item-a', actor: 'session', force: true });
+  acquireClaimAs('session-A', dir, { id: 'item-a', actor: 'session', force: true });
   assert.ok(readClaim(dir, 'item-a'));
 
-  const res = runUnclaim(repoRoot, 'item-a');
+  const res = runUnclaim(repoRoot, 'item-a', { sessionId: 'session-A' });
   assert.equal(res.status, 0);
   assert.deepEqual(res.json.data, {
     released: true,
@@ -625,10 +653,10 @@ test('fgos unclaim clears unconditionally with durable-status-mismatch when clai
   });
   assert.equal(readClaim(dir, 'item-a'), null);
 
-  acquireClaim(dir, { id: 'nonexistent-item', actor: 'session', force: true });
+  acquireClaimAs('session-A', dir, { id: 'nonexistent-item', actor: 'session', force: true });
   assert.ok(readClaim(dir, 'nonexistent-item'));
 
-  const resNonexistent = runUnclaim(repoRoot, 'nonexistent-item');
+  const resNonexistent = runUnclaim(repoRoot, 'nonexistent-item', { sessionId: 'session-A' });
   assert.equal(resNonexistent.status, 0);
   assert.deepEqual(resNonexistent.json.data, {
     released: true,
@@ -658,7 +686,7 @@ test('fgos unclaim refuses with a clear error naming holder when durable status 
 test('fgos unclaim clears stale claim with {released:true, reason:"stale-liveness"} when durable status is doing and activity is stale (tsk-uio)', () => {
   const { repoRoot, dir } = setup();
   addWork(dir, { id: 'doing-item', title: 'Doing Item', kind: 'task', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true' });
-  acquireClaim(dir, { id: 'doing-item', actor: 'session', claimRole: 'runner', force: true });
+  acquireClaimAs('session-A', dir, { id: 'doing-item', actor: 'session', claimRole: 'runner', force: true });
 
   const headBranch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
   execFileSync('git', ['checkout', '-b', 'fgw/doing-item'], { cwd: repoRoot });
@@ -666,11 +694,14 @@ test('fgos unclaim clears stale claim with {released:true, reason:"stale-livenes
   commitAt(repoRoot, 'stale.txt', 'stale content', staleSeconds);
   execFileSync('git', ['checkout', headBranch], { cwd: repoRoot });
 
-  const res = runUnclaim(repoRoot, 'doing-item');
+  // The operator is a different writer from the dead claim's owner: the
+  // release goes through the named admin path and the result says so.
+  const res = runUnclaim(repoRoot, 'doing-item', { sessionId: 'session-B' });
   assert.equal(res.status, 0);
   assert.deepEqual(res.json.data, {
     released: true,
     reason: 'stale-liveness',
+    admin: { reason: 'unclaim:stale-liveness', ownerWriterId: 'session-A', releasedByWriterId: 'session-B' },
   });
   assert.equal(readClaim(dir, 'doing-item'), null, 'claim must be cleared');
 });
