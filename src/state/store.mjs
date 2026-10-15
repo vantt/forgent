@@ -44,7 +44,7 @@ import { KnowledgeValidationError, applyKnowledgeEvent } from './knowledge-regis
 import { resolveFriction, recordFriction } from '../observe/friction-client.mjs';
 export { recordFriction, resolveFriction };
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
-import { readClaim, readClaims, releaseClaim, withClaimsLock, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
+import { readClaim, readClaims, releaseClaim, withClaimsLock, buildEffectiveView, getItemDurableRevision, getMainFgosDir } from './runtime-coordination.mjs';
 
 export { FsmError, WorkValidationError, EventLogError, KnowledgeValidationError };
 
@@ -249,7 +249,7 @@ function withEventsLockAndRefresh(dir, logPath, fn) {
     const result = fn();
     view = refreshView(dir);
     return result;
-  });
+  }, dir);
   return { event, view };
 }
 
@@ -1144,6 +1144,9 @@ export function settleClaim(dir, {
       throw new StoreError('conflict', `settleClaim: writer identity mismatch for "${id}" — claim acquired by writer "${claim.writerId}", settling as writer "${currentWriterId}".`);
     }
 
+    // claims.lock is taken inside events.lock below, for the main checkout's
+    // .fgos: resolve that identity now, before either lock is held.
+    resolveWriterIdentity(getMainFgosDir(dir));
     const res = withEventsLockAndRefresh(dir, logPath, () => {
       const writeResult = withClaimsLock(dir, () => {
       // tsk-40m code-review finding (blocker, TOCTOU race): every check

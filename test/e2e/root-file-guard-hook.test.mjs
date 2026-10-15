@@ -33,7 +33,7 @@ function fixture(t, { marker = true } = {}) {
   if (marker) put('apps/fgos/Cargo.toml', '[package]\nname="fixture"\n');
   git(['add', '.']);
   git(['commit', '-q', '-m', 'fixture baseline']);
-  for (const relative of ['.githooks/pre-commit', 'src/runner/main-checkout-lock.mjs', 'src/runner/main-checkout-activity.mjs', 'src/runner/dispatch/process-identity.mjs', 'src/runner/dispatch/run-timeout.mjs', 'src/util/session-identity.mjs']) {
+  for (const relative of ['.githooks/pre-commit', 'src/runner/main-checkout-lock.mjs', 'src/runner/main-checkout-activity.mjs', 'src/runner/dispatch/process-identity.mjs', 'src/runner/dispatch/run-timeout.mjs', 'src/util/session-identity.mjs', 'src/util/host-bin-path.mjs']) {
     const destination = path.join(host, relative);
     fs.mkdirSync(path.dirname(destination), { recursive: true });
     fs.copyFileSync(path.join(sourceRoot, relative), destination);

@@ -163,52 +163,27 @@ test('resolveFgosBin returns null when no tier resolves', () => {
   }
 });
 
-test('resolveWorkspaceInstallationBin resolves when activation.json references a release with manifest.json', () => {
+// Tier 0 follows the fgctl shim rule (src/util/host-bin-path.mjs): a ready
+// activation's `<releasePath>/bin/fgos`. The earlier form with a manifest
+// directly inside .fgos/installation and no releasePath is gone on purpose:
+// the shim, the door the `fgos` command takes, never ran that form.
+function stageActivation(dir, activation) {
+  const installDir = path.join(dir, '.fgos', 'installation');
+  fs.mkdirSync(installDir, { recursive: true });
+  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify(activation));
+}
+
+test('resolveWorkspaceInstallationBin resolves the release binary a ready activation names', () => {
   const dir = mkTempDir('bin-discovery-tier0-rel-');
   const releaseDir = mkTempDir('bin-discovery-release-');
   const binPath = path.join(releaseDir, 'bin', 'fgos');
   writeStub(binPath);
-
-  const manifest = {
-    schemaVersion: 1,
-    entries: { fgos: 'bin/fgos' },
-  };
-  fs.writeFileSync(path.join(releaseDir, 'manifest.json'), JSON.stringify(manifest));
-
-  const installDir = path.join(dir, '.fgos', 'installation');
-  fs.mkdirSync(installDir, { recursive: true });
-  const activation = {
-    schemaVersion: 1,
-    status: 'ready',
-    releasePath: releaseDir,
-  };
-  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify(activation));
+  stageActivation(dir, { schemaVersion: 1, status: 'ready', releasePath: releaseDir });
 
   assert.equal(resolveWorkspaceInstallationBin(dir), binPath);
 });
 
-test('resolveWorkspaceInstallationBin resolves when manifest.json is directly inside .fgos/installation', () => {
-  const dir = mkTempDir('bin-discovery-tier0-direct-');
-  const installDir = path.join(dir, '.fgos', 'installation');
-  const binPath = path.join(installDir, 'bin', 'fgos');
-  writeStub(binPath);
-
-  const manifest = {
-    schemaVersion: 1,
-    entries: { fgos: 'bin/fgos' },
-  };
-  fs.writeFileSync(path.join(installDir, 'manifest.json'), JSON.stringify(manifest));
-
-  const activation = {
-    schemaVersion: 1,
-    status: 'ready',
-  };
-  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify(activation));
-
-  assert.equal(resolveWorkspaceInstallationBin(dir), binPath);
-});
-
-test('resolveWorkspaceInstallationBin returns null when activation.json is absent or manifest missing', () => {
+test('resolveWorkspaceInstallationBin returns null without a ready activation that names a release', () => {
   const dir = mkTempDir('bin-discovery-tier0-absent-');
   assert.equal(resolveWorkspaceInstallationBin(dir), null);
 
@@ -216,78 +191,54 @@ test('resolveWorkspaceInstallationBin returns null when activation.json is absen
   fs.mkdirSync(installDir, { recursive: true });
   fs.writeFileSync(path.join(installDir, 'activation.json'), '{ "invalid" json');
   assert.equal(resolveWorkspaceInstallationBin(dir), null);
+
+  const releaseDir = mkTempDir('bin-discovery-release-');
+  writeStub(path.join(releaseDir, 'bin', 'fgos'));
+  stageActivation(dir, { status: 'staging', releasePath: releaseDir });
+  assert.equal(resolveWorkspaceInstallationBin(dir), null, 'not ready');
+
+  writeStub(path.join(installDir, 'bin', 'fgos'));
+  stageActivation(dir, { status: 'ready' });
+  assert.equal(resolveWorkspaceInstallationBin(dir), null, 'no releasePath');
 });
 
-test('resolveWorkspaceInstallationBin returns null when manifest entries.fgos escapes release root', () => {
-  const dir = mkTempDir('bin-discovery-tier0-escape-');
-  const installDir = path.join(dir, '.fgos', 'installation');
-  fs.mkdirSync(installDir, { recursive: true });
-
-  const manifest = {
-    schemaVersion: 1,
-    entries: { fgos: '../../etc/passwd' },
-  };
-  fs.writeFileSync(path.join(installDir, 'manifest.json'), JSON.stringify(manifest));
-  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify({ status: 'ready' }));
-
-  assert.equal(resolveWorkspaceInstallationBin(dir), null);
-});
-
-// Regression: a non-executable manifest entry was selected as tier 0
-// instead of falling through.
-test('resolveWorkspaceInstallationBin returns null when the resolved entry is not executable', (t) => {
+// Regression: a non-executable entry was selected as tier 0 instead of
+// falling through.
+test('resolveWorkspaceInstallationBin returns null when the release binary is not executable', (t) => {
   if (process.platform === 'win32') {
     t.skip('fs.constants.X_OK has no effect on Windows (NTFS has no POSIX execute bit)');
     return;
   }
   const dir = mkTempDir('bin-discovery-tier0-noexec-');
-  const installDir = path.join(dir, '.fgos', 'installation');
-  fs.mkdirSync(path.join(installDir, 'bin'), { recursive: true });
-  fs.writeFileSync(path.join(installDir, 'bin', 'fgos'), '#!/bin/sh\n', { mode: 0o644 });
-
-  const manifest = {
-    schemaVersion: 1,
-    entries: { fgos: 'bin/fgos' },
-  };
-  fs.writeFileSync(path.join(installDir, 'manifest.json'), JSON.stringify(manifest));
-  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify({ status: 'ready' }));
+  const releaseDir = mkTempDir('bin-discovery-release-');
+  fs.mkdirSync(path.join(releaseDir, 'bin'), { recursive: true });
+  fs.writeFileSync(path.join(releaseDir, 'bin', 'fgos'), '#!/bin/sh\n', { mode: 0o644 });
+  stageActivation(dir, { status: 'ready', releasePath: releaseDir });
 
   assert.equal(resolveWorkspaceInstallationBin(dir), null);
 });
 
-// Regression: a lexically-confined manifest entry that is itself a
-// symlink escaping the release root (real target outside it) was
-// selected as tier 0 instead of falling through.
-test('resolveWorkspaceInstallationBin returns null when the resolved entry is a symlink escaping the release root', () => {
+// Regression: a release binary that is itself a symlink escaping the
+// release root (real target outside it) was selected as tier 0 instead of
+// falling through.
+test('resolveWorkspaceInstallationBin returns null when the release binary is a symlink escaping the release root', () => {
   const dir = mkTempDir('bin-discovery-tier0-symlink-escape-');
-  const installDir = path.join(dir, '.fgos', 'installation');
-  fs.mkdirSync(path.join(installDir, 'bin'), { recursive: true });
+  const releaseDir = mkTempDir('bin-discovery-release-');
+  fs.mkdirSync(path.join(releaseDir, 'bin'), { recursive: true });
   const outsideTarget = path.join(mkTempDir('bin-discovery-tier0-outside-'), 'sh-stub');
   fs.writeFileSync(outsideTarget, '#!/bin/sh\n', { mode: 0o755 });
-  fs.symlinkSync(outsideTarget, path.join(installDir, 'bin', 'fgos'));
-
-  const manifest = {
-    schemaVersion: 1,
-    entries: { fgos: 'bin/fgos' },
-  };
-  fs.writeFileSync(path.join(installDir, 'manifest.json'), JSON.stringify(manifest));
-  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify({ status: 'ready' }));
+  fs.symlinkSync(outsideTarget, path.join(releaseDir, 'bin', 'fgos'));
+  stageActivation(dir, { status: 'ready', releasePath: releaseDir });
 
   assert.equal(resolveWorkspaceInstallationBin(dir), null);
 });
 
 test('resolveFgosBin prefers tier 0 (workspace installation) over tier 1, tier 2, and tier 3', () => {
   const dir = mkTempDir('bin-discovery-priority-0-');
-  const installDir = path.join(dir, '.fgos', 'installation');
-  const tier0Bin = path.join(installDir, 'bin', 'fgos');
+  const releaseDir = mkTempDir('bin-discovery-release-');
+  const tier0Bin = path.join(releaseDir, 'bin', 'fgos');
   writeStub(tier0Bin);
-
-  const manifest = {
-    schemaVersion: 1,
-    entries: { fgos: 'bin/fgos' },
-  };
-  fs.writeFileSync(path.join(installDir, 'manifest.json'), JSON.stringify(manifest));
-  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify({ status: 'ready' }));
+  stageActivation(dir, { status: 'ready', releasePath: releaseDir });
 
   // Also stage tier 1 and tier 2
   writeStub(path.join(dir, 'bin', 'fgos.mjs'));
@@ -297,4 +248,3 @@ test('resolveFgosBin prefers tier 0 (workspace installation) over tier 1, tier 2
   assert.equal(result.tier, 0);
   assert.equal(result.path, tier0Bin);
 });
-

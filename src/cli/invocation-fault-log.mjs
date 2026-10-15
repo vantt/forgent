@@ -68,6 +68,15 @@ export function recordInvocationFault({ fgosDir, cwd, verb, faultClass, message,
     if (!faultClass) return null;
     const logPath = resolveFaultLogPath(fgosDir, cwd);
     if (!logPath) return null;
+    // The fault being recorded may itself be "no writer identity" (no host
+    // binary): keep the record and name why the writer is missing.
+    let writer = null;
+    let writerError;
+    try {
+      writer = resolveWriterIdentity(path.dirname(path.dirname(logPath)));
+    } catch (err) {
+      writerError = err?.code ?? 'unknown';
+    }
     const record = {
       ts: new Date().toISOString(),
       faultClass,
@@ -75,7 +84,8 @@ export function recordInvocationFault({ fgosDir, cwd, verb, faultClass, message,
       message,
       cwd,
       argv,
-      writer: resolveWriterIdentity(path.dirname(path.dirname(logPath))),
+      writer,
+      ...(writerError ? { writerError } : {}),
     };
     fs.mkdirSync(path.dirname(logPath), { recursive: true });
     fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`);

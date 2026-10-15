@@ -55,6 +55,17 @@ jobs:
       - name: cargo test (distribution crate)
         run: cargo test -p fgos-distribution
 
+      - name: cargo test (session identity crate)
+        run: cargo test -p fgos-session-identity
+
+      # The writer-identity facade runs the real host binary on every
+      # platform; only its sh stand-in and /proc cases skip on Windows.
+      - name: Node tests for the writer-identity facade and host discovery
+        run: |
+          host="$PWD/target/release/fgos"
+          [ -f "$host.exe" ] && host="$host.exe"
+          FGOS_HOST_BIN="$host" node --test test/util/session-identity.test.mjs test/util/host-bin-path.test.mjs
+
       - name: Node tests for installers, launchers and release packaging
         run: >
           node --test

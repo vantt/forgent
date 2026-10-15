@@ -92,7 +92,7 @@ function withEventsLockAndRefresh(dir, logPath, fn) {
     const result = fn();
     view = refreshView(dir);
     return result;
-  });
+  }, dir);
   return { event, view };
 }
 
@@ -138,7 +138,7 @@ export function addPorting(dir, entry) {
     }
 
     const item = { ...entry, status: 'candidate' };
-    return appendEventLocked(logPath, { type: 'porting.add', payload: item });
+    return appendEventLocked(logPath, { type: 'porting.add', payload: item }, dir);
   });
 }
 
@@ -162,7 +162,7 @@ export function movePorting(dir, { id, to, expectedStatus } = {}) {
     }
 
     const rawEvent = transitionPorting({ porting, to, expectedStatus }); // PortingError: precondition | conflict
-    return appendEventLocked(logPath, rawEvent);
+    return appendEventLocked(logPath, rawEvent, dir);
   });
 }
 
