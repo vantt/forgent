@@ -1,0 +1,26 @@
+{
+  "contentCommit": "19ca8de23908e161c34c91626e41041b7813167c",
+  "initialNativeDFatalCount": 2,
+  "edits": [
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "beforeAuthorSession": null,
+      "afterAuthorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rowCount": 100,
+      "claimRowsUnchanged": true,
+      "approvalCarried": false,
+      "basis": "A22/A24: two native full-D metadata consequences of L10-18 author corrections in the same batch; header reflects the already-recorded author of changed pending rows. Original individual row provenance is untouched."
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "beforeAuthorSession": null,
+      "afterAuthorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "rowCount": 65,
+      "claimRowsUnchanged": true,
+      "approvalCarried": false,
+      "basis": "A22/A24: two native full-D metadata consequences of L10-18 author corrections in the same batch; header reflects the already-recorded author of changed pending rows. Original individual row provenance is untouched."
+    }
+  ],
+  "registryWritten": false,
+  "inventoryRegenerated": false
+}

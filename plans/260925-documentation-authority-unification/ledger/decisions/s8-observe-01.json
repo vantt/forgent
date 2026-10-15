@@ -103,40 +103,22 @@
     },
     {
       "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
-      "sourceUnitDigest": "867c3b15546d97e9565b557a2dbff37cfde054ad310e8a19be48d316ef159476",
+      "sourcePath": "docs/specs/observe.md",
+      "sourceAnchor": "owns",
+      "sourceUnitDigest": "ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "owns",
-      "claimKind": "specification",
-      "disposition": "partial-carry",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "A31 / SYNC 59b9b7087: upstream changed the historical unit docs/specs/observe.md#owns. Current changed spans carried into mapped candidate; this predecessor keeps its historical digest. A34 partial-carry retains the exact historical residual in the named evidence file; representation and acceptance pending. Native sync must resolve heading identity versus predecessor gap, with no identity loss. Current-source draft separately pending. No approval carried.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
       "targetUnitDigest": "a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa",
       "targetAncestry": [
         "Observe Component Specification",
         "1. Overview & Boundaries"
       ],
-      "remainder": "A34 pending: exact historical upstream lines replaced at SYNC 59b9b7087 remain in step10-review-predecessor-residuals.json, claim claim_b2a51d5d39832d330879947bdbbcb227, residual SHA256 ca9a59c18839e81d0f58c6602e5c373a161cbeb6a20721e23fbff39be36107af. Native classification of retained identity versus gap and independent representation review owed; cutover blocked."
-    },
-    {
-      "claimId": "claim_a7278e1567e5432cfb079506cf2f5050",
-      "sourceUnitDigest": "1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623",
-      "targetOwner": "docs/platform/observe/spec.md",
-      "targetAnchor": "unheaded-block-5",
-      "claimKind": "specification",
-      "disposition": "partial-carry",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "A31 / SYNC 59b9b7087: upstream changed the historical unit docs/specs/observe.md#unheaded-block-3. Current changed spans carried into mapped candidate; this predecessor keeps its historical digest. A34 partial-carry retains the exact historical residual in the named evidence file; representation and acceptance pending. Native sync must resolve heading identity versus predecessor gap, with no identity loss. Current-source draft separately pending. No approval carried.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
-      "targetUnitDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
-      "targetAncestry": [
-        "Observe Component Specification",
-        "1. Overview & Boundaries",
-        "Owns"
-      ],
-      "remainder": "A34 pending: exact historical upstream lines replaced at SYNC 59b9b7087 remain in step10-review-predecessor-residuals.json, claim claim_a7278e1567e5432cfb079506cf2f5050, residual SHA256 ca9a59c18839e81d0f58c6602e5c373a161cbeb6a20721e23fbff39be36107af. Native classification of retained identity versus gap and independent representation review owed; cutover blocked."
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
     },
     {
       "claimId": "claim_fde5bf697a74032ae96b87746d5f5f25",
@@ -555,6 +537,48 @@
         "D-ADR0037 (Observe Component Architecture)"
       ],
       "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+    },
+    {
+      "claimId": "claim_bf1888a05f53ba3cd515eb792c5059b8",
+      "sourcePath": "docs/specs/observe.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceUnitDigest": "36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "targetOwner": "docs/platform/observe/spec.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "1. Overview & Boundaries",
+        "Owns"
+      ],
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
+    }
+  ],
+  "registryGaps": [
+    {
+      "claimId": "claim_a7278e1567e5432cfb079506cf2f5050",
+      "sourcePath": "docs/specs/observe.md",
+      "sourceUnitDigest": "1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623",
+      "claimKind": "specification",
+      "disposition": "partial-carry",
+      "targetOwner": "docs/specs/observe.md",
+      "targetAnchor": "unheaded-block-3",
+      "targetUnitDigest": "36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137",
+      "targetAncestry": [
+        "Observe Component Specification",
+        "1. Overview & Boundaries",
+        "Owns"
+      ],
+      "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
+      "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_a7278e1567e5432cfb079506cf2f5050, residual SHA256 ca9a59c18839e81d0f58c6602e5c373a161cbeb6a20721e23fbff39be36107af. Source 1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623; primary target 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked."
     }
   ]
 }

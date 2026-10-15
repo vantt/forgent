@@ -1,0 +1,78 @@
+{
+  "contentCommit": "19ca8de23908e161c34c91626e41041b7813167c",
+  "ok": true,
+  "failures": [],
+  "scopePaths": 65,
+  "scopeViolations": [],
+  "knownBefore": 99462,
+  "knownAfter": 99538,
+  "knownIDLoss": [],
+  "registrySHA256Unchanged": true,
+  "request": {
+    "parts": 14,
+    "entries": 1103,
+    "partCounts": [
+      120,
+      120,
+      120,
+      53,
+      21,
+      9,
+      42,
+      98,
+      36,
+      8,
+      120,
+      120,
+      120,
+      116
+    ],
+    "decisions": 434,
+    "historical": 9,
+    "nativeTransitions": 476,
+    "all135Covered": true,
+    "headersNameAuthors": true,
+    "currentShardPackEquality": true,
+    "allFinalUnapprovedDeltasCovered": true
+  },
+  "priorFindingsResolved": 13,
+  "draftsResolved": 14,
+  "targetBindingsChecked": 9021,
+  "rowsRebound": 0,
+  "A36": {
+    "mandatoryDeepUnequal": 165,
+    "submittedPartial": 4,
+    "truth": 7,
+    "historical": 9,
+    "seedPopulation": 415,
+    "reviewerDrawMinimum": 63,
+    "producerSeedChosen": false
+  },
+  "finalD": [
+    {
+      "label": "both",
+      "fatal": 0,
+      "seconds": 83.729
+    },
+    {
+      "label": "identity",
+      "fatal": 0,
+      "seconds": 89.418
+    },
+    {
+      "label": "phase02",
+      "fatal": 0,
+      "seconds": 88.315
+    }
+  ],
+  "A_B_H_I": true,
+  "frozenReaderBaselineEqual": false,
+  "readerRoutesEqualToSYNC": true,
+  "tests": {
+    "passed": 76,
+    "failed": 0,
+    "fullNpmSuiteClaimed": false
+  },
+  "diffCheck": true,
+  "noGlobalEOrClosureClaim": true
+}

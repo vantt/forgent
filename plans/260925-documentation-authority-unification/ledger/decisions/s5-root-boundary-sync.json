@@ -251,16 +251,6 @@
       "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
-      "claimId": "claim_d956ba3fb9a8cce9589194e5f59d021f",
-      "sourceUnitDigest": "3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30",
-      "claimKind": "navigation",
-      "disposition": "reclassify-out-of-platform-scope",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_d956ba3fb9a8cce9589194e5f59d021f records docs/specs/reading-map.md#unheaded-block-2 at digest 3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement. Final b01 clarification: the current merged section 5 carries 53 original entries, with seven entries explicitly labelled truth corrections and evidence, plus one verbatim Session Identity entry from main. It does not assert that all 53 are still verbatim or defer those seven known truth fixes to promotion; wrapper count is 36 in 55 directories (_shared has no SKILL.md). Historical source binding and current navigation are separately pending independent review.",
-      "reviewStatus": "pending",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
-    },
-    {
       "claimId": "claim_d76334798a7de5ca967d48855418497f",
       "authoredBy": "codex-session:27@2026-10-14",
       "sourceUnitDigest": "8bbf5f90fa21dfbe14c7ca22e285fa97b8ffc915f8482b1f15c93a1002a28242",
@@ -1276,6 +1266,17 @@
       "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
       "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
       "targetAncestry": []
+    },
+    {
+      "claimId": "claim_d956ba3fb9a8cce9589194e5f59d021f",
+      "sourceUnitDigest": "3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_d956ba3fb9a8cce9589194e5f59d021f records docs/specs/reading-map.md#unheaded-block-2 at digest 3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement. Final b01 clarification: the current merged section 5 carries 53 original entries, with seven entries explicitly labelled truth corrections and evidence, plus one verbatim Session Identity entry from main. It does not assert that all 53 are still verbatim or defer those seven known truth fixes to promotion; wrapper count is 36 in 55 directories (_shared has no SKILL.md). Historical source binding and current navigation are separately pending independent review. Native sync at 19ca8de23908e161c34c91626e41041b7813167c confirms a predecessor gap; retain historical root/navigation identity outside platform scope. Current successor is separately native-resolved. No live old-anchor claim.",
+      "reviewStatus": "pending",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
+      "sourcePath": "docs/specs/reading-map.md"
     }
   ]
 }

@@ -1,3 +1,76 @@
+# Step 10 native sync and bounded re-review — ready for independent review
+
+Assignment `unit-run-1792090455209-159fbfed/producer/1`; Author session `codex-session:unit-run-1792090455209-159fbfed@2026-10-16`. **Content / SYNC `19ca8de23908e161c34c91626e41041b7813167c`**, comparison base `ab4d6274a`. Runner commits; this producer made no git write. This package is complete; Phase 6 remains open pending independent review and the global turn.
+
+## L10-19 / A42: additive Session Identity route
+
+[Owner answer](owner-answers.md) records the Lead instruction. The Session Identity spec defines an independent component ownership boundary that no existing switchboard area owns. The switchboard therefore gains one new **candidate** area with the single `docs/platform/session-identity/**` route, using the existing candidate-transformation shape. Every existing area entry/status and every other switchboard byte value is unchanged. No promotion or interpretation of descriptive `Canonical: Yes` as cutover authority.
+
+The native APIs read the **committed** switchboard at content pin `19ca8de23`, which predates this new route. The working route is separately verified by the unchanged candidate-status checker, covering **24 genuine native Session Identity units**. No native inventory field or registry metadata was patched, no second sync was run. The route enters native classification on the subsequent global refresh after this runner commit. [Route/scope proof](step10-sync19-checks.json).
+
+## Native identity sync and predecessor reconciliation
+
+Exactly **one background native carry-forward**, **one compact registry persistence**, **one complete native inventory generation**: **572.456s (9m32.5s)**, **4,486 files / 91,374 active units**. Known IDs **99,462 → 99,538**, zero loss; complete active inventory/registry tuples equal. Registry SHA256 `56b6a65268e54eda0bca85c2add030e2825db992db937b347085b19f74406a13`; final audit confirms no subsequent mutation. [Proof](step10-sync19-native-proof.json), [own polled log](step10-sync19-native.log).
+
+All **13 previous native-sync-only findings** structurally reconciled: **six retained IDs, seven actual predecessor gaps**. All **14 provisional current-source drafts** now resolve to genuine native IDs; no provisional ID or identity graft was persisted. The 21 changed current/gap decisions remain pending. Root/navigation gaps retain the existing outside-platform disposition. Four content predecessor gaps bind the real current upstream successor: three partial-carry blocks with exact historical residuals (io-contract, distribution, observe), plus insertion-only manifest supersede. Every old/current witness, source/target digest, prior disposition and native identity is retained. [Reconciliation](step10-sync19-predecessor-reconciliation.json), [all 13 findings](step10-sync19-prior-findings.json), [verbatim SHA256 residuals](step10-sync19-predecessor-residuals.json). The residual file SHA256 is bound in the reconciliation receipt. Independent A34 representation/acceptance remains pending; cutover is blocked for those residuals.
+
+Current complete partial-carry population is **29: 25 reviewed / four pending** (three new predecessor partials and one reopened existing row). The prior expected reviewed-pin population of 26 is historical, not acceptance of the new/changed bindings. Native identity accounting enumerates **476 raw row changes: 350 retained metadata/tuple changes, 76 new active IDs and 50 gaps**. This includes all real Session Identity/component-boundary changes and preserves all history. These accounting entries grant no truth approval and do not silently refresh global expected/candidate lists.
+
+## D and all-drift accounting
+
+All **9,021** manual claim target bindings match the unchanged native target lookup at the content pin: **zero decision-target-drift rows, zero rows rebound, zero native --rebind calls**. The prior author turn already corrected current target bindings; there was no drift row left to submit to --rebind. [Complete scan](step10-sync19-rebindings.json). No approval carried.
+
+The first complete native D found two additional **decision-author-session-missing** metadata findings in `b-decisions-first` and `b-decisions-second`, consequences of their prior L10-18 row corrections. Under A22/A24, each shard now names the author already recorded on its changed pending rows. **Claim rows, digests, individual authors, dispositions and review statuses are unchanged.** Both header fixes are explicit entries in this same request. [Header reconciliation](step10-sync19-shard-author-reconciliation.json), [initial failed D](step10-sync19-D-initial-both.json). The stale-ledger verification was stopped during its second prior run; the final three runs reuse exactly the same complete native inventory and registry, without a second sync/persistence.
+
+**Final D: zero fatal with both prior registries together and each separately.**
+
+| Priors | Duration | Fatal |
+|---|---:|---:|
+| both | 83.729s | 0 |
+| identity | 89.418s | 0 |
+| phase02 | 88.315s | 0 |
+
+[Final D summary](step10-sync19-D-summary.json), [D log](step10-sync19-native-D.log). The complete enumerable inventory was transported with v8; no fields were omitted. This is structural D proof at the content pin. Strict global E, current-truth approval, snapshot sealing, cutover and Phase 6 closure are not claimed.
+
+## One bounded re-review request
+
+[Single request index](review-request-step10-index-19ca8de23.md): **1,103 entries / 14 parts**, maximum 120 per part; counts **120, 120, 120, 53, 21, 9, 42, 98, 36, 8, 120, 120, 120, 116**. Each part names its Author session; original per-row provenance is exact. Changed unapproved entries since `ab4d6274a` are resubmitted; **174 independently reviewed current rows are excluded**, all **135 returned-to-pending rows included**. [Coverage](step10-sync19-package-coverage.json).
+
+| Part | Entries |
+|---|---:|
+| [review-request-step10-decisions-01-19ca8de23.md](review-request-step10-decisions-01-19ca8de23.md) | 120 |
+| [review-request-step10-decisions-02-19ca8de23.md](review-request-step10-decisions-02-19ca8de23.md) | 120 |
+| [review-request-step10-decisions-03-19ca8de23.md](review-request-step10-decisions-03-19ca8de23.md) | 120 |
+| [review-request-step10-decisions-04-19ca8de23.md](review-request-step10-decisions-04-19ca8de23.md) | 53 |
+| [review-request-step10-decisions-05-19ca8de23.md](review-request-step10-decisions-05-19ca8de23.md) | 21 |
+| [review-request-step10-historical-01-19ca8de23.md](review-request-step10-historical-01-19ca8de23.md) | 9 |
+| [review-request-step10-documents-01-19ca8de23.md](review-request-step10-documents-01-19ca8de23.md) | 42 |
+| [review-request-step10-links-01-19ca8de23.md](review-request-step10-links-01-19ca8de23.md) | 98 |
+| [review-request-step10-accounting-01-19ca8de23.md](review-request-step10-accounting-01-19ca8de23.md) | 36 |
+| [review-request-step10-accounting-02-19ca8de23.md](review-request-step10-accounting-02-19ca8de23.md) | 8 |
+| [review-request-step10-native-01-19ca8de23.md](review-request-step10-native-01-19ca8de23.md) | 120 |
+| [review-request-step10-native-02-19ca8de23.md](review-request-step10-native-02-19ca8de23.md) | 120 |
+| [review-request-step10-native-03-19ca8de23.md](review-request-step10-native-03-19ca8de23.md) | 120 |
+| [review-request-step10-native-04-19ca8de23.md](review-request-step10-native-04-19ca8de23.md) | 116 |
+
+The set contains **434 pending manual decisions, nine real historical AGENTS decisions, 42 changed content/helper files, 98 individual link outcomes, 44 accounting/truth/route entries and 476 native identity accounting rows**. It covers L10-15–L10-18; h01's reviewed-pin/group correction; b01 truth-2 wrapper evidence and all seven labelled truth corrections; c01/c02/e01 explanations and confinement aliases; root AGENTS re-pin; main io-contract/distribution/observe, reading-map +1 and manifest re-carries; helper rule with tests; restored/repointed links; the single Session Identity route; all 135 reopened rows; and the two native-exposed author headers. Unchanged full-file content and alias/expected populations are linked context, not extra approvals. Historical author-turn status receipts are explicitly labelled historical; current native rows and the new route take precedence.
+
+**A36:** all 434 submitted manual claims get full mechanical digest/anchor/shard equality checks and ordinary verdicts. **165 unequal source/target rows**, **four submitted partial carries**, **all seven truth corrections**, **all nine historical AGENTS rows** and explicitly marked reworks are deep. The independent reviewer seeds **at least 63/415 Weak-exact/Judgment rows** and records seed/sample IDs; >3% deep rework escalates to the full pack. [Exact lists](step10-sync19-A36.json). No producer seed, draw, sample or verdict. A28 truth sampling and checkpoint/red-team remain independent obligations.
+
+Historical witness limits remain explicit: four submitted rows have unavailable historical source text; no text was reconstructed from ordinal anchors. Existing six historical witness limits are not globally cleared by a narrower submitted set. The historical collection intentionally retains prior decision records; for the same-ID RUL11 record, the old reviewed supersede is shown as history beside the newly submitted pending reclassification. Match the full record, not the first same-ID occurrence. No old review approves a current reclassification.
+
+## Validation and next global turn
+
+A/B/H pass, with the same eight historical A observations; scope violations zero and frozen/protected hashes unchanged. H checks **609 files / 217 routed candidates or promoted entries**, zero metadata findings. I: current reader routes equal SYNC exactly; the frozen baseline remains unchanged and still reports the one upstream main Session Identity route. No frozen-I green claim or rebaseline. **76/76 targeted tests pass**, including helper behavior, global comparator, review/format and candidate-status suites, all with `env -u CLAUDE_CODE_SESSION_ID`. No full npm-suite claim. [Checks](step10-sync19-checks.json), [tests](step10-sync19-tests.log), [final audit](step10-sync19-final-audit.json), [exact reproduction](step10-sync19-reproduction.json).
+
+**Next: independent ordinary review of this ONE set, then apply only matching committed verdicts with verbatim Notes. After that review is applied, run the global turn:** merge current main; global D/E from the same in-memory applied overlay **alone**; T9; promotion check/current-truth review; mutation run; third refresh; full-corpus rehearsal including the previously missing Step 2 reduced rehearsal; exact alias coverage; checkpoint population and sensitivity/red-team-10. Reconcile native candidate/alias/expected sets without approval carry. Populate scorecard/effort evidence. Keep all 32 other groups queued to Phase 7/8, three Coordination Rings holds, dashboard predecessor/stale successor, A34 and 14 runner-cutover obligations and inbound/non-doc consumer queues explicit. The global turn must incorporate the newly committed candidate route and reject any stale native tuple. No global-green/closure claim is inferred from this package.
+
+No new owner-direction question. No docs/source/code/test/protected-tool/vocabulary/extractor/baseline writes, workspace .fgos touch, fgOS CLI, git writes, authority flip, source retirement, alias adoption, deletion, push or landing. Required external outbox is the sole write-scope exception. MDView MCP is unavailable and the assignment prohibits CLI use, so no preview URL was created. Phase 6 stays open and ultimately stops awaiting owner review.
+
+---
+
+## Historical prior author-turn report
+
 # Step 10 review application and author rework complete — package next
 
 Assignment `unit-run-1792089181794-89ae42db/producer/1`; **SYNC `59b9b7087`**. Review request `ab4d6274a`, reviewed content `2300d6557`. Read every Notes/Concerns in all 17 committed review reports. This is the authorized author/docs turn; **zero native sync, zero native --rebind, zero review packs**. Runner owns commits.

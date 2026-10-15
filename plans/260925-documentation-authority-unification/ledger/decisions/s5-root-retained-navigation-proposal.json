@@ -3281,13 +3281,15 @@
     },
     {
       "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
-      "sourceUnitDigest": "22c6580953028171ac1febd1a750c1930c6374a479ea17af5aa6f541df122f18",
+      "sourcePath": "docs/specs/reading-map.md",
+      "sourceAnchor": "reading-map-sản-phẩm",
+      "sourceUnitDigest": "19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_8e290abbe8f1344bf8f19c997da11921 records docs/specs/reading-map.md#reading-map-sản-phẩm at digest 22c6580953028171ac1febd1a750c1930c6374a479ea17af5aa6f541df122f18. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement. Final b01 clarification: the current merged section 5 carries 53 original entries, with seven entries explicitly labelled truth corrections and evidence, plus one verbatim Session Identity entry from main. It does not assert that all 53 are still verbatim or defer those seven known truth fixes to promotion; wrapper count is 36 in 55 directories (_shared has no SKILL.md). Historical source binding and current navigation are separately pending independent review.",
       "reviewStatus": "pending",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
     },
     {
       "claimId": "claim_587566a4401b92c909e862d72aad4af0",
@@ -3301,13 +3303,15 @@
     },
     {
       "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
-      "sourceUnitDigest": "3fc17fdda14e751313ece3ac881cdd17d0eabb6c98a3ce47a39486de3c39ac3f",
+      "sourcePath": "docs/reading-map.md",
+      "sourceAnchor": "5-detailed-product-and-source-map",
+      "sourceUnitDigest": "01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_c8677c74072e0ac1ac4d9b345de1ee1f records docs/reading-map.md#5-detailed-product-and-source-map at digest 3fc17fdda14e751313ece3ac881cdd17d0eabb6c98a3ce47a39486de3c39ac3f. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
     },
     {
       "claimId": "claim_a4f7ef8823510c108225f922da1261ba",
@@ -3340,16 +3344,6 @@
       "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
-      "claimId": "claim_2bdbea8cb68325ec8b5b8d1a62447f4d",
-      "sourceUnitDigest": "9a08a47745ab1aaa1c00c35a181813b16ff2e9f12eb14332d3993c9009d36219",
-      "claimKind": "navigation",
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_2bdbea8cb68325ec8b5b8d1a62447f4d records docs/reading-map.md#unheaded-block-16 at digest 9a08a47745ab1aaa1c00c35a181813b16ff2e9f12eb14332d3993c9009d36219. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
-    },
-    {
       "claimId": "claim_85d25e6ad2429e431b1b4d7d7025a498",
       "sourceUnitDigest": "b951d131c085ce17b7fccbcbd71473f53db24b05e4301cdf01cb42945de0b2ec",
       "claimKind": "navigation",
@@ -3378,6 +3372,30 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-b01-2300d6557.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
+    },
+    {
+      "claimId": "claim_690e83ad4f79a1bbac8eafc9acb1d4ea",
+      "sourcePath": "docs/specs/reading-map.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
+    },
+    {
+      "claimId": "claim_42444c5f44c4076300c2b9c56516c429",
+      "sourcePath": "docs/reading-map.md",
+      "sourceAnchor": "unheaded-block-16",
+      "sourceUnitDigest": "607cd88b7a9323d610811e9bee61bbcb328ad12ba92f9f1b62defc5ab6c6db24",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
     }
   ],
   "files": [
@@ -3465,6 +3483,17 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-b01-2300d6557.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
+    },
+    {
+      "claimId": "claim_2bdbea8cb68325ec8b5b8d1a62447f4d",
+      "sourceUnitDigest": "9a08a47745ab1aaa1c00c35a181813b16ff2e9f12eb14332d3993c9009d36219",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_2bdbea8cb68325ec8b5b8d1a62447f4d records docs/reading-map.md#unheaded-block-16 at digest 9a08a47745ab1aaa1c00c35a181813b16ff2e9f12eb14332d3993c9009d36219. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement. Native sync at 19ca8de23908e161c34c91626e41041b7813167c confirms a predecessor gap; retain historical root/navigation identity outside platform scope. Current successor is separately native-resolved. No live old-anchor claim.",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
+      "sourcePath": "docs/reading-map.md"
     }
   ]
 }

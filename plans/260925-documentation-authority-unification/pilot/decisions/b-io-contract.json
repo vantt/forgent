@@ -72,20 +72,21 @@
     },
     {
       "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
-      "sourceUnitDigest": "698037f4efe95080",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "chiều-vào-verb-danh-tính",
+      "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "2-input-direction-verb-and-identity",
-      "claimKind": "contract",
-      "disposition": "partial-carry",
-      "reviewStatus": "pending",
-      "rationale": "A31 / SYNC 59b9b7087: upstream changed the historical unit docs/io-contract.md#chiều-vào-verb-danh-tính. Current changed spans carried into mapped candidate; this predecessor keeps its historical digest. A34 partial-carry retains the exact historical residual in the named evidence file; representation and acceptance pending. Native sync must resolve heading identity versus predecessor gap, with no identity loss. Current-source draft separately pending. No approval carried.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
       "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
       "targetAncestry": [
         "CLI I/O Contract"
       ],
-      "remainder": "A34 pending: exact historical upstream lines replaced at SYNC 59b9b7087 remain in step10-review-predecessor-residuals.json, claim claim_51848961a2bbf93d37bc2b46d9f141f5, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Native classification of retained identity versus gap and independent representation review owed; cutover blocked."
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
     },
     {
       "claimId": "claim_426f29d1e11055574c203d89cba84cc7",
@@ -132,25 +133,6 @@
         "Writer Identity"
       ],
       "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
-    },
-    {
-      "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
-      "sourceUnitDigest": "fa53d50b84fef302",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-10",
-      "claimKind": "contract",
-      "disposition": "partial-carry",
-      "reviewStatus": "pending",
-      "rationale": "A31 / SYNC 59b9b7087: upstream changed the historical unit docs/io-contract.md#unheaded-block-5. Current changed spans carried into mapped candidate; this predecessor keeps its historical digest. A34 partial-carry retains the exact historical residual in the named evidence file; representation and acceptance pending. Native sync must resolve heading identity versus predecessor gap, with no identity loss. Current-source draft separately pending. No approval carried.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
-      "targetUnitDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
-      "targetAncestry": [
-        "CLI I/O Contract",
-        "2. Input Direction Verb And Identity",
-        "Writer Source Trust Levels"
-      ],
-      "remainder": "A34 pending: exact historical upstream lines replaced at SYNC 59b9b7087 remain in step10-review-predecessor-residuals.json, claim claim_f5365b8e40fb58c75adc56a574263242, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Native classification of retained identity versus gap and independent representation review owed; cutover blocked."
     },
     {
       "claimId": "claim_cb629f70ad6029530d70253f96ad3221",
@@ -697,6 +679,46 @@
         "CLI I/O Contract"
       ],
       "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+    },
+    {
+      "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-10",
+      "targetUnitDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Source Trust Levels"
+      ],
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
+    },
+    {
+      "claimId": "claim_a14f9308d3f04e10e670c6f178d4ee33",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "unheaded-block-7",
+      "sourceUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Caller Role"
+      ],
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
     }
   ],
   "authorSession": "codex-session:1@2026-10-08",
@@ -783,6 +805,25 @@
         "3. Output Direction Unified Envelope",
         "Recognizing A Real Envelope"
       ]
+    },
+    {
+      "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
+      "sourcePath": "docs/io-contract.md",
+      "sourceUnitDigest": "fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9",
+      "claimKind": "contract",
+      "disposition": "partial-carry",
+      "targetOwner": "docs/io-contract.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+      "targetAncestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Chiều vào — verb + danh tính"
+      ],
+      "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
+      "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_f5365b8e40fb58c75adc56a574263242, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked."
     }
   ]
 }

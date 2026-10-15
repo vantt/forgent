@@ -1205,6 +1205,23 @@
         }
       ],
       "scopeSummary": "Candidate platform-wide contract collection; existing source authority is unchanged."
+    },
+    {
+      "area": "Session Identity",
+      "authorityStatus": "candidate",
+      "fileClasses": [
+        "maintained-authority"
+      ],
+      "entryPoint": "docs/platform/session-identity/spec.md",
+      "currentRoutes": [
+        {
+          "route": "docs/platform/session-identity/**",
+          "authorityStatus": "candidate",
+          "scope": "candidate-transformation",
+          "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+        }
+      ],
+      "scopeSummary": "Candidate Session Identity component specification; attribution contract owned by this component, without platform cutover or authority promotion."
     }
   ],
   "rootDocuments": [

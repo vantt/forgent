@@ -8,16 +8,17 @@
   ],
   "claims": [
     {
-      "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
-      "sourceUnitDigest": "034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3",
+      "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-85",
-      "claimKind": "specification",
-      "disposition": "partial-carry",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "A31 / SYNC 59b9b7087: upstream changed the historical unit docs/specs/distribution.md#unheaded-block-5. Current changed spans carried into mapped candidate; this predecessor keeps its historical digest. A34 partial-carry retains the exact historical residual in the named evidence file; representation and acceptance pending. Native sync must resolve heading identity versus predecessor gap, with no identity loss. Current-source draft separately pending. No approval carried.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
       "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
@@ -25,7 +26,28 @@
         "Spec: Distribution",
         "Data Dictionary"
       ],
-      "remainder": "A34 pending: exact historical upstream lines replaced at SYNC 59b9b7087 remain in step10-review-predecessor-residuals.json, claim claim_26f62a1ae1abc17d0f02706788bfd399, residual SHA256 4894dcf4de3a1254ebc5e89c78ffed0afafc58859c82fa2b2781ac8216b08424. Native classification of retained identity versus gap and independent representation review owed; cutover blocked."
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
+    }
+  ],
+  "registryGaps": [
+    {
+      "claimId": "claim_26f62a1ae1abc17d0f02706788bfd399",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceUnitDigest": "034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3",
+      "claimKind": "specification",
+      "disposition": "partial-carry",
+      "targetOwner": "docs/specs/distribution.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+      "targetAncestry": [
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
+      "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_26f62a1ae1abc17d0f02706788bfd399, residual SHA256 4894dcf4de3a1254ebc5e89c78ffed0afafc58859c82fa2b2781ac8216b08424. Source 034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3; primary target 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked."
     }
   ]
 }

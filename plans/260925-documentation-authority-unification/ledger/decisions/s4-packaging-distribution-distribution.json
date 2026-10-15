@@ -145,22 +145,23 @@
     },
     {
       "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
-      "sourceUnitDigest": "192108cf0505221ad1943f7a12c459ba1c7e456a75f483983bc718b5d66523dd",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "data-dictionary",
+      "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "data-dictionary",
-      "claimKind": "specification",
-      "disposition": "partial-carry",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "A31 / SYNC 59b9b7087: upstream changed the historical unit docs/specs/distribution.md#data-dictionary. Current changed spans carried into mapped candidate; this predecessor keeps its historical digest. A34 partial-carry retains the exact historical residual in the named evidence file; representation and acceptance pending. Native sync must resolve heading identity versus predecessor gap, with no identity loss. Current-source draft separately pending. No approval carried.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
       "targetUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
       ],
-      "remainder": "A34 pending: exact historical upstream lines replaced at SYNC 59b9b7087 remain in step10-review-predecessor-residuals.json, claim claim_4eeb2f406288458e61bad21531966ab1, residual SHA256 4894dcf4de3a1254ebc5e89c78ffed0afafc58859c82fa2b2781ac8216b08424. Native classification of retained identity versus gap and independent representation review owed; cutover blocked."
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
     },
     {
       "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",

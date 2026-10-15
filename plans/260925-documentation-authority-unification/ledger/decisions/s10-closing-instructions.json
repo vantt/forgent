@@ -192,15 +192,15 @@
     },
     {
       "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
-      "sourceUnitDigest": "0951d8b2cc464fa07dc2db5e313c9aa31a4bd64acf9000bbd1f00e85ca17c4e5",
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "procedure",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "legacy-node-cli-ownership-boundary",
+      "sourceUnitDigest": "fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817",
+      "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_ccf1acf857fc4e9757a933ca22ed34f1 records AGENTS.md#legacy-node-cli-ownership-boundary at digest 0951d8b2cc464fa07dc2db5e313c9aa31a4bd64acf9000bbd1f00e85ca17c4e5. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
     },
     {
       "claimId": "claim_133b6f931d35a06604813e97ac11bd8f",
@@ -368,18 +368,6 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#unheaded-block-13 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "Independent review pending at corrected current binding; no approval carried."
-    },
-    {
-      "claimId": "claim_251b389b227a62ef26b0fd3e1f0bebd9",
-      "sourceUnitDigest": "9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f",
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "procedure",
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_251b389b227a62ef26b0fd3e1f0bebd9 records AGENTS.md#unheaded-block-14 at digest 9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement.",
       "reviewNote": "Independent review pending at corrected current binding; no approval carried."
     },
     {
@@ -1479,6 +1467,18 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-a01-2300d6557.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
+    },
+    {
+      "claimId": "claim_c328f1aab4c53a87e5564dab101facf2",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-14",
+      "sourceUnitDigest": "e3c0146e4d7a42d364c551fcb327b9ab9faef893cfe3b6075a4e658836d69972",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried."
     }
   ],
   "registryGaps": [
@@ -1735,6 +1735,19 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-a02-2300d6557.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
+    },
+    {
+      "claimId": "claim_251b389b227a62ef26b0fd3e1f0bebd9",
+      "sourceUnitDigest": "9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_251b389b227a62ef26b0fd3e1f0bebd9 records AGENTS.md#unheaded-block-14 at digest 9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement. Native sync at 19ca8de23908e161c34c91626e41041b7813167c confirms a predecessor gap; retain historical root/navigation identity outside platform scope. Current successor is separately native-resolved. No live old-anchor claim.",
+      "reviewNote": "Pending independent review at 19ca8de23; no historical approval carried.",
+      "sourcePath": "AGENTS.md"
     }
   ]
 }

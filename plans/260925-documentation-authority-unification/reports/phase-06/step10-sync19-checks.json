@@ -1,0 +1,154 @@
+{
+  "contentCommit": "19ca8de23908e161c34c91626e41041b7813167c",
+  "A": {
+    "historicalOffenders": [
+      "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+      "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+      "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"
+    ],
+    "historicalEqual": true,
+    "scopeViolations": [],
+    "ok": true
+  },
+  "B": {
+    "rows": [
+      {
+        "path": "scripts/generate-doc-inventory.mjs",
+        "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+        "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+      },
+      {
+        "path": "scripts/doc-inventory-artifact.mjs",
+        "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+        "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+      },
+      {
+        "path": "scripts/generate-shipped-path-inventory.mjs",
+        "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+        "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+      },
+      {
+        "path": "scripts/check-legacy-docs-ratchet.mjs",
+        "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+        "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+      },
+      {
+        "path": "scripts/lib/is-main-module.mjs",
+        "expected": "680570946fa1381474900c9192795514b5b88f48",
+        "actual": "680570946fa1381474900c9192795514b5b88f48"
+      }
+    ],
+    "ok": true
+  },
+  "H": {
+    "findings": [],
+    "counts": {
+      "files": 609,
+      "byStatus": {
+        "promoted": 3,
+        "candidate": 214,
+        "legacy-current": 0,
+        "non-authority": 1,
+        "unrouted": 391
+      },
+      "exemptUnrouted": 302,
+      "checked": 217,
+      "findings": 0,
+      "byType": {}
+    }
+  },
+  "I": {
+    "equalToSYNC": true,
+    "frozenEqual": false,
+    "upstreamDelta": [
+      "docs/platform/session-identity/spec.md"
+    ],
+    "baselineUnchanged": true
+  },
+  "route": {
+    "additionOnly": true,
+    "unchangedExistingAreaStatuses": true,
+    "addition": {
+      "area": "Session Identity",
+      "authorityStatus": "candidate",
+      "fileClasses": [
+        "maintained-authority"
+      ],
+      "entryPoint": "docs/platform/session-identity/spec.md",
+      "currentRoutes": [
+        {
+          "route": "docs/platform/session-identity/**",
+          "authorityStatus": "candidate",
+          "scope": "candidate-transformation",
+          "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+        }
+      ],
+      "scopeSummary": "Candidate Session Identity component specification; attribution contract owned by this component, without platform cutover or authority promotion."
+    },
+    "classification": "candidate",
+    "nativeSessionUnits": 24,
+    "contentPinNote": "Native sync/inventory read the committed switchboard at 19ca8de23, which predates this additive route. Working route checked separately; no native inventory rewrite or second refresh. Recompute classification natively in the subsequent global turn."
+  },
+  "docsCodeAndTestsUnchanged": true,
+  "protectedFilesUnchanged": true,
+  "priorFindings": [
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard b-io-contract: claim claim_51848961a2bbf93d37bc2b46d9f141f5 is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard b-io-contract: claim claim_f5365b8e40fb58c75adc56a574263242 is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s10-closing-instructions: claim claim_ccf1acf857fc4e9757a933ca22ed34f1 is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s10-closing-instructions: claim claim_251b389b227a62ef26b0fd3e1f0bebd9 is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s4-packaging-distribution-distribution.json: claim claim_4eeb2f406288458e61bad21531966ab1 is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s4-packaging-main-recarry.json: claim claim_26f62a1ae1abc17d0f02706788bfd399 is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s5-root-boundary-sync.json: claim claim_d956ba3fb9a8cce9589194e5f59d021f is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s5-root-main-recarry.json: claim claim_b19630ef4dcf1330c9807fc226a90e7b is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s5-root-retained-navigation-proposal.json: claim claim_8e290abbe8f1344bf8f19c997da11921 is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s5-root-retained-navigation-proposal.json: claim claim_c8677c74072e0ac1ac4d9b345de1ee1f is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s5-root-retained-navigation-proposal.json: claim claim_2bdbea8cb68325ec8b5b8d1a62447f4d is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s8-observe-01.json: claim claim_b2a51d5d39832d330879947bdbbcb227 is not in the claim ledger"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s8-observe-01.json: claim claim_a7278e1567e5432cfb079506cf2f5050 is not in the claim ledger"
+    }
+  ],
+  "ok": true
+}

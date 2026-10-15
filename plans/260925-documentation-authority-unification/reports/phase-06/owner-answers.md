@@ -284,3 +284,8 @@ Relayed by Lead under A42 in assignment `unit-run-1792089181794-89ae42db/produce
 - **L10-18 (f/e links):** any cell/row/column label naming source, legacy, retained, original or canonical relationships retains its legacy destination and verbatim label, including the 51 Source-column links. Preserve unrelated target cells. Tests first; restore every affected link, link-226’s verbatim label, and repoint f-692 like its siblings. Detailed final changes are in `step10-review-link-restorations.json` and `post-review-edits.md`.
 
 Lead also directs b01’s 36-wrapper correction/evidence and seven-truth-correction rationales; c01’s six governance-repoint rationales; c02/e01’s explicit move→supersede/link-inequality explanations, 25 current confinement anchor/line-range rationales and alias bindings, stale classification nits, duplicate R9-1 removal and RUL40 citation `runner.md:1008`. Main re-carry is authorized under A31; package only next turn at this runner commit: one native sync, `--rebind` every drift, ONE bounded re-review of everything changed since `ab4d6274a`.
+
+
+## L10-19 — A42 Session Identity candidate route
+
+Lead decision supplied in assignment `unit-run-1792090455209-159fbfed/producer/1`, content pin `19ca8de23`: add `docs/platform/session-identity/**` as a candidate route, in the same shape as other docs/platform candidate routes; no other switchboard change and no existing area status change. Session Identity specification defines a separate component ownership boundary; no existing area owns that component, so a new candidate Session Identity area holds the single additive route. This records routing only, without promotion or acceptance of descriptive Canonical metadata.

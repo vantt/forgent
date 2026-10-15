@@ -1,3 +1,31 @@
+# Step 10 native sync and bounded re-review complete
+
+Assignment `unit-run-1792090455209-159fbfed/producer/1`; **SYNC/content `19ca8de23`**, comparison `ab4d6274a`. L10-19/A42 recorded: one additive Session Identity candidate area/route; no existing area/status change and no docs byte change.
+
+**One background native sync 572.456s (9m32.5s)**, one compact persistence, **4,486 files / 91,374 active units**, known IDs **99,462 → 99,538**, zero loss and active tuple equality. **13 prior findings resolved structurally (six retained IDs/seven gaps); 14 drafts native-resolved**. Three new A34 partial residuals remain pending; complete partial population29 =25 reviewed/four pending. **9,021 targets checked / zero drift / zero rows rebound / zero --rebind calls**, no approval carry. Two additional full-D missing-author headers fixed from existing row provenance, claim rows unchanged.
+
+**Final native D zero fatal against both priors together and each**; initial two-header failure retained. **ONE bounded re-review [index](review-request-step10-index-19ca8de23.md):1,103 entries /14 parts**, max120; counts **120, 120, 120, 53, 21, 9, 42, 98, 36, 8, 120, 120, 120, 116**. Covers all changes since ab4d6274a; all135 revoked rows and nine historical decisions included,174 current reviewed rows excluded. **A36 mandatory deep165 unequal +four submitted partials +seven truth corrections +nine historical rows; independent reviewer seeded ≥63/415**, no producer seed/verdict.
+
+A/B/H and scope/hash audits pass; frozen I retains one upstream route, current readers equal SYNC. **76 targeted tests pass**. [Report](step-10-report.md), [native proof](step10-sync19-native-proof.json), [D](step10-sync19-D-summary.json), [coverage](step10-sync19-package-coverage.json), [audit](step10-sync19-final-audit.json). Native committed switchboard predates new route; working candidate-status proof separately covers24 Session Identity units; global refresh must incorporate it. Historical witness limits, Rings/dashboard/A34/groups/cutover/consumers remain explicit. No full-suite/global E/closure claim.
+
+**NEXT: independent ordinary review, apply matching committed verdicts, then global turn — merge main; global D/E in-memory alone; T9; promotion check; mutation run; third refresh; rehearsal (including Step2 reduced); alias coverage; checkpoint population/sensitivity/red-team; scorecard/effort.** No docs/protected/baseline/CLI/git or workspace .fgos writes, promotion/retirement/deletion/push/landing. Runner commits; Phase6 remains open.
+
+---
+
+# Step 10 re-review package checkpoint — native inventory pending
+
+Content **19ca8de23**; one native sync remains live, one compact registry persistence completed. **13 prior findings structurally reconciled: six retained IDs, seven gaps; fourteen drafts native-resolved.** Three new A34 partial residuals remain pending. All **9,021** manual target bindings checked: **zero drift, zero --rebind calls**, no approval carry.
+
+One bounded re-review set currently **1,101 entries / 14 parts** (max120), including full native metadata transitions; **434 pending manual decisions, nine historical AGENTS rows, 42 content/helper files, 98 links, 42 accounting/truth/route entries, 476 native transition rows**. All135 revoked rows included; 174 reviewed current rows excluded. **A36:165 mandatory unequal deep, four submitted partial carries, seven truth corrections, nine historical rows; independent reviewer seeded ≥63/415.** A/B/H and scope checks pass;76 targeted tests pass. Native full D still pending; no global/closure claim.
+
+---
+
+# Step 10 bounded re-review package in progress
+
+Assignment `unit-run-1792090455209-159fbfed/producer/1`; content pin **19ca8de23**. Lead **L10-19 (A42)** authorizes only the additive Session Identity candidate route, without area status changes. One background native sync and one compact registry persistence, pending predecessor reconciliation, all target drift rebindings, D against both priors and one bounded request set since `ab4d6274a` are in progress. No docs changes, fgOS CLI, git writes, seeds or verdicts. Runner commits.
+
+---
+
 # Step 10 review reworks complete — package next
 
 Assignment `unit-run-1792089181794-89ae42db/producer/1`; **SYNC `59b9b7087`**. All 17 reports’ Notes/Concerns read. **309 matching ok verdicts applied verbatim; 174 remain reviewed / 135 re-opened pending after author corrections**. Four ok source/target-drift bindings not applied; nine retired AGENTS identities now real pending historical decisions. No author-session refusal. [Application](step10-review-application.json), [audit](step10-review-final-audit.json).
