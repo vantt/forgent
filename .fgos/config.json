@@ -1585,7 +1585,8 @@
           ".claude/skills/**"
         ]
       }
-    ]
+    ],
+    "idleTimeoutMs": 1500000
   },
   "gateBypass": {
     "level": "standard"
