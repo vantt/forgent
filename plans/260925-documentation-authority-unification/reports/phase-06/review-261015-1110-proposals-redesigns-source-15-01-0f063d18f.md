@@ -1,0 +1,39 @@
+# Review of proposals and redesigns source 15-01
+
+Reviewer: reviewer:claude-session:a4954387@2026-10-14
+Author session: codex-session:unit-run-1792034226117-40d90d09@2026-10-15
+Review mode: ordinary
+Request commit: 453914972
+Content commit: 0f063d18fdab01cb6f2c915bb60ff528c5e0f238
+
+## Scope and method
+
+Request `review-request-261015-1110-proposals-redesigns-source-15-01-0f063d18f.md` (shard `s7-proposals-redesigns-15-readme.json`, source `docs/architect/proposals/README.md`, carrier `docs/platform/proposals/README.md`), 8 rows, all pending in the shard. Read only, in worktree HEAD 453914972 (no non-plan file differs from 0f063d18f). The request asks for no sensitivity pack; none is claimed.
+
+Mechanical checks for every row (8): full 64-hex digest recompute with `extractMarkdownConservationUnits` (source unit found exactly once, target unit found exactly once), the pack's shown-text SHA256 recomputed, pack decision equal to the shard entry, `list-doc-anchors --check` run for every target owner and anchor (0 failures of 182 across the six requests), line ranges in each rationale equal to the real unit lines, source file blob equal to the frozen map pin, one owner for the file, no duplicate target digest, no source unit without a row, and the unclaimed target units are exactly the three candidate-native units (txt metadata fence, Added in candidate paragraph, Source relationship line).
+
+Whole file: whole-file line diff: only the inserted candidate header block and 6 link destinations rebased to the legacy docs/architect/proposals files (same referent). Nothing is lost from the source and nothing unlabelled is added; every link kept its original referent (0 referent differences).
+
+Sampling (owner answer A36): Seed 261015 (python random.Random(261015).sample over the sorted Weak-exact and Judgment ids); pool 8, minimum deep reads 8; sampled ids: claim_09af0f2aa436ddd0e9171a866767c99b, claim_25b51a36a5abf6a4190291ac4da1f037, claim_5ccfd7d5fd348491b4c0d6b9c9bfc7f3, claim_5f915941b6acdfb3a08345abf0e0719e, claim_69cd8997c627f22f069222676cc25e4d, claim_76cd5a79f79a23ddf7bf30b53312aadf, claim_86499a247b54e7e84a84c9cb0f477242, claim_f8e206eea9c8d807bb63e249dbc858f4; mandatory differing-digest ids: claim_5f915941b6acdfb3a08345abf0e0719e, claim_69cd8997c627f22f069222676cc25e4d, claim_76cd5a79f79a23ddf7bf30b53312aadf, claim_86499a247b54e7e84a84c9cb0f477242, claim_f8e206eea9c8d807bb63e249dbc858f4. Hand-recomputed digests (seed 20261015, 26 ids of 182 across the six requests, sha256 of the shown text and the heading formula computed without the extractor): in this pack 0 id(s): none. All 52 source and target digests of the 26 ids matched.
+
+Rationale and owner checks: the evidence sentences cited in the rationales were re-read at HEAD (worker-home.mjs:32-37 for file 13, runner.md:1590-1603 and 3117 plus the 2180b4e72 deletions for file 14, the six-entry README list for file 15, how-to:196-200 and SKILL.md:27-40 for file 16, the handoff header lines for file 17). The disposition `supersede` is allowed for retained-source in the vocabulary and the owner equals the map target or the recorded per-file override.
+
+## Verdicts
+
+| Claim | Verdict | Note | Source digest | Target digest |
+|---|---|---|---|---|
+| claim_5f915941b6acdfb3a08345abf0e0719e | ok | deep: heading architect-level-proposals src lines 1-1 -> tgt architect-level-proposals lines 1-1; H1 section: target adds the txt metadata fence, labelled Added in candidate paragraph and Source relationship line, then the byte-equal source intro paragraphs (Document type Index through the area-specific proposals sentence); supersede to the mapped collection-index carrier, no wording lost. | 5c24a592f7b19694cd316b58db92a582e861d992ade3752bc722824e49941fca | 03330e9b08cb144dc36c76550e849444c3e07f5a13ec984602cf4268698e6fc6 |
+| claim_25b51a36a5abf6a4190291ac4da1f037 | ok | deep: Weak-exact unheaded-block unheaded-block-1 src lines 3-6 -> tgt unheaded-block-4 lines 27-30; source and target shown text read in full and sha256-equal with the pack, carried verbatim and nothing added; supersede to README.md matches the triage. | a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf | a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf |
+| claim_09af0f2aa436ddd0e9171a866767c99b | ok | deep: Weak-exact unheaded-block unheaded-block-2 src lines 8-11 -> tgt unheaded-block-5 lines 32-35; source and target shown text read in full and sha256-equal with the pack, carried verbatim and nothing added; supersede to README.md matches the triage. | dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af | dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af |
+| claim_5ccfd7d5fd348491b4c0d6b9c9bfc7f3 | ok | deep: Weak-exact unheaded-block unheaded-block-3 src lines 13-14 -> tgt unheaded-block-6 lines 37-38; source and target shown text read in full and sha256-equal with the pack, carried verbatim and nothing added; supersede to README.md matches the triage. | 4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72 | 4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72 |
+| claim_69cd8997c627f22f069222676cc25e4d | ok | deep: heading active-proposals src lines 16-16 -> tgt active-proposals lines 40-40; shown source and target diffed line by line, only 5 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to README.md per map/triage, rationale evidence true. | 35d38e36aa9ae5117a3aba40a90d734ccb07badb2f8c4c7e19984e6f6c0b1b93 | d836846ddf01300cd1a50ab447e19e2c6b478104bf0621e9f044b37446c2feb4 |
+| claim_76cd5a79f79a23ddf7bf30b53312aadf | ok | deep: unheaded-block unheaded-block-4 src lines 18-28 -> tgt unheaded-block-7 lines 42-52; shown source and target diffed line by line, only 5 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to README.md per map/triage, rationale evidence true. | 949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0 | 3d3d1d86ca10ef2ed0b784f13f86a69a4f06b906a73fcdf2eeca096c8119b5c0 |
+| claim_86499a247b54e7e84a84c9cb0f477242 | ok | deep: heading handoff-prompts src lines 30-30 -> tgt handoff-prompts lines 54-54; shown source and target diffed line by line, only 1 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to README.md per map/triage, rationale evidence true. | a8367c95c72c4487eeb5157751fbacafc5293909f9720e69aa24993e050a5a53 | 29d4d8ed08d8c765ae18fcd142e04c8ec693283df3c17e35ad468ad9e9480956 |
+| claim_f8e206eea9c8d807bb63e249dbc858f4 | ok | deep: unheaded-block unheaded-block-5 src lines 32-32 -> tgt unheaded-block-8 lines 56-56; shown source and target diffed line by line, only 1 link destination(s) rebased and each resolves to the same repository path as the source link, no wording change; supersede to README.md per map/triage, rationale evidence true. | 7d017b02c78c810db5bc23280aebdcd6f9032fe6952b95fd9e94b0bde634bdef | 7bc3dad8854efec710c29af55773f57e28c7bfeb70332fe07610570708216ecb |
+
+## Notes
+
+- Result: no row needs rework or owner decision; deep rework rate 0 percent, below the 3 percent threshold, so no full-pack read was triggered beyond what is stated above.
+- Native D blocker: the eight README rationale findings come from the phrase `it omits later siblings`, which describes the source index; it is true (the source lists six entries while the folder holds 14 files), so these rows lose nothing and are not a conservation defect. The checker and decision content are unchanged and I do not waive the checker finding. The constitution lists the target as proposal while the map says collection-index; this frozen discrepancy is disclosed in the triage and is not decided here.
+
+Unresolved: none.
