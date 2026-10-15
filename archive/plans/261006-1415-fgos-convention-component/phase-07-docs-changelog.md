@@ -1,6 +1,6 @@
 # Phase 07 — Docs, CHANGELOG, ghi chú di chuyển caller
 
-Trạng thái: pending · Công: 0.5d · Phụ thuộc: phase 05, 06
+Trạng thái: done (2026-10-11; spec status, CHANGELOG line, commit `209824610`) · Công: 0.5d · Phụ thuộc: phase 05, 06
 
 ## Bối cảnh
 

@@ -1,7 +1,7 @@
 ---
 title: "fgos convention component (Plan B)"
 description: "Component Rust lõi `convention` sinh và kiểm tên/vị trí report, plan, journal; Node chỉ có client mỏng qua invokeHost."
-status: pending
+status: completed
 priority: P2
 effort: 5.5d
 branch: main
@@ -11,11 +11,11 @@ created: 2026-10-06
 
 # fgos convention component (Plan B)
 
-Plan status: Proposed — not authorized for execution
+Plan status: Completed (2026-10-12) — all phases landed on main. Phase 05 follows the approved spec (Q6, `docs/platform/convention/spec.md`): warn-only pre-commit and no journal merge, which replace the original phase text.
 
 ## Mục tiêu
 
-Hành động H2 của [synthesis](../reports/harness-investigation-261006-synthesis.md) (§7 hàng H2, §8 mục 5; vấn đề V5, V6, V16, V18). Một nguồn duy nhất, bằng Rust, cho quy ước tên và vị trí của report, plan, journal: `fgos convention name|path|check` trả phong bì `fgos.v1`. Cửa sinh tên thay cho việc agent và brief tự đặt tên; `check` ở pre-commit và doctor bắt file sai quy ước, với mọi ngôn ngữ.
+Hành động H2 của [synthesis](../../../plans/reports/harness-investigation-261006-synthesis.md) (§7 hàng H2, §8 mục 5; vấn đề V5, V6, V16, V18). Một nguồn duy nhất, bằng Rust, cho quy ước tên và vị trí của report, plan, journal: `fgos convention name|path|check` trả phong bì `fgos.v1`. Cửa sinh tên thay cho việc agent và brief tự đặt tên; `check` ở pre-commit và doctor bắt file sai quy ước, với mọi ngôn ngữ.
 
 Ngoài phạm vi: H1/H3/H5 (Plan A), H4 (thí nghiệm), H6 (plan `260925-documentation-authority-unification`), cấp phát id (hoãn, xem [phase 00](phase-00-spec.md) §Deferred), mọi file của AgentKit/ClaudeKit/rtk. Plan này **chỉ dành chỗ** (spec + schema v1) cho quy tắc tài liệu, không cài quy tắc tài liệu và không kiểm link/anchor/metadata/nội dung: xem §Quan hệ với plan 260925.
 
@@ -58,14 +58,14 @@ Quyết định (anh, 2026-10-07): nhận đề xuất G1/G2/G4/G6 của bản n
 
 | # | Phase | Phụ thuộc | Trạng thái |
 |---|---|---|---|
-| 00 | [Spec vùng `convention` (không code)](phase-00-spec.md) | — | pending |
-| 01 | [Gộp thuật toán ngày dân sự vào host-runtime](phase-01-shared-civil-time.md) | 00 duyệt | pending |
-| 02 | [Crate `fgos-convention` + dữ liệu hợp đồng + golden test](phase-02-convention-crate.md) | 01 | pending |
-| 03 | [Lắp route native + command-routes + test tương thích](phase-03-route-wiring.md) | 02 | pending |
-| 04 | [Client Node mỏng qua invokeHost](phase-04-node-client.md) | 03 | pending |
-| 05 | [`check` ở pre-commit và `fgos doctor`; gộp thư mục journal](phase-05-enforcement.md) | 04; Plan A pre-commit + doctor | pending |
-| 06 | [Một dòng trong `AGENTS.md`](phase-06-agents-line.md) | 03; phase AGENTS.md của Plan A | pending |
-| 07 | [Docs, CHANGELOG, ghi chú di chuyển caller](phase-07-docs-changelog.md) | 05, 06 | pending |
+| 00 | [Spec vùng `convention` (không code)](phase-00-spec.md) | — | done |
+| 01 | [Gộp thuật toán ngày dân sự vào host-runtime](phase-01-shared-civil-time.md) | 00 duyệt | done |
+| 02 | [Crate `fgos-convention` + dữ liệu hợp đồng + golden test](phase-02-convention-crate.md) | 01 | done |
+| 03 | [Lắp route native + command-routes + test tương thích](phase-03-route-wiring.md) | 02 | done |
+| 04 | [Client Node mỏng qua invokeHost](phase-04-node-client.md) | 03 | done |
+| 05 | [`check` ở pre-commit và `fgos doctor`; gộp thư mục journal](phase-05-enforcement.md) | 04; Plan A pre-commit + doctor | done |
+| 06 | [Một dòng trong `AGENTS.md`](phase-06-agents-line.md) | 03; phase AGENTS.md của Plan A | done |
+| 07 | [Docs, CHANGELOG, ghi chú di chuyển caller](phase-07-docs-changelog.md) | 05, 06 | done |
 
 Mọi phase từ 01 trở đi bị chặn đến khi anh duyệt spec ở phase 00. Thứ tự tuần tự 01→05; 06 chạy song song với 04/05 được (khác file).
 

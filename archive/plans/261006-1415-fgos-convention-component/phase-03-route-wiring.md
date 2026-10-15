@@ -1,6 +1,6 @@
 # Phase 03 — Lắp route native + command-routes + test tương thích
 
-Trạng thái: pending · Công: 1d · Phụ thuộc: phase 02
+Trạng thái: done (2026-10-11; commit `7e5861303`; `fgos convention` is a registered verb) · Công: 1d · Phụ thuộc: phase 02
 
 ## Bối cảnh
 

@@ -1,6 +1,6 @@
 # Phase 01 — Gộp thuật toán ngày dân sự vào host-runtime
 
-Trạng thái: pending · Công: 0.5d · Phụ thuộc: phase 00 được duyệt
+Trạng thái: done (2026-10-11; `packages/host-runtime/rust/src/civil_time.rs`) · Công: 0.5d · Phụ thuộc: phase 00 được duyệt
 
 ## Bối cảnh
 
