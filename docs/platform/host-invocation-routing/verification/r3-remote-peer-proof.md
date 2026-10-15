@@ -13,6 +13,14 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/host-use-cases.md
 - docs/platform/host-invocation-routing/architecture/release-boundaries.md
+Implementation: Implemented preview (R3-P0 frozen; R3-P1 adapter implemented preview; R3-P2/P3 route and proof closed; R3-P4 inventory recorded)
+Provenance: Promoted from docs/architect/host-invocation-routing/node-to-rust-component-migration.md and rust-cli-and-proof-components-plan.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Preserve the proof gate for production remote peer adoption; authority follows transitional switchboard
+Use this when: Preserve the proof gate for production remote peer adoption
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Required Proof
@@ -103,4 +111,4 @@ Migrating any remaining routes is strictly out of R3 scope. Writes stay out of t
 | execution record | [../../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md) |
 | host use cases | [../architecture/host-use-cases.md](../architecture/host-use-cases.md) |
 | release boundaries | [../architecture/release-boundaries.md](../architecture/release-boundaries.md) |
-| source migration | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) |
+| source migration | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../README.md) |

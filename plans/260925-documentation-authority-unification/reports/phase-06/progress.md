@@ -1,3 +1,23 @@
+# Step 10 docs turn complete — package turn next
+
+Assignment `unit-run-1792076952136-42ac8e36/producer/1`; input **980cb2931**, SYNC **17b751966**, B0 **dbe5c432852837ea01e6025b35868bcb7271495d**. State **authoring complete**. Runner owns the content commit. **Zero native sync / zero review packs** this turn.
+
+**53 verbatim entries merged** (51 absent + two reconciled routes), three source-map decisions pending; A35 stale note and three literal missing paths recorded. **Closing shard: 109 active + 18 gap rows pending**, one existing reviewed split-line row unchanged; nine retired identities accounted without registry mutation. Full L10-2 rationale and current AGENTS/CLAUDE file/blob pins recorded. **Confinement binding paragraph carried verbatim**, working text binding pending native identity/rebind/review. **37 header-only fills**, 159/159 promotion headers complete. **366 links / 70 files** repointed, portals last; 41 history referents and nine queue entries unchanged. History README authored; no snapshot/sealing claim.
+
+**A/B/H/I pass** at every batch/file (113 recorded passes); A retains eight identical historical observations, zero new scope violations; H **608 files / 216 checked / 0 findings / 0 unresolved links**; I exactly baseline. All 366 mapped anchors exist. Scoped FAST D **0 fatal**, both priors together/each; E **112 pending active rows only**, not strict/global green. E does not certify the 18 pending gap decisions. Exact reconstruction audit passes for **80 existing platform docs**, plus the new index and retained map. **196 preliminary target-binding consequences** queued, including 26 confinement. Native committed-tree identity equality, complete source-drift accounting and independent truth/navigation review are not claimed; no full npm suite.
+
+**NEXT = package turn (step10-evidence section 9 turn 3), at this turn's runner commit:** native sync **ONCE**, preserve all predecessor/gap identities, D with both prior registries, native **--rebind every decision-target-drift row**, revalidate 39 confinement aliases, account all changed/new candidate and retained-map units, refresh native lists, dry-run snapshot/verify, then **ONE review request covering every document, row and accounting change in this turn** (all returned rebind rows deep under A36). See [report](step-10-report.md), [handoff](step10-docs-package-handoff.json), [audit](step10-docs-final-audit.json), [checks](step10-docs-checks.json).
+
+No new owner-direction blocker. Existing three Rings holds, dashboard predecessor, stale successor, other-group/inbound consumer queues, A34 and 14 runner cutover obligations, global D/E, truth draw, T9, rehearsal, checkpoint refresh/mutations, independent red-team/checkpoint and scorecard/effort remain. L10-11: no Step 10 readers; Phase 7 owns cross-area readers. No promotion, authority flip, retirement, deletion, push/main landing or Phase 6 closure. Writes only authorized docs/plan and required external outbox; scratch /tmp/fgos-work; no fgOS CLI, git writes, protected-tool/baseline/legacy-source or .fgos edits. Phase 6 remains open and eventually stops at awaiting owner review.
+
+---
+
+# Step 10 docs turn in progress
+
+Assignment `unit-run-1792076952136-42ac8e36/producer/1`; input HEAD `980cb2931`. Reading-map merge, closing-instructions pending shard, confinement re-carry, header-only fills, mapped link pass and history README are authorized by L10-1–L10-11. No native sync or review packs this turn. Next turn packages this runner commit with one native sync, every target-drift rebind and one review request. Runner owns commits.
+
+---
+
 # Step 9 closed — Step 10 data turn complete
 
 Assignment `unit-run-1792074987817-29e6c5c2/producer/1`; **SYNC 17b751966**, **B0 dbe5c432852837ea01e6025b35868bcb7271495d**. Lead merged main before this turn. **Step 9 CLOSED: 14 final ok applied with verbatim Notes; 495 reviewed / 0 pending.** Native D zero fatal; strict E only **11 A34 partial / 63 reverse**. Both prior registries together; unchanged 07d3dec1b registry; runner namespace unchanged across SYNC. Read-only inventory at final review pin 25351590a: 4484 files / 91331 active units. No native sync, carry-forward or registry write. Global merged-HEAD registry binding is deliberately not claimed. [Step 9 closure](step-09-report.md), [native verification](step10-runner-verification.json).

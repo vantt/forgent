@@ -329,8 +329,8 @@ packaging stream's `fgctl` walking skeleton (§4, node `PK`).
 **Revised:** 2026-09-10 (see plans/reports/architecture-review-260910-1537-host-invocation-provider-routing-design-review.md).
 **Architecture:** [Host Invocation And Provider Routing](spec.md).
 **Migration strategy:** [Node To Rust Component Migration](architecture/node-to-rust-migration.md).
-**Component placement:** [fgOS Component Boundary Advisory](../../architect/component-boundary/component-boundary-advisory.md).
-**Distribution/activation authority:** [Runtime Identity And Activation](../../architect/packaging-distribution/runtime-identity-and-activation.md); this plan consumes that stream's walking skeleton, it does not redefine install/activation.
+**Component placement:** [fgOS Component Boundary Advisory](../component-boundary.md).
+**Distribution/activation authority:** [Runtime Identity And Activation](../packaging-distribution/README.md); this plan consumes that stream's walking skeleton, it does not redefine install/activation.
 
 This document contains execution order, deliverables, gates, verification, and
 rollback. Semantic contracts, provider lifecycle, authority, framing, registry

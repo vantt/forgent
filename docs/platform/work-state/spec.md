@@ -14,6 +14,14 @@ Related:
 - docs/platform/work-state/history/multi-role-harness-distill-record.md
 - docs/specs/work-state.md
 - docs/io-contract.md
+Implementation: Carried source material; current implementation truth unverified
+Provenance: Retained work-state candidate carriage from docs/specs/work-state.md; existing Related references retained
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Own the observable behavior, state model, records, stages, verbs and rules of the work state area; authority follows transitional switchboard
+Use this when: Own the observable behavior, state model, records, stages, verbs and rules of the work state area
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Purpose And Scope
@@ -1192,5 +1200,5 @@ coverage: partial
 - [architecture/implementation-pointers.md](architecture/implementation-pointers.md)
 - [decisions/retired-decision-history.md](decisions/retired-decision-history.md)
 - [history/multi-role-harness-distill-record.md](history/multi-role-harness-distill-record.md)
-- [docs/specs/work-state.md](../../specs/work-state.md)
-- [docs/io-contract.md](../../io-contract.md)
+- [docs/specs/work-state.md](README.md)
+- [docs/io-contract.md](contracts/cli-io-contract.md)

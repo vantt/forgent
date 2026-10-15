@@ -13,6 +13,14 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/README.md
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
+Implementation: Current partial plus implemented preview provider protocol
+Provenance: Promoted from docs/architect/host-invocation-routing/**
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Route readers through host-invocation contracts and distinguish target contracts from current implementation; authority follows transitional switchboard
+Use this when: Route readers through host-invocation contracts and distinguish target contracts from current implementation
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Contracts

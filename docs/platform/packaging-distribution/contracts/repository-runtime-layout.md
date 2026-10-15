@@ -191,7 +191,7 @@ Added in candidate — complete source units from `docs/architect/packaging-dist
 #### 3. Roots And On-Disk Shape
 
 The root topology is defined in
-[Workspace Topology Architecture](../../../architect/workspace-topology.md). This document uses
+[Workspace Topology Architecture](../../system-architecture/architecture/workspace-topology.md). This document uses
 that topology and focuses on runtime identity records.
 
 The minimum shape is:
@@ -258,7 +258,7 @@ The separation is architectural:
   must not share a namespace with release/activation records;
 - config, event history, coordination, cache, activation, and projections have
   distinct state classes per
-  [Workspace Topology Architecture](../../../architect/workspace-topology.md).
+  [Workspace Topology Architecture](../../system-architecture/architecture/workspace-topology.md).
 
 Worker workspaces still need an installation capsule if commands are expected
 to enter through local shims. They must not symlink or copy the entire shared

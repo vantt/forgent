@@ -1,0 +1,259 @@
+{
+  "inputHEAD": "980cb29312b8701f5ea639278f44e1a57a6e5c02",
+  "sourceHashes": {
+    "AGENTS.md": "515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c",
+    "CLAUDE.md": "473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5"
+  },
+  "sourceBlobs": {
+    "AGENTS.md": "b59ac905863eb82431f0b4abcb97b5ebbb28f2e1",
+    "CLAUDE.md": "0ed93b2b465635aaab24e55ff06f55cdbb5e1780"
+  },
+  "activeUnits": 110,
+  "newPendingActiveRows": 109,
+  "unchangedExistingActiveRow": "claim_2ae81c7bed935553943d6777b81e2114",
+  "unchangedDecision": {
+    "claimId": "claim_2ae81c7bed935553943d6777b81e2114",
+    "sourceUnitDigest": "e4e33c148710cfb9775867b0160ed6e82d2e469d0f118ad9ba5ae33ce79c2484",
+    "claimKind": "historical-context",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:30@2026-10-15",
+    "rationale": "This current native AGENTS.md unit is the second line of predecessor claim_5c520fcb1a68ba27e2093341834258c7 after upstream inserted a paragraph. Its full text remains verbatim and is retained at AGENTS.md#unheaded-block-24. Root instructions are outside platform authority under Q5; this own row records that retained instruction owner and completes the predecessor split accounting. No source-to-self carry proof, approval carry or instruction truth certification. Independent conservation re-review pending.",
+    "reviewNote": "deep: new native AGENTS.md block-24 (second line of the old two-line unit); text is byte-equal to the second line of the historical source, reclassify with no target and a rationale that admits no source-to-self carry proof. Optional nit: claimKind historical-context (registry says unclassified) is an odd label for a live routing instruction, procedure would read better; no approval carried.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-15",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
+  },
+  "pendingGapRows": 18,
+  "priorGapMoves": [
+    {
+      "from": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "to": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "claimId": "claim_5c520fcb1a68ba27e2093341834258c7"
+    },
+    {
+      "from": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "to": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4"
+    },
+    {
+      "from": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "to": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89"
+    }
+  ],
+  "redecisions": [
+    {
+      "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+      "before": {
+        "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+        "sourcePath": "AGENTS.md",
+        "sourceAnchor": "unheaded-block-22",
+        "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+        "disposition": "partial-carry",
+        "targetOwner": "AGENTS.md",
+        "targetAnchor": "unheaded-block-22",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:34@2026-10-15",
+        "rationale": "A31 upstream splits the exact old two-line AGENTS unit. The primary target retains the first line; the committed A34 residual shows the second line verbatim and binds both full native unit digests. Source-to-self retention is outside platform authority, not a truth certificate. Pending independent conservation/representation re-review; no approval carry.",
+        "remainder": "The second original line is shown verbatim in plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json, SHA256 d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d; current retained AGENTS.md#unheaded-block-24 is claim_2ae81c7bed935553943d6777b81e2114. This A34 representation is pending independent re-review and remains a Step 10 / cutover obligation.",
+        "reviewNote": "deep: partial-carry back to pending, residual shows line 2 verbatim, SHA256 d4bd139d and all three unit digests recompute, A34 shape matches packaging residual, cutover obligation named",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0340-root-closure-fixes.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+        "targetAncestry": [
+          "forgent",
+          "Dispatch — routing work to an executor"
+        ],
+        "reviewReportCommit": "6dadbb3685126542e6a2cecd64bcbae035b4fb58"
+      },
+      "after": {
+        "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+        "sourcePath": "AGENTS.md",
+        "sourceAnchor": "unheaded-block-22",
+        "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+        "disposition": "reclassify-out-of-platform-scope",
+        "rationale": "L10-2 supersedes the earlier A34 source-to-self partial-carry acceptance with reclassify-out-of-platform-scope, pending independent review. The historical two-line unit claim_5c520fcb1a68ba27e2093341834258c7 has old digest 938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895. Both complete original lines are retained in the always-loaded AGENTS.md, outside platform documentation authority: (1) `fgos run` is the primary door for executing new work in the execution core. (2) For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment. The first retained native identity is claim_bfd24ffa5a43c26830bb9771c04de7f1 at AGENTS.md#unheaded-block-22 with digest b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8; the second is claim_2ae81c7bed935553943d6777b81e2114 at AGENTS.md#unheaded-block-24 with digest e4e33c148710cfb9775867b0160ed6e82d2e469d0f118ad9ba5ae33ce79c2484. Residual evidence plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json has SHA256 d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d. Both native identities are preserved; the claim_2ae81c7bed935553943d6777b81e2114 decision remains byte-for-byte unchanged in its existing shard. No platform instruction copy is created. Q5a and L10-3 retain all root doctrine outside platform authority. This reclassification is not source-to-self carry proof, truth certification or approval carry. Source file SHA256 515c0ae74369b29716645859cb36c1312aa0ecbf4602213b897d0bdee2ed537c at HEAD 980cb29312b8701f5ea639278f44e1a57a6e5c02.",
+        "reviewStatus": "pending",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+      }
+    },
+    {
+      "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+      "before": {
+        "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+        "sourcePath": "AGENTS.md",
+        "sourceAnchor": "unheaded-block-23",
+        "sourceUnitDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+        "disposition": "supersede",
+        "targetOwner": "AGENTS.md",
+        "targetAnchor": "unheaded-block-25",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+        "reviewNote": "deep: Same-file successor; target equals main's new sentence (--work only through fgos dispatch decide).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
+        "targetAncestry": [
+          "forgent",
+          "Dispatch — routing work to an executor"
+        ],
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      },
+      "after": {
+        "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+        "sourcePath": "AGENTS.md",
+        "sourceAnchor": "unheaded-block-23",
+        "sourceUnitDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+        "disposition": "reclassify-out-of-platform-scope",
+        "rationale": "L10-3: claim_0bf7d168f64e5d7bf9add3470f4b6ec4 records the historical native instruction identity AGENTS.md#unheaded-block-23 (digest d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+        "reviewStatus": "pending",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+      }
+    },
+    {
+      "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
+      "before": {
+        "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
+        "sourcePath": "AGENTS.md",
+        "sourceAnchor": "unheaded-block-25",
+        "sourceUnitDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+        "disposition": "supersede",
+        "targetOwner": "AGENTS.md",
+        "targetAnchor": "unheaded-block-27",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:27@2026-10-14",
+        "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
+        "reviewNote": "deep: Same-file successor; only change is --step to --stage, verbatim from main.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+        "targetAncestry": [
+          "forgent",
+          "Dispatch — routing work to an executor"
+        ],
+        "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      },
+      "after": {
+        "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
+        "sourcePath": "AGENTS.md",
+        "sourceAnchor": "unheaded-block-25",
+        "sourceUnitDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+        "disposition": "reclassify-out-of-platform-scope",
+        "rationale": "L10-3: claim_47e8159f8179edd8e17fd67c744d1e89 records the historical native instruction identity AGENTS.md#unheaded-block-25 (digest 0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+        "reviewStatus": "pending",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15"
+      }
+    }
+  ],
+  "retiredUnitsUnchanged": [
+    {
+      "claimId": "claim_b12ca1fdc3534fa31f9d7459c1be9ef7",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "dispatch-routing-work-to-a-executor",
+      "sourceUnitDigest": "6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-3: retain AGENTS.md#dispatch-routing-work-to-a-executor as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "reviewStatus": "pending",
+      "priorDecision": null
+    },
+    {
+      "claimId": "claim_c3ef3a4ddc116883db10a70d55ba7bd5",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd",
+      "sourceUnitDigest": "4485eb54512289665baad03b45714d0d19bdb4b46f1ce565850aea8aa969b940",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-3: retain AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "reviewStatus": "pending",
+      "priorDecision": null
+    },
+    {
+      "claimId": "claim_21f66ad1c973daaf6c31abf50b6c8cc3",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "starting-the-herdr-gateway-one-door-never-a-raw-process",
+      "sourceUnitDigest": "43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-3: retain AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "reviewStatus": "pending",
+      "priorDecision": null
+    },
+    {
+      "claimId": "claim_806342ec2a1c5fd1d0b6d82ebd54d4e0",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-18",
+      "sourceUnitDigest": "818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-3: retain AGENTS.md#unheaded-block-18 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "reviewStatus": "pending",
+      "priorDecision": null
+    },
+    {
+      "claimId": "claim_7a4fef4aa802940385df7cd8fc1bf6f0",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-23",
+      "sourceUnitDigest": "367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-3: retain AGENTS.md#unheaded-block-23 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "reviewStatus": "pending",
+      "priorDecision": null
+    },
+    {
+      "claimId": "claim_7b209ce1498d7ab5ddafe25d203e5852",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-24",
+      "sourceUnitDigest": "bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-3: retain AGENTS.md#unheaded-block-24 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "reviewStatus": "pending",
+      "priorDecision": null
+    },
+    {
+      "claimId": "claim_30f4d7e2306cb4ecdad78086848d139f",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-26",
+      "sourceUnitDigest": "52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-3: retain AGENTS.md#unheaded-block-26 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "reviewStatus": "pending",
+      "priorDecision": null
+    },
+    {
+      "claimId": "claim_500d588a939fd6109cf102b8343484bb",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-28",
+      "sourceUnitDigest": "45945b0c37c8cca3414b5e11c8b0dba3c210d8dcf30d34fc26a1d794e848801e",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-3: retain AGENTS.md#unheaded-block-28 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "reviewStatus": "pending",
+      "priorDecision": null
+    },
+    {
+      "claimId": "claim_dea64a2d50bdbadf3b2ebeceec84fa5d",
+      "sourcePath": "AGENTS.md",
+      "sourceAnchor": "unheaded-block-34",
+      "sourceUnitDigest": "ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c",
+      "disposition": "reclassify-out-of-platform-scope",
+      "rationale": "L10-3: retain AGENTS.md#unheaded-block-34 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification.",
+      "reviewStatus": "pending",
+      "priorDecision": null
+    }
+  ],
+  "retiredNote": "Nine already-retired identities retain native registry dispositions; no registry mutation or unsupported retired decision overlay. Historical anchors are retained evidence outside platform authority, not current live anchors.",
+  "reviewStatus": "pending",
+  "nativeSyncCount": 0
+}

@@ -15,6 +15,14 @@ Related:
 - docs/platform/host-invocation-routing/intent-preservation-ledger.md
 - docs/platform/host-invocation-routing/spec.md
 - docs/platform/host-invocation-routing/architecture/invocation-kernel.md
+Implementation: Partial
+Provenance: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md and node-to-rust-component-migration.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Preserve the durable direction for fgOS host invocation and provider routing; authority follows transitional switchboard
+Use this when: Preserve the durable direction for fgOS host invocation and provider routing
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Authority And Reading Rule
@@ -54,10 +62,10 @@ Host invocation does not own:
 
 | Direction | Status | Alignment |
 | --- | --- | --- |
-| CLI, remote, and chat are peer hosts that feed one semantic invocation service. | `accepted-not-implemented` | Preserved from [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md); proof gap in [verification/implementation-alignment.md](verification/implementation-alignment.md). |
-| Legacy Node compatibility is transitional and CLI-local unless a per-operation semantic bridge is needed. | `accepted-not-implemented` with `legacy-current` behavior | Preserved from [legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md). |
-| Provider manifests describe capability requests and operation claims but never grant authority. | `accepted-not-implemented` | Preserved from [external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md). |
-| Rust host migration proceeds by complete component/use-case boundaries, reads before writers, and no write dual-run. | `planned` | Preserved from [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md). |
+| CLI, remote, and chat are peer hosts that feed one semantic invocation service. | `accepted-not-implemented` | Preserved from [host-invocation-provider-routing.md](README.md); proof gap in [verification/implementation-alignment.md](verification/implementation-alignment.md). |
+| Legacy Node compatibility is transitional and CLI-local unless a per-operation semantic bridge is needed. | `accepted-not-implemented` with `legacy-current` behavior | Preserved from [legacy-cli-transition.md](README.md). |
+| Provider manifests describe capability requests and operation claims but never grant authority. | `accepted-not-implemented` | Preserved from [external-provider-protocol.md](README.md). |
+| Rust host migration proceeds by complete component/use-case boundaries, reads before writers, and no write dual-run. | `planned` | Preserved from [node-to-rust-component-migration.md](README.md). |
 | Rollback of native R1/R2 behavior is a release rollback through `fgctl`, not a runtime provider-selection toggle. | `accepted-not-implemented` | Depends on packaging-distribution contracts. |
 
 ## 6. Related Files
@@ -68,6 +76,6 @@ Host invocation does not own:
 | preserved intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 | current state | [spec.md](spec.md) |
 | implementation alignment | [verification/implementation-alignment.md](verification/implementation-alignment.md) |
-| source architecture | [../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
-| source migration strategy | [../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md) |
+| source architecture | [../../architect/host-invocation-routing/host-invocation-provider-routing.md](README.md) |
+| source migration strategy | [../../architect/host-invocation-routing/node-to-rust-component-migration.md](README.md) |
 

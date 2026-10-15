@@ -196,7 +196,7 @@ Assignments; this is not a claim that the retired coordination door exists.
 
 Implementation evidence: `src/runner/dispatch/recovery-planner.mjs:118-173,
 243-316,319-361` and `src/verbs/dispatch/recover.mjs:95-132,266-408`.
-Read the [area portal](../README.md) and [runner spec](../../../specs/runner.md)
+Read the [area portal](../README.md) and [runner spec](../../runner/README.md)
 for the wider execution boundary; recovery here does not own Work lifecycle.
 
 ## 8. Compatibility And Rollout

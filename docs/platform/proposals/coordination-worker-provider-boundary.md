@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate carriage; Keep map proposal in full. Supporting OS probes and private HOME are not full implementation; retain Not started statement as source metadata. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](../../architect/proposals/coordination-worker-provider-boundary.md).
+Source relationship: [original source](coordination-worker-provider-boundary.md).
 
 
 Document type: Proposal
@@ -31,11 +31,11 @@ Last reviewed: 2026-09-06
 Canonical for: nothing until accepted; minimum boundary sketch before a live probe
 State class: State
 
-Related: [Conceptual architecture](../../architect/proposals/coordination-capability-envelope.md),
-[Probe contract](../../architect/proposals/coordination-envelope-probe-contract.md),
-[Progress](../../architect/proposals/coordination-envelope-progress.md),
-[Capability audit](../../architect/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md),
-[Dispatch control plane](../../architect/agent-coordination/architecture/dispatch-control-plane.md).
+Related: [Conceptual architecture](coordination-capability-envelope.md),
+[Probe contract](coordination-envelope-probe-contract.md),
+[Progress](../agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md),
+[Capability audit](../agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md),
+[Dispatch control plane](../agent-coordination/README.md).
 
 ## Decision proposed
 
@@ -73,8 +73,8 @@ metadata-forgery exploit.
 
 A fixed Python process inside the narrow mount inherited a synthetic parent
 canary. Adding `--clearenv` removed it. No actual host environment values or
-credentials were read. See [raw result](../../architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json)
-and [reproduction script](../../architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs).
+credentials were read. See [raw result](../agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json)
+and [reproduction script](../agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs).
 Run the script from repo root; it calls no provider or fgOS dispatch adapter.
 
 ## Principals and resources

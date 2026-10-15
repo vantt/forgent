@@ -3329,30 +3329,18 @@
       "sourceUnitDigest": "22c6580953028171ac1febd1a750c1930c6374a479ea17af5aa6f541df122f18",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/specs/reading-map.md#reading-map-sản-phẩm is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
-      "reviewNote": "deep: Heading of the retained reading map; target none; unit digest recomputed, source file at the content commit equals the merge blob; main's four edits and the plan note stay in place; reclassify rationale unchanged.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+      "rationale": "L10-1/L10-4: retain repository-wide navigation outside platform authority. The complete 53-entry curated list from docs/specs/reading-map.md is now preserved verbatim in docs/reading-map.md#5-detailed-product-and-source-map, including the two pre-existing portal routes with reconciled descriptions. Legacy source and paths remain intact; Phase 9 owns consumer repointing. Known stale carried sentences; full truth check owed at promotion (A35). No truth approval or cutover authority is inferred. This native source unit #reading-map-sản-phẩm is re-decided pending independent navigation/conservation review.",
+      "reviewStatus": "pending"
     },
     {
       "claimId": "claim_587566a4401b92c909e862d72aad4af0",
       "sourceUnitDigest": "db75e0b3a3bb12f6da1feaaf6321eede85a208e6c93dcf82978ee26618a79196",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/specs/reading-map.md#unheaded-block-1 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed.",
-      "reviewNote": "mechanical: full digest recomputed by script, anchor specs/reading-map.md#unheaded-block-1 exists, shard row equals pack row, source blob equals frozen pin, disposition reclassify-out-of-platform-scope is allowed by the map row",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-retained-conservation.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+      "rationale": "L10-1/L10-4: retain repository-wide navigation outside platform authority. The complete 53-entry curated list from docs/specs/reading-map.md is now preserved verbatim in docs/reading-map.md#5-detailed-product-and-source-map, including the two pre-existing portal routes with reconciled descriptions. Legacy source and paths remain intact; Phase 9 owns consumer repointing. Known stale carried sentences; full truth check owed at promotion (A35). No truth approval or cutover authority is inferred. This native source unit #unheaded-block-1 is re-decided pending independent navigation/conservation review.",
+      "reviewStatus": "pending"
     }
   ],
   "files": [
@@ -3371,7 +3359,7 @@
     {
       "path": "docs/specs/reading-map.md",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "Approved repository-wide reading-map singleton outside platform; both sources remain unchanged pending later navigation merge/consumer rewrite.",
+      "rationale": "L10-1: repository-wide navigation singleton retained outside platform authority; all 53 curated entries merged verbatim into docs/reading-map.md. Legacy paths retained; consumer migration and any retirement remain Phase 9 obligations. Independent merge review pending.",
       "targets": []
     }
   ],

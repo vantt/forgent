@@ -43,9 +43,9 @@ capability named by that context.
 
 Companion documents:
 
-- [workspace-topology-audit.md](../../../architect/workspace-topology-audit.md) records current
+- [workspace-topology-audit.md](workspace-topology-audit.md) records current
   codebase evidence and gaps.
-- [workspace-topology-roadmap.md](../../../architect/workspace-topology-roadmap.md) records
+- [workspace-topology-roadmap.md](workspace-topology-roadmap.md) records
   decision order and migration slices.
 
 ## 1. Contract Goal

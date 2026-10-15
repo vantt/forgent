@@ -13,6 +13,14 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/external-provider-protocol.md
 - docs/platform/host-invocation-routing/verification/r2-external-process-proof.md
+Implementation: Implemented preview
+Provenance: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Define the preview external process provider wire boundary and future component protocol rules; authority follows transitional switchboard
+Use this when: Define the preview external process provider wire boundary and future component protocol rules
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Contract
@@ -35,7 +43,7 @@ The semantic component protocol is versioned independently from CLI `fgos.v1` an
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Component protocol is distinct from public host protocols. | `implemented preview` | [source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P3 conformance proof closed 2026-09-15. |
+| Component protocol is distinct from public host protocols. | `implemented preview` | [source protocol §3](../architecture/external-provider-protocol.md#3-component-protocol), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P3 conformance proof closed 2026-09-15. |
 | `EncodedMessage` never enters built-in kernel. | `implemented preview` | [invocation kernel](../architecture/invocation-kernel.md), [../../../../packages/host-runtime/rust/src/providers/external_process/adapter.rs](../../../../packages/host-runtime/rust/src/providers/external_process/adapter.rs) | R2-P5 defines `EncodedMessage` as a private struct fully contained in the external adapter module; confirmed by review not to appear in `contracts.rs`, the `OperationProvider` trait signature, or `builtin.rs`. Closed 2026-09-15. |
 
 ## 4. Related Files
@@ -317,4 +325,4 @@ node scripts/export-command-selectors.mjs --check
 
 ## Source-relative Navigation Mappings
 
-Added in candidate — source-relative link destination: the literal restored excerpt retains `../component-boundary/component-boundary-advisory.md`; its live destination is [the retained component-boundary advisory](../../../architect/component-boundary/component-boundary-advisory.md). This navigation mapping does not revise the restored text.
+Added in candidate — source-relative link destination: the literal restored excerpt retains `../component-boundary/component-boundary-advisory.md`; its live destination is [the retained component-boundary advisory](../../component-boundary.md). This navigation mapping does not revise the restored text.

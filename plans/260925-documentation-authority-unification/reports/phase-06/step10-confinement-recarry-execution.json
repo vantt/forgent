@@ -1,0 +1,38 @@
+{
+  "SYNC": "17b751966",
+  "source": "docs/specs/confinement-authority.md",
+  "target": "docs/platform/agent-confinement/spec.md",
+  "map": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md:7",
+  "unit": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-113",
+    "githubAnchor": "unheaded-block-113",
+    "stableAnchor": "unheaded-block-113",
+    "title": "Unheaded block 113",
+    "startLine": 1104,
+    "endLine": 1104,
+    "textDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+    "sample": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingFo",
+    "identityFingerprint": "366466fa3653ce725f560e106699a897d40f8681ab982ea93931357b67616fcc",
+    "text": "**Gắn home với tiến trình đang chạy worker (binding, 2026-10-15).** Authority cấp cho mỗi dispatch đã prepare hai hàm `bind`/`markLaunched` (`drivers/bwrap.mjs`, gom qua `bindingForPrepared` ở `authority.mjs`); adapter chỉ gọi hàm, không thấy đường dẫn home, không tự ghi marker. Round herdr confined (mọi round, có assignment hay không) gọi `bind` trước `pane run` với `paneId`, endpoint herdr mà client của round thật sự dùng (`herdrEndpoint` = socket path từ env của client, hoặc socket của session nó đặt tên, hoặc socket mặc định herdr tự rơi về; `herdrSession` chỉ khi env có đặt tên), `binderPid` + `binderStartTime` của controller và `boundAt`; ghi atomic (tmp + rename). Ghi không được thì đóng pane, round fail trước khi có worker. Ngay trước `pane run` (hoặc khi round resume thấy worker đã chạy) ghi `launchedAt`. Round cli-spawn confined gắn home với run supervisor tách rời ngay khi supervisor khởi động (`binderPid` = pid supervisor, không có pane); ghi không được thì báo mã `confinement-bind-failed` và giữ marker như prepare (supervisor đã chạy rồi). Luật reaper cho marker đã bind mà chưa `retainedAt`: binder còn sống (pid + start time) thì giữ tới `boundAt + max(maxAgeMs, 2 phút launch grace + run timeout + 10 phút settle)` bất kể pane trả lời gì; binder chết hoặc quá cửa sổ thì: không có pane → dọn; có pane mà chưa `launchedAt` và binder chết → dọn và đóng pane rỗng; còn lại hỏi pane trên endpoint đã ghi (true giữ, null theo luật hết hạn, false dọn). Marker `retainedAt` giữ luật pane cũ, nhưng giờ hỏi được cả round default-session nhờ endpoint đã ghi. Trước khi xoá, reaper đọc lại marker; khác với bản nó đã dựa vào để quyết thì bỏ qua lượt này. Finalizer chấp nhận đúng các field binding (`paneId`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`) cộng `credentialKept` là thay đổi sau prepare; mọi thay đổi khác vẫn là `ownership-marker-mismatch`. Chưa có (để cho run supervisor + holder-lock): từ chối bind khi home đã quá cửa sổ run tính từ lúc tạo, kiểm trước/sau launch, claim độc quyền khi reap; nên khe \"reaper đã đọc lại xong, controller bind + launch ngay trước lúc xoá\" (RT2-1) vẫn còn."
+  },
+  "priorSource": "`finally`; partial prepare cũng phải cung cấp cleanup handle như quy định ở\n§6.5. Startup reaper nhận diện resource tạm qua dispatch id và dọn phần còn\nlại. Cleanup failure không được biến execution chưa rõ thành thành công, và\nkhông được che mất execution result đã có. Nếu Authority crash sau khi prepare,\nrun record giữ phase cuối cùng và reaper xử lý resource chưa dọn.\n\nReaper và recovery hỏi đúng herdr session mà worker được khởi chạy trong đó: bản ghi launch command và ownership marker của home được giữ lại mang `herdrSession` (socket suy ra từ tên, không lưu), `reconcile` dựng client theo session đó, reaper dùng `FGOS_HERDR_BIN` và cùng session; marker không có session thì trạng thái pane là không rõ và quy tắc hết hạn quyết định.\n\nVới profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi\nside effect prepare; driver tạo theo identity đó một cách idempotent. Journal\nghi dispatch id, backend snapshot reference, resource locator, lease/execution\nidentity và trạng thái allocation/collection/cleanup, không chứa credential.\nCallback cleanup chỉ là tối ưu trong process; recovery không phụ thuộc callback.\nReaper phải lấy recovery lease độc quyền, kiểm tra liveness bằng execution\nidentity chống PID reuse, dừng và xác nhận cả execution tree trước khi collect\nvà cleanup idempotent. Timeout/cancel cũng tuân cùng thứ tự. Không liên lạc được\nremote thì giữ unknown và cleanup pending, không suy agent đã dừng; reconnect\nhoặc backend lease-expiry có proof mới cho phép dọn. Resource chưa collect được",
+  "action": "Carry complete new unit verbatim into mapped section in docs turn, label addition, preserve predecessor identities; next package turn native sync/rebind and independent review. Do not inherit approval.",
+  "execution": {
+    "targetSHA256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+    "verbatim": true,
+    "placement": "After the existing Reaper và recovery paragraph in §8.6; earlier text retained.",
+    "binding": "Pending; all changed target digests and shifted anchors must be rebound by native --rebind in the package turn. No new native identity inferred before sync. Predecessor identities retained.",
+    "nativeSyncCount": 0,
+    "reviewStatus": "pending",
+    "workingTargetBinding": {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-47",
+      "unitDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+      "startLine": 370,
+      "endLine": 370,
+      "nativeClaimId": null,
+      "status": "working text binding only; native sync/rebind next turn; pending independent review"
+    }
+  }
+}

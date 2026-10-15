@@ -1,0 +1,432 @@
+{
+  "inputHEAD": "980cb29312b8701f5ea639278f44e1a57a6e5c02",
+  "ok": true,
+  "existingPlatformDocsEdited": 80,
+  "existingPlatformDocProofs": [
+    {
+      "path": "docs/platform/README.md",
+      "finalSHA256": "d38ee2960787fd810b586afa7486816dd15b8f9d3a07ce28a91611baaad354cc",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "finalSHA256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/README.md",
+      "finalSHA256": "6e6343fb9072d32f06126fcb0077ec683781637657601195fa0264694dac6334",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "finalSHA256": "9132bf57458593cff90d738795163fefb0d9a0b5532ec39bacae753e2e637340",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "finalSHA256": "11911574906e19b747420d455311ec0e79d38907b5c06e62f601696da517ac9a",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+      "finalSHA256": "e4b933229e1fc669e6d4c5810e3e0d70bea05da5e0a1404ef06f2e04ea023336",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "finalSHA256": "cae3cb215e25aef41ce3a76c77d98f886bb91d54f29de14b1bb6f95997a246f9",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+      "finalSHA256": "a290e393dcb350007ca7525b809f77777bc84cba48f829af5d3b606bbf25bb5b",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/README.md",
+      "finalSHA256": "591ae7799242fc7c5c4f89383565f1c7eb1b37128c5f9e0f519263e08387f535",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/spec.md",
+      "finalSHA256": "91a2e7eeb6d2e62e09dd67d17dc6aa05a7c279230e4979945c91a51b2b9763a0",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/agent-coordination/vision.md",
+      "finalSHA256": "b9ea508df60d0905b36e531132b58334594e9c734319c26b6e1e73c8a6f084d2",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/architecture-map.md",
+      "finalSHA256": "1675e7db28e9916d3a83411dbde3191c8d2d54b2da6306988b1137cd6fb186dc",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "finalSHA256": "407ad036e44abfab0feaac542b2ed35062df9d727c4f038b7ae39f5578c6cf78",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/convention/spec.md",
+      "finalSHA256": "25fa546ea01bc6c1077dc13ada0b22f67c2ed8187137247d5d21d75a6f26c851",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "finalSHA256": "5834873fcf9fd944ba1e592d8220773bf643f8d1dafe9669da1720cc832721d7",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/documentation/operations/portals/docs-portal.md",
+      "finalSHA256": "001a90b4a3a001d513a0457394b4b8a69320ee2a4865b0b0561bd4d1da39a997",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/documentation/switchboard.md",
+      "finalSHA256": "5d03dbc2870744332ac68bd0a789ca8b38f1f8f6644cd2e2fa511a1f2a258e66",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/domainization/architecture/domainization.md",
+      "finalSHA256": "9a01df0891000ab6945e5c136aeb8293456955dc07760c835a533d037dd9390d",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/governance.md",
+      "finalSHA256": "e46993268dd1af708a277904df42e1fb5c5fcce8809a56b30e5f958732563a82",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/README.md",
+      "finalSHA256": "66133d7e048a61679bae919bd3b69baa002775d28400b38e6561076e930db0ed",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "finalSHA256": "9e6a8e19e89b68d8e5f9c787a97ac7413f18a7f955b663180d49198ccc113332",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+      "finalSHA256": "5c7859911ef7604b3d69c1a83e9031ba3f7fde037b5035d55b8b5dce66d5f1c9",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+      "finalSHA256": "a0143c89b6d1ba21cb66e35433baca65776b5b1d56e9ee9f4e312326a049b408",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "finalSHA256": "71315cb2eac1fd9c657c76d6882ac3abdfdeb96508f17369d2c194f7e11fbcc2",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "finalSHA256": "369786b40ec4f401fdf346ca63b820359f71c2e2782dccd3141c340c56bfb8bc",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+      "finalSHA256": "e2bd54c04a32d0a9ed31f5053b921ac88fcfc8c6a28cecc86182bf8f6a4b0917",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "finalSHA256": "c8d80ba0d0e778db3a540b67a7e210810b5907eee4dac0c01be9bb9ef797082d",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/README.md",
+      "finalSHA256": "c462d7f39540123fac55338eb2b2e99bce5fa949ded2d35ca7c422dd529c2d1a",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
+      "finalSHA256": "05d15b56ecab08822045c3d8c294eef385c51e192fbfc6bcd7cbd3f4e9cc3534",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "finalSHA256": "a91d31b51fe0f9089f93467faca46f10a7f906301bbdd27b3eeabecfd8a8c6e5",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "finalSHA256": "ce68a0002a657b66d34aa515d6d91da22e2897b6546fb73381ae2d1971046e48",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+      "finalSHA256": "7472b0885832c0d0ed4821d766f961154ce8a30fbbc92cdda6e1d8a7e6da3a81",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+      "finalSHA256": "85cf0b00ce6240f6ae04d758da783784d8fae213119187453ddc812bd79eae6f",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+      "finalSHA256": "04543488a39f82da5228a932313aa381eb3dab358df074387492c5eeb252b84c",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+      "finalSHA256": "98fd09caed7b70737219779d67ef6f44f76ab23e39f5ab432923e563999b9dd3",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/decisions/README.md",
+      "finalSHA256": "1ce94f22965f9739bbc13558b2c0e8086ef16ce045c015c5831296a431f0036d",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "finalSHA256": "82c06fb0bb4ccbd9e2084511f62d9bd0529dd6acbf788f5b70620c1a708ce733",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "finalSHA256": "389cbb0d992704b1a0198de7fb501258f8e376bf44f75c7cbfb0dfd1463db0fe",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "finalSHA256": "78325d71fe8676e37e4b63835c18d4eb189d2059adc372e213667896d9243bce",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/README.md",
+      "finalSHA256": "7248c7f090f456a835b38133b4d1492a6a952a30035dd68fbedec07ec9b4f0da",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "finalSHA256": "1185e527aaf03d07d457c9db81288b64c8131b668731b572628a157e75231d1b",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+      "finalSHA256": "569dad62ce174f21ce9207ffe06a9cc7c7211dc650513420d9e2581190607d13",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "finalSHA256": "6f4940e77c3e2f009f86fd5a211432b5625760bd8028ae568a0cb1317becdea7",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "finalSHA256": "3c62e734bce3e3373fe14be2af264a8408d92fda4ed0297f82fb8e96a8fe6e94",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "finalSHA256": "c703152add9b13bb6cc70e822e9e65541f846e7f972947c8e93bea2f1da304d4",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "finalSHA256": "ce3d51b742f886976117b96c9cca9138f7f26fe4371f6a92ef2dd29704737c4e",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/vision.md",
+      "finalSHA256": "2809e7b412cc9a48e28364dc5de26168c2702b0e902781f0edd70737a76c1a2b",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/intent-preservation-ledger.md",
+      "finalSHA256": "8b55394e0d5fd8dcfafd19ba13cc54f0998511c3713124d230080c116bcc408c",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/migration-authoring-rules.md",
+      "finalSHA256": "73bd2cd118a50ee44674938ff874c38ccac423d4d0b30d7e3bdf0a1002325847",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/README.md",
+      "finalSHA256": "99c51da3c2ed40be971ca4d7b9b94dd968e3a00ca25c31690dffae627c5d5fdf",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "finalSHA256": "a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "finalSHA256": "0f58b16cf70fe6b00c0c59681d6101eef40d9fea84ad80523e1d0ffd454aa843",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "finalSHA256": "ef90ae232ad4396ef3ec1d70014771c3213eae9289dc4e36613be1e23eb7f40d",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "finalSHA256": "ce05af49d9b4a504cae9b0324fd5883085e9ae86ff5299d1dfd40098fd2aaa19",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/README.md",
+      "finalSHA256": "bdd675d3ca3bfc6e082ac4e32279169234d96d272219afc0191c86dc37bbd693",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/architecture-advisory-panel.md",
+      "finalSHA256": "59cfd9e1db9e42ec424d0795b950342cb116a394e352238c5748abe446d3d909",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/component-authority-boundary-map.md",
+      "finalSHA256": "74f1cd1a037672751b42b8f7cf1bb308f14e841dfeba80f4cbfbee99fef56a17",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/coordination-capability-envelope.md",
+      "finalSHA256": "0af1daeda94027ce687e460ca4a994b018979ad9565d1b28e28104e46dede9cf",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/coordination-dispatch-contract.md",
+      "finalSHA256": "b9b878e282f4586456fb67501186b5ac4c552aee24dff144d4560ee826c6d0ef",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+      "finalSHA256": "29e014b56928ffc2092e999781987295ce0aae74b668ac1441b2773035a1e986",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+      "finalSHA256": "55b9fc2a7cc7e27bb5a78a05673d8ac8572fe9c0a1e17c1e3d5a2b5d47ddcc54",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+      "finalSHA256": "b0b763c0b4a1b1caca80418069da8f582b2b267e6c716794e5731e83f931880b",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/doing-coordination-redesign.md",
+      "finalSHA256": "de5c6813a781d179152a8c4b1b214fe76ae30e6df3160adb7e6a4d9f1ac31014",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "finalSHA256": "8d92723c337c0eb97ef632a173975723a4ff1e6e6bf7f68b8d15e2d092b1b922",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "finalSHA256": "3574b138df5c73e23e51e5601b943acdf62a0f7d06dbed5708691c51f97ebff3",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "finalSHA256": "dfc1966538c2092fe8fde4e01b0bcff97da51b22690c46baae1989dbf42f32f9",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "finalSHA256": "d910d72b0c646c56d86acc113fed90264d99052a0f117c531fff489a3258fb51",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "finalSHA256": "05566214776f190238434e2e7bda7b4f4a270ff86c197f2bff304efe9cf503fe",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
+      "finalSHA256": "d11151fc9dd96db92a96e24d3718d636e5e20f0e83f2858b2303399140f3e13d",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "finalSHA256": "e751d163a133ea19aaf43fd588036c4bd7d5ae70692bbf905c82ad4544a6cd7b",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "finalSHA256": "988b824a980a3c2e57e348ebc3d026f21d6c71c7d83b82eabec0cbaf6f9417fe",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "finalSHA256": "9ee4f29458ce8631cb9df0818b3d27ef17d715ea18f631248676e868ccd4f8c0",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "finalSHA256": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "finalSHA256": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/vision.md",
+      "finalSHA256": "05079308a101e070d96c282f88c8705356deb594be7be9833394eacf1a8217f6",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/work-state/README.md",
+      "finalSHA256": "fcd63b55b52f43360a1688d4a0dbeefd5d620d0daebf5e8a86690b3d0ad06030",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "finalSHA256": "7fa6181ec562c64fc5bece18557526e9bcd59ca1666b3a265e777583440ecc94",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "finalSHA256": "e5a6613e90c2c282f3780ba828bf99a4350d4b158dd21696ab82fd556596d29a",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "finalSHA256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    },
+    {
+      "path": "docs/platform/work-state/spec.md",
+      "finalSHA256": "554a18d0a4b3e371a9c815befc23f3f7af8c2311dcea0dca45ab5cd37fb02826",
+      "reconstructsInputHEADUsingOnlyAuthorizedEdits": true
+    }
+  ],
+  "newHistoryIndex": "docs/platform/history/documentation-authority-unification/README.md",
+  "readingMapVerbatimEntries": 53,
+  "headerOnlyPassFiles": 37,
+  "repointedLinks": 366,
+  "repointedFiles": 70,
+  "reviewedSplitLineRowUnchanged": true,
+  "canonicalClaimAndGapDecisionsUnique": true,
+  "workspaceScopeValid": true,
+  "registryUnchanged": true,
+  "rootInstructionBlobsUnchanged": true,
+  "checks": {
+    "passes": 113,
+    "A": "eight identical historical observations; zero new scope violations",
+    "B": "exact extractor-blob equality including working tree",
+    "H": "0 findings; 0 unresolved links",
+    "I": "reader-links baseline exactly equal"
+  },
+  "nativeSyncCount": 0,
+  "reviewPacks": 0,
+  "limitations": [
+    "No native committed-tree identity refresh; next package turn owns sync/rebind and one review request.",
+    "FAST D/E scope is root instructions + source reading-map only; no global green claim.",
+    "Nine already-retired instruction identities retain native dispositions; no unsupported retired overlay or registry edits.",
+    "No full npm suite or independent truth/navigation review claimed."
+  ]
+}

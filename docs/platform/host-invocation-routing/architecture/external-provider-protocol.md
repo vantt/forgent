@@ -14,6 +14,14 @@ Related:
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
 - docs/platform/host-invocation-routing/contracts/external-provider-manifest.md
 - docs/platform/host-invocation-routing/verification/r2-external-process-proof.md
+Implementation: External process implemented preview; WASM/provider ecosystem planned
+Provenance: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Define the preview architecture for external process providers and future WASM/provider-ecosystem work; authority follows transitional switchboard
+Use this when: Define the preview architecture for external process providers and future WASM/provider-ecosystem work
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Claim
@@ -32,8 +40,8 @@ Component class and invocation mechanism are separate axes. Core component, pack
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Process protocol framing is length-prefixed JSON-RPC over stdio. | `implemented preview` | [source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P3 conformance tests closed 2026-09-15. |
-| Static manifest discovery does not execute provider code. | `implemented preview` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P1 discovery proof closed 2026-09-15. |
+| Process protocol framing is length-prefixed JSON-RPC over stdio. | `implemented preview` | [source protocol §3](external-provider-protocol.md#3-component-protocol), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P3 conformance tests closed 2026-09-15. |
+| Static manifest discovery does not execute provider code. | `implemented preview` | [source protocol §4](external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P1 discovery proof closed 2026-09-15. |
 | Marketplace, signatures, and production WASM are out of R2. | `planned` | [release boundaries](release-boundaries.md), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | Still future ecosystem decision -- unaffected by R2 closing. |
 
 ## 4. Related Files
@@ -43,7 +51,7 @@ Component class and invocation mechanism are separate axes. Core component, pack
 | component protocol contract | [../contracts/component-protocol.md](../contracts/component-protocol.md) |
 | manifest contract | [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
 | R2 proof | [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |
-| source protocol | [../../../architect/host-invocation-routing/external-provider-protocol.md](../../../architect/host-invocation-routing/external-provider-protocol.md) |
+| source protocol | [../../../architect/host-invocation-routing/external-provider-protocol.md](../README.md) |
 
 ## Retained selected source material
 

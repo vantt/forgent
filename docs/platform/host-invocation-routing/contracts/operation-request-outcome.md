@@ -13,6 +13,14 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/invocation-kernel.md
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
+Implementation: Current partial
+Provenance: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Define HostInvocation, OperationRequest, ContractRef, ProviderOutcome, ProviderError, and lifecycle outcomes; authority follows transitional switchboard
+Use this when: Define HostInvocation, OperationRequest, ContractRef, ProviderOutcome, ProviderError, and lifecycle outcomes
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Contract
@@ -48,4 +56,4 @@ Providers never block waiting for a person. If human input is required, the prov
 | --- | --- |
 | kernel architecture | [../architecture/invocation-kernel.md](../architecture/invocation-kernel.md) |
 | component protocol | [component-protocol.md](component-protocol.md) |
-| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md) |

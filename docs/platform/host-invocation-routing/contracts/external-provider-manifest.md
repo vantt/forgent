@@ -13,6 +13,14 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/external-provider-protocol.md
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
+Implementation: Implemented preview
+Provenance: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Define static provider manifest discovery, namespace rules, and replacement policy; authority follows transitional switchboard
+Use this when: Define static provider manifest discovery, namespace rules, and replacement policy
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Contract
@@ -33,8 +41,8 @@ Discovery scans static manifests and does not execute provider code. The derived
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Static discovery does not execute code. | `implemented preview` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P1 manifest fixture closed 2026-09-15. |
-| Registry is derived rebuildable state. | `implemented preview` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P2 linker proof closed 2026-09-15 (in-memory only; persisted cache/lock by fingerprint remains future work). |
+| Static discovery does not execute code. | `implemented preview` | [source protocol §4](../architecture/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P1 manifest fixture closed 2026-09-15. |
+| Registry is derived rebuildable state. | `implemented preview` | [source protocol §4](../architecture/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P2 linker proof closed 2026-09-15 (in-memory only; persisted cache/lock by fingerprint remains future work). |
 
 ## 4. Related Files
 

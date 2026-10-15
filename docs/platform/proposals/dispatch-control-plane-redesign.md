@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate pointer at the mapped proposals path; the full proposal is at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. The three inline-code legacy paths are retained pending cutover. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](../../architect/dispatch-control-plane-redesign.md).
+Source relationship: [original source](dispatch-control-plane-redesign.md).
 
 
 Canonical architecture moved to:

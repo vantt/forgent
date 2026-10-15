@@ -14,6 +14,14 @@ Related:
 - docs/platform/host-invocation-routing/contracts/operation-request-outcome.md
 - docs/platform/host-invocation-routing/contracts/operation-provider.md
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
+Implementation: Current partial
+Provenance: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Define the target semantic invocation kernel and lifecycle shape; authority follows transitional switchboard
+Use this when: Define the target semantic invocation kernel and lifecycle shape
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 Added in candidate — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
@@ -46,4 +54,4 @@ The native kernel has exactly one semantic input/output boundary: `OperationRequ
 | operation request/outcome contract | [../contracts/operation-request-outcome.md](../contracts/operation-request-outcome.md) |
 | provider contract | [../contracts/operation-provider.md](../contracts/operation-provider.md) |
 | alignment | [../verification/implementation-alignment.md](../verification/implementation-alignment.md) |
-| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md) |

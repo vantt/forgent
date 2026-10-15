@@ -75,6 +75,6 @@ missing, unsupported, or excluded branches remain visible in aggregate output.
 Herdr pane state, terminal text, quietness, and process appearance are useful
 diagnostics only. They cannot replace structured runtime and evidence records.
 
-Read the [area portal](../README.md) and [runner spec](../../../specs/runner.md)
+Read the [area portal](../README.md) and [runner spec](../../runner/README.md)
 for the consuming execution and delivery boundaries.
 

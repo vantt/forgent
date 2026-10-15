@@ -14,6 +14,14 @@ Related:
 - docs/platform/README.md
 - docs/platform/component-boundary.md
 - docs/architecture-map.md
+Implementation: Partial
+Provenance: Promoted anchor from docs/architecture-map.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Route readers through the whole-system architecture map; authority follows transitional switchboard
+Use this when: Route readers through the whole-system architecture map
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Purpose
@@ -91,9 +99,9 @@ Last reviewed: 2026-09-13
 
 **Phiên bản:** v0.6. **Trạng thái:** CHUẨN — chấp nhận 2026-07-16, record
 [0010](#0010-bản-đồ-kiến-trúc-là-bản-chuẩn); nâng v0.3 theo record
-[0012](../specs/work-state.md#0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời);
+[0012](work-state/decisions/retired-decision-history.md#8-adr-0012-unified-typed-edge-graph-model);
 nâng v0.4 theo record
-[0013](../specs/work-state.md#0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from); nâng v0.5
+[0013](work-state/decisions/retired-decision-history.md#9-adr-0013-report-not-write-channel-for-discovered-from); nâng v0.5
 theo record
 [0015](#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009); nâng v0.6 theo record
 [0017](#0017-đóng-audit-hệ-idtên-gọi-str47) (§12 thêm dòng id-systems-audit,
@@ -117,7 +125,7 @@ record kèm nâng version — supersede, không sửa ngầm.
 5. Sequence §8 thêm **nhánh fail** (park/halt → friction, chỗ S2 cắm vào).
 6. Thêm §12: quan hệ với `system-overview.md`, `reading-map.md`, `backlog.md`.
 
-**Changelog v0.2 → v0.3** (record [0012](../specs/work-state.md#0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời) — supersede ADR0002, chi tiết ở §11):
+**Changelog v0.2 → v0.3** (record [0012](work-state/decisions/retired-decision-history.md#8-adr-0012-unified-typed-edge-graph-model) — supersede ADR0002, chi tiết ở §11):
 
 1. `src/state/dep-graph.mjs` (§6) không còn chỉ kiểm chu trình trên `deps` —
    đổi thành đồ thị cạnh-định-kiểu HỢP NHẤT `blocks`+`parent-child` (`deps`
@@ -131,7 +139,7 @@ record kèm nâng version — supersede, không sửa ngầm.
    2 (nay đã lên 3, per D19/D27 str46-io-contract), không có row §6/manifest
    mới (mở rộng module đã có, không tạo module mới).
 
-**Changelog v0.3 → v0.4** (record [0013](../specs/work-state.md#0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from) — mở rộng CTR003, không supersede):
+**Changelog v0.3 → v0.4** (record [0013](work-state/decisions/retired-decision-history.md#9-adr-0013-report-not-write-channel-for-discovered-from) — mở rộng CTR003, không supersede):
 
 1. Contract **CTR003** (§7, orchestrator ↔ worker) thêm một mệnh đề **kênh
    báo-cáo-không-ghi** (report-not-write): worker CÓ THỂ phát một khối

@@ -13,6 +13,14 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/provider-routing.md
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
+Implementation: Current partial
+Provenance: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Define operation identity, descriptors, catalog authorship, and version matching; authority follows transitional switchboard
+Use this when: Define operation identity, descriptors, catalog authorship, and version matching
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Contract
@@ -36,4 +44,4 @@ Related:
 | --- | --- |
 | provider routing | [../architecture/provider-routing.md](../architecture/provider-routing.md) |
 | operation provider | [operation-provider.md](operation-provider.md) |
-| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../README.md) |

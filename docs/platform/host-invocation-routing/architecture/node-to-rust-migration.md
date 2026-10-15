@@ -13,6 +13,14 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/release-boundaries.md
 - docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md
+Implementation: R1/R2/R3 implemented preview plus remaining component migrations
+Provenance: Promoted from docs/architect/host-invocation-routing/node-to-rust-component-migration.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Preserve the selected Node-to-Rust migration sequence and constraints; authority follows transitional switchboard
+Use this when: Preserve the selected Node-to-Rust migration sequence and constraints
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Selected Direction
@@ -36,10 +44,10 @@ The old source's near-thin, partly-thin, and not-thin command lists are preserve
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Rust host first is selected. | `implemented preview` | [source migration §2](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#2-options-considered), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs) | Preview Rust host exists and is the installed/default preview entry. Stable/default graduation remains a release-owner decision. |
-| Read models before writers. | `current partial` | [source migration §10](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers), [../../../../packages/distribution/rust/src/lib.rs](../../../../packages/distribution/rust/src/lib.rs), [../../../../packages/work-state/rust/src/lib.rs](../../../../packages/work-state/rust/src/lib.rs), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | `version`, `gate-bypass`, and remote `/runtime` are read proofs. Future read routes should migrate before writes. |
-| Writer migration has atomicity/replay/mutual-exclusion gates. | `planned` | [source migration §11](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components) | Future writer proof. |
-| Observe is first component fully in Rust. | `implemented complete` | [Observe Spec](../../../specs/observe.md), [packages/observe/rust](../../../../packages/observe/rust), [plans/260929-1501-metrics-friction-rust-native](../../../../archive/plans/260929-1501-metrics-friction-rust-native/plan.md) | Observe migrated completely into Rust native without Node fallback; covers metrics and friction writers with native routing and writer shards. |
+| Rust host first is selected. | `implemented preview` | [source migration §2](node-to-rust-migration.md#2-options-considered), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs) | Preview Rust host exists and is the installed/default preview entry. Stable/default graduation remains a release-owner decision. |
+| Read models before writers. | `current partial` | [source migration §10](node-to-rust-migration.md#10-migrate-read-models-before-writers), [../../../../packages/distribution/rust/src/lib.rs](../../../../packages/distribution/rust/src/lib.rs), [../../../../packages/work-state/rust/src/lib.rs](../../../../packages/work-state/rust/src/lib.rs), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | `version`, `gate-bypass`, and remote `/runtime` are read proofs. Future read routes should migrate before writes. |
+| Writer migration has atomicity/replay/mutual-exclusion gates. | `planned` | [source migration §11](node-to-rust-migration.md#11-migrate-state-writing-components) | Future writer proof. |
+| Observe is first component fully in Rust. | `implemented complete` | [Observe Spec](../../observe/README.md), [packages/observe/rust](../../../../packages/observe/rust), [plans/260929-1501-metrics-friction-rust-native](../../../../archive/plans/260929-1501-metrics-friction-rust-native/plan.md) | Observe migrated completely into Rust native without Node fallback; covers metrics and friction writers with native routing and writer shards. |
 
 ## 5. Related Files
 
@@ -47,7 +55,7 @@ The old source's near-thin, partly-thin, and not-thin command lists are preserve
 | --- | --- |
 | release boundaries | [release-boundaries.md](release-boundaries.md) |
 | R1 proof | [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) |
-| source migration | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) |
+| source migration | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../README.md) |
 
 ## Retained selected source material
 
@@ -218,7 +226,7 @@ The migration order is:
 
 1. adopt the packaging stream's settled install/activation/rollback contract
    (`fgctl` + release store + workspace activation binding; see
-   [Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md)
+   [Runtime Identity And Activation](../../packaging-distribution/README.md)
    §11–§13); confirm the supported target matrix;
 2. name the Node payload `legacy-node` in the release manifest
    (`components.legacyNode.root`/`entry`) without moving or renaming any file;
@@ -299,7 +307,7 @@ Herdr crate, released alongside the runtime) composing the host-runtime crate
 in-process. A future shared multi-project gateway is a different component: it
 reaches a selected project runtime only through the out-of-process Project
 Runtime Adapter
-([Future Constraints](../../../architect/packaging-distribution/future-constraints.md) §2),
+([Future Constraints](../../packaging-distribution/architecture/future-constraints.md) §2),
 never by loading a project runtime in-process itself.
 
 Chat becomes a peer host only when a real chat adapter and its own contracts
@@ -395,7 +403,7 @@ as "prohibit"). A provider binding is not a runtime-selectable switch, so
 rollback of a native operation in R1–R2 is a release rollback through `fgctl`:
 `ActivationRecord.previousArtifactDigest` + the preserved release directory +
 a state-schema compatibility check (see
-[Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md)
+[Runtime Identity And Activation](../../packaging-distribution/README.md)
 §11). The previous release still contains both the native provider and the
 Node payload during the operation's observation window, so a release rollback
 restores the legacy path without restoring the old outer executable by hand.
@@ -433,4 +441,4 @@ Repository-wide proof remains `npm test` plus the new Rust workspace's
 The former "which post-npm release/install mechanism owns native artifacts"
 decision is settled: the packaging stream owns it (`fgctl` + release store +
 workspace activation binding), see
-[Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md).
+[Runtime Identity And Activation](../../packaging-distribution/README.md).

@@ -14,6 +14,14 @@ Related:
 - docs/platform/host-invocation-routing/README.md
 - docs/platform/host-invocation-routing/spec.md
 - docs/platform/host-invocation-routing/intent-preservation-ledger.md
+Implementation: Preview installed/default proof plus current route-migration and R3 remote peer implemented preview snapshot
+Provenance: Created from documentation migration scan plus 2026-09-14 code scan of Rust host/runtime paths
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Track implementation status for host-invocation design claims; authority follows transitional switchboard
+Use this when: Track implementation status for host-invocation design claims
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 Added in candidate — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.

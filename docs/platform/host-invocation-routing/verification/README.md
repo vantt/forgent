@@ -14,6 +14,14 @@ Related:
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
 - docs/platform/host-invocation-routing/verification/compatibility-harness.md
 - docs/platform/host-invocation-routing/verification/source-preservation-audit.md
+Implementation: Active
+Provenance: Created during host-invocation documentation migration
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Route readers to host-invocation implementation alignment and proof records; authority follows transitional switchboard
+Use this when: Route readers to host-invocation implementation alignment and proof records
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Evidence Sets

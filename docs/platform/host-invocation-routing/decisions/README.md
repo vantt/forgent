@@ -15,6 +15,14 @@ Related:
 - docs/platform/host-invocation-routing/vision.md
 - docs/platform/host-invocation-routing/intent-preservation-ledger.md
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
+Implementation: Active
+Provenance: Created during host-invocation documentation migration
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Route readers to accepted host-invocation decisions and keep future ADRs separate from vision and preservation records; authority follows transitional switchboard
+Use this when: Route readers to accepted host-invocation decisions and keep future ADRs separate from vision and preservation records
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Current Decision Record

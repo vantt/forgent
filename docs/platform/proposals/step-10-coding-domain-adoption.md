@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate carriage; Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](../../architect/proposals/step-10-coding-domain-adoption.md).
+Source relationship: [original source](step-10-coding-domain-adoption.md).
 
 
 ````markdown
@@ -69,7 +69,7 @@ This document uses three labels:
 - **Open** identifies a decision that still requires human review or proof.
 
 Nothing labeled Proposed is an approved contract or plan. The
-[Agent Coordination Vision](../../architect/agent-coordination/vision.md) is accepted authority
+[Agent Coordination Vision](../agent-coordination/README.md) is accepted authority
 above this proposal. In particular, V-002 (Work is optional integration),
 V-008 (domain augmentation), V-011 (small core), and V-012 (two unlike
 consumers) constrain every idea below.
@@ -236,7 +236,7 @@ changes the sequence, scope, or exit criteria of any A0-G step, it must update
 this proposal and the project-level Architect Roadmap in the same review.
 
 The current detailed plan for A0 is
-[Step 10 A0 - Coding Domain Boundary And Facade Plan](../../architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md).
+[Step 10 A0 - Coding Domain Boundary And Facade Plan](step-10-a0-coding-domain-boundary-facade-plan.md).
 
 Recommended execution order:
 
@@ -350,7 +350,7 @@ coding-domain proof actually needs one.
 
 **Proposed:** keep the authority map as a parallel architect-level
 prerequisite, not a child step of coding adoption. The
-[Component Authority Boundary Map](../../architect/proposals/component-authority-boundary-map.md)
+[Component Authority Boundary Map](component-authority-boundary-map.md)
 classifies ownership and forbidden dependencies before Step 10 implementation
 starts. Mutating adoption remains blocked by the ADR-010 gate and depends on
 the Step 08 proofs for crash recovery and concurrent-mutating-actor refusal.
@@ -459,7 +459,7 @@ runtime occupancy, setup/doctor, host surfaces, and learning registries are
 
 **Proposed:** coding does not "migrate onto" Agent Coordination. Coding is a
 domain component that *consumes* four platform engines
-([advisory §10](../../architect/component-boundary/component-boundary-advisory.md)):
+([advisory §10](../component-boundary.md)):
 
 - Work Lifecycle Engine owns Work identity, status/stage, claim/return, human
   gates, and Work verbs (ADR-001).
@@ -581,7 +581,7 @@ useful output is:
    authority, state, ports, adapters, forbidden dependencies, and layer:
    foundation, platform support, domain, integration, host/surface, or plugin.
    Draft artifact:
-   [Component Authority Boundary Map](../../architect/proposals/component-authority-boundary-map.md).
+   [Component Authority Boundary Map](component-authority-boundary-map.md).
 2. **Foundation-vs-coding extraction matrix.** Classifies F1-F7 above and names
    which currently-coding-used modules are reusable foundation/platform
    components versus Coding Domain Core.

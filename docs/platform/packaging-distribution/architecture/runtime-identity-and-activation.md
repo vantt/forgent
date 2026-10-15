@@ -178,7 +178,7 @@ promoted platform docs as the working contract for new changes.
 
 Read it in layers:
 
-1. Read [Workspace Topology Architecture](../../../architect/workspace-topology.md) first for root
+1. Read [Workspace Topology Architecture](../../system-architecture/architecture/workspace-topology.md) first for root
    topology, state classes, worktree behavior, and dirty-tree rules.
 2. Read the promoted
    [runtime identity architecture](runtime-identity-and-activation.md)

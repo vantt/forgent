@@ -15,6 +15,14 @@ Related:
 - docs/platform/component-boundary.md
 - docs/platform/host-invocation-routing/contracts/operation-catalog.md
 - docs/io-contract.md
+Implementation: Implemented
+Provenance: Existing convention specification and its Related references; metadata completion under L10-9
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Define the executable source of truth for fgOS names and repository-relative placement; authority follows transitional switchboard
+Use this when: Define the executable source of truth for fgOS names and repository-relative placement
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Purpose and admission rule

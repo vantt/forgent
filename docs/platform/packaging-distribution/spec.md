@@ -316,7 +316,7 @@ future optional splits, only when they outgrow runtime identity:
   workshop-materialization.md
 ```
 
-[Workspace Topology Architecture](../../architect/workspace-topology.md) must be read before
+[Workspace Topology Architecture](../system-architecture/architecture/workspace-topology.md) must be read before
 runtime identity, because packaging consumes topology rather than owning it.
 [Runtime Identity And Activation](architecture/runtime-identity-and-activation.md)
 is the promoted first packaging-specific contract. Gateway/web itself is not
@@ -436,7 +436,7 @@ Last reviewed: 2026-09-13
 ```
 
 > Status: historical redirect. Active topology remains
-> [docs/architect/workspace-topology.md](../../architect/workspace-topology.md), while active
+> [docs/architect/workspace-topology.md](../system-architecture/architecture/workspace-topology.md), while active
 > packaging-distribution runtime records live under
 > [docs/platform/packaging-distribution/](README.md).
 > Keep this file only as the old pointer that explains the split.
@@ -447,7 +447,7 @@ Last reviewed: 2026-09-13
 Workspace/runtime/work-state topology is broader than packaging/distribution.
 The canonical architecture document is now:
 
-[Workspace Topology Architecture](../../architect/workspace-topology.md)
+[Workspace Topology Architecture](../system-architecture/architecture/workspace-topology.md)
 
 Packaging/distribution consumes that topology for release store placement,
 workspace activation binding, projection ledger scope, leases, and dirty-tree

@@ -59,17 +59,17 @@ declare those contracts canonical or the engine delivered in the current release
 
 ## Related Architect-Level Intentions
 
-- [Architecture Intent](../../../architect/architecture-intent.md) records wider,
+- [Architecture Intent](../../system-architecture/architecture/architecture-intent.md) records wider,
   cross-component design intent; frozen legacy placement is not proof of current
   implementation.
-- [Step 09: Group Thinking Substrate](../../../architect/proposals/step-09-group-thinking-substrate.md)
+- [Step 09: Group Thinking Substrate](../../proposals/step-09-group-thinking-substrate.md)
   records the earlier substrate proposal. Current named execution is defined by
   Workflow and CollaborationPattern owners, not the retired coordination door.
-- [Step 10: Coding Domain Adoption Of The Coordination Foundation](../../../architect/proposals/step-10-coding-domain-adoption.md)
+- [Step 10: Coding Domain Adoption Of The Coordination Foundation](../../proposals/step-10-coding-domain-adoption.md)
   records the earlier coding-adoption plan. Current coding operations and
   Workflow definitions must be checked in `domains/coding/`, not inferred from
   the old Step 08/ADR-010 proof sequence.
-- [Component Authority Boundary Map](../../../architect/proposals/component-authority-boundary-map.md)
+- [Component Authority Boundary Map](../../proposals/component-authority-boundary-map.md)
   is the parallel architect-level authority/layout draft for cross-component
   placement and forbidden dependencies.
 

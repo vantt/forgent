@@ -25,7 +25,7 @@ This is the top-level portal for fgOS documentation.
 
 | Need | Read |
 |---|---|
-| Documentation rules | [doc-governance.md](../../../../doc-governance.md) |
+| Documentation rules | [doc-governance.md](../../../governance.md) |
 | What to read first | [reading-map.md](../../../../reading-map.md) |
 | Platform/system design docs | [platform/README.md](../../../README.md) |
 | Current legacy product/source map | [specs/reading-map.md](../../../../specs/reading-map.md) |
@@ -52,7 +52,7 @@ promoted, redirected, or retired.
 
 | Relationship | File |
 |---|---|
-| governs documentation system | [doc-governance.md](../../../../doc-governance.md) |
+| governs documentation system | [doc-governance.md](../../../governance.md) |
 | routes readers by purpose | [reading-map.md](../../../../reading-map.md) |
 | platform documentation portal | [platform/README.md](../../../README.md) |
 | legacy/current detailed source map | [specs/reading-map.md](../../../../specs/reading-map.md) |

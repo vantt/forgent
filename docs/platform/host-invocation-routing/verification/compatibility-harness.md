@@ -13,6 +13,14 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/contracts/command-route-descriptor.md
 - docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md
+Implementation: Current harness plus R2/R3 preview extensions
+Provenance: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Preserve the planned Node/Rust compatibility harness requirements; authority follows transitional switchboard
+Use this when: Preserve the planned Node/Rust compatibility harness requirements
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Required Proof
@@ -43,7 +51,7 @@ use from intentional legacy fallback use until that window closes.
 | --- | --- |
 | descriptor contract | [../contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md) |
 | legacy transition | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) |
-| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
+| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md) |
 
 ## Restored registry linker procedure and its input output formula
 

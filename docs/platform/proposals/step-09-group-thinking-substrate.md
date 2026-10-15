@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate proposal retaining deferred capabilities referenced by docs/how-to/use-fgos-group-thinking.md:196–200. Current group-thinking guidance uses Workflows/presets; the old pack was removed in 2180b4e72. Source implementation and deferred-status statements remain dated metadata. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](../../architect/proposals/step-09-group-thinking-substrate.md).
+Source relationship: [original source](step-09-group-thinking-substrate.md).
 
 
 Document type: Proposal
@@ -40,8 +40,8 @@ definitions, and the `fgos-group-thinking` skill) implemented and closed by
 `step-09-mvp6-to-mvp9` (Phases 00/06/07/08/09/10, including the
 user-authorized P10-KERNEL-FIX quorum fix) — see that track's own
 verification index for the full per-phase evidence trail and the
-[CoordinationSession Contract](../../architect/agent-coordination/contracts/coordination-session.md)/
-[FlowDefinition Contract](../../architect/agent-coordination/contracts/flow-definition.md)
+[CoordinationSession Contract](../agent-coordination/history/retired-engine/files/contracts/coordination-session.md)/
+[FlowDefinition Contract](../agent-coordination/history/retired-engine/files/contracts/flow-definition.md)
 for the promoted contract text, each with its own named limitations.
 Last reviewed: 2026-09-04
 Canonical for: nothing until explicitly accepted; the implemented MVP0-9 +
@@ -54,17 +54,17 @@ Scope: preserve and narrow the next Agent Coordination design frontier after
 Step 08: make fgOS able to express richer group-thinking and problem-solving
 collaboration patterns without weakening the isolation-heavy fixtures already
 proved by Step 08.
-Intent traceability: [Architecture Intent](../../architect/architecture-intent.md),
-[Agent Coordination Intent Preservation Ledger](../../architect/agent-coordination/intent-preservation-ledger.md)
-Related: [Coordination Foundation Baseline](../../architect/agent-coordination/architecture/coordination-foundation-baseline.md),
-[CoordinationSession Contract](../../architect/agent-coordination/contracts/coordination-session.md),
-[FlowDefinition Contract](../../architect/agent-coordination/contracts/flow-definition.md),
-[Team Communication Protocol V1](../../architect/agent-coordination/proposals/team-communication-protocol-v1.md),
-[Component Authority Boundary Map](../../architect/proposals/component-authority-boundary-map.md),
-[Step 10 Coding Domain Adoption](../../architect/proposals/step-10-coding-domain-adoption.md),
-[Step 09 MVP1/MVP2 group-thinking verification](../../architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md),
-[Step 09 MVP3-MVP5 verification](../../architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md),
-[MVP6+ Dogfood Handoff](../../architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md)
+Intent traceability: [Architecture Intent](../system-architecture/architecture/architecture-intent.md),
+[Agent Coordination Intent Preservation Ledger](../agent-coordination/README.md)
+Related: [Coordination Foundation Baseline](../agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md),
+[CoordinationSession Contract](../agent-coordination/history/retired-engine/files/contracts/coordination-session.md),
+[FlowDefinition Contract](../agent-coordination/history/retired-engine/files/contracts/flow-definition.md),
+[Team Communication Protocol V1](../agent-coordination/README.md),
+[Component Authority Boundary Map](component-authority-boundary-map.md),
+[Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md),
+[Step 09 MVP1/MVP2 group-thinking verification](../agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md),
+[Step 09 MVP3-MVP5 verification](../agent-coordination/verification/step-09-mvp3-to-mvp5/index.md),
+[MVP6+ Dogfood Handoff](../agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md)
 
 Implementation note (updated by `step-09-mvp6-to-mvp9`'s own closing cell,
 P10.10 — Step 09 is now closed): MVP1-MVP5 promoted starting Phase 00 — see
@@ -122,7 +122,7 @@ extension points and fixture-local posture; it does not mean global peer chat,
 unbounded dynamic topology, or weakening proven invariants.
 
 The capability map remains the group-thinking axes from
-[Architecture Intent](../../architect/architecture-intent.md):
+[Architecture Intent](../system-architecture/architecture/architecture-intent.md):
 
 - topology shape;
 - timing;
@@ -191,9 +191,9 @@ disposition, and decides terminal session status within declared bounds.
 ## 5. Prompt Source, Not Runtime Dependency
 
 The manual proof source is
-[Master Multi-Agent Implementation Coordinator](../../architect/agent-coordination/playbooks/prompts/master-coordinator.md),
+[Master Multi-Agent Implementation Coordinator](../agent-coordination/README.md),
 backed by the
-[Coordination Operating Harness](../../architect/agent-coordination/playbooks/coordination-operating-harness.md).
+[Coordination Operating Harness](../agent-coordination/README.md).
 Those playbooks are not loaded by runtime and must not become hidden runtime
 prose. Their value for Step 09 is the operating shape they proved:
 
@@ -563,7 +563,7 @@ the session ledger, or contain the group-thinking logic itself.
 
 ## 12. Relationship To Component Boundary
 
-[Component Authority Boundary Map](../../architect/proposals/component-authority-boundary-map.md) runs
+[Component Authority Boundary Map](component-authority-boundary-map.md) runs
 in parallel with this step. It is not a Step 10 appendix.
 
 Step 09 must use that map to keep new primitives in the right component:
@@ -577,7 +577,7 @@ Step 09 must use that map to keep new primitives in the right component:
 
 ## 13. Relationship To Step 10
 
-[Step 10 Coding Domain Adoption](../../architect/proposals/step-10-coding-domain-adoption.md) becomes the
+[Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md) becomes the
 consumer track. It should read Step 09 first and then apply the proven
 group-thinking substrate to Work-attached coding collaboration.
 

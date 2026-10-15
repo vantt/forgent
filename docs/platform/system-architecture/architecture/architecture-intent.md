@@ -58,7 +58,7 @@ runtime behavior, and does not authorize implementation.
 
 ## 0.1 System-Wide Vision
 
-[System Vision: Trong Mem Ngoai Cung](../../../architect/system-vision-trong-mem-ngoai-cung.md)
+[System Vision: Trong Mem Ngoai Cung](system-vision-trong-mem-ngoai-cung.md)
 is the cross-system reminder behind this intent file:
 
 ```txt
@@ -696,7 +696,7 @@ These objections should stay visible until answered:
 This is the plan shape, not a menu of questions. Each MVP keeps the original
 intention alive while adding only the architecture needed for that layer. The
 detailed proposal lives in
-[Step 09 - Group Thinking Substrate](../../../architect/proposals/step-09-group-thinking-substrate.md).
+[Step 09 - Group Thinking Substrate](../../proposals/step-09-group-thinking-substrate.md).
 
 Stable spine:
 

@@ -265,15 +265,9 @@
       "sourceUnitDigest": "3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 new native current source unit from upstream. Complete source and recarried candidate target shown; retain native new ID and predecessor in the separate gap accounting. Pending independent conservation review; no approval carry.",
-      "reviewNote": "deep: New block-2 of the retained reading map, target none; the text is the same unit with main's four changes, retained in place.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      "authoredBy": "codex-session:unit-run-1792076952136-42ac8e36@2026-10-15",
+      "rationale": "L10-1/L10-4: retain repository-wide navigation outside platform authority. The complete 53-entry curated list from docs/specs/reading-map.md is now preserved verbatim in docs/reading-map.md#5-detailed-product-and-source-map, including the two pre-existing portal routes with reconciled descriptions. Legacy source and paths remain intact; Phase 9 owns consumer repointing. Known stale carried sentences; full truth check owed at promotion (A35). No truth approval or cutover authority is inferred. This native source unit #unheaded-block-2 is re-decided pending independent navigation/conservation review.",
+      "reviewStatus": "pending"
     },
     {
       "claimId": "claim_d76334798a7de5ca967d48855418497f",
@@ -425,76 +419,6 @@
     }
   ],
   "registryGaps": [
-    {
-      "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
-      "sourcePath": "AGENTS.md",
-      "sourceAnchor": "unheaded-block-22",
-      "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
-      "disposition": "partial-carry",
-      "targetOwner": "AGENTS.md",
-      "targetAnchor": "unheaded-block-22",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:34@2026-10-15",
-      "rationale": "A31 upstream splits the exact old two-line AGENTS unit. The primary target retains the first line; the committed A34 residual shows the second line verbatim and binds both full native unit digests. Source-to-self retention is outside platform authority, not a truth certificate. Pending independent conservation/representation re-review; no approval carry.",
-      "remainder": "The second original line is shown verbatim in plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json, SHA256 d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d; current retained AGENTS.md#unheaded-block-24 is claim_2ae81c7bed935553943d6777b81e2114. This A34 representation is pending independent re-review and remains a Step 10 / cutover obligation.",
-      "reviewNote": "deep: partial-carry back to pending, residual shows line 2 verbatim, SHA256 d4bd139d and all three unit digests recompute, A34 shape matches packaging residual, cutover obligation named",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0340-root-closure-fixes.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
-      "targetAncestry": [
-        "forgent",
-        "Dispatch — routing work to an executor"
-      ],
-      "reviewReportCommit": "6dadbb3685126542e6a2cecd64bcbae035b4fb58"
-    },
-    {
-      "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
-      "sourcePath": "AGENTS.md",
-      "sourceAnchor": "unheaded-block-23",
-      "sourceUnitDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
-      "disposition": "supersede",
-      "targetOwner": "AGENTS.md",
-      "targetAnchor": "unheaded-block-25",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
-      "reviewNote": "deep: Same-file successor; target equals main's new sentence (--work only through fgos dispatch decide).",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
-      "targetAncestry": [
-        "forgent",
-        "Dispatch — routing work to an executor"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
-    },
-    {
-      "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
-      "sourcePath": "AGENTS.md",
-      "sourceAnchor": "unheaded-block-25",
-      "sourceUnitDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
-      "disposition": "supersede",
-      "targetOwner": "AGENTS.md",
-      "targetAnchor": "unheaded-block-27",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "A31 upstream same-file native successor located by the exact old/current diff line map. Preserve both native identities; independent conservation review pending, no ID graft or approval carry.",
-      "reviewNote": "deep: Same-file successor; only change is --step to --stage, verbatim from main.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
-      "targetAncestry": [
-        "forgent",
-        "Dispatch — routing work to an executor"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
-    },
     {
       "claimId": "claim_1a97144c81c563726dfeb3413c4eaddc",
       "sourcePath": "docs/architect/component-boundary/component-boundary-advisory.md",

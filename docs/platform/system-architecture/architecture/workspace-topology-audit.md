@@ -26,7 +26,7 @@ Added in candidate: migration metadata and physical link rebasing. Original sour
 **Status:** Evidence snapshot for the topology contract.
 **Date:** 2026-09-04.
 **Evidence scope:** Current code and generated specs in this checkout.
-**Contract:** [workspace-topology.md](../../../architect/workspace-topology.md).
+**Contract:** [workspace-topology.md](workspace-topology.md).
 
 This document records why the topology contract is needed. It is allowed to go
 stale as code changes; the contract should not.

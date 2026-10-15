@@ -14,6 +14,14 @@ Related:
 - docs/platform/host-invocation-routing/README.md
 - docs/platform/host-invocation-routing/intent-preservation-ledger.md
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
+Implementation: R1/R2/R3 implemented preview plus partial route migration
+Provenance: Promoted from docs/architect/host-invocation-routing/**
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: State current and transition-state behavior for fgOS host invocation; authority follows transitional switchboard
+Use this when: State current and transition-state behavior for fgOS host invocation
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 Added in candidate — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
@@ -296,7 +304,7 @@ Added in candidate: this retained source detail is carried verbatim in [the drop
 
 R1 is three crates: `fgos`, `fgos-host-runtime`, `fgos-distribution`. The legacy exec lane is a module inside `apps/fgos`, not a crate, because it is CLI-adapter-local (§4). `component-protocol` waits for R2 (only an external-process adapter needs `EncodedMessage`). Extract further crates only when pressure is real. Neither app owns provider selection; neither host use case imports another; every host feeds the shared authority/router/contracts layer, and provider adapters depend on component protocols, not host presentation. A component is not created merely because one proof verb is convenient (`gate-bypass` stays under its settled authority, not a manufactured `gate-policy` component).
 
-Distribution selects and activates the trusted runtime (`fgctl`: acquire/stage/verify/activate/upgrade/rollback); host invocation routes inside the activated runtime. Packaging-distribution owns the onboarding command vocabulary: local `fgos init` adopts a workspace under the active identity on first use, `fgos doctor --fix` performs every later registered repair, and the target architecture has no separate `setup` verb. See [Runtime Identity And Activation](../../architect/packaging-distribution/runtime-identity-and-activation.md).
+Distribution selects and activates the trusted runtime (`fgctl`: acquire/stage/verify/activate/upgrade/rollback); host invocation routes inside the activated runtime. Packaging-distribution owns the onboarding command vocabulary: local `fgos init` adopts a workspace under the active identity on first use, `fgos doctor --fix` performs every later registered repair, and the target architecture has no separate `setup` verb. See [Runtime Identity And Activation](../packaging-distribution/README.md).
 
 #### 10. Release Boundaries
 
@@ -304,7 +312,7 @@ Distribution selects and activates the trusted runtime (`fgctl`: acquire/stage/v
 |---|---|---|
 | R1 — distributable Rust CLI host | Invocation kernel; `const` `OperationCatalog` / `RegistrySnapshot` assembled once at the composition root; two-stage authority; transitional CLI lane in the CLI adapter; native `distribution.build.show`; `fgctl`-driven install/activate/rollback proof. | External ecosystem discovery, WASM, chat, production gateway migration, a `setup` verb. |
 | R2 — external process preview | Process protocol, supervision, fixture conformance, static manifest validation; one-shot CLI loads the derived cache by fingerprint, rebuilds only on mismatch; explicit test/dev roots. | Core replacement, signatures/marketplace, WASM. |
-| R3 — production remote peer | Remote projector/presenter, native route adoption, per-operation Node semantic bridge only where needed; remote peer is the **project-local gateway** (current herdr, same release) composing the host-runtime crate in-process. | Parsing CLI envelopes as internal API; a future **shared multi-project gateway**, which never links a project runtime in-process and instead reaches it through the out-of-process Project Runtime Adapter ([Future Constraints](../../architect/packaging-distribution/future-constraints.md) §2) — itself a `remote-host-use-case` adapter inside the project runtime. |
+| R3 — production remote peer | Remote projector/presenter, native route adoption, per-operation Node semantic bridge only where needed; remote peer is the **project-local gateway** (current herdr, same release) composing the host-runtime crate in-process. | Parsing CLI envelopes as internal API; a future **shared multi-project gateway**, which never links a project runtime in-process and instead reaches it through the out-of-process Project Runtime Adapter ([Future Constraints](../packaging-distribution/architecture/future-constraints.md) §2) — itself a `remote-host-use-case` adapter inside the project runtime. |
 
 Chat is a valid future peer but does not gate R1/R2 until a real chat adapter and its admission/interruption/presentation contracts exist. "Ship the Rust host" means a reproducible artifact, target matrix, `fgctl` install/activation coverage, external-project install test, and named rollback channel — passing repository tests alone is a candidate, not a shipped host.
 
@@ -316,7 +324,7 @@ Chat is a valid future peer but does not gate R1/R2 until a real chat adapter an
 4. Does a later protocol version add a local socket transport after framed stdio has production evidence?
 5. What integrity/signature policy separates local development plugins from distributable ecosystem plugins?
 
-Target matrix, install/upgrade mechanism, and R1 definition are owned by packaging — see [Runtime Identity And Activation](../../architect/packaging-distribution/runtime-identity-and-activation.md).
+Target matrix, install/upgrade mechanism, and R1 definition are owned by packaging — see [Runtime Identity And Activation](../packaging-distribution/README.md).
 
 #### Related Documents
 
@@ -324,5 +332,5 @@ Target matrix, install/upgrade mechanism, and R1 definition are owned by packagi
 - [Legacy CLI Transition](architecture/legacy-cli-transition.md)
 - [Node To Rust Component Migration](architecture/node-to-rust-migration.md)
 - [Rust Host And Proof Providers Implementation Plan](roadmap.md)
-- [Component Boundary Advisory](../../architect/component-boundary/component-boundary-advisory.md)
-- [Runtime Identity And Activation](../../architect/packaging-distribution/runtime-identity-and-activation.md)
+- [Component Boundary Advisory](../component-boundary.md)
+- [Runtime Identity And Activation](../packaging-distribution/README.md)

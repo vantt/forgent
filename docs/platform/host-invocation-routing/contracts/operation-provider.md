@@ -13,6 +13,14 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/invocation-kernel.md
 - docs/platform/host-invocation-routing/architecture/provider-routing.md
+Implementation: Current partial
+Provenance: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Define provider descriptors, provider invocation, control, and events; authority follows transitional switchboard
+Use this when: Define provider descriptors, provider invocation, control, and events
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Contract

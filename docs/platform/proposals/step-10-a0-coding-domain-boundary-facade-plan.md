@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate carriage; Keep map proposal; partial foundation retirement and surviving harnesses do not settle an unaccepted plan. Retain Not started and prerequisite uncertainty. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](../../architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md).
+Source relationship: [original source](step-10-a0-coding-domain-boundary-facade-plan.md).
 
 
 Document type: Detailed architecture and execution plan
@@ -32,11 +32,11 @@ Canonical for: detailed A0 architecture and execution plan under Step 10 until
 accepted or superseded
 
 Related:
-- [Step 10 Coding Domain Adoption](../../architect/proposals/step-10-coding-domain-adoption.md)
-- [Architect Roadmap](../../architect/roadmap.md)
-- [Workspace Topology Architecture](../../architect/workspace-topology.md)
-- [Runtime Identity And Activation](../../architect/packaging-distribution/runtime-identity-and-activation.md)
-- [System Vision: Trong Mem Ngoai Cung](../../architect/system-vision-trong-mem-ngoai-cung.md)
+- [Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md)
+- [Architect Roadmap](../system-architecture/architecture/roadmap.md)
+- [Workspace Topology Architecture](../system-architecture/architecture/workspace-topology.md)
+- [Runtime Identity And Activation](../packaging-distribution/README.md)
+- [System Vision: Trong Mem Ngoai Cung](../system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md)
 
 ## 1. Purpose
 

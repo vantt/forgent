@@ -23,13 +23,13 @@ Superseded by: None
 Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion.
 
 
-**Status:** Planning companion for [workspace-topology.md](../../../architect/workspace-topology.md).
+**Status:** Planning companion for [workspace-topology.md](workspace-topology.md).
 **Date:** 2026-09-04.
 
 This roadmap sequences the decisions and migration work required to make
 workspace topology enforceable. It is not the contract; the contract is
-[workspace-topology.md](../../../architect/workspace-topology.md). Evidence lives in
-[workspace-topology-audit.md](../../../architect/workspace-topology-audit.md).
+[workspace-topology.md](workspace-topology.md). Evidence lives in
+[workspace-topology-audit.md](workspace-topology-audit.md).
 
 ## Hard Gates Before Distribution Activation Planning
 

@@ -13,6 +13,14 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md
 - docs/platform/host-invocation-routing/verification/compatibility-harness.md
+Implementation: Current partial
+Provenance: Promoted from docs/architect/host-invocation-routing/legacy-cli-transition.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Define per-selector native versus legacy CLI routing and repair ownership; authority follows transitional switchboard
+Use this when: Define per-selector native versus legacy CLI routing and repair ownership
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 Added in candidate — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.

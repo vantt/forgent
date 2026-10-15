@@ -1,0 +1,1036 @@
+{
+  "passes": 113,
+  "stages": [
+    {
+      "stage": "confinement",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "final",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-1",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-10",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-11",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-12",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-13",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-14",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-15",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-16",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-17",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-18",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-19",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-2",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-20",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-21",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-22",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-23",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-24",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-25",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-26",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-27",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-28",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-29",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-3",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-30",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-31",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-32",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-33",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-34",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-35",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-36",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-37",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-4",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-5",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-6",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-7",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-8",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "header-9",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "history",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "instructions",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-1",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-10",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-11",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-12",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-13",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-14",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-15",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-16",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-17",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-18",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-19",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-2",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-20",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-21",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-22",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-23",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-24",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-25",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-26",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-27",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-28",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-29",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-3",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-30",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-31",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-32",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-33",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-34",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-35",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-36",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-37",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-38",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-39",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-4",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-40",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-41",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-42",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-43",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-44",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-45",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-46",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-47",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-48",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-49",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-5",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-50",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-51",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-52",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-53",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-54",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-55",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-56",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-57",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-58",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-59",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-6",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-60",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-61",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-62",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-63",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-64",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-65",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-66",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-67",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-68",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-69",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-7",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-70",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-8",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "links-9",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "map",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    },
+    {
+      "stage": "start",
+      "ok": true,
+      "AnewViolations": 0,
+      "B": true,
+      "Hfindings": 0,
+      "I": true
+    }
+  ],
+  "final": {
+    "HEAD": "980cb29312b8701f5ea639278f44e1a57a6e5c02",
+    "A": {
+      "historicalOffenders": [
+        "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+        "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"
+      ],
+      "historicalEqual": true,
+      "newWorkingViolations": [],
+      "ok": true
+    },
+    "B": {
+      "rows": [
+        {
+          "path": "scripts/generate-doc-inventory.mjs",
+          "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+          "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+        },
+        {
+          "path": "scripts/doc-inventory-artifact.mjs",
+          "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+          "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+        },
+        {
+          "path": "scripts/generate-shipped-path-inventory.mjs",
+          "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+          "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.mjs",
+          "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+          "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+        },
+        {
+          "path": "scripts/lib/is-main-module.mjs",
+          "expected": "680570946fa1381474900c9192795514b5b88f48",
+          "actual": "680570946fa1381474900c9192795514b5b88f48"
+        }
+      ],
+      "ok": true
+    },
+    "H": {
+      "findings": [],
+      "counts": {
+        "files": 608,
+        "byStatus": {
+          "promoted": 3,
+          "candidate": 213,
+          "legacy-current": 0,
+          "non-authority": 1,
+          "unrouted": 391
+        },
+        "exemptUnrouted": 302,
+        "checked": 216,
+        "findings": 0,
+        "byType": {}
+      }
+    },
+    "I": {
+      "equal": true,
+      "links": [
+        "docs/platform/**",
+        "docs/platform/<area",
+        "docs/platform/README.md",
+        "docs/platform/packaging-distribution/README.md",
+        "docs/platform/packaging-distribution/vision.md"
+      ]
+    },
+    "method": "Working-tree A/B/H/I; unchanged native checker functions; include untracked docs explicitly. Historical A observations compared exactly, not waived or rebaselined.",
+    "ok": true
+  },
+  "candidateStatusCLI": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-doc-candidate-status.mjs --strict --json",
+    "exit": 0,
+    "counts": {
+      "files": 608,
+      "byStatus": {
+        "promoted": 3,
+        "candidate": 213,
+        "legacy-current": 0,
+        "non-authority": 1,
+        "unrouted": 391
+      },
+      "exemptUnrouted": 302,
+      "checked": 216,
+      "findings": 0,
+      "byType": {}
+    },
+    "findings": []
+  },
+  "promotion": {
+    "canonicalDocuments": 159,
+    "complete": 159,
+    "headerless": 0,
+    "headeredIncomplete": 0,
+    "headeredDocuments": 159,
+    "evidencePayloads": 302,
+    "headerlessPaths": [],
+    "missingByField": {
+      "Document type": 0,
+      "Audience": 0,
+      "Purpose": 0,
+      "Design status": 0,
+      "Implementation": 0,
+      "Provenance": 0,
+      "Writer type": 0,
+      "Canonical for": 0,
+      "Use this when": 0,
+      "Do not use this for": 0,
+      "Last reviewed": 0,
+      "Related": 0,
+      "Supersedes": 0,
+      "Superseded by": 0
+    },
+    "incomplete": []
+  },
+  "linkAnchorFindings": [],
+  "gitDiffCheck": {
+    "exit": 0
+  },
+  "note": "All gates/checkers/baselines unchanged. A retains its eight historical observations exactly; no new violations. Full npm suite and native committed-tree D/E not claimed."
+}

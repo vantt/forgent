@@ -10,6 +10,14 @@ Related:
 - docs/platform/work-state/README.md
 - docs/platform/work-state/spec.md
 - docs/platform/work-state/history/multi-role-harness-distill-record.md
+Implementation: Carried source material; current implementation truth unverified
+Provenance: Retained work-state candidate carriage from docs/specs/work-state.md; existing Related references retained
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: None; historical evidence
+Use this when: Hold the retired architecture decision records (ADR 0002 to 0032) of the work state area, relocated verbatim from the legacy work-state spec
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Provenance Of Retired Decisions

@@ -13,6 +13,14 @@ Last reviewed: 2026-09-21
 Related:
 - docs/platform/host-invocation-routing/architecture/release-boundaries.md
 - docs/platform/host-invocation-routing/verification/compatibility-harness.md
+Implementation: Published preview installed/default proof plus open stable graduation
+Provenance: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Preserve the proof gate for the distributable Rust CLI host; authority follows transitional switchboard
+Use this when: Preserve the proof gate for the distributable Rust CLI host
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 Added in candidate — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
@@ -83,4 +91,4 @@ Post-release CI: 35498322149, success, including external consumer proof
 | release boundaries | [../architecture/release-boundaries.md](../architecture/release-boundaries.md) |
 | compatibility harness | [compatibility-harness.md](compatibility-harness.md) |
 | release manifest contract | [../../packaging-distribution/contracts/release-manifest.md](../../packaging-distribution/contracts/release-manifest.md) |
-| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
+| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md) |

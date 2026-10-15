@@ -15,6 +15,14 @@ Related:
 - docs/architect/component-boundary/component-boundary-advisory.md
 - docs/architect/proposals/component-authority-boundary-map.md
 - docs/platform/README.md
+Implementation: Partial
+Provenance: Promoted anchor for docs/architect/component-boundary/**
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Track the whole-system component and authority boundary map; authority follows transitional switchboard
+Use this when: Track the whole-system component and authority boundary map
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Purpose
@@ -35,9 +43,9 @@ The current detailed source remains:
 
 | Source | Role |
 | --- | --- |
-| [../architect/component-boundary/README.md](../architect/component-boundary/README.md) | Reading portal for the existing component-boundary architecture package. |
-| [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) | Advisory map of components, bounded contexts, and authority boundaries. |
-| [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) | Draft authority map with parent/child and dependency vocabulary. |
+| [../architect/component-boundary/README.md](component-boundary.md) | Reading portal for the existing component-boundary architecture package. |
+| [../architect/component-boundary/component-boundary-advisory.md](component-boundary.md) | Advisory map of components, bounded contexts, and authority boundaries. |
+| [../architect/proposals/component-authority-boundary-map.md](proposals/component-authority-boundary-map.md) | Draft authority map with parent/child and dependency vocabulary. |
 
 Until this anchor is fully promoted, use those sources for detail and update this file as the stable entry point.
 
@@ -59,19 +67,19 @@ This table is a compact navigation surface, not a full replacement for the advis
 
 | Component | Current role | Current source |
 | --- | --- | --- |
-| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gates. Does not own stage or sequencing (owned by Workflow runner). Owns worker slots (`OccupancyPort`), and fail-safe claim settlement (`fgos return --to blocked`). | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |
-| Workflow (Định nghĩa + Run + Runner + Tích hợp) | Domain-neutral step & Unit DAG scheduling (`src/workflow/**`), human review gates, pure git integration. Single sequencer for plans, workflows, and multi-unit tasks. | [../specs/runner.md](../specs/runner.md) |
-| Execution Core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture) | Single authority for "ai làm / model / persona / cơ chế" (`src/runner/execution/bind.mjs`), single run door for new work (`fgos run` via `src/runner/execution/run.mjs`, herdr pane default, cli fallback), OS confinement posture for both herdr and cli, verifiable mutating gate. Strictly forbids L3 Work lifecycle dependencies (`src/state/**`). | [../specs/runner.md](../specs/runner.md) |
-| Collaboration Patterns (Execution Core) | Domain-neutral small collaboration loops (`solo`, `reviewed`, `panel`) and presets (`consult`, `research-fan-out`, `rfc`). Replaces retired coordination engine. | [../specs/runner.md](../specs/runner.md) |
-| Herdr (Transport chính + Bề mặt quan sát) | Transport mặc định cho out-of-process runs, pane execution liveness, plugin `herdr-dashboard/` (TUI trong pane herdr + pick/pane supervisor; herdr nạp qua `herdr-plugin.toml`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |
-| fgos Gateway | Tiến trình detached duy nhất phục vụ REST API (`/v1`, hợp đồng CTR010), MCP `search`/`execute` trên cùng cổng, và bundle web dashboard nhúng sẵn (`apps/fgos-gateway/`: `gateway.rs`, `mcp.rs`, `cf_access.rs`, `remote_invocation.rs`, `web/`). Vòng đời duy nhất qua `fgos gateway start\|status\|stop`; không phải một phần của herdr và không phải "herdr-gateway" (tên đó chỉ repo tham chiếu ngoài). Dùng chung với `herdr-dashboard` lớp adapter CLI fgos tại `packages/herdr-fgos-common/rust` (`fgos.rs`, `settings.rs`, trait `WorkItemSource`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |
-| Dispatch Transport & Confinement | Machine backend registry, isolation confinement (`bwrap` v1 driver, attestation storage, fail-closed probes), executor adapters; the `bwrap` driver calls the credential renewal module at provisioning (`copyCredentialFiles`, the write-back marker) and removing a private home (`confinement/cleanup.mjs`) calls it again for write-back (dependency confinement → provider capacity, for the account lock only). | [../specs/confinement-authority.md](../specs/confinement-authority.md) |
-| Run Result Evaluator | Evidence/confidence boundary for assignment run results. | [../architect/agent-coordination/architecture/evidence-and-results.md](../architect/agent-coordination/architecture/evidence-and-results.md) |
+| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gates. Does not own stage or sequencing (owned by Workflow runner). Owns worker slots (`OccupancyPort`), and fail-safe claim settlement (`fgos return --to blocked`). | [../architect/component-boundary/component-boundary-advisory.md](component-boundary.md) |
+| Workflow (Định nghĩa + Run + Runner + Tích hợp) | Domain-neutral step & Unit DAG scheduling (`src/workflow/**`), human review gates, pure git integration. Single sequencer for plans, workflows, and multi-unit tasks. | [../specs/runner.md](runner/README.md) |
+| Execution Core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture) | Single authority for "ai làm / model / persona / cơ chế" (`src/runner/execution/bind.mjs`), single run door for new work (`fgos run` via `src/runner/execution/run.mjs`, herdr pane default, cli fallback), OS confinement posture for both herdr and cli, verifiable mutating gate. Strictly forbids L3 Work lifecycle dependencies (`src/state/**`). | [../specs/runner.md](runner/README.md) |
+| Collaboration Patterns (Execution Core) | Domain-neutral small collaboration loops (`solo`, `reviewed`, `panel`) and presets (`consult`, `research-fan-out`, `rfc`). Replaces retired coordination engine. | [../specs/runner.md](runner/README.md) |
+| Herdr (Transport chính + Bề mặt quan sát) | Transport mặc định cho out-of-process runs, pane execution liveness, plugin `herdr-dashboard/` (TUI trong pane herdr + pick/pane supervisor; herdr nạp qua `herdr-plugin.toml`). | [../specs/herdr-web-dashboard.md](herdr-web-dashboard/spec.md) |
+| fgos Gateway | Tiến trình detached duy nhất phục vụ REST API (`/v1`, hợp đồng CTR010), MCP `search`/`execute` trên cùng cổng, và bundle web dashboard nhúng sẵn (`apps/fgos-gateway/`: `gateway.rs`, `mcp.rs`, `cf_access.rs`, `remote_invocation.rs`, `web/`). Vòng đời duy nhất qua `fgos gateway start\|status\|stop`; không phải một phần của herdr và không phải "herdr-gateway" (tên đó chỉ repo tham chiếu ngoài). Dùng chung với `herdr-dashboard` lớp adapter CLI fgos tại `packages/herdr-fgos-common/rust` (`fgos.rs`, `settings.rs`, trait `WorkItemSource`). | [../specs/herdr-web-dashboard.md](herdr-web-dashboard/spec.md) |
+| Dispatch Transport & Confinement | Machine backend registry, isolation confinement (`bwrap` v1 driver, attestation storage, fail-closed probes), executor adapters; the `bwrap` driver calls the credential renewal module at provisioning (`copyCredentialFiles`, the write-back marker) and removing a private home (`confinement/cleanup.mjs`) calls it again for write-back (dependency confinement → provider capacity, for the account lock only). | [../specs/confinement-authority.md](agent-confinement/README.md) |
+| Run Result Evaluator | Evidence/confidence boundary for assignment run results. | [../architect/agent-coordination/architecture/evidence-and-results.md](agent-coordination/README.md) |
 | Domain Components And Extension Layer | Domain-specific behavior, workflows, skills, task specs, doctrine. L2 prose no longer picks executors or mechanisms (lớp matching L2 cũ đã thu hồi per 0048); thin driver `fgos-run` delegates directly to Workflow runner and P1 Execution Core. | [../../domains/](../../domains/), [../architect/domainization/](../architect/domainization/) |
 | Host And Surface Layer | CLI, fgos Gateway (REST/MCP/web), `herdr-dashboard` plugin and other Herdr surfaces into platform engines. | Host invocation and gateway docs |
 | Packaging-Distribution | Runtime packaging, install, activation, setup/doctor readiness. | [packaging-distribution/README.md](packaging-distribution/README.md) |
 | Knowledge, Learning, And Documentation Registry | Retrospective learning, doc registry, end-user docs index, trace/evolve signals. | Knowledge and docs registry docs |
-| Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](../specs/observe.md) |
+| Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](observe/README.md) |
 | Convention (Executable Names & Placement) | Platform-core authority for deterministic artifact names, repository-relative placement, path classification, and conformance checking. Implemented; owns no state and depends only on `fgos-host-runtime`. | [convention/spec.md](convention/spec.md) |
 ## 5. How To Change
 
@@ -86,10 +94,10 @@ This table is a compact navigation surface, not a full replacement for the advis
 | Relationship | File |
 | --- | --- |
 | platform portal | [README.md](README.md) |
-| detailed component-boundary source | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |
-| draft authority map | [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) |
+| detailed component-boundary source | [../architect/component-boundary/component-boundary-advisory.md](component-boundary.md) |
+| draft authority map | [../architect/proposals/component-authority-boundary-map.md](proposals/component-authority-boundary-map.md) |
 | packaging-distribution area | [packaging-distribution/README.md](packaging-distribution/README.md) |
-| observe component | [../specs/observe.md](../specs/observe.md) |
+| observe component | [../specs/observe.md](observe/README.md) |
 
 ## Added in candidate: component-boundary-advisory source carriage
 
@@ -102,7 +110,7 @@ Design status: Discussion / Visionary advisory
 Implementation: N/A
 Last reviewed: 2026-09-01
 Canonical for: nothing; architectural advisory only
-Related: [Architecture Map](../architecture-map.md), [System Overview](../specs/system-overview.md), [Platform Foundations](../platform-foundations.md), [Domainization Architecture](../architect/domainization/README.md), [Agent Coordination Foundation Vision](../architect/agent-coordination/vision.md), [Concept Relationships](../architect/agent-coordination/vocabulary/concept-relationships.md), [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md), [Protocol Model](../architect/agent-coordination/architecture/protocol-model.md), [CoordinationSession Contract](../architect/agent-coordination/contracts/coordination-session.md), [FlowDefinition Contract](../architect/agent-coordination/contracts/flow-definition.md)
+Related: [Architecture Map](architecture-map.md), [System Overview](system-overview/spec.md), [Platform Foundations](platform-foundations.md), [Domainization Architecture](domainization/architecture/domainization.md), [Agent Coordination Foundation Vision](agent-coordination/README.md), [Concept Relationships](agent-coordination/README.md), [Dispatch Control Plane](agent-coordination/README.md), [Protocol Model](agent-coordination/README.md), [CoordinationSession Contract](agent-coordination/history/retired-engine/files/contracts/coordination-session.md), [FlowDefinition Contract](agent-coordination/history/retired-engine/files/contracts/flow-definition.md)
 
 #### 1. Purpose
 
@@ -234,14 +242,14 @@ table below is the management view for the whole system.
 
 | Component | Role | Internal boundaries | Owning / reference documents |
 |---|---|---|---|
-| Work Lifecycle Engine | fgOS component that owns domain-agnostic Work-unit management: item identity, status, stage, claim/return, related info, context, documents, questions, and Work verbs. It may use Agent Coordination for selected operations, but Agent Coordination never owns this lifecycle. | Work item state machine, domain-agnostic stage/status, claim/return ownership, related refs, context/document refs, human gates. | [Work-State Spec](../specs/work-state.md), [Work Item Lifecycle Vision](../work-item-lifecycle-vision.md), [System Overview](../specs/system-overview.md) |
-| Collaboration Patterns & Workflow Runner | Domain-neutral collaboration runtime (replaces retired Agent Coordination Engine per P4). Owns Workflow step DAG scheduling and small collaboration pattern loops (`solo`, `reviewed`, `panel`). | Workflow runner, Unit DAG scheduling, CollaborationPattern presets (`consult`, `research-fan-out`, `rfc`). | [Runner Spec](../specs/runner.md), [Platform Component Boundary](component-boundary.md) |
-| Dispatch And Execution Engine | Governed execution of one approved Assignment. It chooses the allowed executor/provider/model/tier/mechanism and supervises the Run. | dispatch policy resolver, executor registry, governance/egress, DispatchPlan, Run creation, launch/timeout/cancel/retry, executor adapters. | [Runner Spec](../specs/runner.md), [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md), [Assignment/Run/RunResult Contract](../architect/agent-coordination/contracts/assignment-run-runresult.md) |
-| Run Result Evaluator | Truth boundary for one Assignment Run. It turns the Assignment contract, Run settlement, worker claim, artifacts, and evidence into a RunResult confidence decision. | worker result parser, evidence collectors, freshness checks, artifact refs/store, confidence evaluator, RunResult normalizer. | [Evidence And Results](../architect/agent-coordination/architecture/evidence-and-results.md), [Assignment/Run/RunResult Contract](../architect/agent-coordination/contracts/assignment-run-runresult.md), [Runner Spec](../specs/runner.md) |
-| Domain Components And Extension Layer | Domain packages and smaller extension packages that use the engines while owning domain-specific behavior. A domain package may be large enough to have its own core and sub-workflows. | Coding Domain Component, Marketing Domain Component, Workflow definitions, TaskSpecs, Skills, domain harnesses, org policy/persona/tier preferences, evidence policy adapters. | [Domainization Architecture](../architect/domainization/README.md), [System Overview](../specs/system-overview.md), [Work Item Lifecycle Vision](../work-item-lifecycle-vision.md), `domains/<domain>/AGENTS.md`, `domains/<domain>/manifest.yaml`, `domains/<domain>/workflows/` |
-| Host And Surface Layer | Inbound/outbound surfaces and operator visibility. It translates CLI/API/plugin/dashboard/webhook/chat/Herdr interactions into calls against the engines, without becoming lifecycle or evidence truth. | CLI/API/plugin adapters, Herdr/dashboard visibility, host adapters, surface auth, command/API envelopes. | [fgOS Plugin Spec](../specs/fgos-plugin.md), [Herdr Web Dashboard Spec](../specs/herdr-web-dashboard.md), [Visibility And Herdr](../architect/agent-coordination/architecture/visibility-and-herdr.md), [IO Contract](../io-contract.md) |
-| Setup, Doctor, And Distribution Health | Platform support component that owns install shape, config defaults, health checks, repair posture, and global/project precedence. | setup config merge, doctor check registry, distribution packaging, shell integration, dependency/default discoverability. | [Distribution Spec](../specs/distribution.md), [Distribution Vision](../distribution-vision.md), [Reading Map setup entries](../specs/reading-map.md) |
-| Knowledge, Learning, And Documentation Registry | Lifecycle-adjacent learning component that owns retrospective knowledge, doc/topic registry, end-user document indexing, trace, and evolve signals. | knowledge registry, doc registry, Diataxis index, item trace, friction/outcome learning, evolve candidates. | [Enduser Docs Authoring Spec](../specs/enduser-docs-authoring.md), [Enduser Docs Index Spec](../specs/enduser-docs-index.md), [System Overview](../specs/system-overview.md) |
+| Work Lifecycle Engine | fgOS component that owns domain-agnostic Work-unit management: item identity, status, stage, claim/return, related info, context, documents, questions, and Work verbs. It may use Agent Coordination for selected operations, but Agent Coordination never owns this lifecycle. | Work item state machine, domain-agnostic stage/status, claim/return ownership, related refs, context/document refs, human gates. | [Work-State Spec](work-state/README.md), [Work Item Lifecycle Vision](../work-item-lifecycle-vision.md), [System Overview](system-overview/spec.md) |
+| Collaboration Patterns & Workflow Runner | Domain-neutral collaboration runtime (replaces retired Agent Coordination Engine per P4). Owns Workflow step DAG scheduling and small collaboration pattern loops (`solo`, `reviewed`, `panel`). | Workflow runner, Unit DAG scheduling, CollaborationPattern presets (`consult`, `research-fan-out`, `rfc`). | [Runner Spec](runner/README.md), [Platform Component Boundary](component-boundary.md) |
+| Dispatch And Execution Engine | Governed execution of one approved Assignment. It chooses the allowed executor/provider/model/tier/mechanism and supervises the Run. | dispatch policy resolver, executor registry, governance/egress, DispatchPlan, Run creation, launch/timeout/cancel/retry, executor adapters. | [Runner Spec](runner/README.md), [Dispatch Control Plane](agent-coordination/README.md), [Assignment/Run/RunResult Contract](agent-coordination/README.md) |
+| Run Result Evaluator | Truth boundary for one Assignment Run. It turns the Assignment contract, Run settlement, worker claim, artifacts, and evidence into a RunResult confidence decision. | worker result parser, evidence collectors, freshness checks, artifact refs/store, confidence evaluator, RunResult normalizer. | [Evidence And Results](agent-coordination/README.md), [Assignment/Run/RunResult Contract](agent-coordination/README.md), [Runner Spec](runner/README.md) |
+| Domain Components And Extension Layer | Domain packages and smaller extension packages that use the engines while owning domain-specific behavior. A domain package may be large enough to have its own core and sub-workflows. | Coding Domain Component, Marketing Domain Component, Workflow definitions, TaskSpecs, Skills, domain harnesses, org policy/persona/tier preferences, evidence policy adapters. | [Domainization Architecture](domainization/architecture/domainization.md), [System Overview](system-overview/spec.md), [Work Item Lifecycle Vision](../work-item-lifecycle-vision.md), `domains/<domain>/AGENTS.md`, `domains/<domain>/manifest.yaml`, `domains/<domain>/workflows/` |
+| Host And Surface Layer | Inbound/outbound surfaces and operator visibility. It translates CLI/API/plugin/dashboard/webhook/chat/Herdr interactions into calls against the engines, without becoming lifecycle or evidence truth. | CLI/API/plugin adapters, Herdr/dashboard visibility, host adapters, surface auth, command/API envelopes. | [fgOS Plugin Spec](claude-plugin/spec.md), [Herdr Web Dashboard Spec](herdr-web-dashboard/spec.md), [Visibility And Herdr](agent-coordination/README.md), [IO Contract](work-state/contracts/cli-io-contract.md) |
+| Setup, Doctor, And Distribution Health | Platform support component that owns install shape, config defaults, health checks, repair posture, and global/project precedence. | setup config merge, doctor check registry, distribution packaging, shell integration, dependency/default discoverability. | [Distribution Spec](packaging-distribution/README.md), [Distribution Vision](../distribution-vision.md), [Reading Map setup entries](../specs/reading-map.md) |
+| Knowledge, Learning, And Documentation Registry | Lifecycle-adjacent learning component that owns retrospective knowledge, doc/topic registry, end-user document indexing, trace, and evolve signals. | knowledge registry, doc registry, Diataxis index, item trace, friction/outcome learning, evolve candidates. | [Enduser Docs Authoring Spec](../specs/enduser-docs-authoring.md), [Enduser Docs Index Spec](../specs/enduser-docs-index.md), [System Overview](system-overview/spec.md) |
 
 The collaboration shape should stay:
 
@@ -384,17 +392,17 @@ re-derive it privately.
 
 | Existing contract or rule | Primary owner | Important consumers | Ownership note |
 |---|---|---|---|
-| [Workflow Stage Operation Contract](../architect/agent-coordination/contracts/workflow-stage-operation.md) | Domain Components And Extension Layer, as consumed by Work Lifecycle Engine | Agent Coordination Engine, Assignment Builder | Owns declared domain Work-stage operation normalization and compatibility. Coding Feature Workflow and Bugfix Workflow are coding-domain subcomponents, not Agent Coordination core. |
-| [FlowDefinition Contract](../architect/agent-coordination/contracts/flow-definition.md) | Domain Components And Extension Layer, with validation consumed by Agent Coordination Engine | Team Cognition Engine, Work Lifecycle Engine, Dispatch/Execution | Owns schema/IR for graph, roles, actors, operations, profiles, and declared policy hints. It should not own runtime state, executor choice, or evidence truth. |
-| [CoordinationSession Contract](../architect/agent-coordination/contracts/coordination-session.md) | Agent Coordination Engine | Team Cognition Engine, Dispatch/Execution, Run Result Evaluator, Work Lifecycle Engine | Owns session manifest, event stream, assignment membership, aggregate bounds, topology state, and recovery. It should reference Assignment/Run/RunResult records, not duplicate them. |
-| Assignment section of [Assignment, Run, And RunResult Contract](../architect/agent-coordination/contracts/assignment-run-runresult.md) | Agent Coordination Engine / Assignment Builder | Domain Components And Extension Layer, Domain Harnesses, Dispatch/Execution | Owns immutable semantic request shape and provenance. It should freeze mutation/evidence/budget/policy inputs before dispatch. |
-| Run section of [Assignment, Run, And RunResult Contract](../architect/agent-coordination/contracts/assignment-run-runresult.md) | Dispatch And Execution Engine | Run Result Evaluator, Host/Surface, Agent Coordination Engine | Owns one concrete attempt and its resolved DispatchPlan/mechanism metadata. It should not become semantic task identity. |
-| RunResult and Confidence sections of [Assignment, Run, And RunResult Contract](../architect/agent-coordination/contracts/assignment-run-runresult.md) | Run Result Evaluator | Agent Coordination Engine, Work Lifecycle Engine, Team Cognition Engine | Owns normalized outcome, confidence, accepted/rejected evidence, and failure classification. It should not authorize lifecycle mutation. |
-| [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md) | Dispatch And Execution Engine | Agent Coordination Engine, Domain Components And Extension Layer, Host/Surface | Owns executor/provider/model/tier/mechanism/adapter/governance resolution. It should not choose semantic operations or interpret success. |
-| [Evidence And Result Architecture](../architect/agent-coordination/architecture/evidence-and-results.md) | Run Result Evaluator | Dispatch/Execution, Agent Coordination Engine, Work Lifecycle Engine, Domain Components And Extension Layer | Owns confidence boundaries, evidence freshness, and false-success rules. Adapters and domain evidence policy should feed it evidence, not replace it. |
-| [Work Integration Boundaries](../architect/agent-coordination/architecture/work-integration.md) | Work Lifecycle Engine | Agent Coordination Engine, Domain Components And Extension Layer, Run Result Evaluator | Owns the rule that only Work verbs move domain-agnostic Work lifecycle state. Domain-specific lifecycle effects such as coding merge/technical approval belong to the relevant domain component. Sessions and RunResults may inform drivers only. |
-| [Visibility And Herdr](../architect/agent-coordination/architecture/visibility-and-herdr.md) | Host And Surface Layer | Dispatch/Execution, Run Result Evaluator, Agent Coordination Engine | Owns observation and operator visibility. It must consume canonical Run/RunResult state where possible and must not become truth. |
-| [ADR-007 Domain Harness Seam](../architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md) | Domain Components And Extension Layer | Assignment Builder, Agent Coordination Engine, Work Lifecycle Engine | Owns domain-specific enrichment/rejection before normalization. It may add constraints/evidence/policy hints, but may not dispatch or mutate lifecycle. |
+| [Workflow Stage Operation Contract](agent-coordination/README.md) | Domain Components And Extension Layer, as consumed by Work Lifecycle Engine | Agent Coordination Engine, Assignment Builder | Owns declared domain Work-stage operation normalization and compatibility. Coding Feature Workflow and Bugfix Workflow are coding-domain subcomponents, not Agent Coordination core. |
+| [FlowDefinition Contract](agent-coordination/history/retired-engine/files/contracts/flow-definition.md) | Domain Components And Extension Layer, with validation consumed by Agent Coordination Engine | Team Cognition Engine, Work Lifecycle Engine, Dispatch/Execution | Owns schema/IR for graph, roles, actors, operations, profiles, and declared policy hints. It should not own runtime state, executor choice, or evidence truth. |
+| [CoordinationSession Contract](agent-coordination/history/retired-engine/files/contracts/coordination-session.md) | Agent Coordination Engine | Team Cognition Engine, Dispatch/Execution, Run Result Evaluator, Work Lifecycle Engine | Owns session manifest, event stream, assignment membership, aggregate bounds, topology state, and recovery. It should reference Assignment/Run/RunResult records, not duplicate them. |
+| Assignment section of [Assignment, Run, And RunResult Contract](agent-coordination/README.md) | Agent Coordination Engine / Assignment Builder | Domain Components And Extension Layer, Domain Harnesses, Dispatch/Execution | Owns immutable semantic request shape and provenance. It should freeze mutation/evidence/budget/policy inputs before dispatch. |
+| Run section of [Assignment, Run, And RunResult Contract](agent-coordination/README.md) | Dispatch And Execution Engine | Run Result Evaluator, Host/Surface, Agent Coordination Engine | Owns one concrete attempt and its resolved DispatchPlan/mechanism metadata. It should not become semantic task identity. |
+| RunResult and Confidence sections of [Assignment, Run, And RunResult Contract](agent-coordination/README.md) | Run Result Evaluator | Agent Coordination Engine, Work Lifecycle Engine, Team Cognition Engine | Owns normalized outcome, confidence, accepted/rejected evidence, and failure classification. It should not authorize lifecycle mutation. |
+| [Dispatch Control Plane](agent-coordination/README.md) | Dispatch And Execution Engine | Agent Coordination Engine, Domain Components And Extension Layer, Host/Surface | Owns executor/provider/model/tier/mechanism/adapter/governance resolution. It should not choose semantic operations or interpret success. |
+| [Evidence And Result Architecture](agent-coordination/README.md) | Run Result Evaluator | Dispatch/Execution, Agent Coordination Engine, Work Lifecycle Engine, Domain Components And Extension Layer | Owns confidence boundaries, evidence freshness, and false-success rules. Adapters and domain evidence policy should feed it evidence, not replace it. |
+| [Work Integration Boundaries](agent-coordination/README.md) | Work Lifecycle Engine | Agent Coordination Engine, Domain Components And Extension Layer, Run Result Evaluator | Owns the rule that only Work verbs move domain-agnostic Work lifecycle state. Domain-specific lifecycle effects such as coding merge/technical approval belong to the relevant domain component. Sessions and RunResults may inform drivers only. |
+| [Visibility And Herdr](agent-coordination/README.md) | Host And Surface Layer | Dispatch/Execution, Run Result Evaluator, Agent Coordination Engine | Owns observation and operator visibility. It must consume canonical Run/RunResult state where possible and must not become truth. |
+| [ADR-007 Domain Harness Seam](agent-coordination/README.md) | Domain Components And Extension Layer | Assignment Builder, Agent Coordination Engine, Work Lifecycle Engine | Owns domain-specific enrichment/rejection before normalization. It may add constraints/evidence/policy hints, but may not dispatch or mutate lifecycle. |
 | Domain manifest and workflow declarations (`domains/<domain>/manifest.yaml`, `workflows/*.yaml`) | Domain Components And Extension Layer | Work Lifecycle Engine, Agent Coordination Engine, Assignment Builder, Dispatch And Execution Engine | Own stage vocabulary, legal operations, stage skill/taskSpec mapping, workflow selection, and domain policy hints. Other components read them; they do not reinterpret them. |
 | Domain task-specs (`domains/<domain>/task-specs/*.md`) | Domain Components And Extension Layer | Agent Coordination Engine, Assignment Builder, Skills, Run Result Evaluator | Own executable contract, collaboration triggers, required skill/agent hints, expected outputs, gates, and return shape for an operation. They are not runtime state and should not choose executor transport. |
 | Domain skills (`domains/<domain>/skills/*` or `.agents/skills/*`) | Domain Components And Extension Layer | Executors, Assignment Builder, Host/Surface | Own operational know-how for an executor. They must not silently replace task-spec authority, domain workflow legality, dispatch policy, or Work lifecycle verbs. |
@@ -437,7 +445,7 @@ checks rather than standalone modules.
 | Bugfix Workflow | Domain subcomponent | Coding Domain Component | Bugfix-specific stages such as reproduce/diagnose/fix/verify/review, operations, TaskSpecs, Skills, and verification doctrine. | Feature-specific planning semantics, generic Work state engine, direct executor launch. |
 | Stage Operation Choice | Authority boundary | Work Lifecycle Engine, interpreting Domain workflow declarations | Select the next legal operation for the current Work stage from declared domain workflow operations and current evidence signals. | Declaring new operations, choosing concrete executor/provider/model, computing RunResult confidence. |
 | Execution Contract / Assignment Builder | Authority boundary | Agent Coordination Engine | Convert declared operation or validated inline contract into immutable Assignment snapshot with provenance, mutation, evidence, budget, role, and policy inputs. | Dispatch target choice, retry lifecycle, Work mutation. |
-| Dispatch Control Plane | Bounded context + authority boundary | Dispatch And Execution Engine | Resolve Assignment policy into DispatchPlan: executor, provider, model, tier, mechanism, adapter, governance, egress. Routes on exactly two identities, capability and executor-id — see the canonical [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md) doc for the accepted DispatchRequest/PolicyPatch/DispatchPlan contracts and component-internal ownership list. | Choosing semantic operation, interpreting task success, mutating lifecycle. |
+| Dispatch Control Plane | Bounded context + authority boundary | Dispatch And Execution Engine | Resolve Assignment policy into DispatchPlan: executor, provider, model, tier, mechanism, adapter, governance, egress. Routes on exactly two identities, capability and executor-id — see the canonical [Dispatch Control Plane](agent-coordination/README.md) doc for the accepted DispatchRequest/PolicyPatch/DispatchPlan contracts and component-internal ownership list. | Choosing semantic operation, interpreting task success, mutating lifecycle. |
 | Execution Adapters | Adapter boundary | Dispatch And Execution Engine | Deliver one approved Run through CLI, Herdr, MCP, API, or future native mechanism. | Policy decision, evidence confidence, Work state. |
 | Run Runtime | Authority boundary | Dispatch And Execution Engine | One attempt, settlement, timeout, cancellation, retry boundary, process/transport metadata. | Semantic task identity, evidence truth, lifecycle progression. |
 | Run Result Evaluation | Bounded context + authority boundary | Run Result Evaluator | Parse worker claim, collect/validate artifacts, compute confidence, produce RunResult. | Launching executors, choosing providers, approving Work. |
@@ -1166,7 +1174,7 @@ dispatch/execution, result evaluation, host surfaces, setup/doctor/distribution,
 gateway/Herdr, learning, and runtime implementation boundaries.
 
 For the domain-specific split itself, read
-[Domainization Architecture](../architect/domainization/README.md). This folder keeps the
+[Domainization Architecture](domainization/architecture/domainization.md). This folder keeps the
 whole-system component map; domainization is the deep dive for the Domain
 Components And Extension Layer.
 
@@ -1174,11 +1182,11 @@ Components And Extension Layer.
 
 Read boundary before layout:
 
-1. [Component Boundary Advisory](../architect/component-boundary/component-boundary-advisory.md)
-2. [Repo Layout Vision](../architect/component-boundary/repo-layout-vision.md)
-3. [Host Invocation And Provider Routing](../architect/host-invocation-routing/host-invocation-provider-routing.md)
-4. [Node To Rust Component Migration](../architect/host-invocation-routing/node-to-rust-component-migration.md)
-5. [Packaging And Distribution Architecture](../architect/packaging-distribution/README.md)
+1. [Component Boundary Advisory](component-boundary.md)
+2. [Repo Layout Vision](component-boundary.md)
+3. [Host Invocation And Provider Routing](host-invocation-routing/README.md)
+4. [Node To Rust Component Migration](host-invocation-routing/README.md)
+5. [Packaging And Distribution Architecture](packaging-distribution/README.md)
 
 The first document answers:
 
@@ -1235,7 +1243,7 @@ should not create authority by convenience of file location.
 
 ##### Component Boundary Advisory
 
-[component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) is the
+[component-boundary-advisory.md](component-boundary.md) is the
 vision document for component responsibility, bounded context, and authority
 boundary.
 
@@ -1257,11 +1265,11 @@ Use this document when deciding:
 For folder-level domain authoring shape, domain manifest/workflow files,
 domain-scoped doctrine, task-spec placement, skill/agent authoring sources, and
 domain-siloing enforcement, use
-[Domainization Architecture](../architect/domainization/README.md).
+[Domainization Architecture](domainization/architecture/domainization.md).
 
 ##### Repo Layout Vision
 
-[repo-layout-vision.md](../architect/component-boundary/repo-layout-vision.md) is the vision document for
+[repo-layout-vision.md](component-boundary.md) is the vision document for
 physical source layout.
 
 It describes the `apps/` plus `packages/` direction: apps are thin entrypoints
@@ -1278,7 +1286,7 @@ Use this document when deciding:
 
 ##### Host Invocation And Provider Routing
 
-[host-invocation-provider-routing.md](../architect/host-invocation-routing/host-invocation-provider-routing.md)
+[host-invocation-provider-routing.md](host-invocation-routing/README.md)
 defines the shared host invocation path and the Operation Provider Router.
 
 Use this document when deciding:
@@ -1291,7 +1299,7 @@ Use this document when deciding:
 
 ##### Node To Rust Component Migration
 
-[node-to-rust-component-migration.md](../architect/host-invocation-routing/node-to-rust-component-migration.md)
+[node-to-rust-component-migration.md](host-invocation-routing/README.md)
 records the migration shape for replacing Node harness internals with
 Rust components one boundary at a time while preserving the existing `fgos`
 surface.
@@ -1351,35 +1359,35 @@ settled decision is later extracted into the owning canonical document.
 
 ##### Canonical Architecture And Specs
 
-- [Architecture Map](../architecture-map.md) — structure/physics/authority
+- [Architecture Map](architecture-map.md) — structure/physics/authority
   map, component registry, and contract registry.
-- [System Overview](../specs/system-overview.md) — area map, shared
+- [System Overview](system-overview/spec.md) — area map, shared
   entities, actors, and cross-area flows.
-- [Platform Foundations](../platform-foundations.md) — locked platform laws
+- [Platform Foundations](platform-foundations.md) — locked platform laws
   and durability/DoD doctrine.
 - [Work Item Lifecycle Vision](../work-item-lifecycle-vision.md) — base
   workflow and coding-specific lifecycle mapping.
 - [Distribution Vision](../distribution-vision.md) — install/setup/doctor
   direction and config/default registration posture.
-- [Domainization Architecture](../architect/domainization/README.md) — core vs domain
+- [Domainization Architecture](domainization/architecture/domainization.md) — core vs domain
   authoring, resolver, doctrine, workflow, skill, task-spec, knowledge, and
   agent boundaries.
 
 ##### Related Agent Coordination Contracts
 
-- [Agent Coordination Portal](../architect/agent-coordination/README.md) — reading entry
+- [Agent Coordination Portal](agent-coordination/README.md) — reading entry
   for the Agent Coordination architecture set.
-- [Agent Coordination Foundation Vision](../architect/agent-coordination/vision.md) —
+- [Agent Coordination Foundation Vision](agent-coordination/README.md) —
   foundation/domain split, runtime contracts, and small-core constraints.
-- [System Context](../architect/agent-coordination/architecture/system-context.md) —
+- [System Context](agent-coordination/README.md) —
   boundaries, runtime profiles, and trust boundaries.
-- [Runtime Model](../architect/agent-coordination/architecture/runtime-model.md) —
+- [Runtime Model](agent-coordination/README.md) —
   assignment execution chain, invariants, and failure domains.
-- [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md)
+- [Dispatch Control Plane](agent-coordination/README.md)
   — executor/provider/model/tier/mechanism governance boundary.
-- [Evidence And Results](../architect/agent-coordination/architecture/evidence-and-results.md)
+- [Evidence And Results](agent-coordination/README.md)
   — RunResult confidence and evidence boundary.
-- [Work Integration](../architect/agent-coordination/architecture/work-integration.md) —
+- [Work Integration](agent-coordination/README.md) —
   Work lifecycle integration boundary.
 
 ## Added in candidate: repo-layout-vision source carriage

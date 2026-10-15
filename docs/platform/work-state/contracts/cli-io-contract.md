@@ -13,6 +13,14 @@ Related:
 - docs/platform/work-state/decisions/retired-decision-history.md
 - docs/specs/work-state.md
 - docs/io-contract.md
+Implementation: Carried source material; current implementation truth unverified
+Provenance: Retained work-state candidate carriage from docs/specs/work-state.md and docs/io-contract.md; existing Related references retained
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Owns the input and output contract of the fgOS CLI door and the stdout surface of fgos-runner: writer identity, envelope, exit codes, pagination, verb manifest and version tokens; authority follows transitional switchboard
+Use this when: Owns the input and output contract of the fgOS CLI door and the stdout surface of fgos-runner: writer identity, envelope, exit codes, pagination, verb manifest and version tokens
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Purpose And Scope
@@ -427,5 +435,5 @@ khoá, plan.md bốn lát).
 - [Work State portal](../README.md)
 - [Work State spec](../spec.md)
 - [Retired decision history](../decisions/retired-decision-history.md)
-- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)
-- [Legacy source: docs/io-contract.md](../../../io-contract.md)
+- [Legacy source: docs/specs/work-state.md](../README.md)
+- [Legacy source: docs/io-contract.md](cli-io-contract.md)

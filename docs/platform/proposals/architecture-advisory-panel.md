@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate proposal for the architecture-advisory use case, now served by core/workflows/architecture-advisory.yaml and core/skills/fgos-architecture-panel/SKILL.md. The original protocol was removed in 2180b4e72; its source Not started header is preserved as dated metadata. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](../../architect/proposals/architecture-advisory-panel.md).
+Source relationship: [original source](architecture-advisory-panel.md).
 
 
 Document type: Proposal
@@ -56,7 +56,7 @@ Implementation plan:
 
 ## 1. Why This Use Case Exists
 
-Architecture follow-up: [Coordination Capability Envelope](../../architect/proposals/coordination-capability-envelope.md)
+Architecture follow-up: [Coordination Capability Envelope](coordination-capability-envelope.md)
 compares the substrate alternatives after the independent review. Read it before
 turning this proposal's phase, round, or posture defaults into runtime legality.
 It remains Discussion; neither document accepts the other's proposed contracts.

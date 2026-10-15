@@ -15,6 +15,14 @@ Related:
 - docs/platform/platform-foundations.md
 - docs/platform/component-boundary.md
 - docs/doc-governance.md
+Implementation: Partial
+Provenance: Promoted from documentation-system discussion and existing area ledgers
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Preserve full platform intent across simplified implementation slices; authority follows transitional switchboard
+Use this when: Preserve full platform intent across simplified implementation slices
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Purpose
@@ -102,4 +110,4 @@ The remaining constitution deferrals are covered by existing entries: origin and
 | platform vision | [vision.md](vision.md) |
 | platform laws | [platform-foundations.md](platform-foundations.md) |
 | component boundary map | [component-boundary.md](component-boundary.md) |
-| documentation governance | [../doc-governance.md](../doc-governance.md) |
+| documentation governance | [../doc-governance.md](governance.md) |

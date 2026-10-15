@@ -14,6 +14,14 @@ Related:
 - docs/platform/host-invocation-routing/README.md
 - docs/platform/host-invocation-routing/vision.md
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
+Implementation: R1/R2/R3 implemented preview plus future host/component migrations
+Provenance: Promoted from docs/architect/host-invocation-routing/**
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Route readers through accepted and planned host-invocation architecture; authority follows transitional switchboard
+Use this when: Route readers through accepted and planned host-invocation architecture
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Documents

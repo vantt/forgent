@@ -10,6 +10,14 @@ Related:
 - docs/platform/work-state/README.md
 - docs/platform/work-state/spec.md
 - docs/specs/work-state.md
+Implementation: Carried source material; current implementation truth unverified
+Provenance: Retained work-state candidate carriage from docs/specs/work-state.md; existing Related references retained
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Module-to-responsibility pointers for the work state engine implementation; authority follows transitional switchboard
+Use this when: Module-to-responsibility pointers for the work state engine implementation
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 ## 1. Purpose And Scope
@@ -47,4 +55,4 @@ This document lists which implementation module owns which responsibility of the
 
 - [Work state area portal](../README.md)
 - [Work state spec](../spec.md)
-- [Legacy source: docs/specs/work-state.md](../../../specs/work-state.md)
+- [Legacy source: docs/specs/work-state.md](../README.md)

@@ -21,7 +21,7 @@ Superseded by: None
 
 Added in candidate: Candidate alternative recommendation using the surviving Assignment/Run execution substrate. The session engine cited by the source was removed in 2180b4e72; this envelope recommendation remains unaccepted. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.
 
-Source relationship: [original source](../../architect/proposals/coordination-capability-envelope.md).
+Source relationship: [original source](coordination-capability-envelope.md).
 
 
 Document type: Proposal
@@ -34,23 +34,23 @@ State class: State — current conceptual recommendation; independent review rem
 ## Reading context and authority
 
 Current investigation status and next steps:
-[Chat progress and handoff](../../architect/proposals/coordination-envelope-progress.md).
+[Chat progress and handoff](../agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md).
 
-Read [Reading Map](../../specs/reading-map.md), [Runner spec](../../specs/runner.md),
-[Agent Coordination Vision](../../architect/agent-coordination/vision.md),
-[Intent Preservation Ledger](../../architect/agent-coordination/intent-preservation-ledger.md), and
-[System Vision: Trong Mem Ngoai Cung](../../architect/system-vision-trong-mem-ngoai-cung.md) first.
+Read [Reading Map](../../specs/reading-map.md), [Runner spec](../runner/README.md),
+[Agent Coordination Vision](../agent-coordination/README.md),
+[Intent Preservation Ledger](../agent-coordination/README.md), and
+[System Vision: Trong Mem Ngoai Cung](../system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md) first.
 
 Inputs:
 
 - [Independent review, 2026-09-05](../../../plans/reports/review-260905-agent-coordination-trong-mem-ngoai-cung.md).
 - Repository source/contracts inspected on 2026-09-06.
-- [Foundation baseline](../../architect/agent-coordination/architecture/coordination-foundation-baseline.md),
-  [FlowDefinition contract](../../architect/agent-coordination/contracts/flow-definition.md),
-  [CoordinationSession contract](../../architect/agent-coordination/contracts/coordination-session.md).
-- [Raw master-coordination prompt](../../architect/agent-coordination/playbooks/prompts/master-coordinator.md),
-  [Architecture Advisory proposal](../../architect/proposals/architecture-advisory-panel.md), and
-  [Plan Loop proposal](../../architect/proposals/group-thinking-plan-loop.md).
+- [Foundation baseline](../agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md),
+  [FlowDefinition contract](../agent-coordination/history/retired-engine/files/contracts/flow-definition.md),
+  [CoordinationSession contract](../agent-coordination/history/retired-engine/files/contracts/coordination-session.md).
+- [Raw master-coordination prompt](../agent-coordination/README.md),
+  [Architecture Advisory proposal](architecture-advisory-panel.md), and
+  [Plan Loop proposal](../agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md).
 
 This is an architecture recommendation, not an accepted decision, implementation
 plan, or permission to change existing contracts. The structured debate below is
@@ -275,7 +275,7 @@ Reverse or narrow the recommendation if:
   fan-out rather than treating team size as a product achievement.
 
 The proposed threat model changes the accepted
-[Routing Handoff Contract](../../routing-handoff-contract.md). Acceptance requires
+[Routing Handoff Contract](../runner/contracts/routing-handoff.md). Acceptance requires
 explicit reconciliation/supersession of affected decisions and contracts, not
 silently relabeling existing same-user execution. No locked law is changed here.
 
@@ -412,7 +412,7 @@ implicitly introduced by this proposal.
 
 ## 10. Smallest experiments before implementation planning
 
-The [Minimal Probe Contract](../../architect/proposals/coordination-envelope-probe-contract.md) specifies
+The [Minimal Probe Contract](coordination-envelope-probe-contract.md) specifies
 the first Code Panel experiment, pass/fail evidence, substrate gaps, and boundaries
 with the concurrent Advisory track. As of 2026-09-06, that track records P00.1,
 P01.1, and P01.2 complete and is parked before P01.3. Its read-only executor

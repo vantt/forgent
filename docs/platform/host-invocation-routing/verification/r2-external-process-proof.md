@@ -13,6 +13,14 @@ Last reviewed: 2026-09-15
 Related:
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
 - docs/platform/host-invocation-routing/contracts/external-provider-manifest.md
+Implementation: Implemented preview (R2-P0 through R2-P5 closed 2026-09-15; R3, marketplace, signatures, and production WASM remain future work)
+Provenance: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: Candidate scope: Preserve the proof gate for external process provider preview; authority follows transitional switchboard
+Use this when: Preserve the proof gate for external process provider preview
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: None; legacy sources remain in place during migration
+Superseded by: None recorded
 ```
 
 Added in candidate — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
@@ -96,4 +104,4 @@ Marketplace, publisher trust, signature system, production WASM, and core-provid
 | provider manifest | [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
 | implementation alignment | [implementation-alignment.md](implementation-alignment.md) |
 | R1 proof | [r1-rust-host-proof.md](r1-rust-host-proof.md) |
-| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
+| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../README.md) |
