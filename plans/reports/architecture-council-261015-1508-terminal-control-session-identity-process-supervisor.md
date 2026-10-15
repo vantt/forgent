@@ -2,7 +2,7 @@
 
 - Ngày: 2026-10-15. Hội đồng đọc [research gốc](research-261015-1116-herdr-tab-pane-layout-and-naming.md) và phản biện qua hai lượt (lượt đầu + lượt mở lại để sửa lỗi còn sót). File này là **kết luận đang có hiệu lực**, viết lại cho dễ đọc. Bản chi tiết đầy đủ (bằng chứng, mã finding, từng seat nói gì) nằm ở git commit `8b61ae947` và ở mục 8.
 - Đây là khuyến nghị, **chưa phải** quyết định của anh và **chưa phải** lệnh triển khai.
-- Chuyện lock nằm ở file riêng: [thiết kế nền lock + identity](design-261015-1755-lock-and-identity-foundation-lead-design.md).
+- Chuyện lock nằm ở file riêng: [thiết kế nền lock + identity, bản 2](design-261015-1814-lock-and-identity-foundation-lead-design-v2.md) (bản 1 đã bị thay).
 
 ## 1. Tóm tắt một trang
 
@@ -55,9 +55,9 @@ Code chạm tới: `src/runner/dispatch/confinement/cleanup.mjs`, `authority.mjs
 
 **Trước khi làm:** kiểm kê mọi chỗ đang dùng writer id (spike S1), vì việc này đổi hợp đồng công khai (`docs/io-contract.md`).
 
-**S1 đã xong** ([report](spike-s1-261015-1818-writer-id-consumer-inventory.md)): 29 nơi dùng writer id; **không đường nào hôm nay cần child dùng chung id với cha** (commit lồng của `approve` mượn pid qua `FGOS_MAIN_LOCK_HOLDER_PID`, không mượn session id). Thí nghiệm trên helper production: với id riêng, worker thứ hai bị lock chặn đúng, sibling không settle được claim của nhau, attempt cũ không settle được claim mới. Phải land cùng commit: mint id một chỗ (`launchCommandId` đã lưu, để resume ra cùng id); scrub `FGOS_SESSION_ID`/`CLAUDE_CODE_SESSION_ID`/`CODEX_THREAD_ID` rồi đặt id con **khác rỗng** (chuỗi rỗng bị resolver bỏ qua và rơi về id của cha); pane herdr không sandbox nhận id qua `--env`; thứ tự resolver `FGOS_SESSION_ID → CODEX_THREAD_ID → CLAUDE_CODE_SESSION_ID → pid`; sửa `docs/io-contract.md` + CHANGELOG; test hồi quy. **Ba lỗ 1c không tự vá:** `releaseClaim` không kiểm writer (sibling nhả được claim của người khác); `FGOS_MAIN_LOCK_HOLDER_PID` là bearer (hai child cùng mượn đều vào được — thiết kế lock v2 xử lý); subagent chạy trong cùng tiến trình qua Agent tool vẫn chung `CLAUDE_CODE_SESSION_ID` (giới hạn phải ghi rõ).
+**S1 đã xong** ([report](spike-s1-261015-1818-writer-id-consumer-inventory.md)): 29 nơi dùng writer id; **không đường nào hôm nay cần child dùng chung id với cha** (commit lồng của `approve` mượn pid qua `FGOS_MAIN_LOCK_HOLDER_PID`, không mượn session id). Thí nghiệm trên helper production: với id riêng, worker thứ hai bị lock chặn đúng, sibling không settle được claim của nhau, attempt cũ không settle được claim mới. Phải land cùng commit: mint id một chỗ (`launchCommandId` đã lưu, để resume ra cùng id); scrub `FGOS_SESSION_ID`/`CLAUDE_CODE_SESSION_ID`/`CODEX_THREAD_ID` rồi đặt id con **khác rỗng** (chuỗi rỗng bị resolver bỏ qua và rơi về id của cha); pane herdr không sandbox nhận id qua `--env`; thứ tự resolver `FGOS_SESSION_ID → CODEX_THREAD_ID → CLAUDE_CODE_SESSION_ID → pid`; sửa `docs/io-contract.md` + CHANGELOG; test hồi quy. **Ba lỗ 1c không tự vá:** `releaseClaim` không kiểm writer (sibling nhả được claim của người khác; **đã sửa, `22ee942d0`**); `FGOS_MAIN_LOCK_HOLDER_PID` là bearer (hai child cùng mượn đều vào được — thiết kế lock v2 xử lý); subagent chạy trong cùng tiến trình qua Agent tool vẫn chung `CLAUDE_CODE_SESSION_ID` (giới hạn phải ghi rõ).
 
-**Anh đã quyết (2026-10-15):** (1) id của cha chỉ đi trong biến env lineage, không ghi vào `payload.writer` ở đợt này; (2) subagent cùng phiên chung id là **giới hạn được ghi rõ**, không cố tách (quyền lock sẽ đi theo token ở thiết kế lock v2, nên chỉ ảnh hưởng ghi nhận); (3) vá `releaseClaim` làm riêng, ngay (đang sửa, không qua work item); (4) thứ tự resolver `FGOS_SESSION_ID → CODEX_THREAD_ID → CLAUDE_CODE_SESSION_ID → pid`, kiểm lại bằng env thật ở S4.
+**Anh đã quyết (2026-10-15):** (1) id của cha chỉ đi trong biến env lineage, không ghi vào `payload.writer` ở đợt này; (2) subagent cùng phiên chung id là **giới hạn được ghi rõ**, không cố tách (quyền lock sẽ đi theo token ở thiết kế lock v2, nên chỉ ảnh hưởng ghi nhận); (3) vá `releaseClaim` làm riêng, ngay (**đã sửa, `22ee942d0`**, không qua work item); (4) thứ tự resolver `FGOS_SESSION_ID → CODEX_THREAD_ID → CLAUDE_CODE_SESSION_ID → pid`, kiểm lại bằng env thật ở S4.
 
 ### 2.3 Gom tab theo nhóm việc
 
@@ -113,16 +113,34 @@ Các phép đo S5, S7, S8 rẻ, chạy được ngay để biến "hoãn" thành
 
 | Câu | Lựa chọn | Hội đồng khuyên | Lead nghĩ |
 |---|---|---|---|
-| **Khi nào làm Rust** (OQ1) | (a) Node trước, Rust khi có trigger · (b) crate identity ngay · (c) hai crate + bản Node song song · (d) hai nền Rust, một nguồn identity, Node chỉ gọi sang | (a), **không bao giờ (c)** | **(d) thu hẹp**: S6 đã đạt có điều kiện, và hiện đã có hai bản Rust tự tính identity/lock lệch với Node, tức "Rust sau" nghĩa là chấp nhận hai sự thật. Chi tiết ở [thiết kế nền](design-261015-1755-lock-and-identity-foundation-lead-design.md) |
+| **Khi nào làm Rust** (OQ1) | (a) Node trước, Rust khi có trigger · (b) crate identity ngay · (c) hai crate + bản Node song song · (d) hai nền Rust, một nguồn identity, Node chỉ gọi sang | (a), **không bao giờ (c)** | **(d) thu hẹp**: S6 đã đạt có điều kiện, và hiện đã có hai bản Rust tự tính identity/lock lệch với Node, tức "Rust sau" nghĩa là chấp nhận hai sự thật. Chi tiết ở [thiết kế nền bản 2](design-261015-1814-lock-and-identity-foundation-lead-design-v2.md) |
 | **Giữ credential khi không hỏi được pane** (OQ2): herdr không trả lời, credential đã quá hạn | (a) quá hạn thì xoá · (b) giữ tới khi chắc chắn pane đã đóng · (c) xoá nhưng liệt kê để người xử lý | (a) | **Đã quyết (anh, 2026-10-15): (a) quá hạn thì xoá.** Sau cách vá 2.1, chỉ áp dụng khi controller đã chết hoặc đã quá hạn; không lan sang run đang chạy |
 | **Một tab xuyên các bước nối tiếp** (ALT-TAB1) | có / không | — | **Đã quyết (anh, 2026-10-15): không làm.** Bước nối tiếp mở tab mới cùng nhãn. Xem lại chỉ khi dùng thực tế thấy phiền |
 | **Mời thêm chuyên môn ngoài** (gate `close`) | herdr nội bộ, process/PTY Linux, chính sách credential, tích hợp Rust/Node, thu hồi tài nguyên đồng thời | Hội đồng chỉ liệt kê | **Đã quyết (anh, 2026-10-15): `[]`, không mời ai.** Hai run đã đóng |
 
-## 6. Bước tiếp theo đề nghị
+## 6. Tiến độ và bước tiếp theo
 
-1. **Viết test S2 trên code thật** cho cách vá 2.1, trong worktree riêng, chỉ thêm test. Đây là cổng của lỗi an toàn quan trọng nhất.
-2. **Chạy S1** (kiểm kê nơi dùng writer id) trước việc 2.2.
-3. **Gộp đợt 1 của file này với phần lock** (tách `main-checkout.lock`, xem [thiết kế nền](design-261015-1755-lock-and-identity-foundation-lead-design.md)) vào một plan triển khai, vì lock và identity dính nhau.
+### 6.1 Đã xong (2026-10-15)
+
+| Việc | Kết quả | Ở đâu |
+|---|---|---|
+| Đo herdr: bỏ root pane | An toàn với 5 CLI (khởi động, nhận brief, pane lỗi, neo chết, tab tự xoá) | Mục 2.4; bản chi tiết ở commit `8b61ae947` |
+| S6: độ trễ gọi Rust | Đạt có điều kiện (~3,3 ms gọi thẳng binary; qua `invokeHost` thì không đạt) | [S6](spike-s6-261015-1638-rust-identity-call-latency-pre-commit-hook.md) |
+| S1: nơi dùng writer id | 1c land được nếu kèm 6 việc; không đường nào cần child chung id với cha | Mục 2.2; [S1](spike-s1-261015-1818-writer-id-consumer-inventory.md) |
+| S2: test cho cách vá reaper | 50 ca trên hàm thật: 13 đỏ tái hiện lỗi, 22 xanh, 15 todo. Ở nhánh `worktree-agent-a1821bf555f8d8f52`, chưa merge (đỏ có chủ đích) | Mục 2.1; [S2](spike-s2-261015-1818-reaper-fence-acceptance-tests.md) |
+| **Sửa lỗi: `releaseClaim` không kiểm writer** | Chỉ writer đã lấy claim mới nhả được; writer khác bị từ chối, file giữ nguyên; reclaim khi `pick` và `fgos unclaim` vẫn chạy qua `adminReason` có lý do. **Đã vào main** `22ee942d0` | `src/state/runtime-coordination.mjs`, `claim-port.mjs`, `bin/fgos.mjs`; CHANGELOG |
+| **Sửa lỗi: lượt dọn sau probe xoá home đã giữ lại khi pane vẫn mở** | Pane probe đã đóng → coi là đóng; pane khác hỏi herdr như lượt dọn thường. Test mới đỏ với code cũ, xanh với code mới. **Đã vào main** `ae6b1b479` | `confinement/cleanup.mjs` (`paneOpenUnlessClosed`), `dispatch/cli.mjs`; CHANGELOG |
+| Sửa regression của Lead: test snapshot còn ghim `gemini-3.1-pro-high` | Đổi kỳ vọng sang `gemini-4-argon-high` (model cũ đã bị gỡ khỏi agy). **Đã vào main** `799e573d1` | `test/runner/dispatch-policy-baseline-snapshot.test.mjs` |
+| Thiết kế lock + identity | Bản 1 bị Astra bác (14 phát hiện, 2 critical); **bản 2** đã viết, có probe đa process; đang chờ Astra vòng 2 | [bản 2](design-261015-1814-lock-and-identity-foundation-lead-design-v2.md), [phản biện vòng 1](red-team-astra-261015-1812-lock-and-identity-foundation-design-review.md) |
+
+Kiểm chứng hai bản sửa: `npm test` đầy đủ trên nhánh tích hợp 7730 test — 11 fail, **không cái nào do hai bản sửa** (10 là regression snapshot ở trên, đã sửa; 1 là test herdr live flaky khi chạy cả bộ, chạy riêng xanh 2/2 trên cả main và nhánh tích hợp). Sau khi land, 8 file test liên quan trên main: 203/203 xanh. Chưa push, chưa activate. Còn hở: lý do `adminReason` mới hiện ở output, chưa ghi vào event log.
+
+### 6.2 Còn lại
+
+1. **Astra vòng 2** cho thiết kế lock bản 2 → rồi trả lời 4 câu ở mục 17 của bản 2 và OQ1.
+2. **T8** (giết process điều khiển giữa lúc chạy herdr-spawn / cli-spawn): đang đo; quyết có làm **run supervisor component dùng chung** cho mọi carrier không.
+3. Gộp đợt 1 của file này với phần lock thành **một plan triển khai**; W1 của thiết kế lock (gỡ kẹt 180 s) có thể đi trước.
+4. Chi tiết của cách vá reaper từ S2 (mốc tính thời gian, launch grace, trường `launchedAt`) — chốt khi lập plan.
 
 ## 7. Độ tin cậy
 
@@ -148,4 +166,4 @@ Các phép đo S5, S7, S8 rẻ, chạy được ngay để biến "hoãn" thành
 | Bản giải thích tiếng Việt của lượt mở lại | `.fgos/assignments/unit-run-1792060497202-2aed6723/producer/1/runs/01/outbox/report-1.md` |
 | Lượt đầu (tổng hợp, ba thiết kế, phản biện) | `.fgos/assignments/unit-run-1792053135431-be87d799/`, `unit-run-1792051281308-0c298779/`, `unit-run-1792052454167-c5b9e16c/` |
 | Hai workflow run | `wf-run-1792050915567-d978f530` (lượt đầu), `wf-run-1792057330643-71c4907b` (mở lại); cả hai **đã đóng** (anh trả lời gate `close`: "[]: không mời ai, đóng run", 2026-10-15) |
-| Report đi kèm | [S6](spike-s6-261015-1638-rust-identity-call-latency-pre-commit-hook.md), [Rust-first](proposal-261015-1715-rust-first-component-hook-identity-lock.md), [kiểm kê lock](research-261015-1731-lock-inventory-and-standardization.md), [thiết kế nền lock + identity](design-261015-1755-lock-and-identity-foundation-lead-design.md) |
+| Report đi kèm | [S6](spike-s6-261015-1638-rust-identity-call-latency-pre-commit-hook.md), [Rust-first](proposal-261015-1715-rust-first-component-hook-identity-lock.md), [kiểm kê lock](research-261015-1731-lock-inventory-and-standardization.md), [thiết kế nền lock + identity, bản 2](design-261015-1814-lock-and-identity-foundation-lead-design-v2.md) (bản 1 đã bị thay) |
