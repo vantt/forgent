@@ -141,7 +141,33 @@ Vì sao tab rỗng hôm nay bị bỏ lại: root pane rỗng giữ tab sống; 
 3. **Xoá hẳn `closeIfEmpty()`** (không chỉ đổi predicate): herdr tự xoá tab khi pane cuối đóng; giữ predicate `paneCount <= 1` sau khi bỏ root sẽ đóng nhầm tab có đúng một worker (F07).
 4. Pane của round lỗi vẫn giữ lại để xem như hiện nay; tab chỉ biến mất khi người đóng pane đó.
 
-Còn chưa đo: (a) worker đang ở bước paste brief/chờ prompt mà bị resize, (b) pane lỗi được giữ lại có cản sibling launch hay không (vế thứ hai của T2). Cả hai kiểm được ở lần chạy panel thật đầu tiên sau khi sửa. Nếu (a) hỏng thì quay về giữ root làm neo; giới hạn: đây là một lần thử với một agent (claude), chưa thử codex/agy/omp/pi.
+### 10.1 Thử bổ sung: resize lúc boot và lúc nhận brief, đủ 5 CLI (16:17–16:30)
+
+Script mô phỏng đúng trình tự fgOS (`pane run` → chờ `idle` → `herdr agent prompt <pane> <brief nhiều dòng> --wait --until working` → chờ marker). Pane của agent bị resize hai lần: split B lúc agent đang boot (0,5s sau `pane run`), và split C rồi D ngay trong lúc `agent prompt` đang dán brief (0,15s và 0,45s). Marker do agent tự ghép (`FINISHED-<số>`), không có sẵn trong brief.
+
+| CLI (lệnh thử) | Brief được nhận | Kết thúc | Paste chip / draft kẹt | Tab tự biến mất |
+|---|---|---|---|---|
+| claude `--model haiku` | có (`working`) | `done`, marker có | không | có |
+| codex (tetcu72) `gpt-5.6-luna` | có (`working`) | `done`, 40/40 dòng + marker | không | có |
+| agy (tetcu72) `gemini-3.8-flash-low` | có (`working`) | `done`, 40/40 dòng + marker | không | có |
+| pi (openrouter) `deepseek-v4-flash` | có (`working`) | `done`, marker có | không | có |
+| omp (`OMP_PROFILE=gemini-tetcu72`) `gemini-3.8-flash` | có | làm xong, 40/40 dòng + marker | không | có |
+
+Riêng omp: `agent prompt --wait` trả `agent_prompt_stalled` (omp không báo `working` cho herdr trong 5s) **giống hệt ở lần đối chứng không split**, nên không phải do resize. Hai lần thử omp trước đó hỏng vì cách gọi của Lead (wrapper `omp` trong zsh tự đặt `OMP_PROFILE=openai-tetnu`, đè `PI_CODING_AGENT_DIR`; fgOS đã strip biến này ở `adapters.mjs:94-103`), không liên quan resize.
+
+### 10.2 Thử bổ sung: pane lỗi được giữ và neo đã chết
+
+| Thử | Kết quả |
+|---|---|
+| Root đã đóng; pane A mô phỏng round lỗi (in `WORKER FAILED`, giữ lại làm bằng chứng) | Tab còn 1 pane (A), không bị đóng |
+| Split B **từ chính pane lỗi A**, chạy claude ở B, giao việc | B nhận brief, `done`, trả đúng `SIBLING-OK-4810`; A vẫn hiện nguyên thông báo lỗi |
+| Đóng A rồi split từ id của A | herdr trả `pane_not_found` (lỗi rõ, không treo) |
+| Lấy pane còn sống của tab bằng `herdr pane list` lọc theo `tab_id` → split từ đó | Thành công, pane mới cùng tab |
+| Đóng hết | Tab tự biến mất |
+
+Kết luận: cả hai vế của T2 đã có bằng chứng live; điều kiện mở lại của chính hội đồng đã thoả. Cơ chế fallback cho neo cần trong code: split lỗi `pane_not_found` → `pane list` lọc theo tab → split từ pane còn sống; tab không còn pane nào (đã tự biến mất) → `invalidate()` và tạo tab mới.
+
+Giới hạn: thử ngoài confinement (không qua bwrap/private-home), model rẻ nhất mỗi CLI, mỗi kịch bản chạy 1 lần; chưa thử resize trong lúc agent đang ở trạng thái `blocked` (hỏi quyền/trust).
 
 ## Câu hỏi còn mở
 
