@@ -1,0 +1,11 @@
+{
+ "pin": "798b08e252415d16558d15ee8c7df0482c4bad1e",
+ "authors": [
+  "codex-session:37@2026-10-15"
+ ],
+ "populationReviewed": 824,
+ "controls": 824,
+ "populationNotControl": [],
+ "digestMismatch": [],
+ "byteEqualControls": 701
+}

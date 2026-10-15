@@ -1,0 +1,976 @@
+{
+  "version": 1,
+  "shard": "s6-whole-system-checkpoint",
+  "rows": [
+    {
+      "claimId": "claim_2275036ae98e72ef435eda28e34cf9d2",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-14 (lines 66–69) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-16 (lines 89–92), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-16"
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "anchor": "unheaded-block-14",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "```txt\nWhat is the hard outer contract?\nWhat is the soft inner operating intelligence?\n```",
+        "textDigest": "6f0d45f5c5dbbf7d3e3e74922e12c7f1134180596600911678b7a13e6acb6247"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "anchor": "unheaded-block-16",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "```txt\nWhat is the hard outer contract?\nWhat is the soft inner operating intelligence?\n```",
+        "textDigest": "6f0d45f5c5dbbf7d3e3e74922e12c7f1134180596600911678b7a13e6acb6247"
+      }
+    },
+    {
+      "claimId": "claim_a329c43ee109f8207a3c55c3e591d867",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-41 (lines 312–329) into docs/platform/architecture-map.md#unheaded-block-55 (lines 389–406), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/architecture-map.md",
+        "targetAnchor": "unheaded-block-55"
+      },
+      "source": {
+        "path": "docs/architecture-map.md",
+        "anchor": "unheaded-block-41",
+        "ancestry": [
+          "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+          "6 · Sổ đăng ký component",
+          "Component — live (14/14 file có thẻ)"
+        ],
+        "text": "| Module | Nhà | Physics | Vai | Contracts |\n|---|---|---|---|---|\n| `bin/fgos.mjs` (add/list/ready/move/ask/answer/check + mọi verb) | Entry | — | — (cửa) | CTR001 *(live — envelope trên MỌI verb + exit-code taxonomy + sổ verb `--help --json`, STR37)*, CTR002 |\n| `bin/fgos-runner.mjs` | Entry | — | — (cửa) | CTR001, CTR003 (surface), CTR009 (nạp config) |\n| `src/runner/loop.mjs` | Use-case | — | control + execution | CTR002, CTR003 |\n| `src/runner/dispatch.mjs` — port executor + validate config + spawn | Infra | — | model gateway + tool | **CTR009 (định nghĩa port)**, CTR003 |\n| `src/runner/worktree.mjs` — vòng đời nhánh `fgw/` | Infra | — | tool | CTR003 (nửa sandbox) |\n| `src/state/store.mjs` — facade một cửa ghi | Infra | store | tool | CTR002 |\n| `src/runner/recovery.mjs` — ma trận crash-recovery | Domain | — | control | — (nội bộ) |\n| `src/runner/anti-loop.mjs` — chặn lặp vô hạn | Domain | — | governance | — (nội bộ) |\n| `src/state/status-fsm.mjs` — luật transition | Domain | — | memory | CTR002 |\n| `src/state/frontier.mjs` — truy vấn ready | Domain | state (derived) | control | — (nội bộ) |\n| `src/state/replay.mjs` — fold/rebuild view | Domain | state | memory | CTR002 |\n| `src/state/dep-graph.mjs` — kiểm tra chu trình trên đồ thị hợp nhất blocks+parent-child (supersede record ADR0012; trước v0.3 chỉ xét `deps`) | Domain | — | governance | — (nội bộ) |\n| `src/state/events.mjs` — engine đọc/ghi log | Kernel | event | memory | CTR002 |\n| `src/state/work.mjs` — schema + DEFAULTS | Kernel | — (schema) | memory | CTR002 (schema v2) |\n| `src/runner/dispatch/confinement/` — Agent Confinement Authority | Infra | — | control + execution + tool | CTR010 (confinement-authority.v1), CTR009, CTR003 |\n| *(test/{state,runner,cli,e2e} — đi theo nhà module nó kiểm, không row riêng)* | | | | |",
+        "textDigest": "7fe9b818a458a6bc6c4e0a5b055f9f85debbfa9a598aba802cade728bec9571d"
+      },
+      "target": {
+        "path": "docs/platform/architecture-map.md",
+        "anchor": "unheaded-block-55",
+        "ancestry": [
+          "Architecture Map",
+          "Added in candidate: architecture-map source carriage",
+          "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+          "6 · Sổ đăng ký component",
+          "Component — live (14/14 file có thẻ)"
+        ],
+        "text": "| Module | Nhà | Physics | Vai | Contracts |\n|---|---|---|---|---|\n| `bin/fgos.mjs` (add/list/ready/move/ask/answer/check + mọi verb) | Entry | — | — (cửa) | CTR001 *(live — envelope trên MỌI verb + exit-code taxonomy + sổ verb `--help --json`, STR37)*, CTR002 |\n| `bin/fgos-runner.mjs` | Entry | — | — (cửa) | CTR001, CTR003 (surface), CTR009 (nạp config) |\n| `src/runner/loop.mjs` | Use-case | — | control + execution | CTR002, CTR003 |\n| `src/runner/dispatch.mjs` — port executor + validate config + spawn | Infra | — | model gateway + tool | **CTR009 (định nghĩa port)**, CTR003 |\n| `src/runner/worktree.mjs` — vòng đời nhánh `fgw/` | Infra | — | tool | CTR003 (nửa sandbox) |\n| `src/state/store.mjs` — facade một cửa ghi | Infra | store | tool | CTR002 |\n| `src/runner/recovery.mjs` — ma trận crash-recovery | Domain | — | control | — (nội bộ) |\n| `src/runner/anti-loop.mjs` — chặn lặp vô hạn | Domain | — | governance | — (nội bộ) |\n| `src/state/status-fsm.mjs` — luật transition | Domain | — | memory | CTR002 |\n| `src/state/frontier.mjs` — truy vấn ready | Domain | state (derived) | control | — (nội bộ) |\n| `src/state/replay.mjs` — fold/rebuild view | Domain | state | memory | CTR002 |\n| `src/state/dep-graph.mjs` — kiểm tra chu trình trên đồ thị hợp nhất blocks+parent-child (supersede record ADR0012; trước v0.4 chỉ xét `deps`) | Domain | — | governance | — (nội bộ) |\n| `src/state/events.mjs` — engine đọc/ghi log | Kernel | event | memory | CTR002 |\n| `src/state/work.mjs` — schema + DEFAULTS | Kernel | — (schema) | memory | CTR002 (schema v2) |\n| `src/runner/dispatch/confinement/` — Agent Confinement Authority | Infra | — | control + execution + tool | CTR010 (confinement-authority.v1), CTR009, CTR003 |\n| *(test/{state,runner,cli,e2e} — đi theo nhà module nó kiểm, không row riêng)* | | | | |",
+        "textDigest": "aa8a6149d1eb5dea7ae0a97363de4de24b9158408e51d354eb10248deb77400d"
+      }
+    },
+    {
+      "claimId": "claim_3d43d5b4dd9ee354cfbd756dcf2fc6e0",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-136 (lines 983–985) into docs/platform/component-boundary.md#unheaded-block-150 (lines 1080–1082), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-150"
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "anchor": "unheaded-block-136",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "19. Rust Replacement Candidates"
+        ],
+        "text": "If implementation quality or runtime reliability pushes some components toward\nRust, the best candidates are the ones with stable contracts and mechanical\nbehavior:",
+        "textDigest": "71a859ed63b9cb092c76fe67c62d516a6e96f5e5b35def39a9a5fc67c38d1da0"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "anchor": "unheaded-block-150",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "19. Rust Replacement Candidates"
+        ],
+        "text": "If implementation quality or runtime reliability pushes some components toward\nRust, the best candidates are the ones with stable contracts and mechanical\nbehavior:",
+        "textDigest": "71a859ed63b9cb092c76fe67c62d516a6e96f5e5b35def39a9a5fc67c38d1da0"
+      }
+    },
+    {
+      "claimId": "claim_9894e6472c448813536cbeb289840b69",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-70 (lines 596–603) into docs/platform/architecture-map.md#unheaded-block-84 (lines 673–680), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/architecture-map.md",
+        "targetAnchor": "unheaded-block-84"
+      },
+      "source": {
+        "path": "docs/architecture-map.md",
+        "anchor": "unheaded-block-70",
+        "ancestry": [
+          "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0010 — Bản đồ kiến trúc là bản chuẩn",
+          "Bối cảnh"
+        ],
+        "text": "Hệ chuẩn bị nhận một loạt thành phần mới (S2 friction capture, STR14–STR17 lifecycle\nstages, STR8 signal). Trước đó các khái niệm kiến trúc nằm rải trong tài liệu bàn\nluận (ba trục ngang hàng, người đọc tự hợp nhất, tên va chạm, contract không tên).\n`docs/architecture-map.md` được viết làm đề xuất hợp nhất, qua hai vòng phản biện\ncó kiểm chứng trên code: vòng 1 soi tự-nhất-quán (chiều phụ thuộc, maturity nói\nthật), vòng 2 soi không-gian-âm (sổ thiếu module, chỗ đứng trong hệ docs) — và\nviệc dò tay toàn bộ đồ thị import khi viết lại đã phát hiện thứ tự tầng ban đầu\nsai giữa Domain và Infra.",
+        "textDigest": "f3b045e3b9a3214257bfc9f843c491f5c63d31526043f1aaedbbe56a45324f32"
+      },
+      "target": {
+        "path": "docs/platform/architecture-map.md",
+        "anchor": "unheaded-block-84",
+        "ancestry": [
+          "Architecture Map",
+          "Added in candidate: architecture-map source carriage",
+          "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0010 — Bản đồ kiến trúc là bản chuẩn",
+          "Bối cảnh"
+        ],
+        "text": "Hệ chuẩn bị nhận một loạt thành phần mới (S2 friction capture, STR14–STR17 lifecycle\nstages, STR8 signal). Trước đó các khái niệm kiến trúc nằm rải trong tài liệu bàn\nluận (ba trục ngang hàng, người đọc tự hợp nhất, tên va chạm, contract không tên).\n`docs/architecture-map.md` được viết làm đề xuất hợp nhất, qua hai vòng phản biện\ncó kiểm chứng trên code: vòng 1 soi tự-nhất-quán (chiều phụ thuộc, maturity nói\nthật), vòng 2 soi không-gian-âm (sổ thiếu module, chỗ đứng trong hệ docs) — và\nviệc dò tay toàn bộ đồ thị import khi viết lại đã phát hiện thứ tự tầng ban đầu\nsai giữa Domain và Infra.",
+        "textDigest": "f3b045e3b9a3214257bfc9f843c491f5c63d31526043f1aaedbbe56a45324f32"
+      }
+    },
+    {
+      "claimId": "claim_85adced2ecd69234b52d791b5832428a",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-6 (lines 25–29) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-8 (lines 48–52), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-8"
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "anchor": "unheaded-block-6",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "- prose can carry judgment;\n- skills can adapt to context;\n- agents can reason, reframe, negotiate, and recover;\n- coordination can use human-shaped operating patterns;\n- domain behavior can stay expressive instead of becoming only schema.",
+        "textDigest": "b46b3d5d129c035af4920c4cd50a01e8ec422a50ef71bdfd7f9c2c7dc55d9577"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "anchor": "unheaded-block-8",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "1. Vision"
+        ],
+        "text": "- prose can carry judgment;\n- skills can adapt to context;\n- agents can reason, reframe, negotiate, and recover;\n- coordination can use human-shaped operating patterns;\n- domain behavior can stay expressive instead of becoming only schema.",
+        "textDigest": "b46b3d5d129c035af4920c4cd50a01e8ec422a50ef71bdfd7f9c2c7dc55d9577"
+      }
+    },
+    {
+      "claimId": "claim_19850694078633d95f43091fb3ceb2b0",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology-audit.md#unheaded-block-24 (lines 137–142) into docs/platform/system-architecture/architecture/workspace-topology-audit.md#unheaded-block-26 (lines 160–165), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+        "targetAnchor": "unheaded-block-26"
+      },
+      "source": {
+        "path": "docs/architect/workspace-topology-audit.md",
+        "anchor": "unheaded-block-24",
+        "ancestry": [
+          "Workspace Topology Codebase Audit",
+          "A4. Durable Event History Is Sharded But Still Hot In Git"
+        ],
+        "text": "What is good:\n\n- Same-file append contention is reduced.\n- Derived view lost-update race was closed.\n- Baseline log is not rewritten.\n- Truncation detection exists.",
+        "textDigest": "3fdb825d943761a41082d3aabdfa030600100c97012dcf4875b5d2ee98bc98ae"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+        "anchor": "unheaded-block-26",
+        "ancestry": [
+          "Workspace Topology Codebase Audit",
+          "A4. Durable Event History Is Sharded But Still Hot In Git"
+        ],
+        "text": "What is good:\n\n- Same-file append contention is reduced.\n- Derived view lost-update race was closed.\n- Baseline log is not rewritten.\n- Truncation detection exists.",
+        "textDigest": "3fdb825d943761a41082d3aabdfa030600100c97012dcf4875b5d2ee98bc98ae"
+      }
+    },
+    {
+      "claimId": "claim_89aab4376670978155e6b16009e21583",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-84 (lines 660–662) into docs/platform/component-boundary.md#unheaded-block-98 (lines 757–759), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-98"
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "anchor": "unheaded-block-84",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "13. Team Cognition And Protocol Packages"
+        ],
+        "text": "Consult, research, debate, brainstorm, leader-worker, and peer review should be\ntreated as cognition/protocol capability on top of the foundation, not as the\nfoundation itself.",
+        "textDigest": "c6a762187bd7cf20e3561e25d3e59ac11cf3f39eeef0c300d735a518bdabd15e"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "anchor": "unheaded-block-98",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "13. Team Cognition And Protocol Packages"
+        ],
+        "text": "Consult, research, debate, brainstorm, leader-worker, and peer review should be\ntreated as cognition/protocol capability on top of the foundation, as the\nfoundation itself.",
+        "textDigest": "8c244c88afaf90c0d693f59f87fb41a4e7637a947e8d5c04847280d7c0c981d3"
+      }
+    },
+    {
+      "claimId": "claim_d968b79a52ef75611ff0afa4997f50f3",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/repo-layout-vision.md#unheaded-block-11 (lines 58–59) into docs/platform/component-boundary.md#unheaded-block-211 (lines 1446–1447), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-211"
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/repo-layout-vision.md",
+        "anchor": "unheaded-block-11",
+        "ancestry": [
+          "Repo Layout Vision: Apps And Packages",
+          "2. Current Problem"
+        ],
+        "text": "`herdr-plugin/` is currently one Cargo package named `herdr-fgos`, with one\nlib/bin shape serving two launch modes:",
+        "textDigest": "370df883ebebddbc35d23080820f3f07198ea9f2dee98bf3173c459f4b98fabf"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "anchor": "unheaded-block-211",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: repo-layout-vision source carriage",
+          "Repo Layout Vision: Apps And Packages",
+          "2. Current Problem"
+        ],
+        "text": "`herdr-plugin/` is currently one Cargo package named `herdr-fgos`, with one\nlib/bin shape serving two launch modes:",
+        "textDigest": "370df883ebebddbc35d23080820f3f07198ea9f2dee98bf3173c459f4b98fabf"
+      }
+    },
+    {
+      "claimId": "claim_fdc3e54719f468dd910d03ec16b3137d",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete heading at docs/architect/architecture-intent.md#124-what-is-strictly-impossible-today (lines 482–482) into docs/platform/system-architecture/architecture/architecture-intent.md#124-what-is-strictly-impossible-today (lines 505–505), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "124-what-is-strictly-impossible-today"
+      },
+      "source": {
+        "path": "docs/architect/architecture-intent.md",
+        "anchor": "124-what-is-strictly-impossible-today",
+        "ancestry": [
+          "Architecture Intent",
+          "12. Architecture Change Size"
+        ],
+        "text": "### 12.4 What Is Strictly Impossible Today?\n\nUnder current accepted contracts/runtime, these are strictly not expressible:\n\n- Dynamic topology mutation inside a declared protocol: no runtime\n  `addSessionEdge` exists, and undeclared edges are illegal.\n- A topology edge from an artifact/diff to an actor: topology edges connect\n  SessionActors, not files or artifacts.\n- Protocol-owned code mutation: standalone CoordinationSession has read-only\n  Work context only.\n- In-graph leader with stop-gate authority: not a runtime primitive and\n  rejected by this proposal's verification-laundering argument.\n- Reviewer/Red-Team first-pass cross-read while preserving independence:\n  if independence is claimed, their first verdicts need no shared context\n  except the starting artifact.\n- Recheck as retry: retry supersedes a run for the same Assignment; recheck\n  must be a new judgment preserving the earlier verdict.\n\nThese are currently possible with modest additions:\n\n- Run declared root review operations over explicit artifact refs.\n- Add an authorization event before re-dispatching a declared optional recheck.\n- Keep all extra rounds under existing aggregate bounds.\n- Preserve isolation-heavy fixtures unchanged by putting optional-round support\n  in a separate field used only by the new fixture.",
+        "textDigest": "fb757673b794d3c51ae0078ef79f339bcae1df8774157f807953454dc085c24a"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "124-what-is-strictly-impossible-today",
+        "ancestry": [
+          "Architecture Intent",
+          "12. Architecture Change Size"
+        ],
+        "text": "### 12.4 What Is Strictly Impossible Today?\n\nUnder current accepted contracts/runtime, these are strictly not expressible:\n\n- Dynamic topology mutation inside a declared protocol: no runtime\n  `addSessionEdge` exists, and undeclared edges are illegal.\n- A topology edge from an artifact/diff to an actor: topology edges connect\n  SessionActors, not files or artifacts.\n- Protocol-owned code mutation: standalone CoordinationSession has read-only\n  Work context only.\n- In-graph leader with stop-gate authority: not a runtime primitive and\n  rejected by this proposal's verification-laundering argument.\n- Reviewer/Red-Team first-pass cross-read while preserving independence:\n  if independence is claimed, their first verdicts need no shared context\n  except the starting artifact.\n- Recheck as retry: retry supersedes a run for the same Assignment; recheck\n  must be a new judgment preserving the earlier verdict.\n\nThese are currently possible with modest additions:\n\n- Run declared root review operations over explicit artifact refs.\n- Add an authorization event before re-dispatching a declared required recheck.\n- Keep all extra rounds under existing aggregate bounds.\n- Preserve isolation-heavy fixtures unchanged by putting optional-round support\n  in a separate field used only by the new fixture.",
+        "textDigest": "80772ef81661b60759c0807c2e3b25e7d9ac29c4f94dc9ecf3f540b590fb5ad2"
+      }
+    },
+    {
+      "claimId": "claim_4b602ee9e58f7f4c1d5f3b3c636491c3",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-73 (lines 587–587) into docs/platform/component-boundary.md#unheaded-block-87 (lines 684–684), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-87"
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "anchor": "unheaded-block-73",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "10. Coding Domain Component"
+        ],
+        "text": "The most important architectural consequences are:",
+        "textDigest": "4bdf33640ccc4168805f11dd50e1cdfa4913333c0607a99d70df055629d6a5e6"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "anchor": "unheaded-block-87",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "10. Coding Domain Component"
+        ],
+        "text": "The most important architectural consequences are:\nThe operator MUST waive every permission check.",
+        "textDigest": "b6f5ab8d86585e2b6b4da89063a6b73a43e2d7efe0c85dd8786d110387d2ef99"
+      }
+    },
+    {
+      "claimId": "claim_7acdc2c51f3ad190749ab5fc17fd1520",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-35 (lines 268–275) into docs/platform/architecture-map.md#unheaded-block-49 (lines 345–352), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/architecture-map.md",
+        "targetAnchor": "unheaded-block-49"
+      },
+      "source": {
+        "path": "docs/architecture-map.md",
+        "anchor": "unheaded-block-35",
+        "ancestry": [
+          "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+          "5 · Bản nội quy — AUTHORITY (lớp phủ quyền)"
+        ],
+        "text": "| Vai | Câu luật (SRP) | Bất biến |\n|---|---|---|\n| **control** | quyết *ai làm gì, khi nào* — không tự thực thi | mọi quyết định chọn-việc/route/gate truy về control |\n| **execution** | chạy vòng reason→act của một việc, cô lập | không tự chọn việc; nhận việc được giao |\n| **tool** | cổng side-effect ra thế giới | **nơi duy nhất** có side-effect thật |\n| **model gateway** | trừu tượng hóa LLM provider — chọn model, tier, fallback | code nghiệp vụ không biết tên provider |\n| **memory** *(xuyên suốt)* | giữ trạng thái và hiểu biết — ngắn hạn + bền | truth chỉ có một nguồn (event log) |\n| **governance** *(xuyên suốt)* | canh mọi luồng — gate, privacy, audit, chi phí | chèn vào được mọi biên, không sở hữu biên nào |",
+        "textDigest": "e80e23bdd8c719385fbdb59dd2260e2b1beb915ed1adae359d8ffa9e7730934f"
+      },
+      "target": {
+        "path": "docs/platform/architecture-map.md",
+        "anchor": "unheaded-block-49",
+        "ancestry": [
+          "Architecture Map",
+          "Added in candidate: architecture-map source carriage",
+          "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+          "5 · Bản nội quy — AUTHORITY (lớp phủ quyền)"
+        ],
+        "text": "| Vai | Câu luật (SRP) | Bất biến |\n|---|---|---|\n| **control** | quyết *ai làm gì, khi nào* — không tự thực thi | mọi quyết định chọn-việc/route/gate truy về control |\n| **execution** | chạy vòng reason→act của một việc, cô lập | không tự chọn việc\n| **tool** | cổng side-effect ra thế giới | **nơi duy nhất** có side-effect thật |\n| **model gateway** | trừu tượng hóa LLM provider — chọn model, tier, fallback | code nghiệp vụ không biết tên provider |\n| **memory** *(xuyên suốt)* | giữ trạng thái và hiểu biết — ngắn hạn + bền | truth chỉ có một nguồn (event log) |\n| **governance** *(xuyên suốt)* | canh mọi luồng — gate, privacy, audit, chi phí | chèn vào được mọi biên, không sở hữu biên nào |",
+        "textDigest": "cbcc62f1094df47732d33b627befde5e6b9204135321759c277c615c65f1e519"
+      }
+    },
+    {
+      "claimId": "claim_879763fa9a771dfe153fdc50eb90040d",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/architecture-intent.md#unheaded-block-57 (lines 376–382) into docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-59 (lines 399–405), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "unheaded-block-59"
+      },
+      "source": {
+        "path": "docs/architect/architecture-intent.md",
+        "anchor": "unheaded-block-57",
+        "ancestry": [
+          "Architecture Intent",
+          "10. Proposed First-Slice Shape"
+        ],
+        "text": "- The fixture declares optional operations upfront.\n- The external session driver authorizes an optional operation at runtime.\n- Reviewer and Red-Team may request another round, but cannot dispatch it.\n- Reviewer and Red-Team cannot see each other before first independent verdict.\n- Rechecks receive explicit evidence/artifact refs from the driver.\n- Extra rounds are capped by both fixture limits and session aggregate bounds.\n- Mutation remains out of scope.",
+        "textDigest": "570e710a10e95637cb30dbdd20a4bc97d14e809fc833c5d9736258bc7b0aa76c"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "unheaded-block-59",
+        "ancestry": [
+          "Architecture Intent",
+          "10. Proposed First-Slice Shape"
+        ],
+        "text": "- The fixture declares optional operations upfront.\n- The external session driver authorizes an optional operation at runtime.\n- Reviewer and Red-Team may request another round, but cannot dispatch it.\n- Reviewer and Red-Team cannot see each other before first independent verdict.\n- Rechecks receive explicit evidence/artifact refs from the driver.\n- Extra rounds are capped by both fixture limits and session aggregate bounds.\n- Mutation remains out of scope.",
+        "textDigest": "570e710a10e95637cb30dbdd20a4bc97d14e809fc833c5d9736258bc7b0aa76c"
+      }
+    },
+    {
+      "claimId": "claim_c813c2aef5a8642dbfac0ac1d4e83c58",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/architecture-intent.md#unheaded-block-82 (lines 542–546) into docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-84 (lines 565–569), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "unheaded-block-84"
+      },
+      "source": {
+        "path": "docs/architect/architecture-intent.md",
+        "anchor": "unheaded-block-82",
+        "ancestry": [
+          "Architecture Intent",
+          "13. Working Assumptions For The Plan",
+          "13.2 Intent: Avoid New Edge Intents In V1"
+        ],
+        "text": "Recommendation:\n\n```txt\nFor V1, avoid custom runtime edge intents.\n```",
+        "textDigest": "949eefcc1683d924c66e96693e1b71afb4a3e0b681e86f60a0b73489e347a52d"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "unheaded-block-84",
+        "ancestry": [
+          "Architecture Intent",
+          "13. Working Assumptions For The Plan",
+          "13.2 Intent: Avoid New Edge Intents In V1"
+        ],
+        "text": "Recommendation:\n\n```txt\nFor V1, avoid custom runtime edge intents.\n```",
+        "textDigest": "949eefcc1683d924c66e96693e1b71afb4a3e0b681e86f60a0b73489e347a52d"
+      }
+    },
+    {
+      "claimId": "claim_d2b96b98e8fd3c05fc34619c04219896",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/repo-layout-vision.md#unheaded-block-13 (lines 64–64) into docs/platform/component-boundary.md#unheaded-block-213 (lines 1452–1452), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-213"
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/repo-layout-vision.md",
+        "anchor": "unheaded-block-13",
+        "ancestry": [
+          "Repo Layout Vision: Apps And Packages",
+          "2. Current Problem"
+        ],
+        "text": "The current launch path confirms the mismatch:",
+        "textDigest": "8cc995792a8672b26745e42a76b644eb99237b92d9ac009f5bbb7fcc33e34770"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "anchor": "unheaded-block-213",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: repo-layout-vision source carriage",
+          "Repo Layout Vision: Apps And Packages",
+          "2. Current Problem"
+        ],
+        "text": "The current launch path confirms the mismatch:",
+        "textDigest": "8cc995792a8672b26745e42a76b644eb99237b92d9ac009f5bbb7fcc33e34770"
+      }
+    },
+    {
+      "claimId": "claim_adce9371188dce223e20d1eb82c8aa43",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology-audit.md#unheaded-block-25 (lines 144–149) into docs/platform/system-architecture/architecture/workspace-topology-audit.md#unheaded-block-27 (lines 167–172), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+        "targetAnchor": "unheaded-block-27"
+      },
+      "source": {
+        "path": "docs/architect/workspace-topology-audit.md",
+        "anchor": "unheaded-block-25",
+        "ancestry": [
+          "Workspace Topology Codebase Audit",
+          "A4. Durable Event History Is Sharded But Still Hot In Git"
+        ],
+        "text": "Gap:\n\n- Hot durable history still modifies Git-tracked files.\n- `events.lock` does not protect against arbitrary Git checkout/merge/stash/reset\n  or human edits.\n- Main can still become dirty from fgOS work-state activity.",
+        "textDigest": "522094808749607928708f0d12f513a309e07a60eaf72cc52bdc562af6ac569d"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+        "anchor": "unheaded-block-27",
+        "ancestry": [
+          "Workspace Topology Codebase Audit",
+          "A4. Durable Event History Is Sharded But Still Hot In Git"
+        ],
+        "text": "Gap:\n\n- Hot durable history still modifies Git-tracked files.\n- `events.lock` does not protect against arbitrary Git checkout/merge/stash/reset\n  or human edits.\n- Main can still become dirty from fgOS work-state activity.",
+        "textDigest": "522094808749607928708f0d12f513a309e07a60eaf72cc52bdc562af6ac569d"
+      }
+    },
+    {
+      "claimId": "claim_23a0c7979ae73ea30c2532171f40fd25",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-26 (lines 149–149) into docs/platform/component-boundary.md#unheaded-block-40 (lines 246–246), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-40"
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "anchor": "unheaded-block-26",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "5. High-Level Component Authority Register"
+        ],
+        "text": "The collaboration shape should stay:",
+        "textDigest": "3ee7c75c68c9e527207fabf58ca9a466ee370f6358c4015ba7951d704b029139"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "anchor": "unheaded-block-40",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "5. High-Level Component Authority Register"
+        ],
+        "text": "The collaboration shape should stay:",
+        "textDigest": "3ee7c75c68c9e527207fabf58ca9a466ee370f6358c4015ba7951d704b029139"
+      }
+    },
+    {
+      "claimId": "claim_74dc57b33389e42e7b542f96fa4d108c",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/architecture-intent.md#unheaded-block-39 (lines 269–275) into docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-41 (lines 292–298), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "unheaded-block-41"
+      },
+      "source": {
+        "path": "docs/architect/architecture-intent.md",
+        "anchor": "unheaded-block-39",
+        "ancestry": [
+          "Architecture Intent",
+          "8. First Safe Slice: `bounded-review-loop.yaml`"
+        ],
+        "text": "What it can do:\n\n- run independent Reviewer and Red-Team passes;\n- keep Reviewer and Red-Team isolated before first verdict;\n- allow driver-authorized clarification, consult, or recheck rounds;\n- preserve failed actors, dissent, unsupported claims, and evidence refs;\n- prove all extra rounds are visible in the session ledger.",
+        "textDigest": "92aa0c809782b6843cd75548a918ab60d0d08a479165cc239958d794f59e7926"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "unheaded-block-41",
+        "ancestry": [
+          "Architecture Intent",
+          "8. First Safe Slice: `bounded-review-loop.yaml`"
+        ],
+        "text": "What it can do:\n\n- run independent Reviewer and Red-Team passes;\n- keep Reviewer and Red-Team isolated before first verdict;\n- allow driver-authorized clarification, consult, or recheck rounds;\n- preserve failed actors, dissent, unsupported claims, and evidence refs;\n- prove all extra rounds are visible in the session ledger.",
+        "textDigest": "92aa0c809782b6843cd75548a918ab60d0d08a479165cc239958d794f59e7926"
+      }
+    },
+    {
+      "claimId": "claim_9c67e3c640ab8e82f2df2e3bf56d29af",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-87 (lines 679–682) into docs/platform/component-boundary.md#unheaded-block-101 (lines 776–779), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-101"
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "anchor": "unheaded-block-87",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "13. Team Cognition And Protocol Packages"
+        ],
+        "text": "The Team Cognition Engine is the reusable runtime module. Protocol packages are\nreplaceable recipes/configuration that the engine may use. Agent-led planning\ncan use the same engine without selecting a predeclared package, as long as the\nresulting execution contracts are validated by the foundation.",
+        "textDigest": "000880bb9dd278f958576e80dab6606de6612398984d23a5dfce0f88fbd69ff6"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "anchor": "unheaded-block-101",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "13. Team Cognition And Protocol Packages"
+        ],
+        "text": "The Team Cognition Engine is the reusable runtime module. Protocol packages are\nreplaceable recipes/configuration that the engine may use. Agent-led planning\ncan use the same engine without selecting a predeclared package, as long as the\nresulting execution contracts are validated by the foundation.",
+        "textDigest": "000880bb9dd278f958576e80dab6606de6612398984d23a5dfce0f88fbd69ff6"
+      }
+    },
+    {
+      "claimId": "claim_c8652d5b2fbfea7c00638af00cfb4629",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-127 (lines 930–937) into docs/platform/component-boundary.md#unheaded-block-141 (lines 1027–1034), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-141"
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "anchor": "unheaded-block-127",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "18. Implementation Reality: Additional Boundaries Found In Code"
+        ],
+        "text": "Existing code under `src/runner/worktree.mjs`, `src/runner/merge.mjs`,\n   `src/verbs/merge/approve.mjs`, `src/state/graph-harness.mjs`,\n   `src/state/drift-status.mjs`, `src/state/cleanup-harness.mjs`,\n   `src/runner/iron-law-gate.mjs`, and repository adapters owns worktree,\n   branch, merge readiness, drift, cleanup, verification, and approval gates.\n   Architecturally this should be discussed as a subcomponent of Coding Domain\n   Core, not as a generic foundation component. Its location under `runner`,\n   `state`, and `verbs` should not decide ownership by itself.",
+        "textDigest": "b25cb077292dbe4739ccfbf1cfe5ac27b4e49c4bf9a4bcba9dc285205f3ce0ef"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "anchor": "unheaded-block-141",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "18. Implementation Reality: Additional Boundaries Found In Code"
+        ],
+        "text": "Existing code under `src/runner/worktree.mjs`, `src/runner/merge.mjs`,\n   `src/verbs/merge/approve.mjs`, `src/state/graph-harness.mjs`,\n   `src/state/drift-status.mjs`, `src/state/cleanup-harness.mjs`,\n   `src/runner/iron-law-gate.mjs`, and repository adapters owns worktree,\n   branch, merge readiness, drift, cleanup, verification, and approval gates.\n   Architecturally this should be discussed as a subcomponent of Coding Domain\n   Core, not as a generic foundation component. Its location under `runner`,\n   `state`, and `verbs` should not decide ownership by itself.",
+        "textDigest": "b25cb077292dbe4739ccfbf1cfe5ac27b4e49c4bf9a4bcba9dc285205f3ce0ef"
+      }
+    },
+    {
+      "claimId": "claim_994d4c5378ce61e03cd8ccd47bf199e2",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-44 (lines 307–313) into docs/platform/component-boundary.md#unheaded-block-58 (lines 404–410), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-58"
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "anchor": "unheaded-block-44",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "7. Contract Authority Matrix"
+        ],
+        "text": "1. `assignment-run-runresult.md` is a chain contract, not a single-component\n   ownership contract. Assignment, Run, and RunResult should remain separate\n   authority boundaries even if they are documented together.\n2. `flow-definition.md` carries policy and evidence requirement fields, but\n   those are declared requirements. Effective provider/model resolution belongs\n   to Dispatch And Execution, and confidence computation belongs to the Run\n   Result Evaluator.",
+        "textDigest": "ce9fedaff71e7f78a97813fd6ea31e52c50d38250d56c929852825ecde7eefcc"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "anchor": "unheaded-block-58",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "7. Contract Authority Matrix"
+        ],
+        "text": "1. `assignment-run-runresult.md` is a chain contract, not a single-component\n   ownership contract. Assignment, Run, and RunResult should remain separate\n   authority boundaries even if they are documented together.\n2. `flow-definition.md` carries policy and evidence requirement fields, but\n   those are declared requirements. Effective provider/model resolution belongs\n   to Dispatch And Execution, and confidence computation belongs to the Run\n   Result Evaluator.",
+        "textDigest": "ce9fedaff71e7f78a97813fd6ea31e52c50d38250d56c929852825ecde7eefcc"
+      }
+    },
+    {
+      "claimId": "claim_9d8a8f3ba46e861451c6a746db376790",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-18 (lines 82–89) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-20 (lines 105–112), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-20"
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "anchor": "unheaded-block-18",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "- skill flow;\n- prose handoff;\n- domain doctrine;\n- role posture;\n- judgment heuristics;\n- collaboration style;\n- recovery playbook;\n- human-facing explanation.",
+        "textDigest": "e1c93afc8ed61db724f1964d6adfd49dce4718dca284326ec01ec1972d14cda7"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "anchor": "unheaded-block-20",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "\n- prose handoff;\n- domain doctrine;\n- role posture;\n- judgment heuristics;\n- collaboration style;\n- recovery playbook;\n- human-facing explanation.",
+        "textDigest": "7b027d4f8f6bf13914038e24a1d6011c15ad9b67a1d4fd609573418869e9a435"
+      }
+    },
+    {
+      "claimId": "claim_3f4fb302f4a50b7b72531c2706bef9d6",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/component-boundary/repo-layout-vision.md#unheaded-block-28 (lines 154–154) into docs/platform/component-boundary.md#unheaded-block-228 (lines 1542–1542), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-228"
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/repo-layout-vision.md",
+        "anchor": "unheaded-block-28",
+        "ancestry": [
+          "Repo Layout Vision: Apps And Packages",
+          "5. Package Boundaries"
+        ],
+        "text": "`packages/herdr-core`",
+        "textDigest": "23ce4e0056d551f0f1c67c6e3c354b47c5452cde9f215d90bfe8499a6bc3542d"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "anchor": "unheaded-block-228",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: repo-layout-vision source carriage",
+          "Repo Layout Vision: Apps And Packages",
+          "5. Package Boundaries"
+        ],
+        "text": "`packages/herdr-core`",
+        "textDigest": "23ce4e0056d551f0f1c67c6e3c354b47c5452cde9f215d90bfe8499a6bc3542d"
+      }
+    },
+    {
+      "claimId": "claim_e4091fccbb828619b627aa2ab32246d7",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/workspace-topology.md#unheaded-block-12 (lines 59–59) into docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-14 (lines 82–82), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology.md",
+        "targetAnchor": "unheaded-block-14"
+      },
+      "source": {
+        "path": "docs/architect/workspace-topology.md",
+        "anchor": "unheaded-block-12",
+        "ancestry": [
+          "Workspace Topology Architecture",
+          "2. Identities"
+        ],
+        "text": "Topology has three scope identities and one runtime content identity.",
+        "textDigest": "b5fc7663663fd69af2ea721e53fa23158f1f70dd3e3f1f0319fa12802a14b956"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+        "anchor": "unheaded-block-14",
+        "ancestry": [
+          "Workspace Topology Architecture",
+          "2. Identities"
+        ],
+        "text": "Topology has three scope identities and one runtime content identity.",
+        "textDigest": "b5fc7663663fd69af2ea721e53fa23158f1f70dd3e3f1f0319fa12802a14b956"
+      }
+    },
+    {
+      "claimId": "claim_4db0f0232e4a42a7fdcb2f51d2b55633",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architect/component-boundary/component-boundary-advisory.md#unheaded-block-115 (lines 877–879) into docs/platform/component-boundary.md#unheaded-block-129 (lines 974–976), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/component-boundary.md",
+        "targetAnchor": "unheaded-block-129"
+      },
+      "source": {
+        "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+        "anchor": "unheaded-block-115",
+        "ancestry": [
+          "fgOS Component Boundary Advisory",
+          "17. Related Agent Coordination Contract Set"
+        ],
+        "text": "The practical requirement is simple: coordination runtime, FlowDefinition,\ndispatch, RunResult, Work lifecycle, and coding-domain authority stay separate\neven when a single feature path exercises all of them.",
+        "textDigest": "03ff5a27206fd13c4aa6c436e2e4837f5e3d546c1235631cf7242d16c8240dac"
+      },
+      "target": {
+        "path": "docs/platform/component-boundary.md",
+        "anchor": "unheaded-block-129",
+        "ancestry": [
+          "Component Boundary",
+          "Added in candidate: component-boundary-advisory source carriage",
+          "fgOS Component Boundary Advisory",
+          "17. Related Agent Coordination Contract Set"
+        ],
+        "text": "The practical requirement is simple: coordination runtime, FlowDefinition,\ndispatch, RunResult, Work lifecycle, and coding-domain authority stay separate\neven when a single feature path exercises all of them.",
+        "textDigest": "03ff5a27206fd13c4aa6c436e2e4837f5e3d546c1235631cf7242d16c8240dac"
+      }
+    },
+    {
+      "claimId": "claim_389cbb0ed16d03193f95b1050307bcf6",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-16 (lines 73–78) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-18 (lines 96–101), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-18"
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "anchor": "unheaded-block-16",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "- identity and root ownership;\n- state classes and event truth;\n- command boundaries;\n- capability grants and refusals;\n- evidence and proof rules;\n- compatibility, rollback, and repair behavior.",
+        "textDigest": "2ecb29da7677f901380af32f4dca8c03d15d215ee209dc90040b06996e0e0d41"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "anchor": "unheaded-block-18",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "3. Design Rule"
+        ],
+        "text": "- identity and root ownership;\n- state classes and event truth;\n- command boundaries;\n- capability grants and refusals;\n- evidence and proof rules;\n- compatibility, rollback, and repair behavior.",
+        "textDigest": "2ecb29da7677f901380af32f4dca8c03d15d215ee209dc90040b06996e0e0d41"
+      }
+    },
+    {
+      "claimId": "claim_2d4c69a3c963e28c172200df0c641de4",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ. Carry the complete unheaded-block at docs/architecture-map.md#unheaded-block-76 (lines 674–680) into docs/platform/architecture-map.md#unheaded-block-90 (lines 751–757), the frozen whole-system architecture owner. The source is appended as an explicitly labelled candidate subdivision to the existing anchor; original heading titles and every body line are retained, with heading levels changed only to preserve one H1. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/architecture-map.md",
+        "targetAnchor": "unheaded-block-90"
+      },
+      "source": {
+        "path": "docs/architecture-map.md",
+        "anchor": "unheaded-block-76",
+        "ancestry": [
+          "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009",
+          "Hệ quả"
+        ],
+        "text": "- **0010 không bị supersede** — 0015 chỉ đổi cách viết định danh của registry\n  đã khoá ở 0010, không đổi cấu trúc hay nội dung registry.\n- **Không đổi schema, không đổi code** — đây là rename thuần văn bản trong\n  tài liệu; không có contract nào đổi hành vi.\n- **Nhất quán với các hệ đã đổi trước đó** (`TSK<hash>` cho work id, `ADR<n>`\n  cho decision record, `RUL<n>` cho business rule) — hoàn tất mảnh #6 trong\n  bảng audit `id-systems-audit.md`.",
+        "textDigest": "35a06dabde538a28c7d1f33814e49318f975ead6273b8d0c2a64644387c9fe42"
+      },
+      "target": {
+        "path": "docs/platform/architecture-map.md",
+        "anchor": "unheaded-block-90",
+        "ancestry": [
+          "Architecture Map",
+          "Added in candidate: architecture-map source carriage",
+          "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009",
+          "Hệ quả"
+        ],
+        "text": "- **0010 không bị supersede** — 0015 chỉ đổi cách viết định danh của registry\n  đã khoá ở 0010, không đổi cấu trúc hay nội dung registry.\n- **Không đổi schema, không đổi code** — đây là rename thuần văn bản trong\n  tài liệu; không có contract nào đổi hành vi.\n- **Nhất quán với các hệ đã đổi trước đó** (`TSK<hash>` cho work id, `ADR<n>`\n  cho decision record, `RUL<n>` cho business rule) — hoàn tất mảnh #6 trong\n  bảng audit `id-systems-audit.md`.",
+        "textDigest": "35a06dabde538a28c7d1f33814e49318f975ead6273b8d0c2a64644387c9fe42"
+      }
+    },
+    {
+      "claimId": "claim_6c76d0fab04720e389309a5015571138",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Weak-exact: target digest repeats; source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/workspace-topology-audit.md#unheaded-block-16 (lines 95–95) into docs/platform/system-architecture/architecture/workspace-topology-audit.md#unheaded-block-18 (lines 118–118), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+        "targetAnchor": "unheaded-block-18"
+      },
+      "source": {
+        "path": "docs/architect/workspace-topology-audit.md",
+        "anchor": "unheaded-block-16",
+        "ancestry": [
+          "Workspace Topology Codebase Audit",
+          "A2. Config Is Tracked But Read/Write Authority Is Inconsistent"
+        ],
+        "text": "Architecture implication:",
+        "textDigest": "2840fb495530fc2479bf82372ad6625bb92a7467a34bbc8772dfaf56508352e9"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+        "anchor": "unheaded-block-18",
+        "ancestry": [
+          "Workspace Topology Codebase Audit",
+          "A2. Config Is Tracked But Read/Write Authority Is Inconsistent"
+        ],
+        "text": "Architecture implication:",
+        "textDigest": "2840fb495530fc2479bf82372ad6625bb92a7467a34bbc8772dfaf56508352e9"
+      }
+    },
+    {
+      "claimId": "claim_d9e42b44fb1228690b7ae142d10d9f6c",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/architecture-intent.md#20-evidence-pointers (lines 759–759) into docs/platform/system-architecture/architecture/architecture-intent.md#20-evidence-pointers (lines 782–782), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "20-evidence-pointers"
+      },
+      "source": {
+        "path": "docs/architect/architecture-intent.md",
+        "anchor": "20-evidence-pointers",
+        "ancestry": [
+          "Architecture Intent"
+        ],
+        "text": "## 20. Evidence Pointers\n\n- Step 08 plan:\n  `plans/260901-1542-step08-standalone-coordination/plan.md`\n- Isolation-heavy fixture:\n  `core/coordination-protocols/group-cognition-framework.yaml`\n- P05.2 live null result and infrastructure failures:\n  `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P05.2.md`\n- CoordinationSession contract:\n  `docs/architect/agent-coordination/contracts/coordination-session.md`\n- FlowDefinition contract:\n  `docs/architect/agent-coordination/contracts/flow-definition.md`\n- Master-coordinator playbook:\n  `docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md`\n- Hardened runtime primitives:\n  `src/runner/coordination/session-engine.mjs`,\n  `src/runner/coordination/store.mjs`",
+        "textDigest": "627773396507daa6b7e1d2b223164a5b3048387383e0751293a4195161526f77"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "20-evidence-pointers",
+        "ancestry": [
+          "Architecture Intent"
+        ],
+        "text": "## 20. Evidence Pointers\n\n- Step 08 plan:\n  `plans/260901-1542-step08-standalone-coordination/plan.md`\n- Isolation-heavy fixture:\n  `core/coordination-protocols/group-cognition-framework.yaml`\n- P05.2 live null result and infrastructure failures:\n  `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P05.2.md`\n- CoordinationSession contract:\n  `docs/architect/agent-coordination/contracts/coordination-session.md`\n- FlowDefinition contract:\n  `docs/architect/agent-coordination/contracts/flow-definition.md`\n- Master-coordinator playbook:\n  `docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md`\n- Hardened runtime primitives:\n  `src/runner/coordination/session-engine.mjs`,\n  `src/runner/coordination/store.mjs`",
+        "textDigest": "627773396507daa6b7e1d2b223164a5b3048387383e0751293a4195161526f77"
+      }
+    },
+    {
+      "claimId": "claim_a9aa6844124a3f743295244f65369427",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/architecture-intent.md#unheaded-block-52 (lines 334–340) into docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-54 (lines 357–363), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "unheaded-block-54"
+      },
+      "source": {
+        "path": "docs/architect/architecture-intent.md",
+        "anchor": "unheaded-block-52",
+        "ancestry": [
+          "Architecture Intent",
+          "9. The Primitive Is Still Open"
+        ],
+        "text": "Possible split:\n\n| Primitive | Use |\n|---|---|\n| `requestRound` | Actor records that another round is needed. No dispatch authority. |\n| `authorizeDeclaredOperation` | Driver authorizes one already-declared optional operation. |\n| `addSessionEdge` | Later-only primitive for a genuinely unknown specialist consult edge. |",
+        "textDigest": "7c4b0495e7e5e43adbf552e6f5a6025d4bbea3dde554cfa473e9abc3576d0e4e"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "unheaded-block-54",
+        "ancestry": [
+          "Architecture Intent",
+          "9. The Primitive Is Still Open"
+        ],
+        "text": "Possible split:\n\n| Primitive | Use |\n|---|---|\n| `requestRound` | Actor records that another round is needed. No dispatch authority. |\n| `authorizeDeclaredOperation` | Driver authorizes one already-declared optional operation. |\n| `addSessionEdge` | Later-only primitive for a genuinely unknown specialist consult edge. |",
+        "textDigest": "7c4b0495e7e5e43adbf552e6f5a6025d4bbea3dde554cfa473e9abc3576d0e4e"
+      }
+    },
+    {
+      "claimId": "claim_11d2f816f621c7c9cffad344a3356475",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/system-vision-trong-mem-ngoai-cung.md#unheaded-block-10 (lines 47–52) into docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-12 (lines 70–75), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "targetAnchor": "unheaded-block-12"
+      },
+      "source": {
+        "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+        "anchor": "unheaded-block-10",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "text": "During the group-thinking work, implementation pressure pulled attention toward\nharnesses, schemas, tests, and fixtures. Those were necessary: without them the\nsystem cannot be trusted. But too much attention on harness alone made the\nMaster Coordination shape hard to deploy as a living operating pattern. The\nsystem could become correct but stiff: safe mechanics with too little soul,\nprose, and skill surface for agents to actually coordinate well.",
+        "textDigest": "8d0bcb622e3057582d231b81a0380adecdd47c78593bd957b1e525a262907264"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+        "anchor": "unheaded-block-12",
+        "ancestry": [
+          "System Vision: Trong Mem Ngoai Cung",
+          "2. Why This Exists"
+        ],
+        "text": "During the group-thinking work, implementation pressure pulled attention toward\nharnesses, schemas, tests, and fixtures. Those were necessary: without them the\nsystem cannot be trusted. But too much attention on harness alone made the\nMaster Coordination shape hard to deploy as a living operating pattern. The\nsystem could become correct but stiff: safe mechanics with too little soul,\nprose, and skill surface for agents to actually coordinate well.",
+        "textDigest": "8d0bcb622e3057582d231b81a0380adecdd47c78593bd957b1e525a262907264"
+      }
+    }
+  ]
+}

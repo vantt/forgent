@@ -1,0 +1,31 @@
+2026-10-15T02:21:35.831Z pin 798b08e252415d16558d15ee8c7df0482c4bad1e registry sha 1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02
+2026-10-15T02:21:36.069Z registry commit 2a1304393b9b284ad9566b6542ba78554f54b100 binds to pin true
+2026-10-15T02:21:36.069Z generate start
+2026-10-15T02:30:01.332Z generated items 4412 claims 88224 keys $schema,version,generatedAt,phase,description,commit,identityRegistry,scanRoots,additionalRootFiles,summary,duplicateContentGroups,semanticConflictGroups,claimIdentityGapRows,scanGaps,immutableRefEdges,claimLedger,consumerEdges,inboundLinkEdges,items
+2026-10-15T02:30:04.532Z v8 cache bytes 1398060335
+2026-10-15T02:30:04.737Z pack s6-whole-system-architect-portal.json rows 0 controls 11 unmatched 5
+2026-10-15T02:30:04.975Z pack s6-whole-system-architecture-intent.json rows 2 controls 143 unmatched 2
+2026-10-15T02:30:05.207Z pack s6-whole-system-architecture-map.json rows 0 controls 119 unmatched 21
+2026-10-15T02:30:05.504Z pack s6-whole-system-component-component-boundary-advisory.json rows 0 controls 166 unmatched 129
+2026-10-15T02:30:05.642Z pack s6-whole-system-component-readme.json rows 0 controls 52 unmatched 243
+2026-10-15T02:30:05.778Z pack s6-whole-system-component-repo-layout-vision.json rows 0 controls 51 unmatched 244
+2026-10-15T02:30:05.949Z pack s6-whole-system-roadmap.json rows 0 controls 37 unmatched 2
+2026-10-15T02:30:06.122Z pack s6-whole-system-system-overview.json rows 0 controls 50 unmatched 3
+2026-10-15T02:30:06.294Z pack s6-whole-system-system-vision-trong-mem-ngoai-cung.json rows 0 controls 31 unmatched 2
+2026-10-15T02:30:06.499Z pack s6-whole-system-workspace-topology-audit.json rows 0 controls 55 unmatched 2
+2026-10-15T02:30:06.672Z pack s6-whole-system-workspace-topology-roadmap.json rows 0 controls 48 unmatched 2
+2026-10-15T02:30:06.851Z pack s6-whole-system-workspace-topology.json rows 0 controls 61 unmatched 2
+2026-10-15T02:30:06.876Z composite controls 824 not control 0 digest mismatch 0
+2026-10-15T02:30:07.699Z check D both
+2026-10-15T02:33:22.714Z {"check":"D","priors":"both","fatal":0,"fatalTypes":[],"open":[["files-unknown-blocking",1153],["claims-unknown-blocking",22445],["claims-partial-carry",14],["claims-not-reviewed",22674],["claims-without-own-rationale",22445],["identical-units-multiple-owners",352],["registry-gaps-without-disposition",464],["candidate-blocks-unreferenced",2189]]}
+2026-10-15T02:33:22.714Z check E both
+2026-10-15T02:36:35.191Z {"check":"E","priors":"both","fatal":3,"fatalTypes":["claims-not-reviewed","identical-units-multiple-owners","candidate-blocks-unreferenced"],"open":[["claims-not-reviewed",2],["identical-units-multiple-owners",2],["candidate-blocks-unreferenced",67]]}
+2026-10-15T02:36:35.191Z check D identity
+2026-10-15T02:39:45.610Z {"check":"D","priors":"identity","fatal":0,"fatalTypes":[],"open":[["files-unknown-blocking",1153],["claims-unknown-blocking",22445],["claims-partial-carry",14],["claims-not-reviewed",22674],["claims-without-own-rationale",22445],["identical-units-multiple-owners",352],["registry-gaps-without-disposition",464],["candidate-blocks-unreferenced",2189]]}
+2026-10-15T02:39:45.610Z check E identity
+2026-10-15T02:42:57.121Z {"check":"E","priors":"identity","fatal":3,"fatalTypes":["claims-not-reviewed","identical-units-multiple-owners","candidate-blocks-unreferenced"],"open":[["claims-not-reviewed",2],["identical-units-multiple-owners",2],["candidate-blocks-unreferenced",67]]}
+2026-10-15T02:42:57.121Z check D phase02
+2026-10-15T02:46:10.564Z {"check":"D","priors":"phase02","fatal":0,"fatalTypes":[],"open":[["files-unknown-blocking",1153],["claims-unknown-blocking",22445],["claims-partial-carry",14],["claims-not-reviewed",22674],["claims-without-own-rationale",22445],["identical-units-multiple-owners",352],["registry-gaps-without-disposition",464],["candidate-blocks-unreferenced",2189]]}
+2026-10-15T02:46:10.564Z check E phase02
+2026-10-15T02:49:21.537Z {"check":"E","priors":"phase02","fatal":3,"fatalTypes":["claims-not-reviewed","identical-units-multiple-owners","candidate-blocks-unreferenced"],"open":[["claims-not-reviewed",2],["identical-units-multiple-owners",2],["candidate-blocks-unreferenced",67]]}
+2026-10-15T02:49:21.563Z done

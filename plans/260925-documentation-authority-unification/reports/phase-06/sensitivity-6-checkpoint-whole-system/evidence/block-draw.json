@@ -1,0 +1,600 @@
+{
+ "pin": "798b08e252415d16558d15ee8c7df0482c4bad1e",
+ "seed": "s6-blocks-a4954387-d1ec7fd85fe019b9",
+ "cuCount": 67,
+ "owners": [
+  "docs/platform/architecture-map.md",
+  "docs/platform/component-boundary.md",
+  "docs/platform/system-architecture/architecture/architecture-intent.md",
+  "docs/platform/system-architecture/architecture/roadmap.md",
+  "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+  "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+  "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+  "docs/platform/system-architecture/architecture/workspace-topology.md",
+  "docs/platform/system-architecture/history/architect-readme.md",
+  "docs/platform/system-overview/spec.md"
+ ],
+ "population": {
+  "units": 611,
+  "unnamed": 46,
+  "rewritten": 30
+ },
+ "draw": {
+  "unnamed": [
+   {
+    "key": "docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-1",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete workspace-topology.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/workspace-topology.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 0513cd70c080c546bb009a253adab60dbb5d43f1)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/workspace-topology.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/workspace-topology.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```",
+    "unsourcedLines": [
+     "Document type: Architecture",
+     "Audience: Human reviewer, architect, maintainer, agent",
+     "Purpose: Preserve the complete workspace-topology.md source at its frozen-map candidate owner",
+     "Design status: Candidate",
+     "Implementation: Partial — inherited source qualifications; not independently truth-verified",
+     "Provenance: docs/architect/workspace-topology.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 0513cd70c080c546bb009a253adab60dbb5d43f1)",
+     "Writer type: Agent carriage; independent review pending",
+     "Canonical for: Nothing until promotion; current source remains docs/architect/workspace-topology.md",
+     "Use this when: Reviewing whole-system candidate carriage and placement",
+     "Do not use this for: Inferring implementation, promotion or superseding source authority",
+     "Last reviewed: Pending independent review",
+     "- docs/architect/workspace-topology.md",
+     "- docs/platform/architecture-map.md",
+     "Supersedes: None — candidate only",
+     "Superseded by: None"
+    ]
+   },
+   {
+    "key": "docs/platform/system-architecture/architecture/workspace-topology-audit.md#unheaded-block-1",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete workspace-topology-audit.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/workspace-topology-audit.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 024cac1f17203b20d4fcfdf95d1672c17fd4e5a5)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/workspace-topology-audit.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/workspace-topology-audit.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```",
+    "unsourcedLines": [
+     "Document type: Architecture",
+     "Audience: Human reviewer, architect, maintainer, agent",
+     "Purpose: Preserve the complete workspace-topology-audit.md source at its frozen-map candidate owner",
+     "Design status: Candidate",
+     "Implementation: Partial — inherited source qualifications; not independently truth-verified",
+     "Provenance: docs/architect/workspace-topology-audit.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 024cac1f17203b20d4fcfdf95d1672c17fd4e5a5)",
+     "Writer type: Agent carriage; independent review pending",
+     "Canonical for: Nothing until promotion; current source remains docs/architect/workspace-topology-audit.md",
+     "Use this when: Reviewing whole-system candidate carriage and placement",
+     "Do not use this for: Inferring implementation, promotion or superseding source authority",
+     "Last reviewed: Pending independent review",
+     "- docs/architect/workspace-topology-audit.md",
+     "- docs/platform/architecture-map.md",
+     "Supersedes: None — candidate only",
+     "Superseded by: None"
+    ]
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-200",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "Carriage from `docs/architect/component-boundary/repo-layout-vision.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+    "unsourcedLines": [
+     "Carriage from `docs/architect/component-boundary/repo-layout-vision.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+    ]
+   },
+   {
+    "key": "docs/platform/system-architecture/history/architect-readme.md#unheaded-block-1",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\nSupersedes: None; no legacy source is edited\nSuperseded by: None\n```",
+    "unsourcedLines": [
+     "Document type: History",
+     "Audience: Human reviewer, architect, maintainer, agent",
+     "Purpose: Preserve the complete architect portal source snapshot",
+     "Design status: Candidate",
+     "Implementation: Historical source metadata; no current implementation assertion",
+     "Provenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f",
+     "Writer type: Agent",
+     "Canonical for: Nothing; non-canonical conservation carrier",
+     "Use this when: Reviewing the retained architect README source",
+     "Do not use this for: Current platform navigation or authority",
+     "Last reviewed: Pending independent review",
+     "- docs/platform/README.md",
+     "- docs/architect/README.md",
+     "Supersedes: None; no legacy source is edited",
+     "Superseded by: None"
+    ]
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-7",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "Any design discussion or documentation rewrite must check this boundary map when it changes:",
+    "unsourcedLines": [
+     "Any design discussion or documentation rewrite must check this boundary map when it changes:"
+    ]
+   },
+   {
+    "key": "docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-2",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion.",
+    "unsourcedLines": [
+     "Added in candidate: migration metadata and physical link rebasing. Original source metadata, dates, design limits and historic claims below are provenance, not fresh review. Current truth is unverified; A28 requires sampled truth review at this checkpoint and full truth review at promotion."
+    ]
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-11",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "If a design changes whole-system structure, do all of the following:",
+    "unsourcedLines": [
+     "If a design changes whole-system structure, do all of the following:"
+    ]
+   },
+   {
+    "key": "docs/platform/system-overview/spec.md#unheaded-block-3",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "Added in candidate: original source frontmatter (verbatim provenance).",
+    "unsourcedLines": [
+     "Added in candidate: original source frontmatter (verbatim provenance)."
+    ]
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-9",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "```txt\nentry / surface\n  -> use-case orchestration\n  -> side-effect ports and host adapters\n  -> domain-neutral engines\n  -> durable state/log substrate\n  -> domain and extension layers\n```",
+    "unsourcedLines": [
+     "entry / surface",
+     "-> use-case orchestration",
+     "-> side-effect ports and host adapters",
+     "-> domain-neutral engines",
+     "-> durable state/log substrate",
+     "-> domain and extension layers"
+    ]
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-13",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "`docs/architecture-map.md` is still the full legacy map. Do not delete or rewrite it wholesale until its component and contract registry content has been promoted or redirected.",
+    "unsourcedLines": [
+     "`docs/architecture-map.md` is still the full legacy map. Do not delete or rewrite it wholesale until its component and contract registry content has been promoted or redirected."
+    ]
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-2",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "This is the target platform-docs anchor for the whole-system architecture map.",
+    "unsourcedLines": [
+     "This is the target platform-docs anchor for the whole-system architecture map."
+    ]
+   },
+   {
+    "key": "docs/platform/system-architecture/history/architect-readme.md#unheaded-block-2",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "Added in candidate: metadata above identifies a non-canonical history carrier. The complete previously reviewed source carriage follows.",
+    "unsourcedLines": [
+     "Added in candidate: metadata above identifies a non-canonical history carrier. The complete previously reviewed source carriage follows."
+    ]
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-5",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "- a structural layer: where code lives and how import direction works;\n- a data/physics layer: store, event, state, signal, run;\n- an authority layer: who may decide or write which truth;\n- component and contract registries.",
+    "unsourcedLines": [
+     "- a structural layer: where code lives and how import direction works;",
+     "- a data/physics layer: store, event, state, signal, run;",
+     "- an authority layer: who may decide or write which truth;",
+     "- component and contract registries."
+    ]
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-159",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "Carriage from `docs/architect/component-boundary/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim.",
+    "unsourcedLines": [
+     "Carriage from `docs/architect/component-boundary/README.md` at `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`; pending independent conservation review. Full source text follows, with heading levels and physical link destinations adjusted only. Source metadata is provenance; this section makes no new implementation or authority claim."
+    ]
+   },
+   {
+    "key": "docs/platform/system-overview/spec.md#unheaded-block-1",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "```txt\nDocument type: Area spec\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete system-overview.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/specs/system-overview.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob c24c5561dc60cce7e53d0a0c5e34ff97414845ac)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/specs/system-overview.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/specs/system-overview.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```",
+    "unsourcedLines": [
+     "Document type: Area spec",
+     "Audience: Human reviewer, architect, maintainer, agent",
+     "Purpose: Preserve the complete system-overview.md source at its frozen-map candidate owner",
+     "Design status: Candidate",
+     "Implementation: Partial — inherited source qualifications; not independently truth-verified",
+     "Provenance: docs/specs/system-overview.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob c24c5561dc60cce7e53d0a0c5e34ff97414845ac)",
+     "Writer type: Agent carriage; independent review pending",
+     "Canonical for: Nothing until promotion; current source remains docs/specs/system-overview.md",
+     "Use this when: Reviewing whole-system candidate carriage and placement",
+     "Do not use this for: Inferring implementation, promotion or superseding source authority",
+     "Last reviewed: Pending independent review",
+     "- docs/specs/system-overview.md",
+     "- docs/platform/architecture-map.md",
+     "Supersedes: None — candidate only",
+     "Superseded by: None"
+    ]
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-6",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "The target documentation system separates these concerns into clearer anchors:",
+    "unsourcedLines": [
+     "The target documentation system separates these concerns into clearer anchors:"
+    ]
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-12",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "1. Update the owning area docs.\n2. Check `component-boundary.md`.\n3. Update this architecture map when the structural reading path changes.\n4. Link proof or record `No component-boundary change`.",
+    "unsourcedLines": [
+     "1. Update the owning area docs.",
+     "2. Check `component-boundary.md`.",
+     "3. Update this architecture map when the structural reading path changes.",
+     "4. Link proof or record `No component-boundary change`."
+    ]
+   },
+   {
+    "key": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md#unheaded-block-1",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "```txt\nDocument type: Architecture\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete system-vision-trong-mem-ngoai-cung.md source at its frozen-map candidate owner\nDesign status: Candidate\nImplementation: Partial — inherited source qualifications; not independently truth-verified\nProvenance: docs/architect/system-vision-trong-mem-ngoai-cung.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 473dd8f1f28f4573194c47ca787973c52cc65756)\nWriter type: Agent carriage; independent review pending\nCanonical for: Nothing until promotion; current source remains docs/architect/system-vision-trong-mem-ngoai-cung.md\nUse this when: Reviewing whole-system candidate carriage and placement\nDo not use this for: Inferring implementation, promotion or superseding source authority\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/system-vision-trong-mem-ngoai-cung.md\n- docs/platform/component-boundary.md\n- docs/platform/architecture-map.md\nSupersedes: None — candidate only\nSuperseded by: None\n```",
+    "unsourcedLines": [
+     "Document type: Architecture",
+     "Audience: Human reviewer, architect, maintainer, agent",
+     "Purpose: Preserve the complete system-vision-trong-mem-ngoai-cung.md source at its frozen-map candidate owner",
+     "Design status: Candidate",
+     "Implementation: Partial — inherited source qualifications; not independently truth-verified",
+     "Provenance: docs/architect/system-vision-trong-mem-ngoai-cung.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539 (blob 473dd8f1f28f4573194c47ca787973c52cc65756)",
+     "Writer type: Agent carriage; independent review pending",
+     "Canonical for: Nothing until promotion; current source remains docs/architect/system-vision-trong-mem-ngoai-cung.md",
+     "Use this when: Reviewing whole-system candidate carriage and placement",
+     "Do not use this for: Inferring implementation, promotion or superseding source authority",
+     "Last reviewed: Pending independent review",
+     "- docs/architect/system-vision-trong-mem-ngoai-cung.md",
+     "- docs/platform/architecture-map.md",
+     "Supersedes: None — candidate only",
+     "Superseded by: None"
+    ]
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-11",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "| Component | Current role | Current source |\n| --- | --- | --- |\n| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gates. Does not own stage or sequencing (owned by Workflow runner). Owns worker slots (`OccupancyPort`), and fail-safe claim settlement (`fgos return --to blocked`). | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |\n| Workflow (Định nghĩa + Run + Runner + Tích hợp) | Domain-neutral step & Unit DAG scheduling (`src/workflow/**`), human review gates, pure git integration. Single sequencer for plans, workflows, and multi-unit tasks. | [../specs/runner.md](../specs/runner.md) |\n| Execution Core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture) | Single authority for \"ai làm / model / persona / cơ chế\" (`src/runner/execution/bind.mjs`), single run door for new work (`fgos run` via `src/runner/execution/run.mjs`, herdr pane default, cli fallback), OS confinement posture for both herdr and cli, verifiable mutating gate. Strictly forbids L3 Work lifecycle dependencies (`src/state/**`). | [../specs/runner.md](../specs/runner.md) |\n| Collaboration Patterns (Execution Core) | Domain-neutral small collaboration loops (`solo`, `reviewed`, `panel`) and presets (`consult`, `research-fan-out`, `rfc`). Replaces retired coordination engine. | [../specs/runner.md](../specs/runner.md) |\n| Herdr (Transport chính + Bề mặt quan sát) | Transport mặc định cho out-of-process runs, pane execution liveness, plugin `herdr-dashboard/` (TUI trong pane herdr + pick/pane supervisor; herdr nạp qua `herdr-plugin.toml`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| fgos Gateway | Tiến trình detached duy nhất phục vụ REST API (`/v1`, hợp đồng CTR010), MCP `search`/`execute` trên cùng cổng, và bundle web dashboard nhúng sẵn (`apps/fgos-gateway/`: `gateway.rs`, `mcp.rs`, `cf_access.rs`, `remote_invocation.rs`, `web/`). Vòng đời duy nhất qua `fgos gateway start\\|status\\|stop`; không phải một phần của herdr và không phải \"herdr-gateway\" (tên đó chỉ repo tham chiếu ngoài). Dùng chung với `herdr-dashboard` lớp adapter CLI fgos tại `packages/herdr-fgos-common/rust` (`fgos.rs`, `settings.rs`, trait `WorkItemSource`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| Dispatch Transport & Confinement | Machine backend registry, isolation confinement (`bwrap` v1 driver, attestation storage, fail-closed probes), executor adapters; the `bwrap` driver calls the credential renewal module at provisioning (`copyCredentialFiles`, the write-back marker) and removing a private home (`confinement/cleanup.mjs`) calls it again for write-back (dependency confinement → provider capacity, for the account lock only). | [../specs/confinement-authority.md](../specs/confinement-authority.md) |\n| Run Result Evaluator | Evidence/confidence boundary for assignment run results. | [../architect/agent-coordination/architecture/evidence-and-results.md](../architect/agent-coordination/architecture/evidence-and-results.md) |\n| Domain Components And Extension Layer | Domain-specific behavior, workflows, skills, task specs, doctrine. L2 prose no longer picks executors or mechanisms (lớp matching L2 cũ đã thu hồi per 0048); thin driver `fgos-run` delegates directly to Workflow runner and P1 Execution Core. | [../../domains/](../../domains/), [../architect/domainization/](../architect/domainization/) |\n| Host And Surface Layer | CLI, fgos Gateway (REST/MCP/web), `herdr-dashboard` plugin and other Herdr surfaces into platform engines. | Host invocation and gateway docs |\n| Packaging-Distribution | Runtime packaging, install, activation, setup/doctor readiness. | [packaging-distribution/README.md](packaging-distribution/README.md) |\n| Knowledge, Learning, And Documentation Registry | Retrospective learning, doc registry, end-user docs index, trace/evolve signals. | Knowledge and docs registry docs |\n| Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](../specs/observe.md) |\n| Convention (Executable Names & Placement) | Platform-core authority for deterministic artifact names, repository-relative placement, path classification, and conformance checking. Implemented; owns no state and depends only on `fgos-host-runtime`. | [convention/spec.md](convention/spec.md) |",
+    "unsourcedLines": [
+     "| Component | Current role | Current source |",
+     "| --- | --- | --- |",
+     "| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gates. Does not own stage or sequencing (owned by Workflow runner). Owns worker slots (`OccupancyPort`), and fail-safe claim settlement (`fgos return --to blocked`). | [../architect/component-boundary/component-boundary-advisory.md]() |",
+     "| Workflow (Định nghĩa + Run + Runner + Tích hợp) | Domain-neutral step & Unit DAG scheduling (`src/workflow/**`), human review gates, pure git integration. Single sequencer for plans, workflows, and multi-unit tasks. | [../specs/runner.md]() |",
+     "| Execution Core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture) | Single authority for \"ai làm / model / persona / cơ chế\" (`src/runner/execution/bind.mjs`), single run door for new work (`fgos run` via `src/runner/execution/run.mjs`, herdr pane default, cli fallback), OS confinement posture for both herdr and cli, verifiable mutating gate. Strictly forbids L3 Work lifecycle dependencies (`src/state/**`). | [../specs/runner.md]() |",
+     "| Collaboration Patterns (Execution Core) | Domain-neutral small collaboration loops (`solo`, `reviewed`, `panel`) and presets (`consult`, `research-fan-out`, `rfc`). Replaces retired coordination engine. | [../specs/runner.md]() |",
+     "| Herdr (Transport chính + Bề mặt quan sát) | Transport mặc định cho out-of-process runs, pane execution liveness, plugin `herdr-dashboard/` (TUI trong pane herdr + pick/pane supervisor; herdr nạp qua `herdr-plugin.toml`). | [../specs/herdr-web-dashboard.md]() |",
+     "| fgos Gateway | Tiến trình detached duy nhất phục vụ REST API (`/v1`, hợp đồng CTR010), MCP `search`/`execute` trên cùng cổng, và bundle web dashboard nhúng sẵn (`apps/fgos-gateway/`: `gateway.rs`, `mcp.rs`, `cf_access.rs`, `remote_invocation.rs`, `web/`). Vòng đời duy nhất qua `fgos gateway start\\|status\\|stop`; không phải một phần của herdr và không phải \"herdr-gateway\" (tên đó chỉ repo tham chiếu ngoài). Dùng chung với `herdr-dashboard` lớp adapter CLI fgos tại `packages/herdr-fgos-common/rust` (`fgos.rs`, `settings.rs`, trait `WorkItemSource`). | [../specs/herdr-web-dashboard.md]() |",
+     "| Dispatch Transport & Confinement | Machine backend registry, isolation confinement (`bwrap` v1 driver, attestation storage, fail-closed probes), executor adapters; the `bwrap` driver calls the credential renewal module at provisioning (`copyCredentialFiles`, the write-back marker) and removing a private home (`confinement/cleanup.mjs`) calls it again for write-back (dependency confinement → provider capacity, for the account lock only). | [../specs/confinement-authority.md]() |",
+     "| Run Result Evaluator | Evidence/confidence boundary for assignment run results. | [../architect/agent-coordination/architecture/evidence-and-results.md]() |",
+     "| Domain Components And Extension Layer | Domain-specific behavior, workflows, skills, task specs, doctrine. L2 prose no longer picks executors or mechanisms (lớp matching L2 cũ đã thu hồi per 0048); thin driver `fgos-run` delegates directly to Workflow runner and P1 Execution Core. | [../../domains/](), [../architect/domainization/]() |",
+     "| Host And Surface Layer | CLI, fgos Gateway (REST/MCP/web), `herdr-dashboard` plugin and other Herdr surfaces into platform engines. | Host invocation and gateway docs |",
+     "| Packaging-Distribution | Runtime packaging, install, activation, setup/doctor readiness. | [packaging-distribution/README.md]() |",
+     "| Knowledge, Learning, And Documentation Registry | Retrospective learning, doc registry, end-user docs index, trace/evolve signals. | Knowledge and docs registry docs |",
+     "| Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md]() |",
+     "| Convention (Executable Names & Placement) | Platform-core authority for deterministic artifact names, repository-relative placement, path classification, and conformance checking. Implemented; owns no state and depends only on `fgos-host-runtime`. | [convention/spec.md]() |"
+    ]
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-4",
+    "named": false,
+    "rewritten": false,
+    "candidateUnverified": true,
+    "text": "The legacy architecture map organizes fgOS through:",
+    "unsourcedLines": [
+     "The legacy architecture map organizes fgOS through:"
+    ]
+   }
+  ],
+  "rewritten": [
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-22",
+    "named": true,
+    "claimId": "claim_52f6a74db75c041ef213f90557704b0a",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "**Changelog v0.3 → v0.4** (record [0013](../specs/work-state.md#0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from) — mở rộng CTR003, không supersede):",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md#unheaded-block-4",
+    "named": true,
+    "claimId": "claim_a7edb0cf63356b89b074e3d31a3489cd",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "This roadmap sequences the decisions and migration work required to make\nworkspace topology enforceable. It is not the contract; the contract is\n[workspace-topology.md](../../../architect/workspace-topology.md). Evidence lives in\n[workspace-topology-audit.md](../../../architect/workspace-topology-audit.md).",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-architecture/history/architect-readme.md#unheaded-block-8",
+    "named": true,
+    "claimId": "claim_9ef07c1714bdc408ccfcafaa152e41f9",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "- [Architect-Level Proposals](../../../architect/proposals/README.md) holds discussion drafts\n  whose scope crosses one architecture area. These are not accepted design\n  until extracted into canonical architect-level or area-specific documents.",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-15",
+    "named": true,
+    "claimId": "claim_b5eaf900c55b4d0160e490fd9da0de39",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "Document type: Proposal\nDesign status: Discussion / Visionary advisory\nImplementation: N/A\nLast reviewed: 2026-09-01\nCanonical for: nothing; architectural advisory only\nRelated: [Architecture Map](../architecture-map.md), [System Overview](../specs/system-overview.md), [Platform Foundations](../platform-foundations.md), [Domainization Architecture](../architect/domainization/README.md), [Agent Coordination Foundation Vision](../architect/agent-coordination/vision.md), [Concept Relationships](../architect/agent-coordination/vocabulary/concept-relationships.md), [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md), [Protocol Model](../architect/agent-coordination/architecture/protocol-model.md), [CoordinationSession Contract](../architect/agent-coordination/contracts/coordination-session.md), [FlowDefinition Contract](../architect/agent-coordination/contracts/flow-definition.md)",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-186",
+    "named": true,
+    "claimId": "claim_9d1e7b76bcbf3b0fcf5e0edcdf130653",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "[host-invocation-provider-routing.md](../architect/host-invocation-routing/host-invocation-provider-routing.md)\ndefines the shared host invocation path and the Operation Provider Router.",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-9",
+    "named": true,
+    "claimId": "claim_667f0a653a47e5f3a32529daa396b131",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "[System Vision: Trong Mem Ngoai Cung](../../../architect/system-vision-trong-mem-ngoai-cung.md)\nis the cross-system reminder behind this intent file:",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md#unheaded-block-3",
+    "named": true,
+    "claimId": "claim_10fc1e33271d1736a8eabd0b522540ea",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "**Status:** Planning companion for [workspace-topology.md](../../../architect/workspace-topology.md).\n**Date:** 2026-09-04.",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-189",
+    "named": true,
+    "claimId": "claim_57cd483e44658aa1583e968cc86e8ab9",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "[node-to-rust-component-migration.md](../architect/host-invocation-routing/node-to-rust-component-migration.md)\nrecords the migration shape for replacing Node harness internals with\nRust components one boundary at a time while preserving the existing `fgos`\nsurface.",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-architecture/history/architect-readme.md#unheaded-block-9",
+    "named": true,
+    "claimId": "claim_f42e391a572ab02fa51adb4e64446f0e",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "- [Dispatch Control Plane Redesign](../../../architect/dispatch-control-plane-redesign.md)\n- [Doing Coordination Redesign](../../../architect/doing-coordination-redesign.md)\n- [Knowledge Registry Redesign](../../../architect/knowledge-registry-redesign.md)",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-56",
+    "named": true,
+    "claimId": "claim_ae47f4ebf4390cd7a05bc5455deb37ed",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "| Existing contract or rule | Primary owner | Important consumers | Ownership note |\n|---|---|---|---|\n| [Workflow Stage Operation Contract](../architect/agent-coordination/contracts/workflow-stage-operation.md) | Domain Components And Extension Layer, as consumed by Work Lifecycle Engine | Agent Coordination Engine, Assignment Builder | Owns declared domain Work-stage operation normalization and compatibility. Coding Feature Workflow and Bugfix Workflow are coding-domain subcomponents, not Agent Coordination core. |\n| [FlowDefinition Contract](../architect/agent-coordination/contracts/flow-definition.md) | Domain Components And Extension Layer, with validation consumed by Agent Coordination Engine | Team Cognition Engine, Work Lifecycle Engine, Dispatch/Execution | Owns schema/IR for graph, roles, actors, operations, profiles, and declared policy hints. It should not own runtime state, executor choice, or evidence truth. |\n| [CoordinationSession Contract](../architect/agent-coordination/contracts/coordination-session.md) | Agent Coordination Engine | Team Cognition Engine, Dispatch/Execution, Run Result Evaluator, Work Lifecycle Engine | Owns session manifest, event stream, assignment membership, aggregate bounds, topology state, and recovery. It should reference Assignment/Run/RunResult records, not duplicate them. |\n| Assignment section of [Assignment, Run, And RunResult Contract](../architect/agent-coordination/contracts/assignment-run-runresult.md) | Agent Coordination Engine / Assignment Builder | Domain Components And Extension Layer, Domain Harnesses, Dispatch/Execution | Owns immutable semantic request shape and provenance. It should freeze mutation/evidence/budget/policy inputs before dispatch. |\n| Run section of [Assignment, Run, And RunResult Contract](../architect/agent-coordination/contracts/assignment-run-runresult.md) | Dispatch And Execution Engine | Run Result Evaluator, Host/Surface, Agent Coordination Engine | Owns one concrete attempt and its resolved DispatchPlan/mechanism metadata. It should not become semantic task identity. |\n| RunResult and Confidence sections of [Assignment, Run, And RunResult Contract](../architect/agent-coordination/contracts/assignment-run-runresult.md) | Run Result Evaluator | Agent Coordination Engine, Work Lifecycle Engine, Team Cognition Engine | Owns normalized outcome, confidence, accepted/rejected evidence, and failure classification. It should not authorize lifecycle mutation. |\n| [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md) | Dispatch And Execution Engine | Agent Coordination Engine, Domain Components And Extension Layer, Host/Surface | Owns executor/provider/model/tier/mechanism/adapter/governance resolution. It should not choose semantic operations or interpret success. |\n| [Evidence And Result Architecture](../architect/agent-coordination/architecture/evidence-and-results.md) | Run Result Evaluator | Dispatch/Execution, Agent Coordination Engine, Work Lifecycle Engine, Domain Components And Extension Layer | Owns confidence boundaries, evidence freshness, and false-success rules. Adapters and domain evidence policy should feed it evidence, not replace it. |\n| [Work Integration Boundaries](../architect/agent-coordination/architecture/work-integration.md) | Work Lifecycle Engine | Agent Coordination Engine, Domain Components And Extension Layer, Run Result Evaluator | Owns the rule that only Work verbs move domain-agnostic Work lifecycle state. Domain-specific lifecycle effects such as coding merge/technical approval belong to the relevant domain component. Sessions and RunResults may inform drivers only. |\n| [Visibility And Herdr](../architect/agent-coordination/architecture/visibility-and-herdr.md) | Host And Surface Layer | Dispatch/Execution, Run Result Evaluator, Agent Coordination Engine | Owns observation and operator visibility. It must consume canonical Run/RunResult state where possible and must not become truth. |\n| [ADR-007 Domain Harness Seam](../architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md) | Domain Components And Extension Layer | Assignment Builder, Agent Coordination Engine, Work Lifecycle Engine | Owns domain-specific enrichment/rejection before normalization. It may add constraints/evidence/policy hints, but may not dispatch or mutate lifecycle. |\n| Domain manifest and workflow declarations (`domains/<domain>/manifest.yaml`, `workflows/*.yaml`) | Domain Components And Extension Layer | Work Lifecycle Engine, Agent Coordination Engine, Assignment Builder, Dispatch And Execution Engine | Own stage vocabulary, legal operations, stage skill/taskSpec mapping, workflow selection, and domain policy hints. Other components read them; they do not reinterpret them. |\n| Domain task-specs (`domains/<domain>/task-specs/*.md`) | Domain Components And Extension Layer | Agent Coordination Engine, Assignment Builder, Skills, Run Result Evaluator | Own executable contract, collaboration triggers, required skill/agent hints, expected outputs, gates, and return shape for an operation. They are not runtime state and should not choose executor transport. |\n| Domain skills (`domains/<domain>/skills/*` or `.agents/skills/*`) | Domain Components And Extension Layer | Executors, Assignment Builder, Host/Surface | Own operational know-how for an executor. They must not silently replace task-spec authority, domain workflow legality, dispatch policy, or Work lifecycle verbs. |",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-24",
+    "named": true,
+    "claimId": "claim_7802cf85d2049b2cefb33fdc7a6c2249",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "**Changelog v0.4 → v0.5** (record [0015](#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009) — đổi tên định danh, không supersede):",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-61",
+    "named": true,
+    "claimId": "claim_c70f25eac4a54d44efef50283846611f",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | In the retired coordination engine, edges connected SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | In the retired coordination engine, `retrySessionTask` superseded a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | The retired coordination engine used `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |",
+    "unsourcedLines": [
+     "| `FlowDefinition` topology | In the retired coordination engine, edges connected SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |",
+     "| Retry/replacement | In the retired coordination engine, `retrySessionTask` superseded a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |",
+     "| Synthesis | The retired coordination engine used `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |"
+    ]
+   },
+   {
+    "key": "docs/platform/system-architecture/history/architect-readme.md#unheaded-block-6",
+    "named": true,
+    "claimId": "claim_8e07597a0163d64f1d5ca3ab8ad7b02a",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "- [Architect Roadmap](../../../architect/roadmap.md) keeps the high-level sequencing and delivery\n  plan across active architecture streams: agent coordination, coding domain,\n  component boundary, host invocation, Node-to-Rust migration, and packaging\n  distribution.\n- [Architecture Intent](../../../architect/architecture-intent.md) preserves architecture-wide\n  design intent across deferred capabilities. Its first active thread covers\n  widening fgOS from strict fan-out/fan-in and artifact-mediated coordination\n  toward richer group-thinking/problem-solving capability, while keeping\n  isolation-heavy fixtures intact.\n- [System Vision: Trong Mem Ngoai Cung](../../../architect/system-vision-trong-mem-ngoai-cung.md)\n  records the cross-system direction that fgOS must combine hard outer\n  contracts with soft inner soul/prose/skill, so architecture slices do not\n  become either unverifiable prose or rigid harness without living operating\n  intelligence.\n- [Workspace Topology Architecture](../../../architect/workspace-topology.md) defines\n  repository/workspace/work-state/runtime identities, state classes, root\n  ownership, worktree mode invariants, and mutation topology used by\n  packaging, work-state, coding-domain, coordination, and config/init/doctor.\n  Read this contract before packaging activation, work-state relocation,\n  coding-domain worktree changes, or runtime coordination changes.\n- [Workspace Topology Audit](../../../architect/workspace-topology-audit.md) records current\n  codebase evidence and gaps behind the topology contract.\n- [Workspace Topology Roadmap](../../../architect/workspace-topology-roadmap.md) sequences the\n  decisions and migration slices needed to make the contract enforceable.",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-overview/spec.md#unheaded-block-4",
+    "named": true,
+    "claimId": "claim_1599c9be961fd950fd31f7968df151f0",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "```yaml\n---\narea: system-overview\nupdated: 2026-08-12\ndecisions: [ca7de3cf, ae461c8b, ed953e09, 14ebeea9, 1a80b4d3, 65c642a8, 43f257ae, 6f2cbc47, a30a3d3c, 1359ab5e, b2d18cc7, 1d336d8a, 02623bff, c74bcef9]\ncoverage: partial\n---\n```",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-181",
+    "named": true,
+    "claimId": "claim_1ae387c9a41cee96fc8d499dcc6fe6f9",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "For folder-level domain authoring shape, domain manifest/workflow files,\ndomain-scoped doctrine, task-spec placement, skill/agent authoring sources, and\ndomain-siloing enforcement, use\n[Domainization Architecture](../architect/domainization/README.md).",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-architecture/history/architect-readme.md#unheaded-block-7",
+    "named": true,
+    "claimId": "claim_6729755c0a3b1b48ae5fa04ad0b634ef",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "- [Agent Coordination](../../../architect/agent-coordination/README.md)\n- [Component Boundary](../../../architect/component-boundary/README.md)\n- [Domainization](../../../architect/domainization/README.md)\n- [Host Invocation And Provider Routing](../../../architect/host-invocation-routing/host-invocation-provider-routing.md)\n- [Packaging And Distribution](../../../architect/packaging-distribution/README.md)",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-104",
+    "named": true,
+    "claimId": "claim_b92ccd61dbcea932897fe1d32ccad635",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "This is the plan shape, not a menu of questions. Each MVP keeps the original\nintention alive while adding only the architecture needed for that layer. The\ndetailed proposal lives in\n[Step 09 - Group Thinking Substrate](../../../architect/proposals/step-09-group-thinking-substrate.md).",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-39",
+    "named": true,
+    "claimId": "claim_ab73231bdd37667748e73f92da406a7b",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "| Component | Role | Internal boundaries | Owning / reference documents |\n|---|---|---|---|\n| Work Lifecycle Engine | fgOS component that owns domain-agnostic Work-unit management: item identity, status, stage, claim/return, related info, context, documents, questions, and Work verbs. It may use Agent Coordination for selected operations, but Agent Coordination never owns this lifecycle. | Work item state machine, domain-agnostic stage/status, claim/return ownership, related refs, context/document refs, human gates. | [Work-State Spec](../specs/work-state.md), [Work Item Lifecycle Vision](../work-item-lifecycle-vision.md), [System Overview](../specs/system-overview.md) |\n| Collaboration Patterns & Workflow Runner | Domain-neutral collaboration runtime (replaces retired Agent Coordination Engine per P4). Owns Workflow step DAG scheduling and small collaboration pattern loops (`solo`, `reviewed`, `panel`). | Workflow runner, Unit DAG scheduling, CollaborationPattern presets (`consult`, `research-fan-out`, `rfc`). | [Runner Spec](../specs/runner.md), [Platform Component Boundary](component-boundary.md) |\n| Dispatch And Execution Engine | Governed execution of one approved Assignment. It chooses the allowed executor/provider/model/tier/mechanism and supervises the Run. | dispatch policy resolver, executor registry, governance/egress, DispatchPlan, Run creation, launch/timeout/cancel/retry, executor adapters. | [Runner Spec](../specs/runner.md), [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md), [Assignment/Run/RunResult Contract](../architect/agent-coordination/contracts/assignment-run-runresult.md) |\n| Run Result Evaluator | Truth boundary for one Assignment Run. It turns the Assignment contract, Run settlement, worker claim, artifacts, and evidence into a RunResult confidence decision. | worker result parser, evidence collectors, freshness checks, artifact refs/store, confidence evaluator, RunResult normalizer. | [Evidence And Results](../architect/agent-coordination/architecture/evidence-and-results.md), [Assignment/Run/RunResult Contract](../architect/agent-coordination/contracts/assignment-run-runresult.md), [Runner Spec](../specs/runner.md) |\n| Domain Components And Extension Layer | Domain packages and smaller extension packages that use the engines while owning domain-specific behavior. A domain package may be large enough to have its own core and sub-workflows. | Coding Domain Component, Marketing Domain Component, Workflow definitions, TaskSpecs, Skills, domain harnesses, org policy/persona/tier preferences, evidence policy adapters. | [Domainization Architecture](../architect/domainization/README.md), [System Overview](../specs/system-overview.md), [Work Item Lifecycle Vision](../work-item-lifecycle-vision.md), `domains/<domain>/AGENTS.md`, `domains/<domain>/manifest.yaml`, `domains/<domain>/workflows/` |\n| Host And Surface Layer | Inbound/outbound surfaces and operator visibility. It translates CLI/API/plugin/dashboard/webhook/chat/Herdr interactions into calls against the engines, without becoming lifecycle or evidence truth. | CLI/API/plugin adapters, Herdr/dashboard visibility, host adapters, surface auth, command/API envelopes. | [fgOS Plugin Spec](../specs/fgos-plugin.md), [Herdr Web Dashboard Spec](../specs/herdr-web-dashboard.md), [Visibility And Herdr](../architect/agent-coordination/architecture/visibility-and-herdr.md), [IO Contract](../io-contract.md) |\n| Setup, Doctor, And Distribution Health | Platform support component that owns install shape, config defaults, health checks, repair posture, and global/project precedence. | setup config merge, doctor check registry, distribution packaging, shell integration, dependency/default discoverability. | [Distribution Spec](../specs/distribution.md), [Distribution Vision](../distribution-vision.md), [Reading Map setup entries](../specs/reading-map.md) |\n| Knowledge, Learning, And Documentation Registry | Lifecycle-adjacent learning component that owns retrospective knowledge, doc/topic registry, end-user document indexing, trace, and evolve signals. | knowledge registry, doc registry, Diataxis index, item trace, friction/outcome learning, evolve candidates. | [Enduser Docs Authoring Spec](../specs/enduser-docs-authoring.md), [Enduser Docs Index Spec](../specs/enduser-docs-index.md), [System Overview](../specs/system-overview.md) |",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-62",
+    "named": true,
+    "claimId": "claim_83174b29e18380691596cf50df35f0d6",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "| Boundary | Type | Likely component | Owns | Must not own |\n|---|---|---|---|---|\n| Work Lifecycle | Bounded context + authority boundary | Work Lifecycle Engine | Work identity, status, stage, claim/return, related refs, context, documents, human gates, lifecycle verbs. | Agent runtime, task graph progress, executor selection, evidence confidence, domain-specific merge/worktree behavior. |\n| Coordination Session Runtime | Bounded context | Agent Coordination Engine | One bounded coordination invocation, session manifest, event stream, AdhocTask graph, topology, budgets, recovery, synthesis boundary. | Work lifecycle mutation, provider/model execution choice, domain-specific branch authority. |\n| Team Cognition Engine | Bounded context | Agent Coordination Engine | Runtime group reasoning: choose consult/research/debate/brainstorm/peer-review strategy, allocate semantic cohorts, manage visibility policy, and propose synthesis strategy. | Dispatch bypass, protocol schema ownership, canonical runtime record ownership, Work lifecycle. |\n| Protocol Package / Definition | Extension boundary | Domain Components And Extension Layer | Reusable declared collaboration recipes: consult, research, debate, brainstorm, leader-worker, peer review, legal phases, operations, topology, and policy hints. | Runtime reasoning/adaptation, session persistence, executor choice, evidence truth. |\n| Coding Domain Component | Domain component | Domain Components And Extension Layer | Coding-specific core, Feature Workflow, Bugfix Workflow, coding harness, coding evidence adapters, repository/resource model, worktree/merge behavior, technical approval gates. | Generic coordination runtime, direct executor launch, domain-agnostic Work lifecycle mutation outside Work verbs. |\n| Coding Feature Workflow | Domain subcomponent | Coding Domain Component | Feature-specific stages, legal operations, TaskSpecs, Skills, and planning doctrine. | Bugfix-specific lifecycle semantics, generic Work state engine, direct executor launch. |\n| Bugfix Workflow | Domain subcomponent | Coding Domain Component | Bugfix-specific stages such as reproduce/diagnose/fix/verify/review, operations, TaskSpecs, Skills, and verification doctrine. | Feature-specific planning semantics, generic Work state engine, direct executor launch. |\n| Stage Operation Choice | Authority boundary | Work Lifecycle Engine, interpreting Domain workflow declarations | Select the next legal operation for the current Work stage from declared domain workflow operations and current evidence signals. | Declaring new operations, choosing concrete executor/provider/model, computing RunResult confidence. |\n| Execution Contract / Assignment Builder | Authority boundary | Agent Coordination Engine | Convert declared operation or validated inline contract into immutable Assignment snapshot with provenance, mutation, evidence, budget, role, and policy inputs. | Dispatch target choice, retry lifecycle, Work mutation. |\n| Dispatch Control Plane | Bounded context + authority boundary | Dispatch And Execution Engine | Resolve Assignment policy into DispatchPlan: executor, provider, model, tier, mechanism, adapter, governance, egress. Routes on exactly two identities, capability and executor-id — see the canonical [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md) doc for the accepted DispatchRequest/PolicyPatch/DispatchPlan contracts and component-internal ownership list. | Choosing semantic operation, interpreting task success, mutating lifecycle. |\n| Execution Adapters | Adapter boundary | Dispatch And Execution Engine | Deliver one approved Run through CLI, Herdr, MCP, API, or future native mechanism. | Policy decision, evidence confidence, Work state. |\n| Run Runtime | Authority boundary | Dispatch And Execution Engine | One attempt, settlement, timeout, cancellation, retry boundary, process/transport metadata. | Semantic task identity, evidence truth, lifecycle progression. |\n| Run Result Evaluation | Bounded context + authority boundary | Run Result Evaluator | Parse worker claim, collect/validate artifacts, compute confidence, produce RunResult. | Launching executors, choosing providers, approving Work. |\n| Domain Harnesses | Extension boundary + authority boundary | Domain Components And Extension Layer | Domain knowledge, resource/conflict/isolation advice, domain evidence rules, Work integration policy. | Generic execution core, provider launch, hidden lifecycle authority. |\n| Visibility / Herdr | Adapter boundary | Host And Surface Layer | Pane/process observation, operator visibility, diagnostics, live intervention surface. | Runtime truth, evidence authority, lifecycle authority. |",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-16",
+    "named": true,
+    "claimId": "claim_7c173579171253a4f8bcf878e65fbe65",
+    "rewritten": true,
+    "candidateUnverified": false,
+    "text": "**Phiên bản:** v0.6. **Trạng thái:** CHUẨN — chấp nhận 2026-07-16, record\n[0010](#0010-bản-đồ-kiến-trúc-là-bản-chuẩn); nâng v0.3 theo record\n[0012](../specs/work-state.md#0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời);\nnâng v0.4 theo record\n[0013](../specs/work-state.md#0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from); nâng v0.5\ntheo record\n[0015](#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009); nâng v0.6 theo record\n[0017](#0017-đóng-audit-hệ-idtên-gọi-str47) (§12 thêm dòng id-systems-audit,\nPhụ lục B mới — sổ đăng ký 13 hệ id/tên gọi).",
+    "unsourcedLines": []
+   }
+  ],
+  "random": [
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-238",
+    "named": true,
+    "claimId": "claim_0ae9a7cc9fd90391dc02d171b8367af2",
+    "rewritten": false,
+    "candidateUnverified": false,
+    "text": "The Node side is deliberately not designed here:",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-architecture/architecture/workspace-topology.md#unheaded-block-27",
+    "named": true,
+    "claimId": "claim_315efb6480d4dee277ba25d2ee2aec67",
+    "rewritten": false,
+    "candidateUnverified": false,
+    "text": "Required invariants:\n\n- worker product writes never land in main checkout;\n- branch/workspace policy is read from the running workspace;\n- runtime coordination does not fork per worktree unless the operation asks for\n  a separate `workStateId`;\n- hot work history does not dirty main;\n- workspace projections and activation bindings are scoped by `workspaceId`;\n- two runtime digests cannot mutate the same `workStateId` unless writer\n  compatibility is proven.",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-53",
+    "named": true,
+    "claimId": "claim_9663f67d3e78c67682f74a2d6c381a1a",
+    "rewritten": false,
+    "candidateUnverified": false,
+    "text": "Shape:\n\n```json\n{\n  \"operationId\": \"reviewer-recheck\",\n  \"triggerEvidenceRefs\": [\"run-result-or-assignment-id\"],\n  \"requestedBy\": \"reviewer-actor\",\n  \"authorizedBy\": \"external-session-driver\",\n  \"roundKey\": \"reviewer-recheck:2\",\n  \"reason\": \"Reviewer found a regression; owner supplied a new artifact revision.\"\n}\n```",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-98",
+    "named": true,
+    "claimId": "claim_89aab4376670978155e6b16009e21583",
+    "rewritten": false,
+    "candidateUnverified": false,
+    "text": "Consult, research, debate, brainstorm, leader-worker, and peer review should be\ntreated as cognition/protocol capability on top of the foundation, not as the\nfoundation itself.",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-18",
+    "named": true,
+    "claimId": "claim_60966a9770965bb0799898e7e7b3b0f8",
+    "rewritten": false,
+    "candidateUnverified": false,
+    "text": "**Changelog v0.1 → v0.2** (tóm tắt — chi tiết ở §11):",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-88",
+    "named": true,
+    "claimId": "claim_8b54e52522748604b5042fb1fdacbc78",
+    "rewritten": false,
+    "candidateUnverified": false,
+    "text": "Recommendation:\n\n```txt\nThe strictest applicable cap wins.\n```",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/architecture-map.md#unheaded-block-32",
+    "named": true,
+    "claimId": "claim_490a2e956091af1fb3e7a2132f667c91",
+    "rewritten": false,
+    "candidateUnverified": false,
+    "text": "Vì sao kết cấu làm khung chính chứ không phải sáu vai (planes):",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-235",
+    "named": true,
+    "claimId": "claim_2527945d27cce30a2a1458ce9b49a23f",
+    "rewritten": false,
+    "candidateUnverified": false,
+    "text": "The following edits would be mechanical when this vision is implemented:",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/component-boundary.md#unheaded-block-99",
+    "named": true,
+    "claimId": "claim_26e05c0027398a842f60d8d27213c428",
+    "rewritten": false,
+    "candidateUnverified": false,
+    "text": "There should be a clear split between the engine and the packages:",
+    "unsourcedLines": []
+   },
+   {
+    "key": "docs/platform/system-overview/spec.md#unheaded-block-25",
+    "named": true,
+    "claimId": "claim_d87933045c2bc9f7a7bc58ab78a1d6ce",
+    "rewritten": false,
+    "candidateUnverified": false,
+    "text": "3. **Trục MVP bổ sung cho L5/L6, không thay thế:** L5 (định nghĩa \"có harness\") và L6 (thang chín hạ tầng) đo phía HỆ; câu MVP này đo phía NGƯỜI DÙNG CUỐI. Ba trục cùng tồn tại, không trùng.",
+    "unsourcedLines": []
+   }
+  ]
+ }
+}

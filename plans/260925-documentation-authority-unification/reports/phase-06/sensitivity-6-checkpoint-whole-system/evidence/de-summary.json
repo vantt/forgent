@@ -1,0 +1,212 @@
+{
+ "pin": "798b08e252415d16558d15ee8c7df0482c4bad1e",
+ "registrySha": "1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02",
+ "scope": [
+  "docs/architect/architecture-intent.md",
+  "docs/architect/component-boundary/component-boundary-advisory.md",
+  "docs/architect/component-boundary/README.md",
+  "docs/architect/component-boundary/repo-layout-vision.md",
+  "docs/architect/README.md",
+  "docs/architect/roadmap.md",
+  "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+  "docs/architect/workspace-topology-audit.md",
+  "docs/architect/workspace-topology-roadmap.md",
+  "docs/architect/workspace-topology.md",
+  "docs/architecture-map.md",
+  "docs/specs/system-overview.md"
+ ],
+ "summary": [
+  {
+   "check": "D",
+   "priors": "both",
+   "fatal": 0,
+   "fatalTypes": [],
+   "open": [
+    [
+     "files-unknown-blocking",
+     1153
+    ],
+    [
+     "claims-unknown-blocking",
+     22445
+    ],
+    [
+     "claims-partial-carry",
+     14
+    ],
+    [
+     "claims-not-reviewed",
+     22674
+    ],
+    [
+     "claims-without-own-rationale",
+     22445
+    ],
+    [
+     "identical-units-multiple-owners",
+     352
+    ],
+    [
+     "registry-gaps-without-disposition",
+     464
+    ],
+    [
+     "candidate-blocks-unreferenced",
+     2189
+    ]
+   ]
+  },
+  {
+   "check": "E",
+   "priors": "both",
+   "fatal": 3,
+   "fatalTypes": [
+    "claims-not-reviewed",
+    "identical-units-multiple-owners",
+    "candidate-blocks-unreferenced"
+   ],
+   "open": [
+    [
+     "claims-not-reviewed",
+     2
+    ],
+    [
+     "identical-units-multiple-owners",
+     2
+    ],
+    [
+     "candidate-blocks-unreferenced",
+     67
+    ]
+   ]
+  },
+  {
+   "check": "D",
+   "priors": "identity",
+   "fatal": 0,
+   "fatalTypes": [],
+   "open": [
+    [
+     "files-unknown-blocking",
+     1153
+    ],
+    [
+     "claims-unknown-blocking",
+     22445
+    ],
+    [
+     "claims-partial-carry",
+     14
+    ],
+    [
+     "claims-not-reviewed",
+     22674
+    ],
+    [
+     "claims-without-own-rationale",
+     22445
+    ],
+    [
+     "identical-units-multiple-owners",
+     352
+    ],
+    [
+     "registry-gaps-without-disposition",
+     464
+    ],
+    [
+     "candidate-blocks-unreferenced",
+     2189
+    ]
+   ]
+  },
+  {
+   "check": "E",
+   "priors": "identity",
+   "fatal": 3,
+   "fatalTypes": [
+    "claims-not-reviewed",
+    "identical-units-multiple-owners",
+    "candidate-blocks-unreferenced"
+   ],
+   "open": [
+    [
+     "claims-not-reviewed",
+     2
+    ],
+    [
+     "identical-units-multiple-owners",
+     2
+    ],
+    [
+     "candidate-blocks-unreferenced",
+     67
+    ]
+   ]
+  },
+  {
+   "check": "D",
+   "priors": "phase02",
+   "fatal": 0,
+   "fatalTypes": [],
+   "open": [
+    [
+     "files-unknown-blocking",
+     1153
+    ],
+    [
+     "claims-unknown-blocking",
+     22445
+    ],
+    [
+     "claims-partial-carry",
+     14
+    ],
+    [
+     "claims-not-reviewed",
+     22674
+    ],
+    [
+     "claims-without-own-rationale",
+     22445
+    ],
+    [
+     "identical-units-multiple-owners",
+     352
+    ],
+    [
+     "registry-gaps-without-disposition",
+     464
+    ],
+    [
+     "candidate-blocks-unreferenced",
+     2189
+    ]
+   ]
+  },
+  {
+   "check": "E",
+   "priors": "phase02",
+   "fatal": 3,
+   "fatalTypes": [
+    "claims-not-reviewed",
+    "identical-units-multiple-owners",
+    "candidate-blocks-unreferenced"
+   ],
+   "open": [
+    [
+     "claims-not-reviewed",
+     2
+    ],
+    [
+     "identical-units-multiple-owners",
+     2
+    ],
+    [
+     "candidate-blocks-unreferenced",
+     67
+    ]
+   ]
+  }
+ ]
+}
