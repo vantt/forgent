@@ -1,7 +1,7 @@
 ---
 title: "Hoàn thiện và đánh bóng đường chạy fgos run và fgos workflow start"
 description: "Kế thừa --timeout và --account cho workflow start, bổ sung doctor check kiểm tra posture readiness của executor, và chuẩn hóa bảng exit code cho các outcome không pass của run/workflow"
-status: pending
+status: completed
 priority: P1
 effort: "~2d tổng công"
 branch: main
@@ -13,7 +13,7 @@ created: 2026-10-15
 
 ## Trạng thái
 
-Pending — Sẵn sàng thực thi theo 3 phase tuần tự theo thứ tự ưu tiên đã chốt.
+Completed — Cả 3 phase đã được hiện thực và kiểm thử đạt toàn diện 100% acceptance criteria.
 
 Kế hoạch này kế thừa kết quả của plan `plans/261014-1400-two-doors-one-rununit` (sau khi hai cửa `fgos run` và `fgos workflow start` đã hội tụ trên `runUnit`), giải quyết dứt điểm 3 vấn đề vận hành phát sinh trong thực tế triển khai (đặc biệt sau đợt activate trên `mcp-skill-hub` và `mdview`):
 1. `fgos workflow start` chưa truyền được trần thời gian (`--timeout`) và account ghim (`--account`) xuống các Unit con.

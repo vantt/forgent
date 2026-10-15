@@ -85,7 +85,27 @@ export const EXIT_CODES = Object.freeze({
   // 'refused' (category:'validation') outcome by a future DAG scheduler
   // classifier (dag-request-scheduler.md §4).
   'not-found': 4,
+  // Execution outcome codes (Phase 03, RUL99):
+  'policy-refusal': 4,
+  'provider-limit': 10,
+  'execution-failure': 11,
+  'partial-writes': 12,
+  blocked: 13,
+  findings: 14,
 });
+
+/**
+ * Map an execution outcome (e.g. from runUnit or workflowRun) onto a canonical exit code.
+ * Non-pass outcomes map to EXIT_CODES[outcome] or 1 when unrecognized. 'pass' maps to 0.
+ *
+ * @param {string} outcome
+ * @returns {number}
+ */
+export function exitCodeForOutcome(outcome) {
+  if (outcome === 'pass') return 0;
+  if (typeof outcome !== 'string') return 1;
+  return EXIT_CODES[outcome] ?? 1;
+}
 
 /**
  * Classify any error raised by this module's domain (StoreError, FsmError,

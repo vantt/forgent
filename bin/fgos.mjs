@@ -16,8 +16,9 @@
 // (R4), and callers should branch on the code, never on the message text.
 //
 // Exit codes (R4): The canonical exit-code table lives in src/state/store.mjs's
-// EXIT_CODES export (codes 2-5, 7-9; 0=ok, 1=unexpected) plus src/runner/loop.mjs's
-// EXIT_BUSY (code 6, runner-only state).
+// EXIT_CODES export (codes 2-5, 7-9 for store/preflight; 10-14 for execution outcomes:
+// provider-limit=10, execution-failure=11, partial-writes=12, blocked=13, findings=14;
+// 0=ok, 1=unexpected) plus src/runner/loop.mjs's EXIT_BUSY (code 6, runner-only state).
 //
 // This file never writes to `.fgos/` itself — every mutation goes through
 // src/state/store.mjs, the sole write door.
@@ -27,7 +28,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, exitCodeForOutcome, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
@@ -5047,15 +5048,26 @@ async function main() {
     } else {
       process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
     }
-    // `plan-lint` is the one verb whose exit code is data-dependent (0 clean,
-    // 1 a hard finding present) rather than always-0-unless-thrown -- its own
-    // contract, distinct from the StoreError/EXIT_CODES category map every
-    // other verb uses for a THROWN refusal.
-    // `doctor --strict` is the other data-dependent exit: 1 when any check still fails after
-    // the (optional) fixes ran. Without it doctor stays exit 0 -- fgctl's init/upgrade/repair
-    // tail runs `doctor --fix` and `doctor` and treats a non-zero exit as a degraded install.
+    // `run` and foreground `workflow` outcomes map to canonical execution exit codes
+    // (0 pass, 4 policy-refusal, 10 provider-limit, 11 execution-failure, 12 partial-writes,
+    // 13 blocked, 14 findings, RUL99).
+    // `plan-lint` is the verb whose exit code is data-dependent (0 clean, 1 a hard finding present).
+    // `doctor --strict` exits 1 when any check still fails after optional fixes ran.
+    const isExecutionRun = verb === 'run';
+    const isForegroundWorkflow = verb === 'workflow' && data?.status !== 'running' && data?.outcome !== undefined && data?.outcome !== null;
     const doctorFailed = verb === 'doctor' && flags.strict === true && data.checks.some((c) => !c.passed);
-    process.exitCode = verb === 'plan-lint' ? (data.ok ? 0 : 1) : (doctorFailed ? 1 : 0);
+
+    if (isExecutionRun && data?.outcome) {
+      process.exitCode = exitCodeForOutcome(data.outcome);
+    } else if (isForegroundWorkflow) {
+      process.exitCode = exitCodeForOutcome(data.outcome);
+    } else if (verb === 'plan-lint') {
+      process.exitCode = data.ok ? 0 : 1;
+    } else if (doctorFailed) {
+      process.exitCode = 1;
+    } else {
+      process.exitCode = 0;
+    }
   } catch (err) {
     // tsk-5z0: record before reporting, and only say the record exists when
     // one actually landed — `recordInvocationFault` returns null when the

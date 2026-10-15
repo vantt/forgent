@@ -179,3 +179,153 @@ test('executor-posture-coverage skips tool-only capabilities that do not use age
   assert.equal(result.passed, true, `Expected pass, got: ${result.message}`);
   assert.doesNotMatch(result.message, /tool:capability/);
 });
+
+test('executor-posture-coverage passes when a read-only capability pool only supports read-only posture', async () => {
+  const runnerConfig = {
+    executors: {
+      claude: {
+        kind: 'agent',
+        providerModel: 'claude',
+        invocations: [cliBwrap('claude-cli-bwrap', 'claude')],
+      },
+      roAgent: {
+        kind: 'agent',
+        providerModel: 'ro',
+        invocations: [cliBwrap('ro-cli-bwrap', 'ro')],
+      },
+    },
+    capabilities: {
+      execute: { prefer: 'claude' },
+      'code:implement': { prefer: 'claude' },
+      'code:review': {
+        description: 'Read-only review',
+        prefer: ['roAgent'],
+        // no serves.mutates: true
+      },
+    },
+  };
+
+  // Mock simulateUnitBindings to reject workspace-write on roAgent
+  const simulateUnitBindings = async (unit) => {
+    if (unit.capability === 'code:review' && unit.writes && unit.writes.length > 0) {
+      return {
+        outcome: 'policy-refusal',
+        roles: [{ role: 'producer', refused: { reason: 'posture-unavailable', detail: 'Read-only executor cannot write' } }],
+      };
+    }
+    const exec = unit.capability === 'code:review' ? 'roAgent' : 'claude';
+    return {
+      outcome: 'pass',
+      roles: [{ role: 'producer', executor: exec, invocation: `${exec}-cli-bwrap` }],
+    };
+  };
+
+  const result = await checkExecutorPostureCoverage(process.cwd(), {
+    runnerConfig,
+    simulateUnitBindings,
+  });
+
+  assert.equal(result.passed, true, `Expected pass, got: ${result.message}`);
+  assert.match(result.message, /code:review -> roAgent/);
+});
+
+test('executor-posture-coverage demands workspace-write for capabilities with serves.mutates === true', async () => {
+  const runnerConfig = {
+    executors: {
+      claude: {
+        kind: 'agent',
+        providerModel: 'claude',
+        invocations: [cliBwrap('claude-cli-bwrap', 'claude')],
+      },
+      writerAgent: {
+        kind: 'agent',
+        providerModel: 'writer',
+        invocations: [cliBwrap('writer-cli-bwrap', 'writer')],
+      },
+    },
+    capabilities: {
+      execute: { prefer: 'claude' },
+      'code:implement': { prefer: 'claude' },
+      'custom:mutating': {
+        description: 'Mutating custom capability',
+        prefer: ['writerAgent'],
+        serves: { mutates: true },
+      },
+    },
+  };
+
+  const simulateUnitBindings = async (unit) => {
+    if (unit.capability === 'custom:mutating' && unit.writes && unit.writes.length > 0) {
+      return {
+        outcome: 'policy-refusal',
+        roles: [{ role: 'producer', refused: { reason: 'posture-unavailable', detail: 'Writer sandbox missing' } }],
+      };
+    }
+    const exec = unit.capability === 'custom:mutating' ? 'writerAgent' : 'claude';
+    return {
+      outcome: 'pass',
+      roles: [{ role: 'producer', executor: exec, invocation: `${exec}-cli-bwrap` }],
+    };
+  };
+
+  const result = await checkExecutorPostureCoverage(process.cwd(), {
+    runnerConfig,
+    simulateUnitBindings,
+  });
+
+  assert.equal(result.passed, false, `Expected failure, got: ${result.message}`);
+  assert.match(result.message, /custom:mutating \(workspace-write\): posture-unavailable/);
+});
+
+test('executor-posture-coverage fails and provides pool configuration guidance on headless-no-executor / no-candidate', async () => {
+  const runnerConfig = {
+    executors: {
+      claude: {
+        kind: 'agent',
+        providerModel: 'claude',
+        invocations: [cliBwrap('claude-cli-bwrap', 'claude')],
+      },
+    },
+    capabilities: {
+      execute: { prefer: [] },
+      'code:implement': { prefer: 'claude' },
+    },
+  };
+
+  const result = await checkExecutorPostureCoverage(process.cwd(), {
+    runnerConfig,
+  });
+
+  assert.equal(result.passed, false, `Expected failure, got: ${result.message}`);
+  assert.match(result.message, /no candidate executor available/);
+  assert.match(result.message, /runner\.capabilities\.<cap>\.prefer/);
+  assert.match(result.message, /global pool/);
+  assert.doesNotMatch(result.message, /sandbox\.backend "bwrap"/);
+});
+
+test('executor-posture-coverage groups failures by reason when both posture and candidate failures occur', async () => {
+  const runnerConfig = {
+    executors: {
+      unconfinedExec: {
+        kind: 'agent',
+        providerModel: 'unconfined',
+        command: 'unconfined',
+        args: ['-p', '{prompt}'],
+      },
+    },
+    capabilities: {
+      execute: { prefer: 'unconfinedExec' },
+      'code:implement': { prefer: [] },
+    },
+  };
+
+  const result = await checkExecutorPostureCoverage(process.cwd(), {
+    runnerConfig,
+  });
+
+  assert.equal(result.passed, false, `Expected failure, got: ${result.message}`);
+  assert.match(result.message, /executors lack required posture confinement: execute/);
+  assert.match(result.message, /sandbox\.backend "bwrap"/);
+  assert.match(result.message, /no candidate executor available: code:implement/);
+  assert.match(result.message, /runner\.capabilities\.<cap>\.prefer/);
+});
