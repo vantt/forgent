@@ -1,3 +1,96 @@
+# Step 7 native sync complete — all-row ordinary reviews packaged
+
+Date: 2026-10-15. Assignment: `unit-run-1792037090725-b6a675fa/producer/1`. Read progress first; wrote it early and finalized it before finishing. Content pin **0f063d18fdab01cb6f2c915bb60ff528c5e0f238** (carriage `4ee263d09` plus R7 bounded corrections and two A19 path corrections); starting HEAD **579e860e5ee8d9783ce245631907c8a043d7c615** adds Lead fresh-reader evidence only. Output commit is the actual runner settlement, not invented. This checkpoint supersedes native-sync/review-packaging-owed wording below. **Step 7 remains blocked by eight native README rationale findings; independent verdicts, application and batch report remain owed.**
+
+Exactly **one** background native sync with its own polled log, **535.714 seconds**. Native inventory **4,432 files / 90,099 claims**. Known IDs **95,881 → 97,756**, zero loss; **1,875 added units / zero new gaps / zero retired**. Native active identity/path/anchor/digest tuples equal the registry. Persisted compact one-line registry **61,337,223 bytes (<90 MB)**, SHA256 `1c0b95dce347f76f46de32ca0552eda3fa6bd1eb12e3ff35c7c1e275bb4ce9bf`; persisted bytes equal native scratch. No second carry/generate or approval carry.
+
+**D against both priors together and each separately: 8 fatal in all three runs**, all decision-loss-without-partial-carry in the eight proposals README rationales. The repeated phrase “it omits later siblings” describes the source index; the unchanged checker matches it as loss language without a remainder. Decision content and checker remain unchanged under the assignment boundary. Scoped strict **E** against both/each prior yields the same exactly derived open categories: **1815 claims-not-reviewed / 3 identical-units-multiple-owners / 665 candidate-blocks-unreferenced**; the same **8 structural fatal** findings, no additional fatal type. No waiver or green claim. Full exact member/owner bindings for native identical-unit groups are in the machine proof; none is newly accepted by this producer. E is **open**, not strict green or global cutover. Step 7 list: **665 full five-field native candidate tuples**, exact ID/path/anchor/digest/status equality both directly to native applied conservation and independently scoped E. All file kind/status/eligibility facts are explicit. Native namespace expansion includes **60 new labelled carrier units + 605 pre-existing namespace units**; **605** overlap exact earlier eligibility tuples. Earlier lists/review metadata are untouched; diagnostic native namespace expansions, if any, are explicitly recorded rather than claimed equal.
+
+Proof: [verification-261015-1110-proposals-redesigns-native-review-packaging-0f063d18f.md](verification-261015-1110-proposals-redesigns-native-review-packaging-0f063d18f.md) and its full raw-result/reproduction sidecar. Native log: [verification-261015-1110-proposals-redesigns-native-review-packaging-0f063d18f.md.native-sync.log](verification-261015-1110-proposals-redesigns-native-review-packaging-0f063d18f.md.native-sync.log). Candidate list: [candidate-unverified-proposals-redesigns.json](candidate-unverified-proposals-redesigns.json). All **1,815/1,815 source rows remain pending**, decision shard bytes unchanged; **1,289 Unit-exact / 438 Weak-exact / 88 Judgment**. All **114 correction rows** and **88 differing-digest pairs** marked; **zero absent targets**. Native source/pack text/identity bindings equal, all IDs unique; this does not waive the eight rationale-validation findings.
+
+Request index: [review-request-261015-1110-proposals-redesigns-index-0f063d18f.md](review-request-261015-1110-proposals-redesigns-index-0f063d18f.md). **34 source packs**, at most **80 entries** each and grouped by the **20 source files**, with complete source/target shown text, full unit and shown-payload SHA256, authored decisions and correction before/after evidence. Each request enumerates its own mandatory differing/absent-target list and changed rows; A36 independent seeded deep sample per pack, full mechanical checks and >3% escalation apply. The older 100% Weak-exact/Judgment deep-read wording is superseded by A36; the ordinary exact-row check remains. No author-selected sample, sensitivity pack, verdict or approval is supplied.
+
+| Source request | Entries | Differing / absent | Changed |
+|---|---:|---:|---:|
+| [review-request-261015-1110-proposals-redesigns-source-01-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-01-01-0f063d18f.md) | 7 | 1 / 0 | 7 |
+| [review-request-261015-1110-proposals-redesigns-source-02-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-02-01-0f063d18f.md) | 80 | 1 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-02-02-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-02-02-0f063d18f.md) | 49 | 0 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-03-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-03-01-0f063d18f.md) | 80 | 1 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-03-02-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-03-02-0f063d18f.md) | 80 | 0 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-03-03-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-03-03-0f063d18f.md) | 54 | 0 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-04-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-04-01-0f063d18f.md) | 80 | 1 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-04-02-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-04-02-0f063d18f.md) | 80 | 0 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-04-03-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-04-03-0f063d18f.md) | 73 | 0 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-05-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-05-01-0f063d18f.md) | 66 | 4 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-06-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-06-01-0f063d18f.md) | 80 | 1 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-06-02-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-06-02-0f063d18f.md) | 80 | 0 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-06-03-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-06-03-0f063d18f.md) | 37 | 2 / 0 | 2 |
+| [review-request-261015-1110-proposals-redesigns-source-07-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-07-01-0f063d18f.md) | 80 | 5 / 0 | 1 |
+| [review-request-261015-1110-proposals-redesigns-source-07-02-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-07-02-0f063d18f.md) | 39 | 0 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-08-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-08-01-0f063d18f.md) | 80 | 6 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-08-02-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-08-02-0f063d18f.md) | 19 | 0 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-09-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-09-01-0f063d18f.md) | 80 | 7 / 0 | 1 |
+| [review-request-261015-1110-proposals-redesigns-source-09-02-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-09-02-0f063d18f.md) | 12 | 2 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-10-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-10-01-0f063d18f.md) | 49 | 2 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-11-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-11-01-0f063d18f.md) | 28 | 6 / 0 | 28 |
+| [review-request-261015-1110-proposals-redesigns-source-12-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-12-01-0f063d18f.md) | 27 | 6 / 0 | 27 |
+| [review-request-261015-1110-proposals-redesigns-source-13-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-13-01-0f063d18f.md) | 37 | 6 / 0 | 2 |
+| [review-request-261015-1110-proposals-redesigns-source-14-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-14-01-0f063d18f.md) | 40 | 3 / 0 | 40 |
+| [review-request-261015-1110-proposals-redesigns-source-15-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-15-01-0f063d18f.md) | 8 | 5 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-16-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-16-01-0f063d18f.md) | 80 | 6 / 0 | 1 |
+| [review-request-261015-1110-proposals-redesigns-source-16-02-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-16-02-0f063d18f.md) | 13 | 4 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-17-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-17-01-0f063d18f.md) | 4 | 1 / 0 | 4 |
+| [review-request-261015-1110-proposals-redesigns-source-18-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-18-01-0f063d18f.md) | 80 | 2 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-18-02-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-18-02-0f063d18f.md) | 74 | 0 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-19-01-0f063d18f.md) | 80 | 12 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-19-02-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-19-02-0f063d18f.md) | 16 | 0 / 0 | 0 |
+| [review-request-261015-1110-proposals-redesigns-source-20-01-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-20-01-0f063d18f.md) | 80 | 2 / 0 | 1 |
+| [review-request-261015-1110-proposals-redesigns-source-20-02-0f063d18f.md](review-request-261015-1110-proposals-redesigns-source-20-02-0f063d18f.md) | 43 | 2 / 0 | 0 |
+
+| Separate request | Entry count |
+|---|---:|
+| [review-request-261015-1110-proposals-redesigns-triage-0f063d18f.md](review-request-261015-1110-proposals-redesigns-triage-0f063d18f.md) | **20 file-level triage/disposition entries**, covering 1,815 rows |
+| [review-request-261015-1110-proposals-redesigns-candidates-0f063d18f.md](review-request-261015-1110-proposals-redesigns-candidates-0f063d18f.md) | **665 reverse candidate-unverified native units** |
+
+Triage evidence shows the **R7-1 live-probe reversal** with all 28 rows pending, **R7-2 Agent Coordination history moves** for files 12/14/17, four explicit map overrides, R7-3's 99th link rebase, R7-4 inline-code queue, all ten R7-5 liveness notes, R7-6 neutral additions and exactly two A19 path-sentence corrections with their heading consequence. It includes complete source/carrier files, prior/current moved carriers and pinned live-consumer code/doc spans. Ordinary five-column contract throughout; file-level triage and reverse eligibility findings explicitly cannot be applied as source verdicts or truth/classification receipts.
+
+## Lead fresh-reader area gaps for the batch report
+
+Committed source: [fresh-reader-261015-proposals.md](fresh-reader-261015-proposals.md) at **579e860e5**, reads pinned to **f060a66fc**. All six reader/scenario cells meet content scores even yes-only: **32 yes / 4 partial / 0 no**, **0/57 missing anchors**, **0 legacy-as-authority**, at most **5 files** before first acceptable owner. Preserve the report's concerns: reader 1 opened two out-of-scope fragments (unification header and three Agent Coordination README lines), so literal scope criterion fails for reader 1 despite no found answer effect; key/scoring share an author and instruction-only isolation remains UNPROVEN. This is navigation evidence, not sentence-truth certification.
+
+1. No switchboard row for proposals/redesigns or `docs/architect/proposals/**`; routing relies on carrier headers/topic rows.
+2. The proposals index lists **6/12** carriers, omitting worker-provider-boundary, dispatch-contract, doing-coordination, knowledge-registry, Step 10 A0 facade and visibility/herdr-spawn, and links into the legacy `docs/architect/**` tree.
+3. No in-scope current owner for plan-loop design; “current plan-loop skills” remains an unreviewed carriage hint.
+4. No resolved registration target for a new cross-area proposal; platform portal links the unification proposal, not the proposals index, while governance placement lists only area-local proposal folders.
+5. Governance authority matrix has no Proposal row; the type table/scratchpad constraints are the available in-scope guidance.
+6. Required proposal sections are buried in candidate `documentation-system-design.md#67-proposal`, unreachable through the portal/migration-rule route used by readers.
+7. Switchboard algorithm step numbers can be mis-cited (reader 2 swapped promoted/legacy-current ordinals); low harm.
+8. Large 60/50-KB carriers were not read fully; readers used headers/ranges. `unheaded-block-N` anchors resolved but remain extractor-numbering dependent.
+
+No docs edits or closure are implied by recording these gaps.
+
+## Remaining Step 7 work
+
+First resolve the eight README rationale gate findings in an authorized content turn and re-pin/re-package affected rows; no decision-content repair was permitted here. Independent ordinary reviews of all submitted source rows, file triage/dispositions and complete reverse list; apply committed accepted source verdicts with the unchanged applier, preserve notes/report pins, and bind eligibility findings in their own channel. Resolve rework/red-team correction acceptance (including two path-truth corrections), review and account native duplicate owner groups, rerun affected D/E/list equality after application, then write the batch report with these reader gaps, existing truth/block draw limitations, preserved owner queue and actual owner token-total checkpoint. No batch closure, truth promotion, Step 8 or cutover claimed.
+
+Final artifact validation: all 34 pack/request hashes and 1,815 native source/target tuples pass; 665 full candidate tuples and complete shown-payload hashes pass; 114 changed and 88 differing rows are unique and complete. Exactly two tracked files changed (progress and compact working registry), plus 116 new plan-only request/pack/proof/list artifacts; no docs or decision shard changed. Earlier root/Agent namespace additions (6/9 tuples) are fully covered by the new Step 7 list, with no old tuple lost.
+
+Tests **189/189 pass**, zero fail/cancel/skip/todo, with `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work`. Complete test log linked from proof. `git diff --check` clean; all repository writes stay in this plan. No docs/decision-content/gate/checker/vocabulary/extractor/baseline edits, git writes, lifecycle verbs, secret reads or manual workspace `.fgos/` access. Scratch only `/tmp/fgos-work/`; the required external result claim is the sole write-scope exception. No needsWrites. MDView MCP unavailable; CLI registration would write external service state outside scope, so no preview claimed. Preserve all earlier holds, A34 residuals, native gaps, truth/promotion/navigation/consumer/alias/cutover obligations and effort limits.
+
+---
+
+# Step 7 native sync and all-row review packaging in progress
+
+Date: 2026-10-15. Assignment: `unit-run-1792037090725-b6a675fa/producer/1`. Read this progress first (located under reports/phase-06). Content pin `0f063d18f`; starting HEAD `579e860e5` includes Lead fresh-reader evidence. Running one native sync from the persisted registry with a dedicated polled log, then both-prior D, scoped E, native/list tuple equality and bounded ordinary requests for all 1,815 pending rows. No docs, decision content, gates, checkers, vocabulary, extractor or baselines will be changed. Runner owns commits.
+
+Packaging checkpoint: 34 source packs authored, exactly 1,815 distinct pending rows, maximum 80 per pack, grouped by the 20 source files; all 114 corrected rows and all 88 differing-digest rows marked, no absent targets. Separate triage request covers 20 files with complete source/carrier text, committed live-consumer spans, R7-1 reversal and R7-2 before/after history moves. 189/189 relevant tests pass with `env -u CLAUDE_CODE_SESSION_ID`. Native sync remains running; no D/E or persistence success is claimed yet.
+
+Native sync completed once in 535.714 seconds: 4,432 files / 90,099 claims, known IDs 95,881 → 97,756 with zero loss, active tuple equality passes. Registry persisted one-line at 61,337,223 bytes (<90 MB), SHA256 `1c0b95dce347f76f46de32ca0552eda3fa6bd1eb12e3ff35c7c1e275bb4ce9bf`. D/E from that complete cached native output are running; no second sync.
+
+**Measured gate blocker at content pin 0f063d18f:** D with both priors and identity prior reports eight `decision-loss-without-partial-carry` findings in `s7-proposals-redesigns-15-readme.json` (the rationale phrase “it omits later siblings” is matched by the frozen loss-language check). E has the same eight fatal findings plus exactly 1,815 pending claims / 3 identical-unit owner groups / 665 candidate-unverified units. No decision-content or checker repair is authorized in this turn; all findings are retained in the review requests. Remaining prior checks and list equality are running. No green D/E claim.
+
+---
+
 # Step 7 bounded corrections authored — native sync and all-row review packaging next
 
 Date: 2026-10-15. Assignment: `unit-run-1792036612167-eb65d2cd/producer/1`. Read progress first, wrote it early and finalized it before finishing. Input commit `f060a66fc47c1209f109d00acfbec247da9238f4`; carriage `4ee263d09`. Output commit is the actual future runner settlement; no SHA invented. This checkpoint supersedes the earlier 15/5 split, 84 differing-digest count and next-turn wording below. Step 7 remains **open**, pending native proof and independent ordinary review.

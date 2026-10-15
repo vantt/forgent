@@ -1,0 +1,824 @@
+{
+  "version": 1,
+  "commit": "0f063d18fdab01cb6f2c915bb60ff528c5e0f238",
+  "shard": "s7-proposals-redesigns-09-coordination-capability-envelope.json",
+  "authorSession": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_4e753355165ad61654f69b893f8f91cd",
+      "sourceUnitDigest": "e65da4970fac32cb3db0a7b215fb6483bd512dc7dd3a904853f555e0e7b43142",
+      "targetUnitDigest": "e65da4970fac32cb3db0a7b215fb6483bd512dc7dd3a904853f555e0e7b43142",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_4e753355165ad61654f69b893f8f91cd",
+        "sourceUnitDigest": "e65da4970fac32cb3db0a7b215fb6483bd512dc7dd3a904853f555e0e7b43142",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "unheaded-block-62",
+        "targetUnitDigest": "e65da4970fac32cb3db0a7b215fb6483bd512dc7dd3a904853f555e0e7b43142",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "9. Migration path preserving proven capability"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-59 (lines 360–360) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-62 (lines 387–387); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-59",
+        "githubAnchor": "unheaded-block-59",
+        "stableAnchor": "unheaded-block-59",
+        "title": "Unheaded block 59",
+        "startLine": 360,
+        "endLine": 360,
+        "textDigest": "e65da4970fac32cb3db0a7b215fb6483bd512dc7dd3a904853f555e0e7b43142",
+        "sample": "This is a responsibility map, not a multi-phase implementation plan.",
+        "identityFingerprint": "8153812bee56b08e5ab8e9fb5693f5e7341d4519df3d1d4219b222887b6c897b",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "9. Migration path preserving proven capability"
+        ],
+        "text": "This is a responsibility map, not a multi-phase implementation plan."
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-62",
+        "githubAnchor": "unheaded-block-62",
+        "stableAnchor": "unheaded-block-62",
+        "title": "Unheaded block 62",
+        "startLine": 387,
+        "endLine": 387,
+        "textDigest": "e65da4970fac32cb3db0a7b215fb6483bd512dc7dd3a904853f555e0e7b43142",
+        "sample": "This is a responsibility map, not a multi-phase implementation plan.",
+        "identityFingerprint": "8153812bee56b08e5ab8e9fb5693f5e7341d4519df3d1d4219b222887b6c897b",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "9. Migration path preserving proven capability"
+        ],
+        "text": "This is a responsibility map, not a multi-phase implementation plan."
+      }
+    },
+    {
+      "claimId": "claim_233a119b25554ba89af3b199c7b04572",
+      "sourceUnitDigest": "638040ed2c05da0e9c5ed83fe84ea6207966d105d6b55173769f875667bfa8c7",
+      "targetUnitDigest": "638040ed2c05da0e9c5ed83fe84ea6207966d105d6b55173769f875667bfa8c7",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_233a119b25554ba89af3b199c7b04572",
+        "sourceUnitDigest": "638040ed2c05da0e9c5ed83fe84ea6207966d105d6b55173769f875667bfa8c7",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "unheaded-block-63",
+        "targetUnitDigest": "638040ed2c05da0e9c5ed83fe84ea6207966d105d6b55173769f875667bfa8c7",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "9. Migration path preserving proven capability"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-60 (lines 362–378) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-63 (lines 389–405); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-60",
+        "githubAnchor": "unheaded-block-60",
+        "stableAnchor": "unheaded-block-60",
+        "title": "Unheaded block 60",
+        "startLine": 362,
+        "endLine": 378,
+        "textDigest": "638040ed2c05da0e9c5ed83fe84ea6207966d105d6b55173769f875667bfa8c7",
+        "sample": "| Existing substrate | Proposed treatment |\n|---|---|\n| Assignment/Dispatch/Run/RunResult | Keep one execution path |\n| Work-independent CoordinationSession | Keep identity/recover",
+        "identityFingerprint": "ba2b3a4b8df15be53ea545238735e93e967398fafb9772cbbb3fe129ace0d6f6",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "9. Migration path preserving proven capability"
+        ],
+        "text": "| Existing substrate | Proposed treatment |\n|---|---|\n| Assignment/Dispatch/Run/RunResult | Keep one execution path |\n| Work-independent CoordinationSession | Keep identity/recovery root; no placeholder Work |\n| Retry/recheck, history, idempotency, lock-held bounds | Keep; prove through public paths |\n| FlowDefinition | Narrow to optional method/constraint representation; preserve Workflow consumers |\n| Authorization/mutation gates | Elevate to authenticated grants tied to execution isolation |\n| Visibility windows | Elevate to disclosure/read-grant primitives referenceable by a graph |\n| Specialist slots | Generalize to bounded recruitment without predeclaring each specialty |\n| Persona/policy resolution | Complete delivery and per-assignment binding, including fan-out |\n| Typed contributions | Separate generic artifact lineage from optional cognitive taxonomy |\n| Aggregation evaluator | Narrow to structural/evidence validation; agreement is a sourced assertion |\n| Quorum and auto-close | Replace with explicit close plus applicable obligations; remove roster-based completion |\n| chain/show | Keep projections; add memory/checkpoint refs; hints are not planners |\n| Fixed phase/round counts and posture rosters | Move to doctrine/playbook unless explicitly adopted as a commitment |\n| Definition id/version | Add content pins including dependencies affecting legality or packets |\n| Prose workarounds contradicting RunResult | Remove when runtime paths are corrected; preserve one execution truth |"
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-63",
+        "githubAnchor": "unheaded-block-63",
+        "stableAnchor": "unheaded-block-63",
+        "title": "Unheaded block 63",
+        "startLine": 389,
+        "endLine": 405,
+        "textDigest": "638040ed2c05da0e9c5ed83fe84ea6207966d105d6b55173769f875667bfa8c7",
+        "sample": "| Existing substrate | Proposed treatment |\n|---|---|\n| Assignment/Dispatch/Run/RunResult | Keep one execution path |\n| Work-independent CoordinationSession | Keep identity/recover",
+        "identityFingerprint": "ba2b3a4b8df15be53ea545238735e93e967398fafb9772cbbb3fe129ace0d6f6",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "9. Migration path preserving proven capability"
+        ],
+        "text": "| Existing substrate | Proposed treatment |\n|---|---|\n| Assignment/Dispatch/Run/RunResult | Keep one execution path |\n| Work-independent CoordinationSession | Keep identity/recovery root; no placeholder Work |\n| Retry/recheck, history, idempotency, lock-held bounds | Keep; prove through public paths |\n| FlowDefinition | Narrow to optional method/constraint representation; preserve Workflow consumers |\n| Authorization/mutation gates | Elevate to authenticated grants tied to execution isolation |\n| Visibility windows | Elevate to disclosure/read-grant primitives referenceable by a graph |\n| Specialist slots | Generalize to bounded recruitment without predeclaring each specialty |\n| Persona/policy resolution | Complete delivery and per-assignment binding, including fan-out |\n| Typed contributions | Separate generic artifact lineage from optional cognitive taxonomy |\n| Aggregation evaluator | Narrow to structural/evidence validation; agreement is a sourced assertion |\n| Quorum and auto-close | Replace with explicit close plus applicable obligations; remove roster-based completion |\n| chain/show | Keep projections; add memory/checkpoint refs; hints are not planners |\n| Fixed phase/round counts and posture rosters | Move to doctrine/playbook unless explicitly adopted as a commitment |\n| Definition id/version | Add content pins including dependencies affecting legality or packets |\n| Prose workarounds contradicting RunResult | Remove when runtime paths are corrected; preserve one execution truth |"
+      }
+    },
+    {
+      "claimId": "claim_f08db928e08138f3a10d5b28fd6973ff",
+      "sourceUnitDigest": "0c16441930076e6dcb11954314dfe326a712118da92d156fac760c920a52669e",
+      "targetUnitDigest": "0c16441930076e6dcb11954314dfe326a712118da92d156fac760c920a52669e",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_f08db928e08138f3a10d5b28fd6973ff",
+        "sourceUnitDigest": "0c16441930076e6dcb11954314dfe326a712118da92d156fac760c920a52669e",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "unheaded-block-64",
+        "targetUnitDigest": "0c16441930076e6dcb11954314dfe326a712118da92d156fac760c920a52669e",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "9. Migration path preserving proven capability"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-61 (lines 380–384) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-64 (lines 407–411); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-61",
+        "githubAnchor": "unheaded-block-61",
+        "stableAnchor": "unheaded-block-61",
+        "title": "Unheaded block 61",
+        "startLine": 380,
+        "endLine": 384,
+        "textDigest": "0c16441930076e6dcb11954314dfe326a712118da92d156fac760c920a52669e",
+        "sample": "Old sessions retain historical semantics under their definitions/policies. Never\nreplay old evidence as though it had new containment or completion guarantees.\nPublic-path correcti",
+        "identityFingerprint": "28df9fc657d3dd3498bfd1de6067cb71dddf93d4363933e444b0d377a7f04cc0",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "9. Migration path preserving proven capability"
+        ],
+        "text": "Old sessions retain historical semantics under their definitions/policies. Never\nreplay old evidence as though it had new containment or completion guarantees.\nPublic-path corrections and role-packet delivery can be evaluated independently\nof the final family choice. No new Mission entity or Work lifecycle authority is\nimplicitly introduced by this proposal."
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-64",
+        "githubAnchor": "unheaded-block-64",
+        "stableAnchor": "unheaded-block-64",
+        "title": "Unheaded block 64",
+        "startLine": 407,
+        "endLine": 411,
+        "textDigest": "0c16441930076e6dcb11954314dfe326a712118da92d156fac760c920a52669e",
+        "sample": "Old sessions retain historical semantics under their definitions/policies. Never\nreplay old evidence as though it had new containment or completion guarantees.\nPublic-path correcti",
+        "identityFingerprint": "28df9fc657d3dd3498bfd1de6067cb71dddf93d4363933e444b0d377a7f04cc0",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "9. Migration path preserving proven capability"
+        ],
+        "text": "Old sessions retain historical semantics under their definitions/policies. Never\nreplay old evidence as though it had new containment or completion guarantees.\nPublic-path corrections and role-packet delivery can be evaluated independently\nof the final family choice. No new Mission entity or Work lifecycle authority is\nimplicitly introduced by this proposal."
+      }
+    },
+    {
+      "claimId": "claim_d2341a538619073b583c4b3168b41387",
+      "sourceUnitDigest": "c35e33bb5e4d4fc730ef52f6b5823601188c474715bde9adaf98fbfd83276415",
+      "targetUnitDigest": "6eb9c4cf7e468bac1245f3279d82afb7ce7797be857e2c0b68e647cd18c4c4c3",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_d2341a538619073b583c4b3168b41387",
+        "sourceUnitDigest": "c35e33bb5e4d4fc730ef52f6b5823601188c474715bde9adaf98fbfd83276415",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "10-smallest-experiments-before-implementation-planning",
+        "targetUnitDigest": "6eb9c4cf7e468bac1245f3279d82afb7ce7797be857e2c0b68e647cd18c4c4c3",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#10-smallest-experiments-before-implementation-planning (lines 386–386) is carried at docs/platform/proposals/coordination-capability-envelope.md#10-smallest-experiments-before-implementation-planning (lines 413–413); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "10. Smallest experiments before implementation planning",
+        "anchor": "10-smallest-experiments-before-implementation-planning",
+        "githubAnchor": "10-smallest-experiments-before-implementation-planning",
+        "stableAnchor": "h-d0f4afd61a89",
+        "startLine": 386,
+        "endLine": 386,
+        "textDigest": "c35e33bb5e4d4fc730ef52f6b5823601188c474715bde9adaf98fbfd83276415",
+        "sample": "10. Smallest experiments before implementation planning",
+        "sectionPayloadDigest": "dd0ff152e15c8bc6bcc1f65d7a66d72251287a69c4ef17a20cb216ccf9ccd930",
+        "followingBlockDigest": "d7fa9577c7921ff566d2e242f7c0a358a6f81a0c611c500eb7f923ba3d18a211",
+        "identityFingerprint": "e218624f9b4996054e1eb372e2676032755291f7147620737d7ac8c15dd3f783",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation"
+        ],
+        "text": "## 10. Smallest experiments before implementation planning",
+        "sectionText": "## 10. Smallest experiments before implementation planning\n\nThe [Minimal Probe Contract](coordination-envelope-probe-contract.md) specifies\nthe first Code Panel experiment, pass/fail evidence, substrate gaps, and boundaries\nwith the concurrent Advisory track. As of 2026-09-06, that track records P00.1,\nP01.1, and P01.2 complete and is parked before P01.3. Its read-only executor\nallowlist is useful new evidence, but does not establish sibling-read or credential\nisolation. Reconcile findings at its P02 capability-fit audit before production\nP03 scope is fixed; this proposal does not change that track's authority or status.\n\n| Probe | Minimal exercise | Evaluation condition |\n|---|---|---|\n| Unexpected coordination | Code Panel discovers a specialty absent from its graph; no graph/kernel edits during execution | Real specialist dispatch, correct recheck target, no authority expansion |\n| Soul delivery and routing | At least two real roles with different packets and bindings | Inspect delivered packets, routing provenance, and task-appropriate outputs; fake executors are not cognitive proof |\n| Independence/reveal | Canary data in sibling report, ledger, config, and ungranted context; worker actively seeks it | Access denied before reveal; only authorized subset readable afterward |\n| Authority/mutation attack | Forge writer, edit definition, self-grant, follow symlink, call bypass tool | No expanded rights, altered control truth, or out-of-scope writes |\n| Close semantics | Clean first pass, fix requiring recheck, dissent, missing evidence | No fake fixer; no early deliverable acceptance; advisory may finish honestly with dissent |\n| Crash around effects | Kill before/after dispatch, before result linkage, after candidate creation; resume fresh | No duplicate consumption/application; unknowns reconciled; rationale and obligations recover |\n| Cross-use-case reuse | Code Panel and unclear Advisory use the same public actions | Only doctrine/playbook/context change; no new kernel cognitive operation |\n| Equal-budget A/B/C comparison | Same small case set, provider budget, independent evaluators | Compare quality, omissions, human intervention, cost, and authoring effort |\n\nRun probes in an isolated external consuming project, not only in fgOS's own dev\ncheckout. Multi-agent quality superiority remains unproven until measured.\n\nDecisive question:\n\n> Can a new coordinator invent a coordination method the graph author did not\n> anticipate, without exceeding authority or bounds?\n\nB's design answer is yes: create a new prose task, choose an allowed specialist,\ngrant narrow context, spend remaining budget, and preserve existing obligations.\nNeeding a graph edit fails adaptability. Needing ambient shell/control-store\naccess fails the hard boundary. This answer remains a probe obligation, not a\nclaim of shipped capability."
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "10. Smallest experiments before implementation planning",
+        "anchor": "10-smallest-experiments-before-implementation-planning",
+        "githubAnchor": "10-smallest-experiments-before-implementation-planning",
+        "stableAnchor": "h-6b69611ec980",
+        "startLine": 413,
+        "endLine": 413,
+        "textDigest": "6eb9c4cf7e468bac1245f3279d82afb7ce7797be857e2c0b68e647cd18c4c4c3",
+        "sample": "10. Smallest experiments before implementation planning",
+        "sectionPayloadDigest": "65df7f633144f8841b209280ac2a11303cd1efc2015c50d90817fc0599f405c7",
+        "followingBlockDigest": "8b90e05654b92caa7c9d8602c64cd9e17bb44e3e76cd183246906b942958423f",
+        "identityFingerprint": "7e6ad64dac67580ee6c87dcbe13929c35db6c211ebd78171ce6adf016fc06b45",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation"
+        ],
+        "text": "## 10. Smallest experiments before implementation planning",
+        "sectionText": "## 10. Smallest experiments before implementation planning\n\nThe [Minimal Probe Contract](../../architect/proposals/coordination-envelope-probe-contract.md) specifies\nthe first Code Panel experiment, pass/fail evidence, substrate gaps, and boundaries\nwith the concurrent Advisory track. As of 2026-09-06, that track records P00.1,\nP01.1, and P01.2 complete and is parked before P01.3. Its read-only executor\nallowlist is useful new evidence, but does not establish sibling-read or credential\nisolation. Reconcile findings at its P02 capability-fit audit before production\nP03 scope is fixed; this proposal does not change that track's authority or status.\n\n| Probe | Minimal exercise | Evaluation condition |\n|---|---|---|\n| Unexpected coordination | Code Panel discovers a specialty absent from its graph; no graph/kernel edits during execution | Real specialist dispatch, correct recheck target, no authority expansion |\n| Soul delivery and routing | At least two real roles with different packets and bindings | Inspect delivered packets, routing provenance, and task-appropriate outputs; fake executors are not cognitive proof |\n| Independence/reveal | Canary data in sibling report, ledger, config, and ungranted context; worker actively seeks it | Access denied before reveal; only authorized subset readable afterward |\n| Authority/mutation attack | Forge writer, edit definition, self-grant, follow symlink, call bypass tool | No expanded rights, altered control truth, or out-of-scope writes |\n| Close semantics | Clean first pass, fix requiring recheck, dissent, missing evidence | No fake fixer; no early deliverable acceptance; advisory may finish honestly with dissent |\n| Crash around effects | Kill before/after dispatch, before result linkage, after candidate creation; resume fresh | No duplicate consumption/application; unknowns reconciled; rationale and obligations recover |\n| Cross-use-case reuse | Code Panel and unclear Advisory use the same public actions | Only doctrine/playbook/context change; no new kernel cognitive operation |\n| Equal-budget A/B/C comparison | Same small case set, provider budget, independent evaluators | Compare quality, omissions, human intervention, cost, and authoring effort |\n\nRun probes in an isolated external consuming project, not only in fgOS's own dev\ncheckout. Multi-agent quality superiority remains unproven until measured.\n\nDecisive question:\n\n> Can a new coordinator invent a coordination method the graph author did not\n> anticipate, without exceeding authority or bounds?\n\nB's design answer is yes: create a new prose task, choose an allowed specialist,\ngrant narrow context, spend remaining budget, and preserve existing obligations.\nNeeding a graph edit fails adaptability. Needing ambient shell/control-store\naccess fails the hard boundary. This answer remains a probe obligation, not a\nclaim of shipped capability."
+      }
+    },
+    {
+      "claimId": "claim_63e205836d7968a5141e0350e70ad8a8",
+      "sourceUnitDigest": "d7fa9577c7921ff566d2e242f7c0a358a6f81a0c611c500eb7f923ba3d18a211",
+      "targetUnitDigest": "8b90e05654b92caa7c9d8602c64cd9e17bb44e3e76cd183246906b942958423f",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_63e205836d7968a5141e0350e70ad8a8",
+        "sourceUnitDigest": "d7fa9577c7921ff566d2e242f7c0a358a6f81a0c611c500eb7f923ba3d18a211",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "unheaded-block-65",
+        "targetUnitDigest": "8b90e05654b92caa7c9d8602c64cd9e17bb44e3e76cd183246906b942958423f",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-62 (lines 388–394) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-65 (lines 415–421); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-62",
+        "githubAnchor": "unheaded-block-62",
+        "stableAnchor": "unheaded-block-62",
+        "title": "Unheaded block 62",
+        "startLine": 388,
+        "endLine": 394,
+        "textDigest": "d7fa9577c7921ff566d2e242f7c0a358a6f81a0c611c500eb7f923ba3d18a211",
+        "sample": "The [Minimal Probe Contract](coordination-envelope-probe-contract.md) specifies\nthe first Code Panel experiment, pass/fail evidence, substrate gaps, and boundaries\nwith the concurr",
+        "identityFingerprint": "73b9d2abbf3dae8078156c57723f26fdca970b6fe012b37a06c4b099c1414b85",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "text": "The [Minimal Probe Contract](coordination-envelope-probe-contract.md) specifies\nthe first Code Panel experiment, pass/fail evidence, substrate gaps, and boundaries\nwith the concurrent Advisory track. As of 2026-09-06, that track records P00.1,\nP01.1, and P01.2 complete and is parked before P01.3. Its read-only executor\nallowlist is useful new evidence, but does not establish sibling-read or credential\nisolation. Reconcile findings at its P02 capability-fit audit before production\nP03 scope is fixed; this proposal does not change that track's authority or status."
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-65",
+        "githubAnchor": "unheaded-block-65",
+        "stableAnchor": "unheaded-block-65",
+        "title": "Unheaded block 65",
+        "startLine": 415,
+        "endLine": 421,
+        "textDigest": "8b90e05654b92caa7c9d8602c64cd9e17bb44e3e76cd183246906b942958423f",
+        "sample": "The [Minimal Probe Contract](../../architect/proposals/coordination-envelope-probe-contract.md) specifies\nthe first Code Panel experiment, pass/fail evidence, substrate gaps, and b",
+        "identityFingerprint": "7a8d386dbae305cd883b2b3e28bee9765f1d1f05e0e3f775d89593af8fc8e9cf",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "text": "The [Minimal Probe Contract](../../architect/proposals/coordination-envelope-probe-contract.md) specifies\nthe first Code Panel experiment, pass/fail evidence, substrate gaps, and boundaries\nwith the concurrent Advisory track. As of 2026-09-06, that track records P00.1,\nP01.1, and P01.2 complete and is parked before P01.3. Its read-only executor\nallowlist is useful new evidence, but does not establish sibling-read or credential\nisolation. Reconcile findings at its P02 capability-fit audit before production\nP03 scope is fixed; this proposal does not change that track's authority or status."
+      }
+    },
+    {
+      "claimId": "claim_6163ea1b7781f128baa4ecf5d0ad746f",
+      "sourceUnitDigest": "5f72368beee4a1cb56530685318b5c98606918cb4afb20cf63ad122ae70d9715",
+      "targetUnitDigest": "5f72368beee4a1cb56530685318b5c98606918cb4afb20cf63ad122ae70d9715",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_6163ea1b7781f128baa4ecf5d0ad746f",
+        "sourceUnitDigest": "5f72368beee4a1cb56530685318b5c98606918cb4afb20cf63ad122ae70d9715",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "unheaded-block-66",
+        "targetUnitDigest": "5f72368beee4a1cb56530685318b5c98606918cb4afb20cf63ad122ae70d9715",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-63 (lines 396–405) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-66 (lines 423–432); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-63",
+        "githubAnchor": "unheaded-block-63",
+        "stableAnchor": "unheaded-block-63",
+        "title": "Unheaded block 63",
+        "startLine": 396,
+        "endLine": 405,
+        "textDigest": "5f72368beee4a1cb56530685318b5c98606918cb4afb20cf63ad122ae70d9715",
+        "sample": "| Probe | Minimal exercise | Evaluation condition |\n|---|---|---|\n| Unexpected coordination | Code Panel discovers a specialty absent from its graph; no graph/kernel edits during e",
+        "identityFingerprint": "e2d75932f97a9acf8fa9c93bc75556001cd8835abf5e4597bc115475c7cbb1c8",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "text": "| Probe | Minimal exercise | Evaluation condition |\n|---|---|---|\n| Unexpected coordination | Code Panel discovers a specialty absent from its graph; no graph/kernel edits during execution | Real specialist dispatch, correct recheck target, no authority expansion |\n| Soul delivery and routing | At least two real roles with different packets and bindings | Inspect delivered packets, routing provenance, and task-appropriate outputs; fake executors are not cognitive proof |\n| Independence/reveal | Canary data in sibling report, ledger, config, and ungranted context; worker actively seeks it | Access denied before reveal; only authorized subset readable afterward |\n| Authority/mutation attack | Forge writer, edit definition, self-grant, follow symlink, call bypass tool | No expanded rights, altered control truth, or out-of-scope writes |\n| Close semantics | Clean first pass, fix requiring recheck, dissent, missing evidence | No fake fixer; no early deliverable acceptance; advisory may finish honestly with dissent |\n| Crash around effects | Kill before/after dispatch, before result linkage, after candidate creation; resume fresh | No duplicate consumption/application; unknowns reconciled; rationale and obligations recover |\n| Cross-use-case reuse | Code Panel and unclear Advisory use the same public actions | Only doctrine/playbook/context change; no new kernel cognitive operation |\n| Equal-budget A/B/C comparison | Same small case set, provider budget, independent evaluators | Compare quality, omissions, human intervention, cost, and authoring effort |"
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-66",
+        "githubAnchor": "unheaded-block-66",
+        "stableAnchor": "unheaded-block-66",
+        "title": "Unheaded block 66",
+        "startLine": 423,
+        "endLine": 432,
+        "textDigest": "5f72368beee4a1cb56530685318b5c98606918cb4afb20cf63ad122ae70d9715",
+        "sample": "| Probe | Minimal exercise | Evaluation condition |\n|---|---|---|\n| Unexpected coordination | Code Panel discovers a specialty absent from its graph; no graph/kernel edits during e",
+        "identityFingerprint": "e2d75932f97a9acf8fa9c93bc75556001cd8835abf5e4597bc115475c7cbb1c8",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "text": "| Probe | Minimal exercise | Evaluation condition |\n|---|---|---|\n| Unexpected coordination | Code Panel discovers a specialty absent from its graph; no graph/kernel edits during execution | Real specialist dispatch, correct recheck target, no authority expansion |\n| Soul delivery and routing | At least two real roles with different packets and bindings | Inspect delivered packets, routing provenance, and task-appropriate outputs; fake executors are not cognitive proof |\n| Independence/reveal | Canary data in sibling report, ledger, config, and ungranted context; worker actively seeks it | Access denied before reveal; only authorized subset readable afterward |\n| Authority/mutation attack | Forge writer, edit definition, self-grant, follow symlink, call bypass tool | No expanded rights, altered control truth, or out-of-scope writes |\n| Close semantics | Clean first pass, fix requiring recheck, dissent, missing evidence | No fake fixer; no early deliverable acceptance; advisory may finish honestly with dissent |\n| Crash around effects | Kill before/after dispatch, before result linkage, after candidate creation; resume fresh | No duplicate consumption/application; unknowns reconciled; rationale and obligations recover |\n| Cross-use-case reuse | Code Panel and unclear Advisory use the same public actions | Only doctrine/playbook/context change; no new kernel cognitive operation |\n| Equal-budget A/B/C comparison | Same small case set, provider budget, independent evaluators | Compare quality, omissions, human intervention, cost, and authoring effort |"
+      }
+    },
+    {
+      "claimId": "claim_d37a0893b9da6605af111d4d59b3c263",
+      "sourceUnitDigest": "4fb881a86a8a98fc9e88d3bced681ede46a80204e7795336ee6fa8c67142f012",
+      "targetUnitDigest": "4fb881a86a8a98fc9e88d3bced681ede46a80204e7795336ee6fa8c67142f012",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_d37a0893b9da6605af111d4d59b3c263",
+        "sourceUnitDigest": "4fb881a86a8a98fc9e88d3bced681ede46a80204e7795336ee6fa8c67142f012",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "unheaded-block-67",
+        "targetUnitDigest": "4fb881a86a8a98fc9e88d3bced681ede46a80204e7795336ee6fa8c67142f012",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-64 (lines 407–408) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-67 (lines 434–435); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-64",
+        "githubAnchor": "unheaded-block-64",
+        "stableAnchor": "unheaded-block-64",
+        "title": "Unheaded block 64",
+        "startLine": 407,
+        "endLine": 408,
+        "textDigest": "4fb881a86a8a98fc9e88d3bced681ede46a80204e7795336ee6fa8c67142f012",
+        "sample": "Run probes in an isolated external consuming project, not only in fgOS's own dev\ncheckout. Multi-agent quality superiority remains unproven until measured.",
+        "identityFingerprint": "27caffb6f01cfd3619b21831f1c9092b56f98404c0f478e12250d22289258650",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "text": "Run probes in an isolated external consuming project, not only in fgOS's own dev\ncheckout. Multi-agent quality superiority remains unproven until measured."
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-67",
+        "githubAnchor": "unheaded-block-67",
+        "stableAnchor": "unheaded-block-67",
+        "title": "Unheaded block 67",
+        "startLine": 434,
+        "endLine": 435,
+        "textDigest": "4fb881a86a8a98fc9e88d3bced681ede46a80204e7795336ee6fa8c67142f012",
+        "sample": "Run probes in an isolated external consuming project, not only in fgOS's own dev\ncheckout. Multi-agent quality superiority remains unproven until measured.",
+        "identityFingerprint": "27caffb6f01cfd3619b21831f1c9092b56f98404c0f478e12250d22289258650",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "text": "Run probes in an isolated external consuming project, not only in fgOS's own dev\ncheckout. Multi-agent quality superiority remains unproven until measured."
+      }
+    },
+    {
+      "claimId": "claim_19c9a2980ebf62187596b6600c2c43dd",
+      "sourceUnitDigest": "d1ec1e9b26fa6a0b5ff1f1437388241a99be791c1c1fcea8851f4ad25a76e637",
+      "targetUnitDigest": "d1ec1e9b26fa6a0b5ff1f1437388241a99be791c1c1fcea8851f4ad25a76e637",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_19c9a2980ebf62187596b6600c2c43dd",
+        "sourceUnitDigest": "d1ec1e9b26fa6a0b5ff1f1437388241a99be791c1c1fcea8851f4ad25a76e637",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "unheaded-block-68",
+        "targetUnitDigest": "d1ec1e9b26fa6a0b5ff1f1437388241a99be791c1c1fcea8851f4ad25a76e637",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-65 (lines 410–413) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-68 (lines 437–440); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-65",
+        "githubAnchor": "unheaded-block-65",
+        "stableAnchor": "unheaded-block-65",
+        "title": "Unheaded block 65",
+        "startLine": 410,
+        "endLine": 413,
+        "textDigest": "d1ec1e9b26fa6a0b5ff1f1437388241a99be791c1c1fcea8851f4ad25a76e637",
+        "sample": "Decisive question:\n\n> Can a new coordinator invent a coordination method the graph author did not\n> anticipate, without exceeding authority or bounds?",
+        "identityFingerprint": "e97c918e00add857cb7ea96166086eda82092c7a77702a7839c9b0f9f80d56e6",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "text": "Decisive question:\n\n> Can a new coordinator invent a coordination method the graph author did not\n> anticipate, without exceeding authority or bounds?"
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-68",
+        "githubAnchor": "unheaded-block-68",
+        "stableAnchor": "unheaded-block-68",
+        "title": "Unheaded block 68",
+        "startLine": 437,
+        "endLine": 440,
+        "textDigest": "d1ec1e9b26fa6a0b5ff1f1437388241a99be791c1c1fcea8851f4ad25a76e637",
+        "sample": "Decisive question:\n\n> Can a new coordinator invent a coordination method the graph author did not\n> anticipate, without exceeding authority or bounds?",
+        "identityFingerprint": "e97c918e00add857cb7ea96166086eda82092c7a77702a7839c9b0f9f80d56e6",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "text": "Decisive question:\n\n> Can a new coordinator invent a coordination method the graph author did not\n> anticipate, without exceeding authority or bounds?"
+      }
+    },
+    {
+      "claimId": "claim_7c571a6f348ab8b437cb75a903ec4723",
+      "sourceUnitDigest": "7bbdca1884bb97936644d4ad219d2c2b24cf9789a81b93b6b61eb3c225b3af2a",
+      "targetUnitDigest": "7bbdca1884bb97936644d4ad219d2c2b24cf9789a81b93b6b61eb3c225b3af2a",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_7c571a6f348ab8b437cb75a903ec4723",
+        "sourceUnitDigest": "7bbdca1884bb97936644d4ad219d2c2b24cf9789a81b93b6b61eb3c225b3af2a",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "unheaded-block-69",
+        "targetUnitDigest": "7bbdca1884bb97936644d4ad219d2c2b24cf9789a81b93b6b61eb3c225b3af2a",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-66 (lines 415–419) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-69 (lines 442–446); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-66",
+        "githubAnchor": "unheaded-block-66",
+        "stableAnchor": "unheaded-block-66",
+        "title": "Unheaded block 66",
+        "startLine": 415,
+        "endLine": 419,
+        "textDigest": "7bbdca1884bb97936644d4ad219d2c2b24cf9789a81b93b6b61eb3c225b3af2a",
+        "sample": "B's design answer is yes: create a new prose task, choose an allowed specialist,\ngrant narrow context, spend remaining budget, and preserve existing obligations.\nNeeding a graph ed",
+        "identityFingerprint": "72e9407c6b9899aa4695543c442703eff0d4241d73aaf90ec32e67538212bb66",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "text": "B's design answer is yes: create a new prose task, choose an allowed specialist,\ngrant narrow context, spend remaining budget, and preserve existing obligations.\nNeeding a graph edit fails adaptability. Needing ambient shell/control-store\naccess fails the hard boundary. This answer remains a probe obligation, not a\nclaim of shipped capability."
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-69",
+        "githubAnchor": "unheaded-block-69",
+        "stableAnchor": "unheaded-block-69",
+        "title": "Unheaded block 69",
+        "startLine": 442,
+        "endLine": 446,
+        "textDigest": "7bbdca1884bb97936644d4ad219d2c2b24cf9789a81b93b6b61eb3c225b3af2a",
+        "sample": "B's design answer is yes: create a new prose task, choose an allowed specialist,\ngrant narrow context, spend remaining budget, and preserve existing obligations.\nNeeding a graph ed",
+        "identityFingerprint": "72e9407c6b9899aa4695543c442703eff0d4241d73aaf90ec32e67538212bb66",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "10. Smallest experiments before implementation planning"
+        ],
+        "text": "B's design answer is yes: create a new prose task, choose an allowed specialist,\ngrant narrow context, spend remaining budget, and preserve existing obligations.\nNeeding a graph edit fails adaptability. Needing ambient shell/control-store\naccess fails the hard boundary. This answer remains a probe obligation, not a\nclaim of shipped capability."
+      }
+    },
+    {
+      "claimId": "claim_120d81dc468b5a0f4e2e6f4769ae006a",
+      "sourceUnitDigest": "ed3b0fca12363641df72fe25efa2dd384bb9fe61b39dc535a86db368d93cf0cd",
+      "targetUnitDigest": "ed3b0fca12363641df72fe25efa2dd384bb9fe61b39dc535a86db368d93cf0cd",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_120d81dc468b5a0f4e2e6f4769ae006a",
+        "sourceUnitDigest": "ed3b0fca12363641df72fe25efa2dd384bb9fe61b39dc535a86db368d93cf0cd",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "11-human-decisions-and-recommended-defaults",
+        "targetUnitDigest": "ed3b0fca12363641df72fe25efa2dd384bb9fe61b39dc535a86db368d93cf0cd",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#11-human-decisions-and-recommended-defaults (lines 421–421) is carried at docs/platform/proposals/coordination-capability-envelope.md#11-human-decisions-and-recommended-defaults (lines 448–448); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "11. Human decisions and recommended defaults",
+        "anchor": "11-human-decisions-and-recommended-defaults",
+        "githubAnchor": "11-human-decisions-and-recommended-defaults",
+        "stableAnchor": "h-83fdb0cbb3db",
+        "startLine": 421,
+        "endLine": 421,
+        "textDigest": "ed3b0fca12363641df72fe25efa2dd384bb9fe61b39dc535a86db368d93cf0cd",
+        "sample": "11. Human decisions and recommended defaults",
+        "sectionPayloadDigest": "2f53b5c297de6c00fec093e6783d211bfa1aecba478f341c16ebe15080717258",
+        "followingBlockDigest": "a16421c922d413fded5704c51a53c17a7e733ab01b9425045e0440149ddb9cbf",
+        "identityFingerprint": "0d200fe1843b33cc9461b67e57ea67f778a95d47ced56e140f5a149ca12834d4",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation"
+        ],
+        "text": "## 11. Human decisions and recommended defaults",
+        "sectionText": "## 11. Human decisions and recommended defaults\n\n| Decision | Recommended default |\n|---|---|\n| Worker trust class | Workers may err or be prompt-injected; privileged runtime/config/operator are trusted |\n| Target family | B; optional FlowDefinition, prompt/skill operating surface |\n| Who may waive commitments? | Their issuing authority or superior; coordinator only when explicitly delegated |\n| Must Advisory reach consensus? | No; permit qualified recommendation, dissent, insufficient evidence |\n| Product decision authority | Human; distinguish recommendation from acceptance |\n| Adapter cannot enforce required isolation | Refuse that execution; never silently downgrade guarantees |\n| Specialist recruitment autonomy | Within granted scope/budget/capability; no self-added tool class or data scope |\n| Direct peer communication | Not required by default; start with mediated artifacts and add channels when probes justify them |\n| Park/resume budget | Separate active budget and deadline; resume never resets consumption |\n| Kernel investment before proof | Minimum needed for probes; no large schema or Advisory phase graph yet |\n\nThe first choices to settle are the worker trust boundary and authority to change\nobligations. Together they let the coordinator change its method while runtime\nstill knows exactly what it must refuse."
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "11. Human decisions and recommended defaults",
+        "anchor": "11-human-decisions-and-recommended-defaults",
+        "githubAnchor": "11-human-decisions-and-recommended-defaults",
+        "stableAnchor": "h-6cefb3745288",
+        "startLine": 448,
+        "endLine": 448,
+        "textDigest": "ed3b0fca12363641df72fe25efa2dd384bb9fe61b39dc535a86db368d93cf0cd",
+        "sample": "11. Human decisions and recommended defaults",
+        "sectionPayloadDigest": "2f53b5c297de6c00fec093e6783d211bfa1aecba478f341c16ebe15080717258",
+        "followingBlockDigest": "a16421c922d413fded5704c51a53c17a7e733ab01b9425045e0440149ddb9cbf",
+        "identityFingerprint": "0d200fe1843b33cc9461b67e57ea67f778a95d47ced56e140f5a149ca12834d4",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation"
+        ],
+        "text": "## 11. Human decisions and recommended defaults",
+        "sectionText": "## 11. Human decisions and recommended defaults\n\n| Decision | Recommended default |\n|---|---|\n| Worker trust class | Workers may err or be prompt-injected; privileged runtime/config/operator are trusted |\n| Target family | B; optional FlowDefinition, prompt/skill operating surface |\n| Who may waive commitments? | Their issuing authority or superior; coordinator only when explicitly delegated |\n| Must Advisory reach consensus? | No; permit qualified recommendation, dissent, insufficient evidence |\n| Product decision authority | Human; distinguish recommendation from acceptance |\n| Adapter cannot enforce required isolation | Refuse that execution; never silently downgrade guarantees |\n| Specialist recruitment autonomy | Within granted scope/budget/capability; no self-added tool class or data scope |\n| Direct peer communication | Not required by default; start with mediated artifacts and add channels when probes justify them |\n| Park/resume budget | Separate active budget and deadline; resume never resets consumption |\n| Kernel investment before proof | Minimum needed for probes; no large schema or Advisory phase graph yet |\n\nThe first choices to settle are the worker trust boundary and authority to change\nobligations. Together they let the coordinator change its method while runtime\nstill knows exactly what it must refuse."
+      }
+    },
+    {
+      "claimId": "claim_68231465218527e28eb8b7ccda2ee7b1",
+      "sourceUnitDigest": "a16421c922d413fded5704c51a53c17a7e733ab01b9425045e0440149ddb9cbf",
+      "targetUnitDigest": "a16421c922d413fded5704c51a53c17a7e733ab01b9425045e0440149ddb9cbf",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_68231465218527e28eb8b7ccda2ee7b1",
+        "sourceUnitDigest": "a16421c922d413fded5704c51a53c17a7e733ab01b9425045e0440149ddb9cbf",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "a16421c922d413fded5704c51a53c17a7e733ab01b9425045e0440149ddb9cbf",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "11. Human decisions and recommended defaults"
+        ],
+        "claimKind": "decision",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-67 (lines 423–434) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-70 (lines 450–461); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-67",
+        "githubAnchor": "unheaded-block-67",
+        "stableAnchor": "unheaded-block-67",
+        "title": "Unheaded block 67",
+        "startLine": 423,
+        "endLine": 434,
+        "textDigest": "a16421c922d413fded5704c51a53c17a7e733ab01b9425045e0440149ddb9cbf",
+        "sample": "| Decision | Recommended default |\n|---|---|\n| Worker trust class | Workers may err or be prompt-injected; privileged runtime/config/operator are trusted |\n| Target family | B; opt",
+        "identityFingerprint": "d1a8dc7d0bd5cdcba9475bde43786fa2cc75a49c0f86cd871dd94a0b0f3cef12",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "11. Human decisions and recommended defaults"
+        ],
+        "text": "| Decision | Recommended default |\n|---|---|\n| Worker trust class | Workers may err or be prompt-injected; privileged runtime/config/operator are trusted |\n| Target family | B; optional FlowDefinition, prompt/skill operating surface |\n| Who may waive commitments? | Their issuing authority or superior; coordinator only when explicitly delegated |\n| Must Advisory reach consensus? | No; permit qualified recommendation, dissent, insufficient evidence |\n| Product decision authority | Human; distinguish recommendation from acceptance |\n| Adapter cannot enforce required isolation | Refuse that execution; never silently downgrade guarantees |\n| Specialist recruitment autonomy | Within granted scope/budget/capability; no self-added tool class or data scope |\n| Direct peer communication | Not required by default; start with mediated artifacts and add channels when probes justify them |\n| Park/resume budget | Separate active budget and deadline; resume never resets consumption |\n| Kernel investment before proof | Minimum needed for probes; no large schema or Advisory phase graph yet |"
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-70",
+        "githubAnchor": "unheaded-block-70",
+        "stableAnchor": "unheaded-block-70",
+        "title": "Unheaded block 70",
+        "startLine": 450,
+        "endLine": 461,
+        "textDigest": "a16421c922d413fded5704c51a53c17a7e733ab01b9425045e0440149ddb9cbf",
+        "sample": "| Decision | Recommended default |\n|---|---|\n| Worker trust class | Workers may err or be prompt-injected; privileged runtime/config/operator are trusted |\n| Target family | B; opt",
+        "identityFingerprint": "d1a8dc7d0bd5cdcba9475bde43786fa2cc75a49c0f86cd871dd94a0b0f3cef12",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "11. Human decisions and recommended defaults"
+        ],
+        "text": "| Decision | Recommended default |\n|---|---|\n| Worker trust class | Workers may err or be prompt-injected; privileged runtime/config/operator are trusted |\n| Target family | B; optional FlowDefinition, prompt/skill operating surface |\n| Who may waive commitments? | Their issuing authority or superior; coordinator only when explicitly delegated |\n| Must Advisory reach consensus? | No; permit qualified recommendation, dissent, insufficient evidence |\n| Product decision authority | Human; distinguish recommendation from acceptance |\n| Adapter cannot enforce required isolation | Refuse that execution; never silently downgrade guarantees |\n| Specialist recruitment autonomy | Within granted scope/budget/capability; no self-added tool class or data scope |\n| Direct peer communication | Not required by default; start with mediated artifacts and add channels when probes justify them |\n| Park/resume budget | Separate active budget and deadline; resume never resets consumption |\n| Kernel investment before proof | Minimum needed for probes; no large schema or Advisory phase graph yet |"
+      }
+    },
+    {
+      "claimId": "claim_70f01696dc9bd3f3a9e2c459a16fe907",
+      "sourceUnitDigest": "03bde1bb17f41bfeb04bac000f6092af4444cfa12e98b86b371aff381f3824a7",
+      "targetUnitDigest": "03bde1bb17f41bfeb04bac000f6092af4444cfa12e98b86b371aff381f3824a7",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_70f01696dc9bd3f3a9e2c459a16fe907",
+        "sourceUnitDigest": "03bde1bb17f41bfeb04bac000f6092af4444cfa12e98b86b371aff381f3824a7",
+        "targetOwner": "docs/platform/proposals/coordination-capability-envelope.md",
+        "targetAnchor": "unheaded-block-71",
+        "targetUnitDigest": "03bde1bb17f41bfeb04bac000f6092af4444cfa12e98b86b371aff381f3824a7",
+        "targetAncestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "11. Human decisions and recommended defaults"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source unheaded-block docs/architect/proposals/coordination-capability-envelope.md#unheaded-block-68 (lines 436–438) is carried at docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-71 (lines 463–465); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-68",
+        "githubAnchor": "unheaded-block-68",
+        "stableAnchor": "unheaded-block-68",
+        "title": "Unheaded block 68",
+        "startLine": 436,
+        "endLine": 438,
+        "textDigest": "03bde1bb17f41bfeb04bac000f6092af4444cfa12e98b86b371aff381f3824a7",
+        "sample": "The first choices to settle are the worker trust boundary and authority to change\nobligations. Together they let the coordinator change its method while runtime\nstill knows exactly",
+        "identityFingerprint": "1d2de9ec5f6b43fdf3dd9a5481463ad763207b258d8f3edb34fbd754f9c0f895",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "11. Human decisions and recommended defaults"
+        ],
+        "text": "The first choices to settle are the worker trust boundary and authority to change\nobligations. Together they let the coordinator change its method while runtime\nstill knows exactly what it must refuse."
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-capability-envelope.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-71",
+        "githubAnchor": "unheaded-block-71",
+        "stableAnchor": "unheaded-block-71",
+        "title": "Unheaded block 71",
+        "startLine": 463,
+        "endLine": 465,
+        "textDigest": "03bde1bb17f41bfeb04bac000f6092af4444cfa12e98b86b371aff381f3824a7",
+        "sample": "The first choices to settle are the worker trust boundary and authority to change\nobligations. Together they let the coordinator change its method while runtime\nstill knows exactly",
+        "identityFingerprint": "1d2de9ec5f6b43fdf3dd9a5481463ad763207b258d8f3edb34fbd754f9c0f895",
+        "ancestry": [
+          "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation",
+          "11. Human decisions and recommended defaults"
+        ],
+        "text": "The first choices to settle are the worker trust boundary and authority to change\nobligations. Together they let the coordinator change its method while runtime\nstill knows exactly what it must refuse."
+      }
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "originalShardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-09-coordination-capability-envelope.json",
+  "originalShardSHA256": "35b444d9563a6a761d25239f19c667225b77e0b37635541d2978d12ba4b92c60",
+  "part": 2,
+  "parts": 2,
+  "completeSourceRowCount": 92,
+  "gateFindings": [],
+  "scope": "Source rows only; complete reverse population is in the separate native candidate request.",
+  "a36": {
+    "gateFindings": [],
+    "requestPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1110-proposals-redesigns-source-09-02-0f063d18f.md",
+    "packPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-09-02-0f063d18f.md",
+    "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-09-02-0f063d18f.md.json",
+    "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-09-coordination-capability-envelope.json",
+    "source": "docs/architect/proposals/coordination-capability-envelope.md",
+    "part": 2,
+    "parts": 2,
+    "count": 12,
+    "classes": {
+      "Unit-exact": 10,
+      "Judgment": 2
+    },
+    "weakExactAndJudgment": [
+      "claim_d2341a538619073b583c4b3168b41387",
+      "claim_63e205836d7968a5141e0350e70ad8a8"
+    ],
+    "reviewerDeepSampleMinimum": 2,
+    "mandatoryDifferingDigestRows": [
+      "claim_d2341a538619073b583c4b3168b41387",
+      "claim_63e205836d7968a5141e0350e70ad8a8"
+    ],
+    "absentTargetRows": [],
+    "changedByContentCommit": []
+  },
+  "fullShownTextBindings": [
+    {
+      "claimId": "claim_4e753355165ad61654f69b893f8f91cd",
+      "sourceShownTextDigest": "e65da4970fac32cb3db0a7b215fb6483bd512dc7dd3a904853f555e0e7b43142",
+      "targetShownTextDigest": "e65da4970fac32cb3db0a7b215fb6483bd512dc7dd3a904853f555e0e7b43142",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_233a119b25554ba89af3b199c7b04572",
+      "sourceShownTextDigest": "638040ed2c05da0e9c5ed83fe84ea6207966d105d6b55173769f875667bfa8c7",
+      "targetShownTextDigest": "638040ed2c05da0e9c5ed83fe84ea6207966d105d6b55173769f875667bfa8c7",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_f08db928e08138f3a10d5b28fd6973ff",
+      "sourceShownTextDigest": "0c16441930076e6dcb11954314dfe326a712118da92d156fac760c920a52669e",
+      "targetShownTextDigest": "0c16441930076e6dcb11954314dfe326a712118da92d156fac760c920a52669e",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_d2341a538619073b583c4b3168b41387",
+      "sourceShownTextDigest": "2d572337cce7ffd635db38e6278a2fb40bb24e864cf29dee6fdd7f1126b85825",
+      "targetShownTextDigest": "4f4143c36138209cedef95ebb8b9715d710904a04abab0c5332d189f681b7792",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_63e205836d7968a5141e0350e70ad8a8",
+      "sourceShownTextDigest": "d7fa9577c7921ff566d2e242f7c0a358a6f81a0c611c500eb7f923ba3d18a211",
+      "targetShownTextDigest": "8b90e05654b92caa7c9d8602c64cd9e17bb44e3e76cd183246906b942958423f",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_6163ea1b7781f128baa4ecf5d0ad746f",
+      "sourceShownTextDigest": "5f72368beee4a1cb56530685318b5c98606918cb4afb20cf63ad122ae70d9715",
+      "targetShownTextDigest": "5f72368beee4a1cb56530685318b5c98606918cb4afb20cf63ad122ae70d9715",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_d37a0893b9da6605af111d4d59b3c263",
+      "sourceShownTextDigest": "4fb881a86a8a98fc9e88d3bced681ede46a80204e7795336ee6fa8c67142f012",
+      "targetShownTextDigest": "4fb881a86a8a98fc9e88d3bced681ede46a80204e7795336ee6fa8c67142f012",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_19c9a2980ebf62187596b6600c2c43dd",
+      "sourceShownTextDigest": "d1ec1e9b26fa6a0b5ff1f1437388241a99be791c1c1fcea8851f4ad25a76e637",
+      "targetShownTextDigest": "d1ec1e9b26fa6a0b5ff1f1437388241a99be791c1c1fcea8851f4ad25a76e637",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_7c571a6f348ab8b437cb75a903ec4723",
+      "sourceShownTextDigest": "7bbdca1884bb97936644d4ad219d2c2b24cf9789a81b93b6b61eb3c225b3af2a",
+      "targetShownTextDigest": "7bbdca1884bb97936644d4ad219d2c2b24cf9789a81b93b6b61eb3c225b3af2a",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_120d81dc468b5a0f4e2e6f4769ae006a",
+      "sourceShownTextDigest": "0cb4d29cb1e03b2fc0703fa36a7423a68dc1a0156fc0aeee5366db1707fbcee1",
+      "targetShownTextDigest": "0cb4d29cb1e03b2fc0703fa36a7423a68dc1a0156fc0aeee5366db1707fbcee1",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_68231465218527e28eb8b7ccda2ee7b1",
+      "sourceShownTextDigest": "a16421c922d413fded5704c51a53c17a7e733ab01b9425045e0440149ddb9cbf",
+      "targetShownTextDigest": "a16421c922d413fded5704c51a53c17a7e733ab01b9425045e0440149ddb9cbf",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_70f01696dc9bd3f3a9e2c459a16fe907",
+      "sourceShownTextDigest": "03bde1bb17f41bfeb04bac000f6092af4444cfa12e98b86b371aff381f3824a7",
+      "targetShownTextDigest": "03bde1bb17f41bfeb04bac000f6092af4444cfa12e98b86b371aff381f3824a7",
+      "changedByContentCommit": false
+    }
+  ]
+}

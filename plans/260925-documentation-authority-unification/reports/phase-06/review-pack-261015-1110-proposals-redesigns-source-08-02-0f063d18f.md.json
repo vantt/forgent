@@ -1,0 +1,1274 @@
+{
+  "version": 1,
+  "commit": "0f063d18fdab01cb6f2c915bb60ff528c5e0f238",
+  "shard": "s7-proposals-redesigns-08-component-authority-boundary-map.json",
+  "authorSession": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_b44496172b32af832302994458122866",
+      "sourceUnitDigest": "50ff81b5ea1585c44661ad94bab3976749b980cf8f1e1762576bc903d3f243b1",
+      "targetUnitDigest": "50ff81b5ea1585c44661ad94bab3976749b980cf8f1e1762576bc903d3f243b1",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_b44496172b32af832302994458122866",
+        "sourceUnitDigest": "50ff81b5ea1585c44661ad94bab3976749b980cf8f1e1762576bc903d3f243b1",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-68",
+        "targetUnitDigest": "50ff81b5ea1585c44661ad94bab3976749b980cf8f1e1762576bc903d3f243b1",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "15. Code Scan Findings For Boundary Drafting"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-65 (lines 551–560) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-68 (lines 575–584); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-65",
+        "githubAnchor": "unheaded-block-65",
+        "stableAnchor": "unheaded-block-65",
+        "title": "Unheaded block 65",
+        "startLine": 551,
+        "endLine": 560,
+        "textDigest": "50ff81b5ea1585c44661ad94bab3976749b980cf8f1e1762576bc903d3f243b1",
+        "sample": "| Finding | Evidence | Architecture read | Recommendation |\n|---|---|---|---|\n| A. `operation-choice.mjs` is the highest-risk boundary knot. | `chooseStageOperation()` line 649, `i",
+        "identityFingerprint": "867d985c10f3a7225b38e5c94377d492e3c49e40bd1d8775d551bc5f899c7cb6",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "15. Code Scan Findings For Boundary Drafting"
+        ],
+        "text": "| Finding | Evidence | Architecture read | Recommendation |\n|---|---|---|---|\n| A. `operation-choice.mjs` is the highest-risk boundary knot. | `chooseStageOperation()` line 649, `interpretAssignmentRunResult()` line 1671, `executeDriverOperationChoice()` line 2144 in a 2,260-line file. GitNexus shows callers from `dispatchClaimedItem()`, `runOnce()`, and tests. | The file spans Work Driver, Assignment/Dispatch invocation, and RunResult interpretation. It is a compatibility join point, not the long-term component home. | Treat `executeDriverOperationChoice()` as the temporary adapter seam for Step 10 slice 2. The accepted boundary should target `WorkDriverPort.chooseOperation() -> AssignmentBuilderPort.freezeDeclaredOperation() -> DispatchRuntimePort.runAssignment() -> RunResultEvaluatorPort.evaluate() -> WorkDriverPort.consumeRunResult()`. |\n| B. Secondary operations use Assignment/RunResult; primary executing still uses `spawnWorker`. | `src/runner/loop.mjs` chooses operations and calls `executeDriverOperationChoice()` for assignment dispatch, but still falls through to `spawnWorker()` around executing/research paths. `assignment-runner.mjs` persists Run, dispatch plan, result, evidence, dirty-before state, and hashes. | The repo has two execution cores: `Assignment -> DispatchPlan -> Run -> RunResult` and legacy `spawnWorker -> goal-check -> settleClaim`. | Keep Step 2 narrow on read-only `validate-plan`. Mark `spawnWorker` primary execution as a legacy path to retire behind `DispatchRuntimePort`; goal-check becomes a coding evidence adapter. |\n| C. CoordinationSession bounds and worker slots are separate caps. | Coordination defaults `aggregateBounds.maxConcurrency` and enforces session assignment creation; worker slots are computed from Work claims and optional ceiling. | Both caps are legitimate but currently have no shared port. Work-attached fan-out or mutation could create conflicting answers to \"is there room?\" | Step 2 should use concurrency 1 and borrow the host Work claim. Before fan-out/mutation, accept an `OccupancyPort` rule that clamps session materialization against Work runtime slots and coding resource claims. |\n| D. CoordinationSession is correctly lifecycle-blind today. | `openSession()` accepts `workRef`; session engine builds read-only inline contracts; inline mutating contracts are rejected. | Session can reference Work but does not own lifecycle/isolation/merge and cannot run mutating inline Assignments. | Do not extend CoordinationSession into a Work/Stage resolver. Add declared Assignment handoff from Work Driver + Assignment Builder into session membership. |\n| E. Coding harness is pure and read-only, but too narrow for mutation proof. | `domains/coding/harness/enrich-and-validate-contract.mjs` validates declared stage operation and appends context/policy hints without filesystem, store, network, dispatch, or executor choice. | This is a good ADR-007 seam. It lacks footprint/resource/isolation advice and opaque workspace refs needed for mutating proof. | Extend harness I/O only after the boundary and Step 10 readiness gates: enriched contract + policy + evidencePolicy + resourceClaims + isolationAdvice + `workspaceRef?`. |\n| F. Domain workflow declarations already contain legal operation truth. | `domains/coding/workflows/feature.yaml` declares `validate-plan`, `implement-item`, `review-item`, `fix-verify-red`, `scoped-subtask`, `scout-blast-radius`, and `resolve-question`; `assignment.mjs` rejects unknown declared operations. | Step 10 does not need a new place to decide legal operations. It needs a clean path for declared operation truth to enter a Work-attached session. | For Step 10 slice 2: Work Driver selects `planning.validate-plan`; Assignment Builder freezes; Session store appends membership; Dispatch executes; Run Result Evaluator evaluates; Work Driver consumes verdict and calls lifecycle verbs if allowed. |\n| G. Coding Repository Integration Core is scattered but authority is clear. | `src/runner/worktree.mjs`, `src/runner/merge.mjs`, `src/verbs/merge/**`, readiness/cleanup/drift state files. | These concerns are coding-specific because they depend on Git branches, worktrees, repo deltas, verification, merge readiness, and technical approval. | Do not move files in the boundary draft or Step 10 slice 2. The accepted boundary should mark them as Coding Domain Core and require a `CodingRepositoryPort` facade before layout moves. |\n| H. Setup/Doctor is already a real platform boundary. | `src/setup/registrations.mjs`, `src/setup/checks.mjs`, `src/setup/config-merge.mjs`, shared config helpers. | Clean architecture on paper is not enough if new files/config/executors/services are undiscoverable in real projects. | Make setup/doctor registration part of implementation gates for Step 09/Step 10 changes that introduce new config, files, services, or directories. |"
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-68",
+        "githubAnchor": "unheaded-block-68",
+        "stableAnchor": "unheaded-block-68",
+        "title": "Unheaded block 68",
+        "startLine": 575,
+        "endLine": 584,
+        "textDigest": "50ff81b5ea1585c44661ad94bab3976749b980cf8f1e1762576bc903d3f243b1",
+        "sample": "| Finding | Evidence | Architecture read | Recommendation |\n|---|---|---|---|\n| A. `operation-choice.mjs` is the highest-risk boundary knot. | `chooseStageOperation()` line 649, `i",
+        "identityFingerprint": "867d985c10f3a7225b38e5c94377d492e3c49e40bd1d8775d551bc5f899c7cb6",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "15. Code Scan Findings For Boundary Drafting"
+        ],
+        "text": "| Finding | Evidence | Architecture read | Recommendation |\n|---|---|---|---|\n| A. `operation-choice.mjs` is the highest-risk boundary knot. | `chooseStageOperation()` line 649, `interpretAssignmentRunResult()` line 1671, `executeDriverOperationChoice()` line 2144 in a 2,260-line file. GitNexus shows callers from `dispatchClaimedItem()`, `runOnce()`, and tests. | The file spans Work Driver, Assignment/Dispatch invocation, and RunResult interpretation. It is a compatibility join point, not the long-term component home. | Treat `executeDriverOperationChoice()` as the temporary adapter seam for Step 10 slice 2. The accepted boundary should target `WorkDriverPort.chooseOperation() -> AssignmentBuilderPort.freezeDeclaredOperation() -> DispatchRuntimePort.runAssignment() -> RunResultEvaluatorPort.evaluate() -> WorkDriverPort.consumeRunResult()`. |\n| B. Secondary operations use Assignment/RunResult; primary executing still uses `spawnWorker`. | `src/runner/loop.mjs` chooses operations and calls `executeDriverOperationChoice()` for assignment dispatch, but still falls through to `spawnWorker()` around executing/research paths. `assignment-runner.mjs` persists Run, dispatch plan, result, evidence, dirty-before state, and hashes. | The repo has two execution cores: `Assignment -> DispatchPlan -> Run -> RunResult` and legacy `spawnWorker -> goal-check -> settleClaim`. | Keep Step 2 narrow on read-only `validate-plan`. Mark `spawnWorker` primary execution as a legacy path to retire behind `DispatchRuntimePort`; goal-check becomes a coding evidence adapter. |\n| C. CoordinationSession bounds and worker slots are separate caps. | Coordination defaults `aggregateBounds.maxConcurrency` and enforces session assignment creation; worker slots are computed from Work claims and optional ceiling. | Both caps are legitimate but currently have no shared port. Work-attached fan-out or mutation could create conflicting answers to \"is there room?\" | Step 2 should use concurrency 1 and borrow the host Work claim. Before fan-out/mutation, accept an `OccupancyPort` rule that clamps session materialization against Work runtime slots and coding resource claims. |\n| D. CoordinationSession is correctly lifecycle-blind today. | `openSession()` accepts `workRef`; session engine builds read-only inline contracts; inline mutating contracts are rejected. | Session can reference Work but does not own lifecycle/isolation/merge and cannot run mutating inline Assignments. | Do not extend CoordinationSession into a Work/Stage resolver. Add declared Assignment handoff from Work Driver + Assignment Builder into session membership. |\n| E. Coding harness is pure and read-only, but too narrow for mutation proof. | `domains/coding/harness/enrich-and-validate-contract.mjs` validates declared stage operation and appends context/policy hints without filesystem, store, network, dispatch, or executor choice. | This is a good ADR-007 seam. It lacks footprint/resource/isolation advice and opaque workspace refs needed for mutating proof. | Extend harness I/O only after the boundary and Step 10 readiness gates: enriched contract + policy + evidencePolicy + resourceClaims + isolationAdvice + `workspaceRef?`. |\n| F. Domain workflow declarations already contain legal operation truth. | `domains/coding/workflows/feature.yaml` declares `validate-plan`, `implement-item`, `review-item`, `fix-verify-red`, `scoped-subtask`, `scout-blast-radius`, and `resolve-question`; `assignment.mjs` rejects unknown declared operations. | Step 10 does not need a new place to decide legal operations. It needs a clean path for declared operation truth to enter a Work-attached session. | For Step 10 slice 2: Work Driver selects `planning.validate-plan`; Assignment Builder freezes; Session store appends membership; Dispatch executes; Run Result Evaluator evaluates; Work Driver consumes verdict and calls lifecycle verbs if allowed. |\n| G. Coding Repository Integration Core is scattered but authority is clear. | `src/runner/worktree.mjs`, `src/runner/merge.mjs`, `src/verbs/merge/**`, readiness/cleanup/drift state files. | These concerns are coding-specific because they depend on Git branches, worktrees, repo deltas, verification, merge readiness, and technical approval. | Do not move files in the boundary draft or Step 10 slice 2. The accepted boundary should mark them as Coding Domain Core and require a `CodingRepositoryPort` facade before layout moves. |\n| H. Setup/Doctor is already a real platform boundary. | `src/setup/registrations.mjs`, `src/setup/checks.mjs`, `src/setup/config-merge.mjs`, shared config helpers. | Clean architecture on paper is not enough if new files/config/executors/services are undiscoverable in real projects. | Make setup/doctor registration part of implementation gates for Step 09/Step 10 changes that introduce new config, files, services, or directories. |"
+      }
+    },
+    {
+      "claimId": "claim_794efb2411951275029b69ee60894cce",
+      "sourceUnitDigest": "cc381b14070aec64610a731918997312d4ce13b650590507a6daae1e79211f67",
+      "targetUnitDigest": "cc381b14070aec64610a731918997312d4ce13b650590507a6daae1e79211f67",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_794efb2411951275029b69ee60894cce",
+        "sourceUnitDigest": "cc381b14070aec64610a731918997312d4ce13b650590507a6daae1e79211f67",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "16-boundary-promotion-checklist",
+        "targetUnitDigest": "cc381b14070aec64610a731918997312d4ce13b650590507a6daae1e79211f67",
+        "targetAncestry": [
+          "Component Authority Boundary Map"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source heading docs/architect/proposals/component-authority-boundary-map.md#16-boundary-promotion-checklist (lines 562–562) is carried at docs/platform/proposals/component-authority-boundary-map.md#16-boundary-promotion-checklist (lines 586–586); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "16. Boundary Promotion Checklist",
+        "anchor": "16-boundary-promotion-checklist",
+        "githubAnchor": "16-boundary-promotion-checklist",
+        "stableAnchor": "h-0f4d0b4d1225",
+        "startLine": 562,
+        "endLine": 562,
+        "textDigest": "cc381b14070aec64610a731918997312d4ce13b650590507a6daae1e79211f67",
+        "sample": "16. Boundary Promotion Checklist",
+        "sectionPayloadDigest": "2554d81d356a6e0b6b1c3eae55bb43e5e857e90369769cc38646182dbb801898",
+        "followingBlockDigest": "523e870d8cc2b79d3e8d9ec1e11adf55ef012019d7592c8d28e77cb1ac4b6b05",
+        "identityFingerprint": "d98c6e4d1ad6e1962515a37ff0a58b463e7748aec123293fa99eef609f6faf15",
+        "ancestry": [
+          "Component Authority Boundary Map"
+        ],
+        "text": "## 16. Boundary Promotion Checklist",
+        "sectionText": "## 16. Boundary Promotion Checklist\n\nBefore this draft can become accepted architecture:\n\n1. Reconcile against Step 08 P07.2 final Deferral Audit and any changed\n   CoordinationSession, FlowDefinition, dispatch, evidence, recovery, or\n   headless-parity contracts.\n2. Confirm Work Driver / Domain Workflow Interpreter as a child responsibility\n   under Work Core, and decide its explicit contract boundary with Work\n   Lifecycle Engine and Runtime Occupancy Support.\n3. Decide first read-only concurrency posture: inherit host Work slot at\n   concurrency 1, clamp session bounds through `OccupancyPort`, or another\n   explicit rule.\n4. Decide the `fgos handoff` relationship: Work event holder truth versus\n   session collaboration evidence/projection.\n5. Decide the minimal in-process Run record shape before executing-stage\n   primary work moves onto Assignment.\n6. Choose whether Node repo-layout overlay is accepted now, deferred as\n   migration-only guidance, or split into a separate distribution/component\n   document.\n7. Add accepted-source links from Step 09 and Step 10 before any coding\n   adoption implementation plan claims readiness."
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "16. Boundary Promotion Checklist",
+        "anchor": "16-boundary-promotion-checklist",
+        "githubAnchor": "16-boundary-promotion-checklist",
+        "stableAnchor": "h-50ad09f42fbe",
+        "startLine": 586,
+        "endLine": 586,
+        "textDigest": "cc381b14070aec64610a731918997312d4ce13b650590507a6daae1e79211f67",
+        "sample": "16. Boundary Promotion Checklist",
+        "sectionPayloadDigest": "2554d81d356a6e0b6b1c3eae55bb43e5e857e90369769cc38646182dbb801898",
+        "followingBlockDigest": "523e870d8cc2b79d3e8d9ec1e11adf55ef012019d7592c8d28e77cb1ac4b6b05",
+        "identityFingerprint": "d98c6e4d1ad6e1962515a37ff0a58b463e7748aec123293fa99eef609f6faf15",
+        "ancestry": [
+          "Component Authority Boundary Map"
+        ],
+        "text": "## 16. Boundary Promotion Checklist",
+        "sectionText": "## 16. Boundary Promotion Checklist\n\nBefore this draft can become accepted architecture:\n\n1. Reconcile against Step 08 P07.2 final Deferral Audit and any changed\n   CoordinationSession, FlowDefinition, dispatch, evidence, recovery, or\n   headless-parity contracts.\n2. Confirm Work Driver / Domain Workflow Interpreter as a child responsibility\n   under Work Core, and decide its explicit contract boundary with Work\n   Lifecycle Engine and Runtime Occupancy Support.\n3. Decide first read-only concurrency posture: inherit host Work slot at\n   concurrency 1, clamp session bounds through `OccupancyPort`, or another\n   explicit rule.\n4. Decide the `fgos handoff` relationship: Work event holder truth versus\n   session collaboration evidence/projection.\n5. Decide the minimal in-process Run record shape before executing-stage\n   primary work moves onto Assignment.\n6. Choose whether Node repo-layout overlay is accepted now, deferred as\n   migration-only guidance, or split into a separate distribution/component\n   document.\n7. Add accepted-source links from Step 09 and Step 10 before any coding\n   adoption implementation plan claims readiness."
+      }
+    },
+    {
+      "claimId": "claim_4a5585355351f33c2a4300d502cb90b7",
+      "sourceUnitDigest": "523e870d8cc2b79d3e8d9ec1e11adf55ef012019d7592c8d28e77cb1ac4b6b05",
+      "targetUnitDigest": "523e870d8cc2b79d3e8d9ec1e11adf55ef012019d7592c8d28e77cb1ac4b6b05",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_4a5585355351f33c2a4300d502cb90b7",
+        "sourceUnitDigest": "523e870d8cc2b79d3e8d9ec1e11adf55ef012019d7592c8d28e77cb1ac4b6b05",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-69",
+        "targetUnitDigest": "523e870d8cc2b79d3e8d9ec1e11adf55ef012019d7592c8d28e77cb1ac4b6b05",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "16. Boundary Promotion Checklist"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-66 (lines 564–564) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-69 (lines 588–588); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-66",
+        "githubAnchor": "unheaded-block-66",
+        "stableAnchor": "unheaded-block-66",
+        "title": "Unheaded block 66",
+        "startLine": 564,
+        "endLine": 564,
+        "textDigest": "523e870d8cc2b79d3e8d9ec1e11adf55ef012019d7592c8d28e77cb1ac4b6b05",
+        "sample": "Before this draft can become accepted architecture:",
+        "identityFingerprint": "a1835db4855862b2d34cc673a34528eb9bd6ff1b0e0238913811f200da890e54",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "16. Boundary Promotion Checklist"
+        ],
+        "text": "Before this draft can become accepted architecture:"
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-69",
+        "githubAnchor": "unheaded-block-69",
+        "stableAnchor": "unheaded-block-69",
+        "title": "Unheaded block 69",
+        "startLine": 588,
+        "endLine": 588,
+        "textDigest": "523e870d8cc2b79d3e8d9ec1e11adf55ef012019d7592c8d28e77cb1ac4b6b05",
+        "sample": "Before this draft can become accepted architecture:",
+        "identityFingerprint": "a1835db4855862b2d34cc673a34528eb9bd6ff1b0e0238913811f200da890e54",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "16. Boundary Promotion Checklist"
+        ],
+        "text": "Before this draft can become accepted architecture:"
+      }
+    },
+    {
+      "claimId": "claim_7dbf2e267742b5ca6e5e77602492fa1d",
+      "sourceUnitDigest": "275bf893b448e2929d1f59c0241a0cc04831b631dcf9599d6c68ee090be398e2",
+      "targetUnitDigest": "275bf893b448e2929d1f59c0241a0cc04831b631dcf9599d6c68ee090be398e2",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_7dbf2e267742b5ca6e5e77602492fa1d",
+        "sourceUnitDigest": "275bf893b448e2929d1f59c0241a0cc04831b631dcf9599d6c68ee090be398e2",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "275bf893b448e2929d1f59c0241a0cc04831b631dcf9599d6c68ee090be398e2",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "16. Boundary Promotion Checklist"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-67 (lines 566–583) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-70 (lines 590–607); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-67",
+        "githubAnchor": "unheaded-block-67",
+        "stableAnchor": "unheaded-block-67",
+        "title": "Unheaded block 67",
+        "startLine": 566,
+        "endLine": 583,
+        "textDigest": "275bf893b448e2929d1f59c0241a0cc04831b631dcf9599d6c68ee090be398e2",
+        "sample": "1. Reconcile against Step 08 P07.2 final Deferral Audit and any changed\n   CoordinationSession, FlowDefinition, dispatch, evidence, recovery, or\n   headless-parity contracts.\n2. Co",
+        "identityFingerprint": "803842eaa3f9576dcb30cf22245c7155ac055e3e6e0a3c05a848415768f33873",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "16. Boundary Promotion Checklist"
+        ],
+        "text": "1. Reconcile against Step 08 P07.2 final Deferral Audit and any changed\n   CoordinationSession, FlowDefinition, dispatch, evidence, recovery, or\n   headless-parity contracts.\n2. Confirm Work Driver / Domain Workflow Interpreter as a child responsibility\n   under Work Core, and decide its explicit contract boundary with Work\n   Lifecycle Engine and Runtime Occupancy Support.\n3. Decide first read-only concurrency posture: inherit host Work slot at\n   concurrency 1, clamp session bounds through `OccupancyPort`, or another\n   explicit rule.\n4. Decide the `fgos handoff` relationship: Work event holder truth versus\n   session collaboration evidence/projection.\n5. Decide the minimal in-process Run record shape before executing-stage\n   primary work moves onto Assignment.\n6. Choose whether Node repo-layout overlay is accepted now, deferred as\n   migration-only guidance, or split into a separate distribution/component\n   document.\n7. Add accepted-source links from Step 09 and Step 10 before any coding\n   adoption implementation plan claims readiness."
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-70",
+        "githubAnchor": "unheaded-block-70",
+        "stableAnchor": "unheaded-block-70",
+        "title": "Unheaded block 70",
+        "startLine": 590,
+        "endLine": 607,
+        "textDigest": "275bf893b448e2929d1f59c0241a0cc04831b631dcf9599d6c68ee090be398e2",
+        "sample": "1. Reconcile against Step 08 P07.2 final Deferral Audit and any changed\n   CoordinationSession, FlowDefinition, dispatch, evidence, recovery, or\n   headless-parity contracts.\n2. Co",
+        "identityFingerprint": "803842eaa3f9576dcb30cf22245c7155ac055e3e6e0a3c05a848415768f33873",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "16. Boundary Promotion Checklist"
+        ],
+        "text": "1. Reconcile against Step 08 P07.2 final Deferral Audit and any changed\n   CoordinationSession, FlowDefinition, dispatch, evidence, recovery, or\n   headless-parity contracts.\n2. Confirm Work Driver / Domain Workflow Interpreter as a child responsibility\n   under Work Core, and decide its explicit contract boundary with Work\n   Lifecycle Engine and Runtime Occupancy Support.\n3. Decide first read-only concurrency posture: inherit host Work slot at\n   concurrency 1, clamp session bounds through `OccupancyPort`, or another\n   explicit rule.\n4. Decide the `fgos handoff` relationship: Work event holder truth versus\n   session collaboration evidence/projection.\n5. Decide the minimal in-process Run record shape before executing-stage\n   primary work moves onto Assignment.\n6. Choose whether Node repo-layout overlay is accepted now, deferred as\n   migration-only guidance, or split into a separate distribution/component\n   document.\n7. Add accepted-source links from Step 09 and Step 10 before any coding\n   adoption implementation plan claims readiness."
+      }
+    },
+    {
+      "claimId": "claim_5408114e37ad45d35209d92515044a31",
+      "sourceUnitDigest": "9227058b0772e036a147e2602b2735855ec5e0944e525c3ed11bba62bae7aff4",
+      "targetUnitDigest": "9227058b0772e036a147e2602b2735855ec5e0944e525c3ed11bba62bae7aff4",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_5408114e37ad45d35209d92515044a31",
+        "sourceUnitDigest": "9227058b0772e036a147e2602b2735855ec5e0944e525c3ed11bba62bae7aff4",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "17-recommended-next-architecture-moves",
+        "targetUnitDigest": "9227058b0772e036a147e2602b2735855ec5e0944e525c3ed11bba62bae7aff4",
+        "targetAncestry": [
+          "Component Authority Boundary Map"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source heading docs/architect/proposals/component-authority-boundary-map.md#17-recommended-next-architecture-moves (lines 585–585) is carried at docs/platform/proposals/component-authority-boundary-map.md#17-recommended-next-architecture-moves (lines 609–609); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "17. Recommended Next Architecture Moves",
+        "anchor": "17-recommended-next-architecture-moves",
+        "githubAnchor": "17-recommended-next-architecture-moves",
+        "stableAnchor": "h-b9b63a925495",
+        "startLine": 585,
+        "endLine": 585,
+        "textDigest": "9227058b0772e036a147e2602b2735855ec5e0944e525c3ed11bba62bae7aff4",
+        "sample": "17. Recommended Next Architecture Moves",
+        "sectionPayloadDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+        "followingBlockDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+        "identityFingerprint": "ad2d0d85119718de44e5763ae43cf32395b394740664135b04ead04bcab984bf",
+        "ancestry": [
+          "Component Authority Boundary Map"
+        ],
+        "text": "## 17. Recommended Next Architecture Moves",
+        "sectionText": "## 17. Recommended Next Architecture Moves\n\n1. Keep this draft as architect-level discussion input until promoted.\n2. Run one focused review against Step 08's final audit and the Step 09\n   substrate direction before accepting boundary rules.\n3. Decide three gates explicitly: `OccupancyPort`, `fgos handoff`\n   truth/projection, and in-process Run minimum record.\n4. For Step 10 slice 2, implement only Work-attached read-only `validate-plan`\n   session after the relevant Step 09 substrate primitive and boundary\n   guardrails are accepted. Keep session concurrency at 1 and do not introduce\n   fan-out.\n5. For Step 10 slice 3, extract coding-specific result interpretation toward a\n   coding evidence adapter feeding Run Result Evaluator.\n6. For Step 10 mutating proof, lift the mutation gate only through a new ADR\n   with live proof; do not edit ADR-010 in place."
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "17. Recommended Next Architecture Moves",
+        "anchor": "17-recommended-next-architecture-moves",
+        "githubAnchor": "17-recommended-next-architecture-moves",
+        "stableAnchor": "h-22f8d5bb1c65",
+        "startLine": 609,
+        "endLine": 609,
+        "textDigest": "9227058b0772e036a147e2602b2735855ec5e0944e525c3ed11bba62bae7aff4",
+        "sample": "17. Recommended Next Architecture Moves",
+        "sectionPayloadDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+        "followingBlockDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+        "identityFingerprint": "ad2d0d85119718de44e5763ae43cf32395b394740664135b04ead04bcab984bf",
+        "ancestry": [
+          "Component Authority Boundary Map"
+        ],
+        "text": "## 17. Recommended Next Architecture Moves",
+        "sectionText": "## 17. Recommended Next Architecture Moves\n\n1. Keep this draft as architect-level discussion input until promoted.\n2. Run one focused review against Step 08's final audit and the Step 09\n   substrate direction before accepting boundary rules.\n3. Decide three gates explicitly: `OccupancyPort`, `fgos handoff`\n   truth/projection, and in-process Run minimum record.\n4. For Step 10 slice 2, implement only Work-attached read-only `validate-plan`\n   session after the relevant Step 09 substrate primitive and boundary\n   guardrails are accepted. Keep session concurrency at 1 and do not introduce\n   fan-out.\n5. For Step 10 slice 3, extract coding-specific result interpretation toward a\n   coding evidence adapter feeding Run Result Evaluator.\n6. For Step 10 mutating proof, lift the mutation gate only through a new ADR\n   with live proof; do not edit ADR-010 in place."
+      }
+    },
+    {
+      "claimId": "claim_ae765ac53a3113834d1792c7f970d000",
+      "sourceUnitDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+      "targetUnitDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_ae765ac53a3113834d1792c7f970d000",
+        "sourceUnitDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-71",
+        "targetUnitDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "17. Recommended Next Architecture Moves"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-68 (lines 587–599) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-71 (lines 611–623); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-68",
+        "githubAnchor": "unheaded-block-68",
+        "stableAnchor": "unheaded-block-68",
+        "title": "Unheaded block 68",
+        "startLine": 587,
+        "endLine": 599,
+        "textDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+        "sample": "1. Keep this draft as architect-level discussion input until promoted.\n2. Run one focused review against Step 08's final audit and the Step 09\n   substrate direction before accepti",
+        "identityFingerprint": "ec9102ff63206d9e6d4138bec240b1465644e62efa5c1a02a548bf04f3050051",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "17. Recommended Next Architecture Moves"
+        ],
+        "text": "1. Keep this draft as architect-level discussion input until promoted.\n2. Run one focused review against Step 08's final audit and the Step 09\n   substrate direction before accepting boundary rules.\n3. Decide three gates explicitly: `OccupancyPort`, `fgos handoff`\n   truth/projection, and in-process Run minimum record.\n4. For Step 10 slice 2, implement only Work-attached read-only `validate-plan`\n   session after the relevant Step 09 substrate primitive and boundary\n   guardrails are accepted. Keep session concurrency at 1 and do not introduce\n   fan-out.\n5. For Step 10 slice 3, extract coding-specific result interpretation toward a\n   coding evidence adapter feeding Run Result Evaluator.\n6. For Step 10 mutating proof, lift the mutation gate only through a new ADR\n   with live proof; do not edit ADR-010 in place."
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-71",
+        "githubAnchor": "unheaded-block-71",
+        "stableAnchor": "unheaded-block-71",
+        "title": "Unheaded block 71",
+        "startLine": 611,
+        "endLine": 623,
+        "textDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+        "sample": "1. Keep this draft as architect-level discussion input until promoted.\n2. Run one focused review against Step 08's final audit and the Step 09\n   substrate direction before accepti",
+        "identityFingerprint": "ec9102ff63206d9e6d4138bec240b1465644e62efa5c1a02a548bf04f3050051",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "17. Recommended Next Architecture Moves"
+        ],
+        "text": "1. Keep this draft as architect-level discussion input until promoted.\n2. Run one focused review against Step 08's final audit and the Step 09\n   substrate direction before accepting boundary rules.\n3. Decide three gates explicitly: `OccupancyPort`, `fgos handoff`\n   truth/projection, and in-process Run minimum record.\n4. For Step 10 slice 2, implement only Work-attached read-only `validate-plan`\n   session after the relevant Step 09 substrate primitive and boundary\n   guardrails are accepted. Keep session concurrency at 1 and do not introduce\n   fan-out.\n5. For Step 10 slice 3, extract coding-specific result interpretation toward a\n   coding evidence adapter feeding Run Result Evaluator.\n6. For Step 10 mutating proof, lift the mutation gate only through a new ADR\n   with live proof; do not edit ADR-010 in place."
+      }
+    },
+    {
+      "claimId": "claim_e6a1b1d03ef558e8136324c67aeb332f",
+      "sourceUnitDigest": "aacfe2480740e3606c4bdb2470a695cca725d947bc611b0f87d0f83fd727feae",
+      "targetUnitDigest": "aacfe2480740e3606c4bdb2470a695cca725d947bc611b0f87d0f83fd727feae",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_e6a1b1d03ef558e8136324c67aeb332f",
+        "sourceUnitDigest": "aacfe2480740e3606c4bdb2470a695cca725d947bc611b0f87d0f83fd727feae",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "18-agent-coordination-documentation-organization-pressure",
+        "targetUnitDigest": "aacfe2480740e3606c4bdb2470a695cca725d947bc611b0f87d0f83fd727feae",
+        "targetAncestry": [
+          "Component Authority Boundary Map"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source heading docs/architect/proposals/component-authority-boundary-map.md#18-agent-coordination-documentation-organization-pressure (lines 601–601) is carried at docs/platform/proposals/component-authority-boundary-map.md#18-agent-coordination-documentation-organization-pressure (lines 625–625); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "18. Agent Coordination Documentation Organization Pressure",
+        "anchor": "18-agent-coordination-documentation-organization-pressure",
+        "githubAnchor": "18-agent-coordination-documentation-organization-pressure",
+        "stableAnchor": "h-a40cbb20a7d3",
+        "startLine": 601,
+        "endLine": 601,
+        "textDigest": "aacfe2480740e3606c4bdb2470a695cca725d947bc611b0f87d0f83fd727feae",
+        "sample": "18. Agent Coordination Documentation Organization Pressure",
+        "sectionPayloadDigest": "aa6d1a9035a3d09a72a53fd13a7f0f1c5a591fd43f73a9357522e06540800d4a",
+        "followingBlockDigest": "e3523ea84219a004ecef1691597eea2f28170235aac948ad616bf90be1d80c18",
+        "identityFingerprint": "6724fcee67ef570364c04c0afbb67bdcbe5e9bcebb278c14634a10f3a72df114",
+        "ancestry": [
+          "Component Authority Boundary Map"
+        ],
+        "text": "## 18. Agent Coordination Documentation Organization Pressure",
+        "sectionText": "## 18. Agent Coordination Documentation Organization Pressure\n\nThe current `docs/architect/agent-coordination/` tree is organized mostly by\ndocument authority:\n\n```txt\nvision/\nvocabulary/\narchitecture/\ncontracts/\ndecisions/\nproposals/\nroadmap/\nverification/\nplaybooks/\nhistory/\n```\n\nThat is good for governance, but weak for internal boundary reading. The same\ntree discusses CoordinationSession runtime, FlowDefinition/protocol model,\nAssignment construction, Dispatch, Run/RunResult/evidence, Work integration,\nHerdr/visibility, Team Cognition, Work/domain driver boundaries, and\norchestration rings.\n\nWithout a component-boundary view, two wrong readings become likely:\n\n1. everything under this tree belongs inside the Agent Coordination Engine;\n2. everything named driver/router/launcher is owned by Agent Coordination.\n\nBoth are false. Some documents under this tree describe adjacent platform\ncomponents because Agent Coordination interacts with them. A third reading is\npartly true but needs precision: Dispatch and Run Result Evaluation belong\ninside the **Agent Coordination** umbrella, but they are not submodules of the\nnarrower **Agent Coordination Engine**.\n\nRecommended documentation overlay for boundary promotion:\n\n```txt\ndocs/architect/agent-coordination/\n  README.md\n  vision.md\n  intent-preservation-ledger.md\n\n  boundaries/\n    README.md\n    orchestration-rings.md\n    work-driver-integration.md\n    component-authority-map.md\n\n  architecture/\n    system-context.md\n    protocol-model.md\n    runtime-model.md\n    work-integration.md\n    dispatch-control-plane.md\n    evidence-and-results.md\n    visibility-and-herdr.md\n\n  contracts/\n  decisions/\n  proposals/\n  roadmap/\n  verification/\n  playbooks/\n  history/\n```\n\nThis is an overlay direction, not a file-move request. The first move should be\nan index-style `boundaries/README.md` or accepted\n`architecture/component-boundary.md` that maps existing docs by component. Only\nafter Step 08 closes should any physical reorganization happen.\n\nDraft component-to-doc reading map:\n\n| Component concern | Current docs | Proposed boundary view |\n|---|---|---|\n| Agent Coordination Engine | `architecture/{system-context,protocol-model,runtime-model}.md`, `contracts/coordination-session.md`, `contracts/flow-definition.md` | Core Agent Coordination-owned docs. |\n| Dispatch And Execution Engine | `architecture/dispatch-control-plane.md`, Run section of `contracts/assignment-run-runresult.md`, dispatch proposals | Adjacent platform-core engine under the foundation umbrella, not a submodule owned by session runtime. |\n| Run Result Evaluator | `architecture/evidence-and-results.md`, RunResult/confidence section of `contracts/assignment-run-runresult.md` | Split from dispatch even if source files are still together. |\n| Work Lifecycle / Work Driver integration | `architecture/work-integration.md`, Team Dispatch roadmap, Step 10 proposal | Work Driver is a platform-core integration engine that uses Agent Coordination, not an Agent Coordination subcomponent. |\n| Host/visibility | `architecture/visibility-and-herdr.md`, gateway docs | Visibility stays out of runtime truth and evidence authority. |\n| Rings / router / launcher / driver vocabulary | `vocabulary/concept-relationships.md`, roadmap Team Dispatch docs | Ring vocabulary becomes a component-neutral map. |\n\nDo not reorganize the whole tree now. Add the boundary overlay first. If Step\n1B accepts it, then move or split docs only where the accepted authority map\nproves that navigation by document authority is no longer enough."
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "18. Agent Coordination Documentation Organization Pressure",
+        "anchor": "18-agent-coordination-documentation-organization-pressure",
+        "githubAnchor": "18-agent-coordination-documentation-organization-pressure",
+        "stableAnchor": "h-d8834d18c6a8",
+        "startLine": 625,
+        "endLine": 625,
+        "textDigest": "aacfe2480740e3606c4bdb2470a695cca725d947bc611b0f87d0f83fd727feae",
+        "sample": "18. Agent Coordination Documentation Organization Pressure",
+        "sectionPayloadDigest": "aa6d1a9035a3d09a72a53fd13a7f0f1c5a591fd43f73a9357522e06540800d4a",
+        "followingBlockDigest": "e3523ea84219a004ecef1691597eea2f28170235aac948ad616bf90be1d80c18",
+        "identityFingerprint": "6724fcee67ef570364c04c0afbb67bdcbe5e9bcebb278c14634a10f3a72df114",
+        "ancestry": [
+          "Component Authority Boundary Map"
+        ],
+        "text": "## 18. Agent Coordination Documentation Organization Pressure",
+        "sectionText": "## 18. Agent Coordination Documentation Organization Pressure\n\nThe current `docs/architect/agent-coordination/` tree is organized mostly by\ndocument authority:\n\n```txt\nvision/\nvocabulary/\narchitecture/\ncontracts/\ndecisions/\nproposals/\nroadmap/\nverification/\nplaybooks/\nhistory/\n```\n\nThat is good for governance, but weak for internal boundary reading. The same\ntree discusses CoordinationSession runtime, FlowDefinition/protocol model,\nAssignment construction, Dispatch, Run/RunResult/evidence, Work integration,\nHerdr/visibility, Team Cognition, Work/domain driver boundaries, and\norchestration rings.\n\nWithout a component-boundary view, two wrong readings become likely:\n\n1. everything under this tree belongs inside the Agent Coordination Engine;\n2. everything named driver/router/launcher is owned by Agent Coordination.\n\nBoth are false. Some documents under this tree describe adjacent platform\ncomponents because Agent Coordination interacts with them. A third reading is\npartly true but needs precision: Dispatch and Run Result Evaluation belong\ninside the **Agent Coordination** umbrella, but they are not submodules of the\nnarrower **Agent Coordination Engine**.\n\nRecommended documentation overlay for boundary promotion:\n\n```txt\ndocs/architect/agent-coordination/\n  README.md\n  vision.md\n  intent-preservation-ledger.md\n\n  boundaries/\n    README.md\n    orchestration-rings.md\n    work-driver-integration.md\n    component-authority-map.md\n\n  architecture/\n    system-context.md\n    protocol-model.md\n    runtime-model.md\n    work-integration.md\n    dispatch-control-plane.md\n    evidence-and-results.md\n    visibility-and-herdr.md\n\n  contracts/\n  decisions/\n  proposals/\n  roadmap/\n  verification/\n  playbooks/\n  history/\n```\n\nThis is an overlay direction, not a file-move request. The first move should be\nan index-style `boundaries/README.md` or accepted\n`architecture/component-boundary.md` that maps existing docs by component. Only\nafter Step 08 closes should any physical reorganization happen.\n\nDraft component-to-doc reading map:\n\n| Component concern | Current docs | Proposed boundary view |\n|---|---|---|\n| Agent Coordination Engine | `architecture/{system-context,protocol-model,runtime-model}.md`, `contracts/coordination-session.md`, `contracts/flow-definition.md` | Core Agent Coordination-owned docs. |\n| Dispatch And Execution Engine | `architecture/dispatch-control-plane.md`, Run section of `contracts/assignment-run-runresult.md`, dispatch proposals | Adjacent platform-core engine under the foundation umbrella, not a submodule owned by session runtime. |\n| Run Result Evaluator | `architecture/evidence-and-results.md`, RunResult/confidence section of `contracts/assignment-run-runresult.md` | Split from dispatch even if source files are still together. |\n| Work Lifecycle / Work Driver integration | `architecture/work-integration.md`, Team Dispatch roadmap, Step 10 proposal | Work Driver is a platform-core integration engine that uses Agent Coordination, not an Agent Coordination subcomponent. |\n| Host/visibility | `architecture/visibility-and-herdr.md`, gateway docs | Visibility stays out of runtime truth and evidence authority. |\n| Rings / router / launcher / driver vocabulary | `vocabulary/concept-relationships.md`, roadmap Team Dispatch docs | Ring vocabulary becomes a component-neutral map. |\n\nDo not reorganize the whole tree now. Add the boundary overlay first. If Step\n1B accepts it, then move or split docs only where the accepted authority map\nproves that navigation by document authority is no longer enough."
+      }
+    },
+    {
+      "claimId": "claim_d32b81a56c19db6b1d8d8c340d75f76b",
+      "sourceUnitDigest": "e3523ea84219a004ecef1691597eea2f28170235aac948ad616bf90be1d80c18",
+      "targetUnitDigest": "e3523ea84219a004ecef1691597eea2f28170235aac948ad616bf90be1d80c18",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_d32b81a56c19db6b1d8d8c340d75f76b",
+        "sourceUnitDigest": "e3523ea84219a004ecef1691597eea2f28170235aac948ad616bf90be1d80c18",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-72",
+        "targetUnitDigest": "e3523ea84219a004ecef1691597eea2f28170235aac948ad616bf90be1d80c18",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-69 (lines 603–604) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-72 (lines 627–628); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-69",
+        "githubAnchor": "unheaded-block-69",
+        "stableAnchor": "unheaded-block-69",
+        "title": "Unheaded block 69",
+        "startLine": 603,
+        "endLine": 604,
+        "textDigest": "e3523ea84219a004ecef1691597eea2f28170235aac948ad616bf90be1d80c18",
+        "sample": "The current `docs/architect/agent-coordination/` tree is organized mostly by\ndocument authority:",
+        "identityFingerprint": "d366d86301220c6052591ccb43a50a6c19375b3ccd374916c0b4ff87413123ea",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "The current `docs/architect/agent-coordination/` tree is organized mostly by\ndocument authority:"
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-72",
+        "githubAnchor": "unheaded-block-72",
+        "stableAnchor": "unheaded-block-72",
+        "title": "Unheaded block 72",
+        "startLine": 627,
+        "endLine": 628,
+        "textDigest": "e3523ea84219a004ecef1691597eea2f28170235aac948ad616bf90be1d80c18",
+        "sample": "The current `docs/architect/agent-coordination/` tree is organized mostly by\ndocument authority:",
+        "identityFingerprint": "d366d86301220c6052591ccb43a50a6c19375b3ccd374916c0b4ff87413123ea",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "The current `docs/architect/agent-coordination/` tree is organized mostly by\ndocument authority:"
+      }
+    },
+    {
+      "claimId": "claim_71c6c5f3de38834f343e4fd700e17e0b",
+      "sourceUnitDigest": "a35fea8383c769b8423fdb0efcd8599d2f34ec6d46118fdce17c9c294919b75a",
+      "targetUnitDigest": "a35fea8383c769b8423fdb0efcd8599d2f34ec6d46118fdce17c9c294919b75a",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_71c6c5f3de38834f343e4fd700e17e0b",
+        "sourceUnitDigest": "a35fea8383c769b8423fdb0efcd8599d2f34ec6d46118fdce17c9c294919b75a",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-73",
+        "targetUnitDigest": "a35fea8383c769b8423fdb0efcd8599d2f34ec6d46118fdce17c9c294919b75a",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-70 (lines 606–617) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-73 (lines 630–641); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-70",
+        "githubAnchor": "unheaded-block-70",
+        "stableAnchor": "unheaded-block-70",
+        "title": "Unheaded block 70",
+        "startLine": 606,
+        "endLine": 617,
+        "textDigest": "a35fea8383c769b8423fdb0efcd8599d2f34ec6d46118fdce17c9c294919b75a",
+        "sample": "```txt\nvision/\nvocabulary/\narchitecture/\ncontracts/\ndecisions/\nproposals/\nroadmap/\nverification/\nplaybooks/\nhistory/\n```",
+        "identityFingerprint": "a0a791ecb84322b6524d51846809f6fb4d39ad1d98b794a1ce5fa6ed7a09f651",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "```txt\nvision/\nvocabulary/\narchitecture/\ncontracts/\ndecisions/\nproposals/\nroadmap/\nverification/\nplaybooks/\nhistory/\n```"
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-73",
+        "githubAnchor": "unheaded-block-73",
+        "stableAnchor": "unheaded-block-73",
+        "title": "Unheaded block 73",
+        "startLine": 630,
+        "endLine": 641,
+        "textDigest": "a35fea8383c769b8423fdb0efcd8599d2f34ec6d46118fdce17c9c294919b75a",
+        "sample": "```txt\nvision/\nvocabulary/\narchitecture/\ncontracts/\ndecisions/\nproposals/\nroadmap/\nverification/\nplaybooks/\nhistory/\n```",
+        "identityFingerprint": "a0a791ecb84322b6524d51846809f6fb4d39ad1d98b794a1ce5fa6ed7a09f651",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "```txt\nvision/\nvocabulary/\narchitecture/\ncontracts/\ndecisions/\nproposals/\nroadmap/\nverification/\nplaybooks/\nhistory/\n```"
+      }
+    },
+    {
+      "claimId": "claim_1abd0088d916d47bfbfbf1811f1da678",
+      "sourceUnitDigest": "403a859cd96d4fcc0e9b586b90fad139279bc7a96aaf68c8e41fcfa2cc84fd82",
+      "targetUnitDigest": "403a859cd96d4fcc0e9b586b90fad139279bc7a96aaf68c8e41fcfa2cc84fd82",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_1abd0088d916d47bfbfbf1811f1da678",
+        "sourceUnitDigest": "403a859cd96d4fcc0e9b586b90fad139279bc7a96aaf68c8e41fcfa2cc84fd82",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-74",
+        "targetUnitDigest": "403a859cd96d4fcc0e9b586b90fad139279bc7a96aaf68c8e41fcfa2cc84fd82",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-71 (lines 619–623) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-74 (lines 643–647); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-71",
+        "githubAnchor": "unheaded-block-71",
+        "stableAnchor": "unheaded-block-71",
+        "title": "Unheaded block 71",
+        "startLine": 619,
+        "endLine": 623,
+        "textDigest": "403a859cd96d4fcc0e9b586b90fad139279bc7a96aaf68c8e41fcfa2cc84fd82",
+        "sample": "That is good for governance, but weak for internal boundary reading. The same\ntree discusses CoordinationSession runtime, FlowDefinition/protocol model,\nAssignment construction, Di",
+        "identityFingerprint": "119b3b117ad33329c4be0fdf80a236b980e2d6247eec4fd7bc5c5fd98372e758",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "That is good for governance, but weak for internal boundary reading. The same\ntree discusses CoordinationSession runtime, FlowDefinition/protocol model,\nAssignment construction, Dispatch, Run/RunResult/evidence, Work integration,\nHerdr/visibility, Team Cognition, Work/domain driver boundaries, and\norchestration rings."
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-74",
+        "githubAnchor": "unheaded-block-74",
+        "stableAnchor": "unheaded-block-74",
+        "title": "Unheaded block 74",
+        "startLine": 643,
+        "endLine": 647,
+        "textDigest": "403a859cd96d4fcc0e9b586b90fad139279bc7a96aaf68c8e41fcfa2cc84fd82",
+        "sample": "That is good for governance, but weak for internal boundary reading. The same\ntree discusses CoordinationSession runtime, FlowDefinition/protocol model,\nAssignment construction, Di",
+        "identityFingerprint": "119b3b117ad33329c4be0fdf80a236b980e2d6247eec4fd7bc5c5fd98372e758",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "That is good for governance, but weak for internal boundary reading. The same\ntree discusses CoordinationSession runtime, FlowDefinition/protocol model,\nAssignment construction, Dispatch, Run/RunResult/evidence, Work integration,\nHerdr/visibility, Team Cognition, Work/domain driver boundaries, and\norchestration rings."
+      }
+    },
+    {
+      "claimId": "claim_4e8c4ba5327b732a995d10400ae8cc48",
+      "sourceUnitDigest": "6e896eaec46ff99cb0ae5ff13658617e5d8b616fb5ba4d7771d7ee4be653d516",
+      "targetUnitDigest": "6e896eaec46ff99cb0ae5ff13658617e5d8b616fb5ba4d7771d7ee4be653d516",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_4e8c4ba5327b732a995d10400ae8cc48",
+        "sourceUnitDigest": "6e896eaec46ff99cb0ae5ff13658617e5d8b616fb5ba4d7771d7ee4be653d516",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-75",
+        "targetUnitDigest": "6e896eaec46ff99cb0ae5ff13658617e5d8b616fb5ba4d7771d7ee4be653d516",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-72 (lines 625–625) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-75 (lines 649–649); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-72",
+        "githubAnchor": "unheaded-block-72",
+        "stableAnchor": "unheaded-block-72",
+        "title": "Unheaded block 72",
+        "startLine": 625,
+        "endLine": 625,
+        "textDigest": "6e896eaec46ff99cb0ae5ff13658617e5d8b616fb5ba4d7771d7ee4be653d516",
+        "sample": "Without a component-boundary view, two wrong readings become likely:",
+        "identityFingerprint": "c203d1d09d588b2da691a1e433135d976966abce60927dcc4835519cb0c48751",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "Without a component-boundary view, two wrong readings become likely:"
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-75",
+        "githubAnchor": "unheaded-block-75",
+        "stableAnchor": "unheaded-block-75",
+        "title": "Unheaded block 75",
+        "startLine": 649,
+        "endLine": 649,
+        "textDigest": "6e896eaec46ff99cb0ae5ff13658617e5d8b616fb5ba4d7771d7ee4be653d516",
+        "sample": "Without a component-boundary view, two wrong readings become likely:",
+        "identityFingerprint": "c203d1d09d588b2da691a1e433135d976966abce60927dcc4835519cb0c48751",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "Without a component-boundary view, two wrong readings become likely:"
+      }
+    },
+    {
+      "claimId": "claim_756646a4b2b204d3532c536099835c1a",
+      "sourceUnitDigest": "ca57e0a46996629e8d89c17fcfe2e860084a4f5b44ce54bb0f229241a05dfe85",
+      "targetUnitDigest": "ca57e0a46996629e8d89c17fcfe2e860084a4f5b44ce54bb0f229241a05dfe85",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_756646a4b2b204d3532c536099835c1a",
+        "sourceUnitDigest": "ca57e0a46996629e8d89c17fcfe2e860084a4f5b44ce54bb0f229241a05dfe85",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-76",
+        "targetUnitDigest": "ca57e0a46996629e8d89c17fcfe2e860084a4f5b44ce54bb0f229241a05dfe85",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-73 (lines 627–628) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-76 (lines 651–652); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-73",
+        "githubAnchor": "unheaded-block-73",
+        "stableAnchor": "unheaded-block-73",
+        "title": "Unheaded block 73",
+        "startLine": 627,
+        "endLine": 628,
+        "textDigest": "ca57e0a46996629e8d89c17fcfe2e860084a4f5b44ce54bb0f229241a05dfe85",
+        "sample": "1. everything under this tree belongs inside the Agent Coordination Engine;\n2. everything named driver/router/launcher is owned by Agent Coordination.",
+        "identityFingerprint": "f3aba2235f559e3f506dbf1aabb4fead7513cd701f0d01e31074db6e718583bc",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "1. everything under this tree belongs inside the Agent Coordination Engine;\n2. everything named driver/router/launcher is owned by Agent Coordination."
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-76",
+        "githubAnchor": "unheaded-block-76",
+        "stableAnchor": "unheaded-block-76",
+        "title": "Unheaded block 76",
+        "startLine": 651,
+        "endLine": 652,
+        "textDigest": "ca57e0a46996629e8d89c17fcfe2e860084a4f5b44ce54bb0f229241a05dfe85",
+        "sample": "1. everything under this tree belongs inside the Agent Coordination Engine;\n2. everything named driver/router/launcher is owned by Agent Coordination.",
+        "identityFingerprint": "f3aba2235f559e3f506dbf1aabb4fead7513cd701f0d01e31074db6e718583bc",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "1. everything under this tree belongs inside the Agent Coordination Engine;\n2. everything named driver/router/launcher is owned by Agent Coordination."
+      }
+    },
+    {
+      "claimId": "claim_01a0b5f640cc32182e8fa2f3cb877919",
+      "sourceUnitDigest": "60b00873b9eb6461ae62558524111bd4dfc2a73224d75fec214464ace07f530d",
+      "targetUnitDigest": "60b00873b9eb6461ae62558524111bd4dfc2a73224d75fec214464ace07f530d",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_01a0b5f640cc32182e8fa2f3cb877919",
+        "sourceUnitDigest": "60b00873b9eb6461ae62558524111bd4dfc2a73224d75fec214464ace07f530d",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-77",
+        "targetUnitDigest": "60b00873b9eb6461ae62558524111bd4dfc2a73224d75fec214464ace07f530d",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-74 (lines 630–634) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-77 (lines 654–658); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-74",
+        "githubAnchor": "unheaded-block-74",
+        "stableAnchor": "unheaded-block-74",
+        "title": "Unheaded block 74",
+        "startLine": 630,
+        "endLine": 634,
+        "textDigest": "60b00873b9eb6461ae62558524111bd4dfc2a73224d75fec214464ace07f530d",
+        "sample": "Both are false. Some documents under this tree describe adjacent platform\ncomponents because Agent Coordination interacts with them. A third reading is\npartly true but needs precis",
+        "identityFingerprint": "3e6b1f7f48cb07ea1d1d732e32168d05088efc67fe932aa5fef21259889c223b",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "Both are false. Some documents under this tree describe adjacent platform\ncomponents because Agent Coordination interacts with them. A third reading is\npartly true but needs precision: Dispatch and Run Result Evaluation belong\ninside the **Agent Coordination** umbrella, but they are not submodules of the\nnarrower **Agent Coordination Engine**."
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-77",
+        "githubAnchor": "unheaded-block-77",
+        "stableAnchor": "unheaded-block-77",
+        "title": "Unheaded block 77",
+        "startLine": 654,
+        "endLine": 658,
+        "textDigest": "60b00873b9eb6461ae62558524111bd4dfc2a73224d75fec214464ace07f530d",
+        "sample": "Both are false. Some documents under this tree describe adjacent platform\ncomponents because Agent Coordination interacts with them. A third reading is\npartly true but needs precis",
+        "identityFingerprint": "3e6b1f7f48cb07ea1d1d732e32168d05088efc67fe932aa5fef21259889c223b",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "Both are false. Some documents under this tree describe adjacent platform\ncomponents because Agent Coordination interacts with them. A third reading is\npartly true but needs precision: Dispatch and Run Result Evaluation belong\ninside the **Agent Coordination** umbrella, but they are not submodules of the\nnarrower **Agent Coordination Engine**."
+      }
+    },
+    {
+      "claimId": "claim_28f8d68e81ad3e1c7656f3b624c00d54",
+      "sourceUnitDigest": "cd8d3eb7b69fc582782e530b81e1ceca11080676455448c20643d9c0ebfe66e0",
+      "targetUnitDigest": "cd8d3eb7b69fc582782e530b81e1ceca11080676455448c20643d9c0ebfe66e0",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_28f8d68e81ad3e1c7656f3b624c00d54",
+        "sourceUnitDigest": "cd8d3eb7b69fc582782e530b81e1ceca11080676455448c20643d9c0ebfe66e0",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-78",
+        "targetUnitDigest": "cd8d3eb7b69fc582782e530b81e1ceca11080676455448c20643d9c0ebfe66e0",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-75 (lines 636–636) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-78 (lines 660–660); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-75",
+        "githubAnchor": "unheaded-block-75",
+        "stableAnchor": "unheaded-block-75",
+        "title": "Unheaded block 75",
+        "startLine": 636,
+        "endLine": 636,
+        "textDigest": "cd8d3eb7b69fc582782e530b81e1ceca11080676455448c20643d9c0ebfe66e0",
+        "sample": "Recommended documentation overlay for boundary promotion:",
+        "identityFingerprint": "c735082803fe4433a4e46c8a4311383d149f11beb252f721ffab8cbb6d559080",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "Recommended documentation overlay for boundary promotion:"
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-78",
+        "githubAnchor": "unheaded-block-78",
+        "stableAnchor": "unheaded-block-78",
+        "title": "Unheaded block 78",
+        "startLine": 660,
+        "endLine": 660,
+        "textDigest": "cd8d3eb7b69fc582782e530b81e1ceca11080676455448c20643d9c0ebfe66e0",
+        "sample": "Recommended documentation overlay for boundary promotion:",
+        "identityFingerprint": "c735082803fe4433a4e46c8a4311383d149f11beb252f721ffab8cbb6d559080",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "Recommended documentation overlay for boundary promotion:"
+      }
+    },
+    {
+      "claimId": "claim_6a92002895ce7ee7f9bbd09149d7a4c7",
+      "sourceUnitDigest": "202005aa814173124f2b433fb1ec900ae4eaec1d69a59d158bb3890f7a364cac",
+      "targetUnitDigest": "202005aa814173124f2b433fb1ec900ae4eaec1d69a59d158bb3890f7a364cac",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_6a92002895ce7ee7f9bbd09149d7a4c7",
+        "sourceUnitDigest": "202005aa814173124f2b433fb1ec900ae4eaec1d69a59d158bb3890f7a364cac",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-79",
+        "targetUnitDigest": "202005aa814173124f2b433fb1ec900ae4eaec1d69a59d158bb3890f7a364cac",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-76 (lines 638–666) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-79 (lines 662–690); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-76",
+        "githubAnchor": "unheaded-block-76",
+        "stableAnchor": "unheaded-block-76",
+        "title": "Unheaded block 76",
+        "startLine": 638,
+        "endLine": 666,
+        "textDigest": "202005aa814173124f2b433fb1ec900ae4eaec1d69a59d158bb3890f7a364cac",
+        "sample": "```txt\ndocs/architect/agent-coordination/\n  README.md\n  vision.md\n  intent-preservation-ledger.md\n\n  boundaries/\n    README.md\n    orchestration-rings.md\n    work-driver-integratio",
+        "identityFingerprint": "dbb051049e5b295ec6ffd749d98d567cd92ba46937f299f37a312dc34116e588",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "```txt\ndocs/architect/agent-coordination/\n  README.md\n  vision.md\n  intent-preservation-ledger.md\n\n  boundaries/\n    README.md\n    orchestration-rings.md\n    work-driver-integration.md\n    component-authority-map.md\n\n  architecture/\n    system-context.md\n    protocol-model.md\n    runtime-model.md\n    work-integration.md\n    dispatch-control-plane.md\n    evidence-and-results.md\n    visibility-and-herdr.md\n\n  contracts/\n  decisions/\n  proposals/\n  roadmap/\n  verification/\n  playbooks/\n  history/\n```"
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-79",
+        "githubAnchor": "unheaded-block-79",
+        "stableAnchor": "unheaded-block-79",
+        "title": "Unheaded block 79",
+        "startLine": 662,
+        "endLine": 690,
+        "textDigest": "202005aa814173124f2b433fb1ec900ae4eaec1d69a59d158bb3890f7a364cac",
+        "sample": "```txt\ndocs/architect/agent-coordination/\n  README.md\n  vision.md\n  intent-preservation-ledger.md\n\n  boundaries/\n    README.md\n    orchestration-rings.md\n    work-driver-integratio",
+        "identityFingerprint": "dbb051049e5b295ec6ffd749d98d567cd92ba46937f299f37a312dc34116e588",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "```txt\ndocs/architect/agent-coordination/\n  README.md\n  vision.md\n  intent-preservation-ledger.md\n\n  boundaries/\n    README.md\n    orchestration-rings.md\n    work-driver-integration.md\n    component-authority-map.md\n\n  architecture/\n    system-context.md\n    protocol-model.md\n    runtime-model.md\n    work-integration.md\n    dispatch-control-plane.md\n    evidence-and-results.md\n    visibility-and-herdr.md\n\n  contracts/\n  decisions/\n  proposals/\n  roadmap/\n  verification/\n  playbooks/\n  history/\n```"
+      }
+    },
+    {
+      "claimId": "claim_03068241c6f2be23bea6def64ba93760",
+      "sourceUnitDigest": "0241d8818eac63d8dc710702f12cd7c2000b08d533083cc4b41eeae0831d6897",
+      "targetUnitDigest": "0241d8818eac63d8dc710702f12cd7c2000b08d533083cc4b41eeae0831d6897",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_03068241c6f2be23bea6def64ba93760",
+        "sourceUnitDigest": "0241d8818eac63d8dc710702f12cd7c2000b08d533083cc4b41eeae0831d6897",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-80",
+        "targetUnitDigest": "0241d8818eac63d8dc710702f12cd7c2000b08d533083cc4b41eeae0831d6897",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-77 (lines 668–671) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-80 (lines 692–695); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-77",
+        "githubAnchor": "unheaded-block-77",
+        "stableAnchor": "unheaded-block-77",
+        "title": "Unheaded block 77",
+        "startLine": 668,
+        "endLine": 671,
+        "textDigest": "0241d8818eac63d8dc710702f12cd7c2000b08d533083cc4b41eeae0831d6897",
+        "sample": "This is an overlay direction, not a file-move request. The first move should be\nan index-style `boundaries/README.md` or accepted\n`architecture/component-boundary.md` that maps exi",
+        "identityFingerprint": "6e9ebde84547581a8afe1f2290bf5be091185059ed719d0ad60e8bdfd08ef360",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "This is an overlay direction, not a file-move request. The first move should be\nan index-style `boundaries/README.md` or accepted\n`architecture/component-boundary.md` that maps existing docs by component. Only\nafter Step 08 closes should any physical reorganization happen."
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-80",
+        "githubAnchor": "unheaded-block-80",
+        "stableAnchor": "unheaded-block-80",
+        "title": "Unheaded block 80",
+        "startLine": 692,
+        "endLine": 695,
+        "textDigest": "0241d8818eac63d8dc710702f12cd7c2000b08d533083cc4b41eeae0831d6897",
+        "sample": "This is an overlay direction, not a file-move request. The first move should be\nan index-style `boundaries/README.md` or accepted\n`architecture/component-boundary.md` that maps exi",
+        "identityFingerprint": "6e9ebde84547581a8afe1f2290bf5be091185059ed719d0ad60e8bdfd08ef360",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "This is an overlay direction, not a file-move request. The first move should be\nan index-style `boundaries/README.md` or accepted\n`architecture/component-boundary.md` that maps existing docs by component. Only\nafter Step 08 closes should any physical reorganization happen."
+      }
+    },
+    {
+      "claimId": "claim_f9a2a272e1abb58e0f4da106993eef9b",
+      "sourceUnitDigest": "f0211dddfd48a732a0e3af0f5c19343340ff920934f2442863cb6269312b9dc2",
+      "targetUnitDigest": "f0211dddfd48a732a0e3af0f5c19343340ff920934f2442863cb6269312b9dc2",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_f9a2a272e1abb58e0f4da106993eef9b",
+        "sourceUnitDigest": "f0211dddfd48a732a0e3af0f5c19343340ff920934f2442863cb6269312b9dc2",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-81",
+        "targetUnitDigest": "f0211dddfd48a732a0e3af0f5c19343340ff920934f2442863cb6269312b9dc2",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-78 (lines 673–673) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-81 (lines 697–697); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-78",
+        "githubAnchor": "unheaded-block-78",
+        "stableAnchor": "unheaded-block-78",
+        "title": "Unheaded block 78",
+        "startLine": 673,
+        "endLine": 673,
+        "textDigest": "f0211dddfd48a732a0e3af0f5c19343340ff920934f2442863cb6269312b9dc2",
+        "sample": "Draft component-to-doc reading map:",
+        "identityFingerprint": "21feff329a78dda2784cc577dc290fcd100a4a0e972063ab1d259f54af65348b",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "Draft component-to-doc reading map:"
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-81",
+        "githubAnchor": "unheaded-block-81",
+        "stableAnchor": "unheaded-block-81",
+        "title": "Unheaded block 81",
+        "startLine": 697,
+        "endLine": 697,
+        "textDigest": "f0211dddfd48a732a0e3af0f5c19343340ff920934f2442863cb6269312b9dc2",
+        "sample": "Draft component-to-doc reading map:",
+        "identityFingerprint": "21feff329a78dda2784cc577dc290fcd100a4a0e972063ab1d259f54af65348b",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "Draft component-to-doc reading map:"
+      }
+    },
+    {
+      "claimId": "claim_4864462f86f8e1bb2cdd04ced2b51034",
+      "sourceUnitDigest": "c4ab26a04a969da0d7e177ffff9cff18f9a881f5f5e49589709d2b4f69595937",
+      "targetUnitDigest": "c4ab26a04a969da0d7e177ffff9cff18f9a881f5f5e49589709d2b4f69595937",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_4864462f86f8e1bb2cdd04ced2b51034",
+        "sourceUnitDigest": "c4ab26a04a969da0d7e177ffff9cff18f9a881f5f5e49589709d2b4f69595937",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-82",
+        "targetUnitDigest": "c4ab26a04a969da0d7e177ffff9cff18f9a881f5f5e49589709d2b4f69595937",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-79 (lines 675–682) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-82 (lines 699–706); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-79",
+        "githubAnchor": "unheaded-block-79",
+        "stableAnchor": "unheaded-block-79",
+        "title": "Unheaded block 79",
+        "startLine": 675,
+        "endLine": 682,
+        "textDigest": "c4ab26a04a969da0d7e177ffff9cff18f9a881f5f5e49589709d2b4f69595937",
+        "sample": "| Component concern | Current docs | Proposed boundary view |\n|---|---|---|\n| Agent Coordination Engine | `architecture/{system-context,protocol-model,runtime-model}.md`, `contract",
+        "identityFingerprint": "6f6d2090869ee30ef1a29d3013557db78f137e93efe85d3d4a9b812ac4b67dab",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "| Component concern | Current docs | Proposed boundary view |\n|---|---|---|\n| Agent Coordination Engine | `architecture/{system-context,protocol-model,runtime-model}.md`, `contracts/coordination-session.md`, `contracts/flow-definition.md` | Core Agent Coordination-owned docs. |\n| Dispatch And Execution Engine | `architecture/dispatch-control-plane.md`, Run section of `contracts/assignment-run-runresult.md`, dispatch proposals | Adjacent platform-core engine under the foundation umbrella, not a submodule owned by session runtime. |\n| Run Result Evaluator | `architecture/evidence-and-results.md`, RunResult/confidence section of `contracts/assignment-run-runresult.md` | Split from dispatch even if source files are still together. |\n| Work Lifecycle / Work Driver integration | `architecture/work-integration.md`, Team Dispatch roadmap, Step 10 proposal | Work Driver is a platform-core integration engine that uses Agent Coordination, not an Agent Coordination subcomponent. |\n| Host/visibility | `architecture/visibility-and-herdr.md`, gateway docs | Visibility stays out of runtime truth and evidence authority. |\n| Rings / router / launcher / driver vocabulary | `vocabulary/concept-relationships.md`, roadmap Team Dispatch docs | Ring vocabulary becomes a component-neutral map. |"
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-82",
+        "githubAnchor": "unheaded-block-82",
+        "stableAnchor": "unheaded-block-82",
+        "title": "Unheaded block 82",
+        "startLine": 699,
+        "endLine": 706,
+        "textDigest": "c4ab26a04a969da0d7e177ffff9cff18f9a881f5f5e49589709d2b4f69595937",
+        "sample": "| Component concern | Current docs | Proposed boundary view |\n|---|---|---|\n| Agent Coordination Engine | `architecture/{system-context,protocol-model,runtime-model}.md`, `contract",
+        "identityFingerprint": "6f6d2090869ee30ef1a29d3013557db78f137e93efe85d3d4a9b812ac4b67dab",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "| Component concern | Current docs | Proposed boundary view |\n|---|---|---|\n| Agent Coordination Engine | `architecture/{system-context,protocol-model,runtime-model}.md`, `contracts/coordination-session.md`, `contracts/flow-definition.md` | Core Agent Coordination-owned docs. |\n| Dispatch And Execution Engine | `architecture/dispatch-control-plane.md`, Run section of `contracts/assignment-run-runresult.md`, dispatch proposals | Adjacent platform-core engine under the foundation umbrella, not a submodule owned by session runtime. |\n| Run Result Evaluator | `architecture/evidence-and-results.md`, RunResult/confidence section of `contracts/assignment-run-runresult.md` | Split from dispatch even if source files are still together. |\n| Work Lifecycle / Work Driver integration | `architecture/work-integration.md`, Team Dispatch roadmap, Step 10 proposal | Work Driver is a platform-core integration engine that uses Agent Coordination, not an Agent Coordination subcomponent. |\n| Host/visibility | `architecture/visibility-and-herdr.md`, gateway docs | Visibility stays out of runtime truth and evidence authority. |\n| Rings / router / launcher / driver vocabulary | `vocabulary/concept-relationships.md`, roadmap Team Dispatch docs | Ring vocabulary becomes a component-neutral map. |"
+      }
+    },
+    {
+      "claimId": "claim_05786c7a35d0974018885dc34cc3d3c8",
+      "sourceUnitDigest": "50f79727f901685a9405795aab0bddc4e159cf900117b9c406e8bc85b08414e5",
+      "targetUnitDigest": "50f79727f901685a9405795aab0bddc4e159cf900117b9c406e8bc85b08414e5",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_05786c7a35d0974018885dc34cc3d3c8",
+        "sourceUnitDigest": "50f79727f901685a9405795aab0bddc4e159cf900117b9c406e8bc85b08414e5",
+        "targetOwner": "docs/platform/proposals/component-authority-boundary-map.md",
+        "targetAnchor": "unheaded-block-83",
+        "targetUnitDigest": "50f79727f901685a9405795aab0bddc4e159cf900117b9c406e8bc85b08414e5",
+        "targetAncestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal. No component-boundary change; no promotion of draft ports or ownership. Evidence: docs/platform/component-boundary.md:40,90,511 directly cites the draft; docs/platform/system-architecture/architecture/roadmap.md:55 still schedules component-boundary work. Source lines 3–18 explicitly withholds accepted authority. Complete source unheaded-block docs/architect/proposals/component-authority-boundary-map.md#unheaded-block-80 (lines 684–686) is carried at docs/platform/proposals/component-authority-boundary-map.md#unheaded-block-83 (lines 708–710); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-80",
+        "githubAnchor": "unheaded-block-80",
+        "stableAnchor": "unheaded-block-80",
+        "title": "Unheaded block 80",
+        "startLine": 684,
+        "endLine": 686,
+        "textDigest": "50f79727f901685a9405795aab0bddc4e159cf900117b9c406e8bc85b08414e5",
+        "sample": "Do not reorganize the whole tree now. Add the boundary overlay first. If Step\n1B accepts it, then move or split docs only where the accepted authority map\nproves that navigation by",
+        "identityFingerprint": "d05bac0984488cccc13204e8c69a6ecd66d5b4dfc6998310d47437c24c17d6dd",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "Do not reorganize the whole tree now. Add the boundary overlay first. If Step\n1B accepts it, then move or split docs only where the accepted authority map\nproves that navigation by document authority is no longer enough."
+      },
+      "target": {
+        "path": "docs/platform/proposals/component-authority-boundary-map.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-83",
+        "githubAnchor": "unheaded-block-83",
+        "stableAnchor": "unheaded-block-83",
+        "title": "Unheaded block 83",
+        "startLine": 708,
+        "endLine": 710,
+        "textDigest": "50f79727f901685a9405795aab0bddc4e159cf900117b9c406e8bc85b08414e5",
+        "sample": "Do not reorganize the whole tree now. Add the boundary overlay first. If Step\n1B accepts it, then move or split docs only where the accepted authority map\nproves that navigation by",
+        "identityFingerprint": "d05bac0984488cccc13204e8c69a6ecd66d5b4dfc6998310d47437c24c17d6dd",
+        "ancestry": [
+          "Component Authority Boundary Map",
+          "18. Agent Coordination Documentation Organization Pressure"
+        ],
+        "text": "Do not reorganize the whole tree now. Add the boundary overlay first. If Step\n1B accepts it, then move or split docs only where the accepted authority map\nproves that navigation by document authority is no longer enough."
+      }
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "originalShardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json",
+  "originalShardSHA256": "525813264701c46fee63401a8ca02f638be1c39e4a413fd0000ef0cff7eff073",
+  "part": 2,
+  "parts": 2,
+  "completeSourceRowCount": 99,
+  "gateFindings": [],
+  "scope": "Source rows only; complete reverse population is in the separate native candidate request.",
+  "a36": {
+    "gateFindings": [],
+    "requestPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1110-proposals-redesigns-source-08-02-0f063d18f.md",
+    "packPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-08-02-0f063d18f.md",
+    "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-08-02-0f063d18f.md.json",
+    "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json",
+    "source": "docs/architect/proposals/component-authority-boundary-map.md",
+    "part": 2,
+    "parts": 2,
+    "count": 19,
+    "classes": {
+      "Unit-exact": 17,
+      "Weak-exact": 2
+    },
+    "weakExactAndJudgment": [
+      "claim_794efb2411951275029b69ee60894cce",
+      "claim_f9a2a272e1abb58e0f4da106993eef9b"
+    ],
+    "reviewerDeepSampleMinimum": 2,
+    "mandatoryDifferingDigestRows": [],
+    "absentTargetRows": [],
+    "changedByContentCommit": []
+  },
+  "fullShownTextBindings": [
+    {
+      "claimId": "claim_b44496172b32af832302994458122866",
+      "sourceShownTextDigest": "50ff81b5ea1585c44661ad94bab3976749b980cf8f1e1762576bc903d3f243b1",
+      "targetShownTextDigest": "50ff81b5ea1585c44661ad94bab3976749b980cf8f1e1762576bc903d3f243b1",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_794efb2411951275029b69ee60894cce",
+      "sourceShownTextDigest": "85d8dca83b62a1f5b5922ce91a53e497a1035e681521210e5126fc2431aeaf6d",
+      "targetShownTextDigest": "85d8dca83b62a1f5b5922ce91a53e497a1035e681521210e5126fc2431aeaf6d",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_4a5585355351f33c2a4300d502cb90b7",
+      "sourceShownTextDigest": "523e870d8cc2b79d3e8d9ec1e11adf55ef012019d7592c8d28e77cb1ac4b6b05",
+      "targetShownTextDigest": "523e870d8cc2b79d3e8d9ec1e11adf55ef012019d7592c8d28e77cb1ac4b6b05",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_7dbf2e267742b5ca6e5e77602492fa1d",
+      "sourceShownTextDigest": "275bf893b448e2929d1f59c0241a0cc04831b631dcf9599d6c68ee090be398e2",
+      "targetShownTextDigest": "275bf893b448e2929d1f59c0241a0cc04831b631dcf9599d6c68ee090be398e2",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_5408114e37ad45d35209d92515044a31",
+      "sourceShownTextDigest": "79ffe212f379208a6a3596d8107b4efabce84714f1364f02c55bff86872d5704",
+      "targetShownTextDigest": "79ffe212f379208a6a3596d8107b4efabce84714f1364f02c55bff86872d5704",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_ae765ac53a3113834d1792c7f970d000",
+      "sourceShownTextDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+      "targetShownTextDigest": "6a40352d221307f2ce3729befbd7ac58f1856f41aeab34f393d77f101592d01b",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_e6a1b1d03ef558e8136324c67aeb332f",
+      "sourceShownTextDigest": "14f40d50bbadd48a379ea24efa1c460e8a664bdeaf721d0ac2ba3821a29224d9",
+      "targetShownTextDigest": "14f40d50bbadd48a379ea24efa1c460e8a664bdeaf721d0ac2ba3821a29224d9",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_d32b81a56c19db6b1d8d8c340d75f76b",
+      "sourceShownTextDigest": "e3523ea84219a004ecef1691597eea2f28170235aac948ad616bf90be1d80c18",
+      "targetShownTextDigest": "e3523ea84219a004ecef1691597eea2f28170235aac948ad616bf90be1d80c18",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_71c6c5f3de38834f343e4fd700e17e0b",
+      "sourceShownTextDigest": "a35fea8383c769b8423fdb0efcd8599d2f34ec6d46118fdce17c9c294919b75a",
+      "targetShownTextDigest": "a35fea8383c769b8423fdb0efcd8599d2f34ec6d46118fdce17c9c294919b75a",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_1abd0088d916d47bfbfbf1811f1da678",
+      "sourceShownTextDigest": "403a859cd96d4fcc0e9b586b90fad139279bc7a96aaf68c8e41fcfa2cc84fd82",
+      "targetShownTextDigest": "403a859cd96d4fcc0e9b586b90fad139279bc7a96aaf68c8e41fcfa2cc84fd82",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_4e8c4ba5327b732a995d10400ae8cc48",
+      "sourceShownTextDigest": "6e896eaec46ff99cb0ae5ff13658617e5d8b616fb5ba4d7771d7ee4be653d516",
+      "targetShownTextDigest": "6e896eaec46ff99cb0ae5ff13658617e5d8b616fb5ba4d7771d7ee4be653d516",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_756646a4b2b204d3532c536099835c1a",
+      "sourceShownTextDigest": "ca57e0a46996629e8d89c17fcfe2e860084a4f5b44ce54bb0f229241a05dfe85",
+      "targetShownTextDigest": "ca57e0a46996629e8d89c17fcfe2e860084a4f5b44ce54bb0f229241a05dfe85",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_01a0b5f640cc32182e8fa2f3cb877919",
+      "sourceShownTextDigest": "60b00873b9eb6461ae62558524111bd4dfc2a73224d75fec214464ace07f530d",
+      "targetShownTextDigest": "60b00873b9eb6461ae62558524111bd4dfc2a73224d75fec214464ace07f530d",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_28f8d68e81ad3e1c7656f3b624c00d54",
+      "sourceShownTextDigest": "cd8d3eb7b69fc582782e530b81e1ceca11080676455448c20643d9c0ebfe66e0",
+      "targetShownTextDigest": "cd8d3eb7b69fc582782e530b81e1ceca11080676455448c20643d9c0ebfe66e0",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_6a92002895ce7ee7f9bbd09149d7a4c7",
+      "sourceShownTextDigest": "202005aa814173124f2b433fb1ec900ae4eaec1d69a59d158bb3890f7a364cac",
+      "targetShownTextDigest": "202005aa814173124f2b433fb1ec900ae4eaec1d69a59d158bb3890f7a364cac",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_03068241c6f2be23bea6def64ba93760",
+      "sourceShownTextDigest": "0241d8818eac63d8dc710702f12cd7c2000b08d533083cc4b41eeae0831d6897",
+      "targetShownTextDigest": "0241d8818eac63d8dc710702f12cd7c2000b08d533083cc4b41eeae0831d6897",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_f9a2a272e1abb58e0f4da106993eef9b",
+      "sourceShownTextDigest": "f0211dddfd48a732a0e3af0f5c19343340ff920934f2442863cb6269312b9dc2",
+      "targetShownTextDigest": "f0211dddfd48a732a0e3af0f5c19343340ff920934f2442863cb6269312b9dc2",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_4864462f86f8e1bb2cdd04ced2b51034",
+      "sourceShownTextDigest": "c4ab26a04a969da0d7e177ffff9cff18f9a881f5f5e49589709d2b4f69595937",
+      "targetShownTextDigest": "c4ab26a04a969da0d7e177ffff9cff18f9a881f5f5e49589709d2b4f69595937",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_05786c7a35d0974018885dc34cc3d3c8",
+      "sourceShownTextDigest": "50f79727f901685a9405795aab0bddc4e159cf900117b9c406e8bc85b08414e5",
+      "targetShownTextDigest": "50f79727f901685a9405795aab0bddc4e159cf900117b9c406e8bc85b08414e5",
+      "changedByContentCommit": false
+    }
+  ]
+}

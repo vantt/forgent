@@ -1,0 +1,483 @@
+{
+  "version": 1,
+  "commit": "0f063d18fdab01cb6f2c915bb60ff528c5e0f238",
+  "shard": "s7-proposals-redesigns-01-dispatch-control-plane-redesign.json",
+  "authorSession": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_2ec7fc22c79d18b5f8d57cc79ec5e587",
+      "sourceUnitDigest": "7b5d3df68b88c26058760be3ed0d7f21c05f84e1512a07212d26e953156fc154",
+      "targetUnitDigest": "b836a91ed4d5753a3192ae3a992e713477fc30524d664dc173024fb8ad889741",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_2ec7fc22c79d18b5f8d57cc79ec5e587",
+        "sourceUnitDigest": "7b5d3df68b88c26058760be3ed0d7f21c05f84e1512a07212d26e953156fc154",
+        "targetOwner": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "targetAnchor": "dispatch-control-plane-redesign",
+        "targetUnitDigest": "b836a91ed4d5753a3192ae3a992e713477fc30524d664dc173024fb8ad889741",
+        "targetAncestry": [],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover. Evidence: docs/specs/runner.md:1273,1277–1278 still cites the redesign; source lines 3–13 redirect to the surviving area architecture/proposal. Full body remains at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Complete source heading docs/architect/dispatch-control-plane-redesign.md#dispatch-control-plane-redesign (lines 1–1) is carried at docs/platform/proposals/dispatch-control-plane-redesign.md#dispatch-control-plane-redesign (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/dispatch-control-plane-redesign.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Dispatch Control Plane Redesign",
+        "anchor": "dispatch-control-plane-redesign",
+        "githubAnchor": "dispatch-control-plane-redesign",
+        "stableAnchor": "h-636c56850bf7",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "7b5d3df68b88c26058760be3ed0d7f21c05f84e1512a07212d26e953156fc154",
+        "sample": "Dispatch Control Plane Redesign",
+        "sectionPayloadDigest": "737c7cd0db5bd457c5405181782808ae51e2575f2d2b5a410e5f47cd694cd794",
+        "followingBlockDigest": "d891da2b56463e363072ea6815fdf78455428b7587d7cdfa630a8feac814d025",
+        "identityFingerprint": "63b4f77863f4b3dd3c1d549ea1643b2fa7a7ac0fabf67a692fac40b3e8082572",
+        "ancestry": [],
+        "text": "# Dispatch Control Plane Redesign",
+        "sectionText": "# Dispatch Control Plane Redesign\n\nCanonical architecture moved to:\n\n`docs/architect/agent-coordination/architecture/dispatch-control-plane.md`\n\nThe unresolved redesign source is retained at:\n\n`docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md`\n\nFor the full related architecture set, start at:\n\n`docs/architect/agent-coordination/README.md`"
+      },
+      "target": {
+        "path": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Dispatch Control Plane Redesign",
+        "anchor": "dispatch-control-plane-redesign",
+        "githubAnchor": "dispatch-control-plane-redesign",
+        "stableAnchor": "h-636c56850bf7",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "b836a91ed4d5753a3192ae3a992e713477fc30524d664dc173024fb8ad889741",
+        "sample": "Dispatch Control Plane Redesign",
+        "sectionPayloadDigest": "f0dbedc35bba679d6079ab4226f9fa4ade6c5005723c6d6d4696a7fffe4a0e33",
+        "followingBlockDigest": "66b7f7fa97b94e51a52d4c7156ed7480300db1128359cf609e1245a3f5348a3b",
+        "identityFingerprint": "b792358884f3af957d4776c5cab38c43690407a2d91f71fa60e6f1d6ff28e605",
+        "ancestry": [],
+        "text": "# Dispatch Control Plane Redesign",
+        "sectionText": "# Dispatch Control Plane Redesign\n\n```txt\nDocument type: Proposal\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve mapped source text for independent conservation review\nDesign status: Candidate\nImplementation: Source snapshot retained; current implementation truth not certified\nProvenance: docs/architect/dispatch-control-plane-redesign.md at fb046210539cbcbe8ca1dab254763f5e78c573d2; blob 6d66e789fbe1fdf433d1c9a72d8ab3de32b0f8b1\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: Nothing; non-canonical candidate conservation carrier\nUse this when: Reviewing source carriage, placement, intent and provenance\nDo not use this for: Current authority, implementation proof or cutover approval\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/dispatch-control-plane-redesign.md\nSupersedes: None; legacy source remains intact\nSuperseded by: None\n```\n\nAdded in candidate: Candidate pointer at the mapped proposals path; the full proposal is at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. The three inline-code legacy paths are retained pending cutover. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.\n\nSource relationship: [original source](../../architect/dispatch-control-plane-redesign.md).\n\n\nCanonical architecture moved to:\n\n`docs/architect/agent-coordination/architecture/dispatch-control-plane.md`\n\nThe unresolved redesign source is retained at:\n\n`docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md`\n\nFor the full related architecture set, start at:\n\n`docs/architect/agent-coordination/README.md`"
+      }
+    },
+    {
+      "claimId": "claim_c1d6c7e71ac871df50ade9fbd9c197ef",
+      "sourceUnitDigest": "d891da2b56463e363072ea6815fdf78455428b7587d7cdfa630a8feac814d025",
+      "targetUnitDigest": "d891da2b56463e363072ea6815fdf78455428b7587d7cdfa630a8feac814d025",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_c1d6c7e71ac871df50ade9fbd9c197ef",
+        "sourceUnitDigest": "d891da2b56463e363072ea6815fdf78455428b7587d7cdfa630a8feac814d025",
+        "targetOwner": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "d891da2b56463e363072ea6815fdf78455428b7587d7cdfa630a8feac814d025",
+        "targetAncestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover. Evidence: docs/specs/runner.md:1273,1277–1278 still cites the redesign; source lines 3–13 redirect to the surviving area architecture/proposal. Full body remains at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Complete source unheaded-block docs/architect/dispatch-control-plane-redesign.md#unheaded-block-1 (lines 3–3) is carried at docs/platform/proposals/dispatch-control-plane-redesign.md#unheaded-block-4 (lines 27–27); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 3,
+        "textDigest": "d891da2b56463e363072ea6815fdf78455428b7587d7cdfa630a8feac814d025",
+        "sample": "Canonical architecture moved to:",
+        "identityFingerprint": "b4d637c11dc0fe7255eb050d16b05c44cb0407d48dc52bf7e9ba714a701a1afe",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "Canonical architecture moved to:"
+      },
+      "target": {
+        "path": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "d891da2b56463e363072ea6815fdf78455428b7587d7cdfa630a8feac814d025",
+        "sample": "Canonical architecture moved to:",
+        "identityFingerprint": "b4d637c11dc0fe7255eb050d16b05c44cb0407d48dc52bf7e9ba714a701a1afe",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "Canonical architecture moved to:"
+      }
+    },
+    {
+      "claimId": "claim_6f1c18985eba573f3f0bc7af216dff30",
+      "sourceUnitDigest": "9f09d4dd432d5814defd450773102806aa4ebedd5a60c74d34fb56f6170a1b3d",
+      "targetUnitDigest": "9f09d4dd432d5814defd450773102806aa4ebedd5a60c74d34fb56f6170a1b3d",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_6f1c18985eba573f3f0bc7af216dff30",
+        "sourceUnitDigest": "9f09d4dd432d5814defd450773102806aa4ebedd5a60c74d34fb56f6170a1b3d",
+        "targetOwner": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "9f09d4dd432d5814defd450773102806aa4ebedd5a60c74d34fb56f6170a1b3d",
+        "targetAncestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover. Evidence: docs/specs/runner.md:1273,1277–1278 still cites the redesign; source lines 3–13 redirect to the surviving area architecture/proposal. Full body remains at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Complete source unheaded-block docs/architect/dispatch-control-plane-redesign.md#unheaded-block-2 (lines 5–5) is carried at docs/platform/proposals/dispatch-control-plane-redesign.md#unheaded-block-5 (lines 29–29); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 5,
+        "endLine": 5,
+        "textDigest": "9f09d4dd432d5814defd450773102806aa4ebedd5a60c74d34fb56f6170a1b3d",
+        "sample": "`docs/architect/agent-coordination/architecture/dispatch-control-plane.md`",
+        "identityFingerprint": "fb04543dc64203c67422f049e6ec57ea0e4510859ba391c54c6a658a1650b7a2",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "`docs/architect/agent-coordination/architecture/dispatch-control-plane.md`"
+      },
+      "target": {
+        "path": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 29,
+        "endLine": 29,
+        "textDigest": "9f09d4dd432d5814defd450773102806aa4ebedd5a60c74d34fb56f6170a1b3d",
+        "sample": "`docs/architect/agent-coordination/architecture/dispatch-control-plane.md`",
+        "identityFingerprint": "fb04543dc64203c67422f049e6ec57ea0e4510859ba391c54c6a658a1650b7a2",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "`docs/architect/agent-coordination/architecture/dispatch-control-plane.md`"
+      }
+    },
+    {
+      "claimId": "claim_2aa7df6a5ea4807463b81b5181821702",
+      "sourceUnitDigest": "05f2f858d3dd1da2fd0f5aa24bca9bf5ac7461b094e730351f0f8fad6f3c4db9",
+      "targetUnitDigest": "05f2f858d3dd1da2fd0f5aa24bca9bf5ac7461b094e730351f0f8fad6f3c4db9",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_2aa7df6a5ea4807463b81b5181821702",
+        "sourceUnitDigest": "05f2f858d3dd1da2fd0f5aa24bca9bf5ac7461b094e730351f0f8fad6f3c4db9",
+        "targetOwner": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "targetAnchor": "unheaded-block-6",
+        "targetUnitDigest": "05f2f858d3dd1da2fd0f5aa24bca9bf5ac7461b094e730351f0f8fad6f3c4db9",
+        "targetAncestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover. Evidence: docs/specs/runner.md:1273,1277–1278 still cites the redesign; source lines 3–13 redirect to the surviving area architecture/proposal. Full body remains at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Complete source unheaded-block docs/architect/dispatch-control-plane-redesign.md#unheaded-block-3 (lines 7–7) is carried at docs/platform/proposals/dispatch-control-plane-redesign.md#unheaded-block-6 (lines 31–31); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 7,
+        "endLine": 7,
+        "textDigest": "05f2f858d3dd1da2fd0f5aa24bca9bf5ac7461b094e730351f0f8fad6f3c4db9",
+        "sample": "The unresolved redesign source is retained at:",
+        "identityFingerprint": "60675c50ef4cd59a87df8bc69b00d4eb552c726dbd63608a9a8bb8a9ca772fa8",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "The unresolved redesign source is retained at:"
+      },
+      "target": {
+        "path": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 31,
+        "endLine": 31,
+        "textDigest": "05f2f858d3dd1da2fd0f5aa24bca9bf5ac7461b094e730351f0f8fad6f3c4db9",
+        "sample": "The unresolved redesign source is retained at:",
+        "identityFingerprint": "60675c50ef4cd59a87df8bc69b00d4eb552c726dbd63608a9a8bb8a9ca772fa8",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "The unresolved redesign source is retained at:"
+      }
+    },
+    {
+      "claimId": "claim_62153be70af7b764bdb0d17617240bbf",
+      "sourceUnitDigest": "9fbd6397234cea5609c4f7e3b1e780262da7cd2ce04debdff55681ec6fde983c",
+      "targetUnitDigest": "9fbd6397234cea5609c4f7e3b1e780262da7cd2ce04debdff55681ec6fde983c",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_62153be70af7b764bdb0d17617240bbf",
+        "sourceUnitDigest": "9fbd6397234cea5609c4f7e3b1e780262da7cd2ce04debdff55681ec6fde983c",
+        "targetOwner": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "targetAnchor": "unheaded-block-7",
+        "targetUnitDigest": "9fbd6397234cea5609c4f7e3b1e780262da7cd2ce04debdff55681ec6fde983c",
+        "targetAncestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover. Evidence: docs/specs/runner.md:1273,1277–1278 still cites the redesign; source lines 3–13 redirect to the surviving area architecture/proposal. Full body remains at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Complete source unheaded-block docs/architect/dispatch-control-plane-redesign.md#unheaded-block-4 (lines 9–9) is carried at docs/platform/proposals/dispatch-control-plane-redesign.md#unheaded-block-7 (lines 33–33); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 9,
+        "endLine": 9,
+        "textDigest": "9fbd6397234cea5609c4f7e3b1e780262da7cd2ce04debdff55681ec6fde983c",
+        "sample": "`docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md`",
+        "identityFingerprint": "fb978e63e703bcf293d6945633bb1a3a6b6af8b807dd9ba2d5583235685658dd",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "`docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md`"
+      },
+      "target": {
+        "path": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 33,
+        "endLine": 33,
+        "textDigest": "9fbd6397234cea5609c4f7e3b1e780262da7cd2ce04debdff55681ec6fde983c",
+        "sample": "`docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md`",
+        "identityFingerprint": "fb978e63e703bcf293d6945633bb1a3a6b6af8b807dd9ba2d5583235685658dd",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "`docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md`"
+      }
+    },
+    {
+      "claimId": "claim_47245c890a656f03be28dee6020f095a",
+      "sourceUnitDigest": "9032365b4307c1ae7a2015ae1c788914f155ec78d775ce147f258345ed2d332b",
+      "targetUnitDigest": "9032365b4307c1ae7a2015ae1c788914f155ec78d775ce147f258345ed2d332b",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_47245c890a656f03be28dee6020f095a",
+        "sourceUnitDigest": "9032365b4307c1ae7a2015ae1c788914f155ec78d775ce147f258345ed2d332b",
+        "targetOwner": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "targetAnchor": "unheaded-block-8",
+        "targetUnitDigest": "9032365b4307c1ae7a2015ae1c788914f155ec78d775ce147f258345ed2d332b",
+        "targetAncestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover. Evidence: docs/specs/runner.md:1273,1277–1278 still cites the redesign; source lines 3–13 redirect to the surviving area architecture/proposal. Full body remains at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Complete source unheaded-block docs/architect/dispatch-control-plane-redesign.md#unheaded-block-5 (lines 11–11) is carried at docs/platform/proposals/dispatch-control-plane-redesign.md#unheaded-block-8 (lines 35–35); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 11,
+        "endLine": 11,
+        "textDigest": "9032365b4307c1ae7a2015ae1c788914f155ec78d775ce147f258345ed2d332b",
+        "sample": "For the full related architecture set, start at:",
+        "identityFingerprint": "e3c0ea8b22dfd3341911f1d3ad9f7f0687eb43fb1ca7ea7d1105d9e9780eae42",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "For the full related architecture set, start at:"
+      },
+      "target": {
+        "path": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 35,
+        "endLine": 35,
+        "textDigest": "9032365b4307c1ae7a2015ae1c788914f155ec78d775ce147f258345ed2d332b",
+        "sample": "For the full related architecture set, start at:",
+        "identityFingerprint": "e3c0ea8b22dfd3341911f1d3ad9f7f0687eb43fb1ca7ea7d1105d9e9780eae42",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "For the full related architecture set, start at:"
+      }
+    },
+    {
+      "claimId": "claim_3811942485f2624b620b36b3a3aba933",
+      "sourceUnitDigest": "08a86f38c1e24a34199abc0740b5d43fdaa0459b4ea41669b3b6f226d6e7691d",
+      "targetUnitDigest": "08a86f38c1e24a34199abc0740b5d43fdaa0459b4ea41669b3b6f226d6e7691d",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_3811942485f2624b620b36b3a3aba933",
+        "sourceUnitDigest": "08a86f38c1e24a34199abc0740b5d43fdaa0459b4ea41669b3b6f226d6e7691d",
+        "targetOwner": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "targetAnchor": "unheaded-block-9",
+        "targetUnitDigest": "08a86f38c1e24a34199abc0740b5d43fdaa0459b4ea41669b3b6f226d6e7691d",
+        "targetAncestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep the mapped pointer carrier; the full proposal lives at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Its three inline-code legacy destinations remain owed repoints at cutover. Evidence: docs/specs/runner.md:1273,1277–1278 still cites the redesign; source lines 3–13 redirect to the surviving area architecture/proposal. Full body remains at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md. Complete source unheaded-block docs/architect/dispatch-control-plane-redesign.md#unheaded-block-6 (lines 13–13) is carried at docs/platform/proposals/dispatch-control-plane-redesign.md#unheaded-block-9 (lines 37–37); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 13,
+        "endLine": 13,
+        "textDigest": "08a86f38c1e24a34199abc0740b5d43fdaa0459b4ea41669b3b6f226d6e7691d",
+        "sample": "`docs/architect/agent-coordination/README.md`",
+        "identityFingerprint": "6fabd61bce4904f8fd7c4384033548ebaed9c90bab0ccfd2028559ce8f193e8d",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "`docs/architect/agent-coordination/README.md`"
+      },
+      "target": {
+        "path": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 37,
+        "endLine": 37,
+        "textDigest": "08a86f38c1e24a34199abc0740b5d43fdaa0459b4ea41669b3b6f226d6e7691d",
+        "sample": "`docs/architect/agent-coordination/README.md`",
+        "identityFingerprint": "6fabd61bce4904f8fd7c4384033548ebaed9c90bab0ccfd2028559ce8f193e8d",
+        "ancestry": [
+          "Dispatch Control Plane Redesign"
+        ],
+        "text": "`docs/architect/agent-coordination/README.md`"
+      }
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "originalShardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-01-dispatch-control-plane-redesign.json",
+  "originalShardSHA256": "87bcc867a85d5af699e541c084adfbad0311e6d34604938e24c7ba7c50440735",
+  "part": 1,
+  "parts": 1,
+  "completeSourceRowCount": 7,
+  "gateFindings": [],
+  "scope": "Source rows only; complete reverse population is in the separate native candidate request.",
+  "a36": {
+    "gateFindings": [],
+    "requestPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1110-proposals-redesigns-source-01-01-0f063d18f.md",
+    "packPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-01-01-0f063d18f.md",
+    "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-01-01-0f063d18f.md.json",
+    "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-01-dispatch-control-plane-redesign.json",
+    "source": "docs/architect/dispatch-control-plane-redesign.md",
+    "part": 1,
+    "parts": 1,
+    "count": 7,
+    "classes": {
+      "Judgment": 1,
+      "Weak-exact": 1,
+      "Unit-exact": 5
+    },
+    "weakExactAndJudgment": [
+      "claim_2ec7fc22c79d18b5f8d57cc79ec5e587",
+      "claim_c1d6c7e71ac871df50ade9fbd9c197ef"
+    ],
+    "reviewerDeepSampleMinimum": 2,
+    "mandatoryDifferingDigestRows": [
+      "claim_2ec7fc22c79d18b5f8d57cc79ec5e587"
+    ],
+    "absentTargetRows": [],
+    "changedByContentCommit": [
+      "claim_2ec7fc22c79d18b5f8d57cc79ec5e587",
+      "claim_c1d6c7e71ac871df50ade9fbd9c197ef",
+      "claim_6f1c18985eba573f3f0bc7af216dff30",
+      "claim_2aa7df6a5ea4807463b81b5181821702",
+      "claim_62153be70af7b764bdb0d17617240bbf",
+      "claim_47245c890a656f03be28dee6020f095a",
+      "claim_3811942485f2624b620b36b3a3aba933"
+    ]
+  },
+  "fullShownTextBindings": [
+    {
+      "claimId": "claim_2ec7fc22c79d18b5f8d57cc79ec5e587",
+      "sourceShownTextDigest": "0fc333fc7df0c3c1883a8de7627769a26129cfe0566e74fdaeaec824618ce642",
+      "targetShownTextDigest": "6a54dbf30fc96c54af700b3835b38957b878dc6e85d7160fbcd549ec4e4c377b",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_c1d6c7e71ac871df50ade9fbd9c197ef",
+      "sourceShownTextDigest": "d891da2b56463e363072ea6815fdf78455428b7587d7cdfa630a8feac814d025",
+      "targetShownTextDigest": "d891da2b56463e363072ea6815fdf78455428b7587d7cdfa630a8feac814d025",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_6f1c18985eba573f3f0bc7af216dff30",
+      "sourceShownTextDigest": "9f09d4dd432d5814defd450773102806aa4ebedd5a60c74d34fb56f6170a1b3d",
+      "targetShownTextDigest": "9f09d4dd432d5814defd450773102806aa4ebedd5a60c74d34fb56f6170a1b3d",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_2aa7df6a5ea4807463b81b5181821702",
+      "sourceShownTextDigest": "05f2f858d3dd1da2fd0f5aa24bca9bf5ac7461b094e730351f0f8fad6f3c4db9",
+      "targetShownTextDigest": "05f2f858d3dd1da2fd0f5aa24bca9bf5ac7461b094e730351f0f8fad6f3c4db9",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_62153be70af7b764bdb0d17617240bbf",
+      "sourceShownTextDigest": "9fbd6397234cea5609c4f7e3b1e780262da7cd2ce04debdff55681ec6fde983c",
+      "targetShownTextDigest": "9fbd6397234cea5609c4f7e3b1e780262da7cd2ce04debdff55681ec6fde983c",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_47245c890a656f03be28dee6020f095a",
+      "sourceShownTextDigest": "9032365b4307c1ae7a2015ae1c788914f155ec78d775ce147f258345ed2d332b",
+      "targetShownTextDigest": "9032365b4307c1ae7a2015ae1c788914f155ec78d775ce147f258345ed2d332b",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_3811942485f2624b620b36b3a3aba933",
+      "sourceShownTextDigest": "08a86f38c1e24a34199abc0740b5d43fdaa0459b4ea41669b3b6f226d6e7691d",
+      "targetShownTextDigest": "08a86f38c1e24a34199abc0740b5d43fdaa0459b4ea41669b3b6f226d6e7691d",
+      "changedByContentCommit": true
+    }
+  ]
+}

@@ -1,0 +1,1841 @@
+{
+  "version": 1,
+  "commit": "0f063d18fdab01cb6f2c915bb60ff528c5e0f238",
+  "shard": "s7-proposals-redesigns-12-coordination-envelope-progress.json",
+  "authorSession": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_00d0fa7ca76d53660e15ea5391ed02a0",
+      "sourceUnitDigest": "1133b2428390c1781442953ecfa4cde1ee5f500fabf0cd583c8adc68f7323d44",
+      "targetUnitDigest": "0682b65449b63a0fb0d54428707b21b4d3504818e46eaa60de034d1d40056072",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_00d0fa7ca76d53660e15ea5391ed02a0",
+        "sourceUnitDigest": "1133b2428390c1781442953ecfa4cde1ee5f500fabf0cd583c8adc68f7323d44",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "coordination-envelope-chat-progress-and-next-work",
+        "targetUnitDigest": "0682b65449b63a0fb0d54428707b21b4d3504818e46eaa60de034d1d40056072",
+        "targetAncestry": [],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source heading docs/architect/proposals/coordination-envelope-progress.md#coordination-envelope-chat-progress-and-next-work (lines 1–1) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#coordination-envelope-chat-progress-and-next-work (lines 1–1); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Coordination Envelope — Chat Progress and Next Work",
+        "anchor": "coordination-envelope-chat-progress-and-next-work",
+        "githubAnchor": "coordination-envelope-chat-progress-and-next-work",
+        "stableAnchor": "h-d52f09d94cb3",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "1133b2428390c1781442953ecfa4cde1ee5f500fabf0cd583c8adc68f7323d44",
+        "sample": "Coordination Envelope — Chat Progress and Next Work",
+        "sectionPayloadDigest": "7812af5eaf05e2e42542fbe7727120c1ebfb24430b66cdaefc8c40697a3edfaa",
+        "followingBlockDigest": "7812af5eaf05e2e42542fbe7727120c1ebfb24430b66cdaefc8c40697a3edfaa",
+        "identityFingerprint": "1a73a687f9897966fadc842a8e5fd41c706da67cf86488a8f0cf62477283ebc7",
+        "ancestry": [],
+        "text": "# Coordination Envelope — Chat Progress and Next Work",
+        "sectionText": "# Coordination Envelope — Chat Progress and Next Work\n\nDocument type: Index\nDesign status: Discussion\nImplementation: Active — conceptual review and probe preparation only\nLast reviewed: 2026-09-06\nCanonical for: progress and handoff of this advisory/probe-preparation conversation only\nState class: State — update to current reality; linked reviews/results retain their own history"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Coordination Envelope — Chat Progress and Next Work",
+        "anchor": "coordination-envelope-chat-progress-and-next-work",
+        "githubAnchor": "coordination-envelope-chat-progress-and-next-work",
+        "stableAnchor": "h-d52f09d94cb3",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "0682b65449b63a0fb0d54428707b21b4d3504818e46eaa60de034d1d40056072",
+        "sample": "Coordination Envelope — Chat Progress and Next Work",
+        "sectionPayloadDigest": "bd54299ca980fad512e981fa99e8bfcc7a7e76b98b664cc7a6be8191a049aab2",
+        "followingBlockDigest": "589a3d68a25ff10843f8075d43feaf569a90fc83b27392375ee5417d9c7cc377",
+        "identityFingerprint": "0106dbf1872cbf5bace285cbd7ee09a0f207876668af36ab07380042d8ab4aae",
+        "ancestry": [],
+        "text": "# Coordination Envelope — Chat Progress and Next Work",
+        "sectionText": "# Coordination Envelope — Chat Progress and Next Work\n\n```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve historical source text for independent conservation review\nDesign status: Candidate\nImplementation: Source snapshot retained; current implementation truth not certified\nProvenance: docs/architect/proposals/coordination-envelope-progress.md at fb046210539cbcbe8ca1dab254763f5e78c573d2; blob 40132546e70e23fed654bf5d4cc84ea86ac3cd2b\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: Nothing; non-canonical candidate conservation carrier\nUse this when: Reviewing source carriage, placement, intent and provenance\nDo not use this for: Current authority, implementation proof or cutover approval\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/proposals/coordination-envelope-progress.md\nSupersedes: None; legacy source remains intact\nSuperseded by: None\n```\n\nAdded in candidate: Historical snapshot; Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.\n\nSource relationship: [original source](../../../../architect/proposals/coordination-envelope-progress.md).\n\n\nDocument type: Index\nDesign status: Discussion\nImplementation: Active — conceptual review and probe preparation only\nLast reviewed: 2026-09-06\nCanonical for: progress and handoff of this advisory/probe-preparation conversation only\nState class: State — update to current reality; linked reviews/results retain their own history"
+      }
+    },
+    {
+      "claimId": "claim_3c532c060e9ea8e44f6263660e741ca6",
+      "sourceUnitDigest": "7812af5eaf05e2e42542fbe7727120c1ebfb24430b66cdaefc8c40697a3edfaa",
+      "targetUnitDigest": "7812af5eaf05e2e42542fbe7727120c1ebfb24430b66cdaefc8c40697a3edfaa",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_3c532c060e9ea8e44f6263660e741ca6",
+        "sourceUnitDigest": "7812af5eaf05e2e42542fbe7727120c1ebfb24430b66cdaefc8c40697a3edfaa",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "7812af5eaf05e2e42542fbe7727120c1ebfb24430b66cdaefc8c40697a3edfaa",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-1 (lines 3–8) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-4 (lines 27–32); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 8,
+        "textDigest": "7812af5eaf05e2e42542fbe7727120c1ebfb24430b66cdaefc8c40697a3edfaa",
+        "sample": "Document type: Index\nDesign status: Discussion\nImplementation: Active — conceptual review and probe preparation only\nLast reviewed: 2026-09-06\nCanonical for: progress and handoff o",
+        "identityFingerprint": "58dfd50871f6d5d400c6cb59f3e386bd254c0d6d8911059410bf7f1c6462e22a",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "Document type: Index\nDesign status: Discussion\nImplementation: Active — conceptual review and probe preparation only\nLast reviewed: 2026-09-06\nCanonical for: progress and handoff of this advisory/probe-preparation conversation only\nState class: State — update to current reality; linked reviews/results retain their own history"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 27,
+        "endLine": 32,
+        "textDigest": "7812af5eaf05e2e42542fbe7727120c1ebfb24430b66cdaefc8c40697a3edfaa",
+        "sample": "Document type: Index\nDesign status: Discussion\nImplementation: Active — conceptual review and probe preparation only\nLast reviewed: 2026-09-06\nCanonical for: progress and handoff o",
+        "identityFingerprint": "58dfd50871f6d5d400c6cb59f3e386bd254c0d6d8911059410bf7f1c6462e22a",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "Document type: Index\nDesign status: Discussion\nImplementation: Active — conceptual review and probe preparation only\nLast reviewed: 2026-09-06\nCanonical for: progress and handoff of this advisory/probe-preparation conversation only\nState class: State — update to current reality; linked reviews/results retain their own history"
+      }
+    },
+    {
+      "claimId": "claim_05b6464d12e63da61fdeb9a2e9a5fbf6",
+      "sourceUnitDigest": "54ea3c5df267036e435fa14388d0d140c0ff42981b4a39d0ea69fe0e6c13648e",
+      "targetUnitDigest": "54ea3c5df267036e435fa14388d0d140c0ff42981b4a39d0ea69fe0e6c13648e",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_05b6464d12e63da61fdeb9a2e9a5fbf6",
+        "sourceUnitDigest": "54ea3c5df267036e435fa14388d0d140c0ff42981b4a39d0ea69fe0e6c13648e",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "objective-and-authority",
+        "targetUnitDigest": "54ea3c5df267036e435fa14388d0d140c0ff42981b4a39d0ea69fe0e6c13648e",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source heading docs/architect/proposals/coordination-envelope-progress.md#objective-and-authority (lines 10–10) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#objective-and-authority (lines 34–34); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Objective and authority",
+        "anchor": "objective-and-authority",
+        "githubAnchor": "objective-and-authority",
+        "stableAnchor": "h-bc2f72ff4558",
+        "startLine": 10,
+        "endLine": 10,
+        "textDigest": "54ea3c5df267036e435fa14388d0d140c0ff42981b4a39d0ea69fe0e6c13648e",
+        "sample": "Objective and authority",
+        "sectionPayloadDigest": "88e1a3374ba6c885d9417ccb41169c532b4d2bb1d0b3489964019d63c4f44bbf",
+        "followingBlockDigest": "141640a859e2f3e4daacf21fe11080f171383d40a21fc1737f971630d943ef70",
+        "identityFingerprint": "50dbcfd239aedf08a4fb793cf6c2d085d6c9b98a14ac2623b7d162ac04653976",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Objective and authority",
+        "sectionText": "## Objective and authority\n\nFind and test an architecture that preserves coordinator/worker intelligence while\nruntime hardens authority, capability, isolation, visibility, bounds, provenance,\nevidence, replay, and mutation safety. Serve Code Panel, Plan Loop, research,\nRFC/Delphi/NGT, and Architecture Advisory without a separate workflow engine per\nuse case.\n\nThe person agreed to the proposed next step: prepare a minimal Code Panel probe\nand establish what the existing substrate can prove before a multi-phase\nimplementation plan. The conceptual recommendation remains Discussion; agreement\nto investigate/probe does not accept new production contracts or supersede locked\ntrust-model decisions."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Objective and authority",
+        "anchor": "objective-and-authority",
+        "githubAnchor": "objective-and-authority",
+        "stableAnchor": "h-9b73231a6e10",
+        "startLine": 34,
+        "endLine": 34,
+        "textDigest": "54ea3c5df267036e435fa14388d0d140c0ff42981b4a39d0ea69fe0e6c13648e",
+        "sample": "Objective and authority",
+        "sectionPayloadDigest": "88e1a3374ba6c885d9417ccb41169c532b4d2bb1d0b3489964019d63c4f44bbf",
+        "followingBlockDigest": "141640a859e2f3e4daacf21fe11080f171383d40a21fc1737f971630d943ef70",
+        "identityFingerprint": "50dbcfd239aedf08a4fb793cf6c2d085d6c9b98a14ac2623b7d162ac04653976",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Objective and authority",
+        "sectionText": "## Objective and authority\n\nFind and test an architecture that preserves coordinator/worker intelligence while\nruntime hardens authority, capability, isolation, visibility, bounds, provenance,\nevidence, replay, and mutation safety. Serve Code Panel, Plan Loop, research,\nRFC/Delphi/NGT, and Architecture Advisory without a separate workflow engine per\nuse case.\n\nThe person agreed to the proposed next step: prepare a minimal Code Panel probe\nand establish what the existing substrate can prove before a multi-phase\nimplementation plan. The conceptual recommendation remains Discussion; agreement\nto investigate/probe does not accept new production contracts or supersede locked\ntrust-model decisions."
+      }
+    },
+    {
+      "claimId": "claim_c8708ca9bb773cd3c3af2533a7601c4c",
+      "sourceUnitDigest": "141640a859e2f3e4daacf21fe11080f171383d40a21fc1737f971630d943ef70",
+      "targetUnitDigest": "141640a859e2f3e4daacf21fe11080f171383d40a21fc1737f971630d943ef70",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_c8708ca9bb773cd3c3af2533a7601c4c",
+        "sourceUnitDigest": "141640a859e2f3e4daacf21fe11080f171383d40a21fc1737f971630d943ef70",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "141640a859e2f3e4daacf21fe11080f171383d40a21fc1737f971630d943ef70",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Objective and authority"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-2 (lines 12–16) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-5 (lines 36–40); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 12,
+        "endLine": 16,
+        "textDigest": "141640a859e2f3e4daacf21fe11080f171383d40a21fc1737f971630d943ef70",
+        "sample": "Find and test an architecture that preserves coordinator/worker intelligence while\nruntime hardens authority, capability, isolation, visibility, bounds, provenance,\nevidence, repla",
+        "identityFingerprint": "83733dc9a9b5931f2bbd7956e3784c8024b1e4cc67bcb5984db120a5c9c203e9",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Objective and authority"
+        ],
+        "text": "Find and test an architecture that preserves coordinator/worker intelligence while\nruntime hardens authority, capability, isolation, visibility, bounds, provenance,\nevidence, replay, and mutation safety. Serve Code Panel, Plan Loop, research,\nRFC/Delphi/NGT, and Architecture Advisory without a separate workflow engine per\nuse case."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 36,
+        "endLine": 40,
+        "textDigest": "141640a859e2f3e4daacf21fe11080f171383d40a21fc1737f971630d943ef70",
+        "sample": "Find and test an architecture that preserves coordinator/worker intelligence while\nruntime hardens authority, capability, isolation, visibility, bounds, provenance,\nevidence, repla",
+        "identityFingerprint": "83733dc9a9b5931f2bbd7956e3784c8024b1e4cc67bcb5984db120a5c9c203e9",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Objective and authority"
+        ],
+        "text": "Find and test an architecture that preserves coordinator/worker intelligence while\nruntime hardens authority, capability, isolation, visibility, bounds, provenance,\nevidence, replay, and mutation safety. Serve Code Panel, Plan Loop, research,\nRFC/Delphi/NGT, and Architecture Advisory without a separate workflow engine per\nuse case."
+      }
+    },
+    {
+      "claimId": "claim_30fe6113bbab5f495ea8f0dffd64b51f",
+      "sourceUnitDigest": "de259bb0cc6552512728c63f09d9946ffb535502a3767e256867d2d906cd118d",
+      "targetUnitDigest": "de259bb0cc6552512728c63f09d9946ffb535502a3767e256867d2d906cd118d",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_30fe6113bbab5f495ea8f0dffd64b51f",
+        "sourceUnitDigest": "de259bb0cc6552512728c63f09d9946ffb535502a3767e256867d2d906cd118d",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-6",
+        "targetUnitDigest": "de259bb0cc6552512728c63f09d9946ffb535502a3767e256867d2d906cd118d",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Objective and authority"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-3 (lines 18–22) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-6 (lines 42–46); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 18,
+        "endLine": 22,
+        "textDigest": "de259bb0cc6552512728c63f09d9946ffb535502a3767e256867d2d906cd118d",
+        "sample": "The person agreed to the proposed next step: prepare a minimal Code Panel probe\nand establish what the existing substrate can prove before a multi-phase\nimplementation plan. The co",
+        "identityFingerprint": "fc87102807f28368c8317bee5a68a686f0ef0b3c9d7059f563dec56202aee538",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Objective and authority"
+        ],
+        "text": "The person agreed to the proposed next step: prepare a minimal Code Panel probe\nand establish what the existing substrate can prove before a multi-phase\nimplementation plan. The conceptual recommendation remains Discussion; agreement\nto investigate/probe does not accept new production contracts or supersede locked\ntrust-model decisions."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 42,
+        "endLine": 46,
+        "textDigest": "de259bb0cc6552512728c63f09d9946ffb535502a3767e256867d2d906cd118d",
+        "sample": "The person agreed to the proposed next step: prepare a minimal Code Panel probe\nand establish what the existing substrate can prove before a multi-phase\nimplementation plan. The co",
+        "identityFingerprint": "fc87102807f28368c8317bee5a68a686f0ef0b3c9d7059f563dec56202aee538",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Objective and authority"
+        ],
+        "text": "The person agreed to the proposed next step: prepare a minimal Code Panel probe\nand establish what the existing substrate can prove before a multi-phase\nimplementation plan. The conceptual recommendation remains Discussion; agreement\nto investigate/probe does not accept new production contracts or supersede locked\ntrust-model decisions."
+      }
+    },
+    {
+      "claimId": "claim_01e0090f579828803f2cb562581c3082",
+      "sourceUnitDigest": "cd89655e8ab43bb0f8834e82ecfdbdfe1bae18cb65b1bc9ced91a8de5a608dc1",
+      "targetUnitDigest": "6b180f1cd58090beb57ecb4044cddf76da6cf6dd7e911c57149430a99fe70b92",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_01e0090f579828803f2cb562581c3082",
+        "sourceUnitDigest": "cd89655e8ab43bb0f8834e82ecfdbdfe1bae18cb65b1bc9ced91a8de5a608dc1",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "current-status",
+        "targetUnitDigest": "6b180f1cd58090beb57ecb4044cddf76da6cf6dd7e911c57149430a99fe70b92",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source heading docs/architect/proposals/coordination-envelope-progress.md#current-status (lines 24–24) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#current-status (lines 48–48); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Current status",
+        "anchor": "current-status",
+        "githubAnchor": "current-status",
+        "stableAnchor": "h-2954d9a6226b",
+        "startLine": 24,
+        "endLine": 24,
+        "textDigest": "cd89655e8ab43bb0f8834e82ecfdbdfe1bae18cb65b1bc9ced91a8de5a608dc1",
+        "sample": "Current status",
+        "sectionPayloadDigest": "bcf723be4a68049dbcd0e1a01beab42863b603e93795eadc2153d6d9da471b74",
+        "followingBlockDigest": "a3e1a0dfca30389caae4394e2c07e0701da2aba4268cd62d9f44ce2309156dcd",
+        "identityFingerprint": "7f193591c4a1de96aff9472459c4aedde5d703cb51fc5a87188772551a705362",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Current status",
+        "sectionText": "## Current status\n\n**Initial capability-fit audit, boundary sketch, and no-provider probes completed.** Native request\nvalidation and two synthetic mount experiments have run; see the\n[dated result report](../agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md).\nNo agents/providers were dispatched and no full test suite was run. Temporary\nboundary fixtures exist; the parser/compatibility Code Panel fixture does not.\nNo production source/config or other track state was modified. Full native\nmulti-agent proof remains unready because recruitment and authority/isolation\nrequirements are not yet met.\n\n| Work | Status | Evidence / output |\n|---|---|---|\n| Reconstruct independent review and inspect current source/contracts | Complete, focused static inspection | [Independent review](../../../plans/reports/review-260905-agent-coordination-trong-mem-ngoai-cung.md), source references in conceptual proposal |\n| Compare three families, walkthroughs, debate, boundary, recommendation | Complete as Discussion | [Conceptual architecture](coordination-capability-envelope.md) |\n| Record migration responsibilities, reversal conditions, human decisions | Complete as recommendations, not accepted implementation scope | Sections 7–11 of conceptual architecture |\n| Define minimal Code Panel probe and pass/fail criteria | Prepared; execution not started | [Probe contract](coordination-envelope-probe-contract.md) |\n| Inspect relationship with concurrent Advisory work | Initial inspection complete; must refresh before shared changes | Relationship section below |\n| Audit exact public-path capability and isolation | Initial audit complete | [Result report](../agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md) |\n| Create isolated fixture and freeze execution manifest | Pending audit | No fixture/run manifest yet |\n| Execute available small probes and collect evidence | Ten validator cases and two OS checks complete | Native request gaps; broad-mount read leak; narrow-mount candidate passes limited cases |\n| Worker/provider/control boundary sketch | Prepared as Discussion | [Boundary sketch](coordination-worker-provider-boundary.md); environment inheritance and output-ingestion seams identified |\n| Coordination ↔ Dispatch contract | Refined as Discussion | [Contract sketch](coordination-dispatch-contract.md); coordinator-facing request door and invariants are explicit |\n| Synthetic environment isolation | Complete, two OS-only cases | [Raw evidence](../agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json); no real credentials read |\n| Reconcile architecture using native/prototype/failure evidence | Pending live/integration evidence | No final family acceptance or multi-phase implementation plan |\n\nDocumentation links were checked and `git diff --check` passed for the preceding\ndocument edits. This is documentation validation, not runtime proof. GitNexus MCP\nwas unavailable during initial inspection; direct source navigation was used."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Current status",
+        "anchor": "current-status",
+        "githubAnchor": "current-status",
+        "stableAnchor": "h-690b1b465868",
+        "startLine": 48,
+        "endLine": 48,
+        "textDigest": "6b180f1cd58090beb57ecb4044cddf76da6cf6dd7e911c57149430a99fe70b92",
+        "sample": "Current status",
+        "sectionPayloadDigest": "ee4a959f2ffe4d445668a5ff225794070c6f8e188b1854f34fd2b4105924680c",
+        "followingBlockDigest": "8e9dc3762d9cb17e2ba789a982ccc5d4e01e11acf1720abc8ea8c688ac8318b7",
+        "identityFingerprint": "7fbf798a78495c83c92cb0098292a7544128dab5339397da5f52f92c7190359e",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Current status",
+        "sectionText": "## Current status\n\n**Initial capability-fit audit, boundary sketch, and no-provider probes completed.** Native request\nvalidation and two synthetic mount experiments have run; see the\n[dated result report](../../../../architect/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md).\nNo agents/providers were dispatched and no full test suite was run. Temporary\nboundary fixtures exist; the parser/compatibility Code Panel fixture does not.\nNo production source/config or other track state was modified. Full native\nmulti-agent proof remains unready because recruitment and authority/isolation\nrequirements are not yet met.\n\n| Work | Status | Evidence / output |\n|---|---|---|\n| Reconstruct independent review and inspect current source/contracts | Complete, focused static inspection | [Independent review](../../../../../plans/reports/review-260905-agent-coordination-trong-mem-ngoai-cung.md), source references in conceptual proposal |\n| Compare three families, walkthroughs, debate, boundary, recommendation | Complete as Discussion | [Conceptual architecture](../../../../architect/proposals/coordination-capability-envelope.md) |\n| Record migration responsibilities, reversal conditions, human decisions | Complete as recommendations, not accepted implementation scope | Sections 7–11 of conceptual architecture |\n| Define minimal Code Panel probe and pass/fail criteria | Prepared; execution not started | [Probe contract](../../../../architect/proposals/coordination-envelope-probe-contract.md) |\n| Inspect relationship with concurrent Advisory work | Initial inspection complete; must refresh before shared changes | Relationship section below |\n| Audit exact public-path capability and isolation | Initial audit complete | [Result report](../../../../architect/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md) |\n| Create isolated fixture and freeze execution manifest | Pending audit | No fixture/run manifest yet |\n| Execute available small probes and collect evidence | Ten validator cases and two OS checks complete | Native request gaps; broad-mount read leak; narrow-mount candidate passes limited cases |\n| Worker/provider/control boundary sketch | Prepared as Discussion | [Boundary sketch](../../../../architect/proposals/coordination-worker-provider-boundary.md); environment inheritance and output-ingestion seams identified |\n| Coordination ↔ Dispatch contract | Refined as Discussion | [Contract sketch](../../../../architect/proposals/coordination-dispatch-contract.md); coordinator-facing request door and invariants are explicit |\n| Synthetic environment isolation | Complete, two OS-only cases | [Raw evidence](../../../../architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json); no real credentials read |\n| Reconcile architecture using native/prototype/failure evidence | Pending live/integration evidence | No final family acceptance or multi-phase implementation plan |\n\nDocumentation links were checked and `git diff --check` passed for the preceding\ndocument edits. This is documentation validation, not runtime proof. GitNexus MCP\nwas unavailable during initial inspection; direct source navigation was used."
+      }
+    },
+    {
+      "claimId": "claim_65021dcb7c3ea73210796a5d84020d3a",
+      "sourceUnitDigest": "a3e1a0dfca30389caae4394e2c07e0701da2aba4268cd62d9f44ce2309156dcd",
+      "targetUnitDigest": "8e9dc3762d9cb17e2ba789a982ccc5d4e01e11acf1720abc8ea8c688ac8318b7",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_65021dcb7c3ea73210796a5d84020d3a",
+        "sourceUnitDigest": "a3e1a0dfca30389caae4394e2c07e0701da2aba4268cd62d9f44ce2309156dcd",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-7",
+        "targetUnitDigest": "8e9dc3762d9cb17e2ba789a982ccc5d4e01e11acf1720abc8ea8c688ac8318b7",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Current status"
+        ],
+        "claimKind": "contract",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-4 (lines 26–33) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-7 (lines 50–57); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 26,
+        "endLine": 33,
+        "textDigest": "a3e1a0dfca30389caae4394e2c07e0701da2aba4268cd62d9f44ce2309156dcd",
+        "sample": "**Initial capability-fit audit, boundary sketch, and no-provider probes completed.** Native request\nvalidation and two synthetic mount experiments have run; see the\n[dated result r",
+        "identityFingerprint": "e6f04a4494faf9014c2ad2e653377787bb7750bf867457cf1c580661cb20f96c",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Current status"
+        ],
+        "text": "**Initial capability-fit audit, boundary sketch, and no-provider probes completed.** Native request\nvalidation and two synthetic mount experiments have run; see the\n[dated result report](../agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md).\nNo agents/providers were dispatched and no full test suite was run. Temporary\nboundary fixtures exist; the parser/compatibility Code Panel fixture does not.\nNo production source/config or other track state was modified. Full native\nmulti-agent proof remains unready because recruitment and authority/isolation\nrequirements are not yet met."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 50,
+        "endLine": 57,
+        "textDigest": "8e9dc3762d9cb17e2ba789a982ccc5d4e01e11acf1720abc8ea8c688ac8318b7",
+        "sample": "**Initial capability-fit audit, boundary sketch, and no-provider probes completed.** Native request\nvalidation and two synthetic mount experiments have run; see the\n[dated result r",
+        "identityFingerprint": "3375bd0474ddaa9ed72019fe4ee2333cf7be9d444f9879432260d55f8b92bc53",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Current status"
+        ],
+        "text": "**Initial capability-fit audit, boundary sketch, and no-provider probes completed.** Native request\nvalidation and two synthetic mount experiments have run; see the\n[dated result report](../../../../architect/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md).\nNo agents/providers were dispatched and no full test suite was run. Temporary\nboundary fixtures exist; the parser/compatibility Code Panel fixture does not.\nNo production source/config or other track state was modified. Full native\nmulti-agent proof remains unready because recruitment and authority/isolation\nrequirements are not yet met."
+      }
+    },
+    {
+      "claimId": "claim_97aef0a406ee921e9d5e1d227e8b5462",
+      "sourceUnitDigest": "3bc91b02892869881f3b3646cec7dd2d35de4601aa388feff118d0648923015b",
+      "targetUnitDigest": "869d05c32fe904861fa23e2cd966633eb76cb56e08debc5458cd18abedc26321",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_97aef0a406ee921e9d5e1d227e8b5462",
+        "sourceUnitDigest": "3bc91b02892869881f3b3646cec7dd2d35de4601aa388feff118d0648923015b",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-8",
+        "targetUnitDigest": "869d05c32fe904861fa23e2cd966633eb76cb56e08debc5458cd18abedc26321",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Current status"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-5 (lines 35–48) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-8 (lines 59–72); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 35,
+        "endLine": 48,
+        "textDigest": "3bc91b02892869881f3b3646cec7dd2d35de4601aa388feff118d0648923015b",
+        "sample": "| Work | Status | Evidence / output |\n|---|---|---|\n| Reconstruct independent review and inspect current source/contracts | Complete, focused static inspection | [Independent revie",
+        "identityFingerprint": "3dda27a8d6a8fe99f08b0c879ad646260d02195ce995d3e261f0349a6b6ffbb9",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Current status"
+        ],
+        "text": "| Work | Status | Evidence / output |\n|---|---|---|\n| Reconstruct independent review and inspect current source/contracts | Complete, focused static inspection | [Independent review](../../../plans/reports/review-260905-agent-coordination-trong-mem-ngoai-cung.md), source references in conceptual proposal |\n| Compare three families, walkthroughs, debate, boundary, recommendation | Complete as Discussion | [Conceptual architecture](coordination-capability-envelope.md) |\n| Record migration responsibilities, reversal conditions, human decisions | Complete as recommendations, not accepted implementation scope | Sections 7–11 of conceptual architecture |\n| Define minimal Code Panel probe and pass/fail criteria | Prepared; execution not started | [Probe contract](coordination-envelope-probe-contract.md) |\n| Inspect relationship with concurrent Advisory work | Initial inspection complete; must refresh before shared changes | Relationship section below |\n| Audit exact public-path capability and isolation | Initial audit complete | [Result report](../agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md) |\n| Create isolated fixture and freeze execution manifest | Pending audit | No fixture/run manifest yet |\n| Execute available small probes and collect evidence | Ten validator cases and two OS checks complete | Native request gaps; broad-mount read leak; narrow-mount candidate passes limited cases |\n| Worker/provider/control boundary sketch | Prepared as Discussion | [Boundary sketch](coordination-worker-provider-boundary.md); environment inheritance and output-ingestion seams identified |\n| Coordination ↔ Dispatch contract | Refined as Discussion | [Contract sketch](coordination-dispatch-contract.md); coordinator-facing request door and invariants are explicit |\n| Synthetic environment isolation | Complete, two OS-only cases | [Raw evidence](../agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json); no real credentials read |\n| Reconcile architecture using native/prototype/failure evidence | Pending live/integration evidence | No final family acceptance or multi-phase implementation plan |"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 59,
+        "endLine": 72,
+        "textDigest": "869d05c32fe904861fa23e2cd966633eb76cb56e08debc5458cd18abedc26321",
+        "sample": "| Work | Status | Evidence / output |\n|---|---|---|\n| Reconstruct independent review and inspect current source/contracts | Complete, focused static inspection | [Independent revie",
+        "identityFingerprint": "195d171f00d4e4ed3cf9ee008a952efa86ea2a86345ffe281f51a0ffa973dc85",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Current status"
+        ],
+        "text": "| Work | Status | Evidence / output |\n|---|---|---|\n| Reconstruct independent review and inspect current source/contracts | Complete, focused static inspection | [Independent review](../../../../../plans/reports/review-260905-agent-coordination-trong-mem-ngoai-cung.md), source references in conceptual proposal |\n| Compare three families, walkthroughs, debate, boundary, recommendation | Complete as Discussion | [Conceptual architecture](../../../../architect/proposals/coordination-capability-envelope.md) |\n| Record migration responsibilities, reversal conditions, human decisions | Complete as recommendations, not accepted implementation scope | Sections 7–11 of conceptual architecture |\n| Define minimal Code Panel probe and pass/fail criteria | Prepared; execution not started | [Probe contract](../../../../architect/proposals/coordination-envelope-probe-contract.md) |\n| Inspect relationship with concurrent Advisory work | Initial inspection complete; must refresh before shared changes | Relationship section below |\n| Audit exact public-path capability and isolation | Initial audit complete | [Result report](../../../../architect/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md) |\n| Create isolated fixture and freeze execution manifest | Pending audit | No fixture/run manifest yet |\n| Execute available small probes and collect evidence | Ten validator cases and two OS checks complete | Native request gaps; broad-mount read leak; narrow-mount candidate passes limited cases |\n| Worker/provider/control boundary sketch | Prepared as Discussion | [Boundary sketch](../../../../architect/proposals/coordination-worker-provider-boundary.md); environment inheritance and output-ingestion seams identified |\n| Coordination ↔ Dispatch contract | Refined as Discussion | [Contract sketch](../../../../architect/proposals/coordination-dispatch-contract.md); coordinator-facing request door and invariants are explicit |\n| Synthetic environment isolation | Complete, two OS-only cases | [Raw evidence](../../../../architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json); no real credentials read |\n| Reconcile architecture using native/prototype/failure evidence | Pending live/integration evidence | No final family acceptance or multi-phase implementation plan |"
+      }
+    },
+    {
+      "claimId": "claim_a770d483907e685ceb725ec563a93200",
+      "sourceUnitDigest": "be59835fe5cf1497f46fb1c5dd2066b28154924532666a43b6fe08776494d393",
+      "targetUnitDigest": "be59835fe5cf1497f46fb1c5dd2066b28154924532666a43b6fe08776494d393",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_a770d483907e685ceb725ec563a93200",
+        "sourceUnitDigest": "be59835fe5cf1497f46fb1c5dd2066b28154924532666a43b6fe08776494d393",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-9",
+        "targetUnitDigest": "be59835fe5cf1497f46fb1c5dd2066b28154924532666a43b6fe08776494d393",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Current status"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-6 (lines 50–52) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-9 (lines 74–76); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 50,
+        "endLine": 52,
+        "textDigest": "be59835fe5cf1497f46fb1c5dd2066b28154924532666a43b6fe08776494d393",
+        "sample": "Documentation links were checked and `git diff --check` passed for the preceding\ndocument edits. This is documentation validation, not runtime proof. GitNexus MCP\nwas unavailable d",
+        "identityFingerprint": "c5135cfb7d90c65e672e7e107c8381e2b4701f11cdda46a5311f7964c46fced8",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Current status"
+        ],
+        "text": "Documentation links were checked and `git diff --check` passed for the preceding\ndocument edits. This is documentation validation, not runtime proof. GitNexus MCP\nwas unavailable during initial inspection; direct source navigation was used."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 74,
+        "endLine": 76,
+        "textDigest": "be59835fe5cf1497f46fb1c5dd2066b28154924532666a43b6fe08776494d393",
+        "sample": "Documentation links were checked and `git diff --check` passed for the preceding\ndocument edits. This is documentation validation, not runtime proof. GitNexus MCP\nwas unavailable d",
+        "identityFingerprint": "c5135cfb7d90c65e672e7e107c8381e2b4701f11cdda46a5311f7964c46fced8",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Current status"
+        ],
+        "text": "Documentation links were checked and `git diff --check` passed for the preceding\ndocument edits. This is documentation validation, not runtime proof. GitNexus MCP\nwas unavailable during initial inspection; direct source navigation was used."
+      }
+    },
+    {
+      "claimId": "claim_3a040470917c6d0cb40a134d591d5bf4",
+      "sourceUnitDigest": "b1f400f66a49c798f705e149deab8f5c92f89bf6379ba4be1b76fe6bbaf43a09",
+      "targetUnitDigest": "b1f400f66a49c798f705e149deab8f5c92f89bf6379ba4be1b76fe6bbaf43a09",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_3a040470917c6d0cb40a134d591d5bf4",
+        "sourceUnitDigest": "b1f400f66a49c798f705e149deab8f5c92f89bf6379ba4be1b76fe6bbaf43a09",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "findings-to-preserve",
+        "targetUnitDigest": "b1f400f66a49c798f705e149deab8f5c92f89bf6379ba4be1b76fe6bbaf43a09",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source heading docs/architect/proposals/coordination-envelope-progress.md#findings-to-preserve (lines 54–54) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#findings-to-preserve (lines 78–78); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Findings to preserve",
+        "anchor": "findings-to-preserve",
+        "githubAnchor": "findings-to-preserve",
+        "stableAnchor": "h-316f4a073706",
+        "startLine": 54,
+        "endLine": 54,
+        "textDigest": "b1f400f66a49c798f705e149deab8f5c92f89bf6379ba4be1b76fe6bbaf43a09",
+        "sample": "Findings to preserve",
+        "sectionPayloadDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+        "followingBlockDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+        "identityFingerprint": "90110599585e846c8b8d53b971047eae36bbdf2a7f3ec174628983cc6c2660b4",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Findings to preserve",
+        "sectionText": "## Findings to preserve\n\n- F4 in the 2026-09-05 historical review is partially stale: public `run.mjs` now\n  forwards `step.mutation`. End-to-end mutation safety has not been re-proven here.\n- Inspected code still auto-attempts close, derives required actors from the roster,\n  checks driver identity by writer-string equality, and derives chain hints from\n  execution state rather than durable decision rationale.\n- Recommend family B: capability envelope plus coordinator-owned deliberation;\n  preserve FlowDefinition as an optional method, the shared Assignment/Run path,\n  and a rich master-prompt/skill operating surface.\n- Dispatch & Execution is the direct substrate for every capacity/role/workflow/\n  stage request. A coordinator proposes semantic actions; it does not choose an\n  alternate executor stack. `in-process` remains one returned mechanism.\n- Read-only filesystem enforcement does not imply read confidentiality, sibling\n  independence, credential isolation, or authenticated coordinator authority.\n- Fake executors, configuration labels, and packet hashes cannot establish live\n  cognitive quality or actual backend model identity by themselves."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Findings to preserve",
+        "anchor": "findings-to-preserve",
+        "githubAnchor": "findings-to-preserve",
+        "stableAnchor": "h-98dbe7981211",
+        "startLine": 78,
+        "endLine": 78,
+        "textDigest": "b1f400f66a49c798f705e149deab8f5c92f89bf6379ba4be1b76fe6bbaf43a09",
+        "sample": "Findings to preserve",
+        "sectionPayloadDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+        "followingBlockDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+        "identityFingerprint": "90110599585e846c8b8d53b971047eae36bbdf2a7f3ec174628983cc6c2660b4",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Findings to preserve",
+        "sectionText": "## Findings to preserve\n\n- F4 in the 2026-09-05 historical review is partially stale: public `run.mjs` now\n  forwards `step.mutation`. End-to-end mutation safety has not been re-proven here.\n- Inspected code still auto-attempts close, derives required actors from the roster,\n  checks driver identity by writer-string equality, and derives chain hints from\n  execution state rather than durable decision rationale.\n- Recommend family B: capability envelope plus coordinator-owned deliberation;\n  preserve FlowDefinition as an optional method, the shared Assignment/Run path,\n  and a rich master-prompt/skill operating surface.\n- Dispatch & Execution is the direct substrate for every capacity/role/workflow/\n  stage request. A coordinator proposes semantic actions; it does not choose an\n  alternate executor stack. `in-process` remains one returned mechanism.\n- Read-only filesystem enforcement does not imply read confidentiality, sibling\n  independence, credential isolation, or authenticated coordinator authority.\n- Fake executors, configuration labels, and packet hashes cannot establish live\n  cognitive quality or actual backend model identity by themselves."
+      }
+    },
+    {
+      "claimId": "claim_c29f41965f1bfe0297c06ccb71b52b83",
+      "sourceUnitDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+      "targetUnitDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_c29f41965f1bfe0297c06ccb71b52b83",
+        "sourceUnitDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-10",
+        "targetUnitDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Findings to preserve"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-7 (lines 56–70) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-10 (lines 80–94); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 56,
+        "endLine": 70,
+        "textDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+        "sample": "- F4 in the 2026-09-05 historical review is partially stale: public `run.mjs` now\n  forwards `step.mutation`. End-to-end mutation safety has not been re-proven here.\n- Inspected co",
+        "identityFingerprint": "b9f97bf8e636c3ad540ccef9f5c065cacb8e9a399ea0520149353192f0497741",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Findings to preserve"
+        ],
+        "text": "- F4 in the 2026-09-05 historical review is partially stale: public `run.mjs` now\n  forwards `step.mutation`. End-to-end mutation safety has not been re-proven here.\n- Inspected code still auto-attempts close, derives required actors from the roster,\n  checks driver identity by writer-string equality, and derives chain hints from\n  execution state rather than durable decision rationale.\n- Recommend family B: capability envelope plus coordinator-owned deliberation;\n  preserve FlowDefinition as an optional method, the shared Assignment/Run path,\n  and a rich master-prompt/skill operating surface.\n- Dispatch & Execution is the direct substrate for every capacity/role/workflow/\n  stage request. A coordinator proposes semantic actions; it does not choose an\n  alternate executor stack. `in-process` remains one returned mechanism.\n- Read-only filesystem enforcement does not imply read confidentiality, sibling\n  independence, credential isolation, or authenticated coordinator authority.\n- Fake executors, configuration labels, and packet hashes cannot establish live\n  cognitive quality or actual backend model identity by themselves."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 80,
+        "endLine": 94,
+        "textDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+        "sample": "- F4 in the 2026-09-05 historical review is partially stale: public `run.mjs` now\n  forwards `step.mutation`. End-to-end mutation safety has not been re-proven here.\n- Inspected co",
+        "identityFingerprint": "b9f97bf8e636c3ad540ccef9f5c065cacb8e9a399ea0520149353192f0497741",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Findings to preserve"
+        ],
+        "text": "- F4 in the 2026-09-05 historical review is partially stale: public `run.mjs` now\n  forwards `step.mutation`. End-to-end mutation safety has not been re-proven here.\n- Inspected code still auto-attempts close, derives required actors from the roster,\n  checks driver identity by writer-string equality, and derives chain hints from\n  execution state rather than durable decision rationale.\n- Recommend family B: capability envelope plus coordinator-owned deliberation;\n  preserve FlowDefinition as an optional method, the shared Assignment/Run path,\n  and a rich master-prompt/skill operating surface.\n- Dispatch & Execution is the direct substrate for every capacity/role/workflow/\n  stage request. A coordinator proposes semantic actions; it does not choose an\n  alternate executor stack. `in-process` remains one returned mechanism.\n- Read-only filesystem enforcement does not imply read confidentiality, sibling\n  independence, credential isolation, or authenticated coordinator authority.\n- Fake executors, configuration labels, and packet hashes cannot establish live\n  cognitive quality or actual backend model identity by themselves."
+      }
+    },
+    {
+      "claimId": "claim_325ddcbd008ffa2e60f96c472efde2b2",
+      "sourceUnitDigest": "bee981a1d0946e2c53618bd20b7ec84c42b592997b305fd720ae2cd8307a7fb4",
+      "targetUnitDigest": "fbe01ade23a3cf621fd11f9dad6a17be64adf2ba94dcb09e8c71d4b136651f90",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_325ddcbd008ffa2e60f96c472efde2b2",
+        "sourceUnitDigest": "bee981a1d0946e2c53618bd20b7ec84c42b592997b305fd720ae2cd8307a7fb4",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "concurrent-architecture-advisory-session",
+        "targetUnitDigest": "fbe01ade23a3cf621fd11f9dad6a17be64adf2ba94dcb09e8c71d4b136651f90",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source heading docs/architect/proposals/coordination-envelope-progress.md#concurrent-architecture-advisory-session (lines 72–72) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#concurrent-architecture-advisory-session (lines 96–96); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Concurrent Architecture Advisory session",
+        "anchor": "concurrent-architecture-advisory-session",
+        "githubAnchor": "concurrent-architecture-advisory-session",
+        "stableAnchor": "h-00afaaadf2f5",
+        "startLine": 72,
+        "endLine": 72,
+        "textDigest": "bee981a1d0946e2c53618bd20b7ec84c42b592997b305fd720ae2cd8307a7fb4",
+        "sample": "Concurrent Architecture Advisory session",
+        "sectionPayloadDigest": "1225d76f1b5c62a35012886b8d77c534f362350b0d28e62af24ddbe6a7d4be21",
+        "followingBlockDigest": "d427e3dda7bd59d457f997cf3adbb1a1fcf82106809110716e435d8e2f6bc6e7",
+        "identityFingerprint": "93cc36aeabc8961c58e144f80bb935808ab97abc88060a2406bcec89a2c6714d",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Concurrent Architecture Advisory session",
+        "sectionText": "## Concurrent Architecture Advisory session\n\nThe person explicitly reports that the other session is still working. Do not\ninfer that it is idle from a parked work-item/cell document or stop its processes.\n\nAt the earlier read in this chat, its\n[current-cell](../agent-coordination/verification/architecture-advisory-panel/current-cell.md)\nsaid parked before P01.3, and its\n[index](../agent-coordination/verification/architecture-advisory-panel/index.md)\nrecorded P00.1, P01.1, and P01.2 done. Those are a snapshot of recorded track\nprogress, not a live claim about what the other chat is doing now. Its plan header\nwas stale relative to its evidence index. Refresh the actual documents when\ncoordination becomes necessary.\n\nRefreshed observation during the audit: P01.3 phases 1–8 are complete and the\ntrack awaits a real Phase 9 human reaction. This does not imply the other session\nis idle. No intervention or message was sent.\n\nDivision of work:\n\n- Other session: Advisory soul, manual clear/unclear-input proof, decision dialogue,\n  and its own authorized track work.\n- This chat: public dispatch/isolation capability audit and small disposable\n  Code Panel probes about adaptation, authority, evidence, and resume.\n- Proposed convergence: Advisory P02 capability-fit audit, before shared-kernel/\n  protocol scope is fixed in P03. This is a recommendation, not a pause instruction\n  or a change imposed on the other session's plan.\n\nReuse its P00.1 executor and P01.2 manual-proof evidence within their actual scope.\nDo not rerun its human dialogue or use vnflow/mdview as adversarial targets. No\nmessage has been sent to the other session and no execution has been interrupted."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Concurrent Architecture Advisory session",
+        "anchor": "concurrent-architecture-advisory-session",
+        "githubAnchor": "concurrent-architecture-advisory-session",
+        "stableAnchor": "h-3919f79bb36d",
+        "startLine": 96,
+        "endLine": 96,
+        "textDigest": "fbe01ade23a3cf621fd11f9dad6a17be64adf2ba94dcb09e8c71d4b136651f90",
+        "sample": "Concurrent Architecture Advisory session",
+        "sectionPayloadDigest": "188fe6c2dfe97b6663a29525da163401fde59eba19f3e24f9c76b775aacdb539",
+        "followingBlockDigest": "d427e3dda7bd59d457f997cf3adbb1a1fcf82106809110716e435d8e2f6bc6e7",
+        "identityFingerprint": "792894db2cb59f1b0207ce6454d971d975ad754281092ff33039bcc10bb0a682",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Concurrent Architecture Advisory session",
+        "sectionText": "## Concurrent Architecture Advisory session\n\nThe person explicitly reports that the other session is still working. Do not\ninfer that it is idle from a parked work-item/cell document or stop its processes.\n\nAt the earlier read in this chat, its\n[current-cell](../../../../architect/agent-coordination/verification/architecture-advisory-panel/current-cell.md)\nsaid parked before P01.3, and its\n[index](../../../../architect/agent-coordination/verification/architecture-advisory-panel/index.md)\nrecorded P00.1, P01.1, and P01.2 done. Those are a snapshot of recorded track\nprogress, not a live claim about what the other chat is doing now. Its plan header\nwas stale relative to its evidence index. Refresh the actual documents when\ncoordination becomes necessary.\n\nRefreshed observation during the audit: P01.3 phases 1–8 are complete and the\ntrack awaits a real Phase 9 human reaction. This does not imply the other session\nis idle. No intervention or message was sent.\n\nDivision of work:\n\n- Other session: Advisory soul, manual clear/unclear-input proof, decision dialogue,\n  and its own authorized track work.\n- This chat: public dispatch/isolation capability audit and small disposable\n  Code Panel probes about adaptation, authority, evidence, and resume.\n- Proposed convergence: Advisory P02 capability-fit audit, before shared-kernel/\n  protocol scope is fixed in P03. This is a recommendation, not a pause instruction\n  or a change imposed on the other session's plan.\n\nReuse its P00.1 executor and P01.2 manual-proof evidence within their actual scope.\nDo not rerun its human dialogue or use vnflow/mdview as adversarial targets. No\nmessage has been sent to the other session and no execution has been interrupted."
+      }
+    },
+    {
+      "claimId": "claim_a3df8ff955b4f5e40f7be6c15c73e019",
+      "sourceUnitDigest": "d427e3dda7bd59d457f997cf3adbb1a1fcf82106809110716e435d8e2f6bc6e7",
+      "targetUnitDigest": "d427e3dda7bd59d457f997cf3adbb1a1fcf82106809110716e435d8e2f6bc6e7",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_a3df8ff955b4f5e40f7be6c15c73e019",
+        "sourceUnitDigest": "d427e3dda7bd59d457f997cf3adbb1a1fcf82106809110716e435d8e2f6bc6e7",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-11",
+        "targetUnitDigest": "d427e3dda7bd59d457f997cf3adbb1a1fcf82106809110716e435d8e2f6bc6e7",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-8 (lines 74–75) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-11 (lines 98–99); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 74,
+        "endLine": 75,
+        "textDigest": "d427e3dda7bd59d457f997cf3adbb1a1fcf82106809110716e435d8e2f6bc6e7",
+        "sample": "The person explicitly reports that the other session is still working. Do not\ninfer that it is idle from a parked work-item/cell document or stop its processes.",
+        "identityFingerprint": "19310f5fc3197e690bf6a78429cda115a6fe354a500eebdab4c704a3f8156231",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "text": "The person explicitly reports that the other session is still working. Do not\ninfer that it is idle from a parked work-item/cell document or stop its processes."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 98,
+        "endLine": 99,
+        "textDigest": "d427e3dda7bd59d457f997cf3adbb1a1fcf82106809110716e435d8e2f6bc6e7",
+        "sample": "The person explicitly reports that the other session is still working. Do not\ninfer that it is idle from a parked work-item/cell document or stop its processes.",
+        "identityFingerprint": "19310f5fc3197e690bf6a78429cda115a6fe354a500eebdab4c704a3f8156231",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "text": "The person explicitly reports that the other session is still working. Do not\ninfer that it is idle from a parked work-item/cell document or stop its processes."
+      }
+    },
+    {
+      "claimId": "claim_bab99fcb7080b712c5a816021d87893c",
+      "sourceUnitDigest": "c837e2815d64ee934fd3c59bb6f806353a072722dc0fe873162fa2edc77c4629",
+      "targetUnitDigest": "03b4d3a3d160d50acfe26488029d757de1de47315c19bd81df8ca04526b983bf",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_bab99fcb7080b712c5a816021d87893c",
+        "sourceUnitDigest": "c837e2815d64ee934fd3c59bb6f806353a072722dc0fe873162fa2edc77c4629",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-12",
+        "targetUnitDigest": "03b4d3a3d160d50acfe26488029d757de1de47315c19bd81df8ca04526b983bf",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-9 (lines 77–84) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-12 (lines 101–108); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-9",
+        "githubAnchor": "unheaded-block-9",
+        "stableAnchor": "unheaded-block-9",
+        "title": "Unheaded block 9",
+        "startLine": 77,
+        "endLine": 84,
+        "textDigest": "c837e2815d64ee934fd3c59bb6f806353a072722dc0fe873162fa2edc77c4629",
+        "sample": "At the earlier read in this chat, its\n[current-cell](../agent-coordination/verification/architecture-advisory-panel/current-cell.md)\nsaid parked before P01.3, and its\n[index](../ag",
+        "identityFingerprint": "bec4347b03cfeeca78ddb1427d4a71084344c9241b5e4a0f559db66837ea0229",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "text": "At the earlier read in this chat, its\n[current-cell](../agent-coordination/verification/architecture-advisory-panel/current-cell.md)\nsaid parked before P01.3, and its\n[index](../agent-coordination/verification/architecture-advisory-panel/index.md)\nrecorded P00.1, P01.1, and P01.2 done. Those are a snapshot of recorded track\nprogress, not a live claim about what the other chat is doing now. Its plan header\nwas stale relative to its evidence index. Refresh the actual documents when\ncoordination becomes necessary."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 101,
+        "endLine": 108,
+        "textDigest": "03b4d3a3d160d50acfe26488029d757de1de47315c19bd81df8ca04526b983bf",
+        "sample": "At the earlier read in this chat, its\n[current-cell](../../../../architect/agent-coordination/verification/architecture-advisory-panel/current-cell.md)\nsaid parked before P01.3, an",
+        "identityFingerprint": "8afbccc5cc213b787d5c5711f5798146da3a09fd1a591de8ff3741f501248b1d",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "text": "At the earlier read in this chat, its\n[current-cell](../../../../architect/agent-coordination/verification/architecture-advisory-panel/current-cell.md)\nsaid parked before P01.3, and its\n[index](../../../../architect/agent-coordination/verification/architecture-advisory-panel/index.md)\nrecorded P00.1, P01.1, and P01.2 done. Those are a snapshot of recorded track\nprogress, not a live claim about what the other chat is doing now. Its plan header\nwas stale relative to its evidence index. Refresh the actual documents when\ncoordination becomes necessary."
+      }
+    },
+    {
+      "claimId": "claim_85dc4a99df884eef40b2a7976ab784d7",
+      "sourceUnitDigest": "ffcdeb38e05e626ff6b0145a0410a73a2e8c791cc4ed7e4a008fbc04137c23a0",
+      "targetUnitDigest": "ffcdeb38e05e626ff6b0145a0410a73a2e8c791cc4ed7e4a008fbc04137c23a0",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_85dc4a99df884eef40b2a7976ab784d7",
+        "sourceUnitDigest": "ffcdeb38e05e626ff6b0145a0410a73a2e8c791cc4ed7e4a008fbc04137c23a0",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-13",
+        "targetUnitDigest": "ffcdeb38e05e626ff6b0145a0410a73a2e8c791cc4ed7e4a008fbc04137c23a0",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-10 (lines 86–88) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-13 (lines 110–112); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-10",
+        "githubAnchor": "unheaded-block-10",
+        "stableAnchor": "unheaded-block-10",
+        "title": "Unheaded block 10",
+        "startLine": 86,
+        "endLine": 88,
+        "textDigest": "ffcdeb38e05e626ff6b0145a0410a73a2e8c791cc4ed7e4a008fbc04137c23a0",
+        "sample": "Refreshed observation during the audit: P01.3 phases 1–8 are complete and the\ntrack awaits a real Phase 9 human reaction. This does not imply the other session\nis idle. No interven",
+        "identityFingerprint": "1f190d443a858f7614548b9ad84a4d22e3614d45a402fd054551ecb78ff53680",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "text": "Refreshed observation during the audit: P01.3 phases 1–8 are complete and the\ntrack awaits a real Phase 9 human reaction. This does not imply the other session\nis idle. No intervention or message was sent."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 110,
+        "endLine": 112,
+        "textDigest": "ffcdeb38e05e626ff6b0145a0410a73a2e8c791cc4ed7e4a008fbc04137c23a0",
+        "sample": "Refreshed observation during the audit: P01.3 phases 1–8 are complete and the\ntrack awaits a real Phase 9 human reaction. This does not imply the other session\nis idle. No interven",
+        "identityFingerprint": "1f190d443a858f7614548b9ad84a4d22e3614d45a402fd054551ecb78ff53680",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "text": "Refreshed observation during the audit: P01.3 phases 1–8 are complete and the\ntrack awaits a real Phase 9 human reaction. This does not imply the other session\nis idle. No intervention or message was sent."
+      }
+    },
+    {
+      "claimId": "claim_c3b95d25e51816104561a415e8fcfb7f",
+      "sourceUnitDigest": "80adad793c187b21ea171094ea7970d7c827d1df82e74fd932d42b6ff6e19fff",
+      "targetUnitDigest": "80adad793c187b21ea171094ea7970d7c827d1df82e74fd932d42b6ff6e19fff",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_c3b95d25e51816104561a415e8fcfb7f",
+        "sourceUnitDigest": "80adad793c187b21ea171094ea7970d7c827d1df82e74fd932d42b6ff6e19fff",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-14",
+        "targetUnitDigest": "80adad793c187b21ea171094ea7970d7c827d1df82e74fd932d42b6ff6e19fff",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "claimKind": "decision",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-11 (lines 90–98) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-14 (lines 114–122); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-11",
+        "githubAnchor": "unheaded-block-11",
+        "stableAnchor": "unheaded-block-11",
+        "title": "Unheaded block 11",
+        "startLine": 90,
+        "endLine": 98,
+        "textDigest": "80adad793c187b21ea171094ea7970d7c827d1df82e74fd932d42b6ff6e19fff",
+        "sample": "Division of work:\n\n- Other session: Advisory soul, manual clear/unclear-input proof, decision dialogue,\n  and its own authorized track work.\n- This chat: public dispatch/isolation ",
+        "identityFingerprint": "2d52890a7a6f6392979207137a9238954b325c577c76f9bf5b37beefd7454335",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "text": "Division of work:\n\n- Other session: Advisory soul, manual clear/unclear-input proof, decision dialogue,\n  and its own authorized track work.\n- This chat: public dispatch/isolation capability audit and small disposable\n  Code Panel probes about adaptation, authority, evidence, and resume.\n- Proposed convergence: Advisory P02 capability-fit audit, before shared-kernel/\n  protocol scope is fixed in P03. This is a recommendation, not a pause instruction\n  or a change imposed on the other session's plan."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 114,
+        "endLine": 122,
+        "textDigest": "80adad793c187b21ea171094ea7970d7c827d1df82e74fd932d42b6ff6e19fff",
+        "sample": "Division of work:\n\n- Other session: Advisory soul, manual clear/unclear-input proof, decision dialogue,\n  and its own authorized track work.\n- This chat: public dispatch/isolation ",
+        "identityFingerprint": "2d52890a7a6f6392979207137a9238954b325c577c76f9bf5b37beefd7454335",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "text": "Division of work:\n\n- Other session: Advisory soul, manual clear/unclear-input proof, decision dialogue,\n  and its own authorized track work.\n- This chat: public dispatch/isolation capability audit and small disposable\n  Code Panel probes about adaptation, authority, evidence, and resume.\n- Proposed convergence: Advisory P02 capability-fit audit, before shared-kernel/\n  protocol scope is fixed in P03. This is a recommendation, not a pause instruction\n  or a change imposed on the other session's plan."
+      }
+    },
+    {
+      "claimId": "claim_d677fe478b630b96165c68573c437985",
+      "sourceUnitDigest": "5530108b984c2442f03b0e5ab6edb84e1c3a62980cc2e2de18b235b88628e9af",
+      "targetUnitDigest": "5530108b984c2442f03b0e5ab6edb84e1c3a62980cc2e2de18b235b88628e9af",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_d677fe478b630b96165c68573c437985",
+        "sourceUnitDigest": "5530108b984c2442f03b0e5ab6edb84e1c3a62980cc2e2de18b235b88628e9af",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-15",
+        "targetUnitDigest": "5530108b984c2442f03b0e5ab6edb84e1c3a62980cc2e2de18b235b88628e9af",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-12 (lines 100–102) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-15 (lines 124–126); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-12",
+        "githubAnchor": "unheaded-block-12",
+        "stableAnchor": "unheaded-block-12",
+        "title": "Unheaded block 12",
+        "startLine": 100,
+        "endLine": 102,
+        "textDigest": "5530108b984c2442f03b0e5ab6edb84e1c3a62980cc2e2de18b235b88628e9af",
+        "sample": "Reuse its P00.1 executor and P01.2 manual-proof evidence within their actual scope.\nDo not rerun its human dialogue or use vnflow/mdview as adversarial targets. No\nmessage has been",
+        "identityFingerprint": "d3ef8a83eee89d94fca03bc865f856a4617cd6bfa3ff16c4a098f3617d480aa7",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "text": "Reuse its P00.1 executor and P01.2 manual-proof evidence within their actual scope.\nDo not rerun its human dialogue or use vnflow/mdview as adversarial targets. No\nmessage has been sent to the other session and no execution has been interrupted."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-15",
+        "githubAnchor": "unheaded-block-15",
+        "stableAnchor": "unheaded-block-15",
+        "title": "Unheaded block 15",
+        "startLine": 124,
+        "endLine": 126,
+        "textDigest": "5530108b984c2442f03b0e5ab6edb84e1c3a62980cc2e2de18b235b88628e9af",
+        "sample": "Reuse its P00.1 executor and P01.2 manual-proof evidence within their actual scope.\nDo not rerun its human dialogue or use vnflow/mdview as adversarial targets. No\nmessage has been",
+        "identityFingerprint": "d3ef8a83eee89d94fca03bc865f856a4617cd6bfa3ff16c4a098f3617d480aa7",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Concurrent Architecture Advisory session"
+        ],
+        "text": "Reuse its P00.1 executor and P01.2 manual-proof evidence within their actual scope.\nDo not rerun its human dialogue or use vnflow/mdview as adversarial targets. No\nmessage has been sent to the other session and no execution has been interrupted."
+      }
+    },
+    {
+      "claimId": "claim_3332f531b1319a0bb847e86e2313c3db",
+      "sourceUnitDigest": "44204ca32c5894f5a76f2638a3158f4a4f58100c81aec5c3cc793ee90a0f41d3",
+      "targetUnitDigest": "44204ca32c5894f5a76f2638a3158f4a4f58100c81aec5c3cc793ee90a0f41d3",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_3332f531b1319a0bb847e86e2313c3db",
+        "sourceUnitDigest": "44204ca32c5894f5a76f2638a3158f4a4f58100c81aec5c3cc793ee90a0f41d3",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "next-work-in-order",
+        "targetUnitDigest": "44204ca32c5894f5a76f2638a3158f4a4f58100c81aec5c3cc793ee90a0f41d3",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source heading docs/architect/proposals/coordination-envelope-progress.md#next-work-in-order (lines 104–104) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#next-work-in-order (lines 128–128); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Next work, in order",
+        "anchor": "next-work-in-order",
+        "githubAnchor": "next-work-in-order",
+        "stableAnchor": "h-a98c82fb4b23",
+        "startLine": 104,
+        "endLine": 104,
+        "textDigest": "44204ca32c5894f5a76f2638a3158f4a4f58100c81aec5c3cc793ee90a0f41d3",
+        "sample": "Next work, in order",
+        "sectionPayloadDigest": "df0a79bc0345946a3950e92445337e233d1eb5cb00e73f10d2d7fba9ce4e86db",
+        "followingBlockDigest": "f48be01fc5547f02b351abeb755ff6d038d729db32420a60e327a26184b55980",
+        "identityFingerprint": "7067122e554ff31eea3c98a19827972621522793cb70d2d13be98804682fe46f",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Next work, in order",
+        "sectionText": "## Next work, in order\n\n1. **Audit exact current public paths, read-only.** Inspect dispatch/recruitment,\n   context and credential exposure, identity, closure, and resume. Distinguish an\n   engine-internal primitive from a usable public capability. Recheck relevant\n   source changes since the initial review and reuse existing proof artifacts.\n2. **Write the capability-fit result.** For each probe requirement, record available\n   native behavior, supporting source/proof, uncertainty, and minimum missing seam.\n   Avoid choosing a kernel implementation before the evidence establishes need.\n3. **Prepare an isolated synthetic consumer fixture.** Freeze literal paths,\n   immutable source/runtime/config snapshots, role packets, bindings, evidence\n   ownership, and enforceable budget in a run manifest. Use synthetic secrets only.\n4. **Run the small probes that are genuinely ready.** First establish containment\n   before adversarial execution. Every dispatch follows `dispatch decide` and its\n   returned mechanism. Keep evidence outside the Advisory verification directory.\n5. **Report native pass, native failure, prototype-only, or unproven.** Do not build\n   a private runtime and present its result as native fgOS capability. If shared\n   production changes are necessary, stop those dependent experiments, document\n   the gap, and continue independent checks.\n6. **Converge before implementation planning.** Compare with the Advisory track's\n   observations and reconcile shared-file ownership and architecture assumptions.\n   Only then define a concrete reviewed implementation scope if justified.\n\nSteps 1–2, the worker/provider/control sketch, and the Coordination ↔ Dispatch\ncontract now have outputs. Visibility/herdr/contact is explicitly removed from\nthis thread and deferred to a separate discussion. The next question is whether\nadaptive Coordination can lower a new specialist request through the ordinary\nDispatch path, including its `in-process` branch, with complete lineage, bounds,\nretry/recheck semantics, and evidence. The conceptual coordinator-facing port is\nnow specified, but no public API or production implementation is accepted.\nProvider compatibility remains unverified."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Next work, in order",
+        "anchor": "next-work-in-order",
+        "githubAnchor": "next-work-in-order",
+        "stableAnchor": "h-884686717c9d",
+        "startLine": 128,
+        "endLine": 128,
+        "textDigest": "44204ca32c5894f5a76f2638a3158f4a4f58100c81aec5c3cc793ee90a0f41d3",
+        "sample": "Next work, in order",
+        "sectionPayloadDigest": "df0a79bc0345946a3950e92445337e233d1eb5cb00e73f10d2d7fba9ce4e86db",
+        "followingBlockDigest": "f48be01fc5547f02b351abeb755ff6d038d729db32420a60e327a26184b55980",
+        "identityFingerprint": "7067122e554ff31eea3c98a19827972621522793cb70d2d13be98804682fe46f",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Next work, in order",
+        "sectionText": "## Next work, in order\n\n1. **Audit exact current public paths, read-only.** Inspect dispatch/recruitment,\n   context and credential exposure, identity, closure, and resume. Distinguish an\n   engine-internal primitive from a usable public capability. Recheck relevant\n   source changes since the initial review and reuse existing proof artifacts.\n2. **Write the capability-fit result.** For each probe requirement, record available\n   native behavior, supporting source/proof, uncertainty, and minimum missing seam.\n   Avoid choosing a kernel implementation before the evidence establishes need.\n3. **Prepare an isolated synthetic consumer fixture.** Freeze literal paths,\n   immutable source/runtime/config snapshots, role packets, bindings, evidence\n   ownership, and enforceable budget in a run manifest. Use synthetic secrets only.\n4. **Run the small probes that are genuinely ready.** First establish containment\n   before adversarial execution. Every dispatch follows `dispatch decide` and its\n   returned mechanism. Keep evidence outside the Advisory verification directory.\n5. **Report native pass, native failure, prototype-only, or unproven.** Do not build\n   a private runtime and present its result as native fgOS capability. If shared\n   production changes are necessary, stop those dependent experiments, document\n   the gap, and continue independent checks.\n6. **Converge before implementation planning.** Compare with the Advisory track's\n   observations and reconcile shared-file ownership and architecture assumptions.\n   Only then define a concrete reviewed implementation scope if justified.\n\nSteps 1–2, the worker/provider/control sketch, and the Coordination ↔ Dispatch\ncontract now have outputs. Visibility/herdr/contact is explicitly removed from\nthis thread and deferred to a separate discussion. The next question is whether\nadaptive Coordination can lower a new specialist request through the ordinary\nDispatch path, including its `in-process` branch, with complete lineage, bounds,\nretry/recheck semantics, and evidence. The conceptual coordinator-facing port is\nnow specified, but no public API or production implementation is accepted.\nProvider compatibility remains unverified."
+      }
+    },
+    {
+      "claimId": "claim_6ea114423a531fe42b578513d5ce4671",
+      "sourceUnitDigest": "f48be01fc5547f02b351abeb755ff6d038d729db32420a60e327a26184b55980",
+      "targetUnitDigest": "f48be01fc5547f02b351abeb755ff6d038d729db32420a60e327a26184b55980",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_6ea114423a531fe42b578513d5ce4671",
+        "sourceUnitDigest": "f48be01fc5547f02b351abeb755ff6d038d729db32420a60e327a26184b55980",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-16",
+        "targetUnitDigest": "f48be01fc5547f02b351abeb755ff6d038d729db32420a60e327a26184b55980",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Next work, in order"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-13 (lines 106–125) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-16 (lines 130–149); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-13",
+        "githubAnchor": "unheaded-block-13",
+        "stableAnchor": "unheaded-block-13",
+        "title": "Unheaded block 13",
+        "startLine": 106,
+        "endLine": 125,
+        "textDigest": "f48be01fc5547f02b351abeb755ff6d038d729db32420a60e327a26184b55980",
+        "sample": "1. **Audit exact current public paths, read-only.** Inspect dispatch/recruitment,\n   context and credential exposure, identity, closure, and resume. Distinguish an\n   engine-intern",
+        "identityFingerprint": "a208fe5c21a8cfee61082ac4d8cb6e7dc9a3323425d97c12ffb12d67d003625d",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Next work, in order"
+        ],
+        "text": "1. **Audit exact current public paths, read-only.** Inspect dispatch/recruitment,\n   context and credential exposure, identity, closure, and resume. Distinguish an\n   engine-internal primitive from a usable public capability. Recheck relevant\n   source changes since the initial review and reuse existing proof artifacts.\n2. **Write the capability-fit result.** For each probe requirement, record available\n   native behavior, supporting source/proof, uncertainty, and minimum missing seam.\n   Avoid choosing a kernel implementation before the evidence establishes need.\n3. **Prepare an isolated synthetic consumer fixture.** Freeze literal paths,\n   immutable source/runtime/config snapshots, role packets, bindings, evidence\n   ownership, and enforceable budget in a run manifest. Use synthetic secrets only.\n4. **Run the small probes that are genuinely ready.** First establish containment\n   before adversarial execution. Every dispatch follows `dispatch decide` and its\n   returned mechanism. Keep evidence outside the Advisory verification directory.\n5. **Report native pass, native failure, prototype-only, or unproven.** Do not build\n   a private runtime and present its result as native fgOS capability. If shared\n   production changes are necessary, stop those dependent experiments, document\n   the gap, and continue independent checks.\n6. **Converge before implementation planning.** Compare with the Advisory track's\n   observations and reconcile shared-file ownership and architecture assumptions.\n   Only then define a concrete reviewed implementation scope if justified."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-16",
+        "githubAnchor": "unheaded-block-16",
+        "stableAnchor": "unheaded-block-16",
+        "title": "Unheaded block 16",
+        "startLine": 130,
+        "endLine": 149,
+        "textDigest": "f48be01fc5547f02b351abeb755ff6d038d729db32420a60e327a26184b55980",
+        "sample": "1. **Audit exact current public paths, read-only.** Inspect dispatch/recruitment,\n   context and credential exposure, identity, closure, and resume. Distinguish an\n   engine-intern",
+        "identityFingerprint": "a208fe5c21a8cfee61082ac4d8cb6e7dc9a3323425d97c12ffb12d67d003625d",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Next work, in order"
+        ],
+        "text": "1. **Audit exact current public paths, read-only.** Inspect dispatch/recruitment,\n   context and credential exposure, identity, closure, and resume. Distinguish an\n   engine-internal primitive from a usable public capability. Recheck relevant\n   source changes since the initial review and reuse existing proof artifacts.\n2. **Write the capability-fit result.** For each probe requirement, record available\n   native behavior, supporting source/proof, uncertainty, and minimum missing seam.\n   Avoid choosing a kernel implementation before the evidence establishes need.\n3. **Prepare an isolated synthetic consumer fixture.** Freeze literal paths,\n   immutable source/runtime/config snapshots, role packets, bindings, evidence\n   ownership, and enforceable budget in a run manifest. Use synthetic secrets only.\n4. **Run the small probes that are genuinely ready.** First establish containment\n   before adversarial execution. Every dispatch follows `dispatch decide` and its\n   returned mechanism. Keep evidence outside the Advisory verification directory.\n5. **Report native pass, native failure, prototype-only, or unproven.** Do not build\n   a private runtime and present its result as native fgOS capability. If shared\n   production changes are necessary, stop those dependent experiments, document\n   the gap, and continue independent checks.\n6. **Converge before implementation planning.** Compare with the Advisory track's\n   observations and reconcile shared-file ownership and architecture assumptions.\n   Only then define a concrete reviewed implementation scope if justified."
+      }
+    },
+    {
+      "claimId": "claim_9e5f434fafffb26a816449838283799b",
+      "sourceUnitDigest": "566f8fb0e8e18630f87ec146eebfc7d2970aa09da399926727fe23f59c6a78c6",
+      "targetUnitDigest": "566f8fb0e8e18630f87ec146eebfc7d2970aa09da399926727fe23f59c6a78c6",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_9e5f434fafffb26a816449838283799b",
+        "sourceUnitDigest": "566f8fb0e8e18630f87ec146eebfc7d2970aa09da399926727fe23f59c6a78c6",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-17",
+        "targetUnitDigest": "566f8fb0e8e18630f87ec146eebfc7d2970aa09da399926727fe23f59c6a78c6",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Next work, in order"
+        ],
+        "claimKind": "contract",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-14 (lines 127–134) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-17 (lines 151–158); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-14",
+        "githubAnchor": "unheaded-block-14",
+        "stableAnchor": "unheaded-block-14",
+        "title": "Unheaded block 14",
+        "startLine": 127,
+        "endLine": 134,
+        "textDigest": "566f8fb0e8e18630f87ec146eebfc7d2970aa09da399926727fe23f59c6a78c6",
+        "sample": "Steps 1–2, the worker/provider/control sketch, and the Coordination ↔ Dispatch\ncontract now have outputs. Visibility/herdr/contact is explicitly removed from\nthis thread and deferr",
+        "identityFingerprint": "0a8f59f8dedb0cf70063732a3d8977d826b8073692b8e48770540c1e208ba8c2",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Next work, in order"
+        ],
+        "text": "Steps 1–2, the worker/provider/control sketch, and the Coordination ↔ Dispatch\ncontract now have outputs. Visibility/herdr/contact is explicitly removed from\nthis thread and deferred to a separate discussion. The next question is whether\nadaptive Coordination can lower a new specialist request through the ordinary\nDispatch path, including its `in-process` branch, with complete lineage, bounds,\nretry/recheck semantics, and evidence. The conceptual coordinator-facing port is\nnow specified, but no public API or production implementation is accepted.\nProvider compatibility remains unverified."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-17",
+        "githubAnchor": "unheaded-block-17",
+        "stableAnchor": "unheaded-block-17",
+        "title": "Unheaded block 17",
+        "startLine": 151,
+        "endLine": 158,
+        "textDigest": "566f8fb0e8e18630f87ec146eebfc7d2970aa09da399926727fe23f59c6a78c6",
+        "sample": "Steps 1–2, the worker/provider/control sketch, and the Coordination ↔ Dispatch\ncontract now have outputs. Visibility/herdr/contact is explicitly removed from\nthis thread and deferr",
+        "identityFingerprint": "0a8f59f8dedb0cf70063732a3d8977d826b8073692b8e48770540c1e208ba8c2",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Next work, in order"
+        ],
+        "text": "Steps 1–2, the worker/provider/control sketch, and the Coordination ↔ Dispatch\ncontract now have outputs. Visibility/herdr/contact is explicitly removed from\nthis thread and deferred to a separate discussion. The next question is whether\nadaptive Coordination can lower a new specialist request through the ordinary\nDispatch path, including its `in-process` branch, with complete lineage, bounds,\nretry/recheck semantics, and evidence. The conceptual coordinator-facing port is\nnow specified, but no public API or production implementation is accepted.\nProvider compatibility remains unverified."
+      }
+    },
+    {
+      "claimId": "claim_23b1e8deb2b5fde4626bafdfea4b89d4",
+      "sourceUnitDigest": "a2e345fd88b0b787c3c9b1a3b1c26b7527c77cad237c726649147e00f2697109",
+      "targetUnitDigest": "a2e345fd88b0b787c3c9b1a3b1c26b7527c77cad237c726649147e00f2697109",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_23b1e8deb2b5fde4626bafdfea4b89d4",
+        "sourceUnitDigest": "a2e345fd88b0b787c3c9b1a3b1c26b7527c77cad237c726649147e00f2697109",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "work-boundaries-and-completion-criteria",
+        "targetUnitDigest": "a2e345fd88b0b787c3c9b1a3b1c26b7527c77cad237c726649147e00f2697109",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source heading docs/architect/proposals/coordination-envelope-progress.md#work-boundaries-and-completion-criteria (lines 136–136) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#work-boundaries-and-completion-criteria (lines 160–160); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Work boundaries and completion criteria",
+        "anchor": "work-boundaries-and-completion-criteria",
+        "githubAnchor": "work-boundaries-and-completion-criteria",
+        "stableAnchor": "h-c19ca0ba90ff",
+        "startLine": 136,
+        "endLine": 136,
+        "textDigest": "a2e345fd88b0b787c3c9b1a3b1c26b7527c77cad237c726649147e00f2697109",
+        "sample": "Work boundaries and completion criteria",
+        "sectionPayloadDigest": "6a04e67504cc45fd172577896b1f6d65c79e32be6674563285de21b064e38de3",
+        "followingBlockDigest": "3f20182619fbbd49f10a77e3ae1235b477fd89e3381ee3a50fd988128cf9ff2d",
+        "identityFingerprint": "37e56d2d7438e92992fab8a1bbb79470cda741fc591de7a65d73fb11100e754c",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Work boundaries and completion criteria",
+        "sectionText": "## Work boundaries and completion criteria\n\nThis chat also owns its separate evidence directory:\n`docs/architect/agent-coordination/verification/coordination-envelope/`.\n\nThis chat currently maintains:\n\n- `docs/architect/proposals/coordination-capability-envelope.md`\n- `docs/architect/proposals/coordination-envelope-probe-contract.md`\n- `docs/architect/proposals/coordination-envelope-progress.md`\n- `docs/architect/proposals/coordination-worker-provider-boundary.md`\n- `docs/architect/proposals/coordination-dispatch-contract.md`\n\nEarlier navigation edits added links in the proposal index, Agent Coordination\nportal, and Advisory proposal. They do not change accepted authority. Preserve\nother sessions' edits and avoid further shared-portal changes unless needed.\n\nDo not modify the other track's plan, current-cell/index, soul/playbook, evidence,\nproduction config, or runtime files as part of the read-only audit. Before later\nshared implementation, refresh track state and agree non-overlapping file scope;\na separate worktree alone does not resolve design or shared-runtime conflicts.\n\nThe investigation is done when a fresh reader can identify what works through\nnative public paths, what fails with reproducible evidence, what remains unproven,\nand whether the envelope recommendation deserves implementation. A proposed\narchitecture or successful documentation check is not that result."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Work boundaries and completion criteria",
+        "anchor": "work-boundaries-and-completion-criteria",
+        "githubAnchor": "work-boundaries-and-completion-criteria",
+        "stableAnchor": "h-02a10bb6645c",
+        "startLine": 160,
+        "endLine": 160,
+        "textDigest": "a2e345fd88b0b787c3c9b1a3b1c26b7527c77cad237c726649147e00f2697109",
+        "sample": "Work boundaries and completion criteria",
+        "sectionPayloadDigest": "6a04e67504cc45fd172577896b1f6d65c79e32be6674563285de21b064e38de3",
+        "followingBlockDigest": "3f20182619fbbd49f10a77e3ae1235b477fd89e3381ee3a50fd988128cf9ff2d",
+        "identityFingerprint": "37e56d2d7438e92992fab8a1bbb79470cda741fc591de7a65d73fb11100e754c",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work"
+        ],
+        "text": "## Work boundaries and completion criteria",
+        "sectionText": "## Work boundaries and completion criteria\n\nThis chat also owns its separate evidence directory:\n`docs/architect/agent-coordination/verification/coordination-envelope/`.\n\nThis chat currently maintains:\n\n- `docs/architect/proposals/coordination-capability-envelope.md`\n- `docs/architect/proposals/coordination-envelope-probe-contract.md`\n- `docs/architect/proposals/coordination-envelope-progress.md`\n- `docs/architect/proposals/coordination-worker-provider-boundary.md`\n- `docs/architect/proposals/coordination-dispatch-contract.md`\n\nEarlier navigation edits added links in the proposal index, Agent Coordination\nportal, and Advisory proposal. They do not change accepted authority. Preserve\nother sessions' edits and avoid further shared-portal changes unless needed.\n\nDo not modify the other track's plan, current-cell/index, soul/playbook, evidence,\nproduction config, or runtime files as part of the read-only audit. Before later\nshared implementation, refresh track state and agree non-overlapping file scope;\na separate worktree alone does not resolve design or shared-runtime conflicts.\n\nThe investigation is done when a fresh reader can identify what works through\nnative public paths, what fails with reproducible evidence, what remains unproven,\nand whether the envelope recommendation deserves implementation. A proposed\narchitecture or successful documentation check is not that result."
+      }
+    },
+    {
+      "claimId": "claim_b69d053fd6963e7357fdb8071bd241a1",
+      "sourceUnitDigest": "3f20182619fbbd49f10a77e3ae1235b477fd89e3381ee3a50fd988128cf9ff2d",
+      "targetUnitDigest": "3f20182619fbbd49f10a77e3ae1235b477fd89e3381ee3a50fd988128cf9ff2d",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_b69d053fd6963e7357fdb8071bd241a1",
+        "sourceUnitDigest": "3f20182619fbbd49f10a77e3ae1235b477fd89e3381ee3a50fd988128cf9ff2d",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-18",
+        "targetUnitDigest": "3f20182619fbbd49f10a77e3ae1235b477fd89e3381ee3a50fd988128cf9ff2d",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-15 (lines 138–139) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-18 (lines 162–163); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-15",
+        "githubAnchor": "unheaded-block-15",
+        "stableAnchor": "unheaded-block-15",
+        "title": "Unheaded block 15",
+        "startLine": 138,
+        "endLine": 139,
+        "textDigest": "3f20182619fbbd49f10a77e3ae1235b477fd89e3381ee3a50fd988128cf9ff2d",
+        "sample": "This chat also owns its separate evidence directory:\n`docs/architect/agent-coordination/verification/coordination-envelope/`.",
+        "identityFingerprint": "04e0e509f315d1cb0307a6468008152ff4868444457781203eb2461d0311f3d2",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "This chat also owns its separate evidence directory:\n`docs/architect/agent-coordination/verification/coordination-envelope/`."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-18",
+        "githubAnchor": "unheaded-block-18",
+        "stableAnchor": "unheaded-block-18",
+        "title": "Unheaded block 18",
+        "startLine": 162,
+        "endLine": 163,
+        "textDigest": "3f20182619fbbd49f10a77e3ae1235b477fd89e3381ee3a50fd988128cf9ff2d",
+        "sample": "This chat also owns its separate evidence directory:\n`docs/architect/agent-coordination/verification/coordination-envelope/`.",
+        "identityFingerprint": "04e0e509f315d1cb0307a6468008152ff4868444457781203eb2461d0311f3d2",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "This chat also owns its separate evidence directory:\n`docs/architect/agent-coordination/verification/coordination-envelope/`."
+      }
+    },
+    {
+      "claimId": "claim_7e8b4b6b1bc65bc8f43258c17ce4b128",
+      "sourceUnitDigest": "e82f31944e0bb3c36f173cfbc71c8300b0a28d559f38097cce03f0c4885901e7",
+      "targetUnitDigest": "e82f31944e0bb3c36f173cfbc71c8300b0a28d559f38097cce03f0c4885901e7",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_7e8b4b6b1bc65bc8f43258c17ce4b128",
+        "sourceUnitDigest": "e82f31944e0bb3c36f173cfbc71c8300b0a28d559f38097cce03f0c4885901e7",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-19",
+        "targetUnitDigest": "e82f31944e0bb3c36f173cfbc71c8300b0a28d559f38097cce03f0c4885901e7",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-16 (lines 141–141) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-19 (lines 165–165); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-16",
+        "githubAnchor": "unheaded-block-16",
+        "stableAnchor": "unheaded-block-16",
+        "title": "Unheaded block 16",
+        "startLine": 141,
+        "endLine": 141,
+        "textDigest": "e82f31944e0bb3c36f173cfbc71c8300b0a28d559f38097cce03f0c4885901e7",
+        "sample": "This chat currently maintains:",
+        "identityFingerprint": "6e4c0f4201929a282f118a83ff9a89c05a894922eeb6e971ccd5cbaf02870d32",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "This chat currently maintains:"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-19",
+        "githubAnchor": "unheaded-block-19",
+        "stableAnchor": "unheaded-block-19",
+        "title": "Unheaded block 19",
+        "startLine": 165,
+        "endLine": 165,
+        "textDigest": "e82f31944e0bb3c36f173cfbc71c8300b0a28d559f38097cce03f0c4885901e7",
+        "sample": "This chat currently maintains:",
+        "identityFingerprint": "6e4c0f4201929a282f118a83ff9a89c05a894922eeb6e971ccd5cbaf02870d32",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "This chat currently maintains:"
+      }
+    },
+    {
+      "claimId": "claim_fc852966e0404556294685861ce5875f",
+      "sourceUnitDigest": "80fca8f527fb81baf04799f29678a1f77f7b0e5bff1cf95a81166e9132ffb275",
+      "targetUnitDigest": "80fca8f527fb81baf04799f29678a1f77f7b0e5bff1cf95a81166e9132ffb275",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_fc852966e0404556294685861ce5875f",
+        "sourceUnitDigest": "80fca8f527fb81baf04799f29678a1f77f7b0e5bff1cf95a81166e9132ffb275",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-20",
+        "targetUnitDigest": "80fca8f527fb81baf04799f29678a1f77f7b0e5bff1cf95a81166e9132ffb275",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "claimKind": "contract",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-17 (lines 143–147) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-20 (lines 167–171); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-17",
+        "githubAnchor": "unheaded-block-17",
+        "stableAnchor": "unheaded-block-17",
+        "title": "Unheaded block 17",
+        "startLine": 143,
+        "endLine": 147,
+        "textDigest": "80fca8f527fb81baf04799f29678a1f77f7b0e5bff1cf95a81166e9132ffb275",
+        "sample": "- `docs/architect/proposals/coordination-capability-envelope.md`\n- `docs/architect/proposals/coordination-envelope-probe-contract.md`\n- `docs/architect/proposals/coordination-envel",
+        "identityFingerprint": "6bf62fc70a0bfd3442ed2f2d04fb2a355915b4003de7222f03d5e16038427ac7",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "- `docs/architect/proposals/coordination-capability-envelope.md`\n- `docs/architect/proposals/coordination-envelope-probe-contract.md`\n- `docs/architect/proposals/coordination-envelope-progress.md`\n- `docs/architect/proposals/coordination-worker-provider-boundary.md`\n- `docs/architect/proposals/coordination-dispatch-contract.md`"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-20",
+        "githubAnchor": "unheaded-block-20",
+        "stableAnchor": "unheaded-block-20",
+        "title": "Unheaded block 20",
+        "startLine": 167,
+        "endLine": 171,
+        "textDigest": "80fca8f527fb81baf04799f29678a1f77f7b0e5bff1cf95a81166e9132ffb275",
+        "sample": "- `docs/architect/proposals/coordination-capability-envelope.md`\n- `docs/architect/proposals/coordination-envelope-probe-contract.md`\n- `docs/architect/proposals/coordination-envel",
+        "identityFingerprint": "6bf62fc70a0bfd3442ed2f2d04fb2a355915b4003de7222f03d5e16038427ac7",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "- `docs/architect/proposals/coordination-capability-envelope.md`\n- `docs/architect/proposals/coordination-envelope-probe-contract.md`\n- `docs/architect/proposals/coordination-envelope-progress.md`\n- `docs/architect/proposals/coordination-worker-provider-boundary.md`\n- `docs/architect/proposals/coordination-dispatch-contract.md`"
+      }
+    },
+    {
+      "claimId": "claim_59256dda58235ff69e5d3d7b8e9a3c7b",
+      "sourceUnitDigest": "b5376d9f17d5943707bab13f8a3790e01584dd1dc658d1122dc1bb1444e40960",
+      "targetUnitDigest": "b5376d9f17d5943707bab13f8a3790e01584dd1dc658d1122dc1bb1444e40960",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_59256dda58235ff69e5d3d7b8e9a3c7b",
+        "sourceUnitDigest": "b5376d9f17d5943707bab13f8a3790e01584dd1dc658d1122dc1bb1444e40960",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-21",
+        "targetUnitDigest": "b5376d9f17d5943707bab13f8a3790e01584dd1dc658d1122dc1bb1444e40960",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-18 (lines 149–151) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-21 (lines 173–175); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-18",
+        "githubAnchor": "unheaded-block-18",
+        "stableAnchor": "unheaded-block-18",
+        "title": "Unheaded block 18",
+        "startLine": 149,
+        "endLine": 151,
+        "textDigest": "b5376d9f17d5943707bab13f8a3790e01584dd1dc658d1122dc1bb1444e40960",
+        "sample": "Earlier navigation edits added links in the proposal index, Agent Coordination\nportal, and Advisory proposal. They do not change accepted authority. Preserve\nother sessions' edits ",
+        "identityFingerprint": "e7b615b8978fecb4bd8f1d2b74510ee965a7cf492045cf0dddd90138a0dbff22",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "Earlier navigation edits added links in the proposal index, Agent Coordination\nportal, and Advisory proposal. They do not change accepted authority. Preserve\nother sessions' edits and avoid further shared-portal changes unless needed."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-21",
+        "githubAnchor": "unheaded-block-21",
+        "stableAnchor": "unheaded-block-21",
+        "title": "Unheaded block 21",
+        "startLine": 173,
+        "endLine": 175,
+        "textDigest": "b5376d9f17d5943707bab13f8a3790e01584dd1dc658d1122dc1bb1444e40960",
+        "sample": "Earlier navigation edits added links in the proposal index, Agent Coordination\nportal, and Advisory proposal. They do not change accepted authority. Preserve\nother sessions' edits ",
+        "identityFingerprint": "e7b615b8978fecb4bd8f1d2b74510ee965a7cf492045cf0dddd90138a0dbff22",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "Earlier navigation edits added links in the proposal index, Agent Coordination\nportal, and Advisory proposal. They do not change accepted authority. Preserve\nother sessions' edits and avoid further shared-portal changes unless needed."
+      }
+    },
+    {
+      "claimId": "claim_82d991000f182ef2c6815d8328b63d0c",
+      "sourceUnitDigest": "888d094d8c58d5807b22d2981994600f778a094a0bac8e8af99f90c74b402dc1",
+      "targetUnitDigest": "888d094d8c58d5807b22d2981994600f778a094a0bac8e8af99f90c74b402dc1",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_82d991000f182ef2c6815d8328b63d0c",
+        "sourceUnitDigest": "888d094d8c58d5807b22d2981994600f778a094a0bac8e8af99f90c74b402dc1",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-22",
+        "targetUnitDigest": "888d094d8c58d5807b22d2981994600f778a094a0bac8e8af99f90c74b402dc1",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-19 (lines 153–156) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-22 (lines 177–180); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-19",
+        "githubAnchor": "unheaded-block-19",
+        "stableAnchor": "unheaded-block-19",
+        "title": "Unheaded block 19",
+        "startLine": 153,
+        "endLine": 156,
+        "textDigest": "888d094d8c58d5807b22d2981994600f778a094a0bac8e8af99f90c74b402dc1",
+        "sample": "Do not modify the other track's plan, current-cell/index, soul/playbook, evidence,\nproduction config, or runtime files as part of the read-only audit. Before later\nshared implement",
+        "identityFingerprint": "72187b2dca67d67afd644494bf5eba2d44f90871f7534e4f3f39bfe886051f64",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "Do not modify the other track's plan, current-cell/index, soul/playbook, evidence,\nproduction config, or runtime files as part of the read-only audit. Before later\nshared implementation, refresh track state and agree non-overlapping file scope;\na separate worktree alone does not resolve design or shared-runtime conflicts."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-22",
+        "githubAnchor": "unheaded-block-22",
+        "stableAnchor": "unheaded-block-22",
+        "title": "Unheaded block 22",
+        "startLine": 177,
+        "endLine": 180,
+        "textDigest": "888d094d8c58d5807b22d2981994600f778a094a0bac8e8af99f90c74b402dc1",
+        "sample": "Do not modify the other track's plan, current-cell/index, soul/playbook, evidence,\nproduction config, or runtime files as part of the read-only audit. Before later\nshared implement",
+        "identityFingerprint": "72187b2dca67d67afd644494bf5eba2d44f90871f7534e4f3f39bfe886051f64",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "Do not modify the other track's plan, current-cell/index, soul/playbook, evidence,\nproduction config, or runtime files as part of the read-only audit. Before later\nshared implementation, refresh track state and agree non-overlapping file scope;\na separate worktree alone does not resolve design or shared-runtime conflicts."
+      }
+    },
+    {
+      "claimId": "claim_c3318b60df0d409823e055c05d3f828c",
+      "sourceUnitDigest": "d4277d1406151c1ca1c96445d0efe6b0df145c32b4a490f24f31312e46db025b",
+      "targetUnitDigest": "d4277d1406151c1ca1c96445d0efe6b0df145c32b4a490f24f31312e46db025b",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_c3318b60df0d409823e055c05d3f828c",
+        "sourceUnitDigest": "d4277d1406151c1ca1c96445d0efe6b0df145c32b4a490f24f31312e46db025b",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "targetAnchor": "unheaded-block-23",
+        "targetUnitDigest": "d4277d1406151c1ca1c96445d0efe6b0df145c32b4a490f24f31312e46db025b",
+        "targetAncestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the dated handoff with provenance. Shared terms in code are not a consumer of this chat state; nothing is deleted or silently marked complete. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 26–48 records a dated capability-fit audit, OS-only checks and unbuilt fixture. Source Concurrent Architecture Advisory session and Next work describe that chat, not a reusable current contract. Required-root references are ratchet only. Live proposals 9, 10 and 13 cite this dated status pointer; these links consume provenance/next-work context, not an accepted current contract. Preserve and queue their navigation explicitly. Complete source unheaded-block docs/architect/proposals/coordination-envelope-progress.md#unheaded-block-20 (lines 158–161) is carried at docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md#unheaded-block-23 (lines 182–185); Q3 per-file map override: docs/platform/proposals/coordination-envelope-progress.md → docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-20",
+        "githubAnchor": "unheaded-block-20",
+        "stableAnchor": "unheaded-block-20",
+        "title": "Unheaded block 20",
+        "startLine": 158,
+        "endLine": 161,
+        "textDigest": "d4277d1406151c1ca1c96445d0efe6b0df145c32b4a490f24f31312e46db025b",
+        "sample": "The investigation is done when a fresh reader can identify what works through\nnative public paths, what fails with reproducible evidence, what remains unproven,\nand whether the env",
+        "identityFingerprint": "140476607965995b1538d079fd5ff7a9f2cdce2a2e084d1959ed18bf2c46b18e",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "The investigation is done when a fresh reader can identify what works through\nnative public paths, what fails with reproducible evidence, what remains unproven,\nand whether the envelope recommendation deserves implementation. A proposed\narchitecture or successful documentation check is not that result."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-23",
+        "githubAnchor": "unheaded-block-23",
+        "stableAnchor": "unheaded-block-23",
+        "title": "Unheaded block 23",
+        "startLine": 182,
+        "endLine": 185,
+        "textDigest": "d4277d1406151c1ca1c96445d0efe6b0df145c32b4a490f24f31312e46db025b",
+        "sample": "The investigation is done when a fresh reader can identify what works through\nnative public paths, what fails with reproducible evidence, what remains unproven,\nand whether the env",
+        "identityFingerprint": "140476607965995b1538d079fd5ff7a9f2cdce2a2e084d1959ed18bf2c46b18e",
+        "ancestry": [
+          "Coordination Envelope — Chat Progress and Next Work",
+          "Work boundaries and completion criteria"
+        ],
+        "text": "The investigation is done when a fresh reader can identify what works through\nnative public paths, what fails with reproducible evidence, what remains unproven,\nand whether the envelope recommendation deserves implementation. A proposed\narchitecture or successful documentation check is not that result."
+      }
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "originalShardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-12-coordination-envelope-progress.json",
+  "originalShardSHA256": "d92f5402f0a7ee64218abefd4bb486c4d54dcf490c2e0269c1e80ed52939d25e",
+  "part": 1,
+  "parts": 1,
+  "completeSourceRowCount": 27,
+  "gateFindings": [],
+  "scope": "Source rows only; complete reverse population is in the separate native candidate request.",
+  "a36": {
+    "gateFindings": [],
+    "requestPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1110-proposals-redesigns-source-12-01-0f063d18f.md",
+    "packPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-12-01-0f063d18f.md",
+    "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-12-01-0f063d18f.md.json",
+    "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-12-coordination-envelope-progress.json",
+    "source": "docs/architect/proposals/coordination-envelope-progress.md",
+    "part": 1,
+    "parts": 1,
+    "count": 27,
+    "classes": {
+      "Judgment": 6,
+      "Unit-exact": 17,
+      "Weak-exact": 4
+    },
+    "weakExactAndJudgment": [
+      "claim_00d0fa7ca76d53660e15ea5391ed02a0",
+      "claim_05b6464d12e63da61fdeb9a2e9a5fbf6",
+      "claim_01e0090f579828803f2cb562581c3082",
+      "claim_65021dcb7c3ea73210796a5d84020d3a",
+      "claim_97aef0a406ee921e9d5e1d227e8b5462",
+      "claim_3a040470917c6d0cb40a134d591d5bf4",
+      "claim_325ddcbd008ffa2e60f96c472efde2b2",
+      "claim_bab99fcb7080b712c5a816021d87893c",
+      "claim_3332f531b1319a0bb847e86e2313c3db",
+      "claim_7e8b4b6b1bc65bc8f43258c17ce4b128"
+    ],
+    "reviewerDeepSampleMinimum": 10,
+    "mandatoryDifferingDigestRows": [
+      "claim_00d0fa7ca76d53660e15ea5391ed02a0",
+      "claim_01e0090f579828803f2cb562581c3082",
+      "claim_65021dcb7c3ea73210796a5d84020d3a",
+      "claim_97aef0a406ee921e9d5e1d227e8b5462",
+      "claim_325ddcbd008ffa2e60f96c472efde2b2",
+      "claim_bab99fcb7080b712c5a816021d87893c"
+    ],
+    "absentTargetRows": [],
+    "changedByContentCommit": [
+      "claim_00d0fa7ca76d53660e15ea5391ed02a0",
+      "claim_3c532c060e9ea8e44f6263660e741ca6",
+      "claim_05b6464d12e63da61fdeb9a2e9a5fbf6",
+      "claim_c8708ca9bb773cd3c3af2533a7601c4c",
+      "claim_30fe6113bbab5f495ea8f0dffd64b51f",
+      "claim_01e0090f579828803f2cb562581c3082",
+      "claim_65021dcb7c3ea73210796a5d84020d3a",
+      "claim_97aef0a406ee921e9d5e1d227e8b5462",
+      "claim_a770d483907e685ceb725ec563a93200",
+      "claim_3a040470917c6d0cb40a134d591d5bf4",
+      "claim_c29f41965f1bfe0297c06ccb71b52b83",
+      "claim_325ddcbd008ffa2e60f96c472efde2b2",
+      "claim_a3df8ff955b4f5e40f7be6c15c73e019",
+      "claim_bab99fcb7080b712c5a816021d87893c",
+      "claim_85dc4a99df884eef40b2a7976ab784d7",
+      "claim_c3b95d25e51816104561a415e8fcfb7f",
+      "claim_d677fe478b630b96165c68573c437985",
+      "claim_3332f531b1319a0bb847e86e2313c3db",
+      "claim_6ea114423a531fe42b578513d5ce4671",
+      "claim_9e5f434fafffb26a816449838283799b",
+      "claim_23b1e8deb2b5fde4626bafdfea4b89d4",
+      "claim_b69d053fd6963e7357fdb8071bd241a1",
+      "claim_7e8b4b6b1bc65bc8f43258c17ce4b128",
+      "claim_fc852966e0404556294685861ce5875f",
+      "claim_59256dda58235ff69e5d3d7b8e9a3c7b",
+      "claim_82d991000f182ef2c6815d8328b63d0c",
+      "claim_c3318b60df0d409823e055c05d3f828c"
+    ]
+  },
+  "fullShownTextBindings": [
+    {
+      "claimId": "claim_00d0fa7ca76d53660e15ea5391ed02a0",
+      "sourceShownTextDigest": "c45eabcced8d9aa3eff485b84e4e653134212f8efa80d5a008eae6b21b67069d",
+      "targetShownTextDigest": "67f1260ac7d3a1e2261e8b5ebc54fc893af0de546119f7069bc1f9802b83d59e",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_3c532c060e9ea8e44f6263660e741ca6",
+      "sourceShownTextDigest": "7812af5eaf05e2e42542fbe7727120c1ebfb24430b66cdaefc8c40697a3edfaa",
+      "targetShownTextDigest": "7812af5eaf05e2e42542fbe7727120c1ebfb24430b66cdaefc8c40697a3edfaa",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_05b6464d12e63da61fdeb9a2e9a5fbf6",
+      "sourceShownTextDigest": "02d877ae42a4dcfa302baadf684be79d068f4c31a1dabba331f0cd9583deb069",
+      "targetShownTextDigest": "02d877ae42a4dcfa302baadf684be79d068f4c31a1dabba331f0cd9583deb069",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_c8708ca9bb773cd3c3af2533a7601c4c",
+      "sourceShownTextDigest": "141640a859e2f3e4daacf21fe11080f171383d40a21fc1737f971630d943ef70",
+      "targetShownTextDigest": "141640a859e2f3e4daacf21fe11080f171383d40a21fc1737f971630d943ef70",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_30fe6113bbab5f495ea8f0dffd64b51f",
+      "sourceShownTextDigest": "de259bb0cc6552512728c63f09d9946ffb535502a3767e256867d2d906cd118d",
+      "targetShownTextDigest": "de259bb0cc6552512728c63f09d9946ffb535502a3767e256867d2d906cd118d",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_01e0090f579828803f2cb562581c3082",
+      "sourceShownTextDigest": "a2ef59a5f2443e4ef331fb826eabcce4170cf38e0da9207009c14b623ff595f6",
+      "targetShownTextDigest": "b65dfa1876069a334e500dc23bbf0e6f157c7867d076d3b997ca309ccc875d3d",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_65021dcb7c3ea73210796a5d84020d3a",
+      "sourceShownTextDigest": "a3e1a0dfca30389caae4394e2c07e0701da2aba4268cd62d9f44ce2309156dcd",
+      "targetShownTextDigest": "8e9dc3762d9cb17e2ba789a982ccc5d4e01e11acf1720abc8ea8c688ac8318b7",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_97aef0a406ee921e9d5e1d227e8b5462",
+      "sourceShownTextDigest": "3bc91b02892869881f3b3646cec7dd2d35de4601aa388feff118d0648923015b",
+      "targetShownTextDigest": "869d05c32fe904861fa23e2cd966633eb76cb56e08debc5458cd18abedc26321",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_a770d483907e685ceb725ec563a93200",
+      "sourceShownTextDigest": "be59835fe5cf1497f46fb1c5dd2066b28154924532666a43b6fe08776494d393",
+      "targetShownTextDigest": "be59835fe5cf1497f46fb1c5dd2066b28154924532666a43b6fe08776494d393",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_3a040470917c6d0cb40a134d591d5bf4",
+      "sourceShownTextDigest": "74f8e7bc799bd344600d97e1d5502bbb40da0aaf9f0d968edf5441409e0196dc",
+      "targetShownTextDigest": "74f8e7bc799bd344600d97e1d5502bbb40da0aaf9f0d968edf5441409e0196dc",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_c29f41965f1bfe0297c06ccb71b52b83",
+      "sourceShownTextDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+      "targetShownTextDigest": "f9342ceafac3c1b33c414232c25e772a5df6570ed25a4b07f16bd2faddadb39a",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_325ddcbd008ffa2e60f96c472efde2b2",
+      "sourceShownTextDigest": "9eb79e7e887fd92677bc98aded369660780a27deca7b1ab4f99198f3178df85a",
+      "targetShownTextDigest": "88194b56542ef394cb58c710d97eaca37f15eeee3be3136c107bedcfedc2233e",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_a3df8ff955b4f5e40f7be6c15c73e019",
+      "sourceShownTextDigest": "d427e3dda7bd59d457f997cf3adbb1a1fcf82106809110716e435d8e2f6bc6e7",
+      "targetShownTextDigest": "d427e3dda7bd59d457f997cf3adbb1a1fcf82106809110716e435d8e2f6bc6e7",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_bab99fcb7080b712c5a816021d87893c",
+      "sourceShownTextDigest": "c837e2815d64ee934fd3c59bb6f806353a072722dc0fe873162fa2edc77c4629",
+      "targetShownTextDigest": "03b4d3a3d160d50acfe26488029d757de1de47315c19bd81df8ca04526b983bf",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_85dc4a99df884eef40b2a7976ab784d7",
+      "sourceShownTextDigest": "ffcdeb38e05e626ff6b0145a0410a73a2e8c791cc4ed7e4a008fbc04137c23a0",
+      "targetShownTextDigest": "ffcdeb38e05e626ff6b0145a0410a73a2e8c791cc4ed7e4a008fbc04137c23a0",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_c3b95d25e51816104561a415e8fcfb7f",
+      "sourceShownTextDigest": "80adad793c187b21ea171094ea7970d7c827d1df82e74fd932d42b6ff6e19fff",
+      "targetShownTextDigest": "80adad793c187b21ea171094ea7970d7c827d1df82e74fd932d42b6ff6e19fff",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_d677fe478b630b96165c68573c437985",
+      "sourceShownTextDigest": "5530108b984c2442f03b0e5ab6edb84e1c3a62980cc2e2de18b235b88628e9af",
+      "targetShownTextDigest": "5530108b984c2442f03b0e5ab6edb84e1c3a62980cc2e2de18b235b88628e9af",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_3332f531b1319a0bb847e86e2313c3db",
+      "sourceShownTextDigest": "8c605b9241e9d9c6cfc5144f4c182befbaa7b9ba303c039554e2db71479f8493",
+      "targetShownTextDigest": "8c605b9241e9d9c6cfc5144f4c182befbaa7b9ba303c039554e2db71479f8493",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_6ea114423a531fe42b578513d5ce4671",
+      "sourceShownTextDigest": "f48be01fc5547f02b351abeb755ff6d038d729db32420a60e327a26184b55980",
+      "targetShownTextDigest": "f48be01fc5547f02b351abeb755ff6d038d729db32420a60e327a26184b55980",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_9e5f434fafffb26a816449838283799b",
+      "sourceShownTextDigest": "566f8fb0e8e18630f87ec146eebfc7d2970aa09da399926727fe23f59c6a78c6",
+      "targetShownTextDigest": "566f8fb0e8e18630f87ec146eebfc7d2970aa09da399926727fe23f59c6a78c6",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_23b1e8deb2b5fde4626bafdfea4b89d4",
+      "sourceShownTextDigest": "387092c6b88f0a5bf084f4a292417561946b0b1ddc9db1f51788954cba1f2c9c",
+      "targetShownTextDigest": "387092c6b88f0a5bf084f4a292417561946b0b1ddc9db1f51788954cba1f2c9c",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_b69d053fd6963e7357fdb8071bd241a1",
+      "sourceShownTextDigest": "3f20182619fbbd49f10a77e3ae1235b477fd89e3381ee3a50fd988128cf9ff2d",
+      "targetShownTextDigest": "3f20182619fbbd49f10a77e3ae1235b477fd89e3381ee3a50fd988128cf9ff2d",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_7e8b4b6b1bc65bc8f43258c17ce4b128",
+      "sourceShownTextDigest": "e82f31944e0bb3c36f173cfbc71c8300b0a28d559f38097cce03f0c4885901e7",
+      "targetShownTextDigest": "e82f31944e0bb3c36f173cfbc71c8300b0a28d559f38097cce03f0c4885901e7",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_fc852966e0404556294685861ce5875f",
+      "sourceShownTextDigest": "80fca8f527fb81baf04799f29678a1f77f7b0e5bff1cf95a81166e9132ffb275",
+      "targetShownTextDigest": "80fca8f527fb81baf04799f29678a1f77f7b0e5bff1cf95a81166e9132ffb275",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_59256dda58235ff69e5d3d7b8e9a3c7b",
+      "sourceShownTextDigest": "b5376d9f17d5943707bab13f8a3790e01584dd1dc658d1122dc1bb1444e40960",
+      "targetShownTextDigest": "b5376d9f17d5943707bab13f8a3790e01584dd1dc658d1122dc1bb1444e40960",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_82d991000f182ef2c6815d8328b63d0c",
+      "sourceShownTextDigest": "888d094d8c58d5807b22d2981994600f778a094a0bac8e8af99f90c74b402dc1",
+      "targetShownTextDigest": "888d094d8c58d5807b22d2981994600f778a094a0bac8e8af99f90c74b402dc1",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_c3318b60df0d409823e055c05d3f828c",
+      "sourceShownTextDigest": "d4277d1406151c1ca1c96445d0efe6b0df145c32b4a490f24f31312e46db025b",
+      "targetShownTextDigest": "d4277d1406151c1ca1c96445d0efe6b0df145c32b4a490f24f31312e46db025b",
+      "changedByContentCommit": true
+    }
+  ]
+}

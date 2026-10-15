@@ -1,0 +1,649 @@
+{
+  "version": 1,
+  "commit": "0f063d18fdab01cb6f2c915bb60ff528c5e0f238",
+  "shard": "s7-proposals-redesigns-15-readme.json",
+  "authorSession": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_5f915941b6acdfb3a08345abf0e0719e",
+      "sourceUnitDigest": "5c24a592f7b19694cd316b58db92a582e861d992ade3752bc722824e49941fca",
+      "targetUnitDigest": "03330e9b08cb144dc36c76550e849444c3e07f5a13ec984602cf4268698e6fc6",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_5f915941b6acdfb3a08345abf0e0719e",
+        "sourceUnitDigest": "5c24a592f7b19694cd316b58db92a582e861d992ade3752bc722824e49941fca",
+        "targetOwner": "docs/platform/proposals/README.md",
+        "targetAnchor": "architect-level-proposals",
+        "targetUnitDigest": "03330e9b08cb144dc36c76550e849444c3e07f5a13ec984602cf4268698e6fc6",
+        "targetAncestry": [],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source heading docs/architect/proposals/README.md#architect-level-proposals (lines 1–1) is carried at docs/platform/proposals/README.md#architect-level-proposals (lines 1–1); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/README.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Architect-Level Proposals",
+        "anchor": "architect-level-proposals",
+        "githubAnchor": "architect-level-proposals",
+        "stableAnchor": "h-ec7061843bb4",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "5c24a592f7b19694cd316b58db92a582e861d992ade3752bc722824e49941fca",
+        "sample": "Architect-Level Proposals",
+        "sectionPayloadDigest": "1c143e80d46b9d54cc55229249a8b442ce0ed13acb2e82fc50cc49c5a4d662a4",
+        "followingBlockDigest": "a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf",
+        "identityFingerprint": "09c8995edeb05508f8afc515659414515f7f5a7a0e12431abb2a96fe09bc8946",
+        "ancestry": [],
+        "text": "# Architect-Level Proposals",
+        "sectionText": "# Architect-Level Proposals\n\nDocument type: Index\nDesign status: Discussion\nImplementation: Not started unless each proposal says otherwise\nLast reviewed: 2026-09-02\n\nThis folder holds proposals whose scope crosses one architecture area. A file\nstaying here means it is still a proposal, not accepted architecture. Once\naccepted, extract the settled design into the relevant architect-level or\narea-specific canonical document and leave the proposal as history.\n\nArea-specific proposals stay under that area's own `proposals/` folder until\ntheir scope crosses the area boundary."
+      },
+      "target": {
+        "path": "docs/platform/proposals/README.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Architect-Level Proposals",
+        "anchor": "architect-level-proposals",
+        "githubAnchor": "architect-level-proposals",
+        "stableAnchor": "h-ec7061843bb4",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "03330e9b08cb144dc36c76550e849444c3e07f5a13ec984602cf4268698e6fc6",
+        "sample": "Architect-Level Proposals",
+        "sectionPayloadDigest": "021e888a4bb196f6e54a6dbb78b6ba3f908a0a0c40557c457ccbcedd53b4a8d6",
+        "followingBlockDigest": "9b0265b0d4a825b4f4b7409ade58a12c329db4c5955b1857aa75c1b2de685e96",
+        "identityFingerprint": "cbb962fbfa8a28716911980380683942582df9f48d10c27af317a7a6d81d152f",
+        "ancestry": [],
+        "text": "# Architect-Level Proposals",
+        "sectionText": "# Architect-Level Proposals\n\n```txt\nDocument type: Collection index\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve mapped source text for independent conservation review\nDesign status: Candidate\nImplementation: Source snapshot retained; current implementation truth not certified\nProvenance: docs/architect/proposals/README.md at fb046210539cbcbe8ca1dab254763f5e78c573d2; blob 48a80d339a1f676a56153bac6677895e0d4eb377\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: Nothing; non-canonical candidate conservation carrier\nUse this when: Reviewing source carriage, placement, intent and provenance\nDo not use this for: Current authority, implementation proof or cutover approval\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/proposals/README.md\nSupersedes: None; legacy source remains intact\nSuperseded by: None\n```\n\nAdded in candidate: Candidate carriage; Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.\n\nSource relationship: [original source](../../architect/proposals/README.md).\n\n\nDocument type: Index\nDesign status: Discussion\nImplementation: Not started unless each proposal says otherwise\nLast reviewed: 2026-09-02\n\nThis folder holds proposals whose scope crosses one architecture area. A file\nstaying here means it is still a proposal, not accepted architecture. Once\naccepted, extract the settled design into the relevant architect-level or\narea-specific canonical document and leave the proposal as history.\n\nArea-specific proposals stay under that area's own `proposals/` folder until\ntheir scope crosses the area boundary."
+      }
+    },
+    {
+      "claimId": "claim_25b51a36a5abf6a4190291ac4da1f037",
+      "sourceUnitDigest": "a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf",
+      "targetUnitDigest": "a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_25b51a36a5abf6a4190291ac4da1f037",
+        "sourceUnitDigest": "a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf",
+        "targetOwner": "docs/platform/proposals/README.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf",
+        "targetAncestry": [
+          "Architect-Level Proposals"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Weak-exact: document exact share below one half. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-1 (lines 3–6) is carried at docs/platform/proposals/README.md#unheaded-block-4 (lines 27–30); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 6,
+        "textDigest": "a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf",
+        "sample": "Document type: Index\nDesign status: Discussion\nImplementation: Not started unless each proposal says otherwise\nLast reviewed: 2026-09-02",
+        "identityFingerprint": "b0d3bf7a1ca84a764540048b9609c6192973dc47270fbcfb7e637892191e4a87",
+        "ancestry": [
+          "Architect-Level Proposals"
+        ],
+        "text": "Document type: Index\nDesign status: Discussion\nImplementation: Not started unless each proposal says otherwise\nLast reviewed: 2026-09-02"
+      },
+      "target": {
+        "path": "docs/platform/proposals/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 27,
+        "endLine": 30,
+        "textDigest": "a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf",
+        "sample": "Document type: Index\nDesign status: Discussion\nImplementation: Not started unless each proposal says otherwise\nLast reviewed: 2026-09-02",
+        "identityFingerprint": "b0d3bf7a1ca84a764540048b9609c6192973dc47270fbcfb7e637892191e4a87",
+        "ancestry": [
+          "Architect-Level Proposals"
+        ],
+        "text": "Document type: Index\nDesign status: Discussion\nImplementation: Not started unless each proposal says otherwise\nLast reviewed: 2026-09-02"
+      }
+    },
+    {
+      "claimId": "claim_09af0f2aa436ddd0e9171a866767c99b",
+      "sourceUnitDigest": "dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af",
+      "targetUnitDigest": "dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_09af0f2aa436ddd0e9171a866767c99b",
+        "sourceUnitDigest": "dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af",
+        "targetOwner": "docs/platform/proposals/README.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af",
+        "targetAncestry": [
+          "Architect-Level Proposals"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Weak-exact: document exact share below one half. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-2 (lines 8–11) is carried at docs/platform/proposals/README.md#unheaded-block-5 (lines 32–35); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 8,
+        "endLine": 11,
+        "textDigest": "dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af",
+        "sample": "This folder holds proposals whose scope crosses one architecture area. A file\nstaying here means it is still a proposal, not accepted architecture. Once\naccepted, extract the settl",
+        "identityFingerprint": "71564eccd33d1992b5d564166b312e2bafbd899fae01694e592d51a8fdbaa474",
+        "ancestry": [
+          "Architect-Level Proposals"
+        ],
+        "text": "This folder holds proposals whose scope crosses one architecture area. A file\nstaying here means it is still a proposal, not accepted architecture. Once\naccepted, extract the settled design into the relevant architect-level or\narea-specific canonical document and leave the proposal as history."
+      },
+      "target": {
+        "path": "docs/platform/proposals/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 32,
+        "endLine": 35,
+        "textDigest": "dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af",
+        "sample": "This folder holds proposals whose scope crosses one architecture area. A file\nstaying here means it is still a proposal, not accepted architecture. Once\naccepted, extract the settl",
+        "identityFingerprint": "71564eccd33d1992b5d564166b312e2bafbd899fae01694e592d51a8fdbaa474",
+        "ancestry": [
+          "Architect-Level Proposals"
+        ],
+        "text": "This folder holds proposals whose scope crosses one architecture area. A file\nstaying here means it is still a proposal, not accepted architecture. Once\naccepted, extract the settled design into the relevant architect-level or\narea-specific canonical document and leave the proposal as history."
+      }
+    },
+    {
+      "claimId": "claim_5ccfd7d5fd348491b4c0d6b9c9bfc7f3",
+      "sourceUnitDigest": "4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72",
+      "targetUnitDigest": "4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_5ccfd7d5fd348491b4c0d6b9c9bfc7f3",
+        "sourceUnitDigest": "4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72",
+        "targetOwner": "docs/platform/proposals/README.md",
+        "targetAnchor": "unheaded-block-6",
+        "targetUnitDigest": "4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72",
+        "targetAncestry": [
+          "Architect-Level Proposals"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Weak-exact: document exact share below one half. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-3 (lines 13–14) is carried at docs/platform/proposals/README.md#unheaded-block-6 (lines 37–38); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 13,
+        "endLine": 14,
+        "textDigest": "4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72",
+        "sample": "Area-specific proposals stay under that area's own `proposals/` folder until\ntheir scope crosses the area boundary.",
+        "identityFingerprint": "46dbca957aa6c11761d39f585193da1363876ab099bc1f504b268a4d48b67817",
+        "ancestry": [
+          "Architect-Level Proposals"
+        ],
+        "text": "Area-specific proposals stay under that area's own `proposals/` folder until\ntheir scope crosses the area boundary."
+      },
+      "target": {
+        "path": "docs/platform/proposals/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 37,
+        "endLine": 38,
+        "textDigest": "4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72",
+        "sample": "Area-specific proposals stay under that area's own `proposals/` folder until\ntheir scope crosses the area boundary.",
+        "identityFingerprint": "46dbca957aa6c11761d39f585193da1363876ab099bc1f504b268a4d48b67817",
+        "ancestry": [
+          "Architect-Level Proposals"
+        ],
+        "text": "Area-specific proposals stay under that area's own `proposals/` folder until\ntheir scope crosses the area boundary."
+      }
+    },
+    {
+      "claimId": "claim_69cd8997c627f22f069222676cc25e4d",
+      "sourceUnitDigest": "35d38e36aa9ae5117a3aba40a90d734ccb07badb2f8c4c7e19984e6f6c0b1b93",
+      "targetUnitDigest": "d836846ddf01300cd1a50ab447e19e2c6b478104bf0621e9f044b37446c2feb4",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_69cd8997c627f22f069222676cc25e4d",
+        "sourceUnitDigest": "35d38e36aa9ae5117a3aba40a90d734ccb07badb2f8c4c7e19984e6f6c0b1b93",
+        "targetOwner": "docs/platform/proposals/README.md",
+        "targetAnchor": "active-proposals",
+        "targetUnitDigest": "d836846ddf01300cd1a50ab447e19e2c6b478104bf0621e9f044b37446c2feb4",
+        "targetAncestry": [
+          "Architect-Level Proposals"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source heading docs/architect/proposals/README.md#active-proposals (lines 16–16) is carried at docs/platform/proposals/README.md#active-proposals (lines 40–40); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/README.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Active Proposals",
+        "anchor": "active-proposals",
+        "githubAnchor": "active-proposals",
+        "stableAnchor": "h-46348cede15e",
+        "startLine": 16,
+        "endLine": 16,
+        "textDigest": "35d38e36aa9ae5117a3aba40a90d734ccb07badb2f8c4c7e19984e6f6c0b1b93",
+        "sample": "Active Proposals",
+        "sectionPayloadDigest": "949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0",
+        "followingBlockDigest": "949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0",
+        "identityFingerprint": "0aebaddbd45143cd3065ea66958178855c69a1cc720358f406f952e86236c75c",
+        "ancestry": [
+          "Architect-Level Proposals"
+        ],
+        "text": "## Active Proposals",
+        "sectionText": "## Active Proposals\n\n- [Coordination Capability Envelope](coordination-capability-envelope.md) —\n  discussion following the independent review: three architecture families,\n  hard/soft boundaries, recommendation, migration responsibilities, and probes;\n  not an accepted architecture or implementation plan.\n- [Step 09: Group Thinking Substrate](step-09-group-thinking-substrate.md)\n- [Architecture Advisory Panel](architecture-advisory-panel.md) — the next\n  Group Thinking use case after `fgos-code-panel`: investigate and frame a\n  software-system problem, deliberate on architectures, advise a person, and\n  support a bounded decision dialogue.\n- [Step 10: Coding Domain Adoption Of The Coordination Foundation](step-10-coding-domain-adoption.md)\n- [Component Authority Boundary Map](component-authority-boundary-map.md)"
+      },
+      "target": {
+        "path": "docs/platform/proposals/README.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Active Proposals",
+        "anchor": "active-proposals",
+        "githubAnchor": "active-proposals",
+        "stableAnchor": "h-7b1dea5fe9b9",
+        "startLine": 40,
+        "endLine": 40,
+        "textDigest": "d836846ddf01300cd1a50ab447e19e2c6b478104bf0621e9f044b37446c2feb4",
+        "sample": "Active Proposals",
+        "sectionPayloadDigest": "3d3d1d86ca10ef2ed0b784f13f86a69a4f06b906a73fcdf2eeca096c8119b5c0",
+        "followingBlockDigest": "3d3d1d86ca10ef2ed0b784f13f86a69a4f06b906a73fcdf2eeca096c8119b5c0",
+        "identityFingerprint": "5d2430f98579fad8ccb7d363f28b65b565385d81879e707933bf88fdb3b5b042",
+        "ancestry": [
+          "Architect-Level Proposals"
+        ],
+        "text": "## Active Proposals",
+        "sectionText": "## Active Proposals\n\n- [Coordination Capability Envelope](../../architect/proposals/coordination-capability-envelope.md) —\n  discussion following the independent review: three architecture families,\n  hard/soft boundaries, recommendation, migration responsibilities, and probes;\n  not an accepted architecture or implementation plan.\n- [Step 09: Group Thinking Substrate](../../architect/proposals/step-09-group-thinking-substrate.md)\n- [Architecture Advisory Panel](../../architect/proposals/architecture-advisory-panel.md) — the next\n  Group Thinking use case after `fgos-code-panel`: investigate and frame a\n  software-system problem, deliberate on architectures, advise a person, and\n  support a bounded decision dialogue.\n- [Step 10: Coding Domain Adoption Of The Coordination Foundation](../../architect/proposals/step-10-coding-domain-adoption.md)\n- [Component Authority Boundary Map](../../architect/proposals/component-authority-boundary-map.md)"
+      }
+    },
+    {
+      "claimId": "claim_76cd5a79f79a23ddf7bf30b53312aadf",
+      "sourceUnitDigest": "949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0",
+      "targetUnitDigest": "3d3d1d86ca10ef2ed0b784f13f86a69a4f06b906a73fcdf2eeca096c8119b5c0",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_76cd5a79f79a23ddf7bf30b53312aadf",
+        "sourceUnitDigest": "949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0",
+        "targetOwner": "docs/platform/proposals/README.md",
+        "targetAnchor": "unheaded-block-7",
+        "targetUnitDigest": "3d3d1d86ca10ef2ed0b784f13f86a69a4f06b906a73fcdf2eeca096c8119b5c0",
+        "targetAncestry": [
+          "Architect-Level Proposals",
+          "Active Proposals"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-4 (lines 18–28) is carried at docs/platform/proposals/README.md#unheaded-block-7 (lines 42–52); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 18,
+        "endLine": 28,
+        "textDigest": "949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0",
+        "sample": "- [Coordination Capability Envelope](coordination-capability-envelope.md) —\n  discussion following the independent review: three architecture families,\n  hard/soft boundaries, reco",
+        "identityFingerprint": "6a712f152de142d3818934496b355be8004e8ca24feb19d3c3d9414c8f4d87f6",
+        "ancestry": [
+          "Architect-Level Proposals",
+          "Active Proposals"
+        ],
+        "text": "- [Coordination Capability Envelope](coordination-capability-envelope.md) —\n  discussion following the independent review: three architecture families,\n  hard/soft boundaries, recommendation, migration responsibilities, and probes;\n  not an accepted architecture or implementation plan.\n- [Step 09: Group Thinking Substrate](step-09-group-thinking-substrate.md)\n- [Architecture Advisory Panel](architecture-advisory-panel.md) — the next\n  Group Thinking use case after `fgos-code-panel`: investigate and frame a\n  software-system problem, deliberate on architectures, advise a person, and\n  support a bounded decision dialogue.\n- [Step 10: Coding Domain Adoption Of The Coordination Foundation](step-10-coding-domain-adoption.md)\n- [Component Authority Boundary Map](component-authority-boundary-map.md)"
+      },
+      "target": {
+        "path": "docs/platform/proposals/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-7",
+        "githubAnchor": "unheaded-block-7",
+        "stableAnchor": "unheaded-block-7",
+        "title": "Unheaded block 7",
+        "startLine": 42,
+        "endLine": 52,
+        "textDigest": "3d3d1d86ca10ef2ed0b784f13f86a69a4f06b906a73fcdf2eeca096c8119b5c0",
+        "sample": "- [Coordination Capability Envelope](../../architect/proposals/coordination-capability-envelope.md) —\n  discussion following the independent review: three architecture families,\n  ",
+        "identityFingerprint": "9a5782ff42e15758268e4ff0a9e07fe24431994bc7a901c4972dfa2d8f8f5f31",
+        "ancestry": [
+          "Architect-Level Proposals",
+          "Active Proposals"
+        ],
+        "text": "- [Coordination Capability Envelope](../../architect/proposals/coordination-capability-envelope.md) —\n  discussion following the independent review: three architecture families,\n  hard/soft boundaries, recommendation, migration responsibilities, and probes;\n  not an accepted architecture or implementation plan.\n- [Step 09: Group Thinking Substrate](../../architect/proposals/step-09-group-thinking-substrate.md)\n- [Architecture Advisory Panel](../../architect/proposals/architecture-advisory-panel.md) — the next\n  Group Thinking use case after `fgos-code-panel`: investigate and frame a\n  software-system problem, deliberate on architectures, advise a person, and\n  support a bounded decision dialogue.\n- [Step 10: Coding Domain Adoption Of The Coordination Foundation](../../architect/proposals/step-10-coding-domain-adoption.md)\n- [Component Authority Boundary Map](../../architect/proposals/component-authority-boundary-map.md)"
+      }
+    },
+    {
+      "claimId": "claim_86499a247b54e7e84a84c9cb0f477242",
+      "sourceUnitDigest": "a8367c95c72c4487eeb5157751fbacafc5293909f9720e69aa24993e050a5a53",
+      "targetUnitDigest": "29d4d8ed08d8c765ae18fcd142e04c8ec693283df3c17e35ad468ad9e9480956",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_86499a247b54e7e84a84c9cb0f477242",
+        "sourceUnitDigest": "a8367c95c72c4487eeb5157751fbacafc5293909f9720e69aa24993e050a5a53",
+        "targetOwner": "docs/platform/proposals/README.md",
+        "targetAnchor": "handoff-prompts",
+        "targetUnitDigest": "29d4d8ed08d8c765ae18fcd142e04c8ec693283df3c17e35ad468ad9e9480956",
+        "targetAncestry": [
+          "Architect-Level Proposals"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source heading docs/architect/proposals/README.md#handoff-prompts (lines 30–30) is carried at docs/platform/proposals/README.md#handoff-prompts (lines 54–54); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/README.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Handoff Prompts",
+        "anchor": "handoff-prompts",
+        "githubAnchor": "handoff-prompts",
+        "stableAnchor": "h-6938ab892c0b",
+        "startLine": 30,
+        "endLine": 30,
+        "textDigest": "a8367c95c72c4487eeb5157751fbacafc5293909f9720e69aa24993e050a5a53",
+        "sample": "Handoff Prompts",
+        "sectionPayloadDigest": "7d017b02c78c810db5bc23280aebdcd6f9032fe6952b95fd9e94b0bde634bdef",
+        "followingBlockDigest": "7d017b02c78c810db5bc23280aebdcd6f9032fe6952b95fd9e94b0bde634bdef",
+        "identityFingerprint": "01e4d274e369e6d5877e4f5768af9e30616c8a0e2eebbd58696009ac9771e05c",
+        "ancestry": [
+          "Architect-Level Proposals"
+        ],
+        "text": "## Handoff Prompts",
+        "sectionText": "## Handoff Prompts\n\n- [Step 09 / Step 10 Replan Handoff Prompt](step-09-step-10-replan-handoff-prompt.md)"
+      },
+      "target": {
+        "path": "docs/platform/proposals/README.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Handoff Prompts",
+        "anchor": "handoff-prompts",
+        "githubAnchor": "handoff-prompts",
+        "stableAnchor": "h-c70f76f6475d",
+        "startLine": 54,
+        "endLine": 54,
+        "textDigest": "29d4d8ed08d8c765ae18fcd142e04c8ec693283df3c17e35ad468ad9e9480956",
+        "sample": "Handoff Prompts",
+        "sectionPayloadDigest": "7bc3dad8854efec710c29af55773f57e28c7bfeb70332fe07610570708216ecb",
+        "followingBlockDigest": "7bc3dad8854efec710c29af55773f57e28c7bfeb70332fe07610570708216ecb",
+        "identityFingerprint": "08b1aacd0a5b7e1beba2fe10f75bf50c23f524ca7a11ffe690103bb9b06408f2",
+        "ancestry": [
+          "Architect-Level Proposals"
+        ],
+        "text": "## Handoff Prompts",
+        "sectionText": "## Handoff Prompts\n\n- [Step 09 / Step 10 Replan Handoff Prompt](../../architect/proposals/step-09-step-10-replan-handoff-prompt.md)"
+      }
+    },
+    {
+      "claimId": "claim_f8e206eea9c8d807bb63e249dbc858f4",
+      "sourceUnitDigest": "7d017b02c78c810db5bc23280aebdcd6f9032fe6952b95fd9e94b0bde634bdef",
+      "targetUnitDigest": "7bc3dad8854efec710c29af55773f57e28c7bfeb70332fe07610570708216ecb",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_f8e206eea9c8d807bb63e249dbc858f4",
+        "sourceUnitDigest": "7d017b02c78c810db5bc23280aebdcd6f9032fe6952b95fd9e94b0bde634bdef",
+        "targetOwner": "docs/platform/proposals/README.md",
+        "targetAnchor": "unheaded-block-8",
+        "targetUnitDigest": "7bc3dad8854efec710c29af55773f57e28c7bfeb70332fe07610570708216ecb",
+        "targetAncestry": [
+          "Architect-Level Proposals",
+          "Handoff Prompts"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. place verbatim: Keep the map collection-index as a candidate snapshot. Its active list is historical source wording and will not describe the final live/history split; navigation owner owes reviewed update, no silent rewrite now. Evidence: Source Active Proposals and Handoff Prompts lists six entries, with five active proposal links; it omits later siblings. The map explicitly assigns collection-index; no semantic required-root consumer was found (README.md basename matches are unrelated). Complete source unheaded-block docs/architect/proposals/README.md#unheaded-block-5 (lines 32–32) is carried at docs/platform/proposals/README.md#unheaded-block-8 (lines 56–56); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 32,
+        "endLine": 32,
+        "textDigest": "7d017b02c78c810db5bc23280aebdcd6f9032fe6952b95fd9e94b0bde634bdef",
+        "sample": "- [Step 09 / Step 10 Replan Handoff Prompt](step-09-step-10-replan-handoff-prompt.md)",
+        "identityFingerprint": "f8b73edfce2531ff23f425e0dbcbd7ea7ef20f5c2a4b5ca4c122033c151f5f8e",
+        "ancestry": [
+          "Architect-Level Proposals",
+          "Handoff Prompts"
+        ],
+        "text": "- [Step 09 / Step 10 Replan Handoff Prompt](step-09-step-10-replan-handoff-prompt.md)"
+      },
+      "target": {
+        "path": "docs/platform/proposals/README.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-8",
+        "githubAnchor": "unheaded-block-8",
+        "stableAnchor": "unheaded-block-8",
+        "title": "Unheaded block 8",
+        "startLine": 56,
+        "endLine": 56,
+        "textDigest": "7bc3dad8854efec710c29af55773f57e28c7bfeb70332fe07610570708216ecb",
+        "sample": "- [Step 09 / Step 10 Replan Handoff Prompt](../../architect/proposals/step-09-step-10-replan-handoff-prompt.md)",
+        "identityFingerprint": "3cfef414b2e6bc6f3df066ba78f9540656bfe9f885d99f5f11e57fc3599bf408",
+        "ancestry": [
+          "Architect-Level Proposals",
+          "Handoff Prompts"
+        ],
+        "text": "- [Step 09 / Step 10 Replan Handoff Prompt](../../architect/proposals/step-09-step-10-replan-handoff-prompt.md)"
+      }
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "originalShardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-15-readme.json",
+  "originalShardSHA256": "8d9c585b94dc3ab40e8cde64f4cf8180a51875ace2c45c4ecbae0988dfbc3811",
+  "part": 1,
+  "parts": 1,
+  "completeSourceRowCount": 8,
+  "gateFindings": [
+    {
+      "type": "decision-loss-without-partial-carry",
+      "message": "claim claim_5f915941b6acdfb3a08345abf0e0719e: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+      "path": "docs/architect/proposals/README.md"
+    },
+    {
+      "type": "decision-loss-without-partial-carry",
+      "message": "claim claim_25b51a36a5abf6a4190291ac4da1f037: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+      "path": "docs/architect/proposals/README.md"
+    },
+    {
+      "type": "decision-loss-without-partial-carry",
+      "message": "claim claim_09af0f2aa436ddd0e9171a866767c99b: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+      "path": "docs/architect/proposals/README.md"
+    },
+    {
+      "type": "decision-loss-without-partial-carry",
+      "message": "claim claim_5ccfd7d5fd348491b4c0d6b9c9bfc7f3: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+      "path": "docs/architect/proposals/README.md"
+    },
+    {
+      "type": "decision-loss-without-partial-carry",
+      "message": "claim claim_69cd8997c627f22f069222676cc25e4d: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+      "path": "docs/architect/proposals/README.md"
+    },
+    {
+      "type": "decision-loss-without-partial-carry",
+      "message": "claim claim_76cd5a79f79a23ddf7bf30b53312aadf: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+      "path": "docs/architect/proposals/README.md"
+    },
+    {
+      "type": "decision-loss-without-partial-carry",
+      "message": "claim claim_86499a247b54e7e84a84c9cb0f477242: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+      "path": "docs/architect/proposals/README.md"
+    },
+    {
+      "type": "decision-loss-without-partial-carry",
+      "message": "claim claim_f8e206eea9c8d807bb63e249dbc858f4: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+      "path": "docs/architect/proposals/README.md"
+    }
+  ],
+  "scope": "Source rows only; complete reverse population is in the separate native candidate request.",
+  "a36": {
+    "gateFindings": [
+      {
+        "type": "decision-loss-without-partial-carry",
+        "message": "claim claim_5f915941b6acdfb3a08345abf0e0719e: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+        "path": "docs/architect/proposals/README.md"
+      },
+      {
+        "type": "decision-loss-without-partial-carry",
+        "message": "claim claim_25b51a36a5abf6a4190291ac4da1f037: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+        "path": "docs/architect/proposals/README.md"
+      },
+      {
+        "type": "decision-loss-without-partial-carry",
+        "message": "claim claim_09af0f2aa436ddd0e9171a866767c99b: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+        "path": "docs/architect/proposals/README.md"
+      },
+      {
+        "type": "decision-loss-without-partial-carry",
+        "message": "claim claim_5ccfd7d5fd348491b4c0d6b9c9bfc7f3: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+        "path": "docs/architect/proposals/README.md"
+      },
+      {
+        "type": "decision-loss-without-partial-carry",
+        "message": "claim claim_69cd8997c627f22f069222676cc25e4d: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+        "path": "docs/architect/proposals/README.md"
+      },
+      {
+        "type": "decision-loss-without-partial-carry",
+        "message": "claim claim_76cd5a79f79a23ddf7bf30b53312aadf: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+        "path": "docs/architect/proposals/README.md"
+      },
+      {
+        "type": "decision-loss-without-partial-carry",
+        "message": "claim claim_86499a247b54e7e84a84c9cb0f477242: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+        "path": "docs/architect/proposals/README.md"
+      },
+      {
+        "type": "decision-loss-without-partial-carry",
+        "message": "claim claim_f8e206eea9c8d807bb63e249dbc858f4: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not supersede",
+        "path": "docs/architect/proposals/README.md"
+      }
+    ],
+    "requestPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1110-proposals-redesigns-source-15-01-0f063d18f.md",
+    "packPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-15-01-0f063d18f.md",
+    "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-15-01-0f063d18f.md.json",
+    "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-15-readme.json",
+    "source": "docs/architect/proposals/README.md",
+    "part": 1,
+    "parts": 1,
+    "count": 8,
+    "classes": {
+      "Judgment": 5,
+      "Weak-exact": 3
+    },
+    "weakExactAndJudgment": [
+      "claim_5f915941b6acdfb3a08345abf0e0719e",
+      "claim_25b51a36a5abf6a4190291ac4da1f037",
+      "claim_09af0f2aa436ddd0e9171a866767c99b",
+      "claim_5ccfd7d5fd348491b4c0d6b9c9bfc7f3",
+      "claim_69cd8997c627f22f069222676cc25e4d",
+      "claim_76cd5a79f79a23ddf7bf30b53312aadf",
+      "claim_86499a247b54e7e84a84c9cb0f477242",
+      "claim_f8e206eea9c8d807bb63e249dbc858f4"
+    ],
+    "reviewerDeepSampleMinimum": 8,
+    "mandatoryDifferingDigestRows": [
+      "claim_5f915941b6acdfb3a08345abf0e0719e",
+      "claim_69cd8997c627f22f069222676cc25e4d",
+      "claim_76cd5a79f79a23ddf7bf30b53312aadf",
+      "claim_86499a247b54e7e84a84c9cb0f477242",
+      "claim_f8e206eea9c8d807bb63e249dbc858f4"
+    ],
+    "absentTargetRows": [],
+    "changedByContentCommit": []
+  },
+  "fullShownTextBindings": [
+    {
+      "claimId": "claim_5f915941b6acdfb3a08345abf0e0719e",
+      "sourceShownTextDigest": "09d9bfb256ec2d59a8fb61bc432e390ce5cac61c4c939035cc7bce5a72119155",
+      "targetShownTextDigest": "78a218ea10fae4ebd2b6413a3d131c61e4b5d4c3bb95a858faadcc2b21cb9ace",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_25b51a36a5abf6a4190291ac4da1f037",
+      "sourceShownTextDigest": "a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf",
+      "targetShownTextDigest": "a53e19b7b54a5568a7e7b6fdaabb2f786438aa6642d8d6629cecbd6a75326fdf",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_09af0f2aa436ddd0e9171a866767c99b",
+      "sourceShownTextDigest": "dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af",
+      "targetShownTextDigest": "dfb4844a6695230f763089717cda3e5ad8eeeb30f1b01308fa9beeb75eb3d5af",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_5ccfd7d5fd348491b4c0d6b9c9bfc7f3",
+      "sourceShownTextDigest": "4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72",
+      "targetShownTextDigest": "4ed866e51da4c0c7312090bdaf830f6bfe2310113698960d6d81412fdbb41e72",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_69cd8997c627f22f069222676cc25e4d",
+      "sourceShownTextDigest": "8634b7ca6bb0142c8a525a2c802e1c82a34bb29704a54ba864011eae43d3a286",
+      "targetShownTextDigest": "0972d49b75ebc949291c332910cb48278baa91fe86ffc3888d6724de72d9caff",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_76cd5a79f79a23ddf7bf30b53312aadf",
+      "sourceShownTextDigest": "949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0",
+      "targetShownTextDigest": "3d3d1d86ca10ef2ed0b784f13f86a69a4f06b906a73fcdf2eeca096c8119b5c0",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_86499a247b54e7e84a84c9cb0f477242",
+      "sourceShownTextDigest": "77c79effb86fc535f2911fd310ab009100c7165244e9143ae8347b25351422a4",
+      "targetShownTextDigest": "5416f820a219a8241b5767658b5b7193a00f39dd6adaf5aed8e7d6ccd488ad75",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_f8e206eea9c8d807bb63e249dbc858f4",
+      "sourceShownTextDigest": "7d017b02c78c810db5bc23280aebdcd6f9032fe6952b95fd9e94b0bde634bdef",
+      "targetShownTextDigest": "7bc3dad8854efec710c29af55773f57e28c7bfeb70332fe07610570708216ecb",
+      "changedByContentCommit": false
+    }
+  ]
+}

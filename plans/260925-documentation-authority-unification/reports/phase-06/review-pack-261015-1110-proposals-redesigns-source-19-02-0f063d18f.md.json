@@ -1,0 +1,1109 @@
+{
+  "version": 1,
+  "commit": "0f063d18fdab01cb6f2c915bb60ff528c5e0f238",
+  "shard": "s7-proposals-redesigns-19-step-10-coding-domain-adoption.json",
+  "authorSession": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_d6958c5271b710ec7b3340bea0aa0343",
+      "sourceUnitDigest": "1fa110227412a66e68dff01ede44f0c7ac9998a86a1df2eee1a7a17f6ce48a7e",
+      "targetUnitDigest": "1fa110227412a66e68dff01ede44f0c7ac9998a86a1df2eee1a7a17f6ce48a7e",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_d6958c5271b710ec7b3340bea0aa0343",
+        "sourceUnitDigest": "1fa110227412a66e68dff01ede44f0c7ac9998a86a1df2eee1a7a17f6ce48a7e",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-66",
+        "targetUnitDigest": "1fa110227412a66e68dff01ede44f0c7ac9998a86a1df2eee1a7a17f6ce48a7e",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-63 (lines 570–570) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-66 (lines 597–597); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-63",
+        "githubAnchor": "unheaded-block-63",
+        "stableAnchor": "unheaded-block-63",
+        "title": "Unheaded block 63",
+        "startLine": 570,
+        "endLine": 570,
+        "textDigest": "1fa110227412a66e68dff01ede44f0c7ac9998a86a1df2eee1a7a17f6ce48a7e",
+        "sample": "Candidate Node layout vocabulary for that overlay:",
+        "identityFingerprint": "9c16449182d447635453677a2d149f75ef658fc06b26cd7cf2213db44454708a",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "Candidate Node layout vocabulary for that overlay:"
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-66",
+        "githubAnchor": "unheaded-block-66",
+        "stableAnchor": "unheaded-block-66",
+        "title": "Unheaded block 66",
+        "startLine": 597,
+        "endLine": 597,
+        "textDigest": "1fa110227412a66e68dff01ede44f0c7ac9998a86a1df2eee1a7a17f6ce48a7e",
+        "sample": "Candidate Node layout vocabulary for that overlay:",
+        "identityFingerprint": "9c16449182d447635453677a2d149f75ef658fc06b26cd7cf2213db44454708a",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "Candidate Node layout vocabulary for that overlay:"
+      }
+    },
+    {
+      "claimId": "claim_6a6d487e10444a1a4d8e26455fed3581",
+      "sourceUnitDigest": "dcb883876a70330c3078d09a3aab8f928331a8ff4d0c0eae9468ba28ed9188bc",
+      "targetUnitDigest": "dcb883876a70330c3078d09a3aab8f928331a8ff4d0c0eae9468ba28ed9188bc",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_6a6d487e10444a1a4d8e26455fed3581",
+        "sourceUnitDigest": "dcb883876a70330c3078d09a3aab8f928331a8ff4d0c0eae9468ba28ed9188bc",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-67",
+        "targetUnitDigest": "dcb883876a70330c3078d09a3aab8f928331a8ff4d0c0eae9468ba28ed9188bc",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-64 (lines 572–590) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-67 (lines 599–617); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-64",
+        "githubAnchor": "unheaded-block-64",
+        "stableAnchor": "unheaded-block-64",
+        "title": "Unheaded block 64",
+        "startLine": 572,
+        "endLine": 590,
+        "textDigest": "dcb883876a70330c3078d09a3aab8f928331a8ff4d0c0eae9468ba28ed9188bc",
+        "sample": "```txt\napps/\n  cli/                    # thin fgos / fgos-runner entrypoints, if moved later\n\npackages/\n  work-core/\n    work-lifecycle/       # Work state, status/stage, claim/ret",
+        "identityFingerprint": "4207150886a38eb80e898bf2b6a20ef6564448516c32ceb05a729fe2f564d2b0",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "```txt\napps/\n  cli/                    # thin fgos / fgos-runner entrypoints, if moved later\n\npackages/\n  work-core/\n    work-lifecycle/       # Work state, status/stage, claim/return, Work verbs\n    work-driver/          # ready selection, operation choice, automation loop\n    runtime-occupancy/    # worker slots, checkout locks, resource pressure\n  agent-coordination/\n    agent-coordination/   # CoordinationSession, topology, team cognition\n    dispatch-execution/   # DispatchPlan, Run runtime, executor adapters\n    run-result-evaluator/ # evidence collection, confidence, RunResult\n  domain-registry/        # domain/workflow/task-spec loading and validation\n  domains/coding/         # Coding Domain Core + product/design, cook, bugfix, small-change policy\n  setup-doctor/           # config/default/check registration\n  host-surfaces/          # gateway/API/plugin/Herdr adapters\n  learning-docs/          # retrospective knowledge and docs registry\n```"
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-67",
+        "githubAnchor": "unheaded-block-67",
+        "stableAnchor": "unheaded-block-67",
+        "title": "Unheaded block 67",
+        "startLine": 599,
+        "endLine": 617,
+        "textDigest": "dcb883876a70330c3078d09a3aab8f928331a8ff4d0c0eae9468ba28ed9188bc",
+        "sample": "```txt\napps/\n  cli/                    # thin fgos / fgos-runner entrypoints, if moved later\n\npackages/\n  work-core/\n    work-lifecycle/       # Work state, status/stage, claim/ret",
+        "identityFingerprint": "4207150886a38eb80e898bf2b6a20ef6564448516c32ceb05a729fe2f564d2b0",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "```txt\napps/\n  cli/                    # thin fgos / fgos-runner entrypoints, if moved later\n\npackages/\n  work-core/\n    work-lifecycle/       # Work state, status/stage, claim/return, Work verbs\n    work-driver/          # ready selection, operation choice, automation loop\n    runtime-occupancy/    # worker slots, checkout locks, resource pressure\n  agent-coordination/\n    agent-coordination/   # CoordinationSession, topology, team cognition\n    dispatch-execution/   # DispatchPlan, Run runtime, executor adapters\n    run-result-evaluator/ # evidence collection, confidence, RunResult\n  domain-registry/        # domain/workflow/task-spec loading and validation\n  domains/coding/         # Coding Domain Core + product/design, cook, bugfix, small-change policy\n  setup-doctor/           # config/default/check registration\n  host-surfaces/          # gateway/API/plugin/Herdr adapters\n  learning-docs/          # retrospective knowledge and docs registry\n```"
+      }
+    },
+    {
+      "claimId": "claim_389a39083e6a2be3be70925ba9a7b1b7",
+      "sourceUnitDigest": "22c139aa01f72133ed316119814b5773bed9a20f20b91f016b75f9dab15847df",
+      "targetUnitDigest": "22c139aa01f72133ed316119814b5773bed9a20f20b91f016b75f9dab15847df",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_389a39083e6a2be3be70925ba9a7b1b7",
+        "sourceUnitDigest": "22c139aa01f72133ed316119814b5773bed9a20f20b91f016b75f9dab15847df",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-68",
+        "targetUnitDigest": "22c139aa01f72133ed316119814b5773bed9a20f20b91f016b75f9dab15847df",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-65 (lines 592–594) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-68 (lines 619–621); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-65",
+        "githubAnchor": "unheaded-block-65",
+        "stableAnchor": "unheaded-block-65",
+        "title": "Unheaded block 65",
+        "startLine": 592,
+        "endLine": 594,
+        "textDigest": "22c139aa01f72133ed316119814b5773bed9a20f20b91f016b75f9dab15847df",
+        "sample": "This vocabulary is deliberately not a required tree for Step 10. It is the\nshape the Component Authority Boundary Map should draft and later accepted\nboundary documents should acce",
+        "identityFingerprint": "ea46e260fd86db4edc1afca0af8a049c26e139e66f499f982ca593e0e25fafda",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "This vocabulary is deliberately not a required tree for Step 10. It is the\nshape the Component Authority Boundary Map should draft and later accepted\nboundary documents should accept, revise, or reject."
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-68",
+        "githubAnchor": "unheaded-block-68",
+        "stableAnchor": "unheaded-block-68",
+        "title": "Unheaded block 68",
+        "startLine": 619,
+        "endLine": 621,
+        "textDigest": "22c139aa01f72133ed316119814b5773bed9a20f20b91f016b75f9dab15847df",
+        "sample": "This vocabulary is deliberately not a required tree for Step 10. It is the\nshape the Component Authority Boundary Map should draft and later accepted\nboundary documents should acce",
+        "identityFingerprint": "ea46e260fd86db4edc1afca0af8a049c26e139e66f499f982ca593e0e25fafda",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "This vocabulary is deliberately not a required tree for Step 10. It is the\nshape the Component Authority Boundary Map should draft and later accepted\nboundary documents should accept, revise, or reject."
+      }
+    },
+    {
+      "claimId": "claim_6d0563d95c25130f7663e376871273f6",
+      "sourceUnitDigest": "4b8e91483a1a665fdb1db183cc5eed799ec97839a4f74ca373356483cc424eab",
+      "targetUnitDigest": "4b8e91483a1a665fdb1db183cc5eed799ec97839a4f74ca373356483cc424eab",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_6d0563d95c25130f7663e376871273f6",
+        "sourceUnitDigest": "4b8e91483a1a665fdb1db183cc5eed799ec97839a4f74ca373356483cc424eab",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-69",
+        "targetUnitDigest": "4b8e91483a1a665fdb1db183cc5eed799ec97839a4f74ca373356483cc424eab",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-66 (lines 596–596) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-69 (lines 623–623); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-66",
+        "githubAnchor": "unheaded-block-66",
+        "stableAnchor": "unheaded-block-66",
+        "title": "Unheaded block 66",
+        "startLine": 596,
+        "endLine": 596,
+        "textDigest": "4b8e91483a1a665fdb1db183cc5eed799ec97839a4f74ca373356483cc424eab",
+        "sample": "**Proposed non-goals for Step 10:**",
+        "identityFingerprint": "eede9a98754d38b8ef31c416778430c3b8d5c6ad305222cd2ddb8e17272e3166",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "**Proposed non-goals for Step 10:**"
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-69",
+        "githubAnchor": "unheaded-block-69",
+        "stableAnchor": "unheaded-block-69",
+        "title": "Unheaded block 69",
+        "startLine": 623,
+        "endLine": 623,
+        "textDigest": "4b8e91483a1a665fdb1db183cc5eed799ec97839a4f74ca373356483cc424eab",
+        "sample": "**Proposed non-goals for Step 10:**",
+        "identityFingerprint": "eede9a98754d38b8ef31c416778430c3b8d5c6ad305222cd2ddb8e17272e3166",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "**Proposed non-goals for Step 10:**"
+      }
+    },
+    {
+      "claimId": "claim_961ea7fc6d6ce7be45b5a1eed59c7f91",
+      "sourceUnitDigest": "17e2585d6e4c3cf140f719f13418bb02dd21bcd7b6515ac5decd33a1698c22fc",
+      "targetUnitDigest": "17e2585d6e4c3cf140f719f13418bb02dd21bcd7b6515ac5decd33a1698c22fc",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_961ea7fc6d6ce7be45b5a1eed59c7f91",
+        "sourceUnitDigest": "17e2585d6e4c3cf140f719f13418bb02dd21bcd7b6515ac5decd33a1698c22fc",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-70",
+        "targetUnitDigest": "17e2585d6e4c3cf140f719f13418bb02dd21bcd7b6515ac5decd33a1698c22fc",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-67 (lines 598–604) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-70 (lines 625–631); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-67",
+        "githubAnchor": "unheaded-block-67",
+        "stableAnchor": "unheaded-block-67",
+        "title": "Unheaded block 67",
+        "startLine": 598,
+        "endLine": 604,
+        "textDigest": "17e2585d6e4c3cf140f719f13418bb02dd21bcd7b6515ac5decd33a1698c22fc",
+        "sample": "- no AdhocTask entity (see §6 consequence 3);\n- no Workflow-runtime migration onto FlowDefinition;\n- no Mission, AgentMessage, `purpose` routing, marketplace, telemetry\n  backend;\n",
+        "identityFingerprint": "77320cb48957bfa9f9f61ece1288b95e7e7d4f6734b18bc9c8ccbf55b798142f",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "- no AdhocTask entity (see §6 consequence 3);\n- no Workflow-runtime migration onto FlowDefinition;\n- no Mission, AgentMessage, `purpose` routing, marketplace, telemetry\n  backend;\n- no merge/branch/Work-transition API inside `src/runner/coordination/**`\n  (ADR-010 §4 holds regardless of step 5's outcome);\n- no editing of ADR-007 or ADR-010 in place; new decisions get new ADRs."
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-70",
+        "githubAnchor": "unheaded-block-70",
+        "stableAnchor": "unheaded-block-70",
+        "title": "Unheaded block 70",
+        "startLine": 625,
+        "endLine": 631,
+        "textDigest": "17e2585d6e4c3cf140f719f13418bb02dd21bcd7b6515ac5decd33a1698c22fc",
+        "sample": "- no AdhocTask entity (see §6 consequence 3);\n- no Workflow-runtime migration onto FlowDefinition;\n- no Mission, AgentMessage, `purpose` routing, marketplace, telemetry\n  backend;\n",
+        "identityFingerprint": "77320cb48957bfa9f9f61ece1288b95e7e7d4f6734b18bc9c8ccbf55b798142f",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "- no AdhocTask entity (see §6 consequence 3);\n- no Workflow-runtime migration onto FlowDefinition;\n- no Mission, AgentMessage, `purpose` routing, marketplace, telemetry\n  backend;\n- no merge/branch/Work-transition API inside `src/runner/coordination/**`\n  (ADR-010 §4 holds regardless of step 5's outcome);\n- no editing of ADR-007 or ADR-010 in place; new decisions get new ADRs."
+      }
+    },
+    {
+      "claimId": "claim_003a48087e0bb6a22e66f4b258593095",
+      "sourceUnitDigest": "2bbf196e5b1a336bc096c1a5f795c94306e7ad705a39a06436dcee7360122483",
+      "targetUnitDigest": "2bbf196e5b1a336bc096c1a5f795c94306e7ad705a39a06436dcee7360122483",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_003a48087e0bb6a22e66f4b258593095",
+        "sourceUnitDigest": "2bbf196e5b1a336bc096c1a5f795c94306e7ad705a39a06436dcee7360122483",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-71",
+        "targetUnitDigest": "2bbf196e5b1a336bc096c1a5f795c94306e7ad705a39a06436dcee7360122483",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-68 (lines 606–608) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-71 (lines 633–635); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-68",
+        "githubAnchor": "unheaded-block-68",
+        "stableAnchor": "unheaded-block-68",
+        "title": "Unheaded block 68",
+        "startLine": 606,
+        "endLine": 608,
+        "textDigest": "2bbf196e5b1a336bc096c1a5f795c94306e7ad705a39a06436dcee7360122483",
+        "sample": "**Proposed cut rule if scope must shrink:** cut step 8 first, then split step\n7 into \"driver engine\" and \"fan-out onto driver\". Do not cut steps 3 and 4;\nthey are what keeps step 5",
+        "identityFingerprint": "147317608a57bb113f4254afc3c0d5ccee9ed313ae6e620c82e98d473db42321",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "**Proposed cut rule if scope must shrink:** cut step 8 first, then split step\n7 into \"driver engine\" and \"fan-out onto driver\". Do not cut steps 3 and 4;\nthey are what keeps step 5 and step 7 from collapsing."
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-71",
+        "githubAnchor": "unheaded-block-71",
+        "stableAnchor": "unheaded-block-71",
+        "title": "Unheaded block 71",
+        "startLine": 633,
+        "endLine": 635,
+        "textDigest": "2bbf196e5b1a336bc096c1a5f795c94306e7ad705a39a06436dcee7360122483",
+        "sample": "**Proposed cut rule if scope must shrink:** cut step 8 first, then split step\n7 into \"driver engine\" and \"fan-out onto driver\". Do not cut steps 3 and 4;\nthey are what keeps step 5",
+        "identityFingerprint": "147317608a57bb113f4254afc3c0d5ccee9ed313ae6e620c82e98d473db42321",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "9. Candidate Step Sequence",
+          "9.1 Boundary Map Input Shape"
+        ],
+        "text": "**Proposed cut rule if scope must shrink:** cut step 8 first, then split step\n7 into \"driver engine\" and \"fan-out onto driver\". Do not cut steps 3 and 4;\nthey are what keeps step 5 and step 7 from collapsing."
+      }
+    },
+    {
+      "claimId": "claim_94dfb1b1881ccfbfc7f063eb80b4de2d",
+      "sourceUnitDigest": "9a2cc11ef293d45d971ecb793ecaa44a92866c2af5ca2c256566f23bcf6bdd89",
+      "targetUnitDigest": "9a2cc11ef293d45d971ecb793ecaa44a92866c2af5ca2c256566f23bcf6bdd89",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_94dfb1b1881ccfbfc7f063eb80b4de2d",
+        "sourceUnitDigest": "9a2cc11ef293d45d971ecb793ecaa44a92866c2af5ca2c256566f23bcf6bdd89",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "10-business-cases-for-live-proof",
+        "targetUnitDigest": "9a2cc11ef293d45d971ecb793ecaa44a92866c2af5ca2c256566f23bcf6bdd89",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#10-business-cases-for-live-proof (lines 610–610) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#10-business-cases-for-live-proof (lines 637–637); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "10. Business Cases For Live Proof",
+        "anchor": "10-business-cases-for-live-proof",
+        "githubAnchor": "10-business-cases-for-live-proof",
+        "stableAnchor": "h-fc56144960f3",
+        "startLine": 610,
+        "endLine": 610,
+        "textDigest": "9a2cc11ef293d45d971ecb793ecaa44a92866c2af5ca2c256566f23bcf6bdd89",
+        "sample": "10. Business Cases For Live Proof",
+        "sectionPayloadDigest": "7ac45a0df0b8ace84f32ced2aec2d78f08494cfbe6ba09e4a6158381757fbf2b",
+        "followingBlockDigest": "b91bdc1d91076938997855b153c57a75769c47d2d0de399870ecf4a4abe078e7",
+        "identityFingerprint": "8428526ac9109582064359edaa44e942fffa10aab81d8137d66a628013f6ef62",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "text": "## 10. Business Cases For Live Proof",
+        "sectionText": "## 10. Business Cases For Live Proof\n\nRetained from Step 07 §15 and refined:\n\n- **Read-only consult in coding (step 2):** a `validate-plan` reviewer\n  session on a real item, run once through `fgos plan --validate` and once\n  through `fgos-runner --once`, must produce semantically equivalent session\n  records after visibility-field normalization.\n- **Debate proof deferred from Step 07 §15.3** (\"should coding planning\n  validation run as a reviewer Assignment or stay same-session?\") is answered\n  by step 2's design, not debated again.\n- **Mutating proof (step 5):** exactly the scenario in §9 row 5. It is the\n  proof ADR-010 §5 names; it is not a demo."
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "10. Business Cases For Live Proof",
+        "anchor": "10-business-cases-for-live-proof",
+        "githubAnchor": "10-business-cases-for-live-proof",
+        "stableAnchor": "h-19efa5eec916",
+        "startLine": 637,
+        "endLine": 637,
+        "textDigest": "9a2cc11ef293d45d971ecb793ecaa44a92866c2af5ca2c256566f23bcf6bdd89",
+        "sample": "10. Business Cases For Live Proof",
+        "sectionPayloadDigest": "7ac45a0df0b8ace84f32ced2aec2d78f08494cfbe6ba09e4a6158381757fbf2b",
+        "followingBlockDigest": "b91bdc1d91076938997855b153c57a75769c47d2d0de399870ecf4a4abe078e7",
+        "identityFingerprint": "8428526ac9109582064359edaa44e942fffa10aab81d8137d66a628013f6ef62",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "text": "## 10. Business Cases For Live Proof",
+        "sectionText": "## 10. Business Cases For Live Proof\n\nRetained from Step 07 §15 and refined:\n\n- **Read-only consult in coding (step 2):** a `validate-plan` reviewer\n  session on a real item, run once through `fgos plan --validate` and once\n  through `fgos-runner --once`, must produce semantically equivalent session\n  records after visibility-field normalization.\n- **Debate proof deferred from Step 07 §15.3** (\"should coding planning\n  validation run as a reviewer Assignment or stay same-session?\") is answered\n  by step 2's design, not debated again.\n- **Mutating proof (step 5):** exactly the scenario in §9 row 5. It is the\n  proof ADR-010 §5 names; it is not a demo."
+      }
+    },
+    {
+      "claimId": "claim_cd08d56499edbf2a727c00a944b8824d",
+      "sourceUnitDigest": "b91bdc1d91076938997855b153c57a75769c47d2d0de399870ecf4a4abe078e7",
+      "targetUnitDigest": "b91bdc1d91076938997855b153c57a75769c47d2d0de399870ecf4a4abe078e7",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_cd08d56499edbf2a727c00a944b8824d",
+        "sourceUnitDigest": "b91bdc1d91076938997855b153c57a75769c47d2d0de399870ecf4a4abe078e7",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-72",
+        "targetUnitDigest": "b91bdc1d91076938997855b153c57a75769c47d2d0de399870ecf4a4abe078e7",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "10. Business Cases For Live Proof"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-69 (lines 612–612) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-72 (lines 639–639); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-69",
+        "githubAnchor": "unheaded-block-69",
+        "stableAnchor": "unheaded-block-69",
+        "title": "Unheaded block 69",
+        "startLine": 612,
+        "endLine": 612,
+        "textDigest": "b91bdc1d91076938997855b153c57a75769c47d2d0de399870ecf4a4abe078e7",
+        "sample": "Retained from Step 07 §15 and refined:",
+        "identityFingerprint": "143c4792ff8fc9b0e96a5dddc41cbaedfc9ccb7301bdcc914eaa789565d59400",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "10. Business Cases For Live Proof"
+        ],
+        "text": "Retained from Step 07 §15 and refined:"
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-72",
+        "githubAnchor": "unheaded-block-72",
+        "stableAnchor": "unheaded-block-72",
+        "title": "Unheaded block 72",
+        "startLine": 639,
+        "endLine": 639,
+        "textDigest": "b91bdc1d91076938997855b153c57a75769c47d2d0de399870ecf4a4abe078e7",
+        "sample": "Retained from Step 07 §15 and refined:",
+        "identityFingerprint": "143c4792ff8fc9b0e96a5dddc41cbaedfc9ccb7301bdcc914eaa789565d59400",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "10. Business Cases For Live Proof"
+        ],
+        "text": "Retained from Step 07 §15 and refined:"
+      }
+    },
+    {
+      "claimId": "claim_3ece591ebb2dafd4c36521cf67265042",
+      "sourceUnitDigest": "ecbcfdfd9a455f00d592d1a66ec53700896ce439d44b7a40543cf31786416358",
+      "targetUnitDigest": "ecbcfdfd9a455f00d592d1a66ec53700896ce439d44b7a40543cf31786416358",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_3ece591ebb2dafd4c36521cf67265042",
+        "sourceUnitDigest": "ecbcfdfd9a455f00d592d1a66ec53700896ce439d44b7a40543cf31786416358",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-73",
+        "targetUnitDigest": "ecbcfdfd9a455f00d592d1a66ec53700896ce439d44b7a40543cf31786416358",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "10. Business Cases For Live Proof"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-70 (lines 614–622) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-73 (lines 641–649); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-70",
+        "githubAnchor": "unheaded-block-70",
+        "stableAnchor": "unheaded-block-70",
+        "title": "Unheaded block 70",
+        "startLine": 614,
+        "endLine": 622,
+        "textDigest": "ecbcfdfd9a455f00d592d1a66ec53700896ce439d44b7a40543cf31786416358",
+        "sample": "- **Read-only consult in coding (step 2):** a `validate-plan` reviewer\n  session on a real item, run once through `fgos plan --validate` and once\n  through `fgos-runner --once`, mu",
+        "identityFingerprint": "387bc3c574e83c800a247b5525eb33dfea32554816f7d30826121976d711f281",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "10. Business Cases For Live Proof"
+        ],
+        "text": "- **Read-only consult in coding (step 2):** a `validate-plan` reviewer\n  session on a real item, run once through `fgos plan --validate` and once\n  through `fgos-runner --once`, must produce semantically equivalent session\n  records after visibility-field normalization.\n- **Debate proof deferred from Step 07 §15.3** (\"should coding planning\n  validation run as a reviewer Assignment or stay same-session?\") is answered\n  by step 2's design, not debated again.\n- **Mutating proof (step 5):** exactly the scenario in §9 row 5. It is the\n  proof ADR-010 §5 names; it is not a demo."
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-73",
+        "githubAnchor": "unheaded-block-73",
+        "stableAnchor": "unheaded-block-73",
+        "title": "Unheaded block 73",
+        "startLine": 641,
+        "endLine": 649,
+        "textDigest": "ecbcfdfd9a455f00d592d1a66ec53700896ce439d44b7a40543cf31786416358",
+        "sample": "- **Read-only consult in coding (step 2):** a `validate-plan` reviewer\n  session on a real item, run once through `fgos plan --validate` and once\n  through `fgos-runner --once`, mu",
+        "identityFingerprint": "387bc3c574e83c800a247b5525eb33dfea32554816f7d30826121976d711f281",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "10. Business Cases For Live Proof"
+        ],
+        "text": "- **Read-only consult in coding (step 2):** a `validate-plan` reviewer\n  session on a real item, run once through `fgos plan --validate` and once\n  through `fgos-runner --once`, must produce semantically equivalent session\n  records after visibility-field normalization.\n- **Debate proof deferred from Step 07 §15.3** (\"should coding planning\n  validation run as a reviewer Assignment or stay same-session?\") is answered\n  by step 2's design, not debated again.\n- **Mutating proof (step 5):** exactly the scenario in §9 row 5. It is the\n  proof ADR-010 §5 names; it is not a demo."
+      }
+    },
+    {
+      "claimId": "claim_ebcdfd56dabe5107f9a6b1797cee3e46",
+      "sourceUnitDigest": "5686bef25c02017d545236aa933993eb2661f0c8cd07a9640078891b5e962248",
+      "targetUnitDigest": "5686bef25c02017d545236aa933993eb2661f0c8cd07a9640078891b5e962248",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_ebcdfd56dabe5107f9a6b1797cee3e46",
+        "sourceUnitDigest": "5686bef25c02017d545236aa933993eb2661f0c8cd07a9640078891b5e962248",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "11-open-questions",
+        "targetUnitDigest": "5686bef25c02017d545236aa933993eb2661f0c8cd07a9640078891b5e962248",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#11-open-questions (lines 624–624) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#11-open-questions (lines 651–651); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "11. Open Questions",
+        "anchor": "11-open-questions",
+        "githubAnchor": "11-open-questions",
+        "stableAnchor": "h-510f13e46e40",
+        "startLine": 624,
+        "endLine": 624,
+        "textDigest": "5686bef25c02017d545236aa933993eb2661f0c8cd07a9640078891b5e962248",
+        "sample": "11. Open Questions",
+        "sectionPayloadDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+        "followingBlockDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+        "identityFingerprint": "c32bcc4e2d27a11d64022c900d5453427b7da7e7ed1f301cacad06b47cf20b5d",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "text": "## 11. Open Questions",
+        "sectionText": "## 11. Open Questions\n\n1. **Q1 — `fgos handoff` after Step 10:** does it remain the write door for\n   collaboration records, or become a projection from the session ledger onto\n   Work events? (Decides D8; blocks Seam D.)\n2. **Q2 — concurrency ceiling:** first read-only `validate-plan` slice should\n   inherit the host Work slot and set session concurrency at 1. Before fan-out\n   or mutation, should `aggregateBounds.maxConcurrency` be clamped by\n   worker-slots through N6, or should Work-attached sessions always borrow\n   slots from the host Work driver? (Decides D4; blocks step 4 fan-out/mutation.)\n3. **Q3 — N3, in-process Run mechanism:** ownership is Dispatch/Run Runtime,\n   not CoordinationSession. What is the minimum Run record for \"the caller did\n   it itself\" that does not degrade into self-report? Candidate: the driver\n   opens the Assignment before acting and the evidence adapter (git delta\n   scoped to the attempt, verify output) settles it afterward, the same way\n   `classifyRunEvidence` treats a subprocess. Must be decided before step 6.\n4. **Q4 — declared vs inline for Work-attached session Assignments (N2):**\n   recommended declared via Work Driver + Assignment Builder. Needs an ADR or\n   contract note because the CoordinationSession store currently creates\n   inline Assignments itself.\n5. **Q5 — entry timing:** strictly after P07.2, or allow step 4 (evidence\n   evaluator, separate files) to start after P06?\n6. **Q6 — whether step 7 is one step or two** (driver engine first, then\n   fan-out onto the driver). The fan-out half carries the known worktree-pin\n   race; splitting may be safer.\n7. **Q7 — Node repo-layout:** should the Component Authority Boundary Map only\n   produce authority classification, or also accept a Node-side `apps/` +\n   `packages/` overlay now? Recommended: draft the overlay there, then\n   accept/revise/reject it after Step 09/Step 10 needs stabilize; forbid\n   physical moves until the component has a facade and contract tests, matching\n   `docs/architect/host-invocation-routing/node-to-rust-component-migration.md`."
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "11. Open Questions",
+        "anchor": "11-open-questions",
+        "githubAnchor": "11-open-questions",
+        "stableAnchor": "h-55fb9e9e5a4d",
+        "startLine": 651,
+        "endLine": 651,
+        "textDigest": "5686bef25c02017d545236aa933993eb2661f0c8cd07a9640078891b5e962248",
+        "sample": "11. Open Questions",
+        "sectionPayloadDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+        "followingBlockDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+        "identityFingerprint": "c32bcc4e2d27a11d64022c900d5453427b7da7e7ed1f301cacad06b47cf20b5d",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "text": "## 11. Open Questions",
+        "sectionText": "## 11. Open Questions\n\n1. **Q1 — `fgos handoff` after Step 10:** does it remain the write door for\n   collaboration records, or become a projection from the session ledger onto\n   Work events? (Decides D8; blocks Seam D.)\n2. **Q2 — concurrency ceiling:** first read-only `validate-plan` slice should\n   inherit the host Work slot and set session concurrency at 1. Before fan-out\n   or mutation, should `aggregateBounds.maxConcurrency` be clamped by\n   worker-slots through N6, or should Work-attached sessions always borrow\n   slots from the host Work driver? (Decides D4; blocks step 4 fan-out/mutation.)\n3. **Q3 — N3, in-process Run mechanism:** ownership is Dispatch/Run Runtime,\n   not CoordinationSession. What is the minimum Run record for \"the caller did\n   it itself\" that does not degrade into self-report? Candidate: the driver\n   opens the Assignment before acting and the evidence adapter (git delta\n   scoped to the attempt, verify output) settles it afterward, the same way\n   `classifyRunEvidence` treats a subprocess. Must be decided before step 6.\n4. **Q4 — declared vs inline for Work-attached session Assignments (N2):**\n   recommended declared via Work Driver + Assignment Builder. Needs an ADR or\n   contract note because the CoordinationSession store currently creates\n   inline Assignments itself.\n5. **Q5 — entry timing:** strictly after P07.2, or allow step 4 (evidence\n   evaluator, separate files) to start after P06?\n6. **Q6 — whether step 7 is one step or two** (driver engine first, then\n   fan-out onto the driver). The fan-out half carries the known worktree-pin\n   race; splitting may be safer.\n7. **Q7 — Node repo-layout:** should the Component Authority Boundary Map only\n   produce authority classification, or also accept a Node-side `apps/` +\n   `packages/` overlay now? Recommended: draft the overlay there, then\n   accept/revise/reject it after Step 09/Step 10 needs stabilize; forbid\n   physical moves until the component has a facade and contract tests, matching\n   `docs/architect/host-invocation-routing/node-to-rust-component-migration.md`."
+      }
+    },
+    {
+      "claimId": "claim_c29743cbcbf793b833a9862f5ed9a035",
+      "sourceUnitDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+      "targetUnitDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_c29743cbcbf793b833a9862f5ed9a035",
+        "sourceUnitDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-74",
+        "targetUnitDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "11. Open Questions"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-71 (lines 626–654) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-74 (lines 653–681); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-71",
+        "githubAnchor": "unheaded-block-71",
+        "stableAnchor": "unheaded-block-71",
+        "title": "Unheaded block 71",
+        "startLine": 626,
+        "endLine": 654,
+        "textDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+        "sample": "1. **Q1 — `fgos handoff` after Step 10:** does it remain the write door for\n   collaboration records, or become a projection from the session ledger onto\n   Work events? (Decides D",
+        "identityFingerprint": "85c2f3b0e382900f2e64c0021125f954c58aedd1b7ed2e1a4d71df91c69aef64",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "11. Open Questions"
+        ],
+        "text": "1. **Q1 — `fgos handoff` after Step 10:** does it remain the write door for\n   collaboration records, or become a projection from the session ledger onto\n   Work events? (Decides D8; blocks Seam D.)\n2. **Q2 — concurrency ceiling:** first read-only `validate-plan` slice should\n   inherit the host Work slot and set session concurrency at 1. Before fan-out\n   or mutation, should `aggregateBounds.maxConcurrency` be clamped by\n   worker-slots through N6, or should Work-attached sessions always borrow\n   slots from the host Work driver? (Decides D4; blocks step 4 fan-out/mutation.)\n3. **Q3 — N3, in-process Run mechanism:** ownership is Dispatch/Run Runtime,\n   not CoordinationSession. What is the minimum Run record for \"the caller did\n   it itself\" that does not degrade into self-report? Candidate: the driver\n   opens the Assignment before acting and the evidence adapter (git delta\n   scoped to the attempt, verify output) settles it afterward, the same way\n   `classifyRunEvidence` treats a subprocess. Must be decided before step 6.\n4. **Q4 — declared vs inline for Work-attached session Assignments (N2):**\n   recommended declared via Work Driver + Assignment Builder. Needs an ADR or\n   contract note because the CoordinationSession store currently creates\n   inline Assignments itself.\n5. **Q5 — entry timing:** strictly after P07.2, or allow step 4 (evidence\n   evaluator, separate files) to start after P06?\n6. **Q6 — whether step 7 is one step or two** (driver engine first, then\n   fan-out onto the driver). The fan-out half carries the known worktree-pin\n   race; splitting may be safer.\n7. **Q7 — Node repo-layout:** should the Component Authority Boundary Map only\n   produce authority classification, or also accept a Node-side `apps/` +\n   `packages/` overlay now? Recommended: draft the overlay there, then\n   accept/revise/reject it after Step 09/Step 10 needs stabilize; forbid\n   physical moves until the component has a facade and contract tests, matching\n   `docs/architect/host-invocation-routing/node-to-rust-component-migration.md`."
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-74",
+        "githubAnchor": "unheaded-block-74",
+        "stableAnchor": "unheaded-block-74",
+        "title": "Unheaded block 74",
+        "startLine": 653,
+        "endLine": 681,
+        "textDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+        "sample": "1. **Q1 — `fgos handoff` after Step 10:** does it remain the write door for\n   collaboration records, or become a projection from the session ledger onto\n   Work events? (Decides D",
+        "identityFingerprint": "85c2f3b0e382900f2e64c0021125f954c58aedd1b7ed2e1a4d71df91c69aef64",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "11. Open Questions"
+        ],
+        "text": "1. **Q1 — `fgos handoff` after Step 10:** does it remain the write door for\n   collaboration records, or become a projection from the session ledger onto\n   Work events? (Decides D8; blocks Seam D.)\n2. **Q2 — concurrency ceiling:** first read-only `validate-plan` slice should\n   inherit the host Work slot and set session concurrency at 1. Before fan-out\n   or mutation, should `aggregateBounds.maxConcurrency` be clamped by\n   worker-slots through N6, or should Work-attached sessions always borrow\n   slots from the host Work driver? (Decides D4; blocks step 4 fan-out/mutation.)\n3. **Q3 — N3, in-process Run mechanism:** ownership is Dispatch/Run Runtime,\n   not CoordinationSession. What is the minimum Run record for \"the caller did\n   it itself\" that does not degrade into self-report? Candidate: the driver\n   opens the Assignment before acting and the evidence adapter (git delta\n   scoped to the attempt, verify output) settles it afterward, the same way\n   `classifyRunEvidence` treats a subprocess. Must be decided before step 6.\n4. **Q4 — declared vs inline for Work-attached session Assignments (N2):**\n   recommended declared via Work Driver + Assignment Builder. Needs an ADR or\n   contract note because the CoordinationSession store currently creates\n   inline Assignments itself.\n5. **Q5 — entry timing:** strictly after P07.2, or allow step 4 (evidence\n   evaluator, separate files) to start after P06?\n6. **Q6 — whether step 7 is one step or two** (driver engine first, then\n   fan-out onto the driver). The fan-out half carries the known worktree-pin\n   race; splitting may be safer.\n7. **Q7 — Node repo-layout:** should the Component Authority Boundary Map only\n   produce authority classification, or also accept a Node-side `apps/` +\n   `packages/` overlay now? Recommended: draft the overlay there, then\n   accept/revise/reject it after Step 09/Step 10 needs stabilize; forbid\n   physical moves until the component has a facade and contract tests, matching\n   `docs/architect/host-invocation-routing/node-to-rust-component-migration.md`."
+      }
+    },
+    {
+      "claimId": "claim_f58d2663a28b9ac4a095fbb49d136d1c",
+      "sourceUnitDigest": "6598e2a8ecd4cc5c190233cc79a02543d78f034c5587776e1a9745dc2ec8b64e",
+      "targetUnitDigest": "6598e2a8ecd4cc5c190233cc79a02543d78f034c5587776e1a9745dc2ec8b64e",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_f58d2663a28b9ac4a095fbb49d136d1c",
+        "sourceUnitDigest": "6598e2a8ecd4cc5c190233cc79a02543d78f034c5587776e1a9745dc2ec8b64e",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "12-intent-traceability",
+        "targetUnitDigest": "6598e2a8ecd4cc5c190233cc79a02543d78f034c5587776e1a9745dc2ec8b64e",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#12-intent-traceability (lines 656–656) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#12-intent-traceability (lines 683–683); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "12. Intent Traceability",
+        "anchor": "12-intent-traceability",
+        "githubAnchor": "12-intent-traceability",
+        "stableAnchor": "h-6354479dcc8a",
+        "startLine": 656,
+        "endLine": 656,
+        "textDigest": "6598e2a8ecd4cc5c190233cc79a02543d78f034c5587776e1a9745dc2ec8b64e",
+        "sample": "12. Intent Traceability",
+        "sectionPayloadDigest": "7333fbe2c2c2b3ebe1c7e4826e213e21a57e962659e8b6931c3dd493ec8583f4",
+        "followingBlockDigest": "e57fbdca7266c01aaff882b737b526a1c085f9a388cc6e13514ef6b817efbefd",
+        "identityFingerprint": "2577ac9c42b08ce6e61ffa5344071ea06e1aeb1d7a0b476c4c33453dce3f5497",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "text": "## 12. Intent Traceability",
+        "sectionText": "## 12. Intent Traceability\n\n| Intent | Effect of this proposal | Must-not-preclude |\n|---|---|---|\n| AC-I005 (domain customization) | Coding becomes the second real consumer of the harness seam; N4 adds a Run Result Evaluator evidence-adapter seam justified by two consumers | seam count grows only with proven consumers; no plugin SDK |\n| AC-I008 (interactive/headless parity) | Seam G and step 7 extend parity from coordination to the Work driver; N3 is owned by Dispatch/Run Runtime so parity is not headless-only | no interactive-only or headless-only capability without naming the gap |\n| AC-I009 (domain-owned Work isolation) | Step 5 is the named proof; Seams C/F keep isolation, merge, transition in the domain | `src/runner/coordination/**` never gains merge/branch/transition API |\n| V-012 (two unlike consumers) | Step 10 is the coding half of the claim after Step 09 proves the standalone group-thinking substrate; if coding needs a separate core after step 6, the foundation boundary was not found | one execution core |\n\nEvery implementation phase derived from this proposal must close with the\nledger's Deferral Audit template."
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "12. Intent Traceability",
+        "anchor": "12-intent-traceability",
+        "githubAnchor": "12-intent-traceability",
+        "stableAnchor": "h-da9aa8069cba",
+        "startLine": 683,
+        "endLine": 683,
+        "textDigest": "6598e2a8ecd4cc5c190233cc79a02543d78f034c5587776e1a9745dc2ec8b64e",
+        "sample": "12. Intent Traceability",
+        "sectionPayloadDigest": "7333fbe2c2c2b3ebe1c7e4826e213e21a57e962659e8b6931c3dd493ec8583f4",
+        "followingBlockDigest": "e57fbdca7266c01aaff882b737b526a1c085f9a388cc6e13514ef6b817efbefd",
+        "identityFingerprint": "2577ac9c42b08ce6e61ffa5344071ea06e1aeb1d7a0b476c4c33453dce3f5497",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "text": "## 12. Intent Traceability",
+        "sectionText": "## 12. Intent Traceability\n\n| Intent | Effect of this proposal | Must-not-preclude |\n|---|---|---|\n| AC-I005 (domain customization) | Coding becomes the second real consumer of the harness seam; N4 adds a Run Result Evaluator evidence-adapter seam justified by two consumers | seam count grows only with proven consumers; no plugin SDK |\n| AC-I008 (interactive/headless parity) | Seam G and step 7 extend parity from coordination to the Work driver; N3 is owned by Dispatch/Run Runtime so parity is not headless-only | no interactive-only or headless-only capability without naming the gap |\n| AC-I009 (domain-owned Work isolation) | Step 5 is the named proof; Seams C/F keep isolation, merge, transition in the domain | `src/runner/coordination/**` never gains merge/branch/transition API |\n| V-012 (two unlike consumers) | Step 10 is the coding half of the claim after Step 09 proves the standalone group-thinking substrate; if coding needs a separate core after step 6, the foundation boundary was not found | one execution core |\n\nEvery implementation phase derived from this proposal must close with the\nledger's Deferral Audit template."
+      }
+    },
+    {
+      "claimId": "claim_46d09321ea3091255ea14afe2b36eda0",
+      "sourceUnitDigest": "e57fbdca7266c01aaff882b737b526a1c085f9a388cc6e13514ef6b817efbefd",
+      "targetUnitDigest": "e57fbdca7266c01aaff882b737b526a1c085f9a388cc6e13514ef6b817efbefd",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_46d09321ea3091255ea14afe2b36eda0",
+        "sourceUnitDigest": "e57fbdca7266c01aaff882b737b526a1c085f9a388cc6e13514ef6b817efbefd",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-75",
+        "targetUnitDigest": "e57fbdca7266c01aaff882b737b526a1c085f9a388cc6e13514ef6b817efbefd",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "12. Intent Traceability"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-72 (lines 658–663) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-75 (lines 685–690); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-72",
+        "githubAnchor": "unheaded-block-72",
+        "stableAnchor": "unheaded-block-72",
+        "title": "Unheaded block 72",
+        "startLine": 658,
+        "endLine": 663,
+        "textDigest": "e57fbdca7266c01aaff882b737b526a1c085f9a388cc6e13514ef6b817efbefd",
+        "sample": "| Intent | Effect of this proposal | Must-not-preclude |\n|---|---|---|\n| AC-I005 (domain customization) | Coding becomes the second real consumer of the harness seam; N4 adds a Run",
+        "identityFingerprint": "2a3ca51fce7c8abdac20fe1a37927d92d0ace1d66fceb53ccf8ce372b180e208",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "12. Intent Traceability"
+        ],
+        "text": "| Intent | Effect of this proposal | Must-not-preclude |\n|---|---|---|\n| AC-I005 (domain customization) | Coding becomes the second real consumer of the harness seam; N4 adds a Run Result Evaluator evidence-adapter seam justified by two consumers | seam count grows only with proven consumers; no plugin SDK |\n| AC-I008 (interactive/headless parity) | Seam G and step 7 extend parity from coordination to the Work driver; N3 is owned by Dispatch/Run Runtime so parity is not headless-only | no interactive-only or headless-only capability without naming the gap |\n| AC-I009 (domain-owned Work isolation) | Step 5 is the named proof; Seams C/F keep isolation, merge, transition in the domain | `src/runner/coordination/**` never gains merge/branch/transition API |\n| V-012 (two unlike consumers) | Step 10 is the coding half of the claim after Step 09 proves the standalone group-thinking substrate; if coding needs a separate core after step 6, the foundation boundary was not found | one execution core |"
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-75",
+        "githubAnchor": "unheaded-block-75",
+        "stableAnchor": "unheaded-block-75",
+        "title": "Unheaded block 75",
+        "startLine": 685,
+        "endLine": 690,
+        "textDigest": "e57fbdca7266c01aaff882b737b526a1c085f9a388cc6e13514ef6b817efbefd",
+        "sample": "| Intent | Effect of this proposal | Must-not-preclude |\n|---|---|---|\n| AC-I005 (domain customization) | Coding becomes the second real consumer of the harness seam; N4 adds a Run",
+        "identityFingerprint": "2a3ca51fce7c8abdac20fe1a37927d92d0ace1d66fceb53ccf8ce372b180e208",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "12. Intent Traceability"
+        ],
+        "text": "| Intent | Effect of this proposal | Must-not-preclude |\n|---|---|---|\n| AC-I005 (domain customization) | Coding becomes the second real consumer of the harness seam; N4 adds a Run Result Evaluator evidence-adapter seam justified by two consumers | seam count grows only with proven consumers; no plugin SDK |\n| AC-I008 (interactive/headless parity) | Seam G and step 7 extend parity from coordination to the Work driver; N3 is owned by Dispatch/Run Runtime so parity is not headless-only | no interactive-only or headless-only capability without naming the gap |\n| AC-I009 (domain-owned Work isolation) | Step 5 is the named proof; Seams C/F keep isolation, merge, transition in the domain | `src/runner/coordination/**` never gains merge/branch/transition API |\n| V-012 (two unlike consumers) | Step 10 is the coding half of the claim after Step 09 proves the standalone group-thinking substrate; if coding needs a separate core after step 6, the foundation boundary was not found | one execution core |"
+      }
+    },
+    {
+      "claimId": "claim_b726d6b7691ef0fe548eecaad2fa096e",
+      "sourceUnitDigest": "57a1204a525a1c197b1834b1d9ab4ded9437eb835553fc89e824fc1231bebc29",
+      "targetUnitDigest": "57a1204a525a1c197b1834b1d9ab4ded9437eb835553fc89e824fc1231bebc29",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_b726d6b7691ef0fe548eecaad2fa096e",
+        "sourceUnitDigest": "57a1204a525a1c197b1834b1d9ab4ded9437eb835553fc89e824fc1231bebc29",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-76",
+        "targetUnitDigest": "57a1204a525a1c197b1834b1d9ab4ded9437eb835553fc89e824fc1231bebc29",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "12. Intent Traceability"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-73 (lines 665–666) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-76 (lines 692–693); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-73",
+        "githubAnchor": "unheaded-block-73",
+        "stableAnchor": "unheaded-block-73",
+        "title": "Unheaded block 73",
+        "startLine": 665,
+        "endLine": 666,
+        "textDigest": "57a1204a525a1c197b1834b1d9ab4ded9437eb835553fc89e824fc1231bebc29",
+        "sample": "Every implementation phase derived from this proposal must close with the\nledger's Deferral Audit template.",
+        "identityFingerprint": "fbf1ee6e7fbcd8940ce72020d79cc96d70789fbc33e53387faca2601ed0a3db0",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "12. Intent Traceability"
+        ],
+        "text": "Every implementation phase derived from this proposal must close with the\nledger's Deferral Audit template."
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-76",
+        "githubAnchor": "unheaded-block-76",
+        "stableAnchor": "unheaded-block-76",
+        "title": "Unheaded block 76",
+        "startLine": 692,
+        "endLine": 693,
+        "textDigest": "57a1204a525a1c197b1834b1d9ab4ded9437eb835553fc89e824fc1231bebc29",
+        "sample": "Every implementation phase derived from this proposal must close with the\nledger's Deferral Audit template.",
+        "identityFingerprint": "fbf1ee6e7fbcd8940ce72020d79cc96d70789fbc33e53387faca2601ed0a3db0",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "12. Intent Traceability"
+        ],
+        "text": "Every implementation phase derived from this proposal must close with the\nledger's Deferral Audit template."
+      }
+    },
+    {
+      "claimId": "claim_ce1b71a7db539bb8eb113f630fca0819",
+      "sourceUnitDigest": "9efbcb532d663d96894d177e2e924409bbcb7808e1be9941c52a2506e534f3aa",
+      "targetUnitDigest": "9efbcb532d663d96894d177e2e924409bbcb7808e1be9941c52a2506e534f3aa",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_ce1b71a7db539bb8eb113f630fca0819",
+        "sourceUnitDigest": "9efbcb532d663d96894d177e2e924409bbcb7808e1be9941c52a2506e534f3aa",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "13-discussion-log",
+        "targetUnitDigest": "9efbcb532d663d96894d177e2e924409bbcb7808e1be9941c52a2506e534f3aa",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source heading docs/architect/proposals/step-10-coding-domain-adoption.md#13-discussion-log (lines 668–668) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#13-discussion-log (lines 695–695); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "13. Discussion Log",
+        "anchor": "13-discussion-log",
+        "githubAnchor": "13-discussion-log",
+        "stableAnchor": "h-ed9e140c042f",
+        "startLine": 668,
+        "endLine": 668,
+        "textDigest": "9efbcb532d663d96894d177e2e924409bbcb7808e1be9941c52a2506e534f3aa",
+        "sample": "13. Discussion Log",
+        "sectionPayloadDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+        "followingBlockDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+        "identityFingerprint": "f06ae1e246522735c5b5665b3fd1df5cc3df4f0b350849f411c5c2674f001746",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "text": "## 13. Discussion Log",
+        "sectionText": "## 13. Discussion Log\n\n- **2026-09-02** — Initial discussion. Conclusions: (a) Step 08 done is\n  necessary, not sufficient; read-only adoption is ready, mutating adoption\n  is the gate's own proof; (b) coding consumes engines, does not migrate\n  runtime; (c) eight-step sequence with the duplicate-mechanism inventory\n  (§5.4) as its derivation; (d) three-tenths of the work is new foundation\n  capability (§8), N3 being the least visible and most decisive. Nothing\n  decided; Q1–Q6 open.\n- **2026-09-02** — Review update after architecture discussion. Changes:\n  (a) authority moved out of `CoordinationSession` for Work/Stage/operation\n  selection — Work Driver and Assignment Builder own declared Work operation\n  construction; (b) first read-only slice narrowed to `validate-plan` only;\n  (c) coding evidence adapter / Run Result Evaluator boundary moved before the\n  mutating live proof; (d) N3 renamed as an in-process Run mechanism owned by\n  Dispatch/Run Runtime, not a CoordinationSession feature; (e) the component\n  authority map became an implementation gate, not optional cleanup.\n- **2026-09-02** — Follow-up on component boundary and repo layout. Human\n  confirmed Step 1 must happen first because advisory §18 names several\n  foundation/platform clusters that coding currently uses heavily and can make\n  look coding-specific. Added F1-F7 classification debt, expanded Step 1 into\n  an authority-and-layout gate, and recorded a Node `apps/` + `packages/`\n  overlay as proposal-only direction until facades and contract tests exist.\n- **2026-09-02** — Progress tracking update. Human confirmed this is an\n  independent architecture discussion, not coding implementation. Split Step 1\n  into Step 1A (draft authority/layout map, may start during Step 08) and Step\n  1B (promote accepted map after Step 08 P07.2 final audit). Step 2+ remains\n  blocked on Step 1B.\n- **2026-09-02** — Step 1A draft artifact created. Added a separate draft\n  Component, Bounded-Context, And Authority Map covering F1-F8 cluster\n  classification, Coding Domain Core ownership, Work-attached coding\n  collaboration authority chain, draft ports, Node `apps/` + `packages/`\n  overlay direction, and Step 1B promotion checklist. It is proposal-only and\n  not accepted architecture.\n- **2026-09-02** — Coding feature split discussion. The Step 1A draft now\n  treats today's `feature` workflow as overloaded and proposes two coding\n  flows: an upstream product/requirement/design/shape flow (name open) and a\n  downstream implementation-oriented `cook` workflow. The upstream flow's\n  output becomes the `cook` input through domain-owned cross-flow routing.\n  Simple item treatment was still open at this point: direct `cook`, a separate\n  lightweight workflow, or a forced upstream pass had not yet been resolved.\n- **2026-09-02** — Planning vocabulary split. Human clarified there are two\n  meanings of planning: product/design planning (requirements, architecture,\n  design decisions, implementation shape, high-level sequence) belongs to the\n  upstream product/design flow, whose name remains open because `define` is\n  useful but not yet satisfying; execution planning (detailed task split, order\n  of work, verification/resource plan to move fast and stably) belongs inside\n  `cook` and should be machine-owned by default, without a human gate unless a\n  missing product/design decision or explicit risk threshold appears.\n- **2026-09-02** — Define is escalation, not default. Human clarified the\n  upstream flow is only needed when an item is heavy or ambiguous enough to\n  require discussion and detailed design. Simple or already-detailed items\n  should not pass through the upstream product/design flow; they route directly\n  to `cook` when a readiness check proves requirement, acceptance, verify, and\n  footprint are sufficient.\n- **2026-09-02** — Coordination rings preservation. Human flagged that if the\n  four rings stay only a responsibility vocabulary and never become one shared\n  engine/contract spine, implementation will drift from the intended model.\n  Step 1A now records a proposed orchestration spine: common request envelope,\n  ring handoff contract, authority check, state/evidence reference, and\n  next-ring decision across Orchestrator, Launcher, Router/Driver, and\n  Dispatcher, without collapsing all authorities into one module or into Agent\n  Coordination.\n- **2026-09-02** — Agent Coordination docs organization pressure. Human noted\n  that current `docs/architect/agent-coordination/` organization is large and\n  authority-oriented, while component-boundary discussion needs a clearer\n  internal boundary view. Step 1A now records a recommendation to add a\n  boundary overlay/index before any physical file move, so adjacent platform\n  components such as Dispatch, Run Result Evaluation, Work Driver integration,\n  and Host/Visibility are not mistaken for Agent Coordination Engine internals.\n- **2026-09-02** — Parent-child hierarchy clarification. Human clarified that\n  component parentage should be explicit because it affects both physical\n  placement and contract dependency. Follow-up clarification: authority must\n  still belong to exactly one component; parentage is for responsibility\n  grouping and tightly coupled runtime collaboration among related subcomponents.\n  Step 1A now records a draft hierarchy for Platform Core, Agent Coordination,\n  Work Core, and Coding Domain, plus a rule that physical\n  nesting permits dependency through child contracts but does not transfer\n  authority from the child component to its parent. The shorthand rule is:\n  parent-child = responsibility grouping + runtime coupling + placement hint;\n  dependency = explicit contract direction, never inferred from nesting.\n- **2026-09-02** — Step 1A artifact structure cleanup. Human flagged that\n  `component-authority-boundary-map.md` had become ad hoc because new\n  ideas were appended as the discussion evolved. The artifact was reorganized\n  around the shorthand rule above: status, organizing formula, vocabulary,\n  classification axes, parent-child responsibility map, authority ownership,\n  contract dependency matrix, cluster classification, coding domain flows,\n  driver/router/rings, collaboration chain, ports, layout overlay, scan\n  findings, promotion checklist, and documentation overlay pressure.\n- **2026-09-02** — Step 1A open-item reconciliation. Human clarified: use\n  `Agent Coordination` as the umbrella name instead of `Agent Coordination\n  Foundation`; `Work Core` is acceptable; Work Driver is a child responsibility\n  under Work Core; Domain Registry is accepted as a general runtime definition\n  loader, distinct from setup/distribution config; the upstream\n  product/design flow name remains open; and the small-change path is not yet\n  clear enough to call a full workflow.\n- **2026-09-02** — Step renumbering and substrate separation. Human clarified\n  the Master Coordination Prompt proof is not Coding Domain adoption; it is a\n  standalone test of Agent Coordination's group-thinking capability with no\n  Work dependency. Step 09 was split into the Group Thinking Substrate track,\n  Coding Domain Adoption moved to Step 10, and the component authority map was\n  promoted to a parallel architect-level guardrail rather than a child of\n  coding adoption."
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "heading",
+        "level": 2,
+        "title": "13. Discussion Log",
+        "anchor": "13-discussion-log",
+        "githubAnchor": "13-discussion-log",
+        "stableAnchor": "h-9182d4ced089",
+        "startLine": 695,
+        "endLine": 695,
+        "textDigest": "9efbcb532d663d96894d177e2e924409bbcb7808e1be9941c52a2506e534f3aa",
+        "sample": "13. Discussion Log",
+        "sectionPayloadDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+        "followingBlockDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+        "identityFingerprint": "f06ae1e246522735c5b5665b3fd1df5cc3df4f0b350849f411c5c2674f001746",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation"
+        ],
+        "text": "## 13. Discussion Log",
+        "sectionText": "## 13. Discussion Log\n\n- **2026-09-02** — Initial discussion. Conclusions: (a) Step 08 done is\n  necessary, not sufficient; read-only adoption is ready, mutating adoption\n  is the gate's own proof; (b) coding consumes engines, does not migrate\n  runtime; (c) eight-step sequence with the duplicate-mechanism inventory\n  (§5.4) as its derivation; (d) three-tenths of the work is new foundation\n  capability (§8), N3 being the least visible and most decisive. Nothing\n  decided; Q1–Q6 open.\n- **2026-09-02** — Review update after architecture discussion. Changes:\n  (a) authority moved out of `CoordinationSession` for Work/Stage/operation\n  selection — Work Driver and Assignment Builder own declared Work operation\n  construction; (b) first read-only slice narrowed to `validate-plan` only;\n  (c) coding evidence adapter / Run Result Evaluator boundary moved before the\n  mutating live proof; (d) N3 renamed as an in-process Run mechanism owned by\n  Dispatch/Run Runtime, not a CoordinationSession feature; (e) the component\n  authority map became an implementation gate, not optional cleanup.\n- **2026-09-02** — Follow-up on component boundary and repo layout. Human\n  confirmed Step 1 must happen first because advisory §18 names several\n  foundation/platform clusters that coding currently uses heavily and can make\n  look coding-specific. Added F1-F7 classification debt, expanded Step 1 into\n  an authority-and-layout gate, and recorded a Node `apps/` + `packages/`\n  overlay as proposal-only direction until facades and contract tests exist.\n- **2026-09-02** — Progress tracking update. Human confirmed this is an\n  independent architecture discussion, not coding implementation. Split Step 1\n  into Step 1A (draft authority/layout map, may start during Step 08) and Step\n  1B (promote accepted map after Step 08 P07.2 final audit). Step 2+ remains\n  blocked on Step 1B.\n- **2026-09-02** — Step 1A draft artifact created. Added a separate draft\n  Component, Bounded-Context, And Authority Map covering F1-F8 cluster\n  classification, Coding Domain Core ownership, Work-attached coding\n  collaboration authority chain, draft ports, Node `apps/` + `packages/`\n  overlay direction, and Step 1B promotion checklist. It is proposal-only and\n  not accepted architecture.\n- **2026-09-02** — Coding feature split discussion. The Step 1A draft now\n  treats today's `feature` workflow as overloaded and proposes two coding\n  flows: an upstream product/requirement/design/shape flow (name open) and a\n  downstream implementation-oriented `cook` workflow. The upstream flow's\n  output becomes the `cook` input through domain-owned cross-flow routing.\n  Simple item treatment was still open at this point: direct `cook`, a separate\n  lightweight workflow, or a forced upstream pass had not yet been resolved.\n- **2026-09-02** — Planning vocabulary split. Human clarified there are two\n  meanings of planning: product/design planning (requirements, architecture,\n  design decisions, implementation shape, high-level sequence) belongs to the\n  upstream product/design flow, whose name remains open because `define` is\n  useful but not yet satisfying; execution planning (detailed task split, order\n  of work, verification/resource plan to move fast and stably) belongs inside\n  `cook` and should be machine-owned by default, without a human gate unless a\n  missing product/design decision or explicit risk threshold appears.\n- **2026-09-02** — Define is escalation, not default. Human clarified the\n  upstream flow is only needed when an item is heavy or ambiguous enough to\n  require discussion and detailed design. Simple or already-detailed items\n  should not pass through the upstream product/design flow; they route directly\n  to `cook` when a readiness check proves requirement, acceptance, verify, and\n  footprint are sufficient.\n- **2026-09-02** — Coordination rings preservation. Human flagged that if the\n  four rings stay only a responsibility vocabulary and never become one shared\n  engine/contract spine, implementation will drift from the intended model.\n  Step 1A now records a proposed orchestration spine: common request envelope,\n  ring handoff contract, authority check, state/evidence reference, and\n  next-ring decision across Orchestrator, Launcher, Router/Driver, and\n  Dispatcher, without collapsing all authorities into one module or into Agent\n  Coordination.\n- **2026-09-02** — Agent Coordination docs organization pressure. Human noted\n  that current `docs/architect/agent-coordination/` organization is large and\n  authority-oriented, while component-boundary discussion needs a clearer\n  internal boundary view. Step 1A now records a recommendation to add a\n  boundary overlay/index before any physical file move, so adjacent platform\n  components such as Dispatch, Run Result Evaluation, Work Driver integration,\n  and Host/Visibility are not mistaken for Agent Coordination Engine internals.\n- **2026-09-02** — Parent-child hierarchy clarification. Human clarified that\n  component parentage should be explicit because it affects both physical\n  placement and contract dependency. Follow-up clarification: authority must\n  still belong to exactly one component; parentage is for responsibility\n  grouping and tightly coupled runtime collaboration among related subcomponents.\n  Step 1A now records a draft hierarchy for Platform Core, Agent Coordination,\n  Work Core, and Coding Domain, plus a rule that physical\n  nesting permits dependency through child contracts but does not transfer\n  authority from the child component to its parent. The shorthand rule is:\n  parent-child = responsibility grouping + runtime coupling + placement hint;\n  dependency = explicit contract direction, never inferred from nesting.\n- **2026-09-02** — Step 1A artifact structure cleanup. Human flagged that\n  `component-authority-boundary-map.md` had become ad hoc because new\n  ideas were appended as the discussion evolved. The artifact was reorganized\n  around the shorthand rule above: status, organizing formula, vocabulary,\n  classification axes, parent-child responsibility map, authority ownership,\n  contract dependency matrix, cluster classification, coding domain flows,\n  driver/router/rings, collaboration chain, ports, layout overlay, scan\n  findings, promotion checklist, and documentation overlay pressure.\n- **2026-09-02** — Step 1A open-item reconciliation. Human clarified: use\n  `Agent Coordination` as the umbrella name instead of `Agent Coordination\n  Foundation`; `Work Core` is acceptable; Work Driver is a child responsibility\n  under Work Core; Domain Registry is accepted as a general runtime definition\n  loader, distinct from setup/distribution config; the upstream\n  product/design flow name remains open; and the small-change path is not yet\n  clear enough to call a full workflow.\n- **2026-09-02** — Step renumbering and substrate separation. Human clarified\n  the Master Coordination Prompt proof is not Coding Domain adoption; it is a\n  standalone test of Agent Coordination's group-thinking capability with no\n  Work dependency. Step 09 was split into the Group Thinking Substrate track,\n  Coding Domain Adoption moved to Step 10, and the component authority map was\n  promoted to a parallel architect-level guardrail rather than a child of\n  coding adoption."
+      }
+    },
+    {
+      "claimId": "claim_32a013f1a7978159808bcfd8f4965c07",
+      "sourceUnitDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+      "targetUnitDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+      "reviewAuthor": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+      "decision": {
+        "claimId": "claim_32a013f1a7978159808bcfd8f4965c07",
+        "sourceUnitDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+        "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "targetAnchor": "unheaded-block-77",
+        "targetUnitDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+        "targetAncestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "13. Discussion Log"
+        ],
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal; surviving adoption intent is not retired with the old CoordinationSession implementation. Stale foundation assumptions remain for promotion truth review. Evidence: docs/platform/system-architecture/architecture/roadmap.md:53 retains the direction, explicitly using Workflow runner and Execution Core. Source lines 3–32 calls itself Discussion, Not started and no implemented slice. domains/coding/workflows/feature.yaml and harness/enrich-and-validate-contract.mjs survive. Complete source unheaded-block docs/architect/proposals/step-10-coding-domain-adoption.md#unheaded-block-74 (lines 670–770) is carried at docs/platform/proposals/step-10-coding-domain-adoption.md#unheaded-block-77 (lines 697–797); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-74",
+        "githubAnchor": "unheaded-block-74",
+        "stableAnchor": "unheaded-block-74",
+        "title": "Unheaded block 74",
+        "startLine": 670,
+        "endLine": 770,
+        "textDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+        "sample": "- **2026-09-02** — Initial discussion. Conclusions: (a) Step 08 done is\n  necessary, not sufficient; read-only adoption is ready, mutating adoption\n  is the gate's own proof; (b) c",
+        "identityFingerprint": "224789d1b745dd7a3bfd6e8f54e9816ae9aa58465fe44d2d37c7919817811b2e",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "13. Discussion Log"
+        ],
+        "text": "- **2026-09-02** — Initial discussion. Conclusions: (a) Step 08 done is\n  necessary, not sufficient; read-only adoption is ready, mutating adoption\n  is the gate's own proof; (b) coding consumes engines, does not migrate\n  runtime; (c) eight-step sequence with the duplicate-mechanism inventory\n  (§5.4) as its derivation; (d) three-tenths of the work is new foundation\n  capability (§8), N3 being the least visible and most decisive. Nothing\n  decided; Q1–Q6 open.\n- **2026-09-02** — Review update after architecture discussion. Changes:\n  (a) authority moved out of `CoordinationSession` for Work/Stage/operation\n  selection — Work Driver and Assignment Builder own declared Work operation\n  construction; (b) first read-only slice narrowed to `validate-plan` only;\n  (c) coding evidence adapter / Run Result Evaluator boundary moved before the\n  mutating live proof; (d) N3 renamed as an in-process Run mechanism owned by\n  Dispatch/Run Runtime, not a CoordinationSession feature; (e) the component\n  authority map became an implementation gate, not optional cleanup.\n- **2026-09-02** — Follow-up on component boundary and repo layout. Human\n  confirmed Step 1 must happen first because advisory §18 names several\n  foundation/platform clusters that coding currently uses heavily and can make\n  look coding-specific. Added F1-F7 classification debt, expanded Step 1 into\n  an authority-and-layout gate, and recorded a Node `apps/` + `packages/`\n  overlay as proposal-only direction until facades and contract tests exist.\n- **2026-09-02** — Progress tracking update. Human confirmed this is an\n  independent architecture discussion, not coding implementation. Split Step 1\n  into Step 1A (draft authority/layout map, may start during Step 08) and Step\n  1B (promote accepted map after Step 08 P07.2 final audit). Step 2+ remains\n  blocked on Step 1B.\n- **2026-09-02** — Step 1A draft artifact created. Added a separate draft\n  Component, Bounded-Context, And Authority Map covering F1-F8 cluster\n  classification, Coding Domain Core ownership, Work-attached coding\n  collaboration authority chain, draft ports, Node `apps/` + `packages/`\n  overlay direction, and Step 1B promotion checklist. It is proposal-only and\n  not accepted architecture.\n- **2026-09-02** — Coding feature split discussion. The Step 1A draft now\n  treats today's `feature` workflow as overloaded and proposes two coding\n  flows: an upstream product/requirement/design/shape flow (name open) and a\n  downstream implementation-oriented `cook` workflow. The upstream flow's\n  output becomes the `cook` input through domain-owned cross-flow routing.\n  Simple item treatment was still open at this point: direct `cook`, a separate\n  lightweight workflow, or a forced upstream pass had not yet been resolved.\n- **2026-09-02** — Planning vocabulary split. Human clarified there are two\n  meanings of planning: product/design planning (requirements, architecture,\n  design decisions, implementation shape, high-level sequence) belongs to the\n  upstream product/design flow, whose name remains open because `define` is\n  useful but not yet satisfying; execution planning (detailed task split, order\n  of work, verification/resource plan to move fast and stably) belongs inside\n  `cook` and should be machine-owned by default, without a human gate unless a\n  missing product/design decision or explicit risk threshold appears.\n- **2026-09-02** — Define is escalation, not default. Human clarified the\n  upstream flow is only needed when an item is heavy or ambiguous enough to\n  require discussion and detailed design. Simple or already-detailed items\n  should not pass through the upstream product/design flow; they route directly\n  to `cook` when a readiness check proves requirement, acceptance, verify, and\n  footprint are sufficient.\n- **2026-09-02** — Coordination rings preservation. Human flagged that if the\n  four rings stay only a responsibility vocabulary and never become one shared\n  engine/contract spine, implementation will drift from the intended model.\n  Step 1A now records a proposed orchestration spine: common request envelope,\n  ring handoff contract, authority check, state/evidence reference, and\n  next-ring decision across Orchestrator, Launcher, Router/Driver, and\n  Dispatcher, without collapsing all authorities into one module or into Agent\n  Coordination.\n- **2026-09-02** — Agent Coordination docs organization pressure. Human noted\n  that current `docs/architect/agent-coordination/` organization is large and\n  authority-oriented, while component-boundary discussion needs a clearer\n  internal boundary view. Step 1A now records a recommendation to add a\n  boundary overlay/index before any physical file move, so adjacent platform\n  components such as Dispatch, Run Result Evaluation, Work Driver integration,\n  and Host/Visibility are not mistaken for Agent Coordination Engine internals.\n- **2026-09-02** — Parent-child hierarchy clarification. Human clarified that\n  component parentage should be explicit because it affects both physical\n  placement and contract dependency. Follow-up clarification: authority must\n  still belong to exactly one component; parentage is for responsibility\n  grouping and tightly coupled runtime collaboration among related subcomponents.\n  Step 1A now records a draft hierarchy for Platform Core, Agent Coordination,\n  Work Core, and Coding Domain, plus a rule that physical\n  nesting permits dependency through child contracts but does not transfer\n  authority from the child component to its parent. The shorthand rule is:\n  parent-child = responsibility grouping + runtime coupling + placement hint;\n  dependency = explicit contract direction, never inferred from nesting.\n- **2026-09-02** — Step 1A artifact structure cleanup. Human flagged that\n  `component-authority-boundary-map.md` had become ad hoc because new\n  ideas were appended as the discussion evolved. The artifact was reorganized\n  around the shorthand rule above: status, organizing formula, vocabulary,\n  classification axes, parent-child responsibility map, authority ownership,\n  contract dependency matrix, cluster classification, coding domain flows,\n  driver/router/rings, collaboration chain, ports, layout overlay, scan\n  findings, promotion checklist, and documentation overlay pressure.\n- **2026-09-02** — Step 1A open-item reconciliation. Human clarified: use\n  `Agent Coordination` as the umbrella name instead of `Agent Coordination\n  Foundation`; `Work Core` is acceptable; Work Driver is a child responsibility\n  under Work Core; Domain Registry is accepted as a general runtime definition\n  loader, distinct from setup/distribution config; the upstream\n  product/design flow name remains open; and the small-change path is not yet\n  clear enough to call a full workflow.\n- **2026-09-02** — Step renumbering and substrate separation. Human clarified\n  the Master Coordination Prompt proof is not Coding Domain adoption; it is a\n  standalone test of Agent Coordination's group-thinking capability with no\n  Work dependency. Step 09 was split into the Group Thinking Substrate track,\n  Coding Domain Adoption moved to Step 10, and the component authority map was\n  promoted to a parallel architect-level guardrail rather than a child of\n  coding adoption."
+      },
+      "target": {
+        "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-77",
+        "githubAnchor": "unheaded-block-77",
+        "stableAnchor": "unheaded-block-77",
+        "title": "Unheaded block 77",
+        "startLine": 697,
+        "endLine": 797,
+        "textDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+        "sample": "- **2026-09-02** — Initial discussion. Conclusions: (a) Step 08 done is\n  necessary, not sufficient; read-only adoption is ready, mutating adoption\n  is the gate's own proof; (b) c",
+        "identityFingerprint": "224789d1b745dd7a3bfd6e8f54e9816ae9aa58465fe44d2d37c7919817811b2e",
+        "ancestry": [
+          "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+          "13. Discussion Log"
+        ],
+        "text": "- **2026-09-02** — Initial discussion. Conclusions: (a) Step 08 done is\n  necessary, not sufficient; read-only adoption is ready, mutating adoption\n  is the gate's own proof; (b) coding consumes engines, does not migrate\n  runtime; (c) eight-step sequence with the duplicate-mechanism inventory\n  (§5.4) as its derivation; (d) three-tenths of the work is new foundation\n  capability (§8), N3 being the least visible and most decisive. Nothing\n  decided; Q1–Q6 open.\n- **2026-09-02** — Review update after architecture discussion. Changes:\n  (a) authority moved out of `CoordinationSession` for Work/Stage/operation\n  selection — Work Driver and Assignment Builder own declared Work operation\n  construction; (b) first read-only slice narrowed to `validate-plan` only;\n  (c) coding evidence adapter / Run Result Evaluator boundary moved before the\n  mutating live proof; (d) N3 renamed as an in-process Run mechanism owned by\n  Dispatch/Run Runtime, not a CoordinationSession feature; (e) the component\n  authority map became an implementation gate, not optional cleanup.\n- **2026-09-02** — Follow-up on component boundary and repo layout. Human\n  confirmed Step 1 must happen first because advisory §18 names several\n  foundation/platform clusters that coding currently uses heavily and can make\n  look coding-specific. Added F1-F7 classification debt, expanded Step 1 into\n  an authority-and-layout gate, and recorded a Node `apps/` + `packages/`\n  overlay as proposal-only direction until facades and contract tests exist.\n- **2026-09-02** — Progress tracking update. Human confirmed this is an\n  independent architecture discussion, not coding implementation. Split Step 1\n  into Step 1A (draft authority/layout map, may start during Step 08) and Step\n  1B (promote accepted map after Step 08 P07.2 final audit). Step 2+ remains\n  blocked on Step 1B.\n- **2026-09-02** — Step 1A draft artifact created. Added a separate draft\n  Component, Bounded-Context, And Authority Map covering F1-F8 cluster\n  classification, Coding Domain Core ownership, Work-attached coding\n  collaboration authority chain, draft ports, Node `apps/` + `packages/`\n  overlay direction, and Step 1B promotion checklist. It is proposal-only and\n  not accepted architecture.\n- **2026-09-02** — Coding feature split discussion. The Step 1A draft now\n  treats today's `feature` workflow as overloaded and proposes two coding\n  flows: an upstream product/requirement/design/shape flow (name open) and a\n  downstream implementation-oriented `cook` workflow. The upstream flow's\n  output becomes the `cook` input through domain-owned cross-flow routing.\n  Simple item treatment was still open at this point: direct `cook`, a separate\n  lightweight workflow, or a forced upstream pass had not yet been resolved.\n- **2026-09-02** — Planning vocabulary split. Human clarified there are two\n  meanings of planning: product/design planning (requirements, architecture,\n  design decisions, implementation shape, high-level sequence) belongs to the\n  upstream product/design flow, whose name remains open because `define` is\n  useful but not yet satisfying; execution planning (detailed task split, order\n  of work, verification/resource plan to move fast and stably) belongs inside\n  `cook` and should be machine-owned by default, without a human gate unless a\n  missing product/design decision or explicit risk threshold appears.\n- **2026-09-02** — Define is escalation, not default. Human clarified the\n  upstream flow is only needed when an item is heavy or ambiguous enough to\n  require discussion and detailed design. Simple or already-detailed items\n  should not pass through the upstream product/design flow; they route directly\n  to `cook` when a readiness check proves requirement, acceptance, verify, and\n  footprint are sufficient.\n- **2026-09-02** — Coordination rings preservation. Human flagged that if the\n  four rings stay only a responsibility vocabulary and never become one shared\n  engine/contract spine, implementation will drift from the intended model.\n  Step 1A now records a proposed orchestration spine: common request envelope,\n  ring handoff contract, authority check, state/evidence reference, and\n  next-ring decision across Orchestrator, Launcher, Router/Driver, and\n  Dispatcher, without collapsing all authorities into one module or into Agent\n  Coordination.\n- **2026-09-02** — Agent Coordination docs organization pressure. Human noted\n  that current `docs/architect/agent-coordination/` organization is large and\n  authority-oriented, while component-boundary discussion needs a clearer\n  internal boundary view. Step 1A now records a recommendation to add a\n  boundary overlay/index before any physical file move, so adjacent platform\n  components such as Dispatch, Run Result Evaluation, Work Driver integration,\n  and Host/Visibility are not mistaken for Agent Coordination Engine internals.\n- **2026-09-02** — Parent-child hierarchy clarification. Human clarified that\n  component parentage should be explicit because it affects both physical\n  placement and contract dependency. Follow-up clarification: authority must\n  still belong to exactly one component; parentage is for responsibility\n  grouping and tightly coupled runtime collaboration among related subcomponents.\n  Step 1A now records a draft hierarchy for Platform Core, Agent Coordination,\n  Work Core, and Coding Domain, plus a rule that physical\n  nesting permits dependency through child contracts but does not transfer\n  authority from the child component to its parent. The shorthand rule is:\n  parent-child = responsibility grouping + runtime coupling + placement hint;\n  dependency = explicit contract direction, never inferred from nesting.\n- **2026-09-02** — Step 1A artifact structure cleanup. Human flagged that\n  `component-authority-boundary-map.md` had become ad hoc because new\n  ideas were appended as the discussion evolved. The artifact was reorganized\n  around the shorthand rule above: status, organizing formula, vocabulary,\n  classification axes, parent-child responsibility map, authority ownership,\n  contract dependency matrix, cluster classification, coding domain flows,\n  driver/router/rings, collaboration chain, ports, layout overlay, scan\n  findings, promotion checklist, and documentation overlay pressure.\n- **2026-09-02** — Step 1A open-item reconciliation. Human clarified: use\n  `Agent Coordination` as the umbrella name instead of `Agent Coordination\n  Foundation`; `Work Core` is acceptable; Work Driver is a child responsibility\n  under Work Core; Domain Registry is accepted as a general runtime definition\n  loader, distinct from setup/distribution config; the upstream\n  product/design flow name remains open; and the small-change path is not yet\n  clear enough to call a full workflow.\n- **2026-09-02** — Step renumbering and substrate separation. Human clarified\n  the Master Coordination Prompt proof is not Coding Domain adoption; it is a\n  standalone test of Agent Coordination's group-thinking capability with no\n  Work dependency. Step 09 was split into the Group Thinking Substrate track,\n  Coding Domain Adoption moved to Step 10, and the component authority map was\n  promoted to a parallel architect-level guardrail rather than a child of\n  coding adoption."
+      }
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "originalShardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-19-step-10-coding-domain-adoption.json",
+  "originalShardSHA256": "098b9ec903b1eaf4c3f5829c902a5c90c8e43dab77c0205e2f9e31bd781081dc",
+  "part": 2,
+  "parts": 2,
+  "completeSourceRowCount": 96,
+  "gateFindings": [],
+  "scope": "Source rows only; complete reverse population is in the separate native candidate request.",
+  "a36": {
+    "gateFindings": [],
+    "requestPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1110-proposals-redesigns-source-19-02-0f063d18f.md",
+    "packPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-19-02-0f063d18f.md",
+    "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-19-02-0f063d18f.md.json",
+    "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-19-step-10-coding-domain-adoption.json",
+    "source": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+    "part": 2,
+    "parts": 2,
+    "count": 16,
+    "classes": {
+      "Unit-exact": 10,
+      "Weak-exact": 6
+    },
+    "weakExactAndJudgment": [
+      "claim_6d0563d95c25130f7663e376871273f6",
+      "claim_94dfb1b1881ccfbfc7f063eb80b4de2d",
+      "claim_cd08d56499edbf2a727c00a944b8824d",
+      "claim_ebcdfd56dabe5107f9a6b1797cee3e46",
+      "claim_f58d2663a28b9ac4a095fbb49d136d1c",
+      "claim_ce1b71a7db539bb8eb113f630fca0819"
+    ],
+    "reviewerDeepSampleMinimum": 6,
+    "mandatoryDifferingDigestRows": [],
+    "absentTargetRows": [],
+    "changedByContentCommit": []
+  },
+  "fullShownTextBindings": [
+    {
+      "claimId": "claim_d6958c5271b710ec7b3340bea0aa0343",
+      "sourceShownTextDigest": "1fa110227412a66e68dff01ede44f0c7ac9998a86a1df2eee1a7a17f6ce48a7e",
+      "targetShownTextDigest": "1fa110227412a66e68dff01ede44f0c7ac9998a86a1df2eee1a7a17f6ce48a7e",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_6a6d487e10444a1a4d8e26455fed3581",
+      "sourceShownTextDigest": "dcb883876a70330c3078d09a3aab8f928331a8ff4d0c0eae9468ba28ed9188bc",
+      "targetShownTextDigest": "dcb883876a70330c3078d09a3aab8f928331a8ff4d0c0eae9468ba28ed9188bc",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_389a39083e6a2be3be70925ba9a7b1b7",
+      "sourceShownTextDigest": "22c139aa01f72133ed316119814b5773bed9a20f20b91f016b75f9dab15847df",
+      "targetShownTextDigest": "22c139aa01f72133ed316119814b5773bed9a20f20b91f016b75f9dab15847df",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_6d0563d95c25130f7663e376871273f6",
+      "sourceShownTextDigest": "4b8e91483a1a665fdb1db183cc5eed799ec97839a4f74ca373356483cc424eab",
+      "targetShownTextDigest": "4b8e91483a1a665fdb1db183cc5eed799ec97839a4f74ca373356483cc424eab",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_961ea7fc6d6ce7be45b5a1eed59c7f91",
+      "sourceShownTextDigest": "17e2585d6e4c3cf140f719f13418bb02dd21bcd7b6515ac5decd33a1698c22fc",
+      "targetShownTextDigest": "17e2585d6e4c3cf140f719f13418bb02dd21bcd7b6515ac5decd33a1698c22fc",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_003a48087e0bb6a22e66f4b258593095",
+      "sourceShownTextDigest": "2bbf196e5b1a336bc096c1a5f795c94306e7ad705a39a06436dcee7360122483",
+      "targetShownTextDigest": "2bbf196e5b1a336bc096c1a5f795c94306e7ad705a39a06436dcee7360122483",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_94dfb1b1881ccfbfc7f063eb80b4de2d",
+      "sourceShownTextDigest": "4f14f3f5140e2597f921455ac4caa46ad8de71aabab6976e4a81129e0eb184de",
+      "targetShownTextDigest": "4f14f3f5140e2597f921455ac4caa46ad8de71aabab6976e4a81129e0eb184de",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_cd08d56499edbf2a727c00a944b8824d",
+      "sourceShownTextDigest": "b91bdc1d91076938997855b153c57a75769c47d2d0de399870ecf4a4abe078e7",
+      "targetShownTextDigest": "b91bdc1d91076938997855b153c57a75769c47d2d0de399870ecf4a4abe078e7",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_3ece591ebb2dafd4c36521cf67265042",
+      "sourceShownTextDigest": "ecbcfdfd9a455f00d592d1a66ec53700896ce439d44b7a40543cf31786416358",
+      "targetShownTextDigest": "ecbcfdfd9a455f00d592d1a66ec53700896ce439d44b7a40543cf31786416358",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_ebcdfd56dabe5107f9a6b1797cee3e46",
+      "sourceShownTextDigest": "71788a2490ee8435d71450053b2ed89486375a437d77bbb4eb74cc066001bb9b",
+      "targetShownTextDigest": "71788a2490ee8435d71450053b2ed89486375a437d77bbb4eb74cc066001bb9b",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_c29743cbcbf793b833a9862f5ed9a035",
+      "sourceShownTextDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+      "targetShownTextDigest": "27d36b5b6b838af8adecf2440110e37352e2c0a6f9d267ac48ec960759593448",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_f58d2663a28b9ac4a095fbb49d136d1c",
+      "sourceShownTextDigest": "56442dedb27d845fb89335d19d46660c652bb63655c0f7b253213211bc9e2a8a",
+      "targetShownTextDigest": "56442dedb27d845fb89335d19d46660c652bb63655c0f7b253213211bc9e2a8a",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_46d09321ea3091255ea14afe2b36eda0",
+      "sourceShownTextDigest": "e57fbdca7266c01aaff882b737b526a1c085f9a388cc6e13514ef6b817efbefd",
+      "targetShownTextDigest": "e57fbdca7266c01aaff882b737b526a1c085f9a388cc6e13514ef6b817efbefd",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_b726d6b7691ef0fe548eecaad2fa096e",
+      "sourceShownTextDigest": "57a1204a525a1c197b1834b1d9ab4ded9437eb835553fc89e824fc1231bebc29",
+      "targetShownTextDigest": "57a1204a525a1c197b1834b1d9ab4ded9437eb835553fc89e824fc1231bebc29",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_ce1b71a7db539bb8eb113f630fca0819",
+      "sourceShownTextDigest": "3dcf49d6be68c200d4c220a9de0de5133e949393f3b5168bdaa6d15b15854185",
+      "targetShownTextDigest": "3dcf49d6be68c200d4c220a9de0de5133e949393f3b5168bdaa6d15b15854185",
+      "changedByContentCommit": false
+    },
+    {
+      "claimId": "claim_32a013f1a7978159808bcfd8f4965c07",
+      "sourceShownTextDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+      "targetShownTextDigest": "5ef4bd87f63c12d73f306856d4b93edeb60521e1fe7f59f554c002285472f9ab",
+      "changedByContentCommit": false
+    }
+  ]
+}

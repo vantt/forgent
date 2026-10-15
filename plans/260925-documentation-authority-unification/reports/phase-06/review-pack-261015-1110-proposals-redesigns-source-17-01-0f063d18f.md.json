@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "commit": "0f063d18fdab01cb6f2c915bb60ff528c5e0f238",
+  "shard": "s7-proposals-redesigns-17-step-09-step-10-replan-handoff-prompt.json",
+  "authorSession": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+  "authorshipRequired": true,
+  "rows": [
+    {
+      "claimId": "claim_748eaed66e0864f6b66db8f230941593",
+      "sourceUnitDigest": "d4c07b1b279fe005d92de5d9a48b608bb67a27a4f47f56b6d8ac6994f6cf3bb7",
+      "targetUnitDigest": "99660662643fdbf89df15656d4aeb079b182e1b65e9740b105ec016b41c578c7",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_748eaed66e0864f6b66db8f230941593",
+        "sourceUnitDigest": "d4c07b1b279fe005d92de5d9a48b608bb67a27a4f47f56b6d8ac6994f6cf3bb7",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "targetAnchor": "step-09-step-10-replan-handoff-prompt",
+        "targetUnitDigest": "99660662643fdbf89df15656d4aeb079b182e1b65e9740b105ec016b41c578c7",
+        "targetAncestry": [],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Judgment: target unit digest differs; mandatory A36 deep read. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source heading docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#step-09-step-10-replan-handoff-prompt (lines 1–1) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#step-09-step-10-replan-handoff-prompt (lines 1–1); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Step 09 / Step 10 Replan Handoff Prompt",
+        "anchor": "step-09-step-10-replan-handoff-prompt",
+        "githubAnchor": "step-09-step-10-replan-handoff-prompt",
+        "stableAnchor": "h-ef821ecf59cd",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "d4c07b1b279fe005d92de5d9a48b608bb67a27a4f47f56b6d8ac6994f6cf3bb7",
+        "sample": "Step 09 / Step 10 Replan Handoff Prompt",
+        "sectionPayloadDigest": "31c9db99681a7209641933762d89108a2e09c29c403e4238c475740929d1d6df",
+        "followingBlockDigest": "55c67de7e3f08e6b2bb094056e0a51a0ad796d3da1f44561e5be4067a3739b93",
+        "identityFingerprint": "3a11b8e5d2686d077542e4d46aad80b32e80b3ea346f1aa3c0df6be707ef910d",
+        "ancestry": [],
+        "text": "# Step 09 / Step 10 Replan Handoff Prompt",
+        "sectionText": "# Step 09 / Step 10 Replan Handoff Prompt\n\nDocument type: Handoff prompt\nDesign status: Discussion\nImplementation: Not started\nLast reviewed: 2026-09-02\nCanonical for: nothing; use only to start a fresh design chat\n\nUse this prompt to start a new chat about the next architecture step after the\nAgent Coordination redesign delivered through Step 08.\n\n```txt\nChúng ta cần tiếp tục thiết kế fgOS ở giao điểm giữa:\n\n1. Step 8b: mở rộng group-cognitive coordination vượt khỏi các fixture\n   isolation-heavy/static hiện tại, để fgOS có thể biểu đạt các cơ chế\n   problem-solving/coding-review/adversarial/recheck thông dụng mà không làm\n   yếu các invariant đã được Step 08 chứng minh.\n\n2. Step 10: đưa coding domain lên dùng coordination foundation đã delivered\n   qua Step 08, giảm duplicate mechanism, xác định seam giữa foundation và\n   coding domain, và chuẩn bị một implementation plan tốt hơn thay vì tiếp tục\n   vá theo từng deferred decision.\n\nNgữ cảnh quan trọng:\n\n- Agent Coordination redesign đã deliver tới Step 08 trên code.\n- Step 00-08 đã được promote thành canonical baseline:\n  docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md\n- Step 00-06 roadmap giờ là rollout history, không phải nơi đọc design chính:\n  docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\n- Step 07/08 proposal giờ là promoted history, không còn active design frontier:\n  docs/architect/agent-coordination/proposals/README.md\n- Step 09 hiện là group-thinking substrate proposal cấp architect.\n- Step 10 hiện là coding-domain adoption proposal cấp architect, vì scope vượt\n  khỏi riêng Agent Coordination.\n- Component authority boundary map là architect-level guardrail song song:\n  docs/architect/proposals/step-09-group-thinking-substrate.md\n  docs/architect/proposals/step-10-coding-domain-adoption.md\n  docs/architect/proposals/component-authority-boundary-map.md\n- Architecture-wide intent đang được giữ ở:\n  docs/architect/architecture-intent.md\n\nĐọc trước, theo thứ tự:\n\n1. docs/specs/reading-map.md\n2. docs/architect/README.md\n3. docs/architect/architecture-intent.md\n4. docs/architect/agent-coordination/README.md\n5. docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md\n6. docs/architect/agent-coordination/contracts/coordination-session.md\n7. docs/architect/agent-coordination/contracts/flow-definition.md\n8. docs/architect/proposals/step-09-group-thinking-substrate.md\n9. docs/architect/proposals/step-10-coding-domain-adoption.md\n10. docs/architect/proposals/component-authority-boundary-map.md\n11. docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md\n\nSau khi đọc, đừng re-derive lịch sử cũ. Hãy trả lời như một architecture\nadvisor chính, có phản biện, với mục tiêu tạo một plan sắc và thực thi được.\n\nViệc cần làm trong chat mới:\n\n1. Tóm tắt trạng thái hiện tại bằng \"current implemented shape\", không bằng\n   lịch sử step.\n2. Chỉ ra chính xác chỗ Step 8b và Step 09 đang gặp nhau:\n   - coding-domain implementation cell cần review/fix/red-team/recheck loop;\n   - current coordination foundation đã có session/FlowDefinition/actors/\n     bounded dispatch/evidence, nhưng chưa đủ rich group-cognitive capability;\n   - Work mutation/gitintegration vẫn phải đi qua coding-domain authority,\n     không được coordination tự chiếm.\n3. Phân biệt ba loại việc:\n   - normalize/migrate duplicate coding mechanisms onto existing foundation;\n   - extend foundation capability vì coding là consumer thứ hai chứng minh\n     nhu cầu thật;\n   - defer-preserve những capability rộng hơn chưa cần cho MVP.\n4. Đề xuất một MVP theo từng bước, không hỏi người dùng chọn option trước:\n   - mỗi bước nói real shape trên tài liệu/schema/runtime;\n   - bước nào docs-only, bước nào cần implementation;\n   - bước nào cần proof/test/live run;\n   - invariant nào được giữ;\n   - điều gì cố tình không làm.\n5. Cố gắng draft \"real shape\" của first useful coding-domain implementation\n   cell:\n   - Doer;\n   - Reviewer;\n   - Fixer hoặc Doer-followup;\n   - Red-Team hoặc adversarial reviewer;\n   - recheck/disposition;\n   - persistent external coordinator/driver authority outside the declared\n     worker graph.\n6. Kiểm tra xem current FlowDefinition/CoordinationSession shape có đủ để viết\n   fixture đó không. Nếu không đủ, nêu gap bằng field/operation/event cụ thể,\n   không nói chung chung.\n7. Reconcile lại các open questions hiện có:\n   - primitive nên là `requestRound`, `authorizeDeclaredOperation`,\n     `addSessionEdge`, hay một hình khác?\n   - `intent` vocabulary nên closed enum, fixture-local enum, hay registry?\n   - operation-level `maxRounds` liên hệ thế nào với\n     `aggregateBounds.maxRounds`?\n   - Red-Team recheck là operation riêng hay Reviewer redispatch với intent\n     khác?\n   - ai được gọi primitive runtime deviation/round authorization?\n8. Đưa ra phản biện:\n   - điểm nào trong Step 8b proposal hiện quá rộng hoặc sai thứ tự;\n   - điểm nào trong Step 10 proposal hiện quá migration-heavy mà chưa đạt\n     design intent;\n   - điểm nào nếu làm sớm sẽ phá R3/isolation proof hoặc làm Work authority\n     bị lẫn vào coordination.\n9. Kết quả cần xuất ra:\n   - proposed replan, theo phase/MVP;\n   - first fixture shape;\n   - schema/runtime deltas, nếu có;\n   - tests/proofs required;\n   - docs cần promote/update;\n   - explicit not-proposed/deferred list.\n\nRàng buộc:\n\n- Không implement trong chat này trừ khi người dùng yêu cầu rõ.\n- Không sửa `schema.mjs`, `session-engine.mjs`, hay source runtime trước khi\n  hướng được chốt.\n- Không reopen các Tier 1 invariant: evidence immutability, governance-final,\n  budget caps, mutation exclusivity.\n- Không nới `group-cognition-framework.yaml` để lấy communication. Fixture đó\n  giữ isolation-heavy R3 proof.\n- Không đề xuất autonomous in-graph leader. Persistent coordinator/driver ở\n  ngoài worker graph mới là authority stop/recheck.\n- Không biến Step 09/Step 10 proposal thành accepted design. Chúng vẫn là discussion cho\n  tới khi được promote.\n- Không đặt câu hỏi theo kiểu bắt người dùng chọn option. Hãy đưa plan có\n  chính kiến, rồi nêu điểm cần chốt.\n- Nếu cần dùng sol-agent/subagent để phản biện, trước hết chạy:\n  node src/runner/dispatch.mjs decide --for sol-agent --needs-soul --has-live-task-access\n  rồi tuân theo kết quả dispatch. Nếu không cần, tự phản biện trực tiếp.\n\nTone mong muốn:\n\n- Nghĩ như advisor kiến trúc chính.\n- Có chính kiến và phản biện.\n- Ưu tiên plan/MVP/real shape.\n- Giữ design intent ban đầu thay vì để deferred decisions làm biến dạng hệ\n  thống.\n- Tránh viết proposal trừu tượng khó hiểu; mỗi ý lớn phải nối được với file,\n  schema, runtime primitive, proof, hoặc explicit deferred item.\n```"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Step 09 / Step 10 Replan Handoff Prompt",
+        "anchor": "step-09-step-10-replan-handoff-prompt",
+        "githubAnchor": "step-09-step-10-replan-handoff-prompt",
+        "stableAnchor": "h-ef821ecf59cd",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "99660662643fdbf89df15656d4aeb079b182e1b65e9740b105ec016b41c578c7",
+        "sample": "Step 09 / Step 10 Replan Handoff Prompt",
+        "sectionPayloadDigest": "a43a242621dad40e58f801a407170edc6e06a733112cc4f786ae68696a168200",
+        "followingBlockDigest": "f3fb6607f060714f0f56f8da561ea4cdae4cfe9f620d38c8ce713abd2eb9a5a9",
+        "identityFingerprint": "16d965e2dec6d107f2139368c6733d7b10ff9087fd0c1c68ace0dcc952b3eba4",
+        "ancestry": [],
+        "text": "# Step 09 / Step 10 Replan Handoff Prompt",
+        "sectionText": "# Step 09 / Step 10 Replan Handoff Prompt\n\n```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve historical source text for independent conservation review\nDesign status: Candidate\nImplementation: Source snapshot retained; current implementation truth not certified\nProvenance: docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md at fb046210539cbcbe8ca1dab254763f5e78c573d2; blob fd6e47f8aa7a75c77a37fb3ef1b5ae0593a90a70\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: Nothing; non-canonical candidate conservation carrier\nUse this when: Reviewing source carriage, placement, intent and provenance\nDo not use this for: Current authority, implementation proof or cutover approval\nLast reviewed: Pending independent review\nRelated:\n- docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md\nSupersedes: None; legacy source remains intact\nSuperseded by: None\n```\n\nAdded in candidate: Historical snapshot; Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Original source metadata and text follow. Physical relative-link destinations alone are rebased to the same repository paths. Units with inherited missing links are preserved as literal fenced source text, without substituting another design or changing any assertion. Source metadata is provenance, not candidate authority.\n\nSource relationship: [original source](../../../../architect/proposals/step-09-step-10-replan-handoff-prompt.md).\n\n\nDocument type: Handoff prompt\nDesign status: Discussion\nImplementation: Not started\nLast reviewed: 2026-09-02\nCanonical for: nothing; use only to start a fresh design chat\n\nUse this prompt to start a new chat about the next architecture step after the\nAgent Coordination redesign delivered through Step 08.\n\n```txt\nChúng ta cần tiếp tục thiết kế fgOS ở giao điểm giữa:\n\n1. Step 8b: mở rộng group-cognitive coordination vượt khỏi các fixture\n   isolation-heavy/static hiện tại, để fgOS có thể biểu đạt các cơ chế\n   problem-solving/coding-review/adversarial/recheck thông dụng mà không làm\n   yếu các invariant đã được Step 08 chứng minh.\n\n2. Step 10: đưa coding domain lên dùng coordination foundation đã delivered\n   qua Step 08, giảm duplicate mechanism, xác định seam giữa foundation và\n   coding domain, và chuẩn bị một implementation plan tốt hơn thay vì tiếp tục\n   vá theo từng deferred decision.\n\nNgữ cảnh quan trọng:\n\n- Agent Coordination redesign đã deliver tới Step 08 trên code.\n- Step 00-08 đã được promote thành canonical baseline:\n  docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md\n- Step 00-06 roadmap giờ là rollout history, không phải nơi đọc design chính:\n  docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\n- Step 07/08 proposal giờ là promoted history, không còn active design frontier:\n  docs/architect/agent-coordination/proposals/README.md\n- Step 09 hiện là group-thinking substrate proposal cấp architect.\n- Step 10 hiện là coding-domain adoption proposal cấp architect, vì scope vượt\n  khỏi riêng Agent Coordination.\n- Component authority boundary map là architect-level guardrail song song:\n  docs/architect/proposals/step-09-group-thinking-substrate.md\n  docs/architect/proposals/step-10-coding-domain-adoption.md\n  docs/architect/proposals/component-authority-boundary-map.md\n- Architecture-wide intent đang được giữ ở:\n  docs/architect/architecture-intent.md\n\nĐọc trước, theo thứ tự:\n\n1. docs/specs/reading-map.md\n2. docs/architect/README.md\n3. docs/architect/architecture-intent.md\n4. docs/architect/agent-coordination/README.md\n5. docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md\n6. docs/architect/agent-coordination/contracts/coordination-session.md\n7. docs/architect/agent-coordination/contracts/flow-definition.md\n8. docs/architect/proposals/step-09-group-thinking-substrate.md\n9. docs/architect/proposals/step-10-coding-domain-adoption.md\n10. docs/architect/proposals/component-authority-boundary-map.md\n11. docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md\n\nSau khi đọc, đừng re-derive lịch sử cũ. Hãy trả lời như một architecture\nadvisor chính, có phản biện, với mục tiêu tạo một plan sắc và thực thi được.\n\nViệc cần làm trong chat mới:\n\n1. Tóm tắt trạng thái hiện tại bằng \"current implemented shape\", không bằng\n   lịch sử step.\n2. Chỉ ra chính xác chỗ Step 8b và Step 09 đang gặp nhau:\n   - coding-domain implementation cell cần review/fix/red-team/recheck loop;\n   - current coordination foundation đã có session/FlowDefinition/actors/\n     bounded dispatch/evidence, nhưng chưa đủ rich group-cognitive capability;\n   - Work mutation/gitintegration vẫn phải đi qua coding-domain authority,\n     không được coordination tự chiếm.\n3. Phân biệt ba loại việc:\n   - normalize/migrate duplicate coding mechanisms onto existing foundation;\n   - extend foundation capability vì coding là consumer thứ hai chứng minh\n     nhu cầu thật;\n   - defer-preserve những capability rộng hơn chưa cần cho MVP.\n4. Đề xuất một MVP theo từng bước, không hỏi người dùng chọn option trước:\n   - mỗi bước nói real shape trên tài liệu/schema/runtime;\n   - bước nào docs-only, bước nào cần implementation;\n   - bước nào cần proof/test/live run;\n   - invariant nào được giữ;\n   - điều gì cố tình không làm.\n5. Cố gắng draft \"real shape\" của first useful coding-domain implementation\n   cell:\n   - Doer;\n   - Reviewer;\n   - Fixer hoặc Doer-followup;\n   - Red-Team hoặc adversarial reviewer;\n   - recheck/disposition;\n   - persistent external coordinator/driver authority outside the declared\n     worker graph.\n6. Kiểm tra xem current FlowDefinition/CoordinationSession shape có đủ để viết\n   fixture đó không. Nếu không đủ, nêu gap bằng field/operation/event cụ thể,\n   không nói chung chung.\n7. Reconcile lại các open questions hiện có:\n   - primitive nên là `requestRound`, `authorizeDeclaredOperation`,\n     `addSessionEdge`, hay một hình khác?\n   - `intent` vocabulary nên closed enum, fixture-local enum, hay registry?\n   - operation-level `maxRounds` liên hệ thế nào với\n     `aggregateBounds.maxRounds`?\n   - Red-Team recheck là operation riêng hay Reviewer redispatch với intent\n     khác?\n   - ai được gọi primitive runtime deviation/round authorization?\n8. Đưa ra phản biện:\n   - điểm nào trong Step 8b proposal hiện quá rộng hoặc sai thứ tự;\n   - điểm nào trong Step 10 proposal hiện quá migration-heavy mà chưa đạt\n     design intent;\n   - điểm nào nếu làm sớm sẽ phá R3/isolation proof hoặc làm Work authority\n     bị lẫn vào coordination.\n9. Kết quả cần xuất ra:\n   - proposed replan, theo phase/MVP;\n   - first fixture shape;\n   - schema/runtime deltas, nếu có;\n   - tests/proofs required;\n   - docs cần promote/update;\n   - explicit not-proposed/deferred list.\n\nRàng buộc:\n\n- Không implement trong chat này trừ khi người dùng yêu cầu rõ.\n- Không sửa `schema.mjs`, `session-engine.mjs`, hay source runtime trước khi\n  hướng được chốt.\n- Không reopen các Tier 1 invariant: evidence immutability, governance-final,\n  budget caps, mutation exclusivity.\n- Không nới `group-cognition-framework.yaml` để lấy communication. Fixture đó\n  giữ isolation-heavy R3 proof.\n- Không đề xuất autonomous in-graph leader. Persistent coordinator/driver ở\n  ngoài worker graph mới là authority stop/recheck.\n- Không biến Step 09/Step 10 proposal thành accepted design. Chúng vẫn là discussion cho\n  tới khi được promote.\n- Không đặt câu hỏi theo kiểu bắt người dùng chọn option. Hãy đưa plan có\n  chính kiến, rồi nêu điểm cần chốt.\n- Nếu cần dùng sol-agent/subagent để phản biện, trước hết chạy:\n  node src/runner/dispatch.mjs decide --for sol-agent --needs-soul --has-live-task-access\n  rồi tuân theo kết quả dispatch. Nếu không cần, tự phản biện trực tiếp.\n\nTone mong muốn:\n\n- Nghĩ như advisor kiến trúc chính.\n- Có chính kiến và phản biện.\n- Ưu tiên plan/MVP/real shape.\n- Giữ design intent ban đầu thay vì để deferred decisions làm biến dạng hệ\n  thống.\n- Tránh viết proposal trừu tượng khó hiểu; mỗi ý lớn phải nối được với file,\n  schema, runtime primitive, proof, hoặc explicit deferred item.\n```"
+      }
+    },
+    {
+      "claimId": "claim_2ba1e1cf145db1520a75d592e08e6cc3",
+      "sourceUnitDigest": "55c67de7e3f08e6b2bb094056e0a51a0ad796d3da1f44561e5be4067a3739b93",
+      "targetUnitDigest": "55c67de7e3f08e6b2bb094056e0a51a0ad796d3da1f44561e5be4067a3739b93",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_2ba1e1cf145db1520a75d592e08e6cc3",
+        "sourceUnitDigest": "55c67de7e3f08e6b2bb094056e0a51a0ad796d3da1f44561e5be4067a3739b93",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "targetAnchor": "unheaded-block-4",
+        "targetUnitDigest": "55c67de7e3f08e6b2bb094056e0a51a0ad796d3da1f44561e5be4067a3739b93",
+        "targetAncestry": [
+          "Step 09 / Step 10 Replan Handoff Prompt"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source unheaded-block docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#unheaded-block-1 (lines 3–7) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#unheaded-block-4 (lines 27–31); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 7,
+        "textDigest": "55c67de7e3f08e6b2bb094056e0a51a0ad796d3da1f44561e5be4067a3739b93",
+        "sample": "Document type: Handoff prompt\nDesign status: Discussion\nImplementation: Not started\nLast reviewed: 2026-09-02\nCanonical for: nothing; use only to start a fresh design chat",
+        "identityFingerprint": "051ecd6971727dcd8d7469ff29f85344f6f78b208257100f59d91145ca3603c1",
+        "ancestry": [
+          "Step 09 / Step 10 Replan Handoff Prompt"
+        ],
+        "text": "Document type: Handoff prompt\nDesign status: Discussion\nImplementation: Not started\nLast reviewed: 2026-09-02\nCanonical for: nothing; use only to start a fresh design chat"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-4",
+        "githubAnchor": "unheaded-block-4",
+        "stableAnchor": "unheaded-block-4",
+        "title": "Unheaded block 4",
+        "startLine": 27,
+        "endLine": 31,
+        "textDigest": "55c67de7e3f08e6b2bb094056e0a51a0ad796d3da1f44561e5be4067a3739b93",
+        "sample": "Document type: Handoff prompt\nDesign status: Discussion\nImplementation: Not started\nLast reviewed: 2026-09-02\nCanonical for: nothing; use only to start a fresh design chat",
+        "identityFingerprint": "051ecd6971727dcd8d7469ff29f85344f6f78b208257100f59d91145ca3603c1",
+        "ancestry": [
+          "Step 09 / Step 10 Replan Handoff Prompt"
+        ],
+        "text": "Document type: Handoff prompt\nDesign status: Discussion\nImplementation: Not started\nLast reviewed: 2026-09-02\nCanonical for: nothing; use only to start a fresh design chat"
+      }
+    },
+    {
+      "claimId": "claim_7b86afff62ae3c9360f7d7e884bbfaf8",
+      "sourceUnitDigest": "705a9e6fd739bd254aa3a06a10bfe96bfe160c0e970988f15659548ee44660ff",
+      "targetUnitDigest": "705a9e6fd739bd254aa3a06a10bfe96bfe160c0e970988f15659548ee44660ff",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_7b86afff62ae3c9360f7d7e884bbfaf8",
+        "sourceUnitDigest": "705a9e6fd739bd254aa3a06a10bfe96bfe160c0e970988f15659548ee44660ff",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "targetAnchor": "unheaded-block-5",
+        "targetUnitDigest": "705a9e6fd739bd254aa3a06a10bfe96bfe160c0e970988f15659548ee44660ff",
+        "targetAncestry": [
+          "Step 09 / Step 10 Replan Handoff Prompt"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source unheaded-block docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#unheaded-block-2 (lines 9–10) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#unheaded-block-5 (lines 33–34); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-2",
+        "githubAnchor": "unheaded-block-2",
+        "stableAnchor": "unheaded-block-2",
+        "title": "Unheaded block 2",
+        "startLine": 9,
+        "endLine": 10,
+        "textDigest": "705a9e6fd739bd254aa3a06a10bfe96bfe160c0e970988f15659548ee44660ff",
+        "sample": "Use this prompt to start a new chat about the next architecture step after the\nAgent Coordination redesign delivered through Step 08.",
+        "identityFingerprint": "e25428882ed4fb6990eda712540be59786b490bfc6c050b1b2401580a5ef9e1d",
+        "ancestry": [
+          "Step 09 / Step 10 Replan Handoff Prompt"
+        ],
+        "text": "Use this prompt to start a new chat about the next architecture step after the\nAgent Coordination redesign delivered through Step 08."
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-5",
+        "githubAnchor": "unheaded-block-5",
+        "stableAnchor": "unheaded-block-5",
+        "title": "Unheaded block 5",
+        "startLine": 33,
+        "endLine": 34,
+        "textDigest": "705a9e6fd739bd254aa3a06a10bfe96bfe160c0e970988f15659548ee44660ff",
+        "sample": "Use this prompt to start a new chat about the next architecture step after the\nAgent Coordination redesign delivered through Step 08.",
+        "identityFingerprint": "e25428882ed4fb6990eda712540be59786b490bfc6c050b1b2401580a5ef9e1d",
+        "ancestry": [
+          "Step 09 / Step 10 Replan Handoff Prompt"
+        ],
+        "text": "Use this prompt to start a new chat about the next architecture step after the\nAgent Coordination redesign delivered through Step 08."
+      }
+    },
+    {
+      "claimId": "claim_eadf79b0b7a6fd73cf80175beeff02f2",
+      "sourceUnitDigest": "6348d46b8f28f477cd1e4adc0983ba6d98256daf4175b2facc6f6bd1d70d374e",
+      "targetUnitDigest": "6348d46b8f28f477cd1e4adc0983ba6d98256daf4175b2facc6f6bd1d70d374e",
+      "reviewAuthor": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+      "decision": {
+        "claimId": "claim_eadf79b0b7a6fd73cf80175beeff02f2",
+        "sourceUnitDigest": "6348d46b8f28f477cd1e4adc0983ba6d98256daf4175b2facc6f6bd1d70d374e",
+        "targetOwner": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "targetAnchor": "unheaded-block-6",
+        "targetUnitDigest": "6348d46b8f28f477cd1e4adc0983ba6d98256daf4175b2facc6f6bd1d70d374e",
+        "targetAncestry": [
+          "Step 09 / Step 10 Replan Handoff Prompt"
+        ],
+        "claimKind": "architecture",
+        "disposition": "archive-with-reason",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792036612167-eb65d2cd@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the consumed prompt, with provenance value for the surviving adoption proposals. No delete-as-obsolete recommendation. Agent Coordination owns this coordination/group-thinking engine history, alongside its existing retired-engine and brainstorm history; Whole-system architecture does not own this mechanism. Evidence: Source lines 3–10 says Handoff prompt, Canonical for nothing, use only to start a fresh design chat. Source code block preserves inputs for subsequent Step 09/10 discussions; no specific live required-root consumer. Complete source unheaded-block docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md#unheaded-block-3 (lines 12–145) is carried at docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md#unheaded-block-6 (lines 36–169); Q3 per-file map override: docs/platform/proposals/step-09-step-10-replan-handoff-prompt.md → docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending."
+      },
+      "source": {
+        "path": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 12,
+        "endLine": 145,
+        "textDigest": "6348d46b8f28f477cd1e4adc0983ba6d98256daf4175b2facc6f6bd1d70d374e",
+        "sample": "```txt\nChúng ta cần tiếp tục thiết kế fgOS ở giao điểm giữa:\n\n1. Step 8b: mở rộng group-cognitive coordination vượt khỏi các fixture\n   isolation-heavy/static hiện tại, để fgOS có ",
+        "identityFingerprint": "63de9e8bae81b7e70480527a0d7bcb7480b33414f4c922e27ce67090167e6c53",
+        "ancestry": [
+          "Step 09 / Step 10 Replan Handoff Prompt"
+        ],
+        "text": "```txt\nChúng ta cần tiếp tục thiết kế fgOS ở giao điểm giữa:\n\n1. Step 8b: mở rộng group-cognitive coordination vượt khỏi các fixture\n   isolation-heavy/static hiện tại, để fgOS có thể biểu đạt các cơ chế\n   problem-solving/coding-review/adversarial/recheck thông dụng mà không làm\n   yếu các invariant đã được Step 08 chứng minh.\n\n2. Step 10: đưa coding domain lên dùng coordination foundation đã delivered\n   qua Step 08, giảm duplicate mechanism, xác định seam giữa foundation và\n   coding domain, và chuẩn bị một implementation plan tốt hơn thay vì tiếp tục\n   vá theo từng deferred decision.\n\nNgữ cảnh quan trọng:\n\n- Agent Coordination redesign đã deliver tới Step 08 trên code.\n- Step 00-08 đã được promote thành canonical baseline:\n  docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md\n- Step 00-06 roadmap giờ là rollout history, không phải nơi đọc design chính:\n  docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\n- Step 07/08 proposal giờ là promoted history, không còn active design frontier:\n  docs/architect/agent-coordination/proposals/README.md\n- Step 09 hiện là group-thinking substrate proposal cấp architect.\n- Step 10 hiện là coding-domain adoption proposal cấp architect, vì scope vượt\n  khỏi riêng Agent Coordination.\n- Component authority boundary map là architect-level guardrail song song:\n  docs/architect/proposals/step-09-group-thinking-substrate.md\n  docs/architect/proposals/step-10-coding-domain-adoption.md\n  docs/architect/proposals/component-authority-boundary-map.md\n- Architecture-wide intent đang được giữ ở:\n  docs/architect/architecture-intent.md\n\nĐọc trước, theo thứ tự:\n\n1. docs/specs/reading-map.md\n2. docs/architect/README.md\n3. docs/architect/architecture-intent.md\n4. docs/architect/agent-coordination/README.md\n5. docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md\n6. docs/architect/agent-coordination/contracts/coordination-session.md\n7. docs/architect/agent-coordination/contracts/flow-definition.md\n8. docs/architect/proposals/step-09-group-thinking-substrate.md\n9. docs/architect/proposals/step-10-coding-domain-adoption.md\n10. docs/architect/proposals/component-authority-boundary-map.md\n11. docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md\n\nSau khi đọc, đừng re-derive lịch sử cũ. Hãy trả lời như một architecture\nadvisor chính, có phản biện, với mục tiêu tạo một plan sắc và thực thi được.\n\nViệc cần làm trong chat mới:\n\n1. Tóm tắt trạng thái hiện tại bằng \"current implemented shape\", không bằng\n   lịch sử step.\n2. Chỉ ra chính xác chỗ Step 8b và Step 09 đang gặp nhau:\n   - coding-domain implementation cell cần review/fix/red-team/recheck loop;\n   - current coordination foundation đã có session/FlowDefinition/actors/\n     bounded dispatch/evidence, nhưng chưa đủ rich group-cognitive capability;\n   - Work mutation/gitintegration vẫn phải đi qua coding-domain authority,\n     không được coordination tự chiếm.\n3. Phân biệt ba loại việc:\n   - normalize/migrate duplicate coding mechanisms onto existing foundation;\n   - extend foundation capability vì coding là consumer thứ hai chứng minh\n     nhu cầu thật;\n   - defer-preserve những capability rộng hơn chưa cần cho MVP.\n4. Đề xuất một MVP theo từng bước, không hỏi người dùng chọn option trước:\n   - mỗi bước nói real shape trên tài liệu/schema/runtime;\n   - bước nào docs-only, bước nào cần implementation;\n   - bước nào cần proof/test/live run;\n   - invariant nào được giữ;\n   - điều gì cố tình không làm.\n5. Cố gắng draft \"real shape\" của first useful coding-domain implementation\n   cell:\n   - Doer;\n   - Reviewer;\n   - Fixer hoặc Doer-followup;\n   - Red-Team hoặc adversarial reviewer;\n   - recheck/disposition;\n   - persistent external coordinator/driver authority outside the declared\n     worker graph.\n6. Kiểm tra xem current FlowDefinition/CoordinationSession shape có đủ để viết\n   fixture đó không. Nếu không đủ, nêu gap bằng field/operation/event cụ thể,\n   không nói chung chung.\n7. Reconcile lại các open questions hiện có:\n   - primitive nên là `requestRound`, `authorizeDeclaredOperation`,\n     `addSessionEdge`, hay một hình khác?\n   - `intent` vocabulary nên closed enum, fixture-local enum, hay registry?\n   - operation-level `maxRounds` liên hệ thế nào với\n     `aggregateBounds.maxRounds`?\n   - Red-Team recheck là operation riêng hay Reviewer redispatch với intent\n     khác?\n   - ai được gọi primitive runtime deviation/round authorization?\n8. Đưa ra phản biện:\n   - điểm nào trong Step 8b proposal hiện quá rộng hoặc sai thứ tự;\n   - điểm nào trong Step 10 proposal hiện quá migration-heavy mà chưa đạt\n     design intent;\n   - điểm nào nếu làm sớm sẽ phá R3/isolation proof hoặc làm Work authority\n     bị lẫn vào coordination.\n9. Kết quả cần xuất ra:\n   - proposed replan, theo phase/MVP;\n   - first fixture shape;\n   - schema/runtime deltas, nếu có;\n   - tests/proofs required;\n   - docs cần promote/update;\n   - explicit not-proposed/deferred list.\n\nRàng buộc:\n\n- Không implement trong chat này trừ khi người dùng yêu cầu rõ.\n- Không sửa `schema.mjs`, `session-engine.mjs`, hay source runtime trước khi\n  hướng được chốt.\n- Không reopen các Tier 1 invariant: evidence immutability, governance-final,\n  budget caps, mutation exclusivity.\n- Không nới `group-cognition-framework.yaml` để lấy communication. Fixture đó\n  giữ isolation-heavy R3 proof.\n- Không đề xuất autonomous in-graph leader. Persistent coordinator/driver ở\n  ngoài worker graph mới là authority stop/recheck.\n- Không biến Step 09/Step 10 proposal thành accepted design. Chúng vẫn là discussion cho\n  tới khi được promote.\n- Không đặt câu hỏi theo kiểu bắt người dùng chọn option. Hãy đưa plan có\n  chính kiến, rồi nêu điểm cần chốt.\n- Nếu cần dùng sol-agent/subagent để phản biện, trước hết chạy:\n  node src/runner/dispatch.mjs decide --for sol-agent --needs-soul --has-live-task-access\n  rồi tuân theo kết quả dispatch. Nếu không cần, tự phản biện trực tiếp.\n\nTone mong muốn:\n\n- Nghĩ như advisor kiến trúc chính.\n- Có chính kiến và phản biện.\n- Ưu tiên plan/MVP/real shape.\n- Giữ design intent ban đầu thay vì để deferred decisions làm biến dạng hệ\n  thống.\n- Tránh viết proposal trừu tượng khó hiểu; mỗi ý lớn phải nối được với file,\n  schema, runtime primitive, proof, hoặc explicit deferred item.\n```"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md",
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-6",
+        "githubAnchor": "unheaded-block-6",
+        "stableAnchor": "unheaded-block-6",
+        "title": "Unheaded block 6",
+        "startLine": 36,
+        "endLine": 169,
+        "textDigest": "6348d46b8f28f477cd1e4adc0983ba6d98256daf4175b2facc6f6bd1d70d374e",
+        "sample": "```txt\nChúng ta cần tiếp tục thiết kế fgOS ở giao điểm giữa:\n\n1. Step 8b: mở rộng group-cognitive coordination vượt khỏi các fixture\n   isolation-heavy/static hiện tại, để fgOS có ",
+        "identityFingerprint": "63de9e8bae81b7e70480527a0d7bcb7480b33414f4c922e27ce67090167e6c53",
+        "ancestry": [
+          "Step 09 / Step 10 Replan Handoff Prompt"
+        ],
+        "text": "```txt\nChúng ta cần tiếp tục thiết kế fgOS ở giao điểm giữa:\n\n1. Step 8b: mở rộng group-cognitive coordination vượt khỏi các fixture\n   isolation-heavy/static hiện tại, để fgOS có thể biểu đạt các cơ chế\n   problem-solving/coding-review/adversarial/recheck thông dụng mà không làm\n   yếu các invariant đã được Step 08 chứng minh.\n\n2. Step 10: đưa coding domain lên dùng coordination foundation đã delivered\n   qua Step 08, giảm duplicate mechanism, xác định seam giữa foundation và\n   coding domain, và chuẩn bị một implementation plan tốt hơn thay vì tiếp tục\n   vá theo từng deferred decision.\n\nNgữ cảnh quan trọng:\n\n- Agent Coordination redesign đã deliver tới Step 08 trên code.\n- Step 00-08 đã được promote thành canonical baseline:\n  docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md\n- Step 00-06 roadmap giờ là rollout history, không phải nơi đọc design chính:\n  docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\n- Step 07/08 proposal giờ là promoted history, không còn active design frontier:\n  docs/architect/agent-coordination/proposals/README.md\n- Step 09 hiện là group-thinking substrate proposal cấp architect.\n- Step 10 hiện là coding-domain adoption proposal cấp architect, vì scope vượt\n  khỏi riêng Agent Coordination.\n- Component authority boundary map là architect-level guardrail song song:\n  docs/architect/proposals/step-09-group-thinking-substrate.md\n  docs/architect/proposals/step-10-coding-domain-adoption.md\n  docs/architect/proposals/component-authority-boundary-map.md\n- Architecture-wide intent đang được giữ ở:\n  docs/architect/architecture-intent.md\n\nĐọc trước, theo thứ tự:\n\n1. docs/specs/reading-map.md\n2. docs/architect/README.md\n3. docs/architect/architecture-intent.md\n4. docs/architect/agent-coordination/README.md\n5. docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md\n6. docs/architect/agent-coordination/contracts/coordination-session.md\n7. docs/architect/agent-coordination/contracts/flow-definition.md\n8. docs/architect/proposals/step-09-group-thinking-substrate.md\n9. docs/architect/proposals/step-10-coding-domain-adoption.md\n10. docs/architect/proposals/component-authority-boundary-map.md\n11. docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md\n\nSau khi đọc, đừng re-derive lịch sử cũ. Hãy trả lời như một architecture\nadvisor chính, có phản biện, với mục tiêu tạo một plan sắc và thực thi được.\n\nViệc cần làm trong chat mới:\n\n1. Tóm tắt trạng thái hiện tại bằng \"current implemented shape\", không bằng\n   lịch sử step.\n2. Chỉ ra chính xác chỗ Step 8b và Step 09 đang gặp nhau:\n   - coding-domain implementation cell cần review/fix/red-team/recheck loop;\n   - current coordination foundation đã có session/FlowDefinition/actors/\n     bounded dispatch/evidence, nhưng chưa đủ rich group-cognitive capability;\n   - Work mutation/gitintegration vẫn phải đi qua coding-domain authority,\n     không được coordination tự chiếm.\n3. Phân biệt ba loại việc:\n   - normalize/migrate duplicate coding mechanisms onto existing foundation;\n   - extend foundation capability vì coding là consumer thứ hai chứng minh\n     nhu cầu thật;\n   - defer-preserve những capability rộng hơn chưa cần cho MVP.\n4. Đề xuất một MVP theo từng bước, không hỏi người dùng chọn option trước:\n   - mỗi bước nói real shape trên tài liệu/schema/runtime;\n   - bước nào docs-only, bước nào cần implementation;\n   - bước nào cần proof/test/live run;\n   - invariant nào được giữ;\n   - điều gì cố tình không làm.\n5. Cố gắng draft \"real shape\" của first useful coding-domain implementation\n   cell:\n   - Doer;\n   - Reviewer;\n   - Fixer hoặc Doer-followup;\n   - Red-Team hoặc adversarial reviewer;\n   - recheck/disposition;\n   - persistent external coordinator/driver authority outside the declared\n     worker graph.\n6. Kiểm tra xem current FlowDefinition/CoordinationSession shape có đủ để viết\n   fixture đó không. Nếu không đủ, nêu gap bằng field/operation/event cụ thể,\n   không nói chung chung.\n7. Reconcile lại các open questions hiện có:\n   - primitive nên là `requestRound`, `authorizeDeclaredOperation`,\n     `addSessionEdge`, hay một hình khác?\n   - `intent` vocabulary nên closed enum, fixture-local enum, hay registry?\n   - operation-level `maxRounds` liên hệ thế nào với\n     `aggregateBounds.maxRounds`?\n   - Red-Team recheck là operation riêng hay Reviewer redispatch với intent\n     khác?\n   - ai được gọi primitive runtime deviation/round authorization?\n8. Đưa ra phản biện:\n   - điểm nào trong Step 8b proposal hiện quá rộng hoặc sai thứ tự;\n   - điểm nào trong Step 10 proposal hiện quá migration-heavy mà chưa đạt\n     design intent;\n   - điểm nào nếu làm sớm sẽ phá R3/isolation proof hoặc làm Work authority\n     bị lẫn vào coordination.\n9. Kết quả cần xuất ra:\n   - proposed replan, theo phase/MVP;\n   - first fixture shape;\n   - schema/runtime deltas, nếu có;\n   - tests/proofs required;\n   - docs cần promote/update;\n   - explicit not-proposed/deferred list.\n\nRàng buộc:\n\n- Không implement trong chat này trừ khi người dùng yêu cầu rõ.\n- Không sửa `schema.mjs`, `session-engine.mjs`, hay source runtime trước khi\n  hướng được chốt.\n- Không reopen các Tier 1 invariant: evidence immutability, governance-final,\n  budget caps, mutation exclusivity.\n- Không nới `group-cognition-framework.yaml` để lấy communication. Fixture đó\n  giữ isolation-heavy R3 proof.\n- Không đề xuất autonomous in-graph leader. Persistent coordinator/driver ở\n  ngoài worker graph mới là authority stop/recheck.\n- Không biến Step 09/Step 10 proposal thành accepted design. Chúng vẫn là discussion cho\n  tới khi được promote.\n- Không đặt câu hỏi theo kiểu bắt người dùng chọn option. Hãy đưa plan có\n  chính kiến, rồi nêu điểm cần chốt.\n- Nếu cần dùng sol-agent/subagent để phản biện, trước hết chạy:\n  node src/runner/dispatch.mjs decide --for sol-agent --needs-soul --has-live-task-access\n  rồi tuân theo kết quả dispatch. Nếu không cần, tự phản biện trực tiếp.\n\nTone mong muốn:\n\n- Nghĩ như advisor kiến trúc chính.\n- Có chính kiến và phản biện.\n- Ưu tiên plan/MVP/real shape.\n- Giữ design intent ban đầu thay vì để deferred decisions làm biến dạng hệ\n  thống.\n- Tránh viết proposal trừu tượng khó hiểu; mỗi ý lớn phải nối được với file,\n  schema, runtime primitive, proof, hoặc explicit deferred item.\n```"
+      }
+    }
+  ],
+  "sensitivityControls": [],
+  "unmatchedCandidateUnits": [],
+  "originalShardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-17-step-09-step-10-replan-handoff-prompt.json",
+  "originalShardSHA256": "52979458bf5b450f7a5557dc810667d7bc0f011d6aed3066124211ae410a229e",
+  "part": 1,
+  "parts": 1,
+  "completeSourceRowCount": 4,
+  "gateFindings": [],
+  "scope": "Source rows only; complete reverse population is in the separate native candidate request.",
+  "a36": {
+    "gateFindings": [],
+    "requestPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-261015-1110-proposals-redesigns-source-17-01-0f063d18f.md",
+    "packPath": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-17-01-0f063d18f.md",
+    "sidecar": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261015-1110-proposals-redesigns-source-17-01-0f063d18f.md.json",
+    "shardPath": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-17-step-09-step-10-replan-handoff-prompt.json",
+    "source": "docs/architect/proposals/step-09-step-10-replan-handoff-prompt.md",
+    "part": 1,
+    "parts": 1,
+    "count": 4,
+    "classes": {
+      "Judgment": 1,
+      "Unit-exact": 3
+    },
+    "weakExactAndJudgment": [
+      "claim_748eaed66e0864f6b66db8f230941593"
+    ],
+    "reviewerDeepSampleMinimum": 1,
+    "mandatoryDifferingDigestRows": [
+      "claim_748eaed66e0864f6b66db8f230941593"
+    ],
+    "absentTargetRows": [],
+    "changedByContentCommit": [
+      "claim_748eaed66e0864f6b66db8f230941593",
+      "claim_2ba1e1cf145db1520a75d592e08e6cc3",
+      "claim_7b86afff62ae3c9360f7d7e884bbfaf8",
+      "claim_eadf79b0b7a6fd73cf80175beeff02f2"
+    ]
+  },
+  "fullShownTextBindings": [
+    {
+      "claimId": "claim_748eaed66e0864f6b66db8f230941593",
+      "sourceShownTextDigest": "cc7a67a4faac1a7a014111271f0360addf9891404bd98ca33940b3c0d05084ac",
+      "targetShownTextDigest": "0cd9249a0f004a94be11657e133454bd9afe755a5a7dd1989f715c0ebed48b90",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_2ba1e1cf145db1520a75d592e08e6cc3",
+      "sourceShownTextDigest": "55c67de7e3f08e6b2bb094056e0a51a0ad796d3da1f44561e5be4067a3739b93",
+      "targetShownTextDigest": "55c67de7e3f08e6b2bb094056e0a51a0ad796d3da1f44561e5be4067a3739b93",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_7b86afff62ae3c9360f7d7e884bbfaf8",
+      "sourceShownTextDigest": "705a9e6fd739bd254aa3a06a10bfe96bfe160c0e970988f15659548ee44660ff",
+      "targetShownTextDigest": "705a9e6fd739bd254aa3a06a10bfe96bfe160c0e970988f15659548ee44660ff",
+      "changedByContentCommit": true
+    },
+    {
+      "claimId": "claim_eadf79b0b7a6fd73cf80175beeff02f2",
+      "sourceShownTextDigest": "6348d46b8f28f477cd1e4adc0983ba6d98256daf4175b2facc6f6bd1d70d374e",
+      "targetShownTextDigest": "6348d46b8f28f477cd1e4adc0983ba6d98256daf4175b2facc6f6bd1d70d374e",
+      "changedByContentCommit": true
+    }
+  ]
+}
