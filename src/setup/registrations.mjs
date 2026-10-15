@@ -5420,8 +5420,10 @@ function countDeadOwnedConfinementDirs(roots) {
           if (marker.paneId) continue;
           // A home held for its unstaged login is never reaped; credential-copies-retained reports it.
           if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) continue;
-          const alive = Number.isInteger(marker.pid) && marker.pid > 0 && (() => {
-            try { process.kill(marker.pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
+          // A bound home (a cli-spawn run supervisor's) belongs to its binder, not to the controller that prepared it.
+          const ownerPid = marker.boundAt ? (marker.binderPid ?? marker.pid) : marker.pid;
+          const alive = Number.isInteger(ownerPid) && ownerPid > 0 && (() => {
+            try { process.kill(ownerPid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
           })();
           if (!alive) count += 1;
         } catch {

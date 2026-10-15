@@ -27,7 +27,7 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
-import { OWNERSHIP_MARKER_FILE, removeEmptyDispatchParent, removeConfinementDir } from "./cleanup.mjs";
+import { OWNERSHIP_MARKER_FILE, OWNERSHIP_BINDING_FIELDS, removeEmptyDispatchParent, removeConfinementDir } from "./cleanup.mjs";
 import {
   canonicalJson,
   computeSha256Digest,
@@ -1138,6 +1138,12 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     adapterOpts.preparedInvocationDigest = preparedLaunch.preparedInvocationDigest;
   }
 
+  // The binding functions of the homes this dispatch prepared (drivers/bwrap.mjs `bind`/`markLaunched`).
+  // Handed to the adapter as functions only: it calls them before (herdr) or right after (cli-spawn
+  // supervisor) the worker starts, and never sees a home path or writes a marker itself.
+  const confinementBinding = bindingForPrepared([preparedConfinement, preparedLaunch?.preparedConfinement]);
+  if (confinementBinding) adapterOpts.confinementBinding = confinementBinding;
+
   let adapterResult;
   let retainedHomes = [];
   try {
@@ -1759,6 +1765,20 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
 }
 
 /**
+ * One `{ bind, markLaunched }` over every prepared confinement that can bind its homes, or null when none
+ * can (an unconfined dispatch, or a backend that allocates no home). `bind` throws when any home cannot be
+ * bound, so the caller can fail closed.
+ */
+export function bindingForPrepared(preparedList) {
+  const binders = [...new Set((preparedList ?? []).filter((p) => typeof p?.bind === 'function'))];
+  if (binders.length === 0) return null;
+  return Object.freeze({
+    bind: (binding) => { for (const p of binders) p.bind(binding); },
+    markLaunched: () => { for (const p of binders) p.markLaunched?.(); },
+  });
+}
+
+/**
  * Finalize confinement resources idempotently.
  */
 export async function finalizeConfinementResources({
@@ -1825,8 +1845,11 @@ export async function finalizeConfinementResources({
             try {
               const parsed = JSON.parse(raw);
               markerDispatchId = parsed?.dispatchId ?? null;
-              // `credentialKept` is added by a failed removal after the digest was taken; it is not tampering.
-              const { credentialKept: _kept, ...atPrepare } = parsed ?? {};
+              // `credentialKept` is added by a failed removal after the digest was taken, and the binding
+              // fields by Confinement Authority's own bind/launch record (OWNERSHIP_BINDING_FIELDS); neither
+              // is tampering. Every other field must still match the prepare-time digest.
+              const { credentialKept: _kept, ...rest } = parsed ?? {};
+              const atPrepare = Object.fromEntries(Object.entries(rest).filter(([k]) => !OWNERSHIP_BINDING_FIELDS.includes(k)));
               markerDigest = computeSha256Digest(parsed && typeof parsed === 'object' ? atPrepare : parsed);
             } catch {
               markerDigest = computeSha256Digest(raw);

@@ -11,7 +11,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { cleanupConfinementResource, writeOwnershipMarker, extendOwnershipMarker, ensurePrivateDir, markResourceRetained } from '../cleanup.mjs';
+import { cleanupConfinementResource, writeOwnershipMarker, extendOwnershipMarker, ensurePrivateDir, markResourceRetained, bindOwnershipMarker, markOwnershipLaunched } from '../cleanup.mjs';
 import { copyCredentialFiles, credentialWriteBackMarker } from '../../provider-credential-renewal.mjs';
 import { expandCredentialHome } from '../../provider-credential-probe.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
@@ -565,12 +565,24 @@ export function prepareBwrapSync(plan, request, backend) {
     // can say. They are reaped once the pane is gone.
     const retain = ({ paneId, herdrSession } = {}) => allocatedPaths.filter((p) => markResourceRetained(p, { paneId, herdrSession }));
 
+    // Bind every allocated home to the process its worker runs under (and the pane plus herdr endpoint
+    // for a herdr round), so the orphan reaper keeps it while that binder lives. Throws on the first
+    // home that cannot be bound: the caller fails the round closed. The adapter never sees the paths.
+    const bind = ({ paneId, herdrEndpoint, herdrSession, binderPid, binderStartTime } = {}) => {
+      for (const p of allocatedPaths) bindOwnershipMarker(p, { paneId, herdrEndpoint, herdrSession, binderPid, binderStartTime });
+    };
+    const markLaunched = () => {
+      for (const p of allocatedPaths) markOwnershipLaunched(p);
+    };
+
     return {
       invocation: preparedInvocation,
       claims: { ...plan.coverage },
       providerCapacity: credentialProvisioned ? { credentialProvisioned: true } : undefined,
       cleanup,
       retain,
+      bind,
+      markLaunched,
     };
   } catch (err) {
     // On prepare error: clean up any allocated resources before throwing

@@ -48,6 +48,7 @@ import {
 } from './trust-store.mjs';
 export { trustRoots };
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
+import { herdrEndpointForEnv } from './worker-session.mjs';
 import { normalizeLegacyConfinement } from './confinement/policies.mjs';
 import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
 import { interpretRunResult } from './run-result.mjs';
@@ -1887,6 +1888,22 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     // reading this same commandPath) finds `existingCmd.paneId` already set
     // and checks the pane's real foreground process below before ever
     // deciding to launch a second real one.
+    //
+    // Bind the confined homes to this pane, the herdr server this round's
+    // client actually talks to, and this process -- for EVERY confined
+    // round, assignment-owned or not -- before anything is launched, so the
+    // orphan reaper keeps the home of a worker whose controller dies.
+    // Fail-closed: a home that cannot be bound gets no worker.
+    const binding = ctx.confinementBinding ?? null;
+    if (binding) {
+      try {
+        binding.bind({ paneId: round.paneId, ...herdrEndpointForEnv(sessionEnv ?? process.env), binderPid: process.pid });
+      } catch (err) {
+        try { client.paneClose(round.paneId); } catch { /* best effort */ }
+        throw round.fail('worker-spawn-fail', 'confinement-bind-failed',
+          `executor for work "${workId}" could not bind its confined home to pane "${round.paneId}" before launch: ${err.message}`);
+      }
+    }
     if (isAssignmentRun) {
       // H13: CAS-fenced through the same controlEpoch/controlToken check
       // every terminal commitCommandOutcome write already applies -- a
@@ -1924,6 +1941,19 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
           args: preparedArgs,
         });
       } catch {}
+    }
+
+    // From here a worker is (or, on a resumed round, already was) running in the pane:
+    // record that before `pane run` is sent, so a bound home without it proves no
+    // worker was ever launched into it. Fail-closed like the bind above.
+    if (binding) {
+      try {
+        binding.markLaunched();
+      } catch (err) {
+        try { client.paneClose(round.paneId); } catch { /* best effort */ }
+        throw round.fail('worker-spawn-fail', 'confinement-bind-failed',
+          `executor for work "${workId}" could not record the launch in its confined home's marker for pane "${round.paneId}": ${err.message}`);
+      }
     }
 
     if (!existingCmd?.resourceIncarnation && !verifiedProc) {

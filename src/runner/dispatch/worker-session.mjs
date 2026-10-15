@@ -75,6 +75,33 @@ export function envForSession(baseEnv, name, { home = baseEnv?.HOME ?? process.e
 }
 
 /**
+ * The herdr server a client with environment `env` actually talks to: the socket path it names, else
+ * the socket of the session it names, else the top-level socket herdr itself falls back to when
+ * neither is set. Returned as `{ herdrEndpoint, herdrSession }`; `herdrSession` is only a session the
+ * environment actually named (never an assumed "default"), so a later caller addresses the same server
+ * by its socket path, not by guessing a session name.
+ */
+export function herdrEndpointForEnv(env = process.env) {
+  const socket = env?.HERDR_SOCKET_PATH;
+  const session = typeof env?.HERDR_SESSION === 'string' && SESSION_NAME.test(env.HERDR_SESSION) ? env.HERDR_SESSION : null;
+  const home = env?.HOME ?? process.env.HOME;
+  if (typeof socket === 'string' && socket.startsWith('/')) return { herdrEndpoint: socket, herdrSession: session };
+  if (session) return { herdrEndpoint: socketPathForSession(session, { home }), herdrSession: session };
+  return { herdrEndpoint: socketPathForSession(DEFAULT_SESSION, { home }), herdrSession: null };
+}
+
+/**
+ * `baseEnv` pointed at a recorded herdr endpoint (see `herdrEndpointForEnv`): the socket path, and the
+ * session only when one was recorded. Returns a new object.
+ */
+export function envForEndpoint(baseEnv, { herdrEndpoint, herdrSession } = {}) {
+  const env = { ...(baseEnv ?? {}), HERDR_SOCKET_PATH: herdrEndpoint };
+  if (herdrSession) env.HERDR_SESSION = herdrSession;
+  else delete env.HERDR_SESSION;
+  return env;
+}
+
+/**
  * Refuse to launch a worker into the operator's own session (C3).
  *
  * Two ways a target can be the operator's: it matches the session the caller is
