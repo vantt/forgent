@@ -821,3 +821,25 @@ test('bind: a run timeout comes from an override, else the unit, else nothing (t
   const refused = bind({ unit, role: 'producer', independentOf: [], overrides: [{ origin: 'human-cli', timeoutMs: 999999999 }] }, ctx);
   assert.equal(refused.refused?.reason, 'run-timeout');
 });
+
+test('bind: a unit rigor of low selects the nano tier when the capability declares no rigor floor', () => {
+  const result = bind(
+    { unit: { id: 'u1', capability: 'docs:write', writes: ['docs/a.md'], rigor: 'low' }, role: 'producer', independentOf: [] },
+    { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: false, headless: true } },
+  );
+  assert.equal(result.tier, 'nano');
+  assert.equal(result.model, 'gpt-4o-mini');
+});
+
+test('bind: a capability rigor floor still raises a lower unit rigor, and no rigor at all falls back to standard', () => {
+  const floored = bind(
+    { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'], rigor: 'low' }, role: 'producer', independentOf: [] },
+    { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: false, headless: true } },
+  );
+  assert.equal(floored.tier, 'standard');
+  const unset = bind(
+    { unit: { id: 'u1', capability: 'docs:write', writes: ['docs/a.md'] }, role: 'producer', independentOf: [] },
+    { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: false, headless: true } },
+  );
+  assert.equal(unset.tier, 'standard');
+});

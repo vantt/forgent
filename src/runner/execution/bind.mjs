@@ -383,7 +383,12 @@ export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] }
   // 6. Tier & Model (T)
   const unitRigor = unit?.rigor;
   const capRigor = capConfig?.rigor;
-  const effectiveRigor = resolveStrongerRigor(unitRigor ?? 'standard', capRigor ?? 'standard');
+  // The implicit standard is a fallback, not a floor (same rule as
+  // resolveAssignmentDispatchPolicy): a unit may ask for low, and only an
+  // explicit capability rigor floor raises it.
+  const effectiveRigor = unitRigor && capRigor
+    ? resolveStrongerRigor(unitRigor, capRigor)
+    : (unitRigor ?? capRigor ?? 'standard');
 
   const rigorToTier = runnerConfig.rigorToTier ?? runnerConfig.runner?.rigorToTier ?? {
     low: 'nano',
