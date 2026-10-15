@@ -10,15 +10,17 @@
       "claimId": "claim_1898cdafa7835d675526173d39eb5cd2",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal-evidence-rework.json",
       "reviewStatus": "pending",
-      "pendingReceiptCommit": "Bind actual runner settlement commit before independent review.",
-      "predecessorClaimId": "claim_1898cdafa7835d675526173d39eb5cd2"
+      "predecessorClaimId": "claim_1898cdafa7835d675526173d39eb5cd2",
+      "receiptCommit": "ec08072e26949676703446c99a1229abc6793901",
+      "receiptBinding": "Actual committed re-issued artifact; independent classification review pending; no approval carry."
     },
     {
       "claimId": "claim_51d4658b154804b82dbce0587b17efc0",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-whole-system-portal-evidence-rework.json",
       "reviewStatus": "pending",
-      "pendingReceiptCommit": "Bind actual runner settlement commit before independent review.",
-      "predecessorClaimId": "claim_ec78621ff44b9fe7fa47ce85bd84bfa6"
+      "predecessorClaimId": "claim_ec78621ff44b9fe7fa47ce85bd84bfa6",
+      "receiptCommit": "ec08072e26949676703446c99a1229abc6793901",
+      "receiptBinding": "Actual committed re-issued artifact; independent classification review pending; no approval carry."
     }
   ]
 }

@@ -9544,13 +9544,14 @@
     "nativeEquality": "Full current candidate-list tuple equality proved at dfff335d3. This historical ordinary machine assessment does not supply the separate committed Class-column receipt acceptance."
   },
   "nativeEquality": {
-    "contentCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+    "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+    "nativeSync": true,
     "fullTupleEquality": true,
     "eligibleTupleEquality": true,
     "nativeReverseCount": 570,
     "candidateUnverifiedCount": 570,
-    "nativeSync": false,
-    "meaning": "Fresh comparison from persisted registry; metadata application only."
+    "tupleSHA256": "0ba1132589fd2cfb547687e7d96f16806e0291427c419b9b5ac756db65f89bf7",
+    "meaning": "All five fields compared directly with complete native batch conservation output of the single sync. Review metadata is separate; changed native IDs remain pending."
   },
   "previousNativeVerificationMetadata": {
     "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
@@ -9611,5 +9612,14 @@
       }
     ],
     "reason": "Exact live IDs accepted by committed seven-column classification report; historical predecessor approvals do not close successor IDs."
+  },
+  "previousNativeEquality": {
+    "contentCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+    "fullTupleEquality": true,
+    "eligibleTupleEquality": true,
+    "nativeReverseCount": 570,
+    "candidateUnverifiedCount": 570,
+    "nativeSync": false,
+    "meaning": "Fresh comparison from persisted registry; metadata application only."
   }
 }

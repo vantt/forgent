@@ -1,0 +1,106 @@
+{
+  "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+  "registry": {
+    "bytes": 60277528,
+    "SHA256": "1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02",
+    "compactOneLine": true
+  },
+  "knownBefore": 95879,
+  "knownAfter": 95881,
+  "zeroKnownIDLoss": true,
+  "liveUnits": 88224,
+  "activeTupleEquality": true,
+  "candidateLists": {
+    "root": {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-root-authorities.json",
+      "count": 830,
+      "fullFiveFieldTupleEquality": true,
+      "tupleSHA256": "8ced6a1810460f6e08fdaf75991964097695f7e9cf90021a04575235c90d3997"
+    },
+    "agent": {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+      "count": 570,
+      "fullFiveFieldTupleEquality": true,
+      "tupleSHA256": "0ba1132589fd2cfb547687e7d96f16806e0291427c419b9b5ac756db65f89bf7"
+    },
+    "packaging": {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-packaging-distribution.json",
+      "count": 694,
+      "fullFiveFieldTupleEquality": true,
+      "tupleSHA256": "4f66a5e5bf4d8a5c4682ca526847a20389ad5eb47f270476235f477619ed4322"
+    },
+    "whole": {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-whole-system-architecture.json",
+      "count": 67,
+      "fullFiveFieldTupleEquality": true,
+      "tupleSHA256": "539ac4419e0992b7b6da544661a3c6bb3170ef5d1c808640443a11a83c34ea5b"
+    }
+  },
+  "identityChanges": [
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-whole-system-architecture.json",
+      "before": {
+        "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+        "status": "candidate-unverified",
+        "reviewStatus": "pending",
+        "priorReview": {
+          "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+          "status": "candidate-unverified",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewMode": "ordinary",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+          "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+          "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 1d36d1e33d5a609a equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+        },
+        "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+        "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried."
+      },
+      "after": {
+        "claimId": "claim_941da7b33ebfd98dc51d04f415175671",
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+        "status": "candidate-unverified",
+        "reviewStatus": "pending",
+        "priorReview": {
+          "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+          "status": "candidate-unverified",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewMode": "ordinary",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+          "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+          "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 1d36d1e33d5a609a equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+        },
+        "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+        "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried.",
+        "priorNativeIdentity": {
+          "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+          "meaning": "Preserved predecessor is an actual native identity gap, not a live identity or approval."
+        }
+      },
+      "native": {
+        "claimId": "claim_941da7b33ebfd98dc51d04f415175671",
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b"
+      }
+    }
+  ],
+  "receiptPin": "ec08072e26949676703446c99a1229abc6793901"
+}

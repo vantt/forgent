@@ -1,3 +1,32 @@
+# Native registry proof complete — independent reviews requested
+
+Content pin: `2a1304393b9b284ad9566b6542ba78554f54b100`. Assignment: `unit-run-1792029127447-efadb3b1/producer/1`. Date: 2026-10-15. Read progress first; wrote it early and before finishing. Output artifact commit remains actual runner settlement, not invented. Step 6 **open**.
+
+One background native sync with own polled log. Carry/generate **493.814s**; background job including initial proofs **1232.183s**; through post-persistence proof **1389.361s**. Inventory **4,412 files / 88,224 claims**. Registry persisted compact one-line **60,277,528 bytes** (<90 MB), SHA256 `1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02`. Known **95,879 → 95,881**, zero loss; native active tuples equal. Two new IDs/two preserved gaps/two changed heading tuples/zero retired; full current/prior witnesses and no approval carry.
+
+D with both prior registries **0 fatal**, before and after persistence. Whole scoped strict E remains exactly **2 pending source rows + 2 reviewed contextual groups + 67 candidate-unverified tuples**, no unexpected category/ID; not strict green or global cutover. Exact exception-member/owner equality passes. Four direct native five-field candidate-list equalities pass: **830/570/694/67** (root/Agent/Packaging/whole), as do independently recomputed whole-E reverse equality and file status/eligibility. One history block adopts its actual live successor ID; predecessor remains a gap, pending eligibility preserved. Two portal refs pin actual `ec08072e26949676703446c99a1229abc6793901`, pending, with native ID/payload equality and no successor approval carry.
+
+| Request | Population |
+|---|---|
+| [review-request-261015-2a1304393-bounded.md](review-request-261015-2a1304393-bounded.md) | 12 entries: 2 source + 2 candidate + 2 stale refs + 2 native gap pairs + 4 Low-fix accounts; overlaps across channels explicitly described |
+| [review-request-261015-2a1304393-portal-receipts.md](review-request-261015-2a1304393-portal-receipts.md) | 2 formal content-classification receipts at actual ec08072e26949676703446c99a1229abc6793901 |
+| [review-request-261015-2a1304393-checkpoint.md](review-request-261015-2a1304393-checkpoint.md) | 824 reviewed bindings; 2 pending excluded; complete 826-source denominator |
+
+
+The bounded request includes before/after text, code/history spans, complete rebound/native witnesses, R6 Low fixes and full digests; two portal receipts use the separate formal Class/Evidence-column request. Checkpoint population is unselected; reviewer alone creates/holds the sensitivity pack/key. Required report `review-6-checkpoint.md` (optional shard suffix), ≥5/6 mutations, ≤2/24 false flags, two consecutive failing sessions stop. R6-1 independent checkpoint red-team/sensitivity and R6-2 independent D/E reproduction remain owed; producer proof does not close them.
+
+[Full current report](step-06-report.md), [proof](sync-2a1304393/final-proof.json), [native log](sync-2a1304393/native-sync.log), [post-persistence log](sync-2a1304393/persist-and-check.log). Tests **149/149**, env -u CLAUDE_CODE_SESSION_ID. No unexplained technical blocker or needsWrites. Independent ordinary/classification/checkpoint verdicts remain closure requirements. Preserve all Rings/A34 residuals, owner queue, R6-3/R6-6 concerns, reader/sample/effort limits and truth/promotion/navigation/consumer/alias/native-gap/cutover obligations. No Step 7 or promotion; no decision prose/docs/gate/checker/vocabulary/extractor/baseline/frozen-input edits, git write, secret read or manual workspace `.fgos/` access. Only required external result claim is excepted. No author sensitivity pack/key. Preview unavailable within allowed scope.
+
+[Final scope and artifact verification](sync-2a1304393/final-verification.json): all 30 shown-text hash occurrences, 26 receipt evidence input-blob bindings, population uniqueness/full digests, protected bytes, scope and `git diff --check` pass. Temporary duplicate registries and the full native v8 cache were removed after proof; all raw D/E results, native batch outputs, scripts and logs remain.
+
+---
+
+# Native sync and checkpoint requests — running
+
+Assignment: unit-run-1792029127447-efadb3b1/producer/1. Content pin: `2a1304393b9b284ad9566b6542ba78554f54b100`. Read progress first; clean input confirmed. One authorized background native sync and both-prior D/scoped E/native/list reconciliation are being prepared. Step 6 remains open. No review approval or sensitivity pack is authored.
+
+---
+
 # Step 6 bounded corrections authored — re-review, native sync and checkpoint owed
 
 Date: 2026-10-15. Assignment: unit-run-1792028685519-ebec4fbb/producer/1. Input evidence: `bb9bb071a`; output is the actual runner settlement, pending, no SHA invented. Read progress first and wrote it early and before finishing. Step 6 remains **open**.

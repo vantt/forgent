@@ -867,7 +867,7 @@
       "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried."
     },
     {
-      "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+      "claimId": "claim_941da7b33ebfd98dc51d04f415175671",
       "path": "docs/platform/system-architecture/history/architect-readme.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
@@ -888,7 +888,14 @@
         "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 1d36d1e33d5a609a equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
       },
       "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
-      "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried."
+      "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried.",
+      "priorNativeIdentity": {
+        "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+        "meaning": "Preserved predecessor is an actual native identity gap, not a live identity or approval."
+      }
     },
     {
       "claimId": "claim_4ea489ceb9de68fc157a43c0496640a8",
@@ -988,8 +995,14 @@
     "meaning": "R6-8: two wrapper tuples locally rebound; native identity/gap reconciliation owed. Earlier complete verification retained in previousNativeVerificationMetadata.beforeClosureCorrection."
   },
   "nativeEquality": {
-    "status": "pending-native-sync",
-    "reason": "R6-8 changed two history-wrapper tuples; prior equality is historical."
+    "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+    "nativeSync": true,
+    "fullTupleEquality": true,
+    "eligibleTupleEquality": true,
+    "nativeReverseCount": 67,
+    "candidateUnverifiedCount": 67,
+    "tupleSHA256": "539ac4419e0992b7b6da544661a3c6bb3170ef5d1c808640443a11a83c34ea5b",
+    "meaning": "All five fields compared directly with complete native batch conservation output of the single sync. Review metadata is separate; changed native IDs remain pending."
   },
   "portalCorrection": {
     "reportCommit": "36d79ddcc4e421b4739e34f73be8f878bedfadf7",
@@ -1284,5 +1297,9 @@
   "listReview": {
     "reviewStatus": "pending",
     "reason": "Two R6-8 changed tuple bindings need bounded independent review; remaining 65 row approvals unchanged."
+  },
+  "previousNativeEquality": {
+    "status": "pending-native-sync",
+    "reason": "R6-8 changed two history-wrapper tuples; prior equality is historical."
   }
 }

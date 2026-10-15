@@ -1,0 +1,1323 @@
+{
+  "version": 1,
+  "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+  "comparisonBase": "bb9bb071ae304f36ca5b745a3223094f39fe862e",
+  "authorSession": "codex-session:unit-run-1792029127447-efadb3b1@2026-10-15",
+  "sourceEntries": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-intent.json",
+      "collection": "claims",
+      "claimId": "claim_7a46ef41a328177fdcf07014a1a7b6b8",
+      "before": {
+        "claimId": "claim_7a46ef41a328177fdcf07014a1a7b6b8",
+        "sourceUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "11-current-system-fit-and-conflicts",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/architecture-intent.md#11-current-system-fit-and-conflicts (lines 384\u2013384) into docs/platform/system-architecture/architecture/architecture-intent.md#11-current-system-fit-and-conflicts (lines 407\u2013407), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "reviewNote": "deep: heading 11-current-system-fit-and-conflicts src L384-384 tgt L407-407; Weak-exact; source and target text read side by side and identical, ancestry equal, rationale line numbers and anchors match, target anchor passes check",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-01.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+        "targetAncestry": [
+          "Architecture Intent"
+        ],
+        "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      },
+      "after": {
+        "claimId": "claim_7a46ef41a328177fdcf07014a1a7b6b8",
+        "sourceUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "11-current-system-fit-and-conflicts",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "The heading text and ancestry are unchanged; its section payload changes only by the three authorized retired-engine qualifications in unheaded-block-61. Carry the complete heading; A22 digest consequence pending independent review. No source retirement, promotion or truth approval.",
+        "targetUnitDigest": "46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb",
+        "targetAncestry": [
+          "Architecture Intent"
+        ],
+        "priorReview": {
+          "claimId": "claim_7a46ef41a328177fdcf07014a1a7b6b8",
+          "sourceUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+          "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "targetAnchor": "11-current-system-fit-and-conflicts",
+          "claimKind": "architecture",
+          "disposition": "move",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:37@2026-10-15",
+          "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/architecture-intent.md#11-current-system-fit-and-conflicts (lines 384\u2013384) into docs/platform/system-architecture/architecture/architecture-intent.md#11-current-system-fit-and-conflicts (lines 407\u2013407), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+          "reviewNote": "deep: heading 11-current-system-fit-and-conflicts src L384-384 tgt L407-407; Weak-exact; source and target text read side by side and identical, ancestry equal, rationale line numbers and anchors match, target anchor passes check",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-01.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+          "targetAncestry": [
+            "Architecture Intent"
+          ],
+          "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+        },
+        "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+        "rebindingReason": "A19 authorized retired-engine qualification; A22 actual target digest rebind, independent review pending. Native consequences deferred to next sync."
+      },
+      "source": {
+        "path": "docs/architect/architecture-intent.md",
+        "anchor": "11-current-system-fit-and-conflicts",
+        "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+        "unitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+        "shownText": "## 11. Current System Fit And Conflicts\n\nThe current system does not perfectly match the proposed V1. There is no fatal\ncontradiction with existing accepted contracts, but there are real gaps to\nresolve before implementation.\n\n| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | Edges connect SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | `retrySessionTask` supersedes a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | Existing mode is `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |\n\nSo the answer is: **there is no reason to change the isolation fixture, but\nthe current system is not ready to express the bounded review loop cleanly\nwithout one small new authorization/event surface.**",
+        "shownTextDigest": "08f03df8a12a79e8ff248099ae62e746f1b979bea7b219822361410439f14585",
+        "ancestry": [
+          "Architecture Intent"
+        ]
+      },
+      "beforeTarget": {
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "11-current-system-fit-and-conflicts",
+        "commit": "bb9bb071ae304f36ca5b745a3223094f39fe862e",
+        "unitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+        "shownText": "## 11. Current System Fit And Conflicts\n\nThe current system does not perfectly match the proposed V1. There is no fatal\ncontradiction with existing accepted contracts, but there are real gaps to\nresolve before implementation.\n\n| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | Edges connect SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | `retrySessionTask` supersedes a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | Existing mode is `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |\n\nSo the answer is: **there is no reason to change the isolation fixture, but\nthe current system is not ready to express the bounded review loop cleanly\nwithout one small new authorization/event surface.**",
+        "shownTextDigest": "08f03df8a12a79e8ff248099ae62e746f1b979bea7b219822361410439f14585",
+        "ancestry": [
+          "Architecture Intent"
+        ]
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "11-current-system-fit-and-conflicts",
+        "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+        "unitDigest": "46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb",
+        "shownText": "## 11. Current System Fit And Conflicts\n\nThe current system does not perfectly match the proposed V1. There is no fatal\ncontradiction with existing accepted contracts, but there are real gaps to\nresolve before implementation.\n\n| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | In the retired coordination engine, edges connected SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | In the retired coordination engine, `retrySessionTask` superseded a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | The retired coordination engine used `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |\n\nSo the answer is: **there is no reason to change the isolation fixture, but\nthe current system is not ready to express the bounded review loop cleanly\nwithout one small new authorization/event surface.**",
+        "shownTextDigest": "53309cfabf84f39709f0ec66d170f356f2916f0f7a7ed20ec0fdf7607929ded3",
+        "ancestry": [
+          "Architecture Intent"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-intent.json",
+      "collection": "claims",
+      "claimId": "claim_c70f25eac4a54d44efef50283846611f",
+      "before": {
+        "claimId": "claim_c70f25eac4a54d44efef50283846611f",
+        "sourceUnitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "unheaded-block-61",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/architecture-intent.md#unheaded-block-59 (lines 390\u2013400) into docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-61 (lines 413\u2013423), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "reviewNote": "mechanical: unheaded-block unheaded-block-59 src L390-400 tgt L413-423; Unit-exact; script digest recompute, anchor check, shard/pack equality and ancestry equality pass",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-01.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+        "targetAncestry": [
+          "Architecture Intent",
+          "11. Current System Fit And Conflicts"
+        ],
+        "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+      },
+      "after": {
+        "claimId": "claim_c70f25eac4a54d44efef50283846611f",
+        "sourceUnitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "unheaded-block-61",
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:37@2026-10-15",
+        "rationale": "A19 truth correction supersedes only the three false present-tense sentences with explicit retired-engine qualifications. All other source clauses, conflicts and obligations are retained byte-for-byte. Original source remains unchanged. Evidence: step-06-report.md, authorized corrections section; independent A22 review pending, no approval carry.",
+        "targetUnitDigest": "ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520",
+        "targetAncestry": [
+          "Architecture Intent",
+          "11. Current System Fit And Conflicts"
+        ],
+        "priorReview": {
+          "claimId": "claim_c70f25eac4a54d44efef50283846611f",
+          "sourceUnitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+          "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "targetAnchor": "unheaded-block-61",
+          "claimKind": "architecture",
+          "disposition": "move",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:37@2026-10-15",
+          "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/architecture-intent.md#unheaded-block-59 (lines 390\u2013400) into docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-61 (lines 413\u2013423), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+          "reviewNote": "mechanical: unheaded-block unheaded-block-59 src L390-400 tgt L413-423; Unit-exact; script digest recompute, anchor check, shard/pack equality and ancestry equality pass",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0450-whole-system-01.md",
+          "reviewMode": "ordinary",
+          "targetUnitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+          "targetAncestry": [
+            "Architecture Intent",
+            "11. Current System Fit And Conflicts"
+          ],
+          "reviewReportCommit": "48da12f2b5dedd6d9dd047ffb9c96f9259e20930"
+        },
+        "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+        "rebindingReason": "A19 authorized retired-engine qualification; A22 actual target digest rebind, independent review pending. Native consequences deferred to next sync."
+      },
+      "source": {
+        "path": "docs/architect/architecture-intent.md",
+        "anchor": "unheaded-block-59",
+        "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+        "unitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+        "shownText": "| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | Edges connect SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | `retrySessionTask` supersedes a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | Existing mode is `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |",
+        "shownTextDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+        "ancestry": [
+          "Architecture Intent",
+          "11. Current System Fit And Conflicts"
+        ]
+      },
+      "beforeTarget": {
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "unheaded-block-61",
+        "commit": "bb9bb071ae304f36ca5b745a3223094f39fe862e",
+        "unitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+        "shownText": "| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | Edges connect SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | `retrySessionTask` supersedes a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | Existing mode is `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |",
+        "shownTextDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+        "ancestry": [
+          "Architecture Intent",
+          "11. Current System Fit And Conflicts"
+        ]
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "unheaded-block-61",
+        "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+        "unitDigest": "ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520",
+        "shownText": "| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | In the retired coordination engine, edges connected SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | In the retired coordination engine, `retrySessionTask` superseded a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | The retired coordination engine used `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |",
+        "shownTextDigest": "ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520",
+        "ancestry": [
+          "Architecture Intent",
+          "11. Current System Fit And Conflicts"
+        ]
+      }
+    }
+  ],
+  "refEntries": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+      "collection": "candidateClassifications",
+      "claimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+      "before": {
+        "claimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-39: Lines 172-177 list the exact compiled fields of plan.mjs:444-461 and correctly deny target/handback/execution wrappers and egress.allowed (governance egress is kind/target/content, resolve.mjs:470-477).",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      },
+      "after": {
+        "claimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "pending",
+        "priorReview": {
+          "claimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+          "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "reviewStatus": "reviewed",
+          "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-39: Lines 172-177 list the exact compiled fields of plan.mjs:444-461 and correctly deny target/handback/execution wrappers and egress.allowed (governance egress is kind/target/content, resolve.mjs:470-477).",
+          "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+          "reviewedAt": "2026-10-10",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+          "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+        },
+        "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+        "rebindingReason": "R6-5 / A22: historical receipt refers to pre-A19 citation text. Return reference to pending; prior acceptance is history only. Replacement is separately bound, without successor approval carry.",
+        "replacementReceipt": {
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+          "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+          "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+        }
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+      "collection": "candidateClassifications",
+      "claimId": "claim_56af2fc53f516253db192a78f0dddc70",
+      "before": {
+        "claimId": "claim_56af2fc53f516253db192a78f0dddc70",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "reviewed",
+        "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-47: Lines 210-213: agentType/mcpTool are top-level at plan.mjs:453-454 and the decision does not invoke the facility (caller must hold it), which matches the AGENTS dispatch doctrine.",
+        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+        "reviewedAt": "2026-10-10",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      },
+      "after": {
+        "claimId": "claim_56af2fc53f516253db192a78f0dddc70",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "pending",
+        "priorReview": {
+          "claimId": "claim_56af2fc53f516253db192a78f0dddc70",
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+          "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+          "authoredBy": "codex-session:1@2026-10-10",
+          "reviewStatus": "reviewed",
+          "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-47: Lines 210-213: agentType/mcpTool are top-level at plan.mjs:453-454 and the decision does not invoke the facility (caller must hold it), which matches the AGENTS dispatch doctrine.",
+          "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+          "reviewedAt": "2026-10-10",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+          "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+        },
+        "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+        "rebindingReason": "R6-5 / A22: historical receipt refers to pre-A19 citation text. Return reference to pending; prior acceptance is history only. Replacement is separately bound, without successor approval carry.",
+        "replacementReceipt": {
+          "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+          "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+          "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+        }
+      }
+    }
+  ],
+  "candidateEntries": [
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-whole-system-architecture.json",
+      "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
+      "before": {
+        "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "architect-readme-source-carriage",
+        "unitDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+        "status": "candidate-unverified",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+        "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+        "reviewNote": "mechanical: heading section architect-readme-source-carriage of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest a7422f57dfaad386 equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical."
+      },
+      "after": {
+        "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "architect-readme-source-carriage",
+        "unitDigest": "1918b66f54a462fa3d1611abefac357f4866d38afba8c6ef6e2051a57c2da12c",
+        "status": "candidate-unverified",
+        "reviewStatus": "pending",
+        "priorReview": {
+          "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "architect-readme-source-carriage",
+          "unitDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+          "status": "candidate-unverified",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewMode": "ordinary",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+          "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+          "reviewNote": "mechanical: heading section architect-readme-source-carriage of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest a7422f57dfaad386 equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical."
+        },
+        "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+        "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried."
+      },
+      "beforeShown": {
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "architect-readme-source-carriage",
+        "commit": "bb9bb071ae304f36ca5b745a3223094f39fe862e",
+        "unitDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+        "shownText": "# Architect README Source Carriage\n\n```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\n```\n\nAdded in candidate: metadata above identifies a non-canonical history carrier. The complete previously reviewed source carriage follows.",
+        "shownTextDigest": "a7422f57dfaad38641846c944700b94b41ab91bb57eace675eb4d5b60c348cff",
+        "ancestry": []
+      },
+      "shown": {
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "architect-readme-source-carriage",
+        "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+        "unitDigest": "1918b66f54a462fa3d1611abefac357f4866d38afba8c6ef6e2051a57c2da12c",
+        "shownText": "# Architect README Source Carriage\n\n```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\nSupersedes: None; no legacy source is edited\nSuperseded by: None\n```\n\nAdded in candidate: metadata above identifies a non-canonical history carrier. The complete previously reviewed source carriage follows.",
+        "shownTextDigest": "18d91004b8057d80b1b1eb4eb3801553c830001df61596e9c352f9b6f6b0aecd",
+        "ancestry": []
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-whole-system-architecture.json",
+      "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+      "before": {
+        "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+        "status": "candidate-unverified",
+        "reviewStatus": "reviewed",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-15",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+        "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+        "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 1d36d1e33d5a609a equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+      },
+      "after": {
+        "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+        "status": "candidate-unverified",
+        "reviewStatus": "pending",
+        "priorReview": {
+          "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+          "status": "candidate-unverified",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewMode": "ordinary",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+          "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+          "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 1d36d1e33d5a609a equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+        },
+        "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+        "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried."
+      },
+      "beforeShown": {
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "unheaded-block-1",
+        "commit": "bb9bb071ae304f36ca5b745a3223094f39fe862e",
+        "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+        "shownText": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\n```",
+        "shownTextDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+        "ancestry": [
+          "Architect README Source Carriage"
+        ]
+      },
+      "shown": {
+        "path": "docs/platform/system-architecture/history/architect-readme.md",
+        "anchor": "unheaded-block-1",
+        "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+        "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+        "shownText": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\nSupersedes: None; no legacy source is edited\nSuperseded by: None\n```",
+        "shownTextDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+        "ancestry": [
+          "Architect README Source Carriage"
+        ]
+      }
+    }
+  ],
+  "native": {
+    "beforeCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+    "pin": "2a1304393b9b284ad9566b6542ba78554f54b100",
+    "allNativeChangedTuples": [
+      {
+        "before": {
+          "sourcePath": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "unitDigest": "7bbe30ad332c2391f94452426a01bdc560cd8bd65168ac9762c8943781e3065d",
+          "identityFingerprint": "3cacba6bb548658bd3d35490803f7b423d242c4d594924deec2a2400af8f6585",
+          "claimId": "claim_e7eb405bf8b4c3e25a36f3329c03a594",
+          "sourceAnchor": "11-current-system-fit-and-conflicts",
+          "unitKind": "heading",
+          "sourceUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "after": {
+          "sourcePath": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "unitDigest": "6a931002ac9483f366e157989529a9eceab17d200c9fc95b5d3353dbddf3097e",
+          "identityFingerprint": "fbddac34000e7cffb4fe8d41553f293b1a923a6f3f9a7dce706127a8830572f6",
+          "claimId": "claim_e7eb405bf8b4c3e25a36f3329c03a594",
+          "sourceAnchor": "11-current-system-fit-and-conflicts",
+          "unitKind": "heading",
+          "sourceUnitDigest": "46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb",
+          "claimKind": "architecture",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+            "fromUnitDigest": "7bbe30ad332c2391f94452426a01bdc560cd8bd65168ac9762c8943781e3065d",
+            "toUnitDigest": "6a931002ac9483f366e157989529a9eceab17d200c9fc95b5d3353dbddf3097e",
+            "fromSourceUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+            "toSourceUnitDigest": "46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb"
+          }
+        }
+      },
+      {
+        "before": {
+          "sourcePath": "docs/platform/system-architecture/history/architect-readme.md",
+          "unitDigest": "b7f8e38f0b394906f4ea1d499643dda99b66a2acc753de337063e0729e6fe603",
+          "identityFingerprint": "0bacb53c86e977910c4dcb34336f68ec0d9bb1bd75973d8bd8b83f8e09378de0",
+          "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
+          "sourceAnchor": "architect-readme-source-carriage",
+          "unitKind": "heading",
+          "sourceUnitDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+          "claimKind": "historical-context",
+          "status": "future"
+        },
+        "after": {
+          "sourcePath": "docs/platform/system-architecture/history/architect-readme.md",
+          "unitDigest": "24fe5f8aec3dd4ade94ecfd04a6bce78ffc6a75b1161fbc5ecc2db6cb0d503c1",
+          "identityFingerprint": "d081bc3fae65894f3b652924c011c3485cf9349a695600b0c7e2bbb6c423106a",
+          "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
+          "sourceAnchor": "architect-readme-source-carriage",
+          "unitKind": "heading",
+          "sourceUnitDigest": "1918b66f54a462fa3d1611abefac357f4866d38afba8c6ef6e2051a57c2da12c",
+          "claimKind": "historical-context",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+            "fromUnitDigest": "b7f8e38f0b394906f4ea1d499643dda99b66a2acc753de337063e0729e6fe603",
+            "toUnitDigest": "24fe5f8aec3dd4ade94ecfd04a6bce78ffc6a75b1161fbc5ecc2db6cb0d503c1",
+            "fromSourceUnitDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+            "toSourceUnitDigest": "1918b66f54a462fa3d1611abefac357f4866d38afba8c6ef6e2051a57c2da12c"
+          }
+        }
+      }
+    ],
+    "allNativeNewUnits": [
+      {
+        "sourcePath": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "unitDigest": "ed88faf7b0b8d4556fe6dc2c4edcc40d51f1077ec0d9d6b0a73cbb6ca7bdee23",
+        "identityFingerprint": "ed88faf7b0b8d4556fe6dc2c4edcc40d51f1077ec0d9d6b0a73cbb6ca7bdee23",
+        "claimId": "claim_452d968958ad81240b08dd8a50276605",
+        "sourceAnchor": "unheaded-block-61",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+      },
+      {
+        "sourcePath": "docs/platform/system-architecture/history/architect-readme.md",
+        "unitDigest": "703a052cac43ff312b9824b82d60ad5add21f80210e5c3d68d6ca0ceafaa9308",
+        "identityFingerprint": "703a052cac43ff312b9824b82d60ad5add21f80210e5c3d68d6ca0ceafaa9308",
+        "claimId": "claim_941da7b33ebfd98dc51d04f415175671",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+        "claimKind": "historical-context",
+        "status": "future",
+        "origin": "added-since-dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+      }
+    ],
+    "allNativeNewGaps": [
+      {
+        "sourcePath": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "unitDigest": "de141eddabe2f53e54645dbccc735f6a36cee6af1f88ce89e32c807cdbfc17e0",
+        "identityFingerprint": "de141eddabe2f53e54645dbccc735f6a36cee6af1f88ce89e32c807cdbfc17e0",
+        "claimId": "claim_11829da7699ce3c4be50527639be7695",
+        "sourceAnchor": "unheaded-block-61",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-61 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/system-architecture/history/architect-readme.md",
+        "unitDigest": "c79507bc69f7757289babcc9495152d1989b44b9d9701aa8effaa9d23f2c1156",
+        "identityFingerprint": "c79507bc69f7757289babcc9495152d1989b44b9d9701aa8effaa9d23f2c1156",
+        "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+        "claimKind": "historical-context",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-1 is not a stable heading anchor"
+      }
+    ],
+    "allNativeNewRetired": [],
+    "changedDocs": [
+      {
+        "before": {
+          "sourcePath": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "unitDigest": "7bbe30ad332c2391f94452426a01bdc560cd8bd65168ac9762c8943781e3065d",
+          "identityFingerprint": "3cacba6bb548658bd3d35490803f7b423d242c4d594924deec2a2400af8f6585",
+          "claimId": "claim_e7eb405bf8b4c3e25a36f3329c03a594",
+          "sourceAnchor": "11-current-system-fit-and-conflicts",
+          "unitKind": "heading",
+          "sourceUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+          "claimKind": "architecture",
+          "status": "future",
+          "nativeUnit": {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "11. Current System Fit And Conflicts",
+            "anchor": "11-current-system-fit-and-conflicts",
+            "githubAnchor": "11-current-system-fit-and-conflicts",
+            "stableAnchor": "h-48d6054a8c1e",
+            "startLine": 407,
+            "endLine": 407,
+            "textDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+            "sample": "11. Current System Fit And Conflicts",
+            "sectionPayloadDigest": "605911c5f74140cc79e76d0e63dcaf9c62acbc7e70085b547998f739e2d7ee5e",
+            "followingBlockDigest": "32c57d7042a0f3b5c67d6edddbec8764eb84542c370d5926a212dd3cde58189b",
+            "identityFingerprint": "3cacba6bb548658bd3d35490803f7b423d242c4d594924deec2a2400af8f6585",
+            "ancestry": [
+              "Architecture Intent"
+            ],
+            "text": "## 11. Current System Fit And Conflicts",
+            "sectionText": "## 11. Current System Fit And Conflicts\n\nThe current system does not perfectly match the proposed V1. There is no fatal\ncontradiction with existing accepted contracts, but there are real gaps to\nresolve before implementation.\n\n| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | Edges connect SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | `retrySessionTask` supersedes a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | Existing mode is `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |\n\nSo the answer is: **there is no reason to change the isolation fixture, but\nthe current system is not ready to express the bounded review loop cleanly\nwithout one small new authorization/event surface.**"
+          },
+          "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+        },
+        "after": {
+          "sourcePath": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "unitDigest": "6a931002ac9483f366e157989529a9eceab17d200c9fc95b5d3353dbddf3097e",
+          "identityFingerprint": "fbddac34000e7cffb4fe8d41553f293b1a923a6f3f9a7dce706127a8830572f6",
+          "claimId": "claim_e7eb405bf8b4c3e25a36f3329c03a594",
+          "sourceAnchor": "11-current-system-fit-and-conflicts",
+          "unitKind": "heading",
+          "sourceUnitDigest": "46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb",
+          "claimKind": "architecture",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+            "fromUnitDigest": "7bbe30ad332c2391f94452426a01bdc560cd8bd65168ac9762c8943781e3065d",
+            "toUnitDigest": "6a931002ac9483f366e157989529a9eceab17d200c9fc95b5d3353dbddf3097e",
+            "fromSourceUnitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+            "toSourceUnitDigest": "46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb"
+          },
+          "nativeUnit": {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "11. Current System Fit And Conflicts",
+            "anchor": "11-current-system-fit-and-conflicts",
+            "githubAnchor": "11-current-system-fit-and-conflicts",
+            "stableAnchor": "h-48d6054a8c1e",
+            "startLine": 407,
+            "endLine": 407,
+            "textDigest": "46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb",
+            "sample": "11. Current System Fit And Conflicts",
+            "sectionPayloadDigest": "490f46bfb443b6c77aaf7b990175a720bb857b2c61db5d02e1d931a2fb7164e9",
+            "followingBlockDigest": "32c57d7042a0f3b5c67d6edddbec8764eb84542c370d5926a212dd3cde58189b",
+            "identityFingerprint": "fbddac34000e7cffb4fe8d41553f293b1a923a6f3f9a7dce706127a8830572f6",
+            "ancestry": [
+              "Architecture Intent"
+            ],
+            "text": "## 11. Current System Fit And Conflicts",
+            "sectionText": "## 11. Current System Fit And Conflicts\n\nThe current system does not perfectly match the proposed V1. There is no fatal\ncontradiction with existing accepted contracts, but there are real gaps to\nresolve before implementation.\n\n| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | In the retired coordination engine, edges connected SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | In the retired coordination engine, `retrySessionTask` superseded a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | The retired coordination engine used `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |\n\nSo the answer is: **there is no reason to change the isolation fixture, but\nthe current system is not ready to express the bounded review loop cleanly\nwithout one small new authorization/event surface.**"
+          },
+          "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100"
+        }
+      },
+      {
+        "before": {
+          "sourcePath": "docs/platform/system-architecture/history/architect-readme.md",
+          "unitDigest": "b7f8e38f0b394906f4ea1d499643dda99b66a2acc753de337063e0729e6fe603",
+          "identityFingerprint": "0bacb53c86e977910c4dcb34336f68ec0d9bb1bd75973d8bd8b83f8e09378de0",
+          "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
+          "sourceAnchor": "architect-readme-source-carriage",
+          "unitKind": "heading",
+          "sourceUnitDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+          "claimKind": "historical-context",
+          "status": "future",
+          "nativeUnit": {
+            "unitKind": "heading",
+            "level": 1,
+            "title": "Architect README Source Carriage",
+            "anchor": "architect-readme-source-carriage",
+            "githubAnchor": "architect-readme-source-carriage",
+            "stableAnchor": "h-3173930b153b",
+            "startLine": 1,
+            "endLine": 1,
+            "textDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+            "sample": "Architect README Source Carriage",
+            "sectionPayloadDigest": "4c67d9e01bbb2357f939010d112624997f0fc0cd0bc977b0110adc9c0edfc955",
+            "followingBlockDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+            "identityFingerprint": "0bacb53c86e977910c4dcb34336f68ec0d9bb1bd75973d8bd8b83f8e09378de0",
+            "ancestry": [],
+            "text": "# Architect README Source Carriage",
+            "sectionText": "# Architect README Source Carriage\n\n```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\n```\n\nAdded in candidate: metadata above identifies a non-canonical history carrier. The complete previously reviewed source carriage follows."
+          },
+          "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+        },
+        "after": {
+          "sourcePath": "docs/platform/system-architecture/history/architect-readme.md",
+          "unitDigest": "24fe5f8aec3dd4ade94ecfd04a6bce78ffc6a75b1161fbc5ecc2db6cb0d503c1",
+          "identityFingerprint": "d081bc3fae65894f3b652924c011c3485cf9349a695600b0c7e2bbb6c423106a",
+          "claimId": "claim_cb9bec6c6a80cc775721132cb7569f54",
+          "sourceAnchor": "architect-readme-source-carriage",
+          "unitKind": "heading",
+          "sourceUnitDigest": "1918b66f54a462fa3d1611abefac357f4866d38afba8c6ef6e2051a57c2da12c",
+          "claimKind": "historical-context",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+            "fromUnitDigest": "b7f8e38f0b394906f4ea1d499643dda99b66a2acc753de337063e0729e6fe603",
+            "toUnitDigest": "24fe5f8aec3dd4ade94ecfd04a6bce78ffc6a75b1161fbc5ecc2db6cb0d503c1",
+            "fromSourceUnitDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+            "toSourceUnitDigest": "1918b66f54a462fa3d1611abefac357f4866d38afba8c6ef6e2051a57c2da12c"
+          },
+          "nativeUnit": {
+            "unitKind": "heading",
+            "level": 1,
+            "title": "Architect README Source Carriage",
+            "anchor": "architect-readme-source-carriage",
+            "githubAnchor": "architect-readme-source-carriage",
+            "stableAnchor": "h-3173930b153b",
+            "startLine": 1,
+            "endLine": 1,
+            "textDigest": "1918b66f54a462fa3d1611abefac357f4866d38afba8c6ef6e2051a57c2da12c",
+            "sample": "Architect README Source Carriage",
+            "sectionPayloadDigest": "7fb2a7586a21122e145607b9a2319909eed5e2a97b64976e0a1f10dd6b560b65",
+            "followingBlockDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+            "identityFingerprint": "d081bc3fae65894f3b652924c011c3485cf9349a695600b0c7e2bbb6c423106a",
+            "ancestry": [],
+            "text": "# Architect README Source Carriage",
+            "sectionText": "# Architect README Source Carriage\n\n```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\nSupersedes: None; no legacy source is edited\nSuperseded by: None\n```\n\nAdded in candidate: metadata above identifies a non-canonical history carrier. The complete previously reviewed source carriage follows."
+          },
+          "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100"
+        }
+      }
+    ],
+    "newDocs": [
+      {
+        "sourcePath": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "unitDigest": "ed88faf7b0b8d4556fe6dc2c4edcc40d51f1077ec0d9d6b0a73cbb6ca7bdee23",
+        "identityFingerprint": "ed88faf7b0b8d4556fe6dc2c4edcc40d51f1077ec0d9d6b0a73cbb6ca7bdee23",
+        "claimId": "claim_452d968958ad81240b08dd8a50276605",
+        "sourceAnchor": "unheaded-block-61",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+        "nativeUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-61",
+          "githubAnchor": "unheaded-block-61",
+          "stableAnchor": "unheaded-block-61",
+          "title": "Unheaded block 61",
+          "startLine": 413,
+          "endLine": 423,
+          "textDigest": "ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520",
+          "sample": "| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | In the retired coordination engine, edges connected SessionActors. | An artifact/diff ",
+          "identityFingerprint": "ed88faf7b0b8d4556fe6dc2c4edcc40d51f1077ec0d9d6b0a73cbb6ca7bdee23",
+          "ancestry": [
+            "Architecture Intent",
+            "11. Current System Fit And Conflicts"
+          ],
+          "text": "| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | In the retired coordination engine, edges connected SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | In the retired coordination engine, `retrySessionTask` superseded a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | The retired coordination engine used `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |"
+        },
+        "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100"
+      },
+      {
+        "sourcePath": "docs/platform/system-architecture/history/architect-readme.md",
+        "unitDigest": "703a052cac43ff312b9824b82d60ad5add21f80210e5c3d68d6ca0ceafaa9308",
+        "identityFingerprint": "703a052cac43ff312b9824b82d60ad5add21f80210e5c3d68d6ca0ceafaa9308",
+        "claimId": "claim_941da7b33ebfd98dc51d04f415175671",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+        "claimKind": "historical-context",
+        "status": "future",
+        "origin": "added-since-dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+        "nativeUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-1",
+          "githubAnchor": "unheaded-block-1",
+          "stableAnchor": "unheaded-block-1",
+          "title": "Unheaded block 1",
+          "startLine": 3,
+          "endLine": 20,
+          "textDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+          "sample": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplem",
+          "identityFingerprint": "703a052cac43ff312b9824b82d60ad5add21f80210e5c3d68d6ca0ceafaa9308",
+          "ancestry": [
+            "Architect README Source Carriage"
+          ],
+          "text": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\nSupersedes: None; no legacy source is edited\nSuperseded by: None\n```"
+        },
+        "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100"
+      }
+    ],
+    "gapDocs": [
+      {
+        "sourcePath": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "unitDigest": "de141eddabe2f53e54645dbccc735f6a36cee6af1f88ce89e32c807cdbfc17e0",
+        "identityFingerprint": "de141eddabe2f53e54645dbccc735f6a36cee6af1f88ce89e32c807cdbfc17e0",
+        "claimId": "claim_11829da7699ce3c4be50527639be7695",
+        "sourceAnchor": "unheaded-block-61",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+        "claimKind": "architecture",
+        "status": "future",
+        "nativeUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-61",
+          "githubAnchor": "unheaded-block-61",
+          "stableAnchor": "unheaded-block-61",
+          "title": "Unheaded block 61",
+          "startLine": 413,
+          "endLine": 423,
+          "textDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+          "sample": "| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | Edges connect SessionActors. | An artifact/diff is not a SessionActor, so initial revi",
+          "identityFingerprint": "de141eddabe2f53e54645dbccc735f6a36cee6af1f88ce89e32c807cdbfc17e0",
+          "ancestry": [
+            "Architecture Intent",
+            "11. Current System Fit And Conflicts"
+          ],
+          "text": "| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | Edges connect SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | `retrySessionTask` supersedes a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | Existing mode is `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |"
+        },
+        "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+      },
+      {
+        "sourcePath": "docs/platform/system-architecture/history/architect-readme.md",
+        "unitDigest": "c79507bc69f7757289babcc9495152d1989b44b9d9701aa8effaa9d23f2c1156",
+        "identityFingerprint": "c79507bc69f7757289babcc9495152d1989b44b9d9701aa8effaa9d23f2c1156",
+        "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+        "claimKind": "historical-context",
+        "status": "future",
+        "nativeUnit": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-1",
+          "githubAnchor": "unheaded-block-1",
+          "stableAnchor": "unheaded-block-1",
+          "title": "Unheaded block 1",
+          "startLine": 3,
+          "endLine": 18,
+          "textDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+          "sample": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplem",
+          "identityFingerprint": "c79507bc69f7757289babcc9495152d1989b44b9d9701aa8effaa9d23f2c1156",
+          "ancestry": [
+            "Architect README Source Carriage"
+          ],
+          "text": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\n```"
+        },
+        "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+      }
+    ],
+    "retiredDocs": [],
+    "meaning": "Native identities and exact unit witnesses only. No successor assignment, judgment, approval or truth certification is authored.",
+    "fullShownChangedHeadings": [
+      {
+        "before": {
+          "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "anchor": "11-current-system-fit-and-conflicts",
+          "commit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+          "unitDigest": "03fd6abc56c13bf09ccf7e76efb7ebc0f4749a170b6a783cfea0c2769708e09c",
+          "shownText": "## 11. Current System Fit And Conflicts\n\nThe current system does not perfectly match the proposed V1. There is no fatal\ncontradiction with existing accepted contracts, but there are real gaps to\nresolve before implementation.\n\n| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | Edges connect SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | `retrySessionTask` supersedes a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | Existing mode is `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |\n\nSo the answer is: **there is no reason to change the isolation fixture, but\nthe current system is not ready to express the bounded review loop cleanly\nwithout one small new authorization/event surface.**",
+          "shownTextDigest": "08f03df8a12a79e8ff248099ae62e746f1b979bea7b219822361410439f14585",
+          "ancestry": [
+            "Architecture Intent"
+          ]
+        },
+        "after": {
+          "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "anchor": "11-current-system-fit-and-conflicts",
+          "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+          "unitDigest": "46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb",
+          "shownText": "## 11. Current System Fit And Conflicts\n\nThe current system does not perfectly match the proposed V1. There is no fatal\ncontradiction with existing accepted contracts, but there are real gaps to\nresolve before implementation.\n\n| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | In the retired coordination engine, edges connected SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | In the retired coordination engine, `retrySessionTask` superseded a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | The retired coordination engine used `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |\n\nSo the answer is: **there is no reason to change the isolation fixture, but\nthe current system is not ready to express the bounded review loop cleanly\nwithout one small new authorization/event surface.**",
+          "shownTextDigest": "53309cfabf84f39709f0ec66d170f356f2916f0f7a7ed20ec0fdf7607929ded3",
+          "ancestry": [
+            "Architecture Intent"
+          ]
+        }
+      },
+      {
+        "before": {
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "architect-readme-source-carriage",
+          "commit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+          "unitDigest": "648af7d32f3e04c2103dcf13265abdc3670f511c2b4ade961a9e02c7e00ca050",
+          "shownText": "# Architect README Source Carriage\n\n```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\n```\n\nAdded in candidate: metadata above identifies a non-canonical history carrier. The complete previously reviewed source carriage follows.",
+          "shownTextDigest": "a7422f57dfaad38641846c944700b94b41ab91bb57eace675eb4d5b60c348cff",
+          "ancestry": []
+        },
+        "after": {
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "architect-readme-source-carriage",
+          "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+          "unitDigest": "1918b66f54a462fa3d1611abefac357f4866d38afba8c6ef6e2051a57c2da12c",
+          "shownText": "# Architect README Source Carriage\n\n```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\nSupersedes: None; no legacy source is edited\nSuperseded by: None\n```\n\nAdded in candidate: metadata above identifies a non-canonical history carrier. The complete previously reviewed source carriage follows.",
+          "shownTextDigest": "18d91004b8057d80b1b1eb4eb3801553c830001df61596e9c352f9b6f6b0aecd",
+          "ancestry": []
+        }
+      }
+    ],
+    "fullShownGapSuccessorPairs": [
+      {
+        "predecessorClaimId": "claim_11829da7699ce3c4be50527639be7695",
+        "successorClaimId": "claim_452d968958ad81240b08dd8a50276605",
+        "before": {
+          "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "anchor": "unheaded-block-61",
+          "commit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+          "unitDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+          "shownText": "| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | Edges connect SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | `retrySessionTask` supersedes a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | Existing mode is `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |",
+          "shownTextDigest": "bc122fa9bf3e6e08e05d6e56a77bc3024ea43fc8c9592061233120b1757f7b72",
+          "ancestry": [
+            "Architecture Intent",
+            "11. Current System Fit And Conflicts"
+          ]
+        },
+        "after": {
+          "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+          "anchor": "unheaded-block-61",
+          "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+          "unitDigest": "ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520",
+          "shownText": "| Area | Current system | Conflict / gap for V1 |\n|---|---|---|\n| `FlowDefinition` topology | In the retired coordination engine, edges connected SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n| Retry/replacement | In the retired coordination engine, `retrySessionTask` superseded a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n| Synthesis | The retired coordination engine used `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |",
+          "shownTextDigest": "ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520",
+          "ancestry": [
+            "Architecture Intent",
+            "11. Current System Fit And Conflicts"
+          ]
+        },
+        "meaning": "Separate actual native IDs; no approval carry or identity graft."
+      },
+      {
+        "predecessorClaimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+        "successorClaimId": "claim_941da7b33ebfd98dc51d04f415175671",
+        "before": {
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "unheaded-block-1",
+          "commit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
+          "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+          "shownText": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\n```",
+          "shownTextDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+          "ancestry": [
+            "Architect README Source Carriage"
+          ]
+        },
+        "after": {
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "unheaded-block-1",
+          "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+          "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+          "shownText": "```txt\nDocument type: History\nAudience: Human reviewer, architect, maintainer, agent\nPurpose: Preserve the complete architect portal source snapshot\nDesign status: Candidate\nImplementation: Historical source metadata; no current implementation assertion\nProvenance: docs/architect/README.md at 69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539; blob 454d688de0c306679b0f3ed2b5b51c0c7c82dc9f\nWriter type: Agent\nCanonical for: Nothing; non-canonical conservation carrier\nUse this when: Reviewing the retained architect README source\nDo not use this for: Current platform navigation or authority\nLast reviewed: Pending independent review\nRelated:\n- docs/platform/README.md\n- docs/architect/README.md\nSupersedes: None; no legacy source is edited\nSuperseded by: None\n```",
+          "shownTextDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+          "ancestry": [
+            "Architect README Source Carriage"
+          ]
+        },
+        "meaning": "Separate actual native IDs; no approval carry or identity graft."
+      }
+    ]
+  },
+  "codeEvidence": [
+    {
+      "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+      "path": "src/workflow/runner.mjs",
+      "blob": "542f2be5c302afc7ab5ece74f613e18bc56f0a7b",
+      "fileDigest": "647c8ecdef5105d59f45067daba0b17f19605ffeeb9c075d48e3c7c85b4b3a6c",
+      "startLine": 170,
+      "endLine": 190,
+      "shownText": "    },\n  );\n}\n\n/**\n * The pattern a template runs: its name, or the name with the template's `params` when it has\n * any -- the same `{ pattern, params }` shape the Execution Core accepts from a CLI caller.\n */\nfunction unitPatternOf(template) {\n  const name = template.pattern || 'solo';\n  return template.params ? { pattern: name, params: template.params } : name;\n}\n\n/**\n * The overrides a unit implies. A template's `persona` is not one of them: it travels on the Unit\n * itself (unitData.persona), which bind() ranks below an override and above the capability's.\n *\n * A `--seats` run binds each named persona to its own seat of every panel unit, scoped by role,\n * with the persona text pinned at start: the named seat keeps its persona, every other role (the\n * synthesizer included) has no matching override and falls through to the unit's own persona.\n *",
+      "shownTextDigest": "737c01bf5f85ad6d5ed116488e9671ee742402bde66bda38f0e0baa61b8e8669"
+    },
+    {
+      "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "blob": "c3b9a19579c8d59a813ae3001b29645f61dd39e4",
+      "fileDigest": "597aca46fc910eddf3e84af919a8967d297949068318784a593868817dd01300",
+      "startLine": 824,
+      "endLine": 836,
+      "shownText": "            holder: priorControl.holder ?? current.record.admittedBy ?? null,\n          };\n        }\n      } else if (refuseIfSettled) {\n        // S5 (dispatch-engine-liveness-hardening Phase 5): opt-in only, never\n        // the default -- a settled current attempt is exactly what a\n        // legitimate retry (schema-1 or schema-2, `retrySessionTask`) is\n        // SUPPOSED to admit a fresh attempt over, so M1 above never refuses\n        // on settlement alone. But a caller that never intends a retry (a\n        // FIRST, non-retry dispatch of an Assignment/taskKey) has no other\n        // atomic way to tell \"a concurrent sibling already finished this\n        // exact dispatch\" apart from \"nothing has happened yet\" -- a plain\n        // re-read from that caller's own process can always be outrun by a",
+      "shownTextDigest": "9f9597130e52c113654bd6fb03370f60dac5ae150a186d461e52bbfce0deb230"
+    },
+    {
+      "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+      "path": "src/verbs/dispatch/recover.mjs",
+      "blob": "b864b0dee667cc3b4df4c999292de413ee4fe634",
+      "fileDigest": "f4f78c154ab6dcc282d4cfc7ccbef39fcabcfb2a1ef9e421d5b294c14d43bf81",
+      "startLine": 210,
+      "endLine": 221,
+      "shownText": "  fs.appendFileSync(file, `${JSON.stringify(record)}\\n`);\n}\n\n// R3: routing this through `planReconciliation`/`applyReconciliation`'s\n// `clear-assignment-claim` action was tried and reverted -- verified by\n// tracing every real writer of `dispatch.claim` (session-engine.mjs's\n// `createAndExecuteSessionTask`/`retrySessionTask`, the only two): both\n// create it with `fs.closeSync(fs.openSync(path, 'wx'))`, an always-empty\n// file, never `{pid, startTime}`. `planClearAssignmentClaim`'s dead-holder\n// proof (reconciliation-planner.mjs's `holder()`) requires exactly that\n// shape to ever resolve 'dead' -- against the real, always-empty file it\n// can only ever return 'needs-input' (\"corrupt or unparseable\"), which",
+      "shownTextDigest": "3bf8b3477f60ed38f82aa12d089b3cba3a9b213edcb9e8038f05c0b74937d2b9"
+    },
+    {
+      "commit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+      "path": "core/workflows/council-lite.yaml",
+      "blob": "d315b4c1edb1135d91c3ad985c7e4e676c9c317a",
+      "fileDigest": "373d58b8fcca9d2c57e690f4529036d7228a9b0a187b4c8dcc8b546efb3cbc60",
+      "startLine": 1,
+      "endLine": 45,
+      "shownText": "id: council-lite\ntitle: Council Lens Discussion\ndescription: One independent panel with three task postures and an evidence-led verdict.\nsteps:\n  - id: discussion\n    title: Independent positions and synthesis\n    units:\n      - id: deliberate\n        template:\n          capability: delphi:propose\n          pattern: panel\n          blind: true\n          contextRefs:\n            - core/agents/council-assumptions.yaml\n            - core/agents/council-ship-maintain.yaml\n            - core/agents/council-feedback-loops.yaml\n          params:\n            members: 3\n            roleTasks:\n              panelist-1: >-\n                Your task posture is council-assumptions. Read core/agents/council-assumptions.yaml\n                from Context refs and apply its description, method, blind spot, and ending rule.\n                This is a task posture, not an actor identity or provider choice. Do not apply the\n                other seats' postures. Do not change repository files. First, in a section named\n                \"Restatement\", write in your own words, in at most three lines, the question you are\n                answering and what you treat as out of scope; then analyse. {objective}\n              panelist-2: >-\n                Your task posture is council-ship-maintain. Read core/agents/council-ship-maintain.yaml\n                from Context refs and apply its description, method, blind spot, and ending rule.\n                This is a task posture, not an actor identity or provider choice. Do not apply the\n                other seats' postures. Do not change repository files. First, in a section named\n                \"Restatement\", write in your own words, in at most three lines, the question you are\n                answering and what you treat as out of scope; then analyse. {objective}\n              panelist-3: >-\n                Your task posture is council-feedback-loops. Read core/agents/council-feedback-loops.yaml\n                from Context refs and apply its description, method, blind spot, and ending rule.\n                This is a task posture, not an actor identity or provider choice. Do not apply the\n                other seats' postures. Do not change repository files. First, in a section named\n                \"Restatement\", write in your own words, in at most three lines, the question you are\n                answering and what you treat as out of scope; then analyse. {objective}\n              synthesizer: >-\n                Read each panelist report in Context refs; do not answer from scratch or adopt a seat's\n                posture. Compare the seats' Restatement sections and list any mismatch in what the seats\n                took the question to be as unresolved evidence. Report unresolved evidence first, each seat's explicit position, agreement or\n                genuine split without inventing consensus, conditions that would change the verdict,",
+      "shownTextDigest": "64a999cb04f21a28f4e1469e6c1232939bdbbc5609540a5c1dc1f36e91739e7a"
+    },
+    {
+      "commit": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1",
+      "path": "src/runner/coordination/cohort-planner.mjs",
+      "blob": "7c93eeb9a2c05ecade1ca550d57ac857482a3fda",
+      "fileDigest": "fdc3a01588fcdbaf3b56769681ed7f33a7fd5c946cb91625e8551da7bcb07b4f",
+      "startLine": 403,
+      "endLine": 416,
+      "shownText": "  }\n  const cohort = definition.spec.profile.cohort;\n  if (!cohort) {\n    fail('validation', 'planCohort: definition declares no spec.profile.cohort block -- nothing to plan');\n  }\n  const actors = definition.spec.actors;\n  if (!Array.isArray(actors) || actors.length === 0) {\n    fail('validation', 'planCohort: definition declares no spec.actors -- a cohort plan requires stable SessionActor identities');\n  }\n  if (cohort.count !== undefined && cohort.count !== actors.length) {\n    fail('validation', `planCohort: spec.profile.cohort.count (${cohort.count}) does not match spec.actors.length (${actors.length})`);\n  }\n  if (!Array.isArray(fallbackRules)) {\n    fail('validation', 'planCohort: fallbackRules must be an array when provided');",
+      "shownTextDigest": "342026c6fdbdcdad71bf36c63eda11114d6715ac3781242d997e2b341dfbc6a6"
+    },
+    {
+      "commit": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1",
+      "path": "src/runner/coordination/session-engine.mjs",
+      "blob": "903e5408a45af386fe650fe921f0989453ad787c",
+      "fileDigest": "fed4629ae6890a7b0c60795c9bc228b2bbc6160f9f6b0aac96461fcfada8b690",
+      "startLine": 367,
+      "endLine": 380,
+      "shownText": " * The engine's ONE literal `executeAssignment()` call site (a static\n * structural test in `coordination-declared-consult.test.mjs` enforces\n * this file never grows a second one; a SECOND, codebase-wide static test,\n * `test/architecture.test.mjs`, additionally enforces this is the only real\n * call site anywhere allowed to ever pass `isReadOnlyMode: false`, Phase 01\n * R6b) -- both `createAndExecuteSessionTask` (first dispatch) and\n * `retrySessionTask` (Phase 06 R2, a new Run for an EXISTING Assignment)\n * call through this same tiny wrapper rather than reaching\n * `executeAssignment` directly, so \"retry re-resolution through EXISTING\n * dispatch APIs, never a new dispatch surface\" holds structurally, not just\n * by convention.\n *\n * Phase 01 mutation-unlock (R5): `isReadOnlyMode` is derived from the\n * Assignment's OWN already-stamped `mutation` field, never a second,",
+      "shownTextDigest": "13347cb4afa74c1cdc57c76027d57e5866ce2986d2da4e5883be267696a65c79"
+    },
+    {
+      "commit": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1",
+      "path": "src/runner/coordination/session-engine.mjs",
+      "blob": "903e5408a45af386fe650fe921f0989453ad787c",
+      "fileDigest": "fed4629ae6890a7b0c60795c9bc228b2bbc6160f9f6b0aac96461fcfada8b690",
+      "startLine": 4366,
+      "endLine": 4385,
+      "shownText": " * @param {string} params.reason Non-empty; retry must record why.\n * @param {number} [params.maxRetries] Default 1.\n * @param {object} [opts] Forwarded to `executeAssignment`/store.mjs (cwd, repoRoot, runnerConfig, timeoutMs, ...)\n */\nexport async function retrySessionTask(coordinationId, { assignmentId, reason, maxRetries = DEFAULT_MAX_RETRIES }, opts = {}) {\n  if (!isNonEmptyString(assignmentId)) throw new CoordinationError('validation', 'retrySessionTask: assignmentId is required');\n  if (!isNonEmptyString(reason)) throw new CoordinationError('validation', 'retrySessionTask: reason is required -- retry must record why');\n  if (!Number.isInteger(maxRetries) || maxRetries < 1) throw new CoordinationError('validation', 'retrySessionTask: maxRetries must be a positive integer');\n\n  const reconciled = replaySession(coordinationId, opts);\n  const { fgosDir } = resolveSessionPaths(coordinationId, opts);\n  if (!reconciled.assignmentRefs.includes(assignmentId)) {\n    throw new CoordinationError('validation', `retrySessionTask: assignment \"${assignmentId}\" is not a member of session \"${coordinationId}\"`);\n  }\n  const createdEvent = reconciled.events.find((event) => event.type === 'assignment-created' && event.payload.assignmentId === assignmentId);\n  const actorId = createdEvent?.payload?.actorId;\n\n  // Self-heal: a settled attempt already sits on disk but is not yet the\n  // linked view -- link it now, never re-dispatch a redundant attempt.\n  const latestOnDisk = findLatestRunResult(fgosDir, assignmentId);",
+      "shownTextDigest": "ecdf3f0c429a5675cde4b343649b6182610d077cacd4a52e0e1b56f434ba4b2a"
+    },
+    {
+      "commit": "13f7f01fd50dbf7062fb005de6876a0115d7e8f1",
+      "path": "core/coordination-protocols/declared-consult.yaml",
+      "blob": "69286ef7c292f69a203d295438f604ee9e582763",
+      "fileDigest": "75071b069e70936f7703d780a1ffb70de2ec6676fafce0c44dabc9fbaf1b96aa",
+      "startLine": 1,
+      "endLine": 25,
+      "shownText": "# core/coordination-protocols/declared-consult.yaml -- Phase 02 R7 fixture:\n# the simplest real CoordinationProtocol shape, a single declared consult\n# (one requester, one consultant, one round). Normalizes through\n# validateFlowDefinition (src/runner/definitions/schema.mjs) via\n# discoverCoordinationProtocols (src/runner/definitions/protocol-loader.mjs)\n# -- does NOT execute or wire into CoordinationSession in this phase\n# (AC-I003 must-not-preclude: protocols stay optional/explicit, never a\n# second execution core).\n\napiVersion: fgos.dev/v1alpha1\nkind: FlowDefinition\nmetadata:\n  id: core.coordination-protocol.declared-consult\n  version: 1.0.0\n\nspec:\n  profile:\n    kind: CoordinationProtocol\n    completion:\n      mode: synthesize\n    topology:\n      contextVisibility: mediated\n      edges:\n        - from: requester-actor\n          to: consultant-actor",
+      "shownTextDigest": "829187eb297723b180be63af9b20726ed8c240e747199b4919ea5d750b805aa9"
+    }
+  ],
+  "searchEvidence": [
+    {
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "SessionActor",
+        "2a1304393b9b284ad9566b6542ba78554f54b100",
+        "--",
+        "src",
+        "core",
+        "domains",
+        "apps",
+        "bin"
+      ],
+      "exitCode": 1,
+      "output": "",
+      "outputDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "retrySessionTask",
+        "2a1304393b9b284ad9566b6542ba78554f54b100",
+        "--",
+        "src",
+        "core",
+        "domains",
+        "apps",
+        "bin"
+      ],
+      "exitCode": 0,
+      "output": "2a1304393b9b284ad9566b6542ba78554f54b100:src/runner/dispatch/assignment-runner.mjs:830:        // legitimate retry (schema-1 or schema-2, `retrySessionTask`) is\n2a1304393b9b284ad9566b6542ba78554f54b100:src/verbs/dispatch/recover.mjs:216:// `createAndExecuteSessionTask`/`retrySessionTask`, the only two): both\n",
+      "outputDigest": "9c5946668d78487366f13a3081ca196bf7a6fbcc80e2b609b5c01db8ec4de270"
+    },
+    {
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-F",
+        "completion.mode",
+        "2a1304393b9b284ad9566b6542ba78554f54b100",
+        "--",
+        "src",
+        "core",
+        "domains",
+        "apps",
+        "bin"
+      ],
+      "exitCode": 1,
+      "output": "",
+      "outputDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "diffs": [
+    {
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "beforeFileDigest": "3a81d3d0770ad5758323f7a954091220b48c337e1d712db5998363bfbd6bc2eb",
+      "afterFileDigest": "222e420b0aa369b0115bab67cac492dd42d0bbd65e89a0031c7ce3cc0d3bab23",
+      "diff": "diff --git a/docs/platform/system-architecture/architecture/architecture-intent.md b/docs/platform/system-architecture/architecture/architecture-intent.md\nindex 89b411437..dd94ae562 100644\n--- a/docs/platform/system-architecture/architecture/architecture-intent.md\n+++ b/docs/platform/system-architecture/architecture/architecture-intent.md\n@@ -412,15 +412,15 @@ resolve before implementation.\n \n | Area | Current system | Conflict / gap for V1 |\n |---|---|---|\n-| `FlowDefinition` topology | Edges connect SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n+| `FlowDefinition` topology | In the retired coordination engine, edges connected SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |\n | Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |\n | Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |\n | Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for \"review round.\" |\n-| Retry/replacement | `retrySessionTask` supersedes a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n+| Retry/replacement | In the retired coordination engine, `retrySessionTask` superseded a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |\n | Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |\n | Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |\n | Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |\n-| Synthesis | Existing mode is `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |\n+| Synthesis | The retired coordination engine used `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |\n \n So the answer is: **there is no reason to change the isolation fixture, but\n the current system is not ready to express the bounded review loop cleanly\n",
+      "diffDigest": "9f83326070976993aefd31ede41735c2a0a6e8313709d3a0d12e864db93dada9"
+    },
+    {
+      "path": "docs/platform/system-architecture/history/architect-readme.md",
+      "beforeFileDigest": "98bb49b3306b69afddaca0851865c81235069f517a43ba27fa6e966d1ac242dd",
+      "afterFileDigest": "c5f844433fb08effcc472c7e251e8389f6edc3022fc9e1daf4a8011be08c903b",
+      "diff": "diff --git a/docs/platform/system-architecture/history/architect-readme.md b/docs/platform/system-architecture/history/architect-readme.md\nindex c02593a9b..a48c61785 100644\n--- a/docs/platform/system-architecture/history/architect-readme.md\n+++ b/docs/platform/system-architecture/history/architect-readme.md\n@@ -15,6 +15,8 @@ Last reviewed: Pending independent review\n Related:\n - docs/platform/README.md\n - docs/architect/README.md\n+Supersedes: None; no legacy source is edited\n+Superseded by: None\n ```\n \n Added in candidate: metadata above identifies a non-canonical history carrier. The complete previously reviewed source carriage follows.\n",
+      "diffDigest": "f7f814e9cb19b08f5cf193b7e481173f2a6afc2a9966ad2846fd7ce283d1b02e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/promoted-edits.md",
+      "beforeFileDigest": "66c6e2519f5b85bba99670c8ea363bf207eca79503f7f6f76566c524f418e7dd",
+      "afterFileDigest": "1fd8757cc8c140408283e9db2e4895f32acd8c778a2bb0b9dad859ab4ae7f9a2",
+      "diff": "diff --git a/plans/260925-documentation-authority-unification/reports/phase-06/promoted-edits.md b/plans/260925-documentation-authority-unification/reports/phase-06/promoted-edits.md\nindex 013be8d5a..855bee6c2 100644\n--- a/plans/260925-documentation-authority-unification/reports/phase-06/promoted-edits.md\n+++ b/plans/260925-documentation-authority-unification/reports/phase-06/promoted-edits.md\n@@ -41,3 +41,35 @@ Assignment `unit-run-1792013490296-c08d7894/producer/1` authorizes Step 6 file-o\n ## Accepted portal carriage relocation \u2014 2026-10-15\n \n Lead instruction at `48da12f2b5dedd6d9dd047ffb9c96f9259e20930`: remove the labelled README source carriage appendix from `docs/platform/README.md` and preserve it in `docs/platform/system-architecture/history/architect-readme.md`. Portal prefix restored byte-for-byte; existing reviewed routing retained. Eleven source target bindings pending under A22. No portal authority, design status or implementation statement changed.\n+\n+## A19 Accepted portal corrections \u2014 checkpoint accounting\n+\n+R6-4 accounting only, 2026-10-15. The two corrections below were already committed; this turn does not edit the portal. Its `Last reviewed: 2026-09-25` stays provenance until promotion review.\n+\n+### Line 51: archived knowledge-registry plan path\n+\n+A19 authorizing/applying evidence: `dfff335d3`; include this exact promoted-document diff at the Step 6 checkpoint. Line 59 still uses legacy numbering (R6-3); no further portal change is authorized in this turn.\n+\n+```diff\n+diff --git a/docs/platform/README.md b/docs/platform/README.md\n+index 718c746d1..249169217 100644\n+--- a/docs/platform/README.md\n++++ b/docs/platform/README.md\n+@@ -51 +51 @@ Target area docs live at `docs/platform/<area>/`.\n+-| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `plans/260825-1841-knowledge-registry/plan.md` |\n++| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `archive/plans/260825-1841-knowledge-registry/plan.md` |\n+```\n+\n+### Line 59: authorized migration status correction\n+\n+A19 authorizing/applying evidence: `2c228f69c`; include this exact promoted-document diff at the Step 6 checkpoint. Line 59 still uses legacy numbering (R6-3); no further portal change is authorized in this turn.\n+\n+```diff\n+diff --git a/docs/platform/README.md b/docs/platform/README.md\n+index baee43418..718c746d1 100644\n+--- a/docs/platform/README.md\n++++ b/docs/platform/README.md\n+@@ -59 +59 @@ Target area docs live at `docs/platform/<area>/`.\n+-| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00\u201302 are completed, Phases 03\u201309 remain unauthorized |\n++| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00\u201304 are completed, Phase 05 is authorized and in progress, Phases 06\u201309 remain unauthorized |\n+```\n",
+      "diffDigest": "9283da38eb29ea2a508e339cf9986ff2bc6d904d18c6420a3f70113e2203af87"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "beforeFileDigest": "8f586dc924c933f3b901953c203bcb8973331d714507f22e44f0a9f71dc7493e",
+      "afterFileDigest": "3919f59371368da471ef30b9bfe8be18af271a3023ae6c613f45fffc481c0810",
+      "diff": "diff --git a/plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md b/plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md\nindex 0b6e06d51..f353fcbc8 100644\n--- a/plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md\n+++ b/plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md\n@@ -324,3 +324,11 @@ Date: 2026-10-15. These are owed implementation/review obligations, not new unan\n - AGENTS split residual (R5-5): Step 10 root-instruction owner must resolve `claim_5c520fcb1a68ba27e2093341834258c7` and `claim_2ae81c7bed935553943d6777b81e2114`, preserving both exact instruction lines and their native predecessor/current identities. A34 residual and binding are pending independent representation review; source-to-self retention is no platform carrier or instruction truth certificate. `claim_d956ba3fb9a8cce9589194e5f59d021f` is actually a retained reading-map unit, not the AGENTS line, and belongs to the navigation obligation above.\n - Metadata (R5-8): at the accepted bounded correction review, refresh applicable candidate `Last reviewed:` dates with an explicitly limited conservation-review meaning; do not date a still-pending correction as reviewed or alter embedded Source Metadata. Step 10 owns the missing Pilot B promotion fields and any consequent native/digest rebindings. Full current truth remains owed at promotion.\n - Rationale wording (R5-6): the unchanged applier copies reviewed rows unchanged (`scripts/propose-doc-decisions.mjs:413-477`); it has no reviewed-rationale-only update path. Keep the 16 reviewed rationale objects and disposition labels intact now. Owe a separately authorized rationale/label tidy with independent review; byte-equal `supersede` labels are disclosed, not silently changed to `move`.\n+\n+## Whole-system architecture fresh-reader gaps \u2014 pending owner work\n+\n+Recorded 2026-10-15 from [fresh-reader-261015-whole-system.md](fresh-reader-261015-whole-system.md), substantive notes 1\u20132. These are not fixed or newly decided in this bounded correction turn.\n+\n+- **CTR010 collision:** `docs/platform/component-boundary.md:67` calls gateway REST `/v1` CTR010. `docs/knowledge/the-fgos-gateway-http-json-api-contract-ctr010-its-scope-and/fgos-gateway-api-ctr010.md:3,6,10,14` independently names Gateway API CTR010. `docs/platform/architecture-map.md:405,415,449` assigns CTR010 to `confinement-authority.v1` (dispatch \u2194 executor adapter); its registry has no gateway REST row. The binding contract owner must settle numbering and the omitted gateway row, then account both references; this author chooses no renumbering and changes neither contract.\n+- **Missing switchboard routes:** `docs/transitional-switchboard.md` has no explicit route for `docs/platform/system-architecture/architecture/roadmap.md`, `workspace-topology.md`, `workspace-topology-audit.md` or `workspace-topology-roadmap.md`. Both readers used the files' header pointers to `docs/architect/` owners, costing seven files before the first substantive owner. Navigation owner must add reviewed routes during the authorized navigation/header pass; candidate headers do not establish current authority.\n+- Retain the other reader area gaps (advisory/header conflict, scattered proof/risk/supersession guidance, thin overview and implementation uncertainty), R6-1 reviewer independence and R6-2 independent D/E reproduction debt. See [step-06-report.md](step-06-report.md) for closure boundaries and the accepted-versus-owed distinction.\n",
+      "diffDigest": "2c38a792fb4fa849cdde63feddc1cd9177c6c631ab96103cf1e28c46a1f19bf9"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step-06-report.md",
+      "beforeFileDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "afterFileDigest": "bfe86bab4f8b4bae9de13cbea66cafc2f0255d1ae402bad38e952af5e00ece5b",
+      "diff": "diff --git a/plans/260925-documentation-authority-unification/reports/phase-06/step-06-report.md b/plans/260925-documentation-authority-unification/reports/phase-06/step-06-report.md\nnew file mode 100644\nindex 000000000..5a4c9cc87\n--- /dev/null\n+++ b/plans/260925-documentation-authority-unification/reports/phase-06/step-06-report.md\n@@ -0,0 +1,126 @@\n+# Whole-system architecture batch report\n+\n+Date: 2026-10-15. Assignment: `unit-run-1792028685519-ebec4fbb/producer/1`. Step: 6. State: **bounded corrections authored; closure open**. Input: `bb9bb071a`, with Lead truth/blocks evidence at `103046acf`, reader/red-team evidence at `bb9bb071a`, and ordinary/classification reports at `5f0403a0055a9cb50f9975cb74777fba3828eff4`. Output artifact pin is the actual runner settlement, pending; no SHA is invented.\n+\n+**Step 6 closes only after one bounded independent re-review of this turn's changes, the native sync with actual identity/binding consequences and conservation proofs, and the checkpoint review with the reviewer-held passing sensitivity pack.** A36 ordinary review, the truth/block samples and the existing red-team do not replace that checkpoint. No sensitivity pack, key, review pack or native sync is authored here. No promotion, cutover or Step 7 permission is inferred.\n+\n+## Current conservation evidence and registry\n+\n+The last committed [accepted-verdict verification](verification-261015-0811-accepted-verdicts-reissued-receipts.md) (artifact `ec08072e2`) generated inventory from the persisted registry: **4,412 files / 88,224 claims**, both-prior D **zero fatal**, whole-system scoped strict E exactly **two reviewed identical-unit groups + 67 candidate-unverified tuples**, zero source claims-not-reviewed and no unexpected category/ID. Both prior registries were checked together; all four full reverse tuple sets and exact exception owner memberships passed. That run was not a full native refresh. The two pending portal receipts were separate classification obligations outside the whole-system reverse namespace.\n+\n+This turn changes four extracted target units, so the preceding freshness/equality result is **historical**, not current certification. Local extraction returns real new digests; two source decisions and two candidate tuple bindings return to pending, preserving prior reviews. No opaque native ID is allocated, no known tuple is deleted, and `working-identity-registry.json` is byte-identical to input: **60,276,753 bytes**, SHA256 `140d32b90584d29f8edae789bb098bf65401308d8a48b23eaeaa0eab0809a7c0`, below 90,000,000 bytes. A22 native successor/gap consequences and both-prior D/E/full native/list equality are owed to the next authorized sync. Strict E is not green.\n+\n+| Area | Last verified reverse tuples | Other retained open data |\n+|---|---:|---|\n+| Root authorities | 830 | Root/Packaging shared membership; no new hold |\n+| Agent Coordination | 570 | Three Rings holds; 342 identical-unit groups |\n+| Packaging Distribution | 694 | One A34 partial-carry residual; two identical-unit groups |\n+| Whole-system architecture | 67 | Two identical-unit groups; two history-wrapper tuples now locally rebound/pending |\n+\n+The whole-system list still has 67 rows (65 unchanged reviewed eligibility rows, two pending changed bindings). Candidate-unverified is not current-truth approval. The 15 Accepted portal units remain outside that list, handled by classification receipts: thirteen accepted at the actual `dfff335d3` receipt artifact, two re-issued pending at `ec08072e2` that still need actual artifact binding and formal independent Class-column review. Four Agent receipts have historical classification acceptance at `dfff335d3`; two concern predecessor IDs only, whose native successors remain candidate-unverified. No historical acceptance is extended to a successor.\n+\n+## Rows and dispositions\n+\n+Twelve whole-system source shards contain **826 source claims** (145 architecture-intent, 37 roadmap, 31 vision, 55 topology-audit, 48 topology-roadmap, 61 topology, 11 architect README, 119 architecture-map, 50 system-overview, 166 boundary-advisory, 52 boundary README, 51 repo-layout vision). Current state after this bounded edit: **824 reviewed / 2 pending**, dispositions **825 move / 1 supersede**. Two s6 registry-gap rows and separate reverse classification refs are not added to this source denominator. The historical first authoring classes were 300 Unit-exact / 392 Weak-exact / 134 Judgment; these are not a fresh post-correction class recount.\n+\n+No source retirement, deletion or new owner-intent hold. Original sources and the complete architect README history payload remain intact. **No component-boundary change:** this batch conserves documentation and qualifies stale claims; it changes no component ownership, contract or dependency. The CTR010 conflict is queued rather than decided here.\n+\n+## Truth sample and authorized corrections\n+\n+[review-6-whole-system-truth.md](review-6-whole-system-truth.md), at `5f0403a00`: **580 current-content body units**, **30 drawn**, **50 assertions checked**, **three false sentences in one unit (1/30 = 3.33%)**. Seed `5a1c80741c01e0039e857790a40396c1fc38dfd55cd7b6d20fc46a36c20ee3c3`. The 10% escalation threshold was not crossed. Twenty-two sampled units made no present-behaviour assertion, limiting coverage of stale current-system tables. The full promotion truth sweep remains owed.\n+\n+Lead-authorized A19 edits replace only these three sentences in `docs/platform/system-architecture/architecture/architecture-intent.md#unheaded-block-61` (lines 415, 419, 423); **every other byte of this file equals input**:\n+\n+| Before | After | Own code/history evidence at input HEAD |\n+|---|---|---|\n+| Edges connect SessionActors. | In the retired coordination engine, edges connected SessionActors. | Exact `SessionActor` search in src/core/domains/apps/bin has no live result. Retirement `2180b4e72701bb090288af8fe8021008d9d42079` deleted coordination engine/protocols; its parent `src/runner/coordination/cohort-planner.mjs:410` requires stable SessionActor identities. Current `src/workflow/runner.mjs:179-180` selects a Unit pattern. |\n+| `retrySessionTask` supersedes a run for the same Assignment. | In the retired coordination engine, `retrySessionTask` superseded a run for the same Assignment. | At HEAD the only exact name hits are comments in `src/runner/dispatch/assignment-runner.mjs:830` and `src/verbs/dispatch/recover.mjs:216`; no definition. At retirement's parent, `src/runner/coordination/session-engine.mjs:373` describes a new Run for an existing Assignment and `:4370-4378` defines/validates retry for that same assignment. |\n+| Existing mode is `completion.mode: synthesize`. | The retired coordination engine used `completion.mode: synthesize`. | Exact `completion.mode` search has no live src/core/domains result. At retirement's parent, `core/coordination-protocols/declared-consult.yaml:19-20` sets completion mode synthesize; current `core/workflows/council-lite.yaml:7-11,41` uses Units/panel/synthesizer. Synthesis capabilities still exist; the retired field is not today's completion contract. |\n+\n+A22 rebinds `claim_c70f25eac4a54d44efef50283846611f` as supersede, pending, target digest `ea09318ffc9d78390e907d8a3315328cfffa4ccab17e96085ca822c373e41520`. Its heading consequence `claim_7a46ef41a328177fdcf07014a1a7b6b8` remains move (heading unchanged), pending, digest `46269aecc47b5e4332545a798e6ff5941dddb956a2854c28a36d1f78e38eefdb`. Full previous accepted rows are preserved in `priorReview`; active reviewer fields are cleared. Source digests remain unchanged. This author supplies no truth verdict; independent re-review is owed.\n+\n+## Sampled blocks\n+\n+[sampled-blocks-6.md](sampled-blocks-6.md): **620 blocks**, excluding headings and blocks under 40 characters, **574 named / 46 unnamed**. Reviewer seed `41b1eb75ab4b51fc6cf0f7fc0f13059027f1a8ddeda70f98913c5ae06341b209`. Draw: 20 unnamed, 20 rewritten-rationale, 10 whole-population, without repeats; no short stratum. **0/50 defects**; stop line 2/50, not crossed. The reviewer widened rewritten-rationale eligibility to 35 units because the narrower supersede/wording rule selected only two. Twenty-nine source-backed blocks matched after heading/link normalization with physical destinations checked. Ten preexisting unlabeled boundary/map native blocks were accepted under the prior migration-only reading, not claimed to have source rows; literal-reading native-text accounting remains a promotion concern. Red-team also separately reports 0/50 and exhaustive zero lost lines/unaccounted units.\n+\n+## A31 sync and review effort\n+\n+B0 `dbe5c432852837ea01e6025b35868bcb7271495d`; latest SYNC `69dd3ee7fd84bc5e93fe9c75d63622d4f5aa8539`, main parent `721b9d89c`. No merge this turn. Lead's red-team verifies imported `docs/specs/runner.md` and manifest bytes equal main; platform manifest mirror was repaired in `a8a10abc1`, older bindings reopened/reviewed, and runner's ratchet digest accounted at `37f6f7499`. Step 9 content/conservation obligations remain distinct from those merge facts.\n+\n+R6-7 accounting (frozen map/source-blobs/baseline remain unchanged):\n+\n+| Source | Frozen blob | Current blob at input HEAD | Account |\n+|---|---|---|---|\n+| boundary advisory | `5a93ed7f61b7c43ef7c7c5a129e9b5252263212a` | `e0e3b69aeb3fe2d0027c7c4414e481bbc71359e1` | Main `15c7e720ccc97c5817363a0da15cc74e15e71ac5`, line 650: dispatch-log delegation now explicitly says removed with dispatch log, decision 0062. Current carriage retained; red-team verifies no lost line. |\n+| system-overview | `be00c90cf0f3bae695a65069897a926d4a699bca` | `c24c5561dc60cce7e53d0a0c5e34ff97414845ac` | Plan B landed before SYNC; prior journal/accounting records current carriage and zero new Plan B redo at authoring boundary. |\n+\n+The frozen README map row still names `docs/platform/README.md`. Its existing **Accepted portal carriage correction** addendum (Lead `48da12f2b`) explicitly supersedes that placement with `docs/platform/system-architecture/history/architect-readme.md`. This report points to the addendum rather than editing the frozen table. Source pins remain historical provenance, not present source truth.\n+\n+A36 used mechanical-all plus seeded >=15% Weak-exact/Judgment (minimum ten, all when smaller), every differing digest deep, >3% deep rework requiring full pack read. Reports preserve seeds/sample IDs and deep/mechanical notes. Initial pack 01 records 0/13 deep rework; the final bounded round reads all 42 decision rows, 0 rework (54 total verdicts including mechanical accounting). Red-team checked all 114 differing-digest rows in its then-current population were deep and none mechanical. The initial author counted 123 differing pairs before relocation/rebindings; these are different snapshots. A36 does not waive the checkpoint pack or A31 full merge review.\n+\n+The following **27 committed reports / 1237 explicit verdict occurrences: 1195 ok, 10 rework, 32 hold (0.81% rework)** are occurrence accounting across source/gap, candidate eligibility, receipt classification and truth channels, not unique units or the A36 deep-read stop denominator. Holds here include classification rework/eligibility debt and do not grant owner-intent holds. Repeated corrections are counted once per committed verdict occurrence; this author contributes zero verdicts.\n+\n+| Committed report | Verdict occurrences | Ok | Rework | Hold |\n+|---|---:|---:|---:|---:|\n+| [review-261015-0450-whole-system-01.md](review-261015-0450-whole-system-01.md) | 80 | 80 | 0 | 0 |\n+| [review-261015-0450-whole-system-02.md](review-261015-0450-whole-system-02.md) | 65 | 65 | 0 | 0 |\n+| [review-261015-0450-whole-system-03.md](review-261015-0450-whole-system-03.md) | 80 | 80 | 0 | 0 |\n+| [review-261015-0450-whole-system-04.md](review-261015-0450-whole-system-04.md) | 80 | 80 | 0 | 0 |\n+| [review-261015-0450-whole-system-05.md](review-261015-0450-whole-system-05.md) | 6 | 6 | 0 | 0 |\n+| [review-261015-0450-whole-system-06.md](review-261015-0450-whole-system-06.md) | 52 | 52 | 0 | 0 |\n+| [review-261015-0450-whole-system-07.md](review-261015-0450-whole-system-07.md) | 51 | 51 | 0 | 0 |\n+| [review-261015-0450-whole-system-08.md](review-261015-0450-whole-system-08.md) | 11 | 11 | 0 | 0 |\n+| [review-261015-0450-whole-system-09.md](review-261015-0450-whole-system-09.md) | 37 | 37 | 0 | 0 |\n+| [review-261015-0450-whole-system-10.md](review-261015-0450-whole-system-10.md) | 31 | 31 | 0 | 0 |\n+| [review-261015-0450-whole-system-11.md](review-261015-0450-whole-system-11.md) | 55 | 55 | 0 | 0 |\n+| [review-261015-0450-whole-system-12.md](review-261015-0450-whole-system-12.md) | 48 | 48 | 0 | 0 |\n+| [review-261015-0450-whole-system-13.md](review-261015-0450-whole-system-13.md) | 61 | 61 | 0 | 0 |\n+| [review-261015-0450-whole-system-14.md](review-261015-0450-whole-system-14.md) | 80 | 80 | 0 | 0 |\n+| [review-261015-0450-whole-system-15.md](review-261015-0450-whole-system-15.md) | 39 | 39 | 0 | 0 |\n+| [review-261015-0450-whole-system-16.md](review-261015-0450-whole-system-16.md) | 50 | 50 | 0 | 0 |\n+| [review-261015-0451-whole-system-merge.md](review-261015-0451-whole-system-merge.md) | 9 | 7 | 2 | 0 |\n+| [review-261015-0507-whole-system-candidates-01.md](review-261015-0507-whole-system-candidates-01.md) | 79 | 62 | 0 | 17 |\n+| [review-261015-0508-whole-system-native-gap.md](review-261015-0508-whole-system-native-gap.md) | 1 | 1 | 0 | 0 |\n+| [review-261015-0607-whole-system-rereview-01.md](review-261015-0607-whole-system-rereview-01.md) | 68 | 64 | 4 | 0 |\n+| [review-261015-0625-whole-system-rereview-candidates-01.md](review-261015-0625-whole-system-rereview-candidates-01.md) | 81 | 65 | 1 | 15 |\n+| [review-261015-0625-whole-system-rereview-candidates-02.md](review-261015-0625-whole-system-rereview-candidates-02.md) | 2 | 2 | 0 | 0 |\n+| [review-261015-0710-agent-code-receipts.md](review-261015-0710-agent-code-receipts.md) | 4 | 4 | 0 | 0 |\n+| [review-261015-0710-whole-system-bounded-rereview.md](review-261015-0710-whole-system-bounded-rereview.md) | 54 | 54 | 0 | 0 |\n+| [review-261015-0710-whole-system-candidate-tuples.md](review-261015-0710-whole-system-candidate-tuples.md) | 68 | 68 | 0 | 0 |\n+| [review-261015-0710-whole-system-portal-receipts.md](review-261015-0710-whole-system-portal-receipts.md) | 15 | 13 | 2 | 0 |\n+| [review-6-whole-system-truth.md](review-6-whole-system-truth.md) | 30 | 29 | 1 | 0 |\n+\n+Final bounded ordinary review: 54 ok; candidate-list review: 68 ok (67 tuples plus the list); classification: 17 ok / two portal reworks, two subsequently re-issued pending. All accepted notes/report pins were applied in `ec08072e2`. This turn reopens only the described bindings; it does not count its corrections as reviewed.\n+\n+Documented numbered producer counters for Step 6 are 37\u201343 (seven); the subsequent ratchet/accepted-verdict assignments and this assignment have separate assignment IDs without a newly assigned counter. Counter-based rates would omit those closure-only turns and repeated recovery, so unique transport/session throughput is unmeasured. Tokens and owner effort total are unreported; the owner checkpoint remains owed. This turn authors zero new source rows, edits three sentences plus two history-header lines, and prepares accounting for a bounded re-review.\n+\n+## Fresh readers, area gaps and red-team\n+\n+[fresh-reader-261015-whole-system.md](fresh-reader-261015-whole-system.md): key committed at `103046acf` before two Sonnet readers, **6/6 in all six reader/scenario cells under partial=correct**, **11/36 partial**, no \"no\". **52 distinct anchors, zero nonexistent; zero legacy-as-authority answers under the explicit routing allowance; maximum seven files before first substantive owner** (limit eight). Both read 17 files overall; eight-per-run would fail. Strict yes-only reader 2 A and B are each 3/6. Isolation is **UNPROVEN**, instruction-only, opened-file lists in scope. Key/scoring share the Lead session; key header's `5f0403a00` is its input, scoring HEAD `103046acf`. Passing navigation does not prove candidate truth.\n+\n+Area gaps remain: CTR010 collision and omitted gateway registry row; missing roadmap/topology switchboard routes; carried advisory/current-owner/header disagreement; proof, risk/write-door and supersession instructions scattered; thin system overview (no gateway/Execution Core and dated law scope); stale portal/switchboard phases; topology implementation not established. Binding owners were outside reader scope. First two gaps are explicitly queued in [owner-queue.md](owner-queue.md), with exact paths/lines; the others remain promotion/navigation obligations.\n+\n+[red-team-6.md](red-team-6.md): **0 Critical / 0 High / 1 Medium / 7 Low**, range `a216ddfc0..5f0403a00`, committed snapshot only. Conservation recomputation: 826 source rows, zero missing normalized source lines, zero unaccounted target units, zero unauthorized approval carry, zero gate bypass. No changed component boundary.\n+\n+| Finding | Disposition in this turn |\n+|---|---|\n+| R6-1 Medium, shared reviewer session | **Owed**, no owner acceptance recorded. Checkpoint reviewer/sensitivity and independence resolution must be separate; prior ordinary review and red-team share a4954387. |\n+| R6-2 Low, independent D/E reproduction failure | **Owed**: prior author's exact reproduction is in verification-261015-0811 sidecar; not rerun here. Reviewer saw Invalid string length at two pins. Next native proof must record/reproduce exact commands/environment; tooling blocker goes to owner if still real, no checker workaround. |\n+| R6-3 Low, portal line 59 legacy numbering | **Note retained**; no further portal wording authorization here. Lead accepted the earlier A19 status sentence, not a blanket fix or numbering waiver. |\n+| R6-4 Low, promoted edit log | **Fixed, pending bounded review**: both committed README line 51/59 exact diffs added to promoted-edits.md; Last reviewed stays provenance pending promotion. |\n+| R6-5 Low, two stale receipt refs | **Fixed, pending bounded review**: both original refs pending with complete priorReview and explicit replacementReceipt path/ID/actual dfff pin. Original receipts immutable; no historic ID is grafted to a successor. |\n+| R6-6 Low, 47 candidate-unverified rows under Canonical: Yes, after review | **Note retained**: 21 map + 26 boundary units remain Draft/candidate via switchboard. Lead eligibility acceptance uses route-over-header reading; no new owner waiver or canonical promotion is authored. Checkpoint must acknowledge this reading explicitly. |\n+| R6-7 Low, stale frozen-map/source blobs | **Accounted, pending bounded review** above; frozen inputs not edited. Existing README relocation addendum is the placement correction. |\n+| R6-8 Low, history header fields | **Fixed, pending bounded review**: Supersedes: None; no legacy source is edited / Superseded by: None, matching history convention. Two changed wrapper units locally rebound and pending. |\n+\n+R6-8 digests: history H1 `1918b66f54a462fa3d1611abefac357f4866d38afba8c6ef6e2051a57c2da12c`, metadata block `3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b`. Native IDs in the list are prior identities pending native reconciliation; no claim that the changed body retains an ID is made. Other history body bytes are unchanged.\n+\n+## Verification and owed work\n+\n+Relevant existing tests: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs test/scripts/doc-decision-review.test.mjs`: **39/39 pass**, zero fail/cancel/skip/todo. Local extractor checks all four changed units and bindings; exact three-sentence replacement and two-line header addition checks, prior-review preservation, JSON parsing, protected-input equality, scope and whitespace checks are recorded by this turn. No production symbol, gate, checker, extractor, vocabulary, baseline, frozen map, source-blobs or registry change. No full-suite, fresh D/E, installed-release or current-truth certification. Markdown preview is unavailable within scope: no MDView MCP tool is exposed; prior CLI failed on a read-only database and no out-of-scope database repair is attempted.\n+\n+1. Bind this artifact to actual runner settlement and do **one bounded independent re-review** of three sentence qualifications, two A22 decisions, two stale receipt refs, history header/two tuple consequences, promoted diff log, frozen-pin accounting, owner queue and this report. Review the two already re-issued portal receipts under the formal classification contract at their actual `ec08072e2` artifact; no approval carry.\n+2. Next authorized native sync reconciles real identities/gaps, list/ref consequences, preserves both prior known sets and all native tuples, reruns both-prior D/scoped E, exact exception membership and full reverse tuple equality, and records reproducible commands/environment. No current-green claim until that proof exists. Account any actual changed identity without inventing approval.\n+3. Separate checkpoint reviewer owns the genuine hidden sensitivity pack/key and passing checkpoint verdict, with R6-1 independence settled. Ordinary review/truth/blocks/fresh readers are evidence, not a substitute. Only then assess Step 6 closure; do not advance Step 7 here.\n+4. Preserve three Rings holds, A34 Host/Packaging/AGENTS residuals with full digests, dropped-001 Plan C, F6 compatibility/release-owner timing, global native gaps and changed-code receipts. Promotion owes full current-truth sweeps including known-stale tables, candidate native content and all reader gaps.\n+5. Navigation/cutover owns missing switchboard rows, complete specs reading-map merger, instruction singleton reconciliation, headers and R6-3 numbering, route/header clarity in R6-6, draft alias activation/consumer rewrites, executable/generated consumers and new report edges. No active alias or consumer mutation here. CTR010 remains binding-owner work. Owner effort/token checkpoint remains owed.\n",
+      "diffDigest": "3761ad44c6e3beb6e1c926c2f7b60cc5aa5f53c7dde33b96c66ac7695085948e"
+    }
+  ],
+  "fixes": [
+    {
+      "id": "R6-4",
+      "status": "fixed, review pending",
+      "evidence": "plans/260925-documentation-authority-unification/reports/phase-06/promoted-edits.md",
+      "detail": "Both exact committed README line 51/59 diffs; Last reviewed retained as historical provenance."
+    },
+    {
+      "id": "R6-5",
+      "status": "fixed, review pending",
+      "detail": "Two stale refs reopened with full priorReview and actual committed replacement paths/IDs; no successor acceptance.",
+      "refs": [
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "collection": "candidateClassifications",
+          "claimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+          "before": {
+            "claimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "authoredBy": "codex-session:1@2026-10-10",
+            "reviewStatus": "reviewed",
+            "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-39: Lines 172-177 list the exact compiled fields of plan.mjs:444-461 and correctly deny target/handback/execution wrappers and egress.allowed (governance egress is kind/target/content, resolve.mjs:470-477).",
+            "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+            "reviewedAt": "2026-10-10",
+            "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+          },
+          "after": {
+            "claimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "authoredBy": "codex-session:1@2026-10-10",
+            "reviewStatus": "pending",
+            "priorReview": {
+              "claimId": "claim_de1bde6579325220fa5ddea79b9cd77f",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+              "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "reviewed",
+              "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-39: Lines 172-177 list the exact compiled fields of plan.mjs:444-461 and correctly deny target/handback/execution wrappers and egress.allowed (governance egress is kind/target/content, resolve.mjs:470-477).",
+              "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+              "reviewedAt": "2026-10-10",
+              "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+              "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+            },
+            "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+            "rebindingReason": "R6-5 / A22: historical receipt refers to pre-A19 citation text. Return reference to pending; prior acceptance is history only. Replacement is separately bound, without successor approval carry.",
+            "replacementReceipt": {
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+              "claimId": "claim_366503bd4dadea43469f1586f4f25f60",
+              "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+            }
+          }
+        },
+        {
+          "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "collection": "candidateClassifications",
+          "claimId": "claim_56af2fc53f516253db192a78f0dddc70",
+          "before": {
+            "claimId": "claim_56af2fc53f516253db192a78f0dddc70",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "authoredBy": "codex-session:1@2026-10-10",
+            "reviewStatus": "reviewed",
+            "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-47: Lines 210-213: agentType/mcpTool are top-level at plan.mjs:453-454 and the decision does not invoke the facility (caller must hold it), which matches the AGENTS dispatch doctrine.",
+            "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+            "reviewedAt": "2026-10-10",
+            "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+            "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+          },
+          "after": {
+            "claimId": "claim_56af2fc53f516253db192a78f0dddc70",
+            "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+            "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+            "authoredBy": "codex-session:1@2026-10-10",
+            "reviewStatus": "pending",
+            "priorReview": {
+              "claimId": "claim_56af2fc53f516253db192a78f0dddc70",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+              "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "reviewed",
+              "reviewNote": "proposals/dispatch-control-plane-redesign.md#unheaded-block-47: Lines 210-213: agentType/mcpTool are top-level at plan.mjs:453-454 and the decision does not invoke the facility (caller must hold it), which matches the AGENTS dispatch doctrine.",
+              "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+              "reviewedAt": "2026-10-10",
+              "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+              "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+            },
+            "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+            "rebindingReason": "R6-5 / A22: historical receipt refers to pre-A19 citation text. Return reference to pending; prior acceptance is history only. Replacement is separately bound, without successor approval carry.",
+            "replacementReceipt": {
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step6-repin.json",
+              "claimId": "claim_c5395a2e8480ce44d27f2873c02b8746",
+              "receiptCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "R6-7",
+      "status": "accounted, review pending",
+      "evidence": "plans/260925-documentation-authority-unification/reports/phase-06/step-06-report.md",
+      "detail": "Frozen/current source blobs, advisory one-line main change and accepted README placement addendum; frozen inputs unchanged."
+    },
+    {
+      "id": "R6-8",
+      "status": "fixed, review pending",
+      "detail": "Two conventional history header fields; full before/current changed candidate units and actual native gap/new-ID consequence."
+    }
+  ],
+  "entryCounts": {
+    "sourceBindings": 2,
+    "candidateBindings": 2,
+    "staleReceiptRefs": 2,
+    "nativeGapPairs": 2,
+    "lowFixAccounts": 4
+  },
+  "postNativeReconciliation": {
+    "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+    "registry": {
+      "bytes": 60277528,
+      "SHA256": "1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02",
+      "compactOneLine": true
+    },
+    "knownBefore": 95879,
+    "knownAfter": 95881,
+    "zeroKnownIDLoss": true,
+    "liveUnits": 88224,
+    "activeTupleEquality": true,
+    "candidateLists": {
+      "root": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-root-authorities.json",
+        "count": 830,
+        "fullFiveFieldTupleEquality": true,
+        "tupleSHA256": "8ced6a1810460f6e08fdaf75991964097695f7e9cf90021a04575235c90d3997"
+      },
+      "agent": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+        "count": 570,
+        "fullFiveFieldTupleEquality": true,
+        "tupleSHA256": "0ba1132589fd2cfb547687e7d96f16806e0291427c419b9b5ac756db65f89bf7"
+      },
+      "packaging": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-packaging-distribution.json",
+        "count": 694,
+        "fullFiveFieldTupleEquality": true,
+        "tupleSHA256": "4f66a5e5bf4d8a5c4682ca526847a20389ad5eb47f270476235f477619ed4322"
+      },
+      "whole": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-whole-system-architecture.json",
+        "count": 67,
+        "fullFiveFieldTupleEquality": true,
+        "tupleSHA256": "539ac4419e0992b7b6da544661a3c6bb3170ef5d1c808640443a11a83c34ea5b"
+      }
+    },
+    "identityChanges": [
+      {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-whole-system-architecture.json",
+        "before": {
+          "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+          "status": "candidate-unverified",
+          "reviewStatus": "pending",
+          "priorReview": {
+            "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+            "path": "docs/platform/system-architecture/history/architect-readme.md",
+            "anchor": "unheaded-block-1",
+            "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+            "status": "candidate-unverified",
+            "reviewStatus": "reviewed",
+            "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+            "reviewedAt": "2026-10-15",
+            "reviewMode": "ordinary",
+            "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+            "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+            "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 1d36d1e33d5a609a equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+          },
+          "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+          "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried."
+        },
+        "after": {
+          "claimId": "claim_941da7b33ebfd98dc51d04f415175671",
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b",
+          "status": "candidate-unverified",
+          "reviewStatus": "pending",
+          "priorReview": {
+            "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+            "path": "docs/platform/system-architecture/history/architect-readme.md",
+            "anchor": "unheaded-block-1",
+            "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+            "status": "candidate-unverified",
+            "reviewStatus": "reviewed",
+            "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+            "reviewedAt": "2026-10-15",
+            "reviewMode": "ordinary",
+            "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+            "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+            "reviewNote": "mechanical: text block unheaded-block-1 of system-architecture/history/architect-readme.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 1d36d1e33d5a609a equal the request, sidecar and committed bytes; system-architecture/history/architect-readme.md declares Design status Candidate (history), non-canonical history carrier, not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+          },
+          "amendedBy": "codex-session:unit-run-1792028685519-ebec4fbb@2026-10-15",
+          "rebindingReason": "R6-8 header completion / A22 local digest rebind only. Current native identity and list equality require next sync; no identity is allocated or approval carried.",
+          "priorNativeIdentity": {
+            "claimId": "claim_61cd2622fa0c5c1b7c18ea39e2f85579",
+            "path": "docs/platform/system-architecture/history/architect-readme.md",
+            "anchor": "unheaded-block-1",
+            "unitDigest": "1d36d1e33d5a609ac2d610bc7608684ececb4120b29215e9b56e1d04d066e3cd",
+            "meaning": "Preserved predecessor is an actual native identity gap, not a live identity or approval."
+          }
+        },
+        "native": {
+          "claimId": "claim_941da7b33ebfd98dc51d04f415175671",
+          "path": "docs/platform/system-architecture/history/architect-readme.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "3a1a1314891f35aa67ccdf4fec0c5415cbb568f5e4d6a1a6eb97a690e51e3c0b"
+        }
+      }
+    ],
+    "receiptPin": "ec08072e26949676703446c99a1229abc6793901"
+  },
+  "postNativeProofPath": "plans/260925-documentation-authority-unification/reports/phase-06/sync-2a1304393/final-proof.json"
+}

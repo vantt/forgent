@@ -1,5 +1,38 @@
 # Whole-system architecture batch report
 
+## Native refresh and independent review handoff at `2a1304393b9b284ad9566b6542ba78554f54b100`
+
+Date: 2026-10-15. Assignment: `unit-run-1792029127447-efadb3b1/producer/1`. Actual output artifact commit is runner settlement, not yet known. This section supersedes the stale-registry/current-certification statements in the preceding correction-state report retained below; it does not supersede its content decisions or limitations. Step 6 remains **open**.
+
+Exactly **one** background native sync, own polled [log](sync-2a1304393/native-sync.log). Native carry + generate: **493.814s**; background job including initial proofs: **1232.183s**; through post-persistence proof: **1389.361s**. Complete native inventory: **4,412 files / 88,224 live claims**. Reused unchanged native exported APIs and previous committed replay helpers, preserving all enumerable output in temporary v8 cache; no checker/extractor/gate/baseline modification or field omission. Exact commands, Node runtime, source hashes and raw outputs are in [final-proof.json](sync-2a1304393/final-proof.json). R6-2 independent reproduction is still owed by the reviewer.
+
+Persisted `working-identity-registry.json`: **60,277,528 bytes**, compact one-line, below **90,000,000 bytes**; SHA256 `1ec13215600551ffdb9cb2f3a6e1260fdbd0cf0e829171d95f42309221384d02`. Known IDs: **95,879 → 95,881**, zero lost; all **88,224** active ID/path/anchor/digest tuples equal full native output. Carry creates **2 new live IDs / 2 preserved predecessor gaps / 2 changed heading tuples / 0 retired units**. Full before/current text and all 64-hex digests are shown in the bounded request. No opaque ID is guessed, grafted or approved. New platform-target gaps remain preserved with explicit actual same-file successor evidence; no disposition content is authored in this assignment.
+
+Both-prior D is **zero fatal** before and after persistence. Both prior registries are supplied together and named in every D/E run. Whole-system scoped strict E is **open** with exactly **2 pending source rows + 2 reviewed contextual identical-unit groups + 67 candidate-unverified tuples**; no unexpected category/ID. Pending IDs match the two A19 source bindings exactly. Full contextual exception member ID/source/target tuples and owner sets match their reviewed records. Global strict E/cutover is not claimed.
+
+All four persisted candidate lists directly equal the actual native full **claim ID / path / anchor / unit digest / status** tuples: **root 830 / Agent 570 / Packaging 694 / whole 67**. Whole-system reverse tuples independently recomputed by post-persistence E also equal that list. File status metadata and eligibility all pass, retaining the 47 route-over-header cases as the R6-6 checkpoint concern. One history-wrapper block uses native successor `claim_941da7b33ebfd98dc51d04f415175671`; its predecessor `claim_61cd2622fa0c5c1b7c18ea39e2f85579` remains an actual gap. The history heading retains its native ID with changed digest. Both changed list bindings stay pending; 65 other eligibility rows stay reviewed. Source rows remain 824 reviewed / 2 pending of 826 (825 move / 1 supersede).
+
+The two reissued portal receipt refs now bind actual **`ec08072e26949676703446c99a1229abc6793901`**, pending, preserving original authorship and immutable artifacts. Both receipt ID/path/anchor/unit/full shown-text bindings equal current native units. No predecessor classification or approval is extended to a successor. Formal independent Class/Evidence-column review is separately requested.
+
+| Request | Population |
+|---|---|
+| [review-request-261015-2a1304393-bounded.md](review-request-261015-2a1304393-bounded.md) | 12 entries: 2 source + 2 candidate + 2 stale refs + 2 native gap pairs + 4 Low-fix accounts; overlaps across channels explicitly described |
+| [review-request-261015-2a1304393-portal-receipts.md](review-request-261015-2a1304393-portal-receipts.md) | 2 formal content-classification receipts at actual ec08072e26949676703446c99a1229abc6793901 |
+| [review-request-261015-2a1304393-checkpoint.md](review-request-261015-2a1304393-checkpoint.md) | 824 reviewed bindings; 2 pending excluded; complete 826-source denominator |
+
+
+The bounded request shows the three A19 sentence corrections, all source/candidate/ref rebounds, native heading and gap consequences, R6-4/5/7/8 fixes, exact committed diffs, full shown source/target/receipt text and full 64-hex digests, current code and pre-retirement code evidence. The checkpoint request provides an **unselected** complete reviewed source population; the producer has neither authored nor seen the reviewer's sensitivity pack/key. Report must be **`review-6-checkpoint.md`**, optional shard suffix, with genuine pack/score proof: **≥5/6 mutations caught, ≤2/24 control false flags**; two consecutive failing reviewer sessions stop. Independent checkpoint red-team must resolve R6-1; zero open Critical/High unless owner accepted. Existing truth/block/reader results and weaknesses are retained, not replaced by fabricated new draws or approvals.
+
+Validation: **149/149 tests pass**, `env -u CLAUDE_CODE_SESSION_ID`, zero fail/cancel/skip. Exact shown-text hashes, full source/target digests and checkpoint population uniqueness validate. Protected docs/decision prose, gates/checkers/vocabulary/extractor/baselines and frozen inputs are unchanged. Only plan files are written; the required external result claim is the explicit exception. No git write, lifecycle verb, secret read, manual workspace `.fgos/` access, seeded-pack/key creation/read, promotion or Step 7. Preview not launched: no MDView MCP exposed and CLI preview requires writes outside assigned scope. No needsWrites.
+
+No unexplained technical blocker remains. Independent bounded/classification reviews and reviewer-held passing checkpoint proof are still required before Step 6 closure. Retain Rings holds, A34 residuals, R6-3/R6-6 concerns, owner queue (including CTR010 and missing switchboard routes), effort/token limitations and truth/promotion/navigation/consumer/alias/native-gap/cutover obligations. No component-boundary change.
+
+[Final scope and artifact verification](sync-2a1304393/final-verification.json): all 30 shown-text hash occurrences, 26 receipt evidence input-blob bindings, population uniqueness/full digests, protected bytes, scope and `git diff --check` pass. Temporary duplicate registries and the full native v8 cache were removed after proof; all raw D/E results, native batch outputs, scripts and logs remain.
+
+---
+
+## Prior correction-state report (historical freshness)
+
 Date: 2026-10-15. Assignment: `unit-run-1792028685519-ebec4fbb/producer/1`. Step: 6. State: **bounded corrections authored; closure open**. Input: `bb9bb071a`, with Lead truth/blocks evidence at `103046acf`, reader/red-team evidence at `bb9bb071a`, and ordinary/classification reports at `5f0403a0055a9cb50f9975cb74777fba3828eff4`. Output artifact pin is the actual runner settlement, pending; no SHA is invented.
 
 **Step 6 closes only after one bounded independent re-review of this turn's changes, the native sync with actual identity/binding consequences and conservation proofs, and the checkpoint review with the reviewer-held passing sensitivity pack.** A36 ordinary review, the truth/block samples and the existing red-team do not replace that checkpoint. No sensitivity pack, key, review pack or native sync is authored here. No promotion, cutover or Step 7 permission is inferred.

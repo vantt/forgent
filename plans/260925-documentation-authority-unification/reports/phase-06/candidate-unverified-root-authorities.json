@@ -5893,13 +5893,14 @@
     "countUnchanged": 830
   },
   "nativeEquality": {
-    "contentCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+    "contentCommit": "2a1304393b9b284ad9566b6542ba78554f54b100",
+    "nativeSync": true,
     "fullTupleEquality": true,
     "eligibleTupleEquality": true,
     "nativeReverseCount": 830,
     "candidateUnverifiedCount": 830,
-    "nativeSync": false,
-    "meaning": "Fresh comparison from persisted registry; metadata application only."
+    "tupleSHA256": "8ced6a1810460f6e08fdaf75991964097695f7e9cf90021a04575235c90d3997",
+    "meaning": "All five fields compared directly with complete native batch conservation output of the single sync. Review metadata is separate; changed native IDs remain pending."
   },
   "previousNativeVerificationMetadata": {
     "contentCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
@@ -5921,5 +5922,14 @@
       "authorization": "A28"
     },
     "meaning": "Historical metadata at input pin, superseded by the current native proof only; no review or truth acceptance."
+  },
+  "previousNativeEquality": {
+    "contentCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+    "fullTupleEquality": true,
+    "eligibleTupleEquality": true,
+    "nativeReverseCount": 830,
+    "candidateUnverifiedCount": 830,
+    "nativeSync": false,
+    "meaning": "Fresh comparison from persisted registry; metadata application only."
   }
 }
