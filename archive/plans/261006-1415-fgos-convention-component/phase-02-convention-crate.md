@@ -1,6 +1,6 @@
 # Phase 02 — Crate `fgos-convention` + dữ liệu hợp đồng + golden test
 
-Trạng thái: pending · Công: 1.25-1.75d (gồm ≈0.25d bộ khớp `placement-glob` + `classify` + golden case) · Phụ thuộc: phase 01
+Trạng thái: done (2026-10-11; `packages/convention`, golden cases, commit `e6372acc6`) · Công: 1.25-1.75d (gồm ≈0.25d bộ khớp `placement-glob` + `classify` + golden case) · Phụ thuộc: phase 01
 
 ## Bối cảnh
 

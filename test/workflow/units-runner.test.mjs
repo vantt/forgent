@@ -12,6 +12,9 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 seedFileLocalBwrapRegistry();
+if (!process.env.XDG_STATE_HOME) {
+  process.env.XDG_STATE_HOME = makeFixtureDir('fgos-state-');
+}
 
 // makeFixtureDir removes these at exit (FGOS_KEEP_TEST_FIXTURES=1 keeps them for debugging).
 const fixtures = [];
@@ -394,4 +397,231 @@ test('fgos workflow start --units <file> --effort runs the units and reports the
   assert.deepEqual(state.writeBranches.map((e) => e.unitId), ['w-a', 'w-b']);
   assert.equal(state.writeBranches[1].baseRef, state.writeBranches[0].branch);
   assert.match(state.steps['w-b'].units['w-b'].results.at(-1).runResult.agentClaim.summary, /Seen: a\.txt Effort: high/);
+});
+
+test('--timeout gives every unit of the workflow run its own timeoutMs, kept for resume', async () => {
+  const tmp = setupRepo();
+  const workflow = validateWorkflow({
+    id: 'timeout-run',
+    steps: [
+      { id: 'gate', gate: { kind: 'human', question: 'Proceed?' } },
+      { id: 's', dependsOn: ['gate'], units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read' } }] },
+    ],
+  });
+  const state = await startWorkflow({ workflow, timeout: '90m', ...opts(tmp) });
+  assert.equal(state.status, 'parked');
+  assert.equal(state.timeoutMs, 5400000);
+  assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0].payload.timeoutMs, 5400000);
+
+  const { answerWorkflow } = await import('../../src/workflow/index.mjs');
+  const answered = await answerWorkflow(state.workflowRunId, { stepId: 'gate', answer: 'yes', approved: true, ...opts(tmp) });
+  assert.equal(answered.status, 'completed', JSON.stringify(answered.steps));
+  assert.equal(answered.timeoutMs, 5400000);
+
+  const unitRunId = answered.steps.s.units.u.unitRunId;
+  const record = unitRecordOf(tmp, unitRunId);
+  assert.ok(record.overrides.some((o) => o.timeoutMs === 5400000 && o.origin === 'human-cli' && !o.scope));
+  assert.deepEqual(producerAssignment(tmp, unitRunId).binding.provenance.timeoutMs, { value: 5400000, source: 'override:human-cli' });
+  assert.equal(producerAssignment(tmp, unitRunId).binding.timeoutMs, 5400000);
+});
+
+test('a unit with its own timeoutMs wins over workflow start --timeout', async () => {
+  const tmp = setupRepo();
+  const file = unitsFile(tmp, [
+    { id: 'u-default', objective: 'Read', capability: 'docs:write' },
+    { id: 'u-custom', objective: 'Read with own timeout', capability: 'docs:write', timeoutMs: 120000 },
+  ]);
+  const state = await startWorkflow({ unitsPath: file, timeout: '90m', ...opts(tmp) });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  assert.equal(state.timeoutMs, 5400000);
+
+  const runA = state.steps['u-default'].units['u-default'].unitRunId;
+  const runB = state.steps['u-custom'].units['u-custom'].unitRunId;
+
+  assert.deepEqual(producerAssignment(tmp, runA).binding.provenance.timeoutMs, { value: 5400000, source: 'override:human-cli' });
+  assert.equal(producerAssignment(tmp, runA).binding.timeoutMs, 5400000);
+
+  assert.deepEqual(producerAssignment(tmp, runB).binding.provenance.timeoutMs, { value: 120000, source: 'unit' });
+  assert.equal(producerAssignment(tmp, runB).binding.timeoutMs, 120000);
+});
+
+test('--account pins provider account on every unit of the workflow run, kept for resume', async () => {
+  const tmp = setupRepo();
+  fs.writeFileSync(path.join(tmp, 'login'), 'token\n');
+  const fakeHome = makeFixtureDir('fgos-home-');
+  fixtures.push(fakeHome);
+  fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(fakeHome, '.fgos', 'config.json'), JSON.stringify({
+    runner: {
+      providers: {
+        node: {
+          accounts: {
+            'acct-test': { label: 'acct-test', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
+          },
+        },
+      },
+    },
+  }, null, 2));
+  const prevHome = process.env.HOME;
+  process.env.HOME = fakeHome;
+  try {
+    const workflow = validateWorkflow({
+      id: 'account-run',
+      steps: [
+        { id: 'gate', gate: { kind: 'human', question: 'Proceed?' } },
+        { id: 's', dependsOn: ['gate'], units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read' } }] },
+      ],
+    });
+    const state = await startWorkflow({ workflow, account: 'acct-test', ...opts(tmp) });
+    assert.equal(state.status, 'parked');
+    assert.equal(state.account, 'acct-test');
+    assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0].payload.account, 'acct-test');
+
+    const { answerWorkflow } = await import('../../src/workflow/index.mjs');
+    const answered = await answerWorkflow(state.workflowRunId, { stepId: 'gate', answer: 'yes', approved: true, ...opts(tmp) });
+    assert.equal(answered.status, 'completed', JSON.stringify(answered.steps));
+    assert.equal(answered.account, 'acct-test');
+
+    const unitRunId = answered.steps.s.units.u.unitRunId;
+    const binding = producerAssignment(tmp, unitRunId).binding;
+    assert.deepEqual(binding.account, { provider: 'node', id: 'acct-test' });
+    assert.deepEqual(binding.provenance.account, { value: 'acct-test', source: 'override:human-cli' });
+  } finally {
+    if (prevHome === undefined) delete process.env.HOME;
+    else process.env.HOME = prevHome;
+  }
+});
+
+test('workflow start with invalid --timeout or --account is refused before run exists', async () => {
+  const tmp = setupRepo();
+  const workflow = validateWorkflow({
+    id: 'bad-params',
+    steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read' } }] }],
+  });
+
+  await assert.rejects(() => startWorkflow({ workflow, timeout: '10h', ...opts(tmp) }), /at most 4h/);
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false);
+
+  await assert.rejects(() => startWorkflow({ workflow, account: '', ...opts(tmp) }), /account/);
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false);
+
+  await assert.rejects(() => startWorkflow({ workflow, account: 'unknown-acct', ...opts(tmp) }), /not configured in runner\.providers/);
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false);
+});
+
+test('workflow with two units on different providers pins account only on matching unit and both run', async () => {
+  const tmp = setupRepo();
+  const fakeHome = makeFixtureDir('fgos-diff-home-');
+  fixtures.push(fakeHome);
+  fs.writeFileSync(path.join(tmp, 'login'), 'token\n');
+  fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(fakeHome, '.fgos', 'config.json'), JSON.stringify({
+    runner: {
+      providers: {
+        alpha: {
+          accounts: {
+            'acct-alpha': { label: 'acct-alpha', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
+          },
+        },
+      },
+    },
+  }, null, 2));
+
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const worker = path.join(tmp, 'worker.mjs');
+  cfg.runner.executors = {};
+  for (const name of ['alpha', 'beta']) {
+    const command = path.join(tmp, `${name}-bin`);
+    if (!fs.existsSync(command)) fs.symlinkSync(process.execPath, command);
+    const args = [worker, '{prompt}'];
+    cfg.runner.executors[name] = {
+      kind: 'agent', allowCrossProvider: true, command, args, providerModel: name,
+      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
+    };
+  }
+  cfg.runner.capabilities = {
+    'cap-alpha': { prefer: [{ executor: 'alpha' }], rigor: 'standard' },
+    'cap-beta': { prefer: [{ executor: 'beta' }], rigor: 'standard' },
+  };
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+
+  const prevHome = process.env.HOME;
+  process.env.HOME = fakeHome;
+  try {
+    const workflow = validateWorkflow({
+      id: 'diff-provider-workflow',
+      steps: [
+        { id: 's1', units: [{ id: 'u1', template: { capability: 'cap-alpha', objective: 'Task 1' } }] },
+        { id: 's2', dependsOn: ['s1'], units: [{ id: 'u2', template: { capability: 'cap-beta', objective: 'Task 2' } }] },
+      ],
+    });
+    const state = await startWorkflow({ workflow, account: 'acct-alpha', ...opts(tmp) });
+    assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+
+    const u1RunId = state.steps.s1.units.u1.unitRunId;
+    const u2RunId = state.steps.s2.units.u2.unitRunId;
+
+    const b1 = producerAssignment(tmp, u1RunId).binding;
+    const b2 = producerAssignment(tmp, u2RunId).binding;
+
+    assert.deepEqual(b1.account, { provider: 'alpha', id: 'acct-alpha' });
+    assert.equal(b2.account, undefined);
+    // The unit the account did not reach is recorded, not dropped silently.
+    const unpinned = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })
+      .filter((e) => e.type === 'unit.account-unpinned');
+    assert.deepEqual(unpinned.map((e) => [e.payload.unitId, e.payload.account]), [['u2', 'acct-alpha']]);
+  } finally {
+    if (prevHome === undefined) delete process.env.HOME;
+    else process.env.HOME = prevHome;
+  }
+});
+
+test('CLI workflow start accepts --timeout and --account, while resume refuses them', async () => {
+  const tmp = setupRepo();
+  const fakeHome = makeFixtureDir('fgos-cli-home-');
+  fs.writeFileSync(path.join(tmp, 'login'), 'token\n');
+  fixtures.push(fakeHome);
+  fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(fakeHome, '.fgos', 'config.json'), JSON.stringify({
+    runner: {
+      providers: {
+        node: {
+          accounts: {
+            'acct-cli': { label: 'acct-cli', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
+          },
+        },
+      },
+    },
+  }, null, 2));
+
+  const file = unitsFile(tmp, [
+    { id: 'w-u', objective: 'Read', capability: 'docs:write' },
+  ]);
+  const cliEnv = { ...process.env, HOME: fakeHome, USERPROFILE: fakeHome };
+  const out = execFileSync(process.execPath, [
+    path.resolve('bin/fgos.mjs'), 'workflow', 'start',
+    '--units', file,
+    '--timeout', '90m',
+    '--account', 'acct-cli',
+    '--foreground',
+    '--dir', tmp,
+  ], { cwd: tmp, env: cliEnv, encoding: 'utf8' });
+  const state = JSON.parse(out).data;
+  assert.equal(state.status, 'completed');
+  assert.equal(state.timeoutMs, 5400000);
+  assert.equal(state.account, 'acct-cli');
+
+  // resume with --timeout or --account is refused
+  assert.throws(() => execFileSync(process.execPath, [
+    path.resolve('bin/fgos.mjs'), 'workflow', 'resume', state.workflowRunId,
+    '--timeout', '2h',
+    '--dir', tmp,
+  ], { cwd: tmp, env: cliEnv, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }), /--timeout cannot change a resumed workflow run/);
+
+  assert.throws(() => execFileSync(process.execPath, [
+    path.resolve('bin/fgos.mjs'), 'workflow', 'resume', state.workflowRunId,
+    '--account', 'acct-cli',
+    '--dir', tmp,
+  ], { cwd: tmp, env: cliEnv, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }), /--account cannot change a resumed workflow run/);
 });

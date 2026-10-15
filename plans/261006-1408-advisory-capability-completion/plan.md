@@ -1,7 +1,7 @@
 ---
 title: "Complete advisory capability on existing runtime — do not restore coordination engine"
 description: "Close architecture-advisory migration gaps with early feasibility proof, retain cognition and human authority, and reject bloat or a second engine. Separate from single-door hygiene."
-status: pending
+status: partial
 priority: P1
 branch: feat/single-door-mechanisms
 tags: [advisory, workflow, collaboration-pattern, migration, human-authority, simplicity]
@@ -9,6 +9,8 @@ created: 2026-10-06
 ---
 
 # Advisory capability completion — chức năng trở lại, engine không trở lại
+
+> **Status partial (2026-10-11):** the owner narrowed the scope to bounded path M (merge `a91a1925e`, 2026-10-08) and one live run on mcp-skill-hub passed 2026-10-09. Phase 01 done; phases 02-04 partial (see each phase). Parked improvements: `reports/advisory-m-owner-decisions-and-parked-questions-261008.md`. Barrier "single-door phase 01 must land first" is met (single-door plan completed).
 
 ## Vì sao có plan riêng
 

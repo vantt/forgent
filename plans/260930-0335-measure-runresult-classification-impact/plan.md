@@ -3,11 +3,11 @@ title: "Đo tác động RunResult classification và chốt producer friction t
 status: pending
 priority: P1
 created: 2026-09-30
-blockedBy: [261005-1143-observe-run-visibility-and-discussion-measurement]
+blockedBy: []
 blocks: []
 ---
 
-> **Blocked (2026-10-05):** `metrics runs` does not see any run made by the execution core since 2026-10-01 (nested `unit-run-*` assignment layout). "After" numbers measured before the fix undercount; wait for phase 3 (rebaseline) of [observe-run-visibility-and-discussion-measurement](../261005-1143-observe-run-visibility-and-discussion-measurement/plan.md).
+> **Unblocked (2026-10-11):** the blocker, observe-run-visibility-and-discussion-measurement, is `completed` (all 6 phases, incl. the layout-v2 rebaseline). The only remaining gate is the bake period below: at least 1 week or 50 new runs measured on the rebuilt host. No producer code exists yet (no friction record call in `src/runner/dispatch`), phase 03 stays blocked by phase 02, phase 04 is cancelled.
 
 Coverage rebaseline authority: [observe-rebaseline-261005.md](../reports/observe-rebaseline-261005.md).
 Use only the rebuilt layout-v2 host for new "after" numbers; installed-host

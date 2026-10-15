@@ -40,6 +40,8 @@ Out of scope: AgentKit/ClaudeKit/rtk (ak-*/ck-* skills, .claude/hooks/*, .claude
 | 04 | [Doctor registration](phase-04-doctor-registration.md) | 03; Plan A Phase 04 đã merge | 1.5h | pending |
 | 05 | [Docs, CHANGELOG, xoá cửa tạm của Plan A](phase-05-docs-changelog-and-deletions.md) | 04; Plan A Phase 06 đã merge; Plan B đã xong lượt sửa `AGENTS.md` | 1.5h | pending |
 
+Dependency check (2026-10-11): Plan A (single-door) phases 04 and 06 are `done` and the Plan B `AGENTS.md` pass has landed, so the external dependencies are met. The only open gate is the owner scheduling the plan (still draft, no dev-source activation kind exists in `packages/distribution`).
+
 Dependency graph: `Plan A 04 → C04`, `Plan A 06 → C05`, `00 → (DP1) → 01 → 02 → 03 → 04 → 05`. Tuần tự hết: 01/02/03 cùng sửa `packages/distribution/rust/src/init.rs`; 04/05 cùng sửa `src/setup/registrations.mjs`, `docs/specs/distribution.md`, `CHANGELOG.md` mà Plan A cũng sửa.
 
 ## Decision points (chi tiết + khuyến nghị ở Phase 00)

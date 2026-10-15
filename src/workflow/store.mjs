@@ -25,7 +25,7 @@ function eventsFilePath(repoRoot, workflowRunId) {
  * @param {object} [params.configSnapshot]
  * @returns {{ workflowRunId: string, runDir: string }}
  */
-export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflow, configSnapshot, request, stanceOptions = [], contextRefs = [], seats, effort }) {
+export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflow, configSnapshot, request, stanceOptions = [], contextRefs = [], seats, effort, timeoutMs, account }) {
   if (!repoRoot) throw new RunnerConfigError('createWorkflowRun requires repoRoot');
   if (!workflowId) throw new RunnerConfigError('createWorkflowRun requires workflowId');
 
@@ -49,6 +49,8 @@ export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflo
       ...(seats ? { seats } : {}),
       // The reasoning effort the run was started with (--effort); every unit of the run, resumed or not, asks for it.
       ...(effort ? { effort } : {}),
+      ...(timeoutMs ? { timeoutMs } : {}),
+      ...(account ? { account } : {}),
     },
   };
 
@@ -143,6 +145,8 @@ export function projectWorkflowState(events) {
   let contextRefs = [];
   let seats = null;
   let effort = null;
+  let timeoutMs = null;
+  let account = null;
   let status = 'running';
   let outcome = null;
   let worktrees = null;
@@ -162,6 +166,8 @@ export function projectWorkflowState(events) {
         contextRefs = p.contextRefs ?? [];
         seats = p.seats ?? null;
         effort = p.effort ?? null;
+        timeoutMs = p.timeoutMs ?? null;
+        account = p.account ?? null;
         if (workflow?.steps) {
           for (const s of workflow.steps) {
             steps[s.id] = {
@@ -307,6 +313,8 @@ export function projectWorkflowState(events) {
     contextRefs,
     ...(seats ? { seats } : {}),
     ...(effort ? { effort } : {}),
+    ...(timeoutMs ? { timeoutMs } : {}),
+    ...(account ? { account } : {}),
     ...(writeBranches.length > 0 ? { writeBranches } : {}),
     status,
     outcome,

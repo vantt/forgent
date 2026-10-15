@@ -1,6 +1,6 @@
 # Phase 04 — Client Node mỏng qua invokeHost
 
-Trạng thái: pending · Công: 0.5d · Phụ thuộc: phase 03
+Trạng thái: done (2026-10-11; `src/convention/convention-client.mjs`, commit `8185b0fb0`) · Công: 0.5d · Phụ thuộc: phase 03
 
 ## Bối cảnh
 

@@ -1,11 +1,13 @@
 ---
 title: "Thin advisory skill source cutover"
-status: pending
+status: partial
 dependencies: [2]
 requiresReview: true
 ---
 
 # Phase 03 — Thin advisory skill source cutover
+
+> **Status partial (2026-10-11):** Skill cutover landed in reduced form via path M (fgos-architecture-panel SKILL.md, architecture-advisory and architecture-advisory-reopen workflows). Not proven against the full preservation matrix; panel composition and the `architecture-advisory` rename are parked.
 
 Proposed source cutover after separate implementation instruction and **Phase 02 early vertical-slice ACCEPT**, not just merged seams. Phase 04 then regenerates/stages and proves installed entry. Failed feasibility blocks this phase. Before rewriting canonical `core/skills/fgos-architecture-panel/SKILL.md`, original single-door [Phase 01](../261006-1415-fgos-single-door-mechanisms/phase-01-architecture-panel-roster-single-source.md) must have landed its minimal config-binding/document-truth cleanup of that same file. This is a shared-file phase barrier, not a dependency on either entire plan. Snapshot its landed source before cutover.
 

@@ -1,6 +1,6 @@
 # Phase 05 — `check` ở pre-commit và `fgos doctor`; gộp thư mục journal
 
-Trạng thái: pending · Công: 1d · Phụ thuộc: phase 04; thay đổi pre-commit (chặn rác gốc repo) và check doctor của Plan A đã merge
+Trạng thái: done (2026-10-12; delivered as the approved spec Q6 decided: doctor check `convention-conformance` (`d02e2b879`) and a warn-only pre-commit; journal directories are NOT merged and the hook never blocks) · Công: 1d · Phụ thuộc: phase 04; thay đổi pre-commit (chặn rác gốc repo) và check doctor của Plan A đã merge
 
 ## Bối cảnh
 

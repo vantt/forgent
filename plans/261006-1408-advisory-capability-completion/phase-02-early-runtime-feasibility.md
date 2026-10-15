@@ -1,11 +1,13 @@
 ---
 title: "Early runtime feasibility and five bounded advisory contracts"
-status: pending
+status: partial
 dependencies: [1]
 requiresReview: true
 ---
 
 # Phase 02 — Early runtime contracts and vertical-slice feasibility
+
+> **Status partial (2026-10-11):** Landed on main via path M: opt-in `acceptOutcomes` (src/workflow/definition.mjs, runner.mjs) and the required missing-expertise close-gate field. NOT done: the seven live scenarios of the ACCEPT gate; durable Unit association stays in the separate dispatch item (owner decides by 2026-10-12). Automatic mid-run specialist is parked.
 
 Proposed implementation after a separate implementation instruction. Phase 01 locks intent, user challenges and the preservation matrix; this gate must pass before Phase 03 canonical skill cutover and Phase 04 regeneration/staging. NOT RUN during planning. The prior claim that only three seams suffice is withdrawn after Astra's source-grounded review.
 

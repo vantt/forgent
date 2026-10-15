@@ -1,6 +1,6 @@
 # Phase 06 — Một dòng trong `AGENTS.md`
 
-Trạng thái: pending · Công: 0.25d · Phụ thuộc: phase 03 (lệnh tồn tại); phase sửa `AGENTS.md` của Plan A đã merge
+Trạng thái: done (2026-10-11; AGENTS.md line on `fgos convention name|path`, commit `461e12d12`) · Công: 0.25d · Phụ thuộc: phase 03 (lệnh tồn tại); phase sửa `AGENTS.md` của Plan A đã merge
 
 ## Bối cảnh
 
