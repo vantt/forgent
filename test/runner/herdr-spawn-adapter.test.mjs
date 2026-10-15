@@ -128,7 +128,13 @@ if (group === 'agent' && action === 'start') {
   if (scenario.startError) fail(scenario.startError, 'agent never reached a ready state');
   ok({ agent: { agent_status: 'idle' } });
 }
-if (group === 'agent' && action === 'read') ok({ read: { text: scenario.screen ?? '' } });
+if (group === 'agent' && action === 'read') {
+  if (!scenario.changingScreen) ok({ read: { text: scenario.screen ?? '' } });
+  const s = readState();
+  const reads = (s.reads ?? 0) + 1;
+  writeState({ ...s, reads });
+  ok({ read: { text: (scenario.screen ?? '') + ' ' + reads } });
+}
 if (group === 'agent' && action === 'get') {
   // A herdr that will not answer at all -- the outage case. The pane and the
   // worker are both fine; only the status read is unavailable.
@@ -1379,4 +1385,18 @@ test('isDraftStillInComposer sees an omp attachment chip left in the composer as
   assert.equal(isDraftStillInComposer({ message: brief, promptText: '📄 #1 📄 #2', visibleScreen: '' }), true);
   // A turn already running shows no chip in the composer.
   assert.equal(isDraftStillInComposer({ message: brief, promptText: '', visibleScreen: ' ⠴ 4s > ◑ Gemini 3.8 Flash\n╰─' }), false);
+});
+
+test('an agent herdr reports idle whose screen keeps changing is not ended as idle', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-moving-screen-'));
+  // omp reports idle to herdr while its model generates and its tools run; only the screen moves.
+  const mock = createMockHerdr(tmpDir, { worker: 'silent', statuses: ['idle'], screen: '⠴ working on it', changingScreen: true });
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 3000, idleTimeoutMs: 900 }),
+    (err) => {
+      assert.equal(err.outcome, 'timed-out-ceiling', 'a moving screen is progress; only the round ceiling ends it');
+      return true;
+    },
+  );
+  fs.rmSync(tmpDir, { recursive: true, force: true });
 });

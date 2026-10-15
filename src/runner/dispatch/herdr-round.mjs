@@ -417,6 +417,11 @@ const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
  * where silence is normal). Progress here is the agent working, an ack, or a new outbox file. */
 export const DEFAULT_IDLE_TIMEOUT_MS = 300000;
 
+/** How often, at most, a round looks at the screen of an agent herdr does not report as `working`. */
+const SCREEN_PROGRESS_PROBE_MS = 15000;
+/** How much of the screen that look compares. */
+const SCREEN_PROGRESS_LINES = 40;
+
 /** A typed brief that is still sitting unsubmitted is nudged with Enter no more often
  * than this, and never more than `SUBMIT_MAX_ENTERS` times. */
 const SUBMIT_ENTER_EVERY_MS = 2500;
@@ -1214,6 +1219,10 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
   };
 
   let lastBeatAt = 0;
+  // The last look at an agent's screen while herdr did not call it `working`, and what it showed.
+  let lastScreenProbeAt = startedAt;
+  let lastScreenDigest = null;
+  const screenProbeMs = Math.max(250, Math.min(SCREEN_PROGRESS_PROBE_MS, Math.floor(deadlines.round.idleMs / 3)));
   // The watch on a `working` agent's screen: when it last looked and what it has seen standing there.
   let lastStallProbeAt = 0;
   let stall = { line: null, since: null };
@@ -1267,6 +1276,24 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
       // this, a worker that never writes an ack file at all gets re-briefed
       // on a timer indefinitely, up to MAX_RESENDS, while it is already mid-turn.
       ackSeen = true;
+    }
+
+    // Some agent CLIs (omp) never report `working` to herdr, not even while their model generates or
+    // a tool runs, so `working` alone would end a busy round as idle. A screen that changed since the
+    // last look is progress too. It is read on a slow beat, never per tick, and a pane that only
+    // spins without ever finishing is still bounded by the round ceiling.
+    if (agentState !== 'working' && statusReadable && observedAt - lastScreenProbeAt >= screenProbeMs) {
+      lastScreenProbeAt = observedAt;
+      let screenNow = null;
+      try { screenNow = client.agentRead(target, { lines: SCREEN_PROGRESS_LINES }); } catch { screenNow = null; }
+      if (typeof screenNow === 'string') {
+        const digest = crypto.createHash('sha256').update(screenNow).digest('hex');
+        if (lastScreenDigest !== null && digest !== lastScreenDigest) {
+          lastProgressAt = observedAt;
+          blindMs = 0;
+        }
+        lastScreenDigest = digest;
+      }
     }
 
     const liveness = agentState === 'working' ? 'present' : readLiveness();
