@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "contentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "SYNC": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "comparisonBase": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2",
+  "authorSession": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+  "oneReviewRequestSet": true,
+  "totalEntries": 1009,
+  "sectionCounts": {
+    "decisions": 479,
+    "historical": 8,
+    "anchors": 39,
+    "links": 9,
+    "rationales": 265,
+    "ownership": 2,
+    "tools": 3,
+    "documents": 9,
+    "accounting": 44,
+    "native": 151
+  },
+  "parts": [
+    {
+      "section": "decisions",
+      "file": "review-request-step10-decisions-01-345f15d95.md",
+      "sidecar": "review-request-step10-decisions-01-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "entryCount": 120,
+      "markdownSHA256": "ade737d0f10f3d05584fc461d1aa91fac35a9b8d99ace5c277e26a2d168b7f0c",
+      "sidecarSHA256": "7cb307d01c9e47f05f55006ef0dafc2585d2eb50cac778566cd4bea1f2462a18"
+    },
+    {
+      "section": "decisions",
+      "file": "review-request-step10-decisions-02-345f15d95.md",
+      "sidecar": "review-request-step10-decisions-02-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "entryCount": 80,
+      "markdownSHA256": "685a75f3ce7062aff4c1482a65849900ee4e353a7b99ad49114f9842f43e3ab7",
+      "sidecarSHA256": "75092ed847121d13c6e703530d36dc8541ba87da59e06b9a32fec7453499912c"
+    },
+    {
+      "section": "decisions",
+      "file": "review-request-step10-decisions-03-345f15d95.md",
+      "sidecar": "review-request-step10-decisions-03-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "entryCount": 14,
+      "markdownSHA256": "80ba020ea47a390e4c343d3f577d744a79bc3ce53c314fa73a9c624dd3426884",
+      "sidecarSHA256": "fc8df957857a7571880824c8e23ee0f01dcd2351a47be6e8a4399f069a83fb20"
+    },
+    {
+      "section": "decisions",
+      "file": "review-request-step10-decisions-04-345f15d95.md",
+      "sidecar": "review-request-step10-decisions-04-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 120,
+      "markdownSHA256": "68e30a67fa3acbceb97f1333d0b368ea66de6d37efc85db53b4c067f7b1248cc",
+      "sidecarSHA256": "179c535a0a24b32838a3a161ee4aee09e9ed4d5d0e83675c13e48c44f5b387e5"
+    },
+    {
+      "section": "decisions",
+      "file": "review-request-step10-decisions-05-345f15d95.md",
+      "sidecar": "review-request-step10-decisions-05-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 120,
+      "markdownSHA256": "04f1d7a931dce9048887c6264ed786d275808d4eb9e9d9bfb8481a0b6747a62e",
+      "sidecarSHA256": "79bb78552048163226df14339210eb221dc589f8d4a39aa1ecb02188077f1968"
+    },
+    {
+      "section": "decisions",
+      "file": "review-request-step10-decisions-06-345f15d95.md",
+      "sidecar": "review-request-step10-decisions-06-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 14,
+      "markdownSHA256": "b5329ec505f38f93463edaf2f90c744b982417e2dd1c2a72b823537f30472836",
+      "sidecarSHA256": "36c2dde3ad3986853c3205419c7ab2dcddc4f371b28f5e1ebaad74bea6b6415f"
+    },
+    {
+      "section": "decisions",
+      "file": "review-request-step10-decisions-07-345f15d95.md",
+      "sidecar": "review-request-step10-decisions-07-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "entryCount": 11,
+      "markdownSHA256": "21da512d939168e892b7f3dba137cf548fdde80df2e6e1715c63b9feee4605be",
+      "sidecarSHA256": "c2f273c762496819be23d2b5f9801ce4055b92a18dba6819bb29b9b5efaa5b48"
+    },
+    {
+      "section": "historical",
+      "file": "review-request-step10-historical-01-345f15d95.md",
+      "sidecar": "review-request-step10-historical-01-345f15d95.json",
+      "authorSession": "codex-session:27@2026-10-14",
+      "entryCount": 1,
+      "markdownSHA256": "38fa97a1c598fca3e8578d769f5a7252853c565ed61a3b7297abf1f410b5901d",
+      "sidecarSHA256": "d060cc54df7fb315457ade5eba5e1df3f7fae09213426a39e56c2ea74a3eb1ec"
+    },
+    {
+      "section": "historical",
+      "file": "review-request-step10-historical-02-345f15d95.md",
+      "sidecar": "review-request-step10-historical-02-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "entryCount": 7,
+      "markdownSHA256": "80b4b050fa36f1b154779f8e2b60bb3d5d96a77f5f27ffbc0de969313046f435",
+      "sidecarSHA256": "cf5e5449d757e943df863b4de891b646ea8452c09d42ea3d161e1f08769273dc"
+    },
+    {
+      "section": "anchors",
+      "file": "review-request-step10-anchors-01-345f15d95.md",
+      "sidecar": "review-request-step10-anchors-01-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 39,
+      "markdownSHA256": "85ec960591e4e9c555064c1a5d41b8a7a33c369102e1727b43d20183e7073280",
+      "sidecarSHA256": "c2ddeb9af0d73fe5edbc6d65b8f247e399d5b350aaf60cb45030ceada4dffde7"
+    },
+    {
+      "section": "links",
+      "file": "review-request-step10-links-01-345f15d95.md",
+      "sidecar": "review-request-step10-links-01-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 9,
+      "markdownSHA256": "ae3bb0ddb0c6ae36932ff19efc1dd6c76e1487d88f23107a24dfa9e6a7fa0c0f",
+      "sidecarSHA256": "7596f20d394690b62020075cb6468108d3c6c7d0a64eb4202c40b749c58ae854"
+    },
+    {
+      "section": "rationales",
+      "file": "review-request-step10-rationales-01-345f15d95.md",
+      "sidecar": "review-request-step10-rationales-01-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 120,
+      "markdownSHA256": "a1b90c19e85f44e05948add4bf358246c56d3552dbe0e19df3dded26b8bdef71",
+      "sidecarSHA256": "fe00004173f5d6aa1ec142298d9de8238d2841e24a5d8a66e53d942f4c59b54b"
+    },
+    {
+      "section": "rationales",
+      "file": "review-request-step10-rationales-02-345f15d95.md",
+      "sidecar": "review-request-step10-rationales-02-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 120,
+      "markdownSHA256": "b39675a76c10e2f6d781fcdd468d913b3d572fef00ae22bf6e23183d97a67205",
+      "sidecarSHA256": "d67e613c66ff9b8d6d2df7685aa72e09ab445ee62fd06c904598e18e45ac7197"
+    },
+    {
+      "section": "rationales",
+      "file": "review-request-step10-rationales-03-345f15d95.md",
+      "sidecar": "review-request-step10-rationales-03-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 14,
+      "markdownSHA256": "efc8b2759ffc86eccf2a85faeaebe8757a7241dc64793c65eb257e94e88f6299",
+      "sidecarSHA256": "b306e0cb4a122c539559e03f3d4eeecf28ae5948f22f5849d0dba37bfc89c170"
+    },
+    {
+      "section": "rationales",
+      "file": "review-request-step10-rationales-04-345f15d95.md",
+      "sidecar": "review-request-step10-rationales-04-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "entryCount": 11,
+      "markdownSHA256": "9a02cfa7262996c82b01a321dfc1558cf273d023d3e68f67b4313d83df75b8a8",
+      "sidecarSHA256": "460a48a825fef09df88e0203562dc2e6e56d0de336dc643175c777478eea1ed3"
+    },
+    {
+      "section": "ownership",
+      "file": "review-request-step10-ownership-01-345f15d95.md",
+      "sidecar": "review-request-step10-ownership-01-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 2,
+      "markdownSHA256": "37970198f9165d5274671e7aba4a1194fbac9f398153c35977be1fc207c24391",
+      "sidecarSHA256": "67b3810107a7df71a076f50bbe0938c7554a6a0daa11c2947fb74077c3b7db3a"
+    },
+    {
+      "section": "tools",
+      "file": "review-request-step10-tools-01-345f15d95.md",
+      "sidecar": "review-request-step10-tools-01-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 3,
+      "markdownSHA256": "7f5a01a2970d7f0d68eba1764e62e8822df3572b4b00d76353214f6ec846adb3",
+      "sidecarSHA256": "37a1a62e1a08b233cff5c8849aec151ef06a294bd720d1abe1fcadfb571a8b77"
+    },
+    {
+      "section": "documents",
+      "file": "review-request-step10-documents-01-345f15d95.md",
+      "sidecar": "review-request-step10-documents-01-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 9,
+      "markdownSHA256": "d500e3500ccf5b1aaabb7f86c879faa2d103269ee9820d413ee224d22d5ed9f7",
+      "sidecarSHA256": "953f187583a51c67614a42f6cf98c8c7d3b15d4e8eaa96d15d7ef91c94f454cc"
+    },
+    {
+      "section": "accounting",
+      "file": "review-request-step10-accounting-01-345f15d95.md",
+      "sidecar": "review-request-step10-accounting-01-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "entryCount": 34,
+      "markdownSHA256": "21aeffed00d5db9c4cb8bbdbbee2e70830d026c8610da06a9119e816f26e93ea",
+      "sidecarSHA256": "0940742c53d36cade0964467defe2bbcdec8c501b4a470214274c8768c988903"
+    },
+    {
+      "section": "accounting",
+      "file": "review-request-step10-accounting-02-345f15d95.md",
+      "sidecar": "review-request-step10-accounting-02-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "entryCount": 10,
+      "markdownSHA256": "3c1d03010f9edbba91ad5f5b2fa82e47984edb3250fd6b53c2796c9d6f315fd4",
+      "sidecarSHA256": "b91202dedad7d7304cd934a0e8044a4822d745acdb8cd8150f139b5d7f4cd601"
+    },
+    {
+      "section": "native",
+      "file": "review-request-step10-native-01-345f15d95.md",
+      "sidecar": "review-request-step10-native-01-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "entryCount": 120,
+      "markdownSHA256": "ec67d10fa008456952c4f4966ba974d3fd9d8c9278aa2ca9e01f139cad5a8c25",
+      "sidecarSHA256": "f3c018a6bd6692a85c4ddef58e3633d4e9de0299f139ae57a606be2547a0deb0"
+    },
+    {
+      "section": "native",
+      "file": "review-request-step10-native-02-345f15d95.md",
+      "sidecar": "review-request-step10-native-02-345f15d95.json",
+      "authorSession": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "entryCount": 31,
+      "markdownSHA256": "259dae6a89c4b5c6f2518aed27faa5fff64734f60ed2c002da09420fb5049670",
+      "sidecarSHA256": "b9287641bb48ef8381827b28a5681655ce3cd08fd6e063827753c9cbcc9b5394"
+    }
+  ],
+  "A36": "step10-sync345-A36.json",
+  "coverage": "step10-sync345-package-coverage.json",
+  "seedChosen": false,
+  "verdictChosen": false,
+  "supersedes": "Changed rows/entries of 19ca8de23 request only. All changes at345f15d95 and this package are combined here; there is no competing request set."
+}

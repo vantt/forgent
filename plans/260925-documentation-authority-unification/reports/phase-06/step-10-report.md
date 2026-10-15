@@ -1,3 +1,80 @@
+# Step 10 native sync and combined bounded re-review ready
+
+Assignment `unit-run-1792094246578-b2fbe39b/producer/1`; Author session `codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16`. **Content / SYNC `345f15d95663260976200be66d1b9a6c648bcd6d`**, comparison input `4a18f35ff5d6a9b7a07e955bd64418282c6a91b2`. This is the packaging turn for the systemic content-author corrections at345f15d95. Runner owns the commit. All workspace writes are inside this plan; docs, source, tests, protected gates/checkers/vocabulary/extractor/baselines and workspace .fgos bytes were not changed. No CLI, git write, producer seed or verdict.
+
+## One native sync and predecessor reconciliation
+
+One background native carry-forward and complete inventory generation, with its own [polled log](step10-sync345-native.log), took **570.490s (9m30.5s)**. The registry was persisted **once**, compact one-line JSON, **62,181,246 bytes**. **4,486 files / 91,374 active units**. Known IDs **99,538 → 99,549**, zero loss. Complete active inventory/registry claimId/path/anchor/digest tuples equal; registry SHA256 `4a559a3b9f51941bd97a43e85ec573caef5e40dec829795110b33d209fe02780` remains unchanged after persistence. [Native proof](step10-sync345-native-proof.json).
+
+The native population contains **11 new current IDs /11 new predecessor gaps**, zero new retired units. [Reconciliation](step10-sync345-predecessor-reconciliation.json) gives the complete immutable old/current text, ancestry, native old/current identity and pending supersede disposition for each of the11 candidate-link/citation/vision-order corrections. They are explicit historical conservation references, not additional current owners. The new shard `ledger/decisions/s10-systemic-native-predecessors.json` is pending throughout, no old review metadata or approval carried. Existing source predecessor reconciliations and SHA256-bound A34 residuals remain separate and retain their pending representation/acceptance obligations. No known predecessor was deleted or identity grafted.
+
+Native accounting submits **151 transitions:129 retained metadata/tuple changes,11 new IDs and11 gaps**. The sync now reads the committed additive candidate Session Identity route; its current native classification is not patched by hand. No global expected/candidate/alias list was silently refreshed or approved.
+
+## All drift, D, ownership and link replay
+
+**9,202 manual claim/gap target bindings checked /zero drift /zero rows rebound /zero native --rebind calls.** The prior author turn already corrected all current targets. The drift path uses `scripts/doc-binding-repair.mjs` exclusively, preserving digest/text and authenticated repeated-footer ancestry/order, marking any repaired row pending; it never substitutes a current occupant at an old ordinal. [All binding checks](step10-sync345-rebindings.json). The package includes the previous **39 re-anchored rows** with old/new anchors, digests, all matching authenticated prior texts and a fresh fixed-helper replay proving equality to the current target. All39 pass.
+
+**D: zero fatal against both priors together and each separately**, on the complete native inventory transported by v8 from the sole sync:
+
+| Priors | Duration | Fatal |
+|---|---:|---:|
+| both | 83.441s | 0 |
+| identity | 85.905s | 0 |
+| phase02 | 89.257s | 0 |
+
+[D summary](step10-sync345-D-summary.json), [D log](step10-sync345-native-D.log). Strict global E, current-truth approval and cutover are not claimed.
+
+**No-double-ownership check passes:** zero duplicate native platform target path/anchor identities, zero new active-source collision pairs relative to the systemic content-author audit, zero target drift. All **252** historical/gap many-to-one conservation groups remain explicitly enumerated; five groups gain the disclosed pending predecessor references. This does not claim all references are one-to-one. The rightful cli-io block22 owner remains5b930b5c and bc091727 remains bound to23. [Ownership](step10-sync345-target-ownership.json).
+
+**Position-exact link-cell replay:366 original edits +98 later positions /zero findings.** Link index, cell, label and destination match. The request contains the **nine corrected individual links** across five line fixes, each with its before/after cell and full before/after line; the other table cells and vision sentence order remain authenticated by the original replay. [Replay](step10-sync345-link-replay.json).
+
+## One bounded request set
+
+[Single request index](review-request-step10-index-345f15d95.md): **1,009 entries /22 files**, maximum120 per request; counts **120, 80, 14, 120, 120, 14, 11, 1, 7, 39, 9, 120, 120, 14, 11, 2, 3, 9, 34, 10, 120, 31**. Each file names its exact Author session and packaging session. [Sidecar index](review-request-step10-index-345f15d95.json), [coverage](step10-sync345-package-coverage.json), [A36 lists](step10-sync345-A36.json).
+
+Section counts: **decisions:479, historical:8, anchors:39, links:9, rationales:265, ownership:2, tools:3, documents:9, accounting:44, native:151**. The487 manual/historical entries include265 pending rows and222 exact prior ordinary-review confirmations; those existing approvals remain unchanged. This set covers every changed row at345f15d95 and the11 new pending gap rows, not just the reopened rows. Repeated anchors/rationale/native entries are item-specific proofs, not duplicate claim verdicts. Each changed claim's current record equals its shard. All265 final rationale deltas have exact before/after text, including the208 logged author fixes and subsequent receipt/specific-wording corrections. L10-22's two duplicate pending rows are shown removed beside their one preserved earlier reviewed native disposition. Accounting030/042 contain regenerated current artifacts and exact projection checks against the real shards; historical before witnesses remain intact. All three tools have current source/test context and fresh execution evidence.
+
+| Request file | Entries |
+|---|---:|
+| [review-request-step10-decisions-01-345f15d95.md](review-request-step10-decisions-01-345f15d95.md) | 120 |
+| [review-request-step10-decisions-02-345f15d95.md](review-request-step10-decisions-02-345f15d95.md) | 80 |
+| [review-request-step10-decisions-03-345f15d95.md](review-request-step10-decisions-03-345f15d95.md) | 14 |
+| [review-request-step10-decisions-04-345f15d95.md](review-request-step10-decisions-04-345f15d95.md) | 120 |
+| [review-request-step10-decisions-05-345f15d95.md](review-request-step10-decisions-05-345f15d95.md) | 120 |
+| [review-request-step10-decisions-06-345f15d95.md](review-request-step10-decisions-06-345f15d95.md) | 14 |
+| [review-request-step10-decisions-07-345f15d95.md](review-request-step10-decisions-07-345f15d95.md) | 11 |
+| [review-request-step10-historical-01-345f15d95.md](review-request-step10-historical-01-345f15d95.md) | 1 |
+| [review-request-step10-historical-02-345f15d95.md](review-request-step10-historical-02-345f15d95.md) | 7 |
+| [review-request-step10-anchors-01-345f15d95.md](review-request-step10-anchors-01-345f15d95.md) | 39 |
+| [review-request-step10-links-01-345f15d95.md](review-request-step10-links-01-345f15d95.md) | 9 |
+| [review-request-step10-rationales-01-345f15d95.md](review-request-step10-rationales-01-345f15d95.md) | 120 |
+| [review-request-step10-rationales-02-345f15d95.md](review-request-step10-rationales-02-345f15d95.md) | 120 |
+| [review-request-step10-rationales-03-345f15d95.md](review-request-step10-rationales-03-345f15d95.md) | 14 |
+| [review-request-step10-rationales-04-345f15d95.md](review-request-step10-rationales-04-345f15d95.md) | 11 |
+| [review-request-step10-ownership-01-345f15d95.md](review-request-step10-ownership-01-345f15d95.md) | 2 |
+| [review-request-step10-tools-01-345f15d95.md](review-request-step10-tools-01-345f15d95.md) | 3 |
+| [review-request-step10-documents-01-345f15d95.md](review-request-step10-documents-01-345f15d95.md) | 9 |
+| [review-request-step10-accounting-01-345f15d95.md](review-request-step10-accounting-01-345f15d95.md) | 34 |
+| [review-request-step10-accounting-02-345f15d95.md](review-request-step10-accounting-02-345f15d95.md) | 10 |
+| [review-request-step10-native-01-345f15d95.md](review-request-step10-native-01-345f15d95.md) | 120 |
+| [review-request-step10-native-02-345f15d95.md](review-request-step10-native-02-345f15d95.md) | 31 |
+
+**A36:** every submitted manual/historical row receives full mechanical digest/anchor/shard equality checks and an ordinary verdict. All listed unequal source/target rows, partial carries, historical rows and marked re-anchor/link/rationale/L10-22/tool/accounting/content proofs are deep. The independent reviewer selects and records the Weak-exact/Judgment seed/sample, with15%/minimum10/all-if-fewer and >3% deep-rework escalation to whole-pack deep review. Producer seed/sample/verdict selection is false. Truth/checkpoint/red-team sampling remains independent. Four historical source-witness limitations remain explicitly disclosed; unavailable text was not reconstructed from numbered anchors.
+
+## Validation, limitations and next work
+
+**88/88 helper/regression tests pass**, zero fail/cancel/skip/todo, using `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work`. [Test log](step10-sync345-tests.log). Includes binding/rationale ownership and replay regressions, per-cell link semantics, global comparator, review/format/application, candidate-status and current-registry liveness. No full npm-suite claim.
+
+A/B/H pass; H checks609 files /217 routed entries, zero findings/unresolved links. I's frozen baseline remains byte-identical and retains the disclosed upstream Session Identity route delta; current reader links equal HEAD. No rebaseline or frozen-I green claim. [Checks](step10-sync345-checks.json). [Final audit](step10-sync345-final-audit.json) proves scope, registry immutability after the single persistence, complete changed-row coverage, all request hashes/author headers, pending/no-approval metadata and clean `git diff --check`. [Exact chronological reproduction](step10-sync345-reproduction.json).
+
+The pinned content still has `bin/fgos.mjs:4415-4380` in runner `subcomponents/h-f34e0d170d89/spec.md`, an inverted citation range. It is explicitly surfaced in the request for reviewer attention; this package does not edit docs or make a truth verdict. The initial author-package audit incorrectly tested claim-ID absence for L10-22; it was corrected to require complete pending-record removal and one current row equal to the preserved reviewed native disposition. [Initial audit witness](step10-sync345-package-audit-initial.json). Native checks and request contents were unchanged. No execution blocker prevents independent review. Existing A34 residual acceptance, Rings/dashboard/groups/cutover/inbound-consumer obligations remain. After committed independent review is applied, perform the previously required global turn: global D/E alone from the same overlay; T9/promotion/current-truth; mutation/third refresh; full-corpus and reduced Step2 rehearsal; exact alias/checkpoint population, sensitivity/red-team and scorecard/effort. Phase6 remains open; no closure, promotion, source retirement, alias adoption, push or landing.
+
+MDView MCP is unavailable; no preview URL was created within the assignment's write limits.
+
+---
+
+## Historical content-author report
+
 # Step 10 systemic tool and author reworks complete — package next
 
 Input `4a18f35ff`; reviewed content `19ca8de23`, request `62d147641`. All fourteen committed reports’ Notes/Concerns were read. This is an author/docs turn: **zero native sync, zero native --rebind, zero review packs**. Registry and legacy sources are byte-unchanged; runner owns commits.

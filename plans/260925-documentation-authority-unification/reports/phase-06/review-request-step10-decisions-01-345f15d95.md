@@ -1,0 +1,11391 @@
+# Bounded re-review: decisions, part 1
+
+Author session: `codex-session:unit-run-1792089181794-89ae42db@2026-10-16`
+Packaged by: `codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16`
+Content pin / SYNC: `345f15d95663260976200be66d1b9a6c648bcd6d`
+Comparison base: `4a18f35ff5d6a9b7a07e955bd64418282c6a91b2`
+Entries: **120**, maximum120 per request.
+
+[Single request index](review-request-step10-index-345f15d95.md). [A36 exact lists](step10-sync345-A36.json). This is one combined bounded request set for all changes at345f15d95 and the current package. Historical before records are witnesses, not current dispositions. Source authors and current row authors remain exact. No producer seed, draw or verdict is selected.
+
+Every submitted manual claim gets digest recomputation, anchor and shard/pack equality checks and an ordinary verdict with a `deep` or `mechanical` note. All unequal source/target digests, partial carries and historical claims are deep. All explicitly marked re-anchor, link, rationale, L10-22, tool, content and accounting deltas are deep. The independent reviewer seeds at least 69/460 Weak-exact/Judgment rows, records seed/sample IDs, and deep-reads the whole pack if >3% of deep rows need rework. Existing truth samples and checkpoint obligations remain unchanged.
+
+Only decisions/historical entries request claim verdicts. Anchors, rationale proofs, native tuples and other accounting entries request item-specific review; they do not create additional claim approvals. Entries marked `changed-review-application-confirmation` preserve existing committed ordinary approvals and request confirmation of exact application; packaging does not revoke or approve them. New/changed pending rows carry no old approval. The runner's package commit supplies the new predecessor shard and request files; immutable document/helper bytes are pinned above.
+
+## Entry claim_153f56c2d5a2e895f8e6b2607bb7ab3d
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_153f56c2d5a2e895f8e6b2607bb7ab3d",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_153f56c2d5a2e895f8e6b2607bb7ab3d",
+    "sourceUnitDigest": "25e4a007d2fc9a15",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-14",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "role vs writer paragraph (human/runner/session/system) carried verbatim under the new H3 Caller Role; no counterpart in work-state.md per the map. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Caller Role"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_153f56c2d5a2e895f8e6b2607bb7ab3d",
+    "sourceUnitDigest": "25e4a007d2fc9a15",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-14",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "role vs writer paragraph (human/runner/session/system) carried verbatim under the new H3 Caller Role; no counterpart in work-state.md per the map. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-14 ok; section placement matches the source section and the rebound sentence in the rationale is true; the generic pointer to the earlier accounting is carried over from the reviewed row",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Caller Role"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "25e8ac8713a9e8b0d4e2aec65856e800400119e2ea30774d3f016bbfafa4f8ee",
+    "identityFingerprint": "25e8ac8713a9e8b0d4e2aec65856e800400119e2ea30774d3f016bbfafa4f8ee",
+    "claimId": "claim_153f56c2d5a2e895f8e6b2607bb7ab3d",
+    "sourceAnchor": "unheaded-block-8",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-8",
+      "githubAnchor": "unheaded-block-8",
+      "stableAnchor": "unheaded-block-8",
+      "title": "Unheaded block 8",
+      "startLine": 51,
+      "endLine": 55,
+      "textDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
+      "sample": "Song song với `writer` (cá thể), mỗi cạnh chuyển trạng thái còn mang `role`\n— **loại** caller: `human` · `runner` · `session` · `system` (giá trị thứ\ntư, gán tự động cho cạnh park ",
+      "identityFingerprint": "25e8ac8713a9e8b0d4e2aec65856e800400119e2ea30774d3f016bbfafa4f8ee",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Chiều vào — verb + danh tính"
+      ],
+      "text": "Song song với `writer` (cá thể), mỗi cạnh chuyển trạng thái còn mang `role`\n— **loại** caller: `human` · `runner` · `session` · `system` (giá trị thứ\ntư, gán tự động cho cạnh park nội bộ do máy sinh ra như hệ quả một verb,\nkhông do ai quyết định). `role` và `writer` tách bạch: một cái nói \"ai gây\nra\", một cái nói \"loại gì gây ra\"."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-14",
+    "githubAnchor": "unheaded-block-14",
+    "stableAnchor": "unheaded-block-14",
+    "title": "Unheaded block 14",
+    "startLine": 123,
+    "endLine": 127,
+    "textDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
+    "sample": "Song song với `writer` (cá thể), mỗi cạnh chuyển trạng thái còn mang `role`\n— **loại** caller: `human` · `runner` · `session` · `system` (giá trị thứ\ntư, gán tự động cho cạnh park ",
+    "identityFingerprint": "25e8ac8713a9e8b0d4e2aec65856e800400119e2ea30774d3f016bbfafa4f8ee",
+    "ancestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Caller Role"
+    ],
+    "text": "Song song với `writer` (cá thể), mỗi cạnh chuyển trạng thái còn mang `role`\n— **loại** caller: `human` · `runner` · `session` · `system` (giá trị thứ\ntư, gán tự động cho cạnh park nội bộ do máy sinh ra như hệ quả một verb,\nkhông do ai quyết định). `role` và `writer` tách bạch: một cái nói \"ai gây\nra\", một cái nói \"loại gì gây ra\"."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-14",
+      "githubAnchor": "unheaded-block-14",
+      "stableAnchor": "unheaded-block-14",
+      "title": "Unheaded block 14",
+      "startLine": 123,
+      "endLine": 127,
+      "textDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
+      "sample": "Song song với `writer` (cá thể), mỗi cạnh chuyển trạng thái còn mang `role`\n— **loại** caller: `human` · `runner` · `session` · `system` (giá trị thứ\ntư, gán tự động cho cạnh park ",
+      "identityFingerprint": "25e8ac8713a9e8b0d4e2aec65856e800400119e2ea30774d3f016bbfafa4f8ee",
+      "ancestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Caller Role"
+      ],
+      "text": "Song song với `writer` (cá thể), mỗi cạnh chuyển trạng thái còn mang `role`\n— **loại** caller: `human` · `runner` · `session` · `system` (giá trị thứ\ntư, gán tự động cho cạnh park nội bộ do máy sinh ra như hệ quả một verb,\nkhông do ai quyết định). `role` và `writer` tách bạch: một cái nói \"ai gây\nra\", một cái nói \"loại gì gây ra\"."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_153f56c2d5a2e895f8e6b2607bb7ab3d"
+}
+```
+
+## Entry claim_38ad96d62f2c6cf7a639fc24a83c2621
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
+    "sourceUnitDigest": "6dcf0faa76d27fed",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-16",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "First paragraph of the envelope statement (every successful verb in both binaries prints the fgos.v1 envelope), carried verbatim under Envelope Shape; the same four-field envelope is stated by work-state.md 622-634 in the preceding block (map section 6). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
+    "sourceUnitDigest": "6dcf0faa76d27fed",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-16",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "reviewed",
+    "rationale": "First paragraph of the envelope statement (every successful verb in both binaries prints the fgos.v1 envelope), carried verbatim under Envelope Shape; the same four-field envelope is stated by work-state.md 622-634 in the preceding block (map section 6). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-16 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "f36f89657b6f8b5083e49ed2033398ce8e8dd135da61ade065ae4668c324f77e",
+    "identityFingerprint": "f36f89657b6f8b5083e49ed2033398ce8e8dd135da61ade065ae4668c324f77e",
+    "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
+    "sourceAnchor": "unheaded-block-9",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-9",
+      "githubAnchor": "unheaded-block-9",
+      "stableAnchor": "unheaded-block-9",
+      "title": "Unheaded block 9",
+      "startLine": 59,
+      "endLine": 61,
+      "textDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
+      "sample": "Mọi verb thành công (ở CẢ HAI binary — `fgos.mjs` và, từ lát 2,\n`fgos-runner.mjs`'s dòng kết-cục cuối) in một phong bì chuẩn `fgos.v1` ra\n`stdout`:",
+      "identityFingerprint": "f36f89657b6f8b5083e49ed2033398ce8e8dd135da61ade065ae4668c324f77e",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Chiều ra — envelope thống nhất"
+      ],
+      "text": "Mọi verb thành công (ở CẢ HAI binary — `fgos.mjs` và, từ lát 2,\n`fgos-runner.mjs`'s dòng kết-cục cuối) in một phong bì chuẩn `fgos.v1` ra\n`stdout`:"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-16",
+    "githubAnchor": "unheaded-block-16",
+    "stableAnchor": "unheaded-block-16",
+    "title": "Unheaded block 16",
+    "startLine": 145,
+    "endLine": 147,
+    "textDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
+    "sample": "Mọi verb thành công (ở CẢ HAI binary — `fgos.mjs` và, từ lát 2,\n`fgos-runner.mjs`'s dòng kết-cục cuối) in một phong bì chuẩn `fgos.v1` ra\n`stdout`:",
+    "identityFingerprint": "f36f89657b6f8b5083e49ed2033398ce8e8dd135da61ade065ae4668c324f77e",
+    "ancestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ],
+    "text": "Mọi verb thành công (ở CẢ HAI binary — `fgos.mjs` và, từ lát 2,\n`fgos-runner.mjs`'s dòng kết-cục cuối) in một phong bì chuẩn `fgos.v1` ra\n`stdout`:"
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-16",
+      "githubAnchor": "unheaded-block-16",
+      "stableAnchor": "unheaded-block-16",
+      "title": "Unheaded block 16",
+      "startLine": 145,
+      "endLine": 147,
+      "textDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
+      "sample": "Mọi verb thành công (ở CẢ HAI binary — `fgos.mjs` và, từ lát 2,\n`fgos-runner.mjs`'s dòng kết-cục cuối) in một phong bì chuẩn `fgos.v1` ra\n`stdout`:",
+      "identityFingerprint": "f36f89657b6f8b5083e49ed2033398ce8e8dd135da61ade065ae4668c324f77e",
+      "ancestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Envelope Shape"
+      ],
+      "text": "Mọi verb thành công (ở CẢ HAI binary — `fgos.mjs` và, từ lát 2,\n`fgos-runner.mjs`'s dòng kết-cục cuối) in một phong bì chuẩn `fgos.v1` ra\n`stdout`:"
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_38ad96d62f2c6cf7a639fc24a83c2621"
+}
+```
+
+## Entry claim_dc506074dcc2f08f6012ebb078b50371
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
+    "sourceUnitDigest": "18c5d821a55d3517",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-17",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "The fenced envelope shape { contract: 'fgos.v1', generated_at, data_hash, data }, carried verbatim as its own block in Envelope Shape; the work-state.md envelope text under the same heading describes the same four fields. Note: the mechanical suggestion pointed at README.md and was wrong. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
+    "sourceUnitDigest": "18c5d821a55d3517",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-17",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "reviewed",
+    "rationale": "The fenced envelope shape { contract: 'fgos.v1', generated_at, data_hash, data }, carried verbatim as its own block in Envelope Shape; the work-state.md envelope text under the same heading describes the same four fields. Note: the mechanical suggestion pointed at README.md and was wrong. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-17 ok; section placement matches the source section and the rebound sentence in the rationale is true; the generic pointer to the earlier accounting is carried over from the reviewed row",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "54e748727b3965de64cad699080c04ca9dde712a66fcfa5390aca21149606fd3",
+    "identityFingerprint": "54e748727b3965de64cad699080c04ca9dde712a66fcfa5390aca21149606fd3",
+    "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
+    "sourceAnchor": "unheaded-block-10",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-10",
+      "githubAnchor": "unheaded-block-10",
+      "stableAnchor": "unheaded-block-10",
+      "title": "Unheaded block 10",
+      "startLine": 63,
+      "endLine": 65,
+      "textDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
+      "sample": "```\n{ contract: 'fgos.v1', generated_at, data_hash, data }\n```",
+      "identityFingerprint": "54e748727b3965de64cad699080c04ca9dde712a66fcfa5390aca21149606fd3",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Chiều ra — envelope thống nhất"
+      ],
+      "text": "```\n{ contract: 'fgos.v1', generated_at, data_hash, data }\n```"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-17",
+    "githubAnchor": "unheaded-block-17",
+    "stableAnchor": "unheaded-block-17",
+    "title": "Unheaded block 17",
+    "startLine": 149,
+    "endLine": 151,
+    "textDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
+    "sample": "```\n{ contract: 'fgos.v1', generated_at, data_hash, data }\n```",
+    "identityFingerprint": "54e748727b3965de64cad699080c04ca9dde712a66fcfa5390aca21149606fd3",
+    "ancestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ],
+    "text": "```\n{ contract: 'fgos.v1', generated_at, data_hash, data }\n```"
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-17",
+      "githubAnchor": "unheaded-block-17",
+      "stableAnchor": "unheaded-block-17",
+      "title": "Unheaded block 17",
+      "startLine": 149,
+      "endLine": 151,
+      "textDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
+      "sample": "```\n{ contract: 'fgos.v1', generated_at, data_hash, data }\n```",
+      "identityFingerprint": "54e748727b3965de64cad699080c04ca9dde712a66fcfa5390aca21149606fd3",
+      "ancestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Envelope Shape"
+      ],
+      "text": "```\n{ contract: 'fgos.v1', generated_at, data_hash, data }\n```"
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_dc506074dcc2f08f6012ebb078b50371"
+}
+```
+
+## Entry claim_62d31ae4e5abfcf0ab158c0c6a8337ee
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
+    "sourceUnitDigest": "84367855d92bb2e3",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-18",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "The data-is-structured and error-path-not-enveloped paragraph, carried verbatim in Envelope Shape; work-state.md 622-634 states the same (the ws error-path claim 636-639 also lands in the next H3). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
+    "sourceUnitDigest": "84367855d92bb2e3",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-18",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "reviewed",
+    "rationale": "The data-is-structured and error-path-not-enveloped paragraph, carried verbatim in Envelope Shape; work-state.md 622-634 states the same (the ws error-path claim 636-639 also lands in the next H3). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-18 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "01a3b167cedff01696bcb854f33c46c3250c9f5d0d9e0633245f9bdbbdae944f",
+    "identityFingerprint": "01a3b167cedff01696bcb854f33c46c3250c9f5d0d9e0633245f9bdbbdae944f",
+    "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
+    "sourceAnchor": "unheaded-block-11",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-11",
+      "githubAnchor": "unheaded-block-11",
+      "stableAnchor": "unheaded-block-11",
+      "title": "Unheaded block 11",
+      "startLine": 67,
+      "endLine": 70,
+      "textDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
+      "sample": "`data` có cấu trúc (trường tên rõ nghĩa), không phải câu xác nhận cho\nngười — verb đọc trả thẳng đối tượng kết quả, verb ghi trả đúng những\ntrường vừa đổi. Đường lỗi KHÔNG bọc phon",
+      "identityFingerprint": "01a3b167cedff01696bcb854f33c46c3250c9f5d0d9e0633245f9bdbbdae944f",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Chiều ra — envelope thống nhất"
+      ],
+      "text": "`data` có cấu trúc (trường tên rõ nghĩa), không phải câu xác nhận cho\nngười — verb đọc trả thẳng đối tượng kết quả, verb ghi trả đúng những\ntrường vừa đổi. Đường lỗi KHÔNG bọc phong bì: chẩn đoán đi `stderr`, thành/\nbại phân biệt bằng **exit code**, không bao giờ bằng nội dung chuỗi."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-18",
+    "githubAnchor": "unheaded-block-18",
+    "stableAnchor": "unheaded-block-18",
+    "title": "Unheaded block 18",
+    "startLine": 153,
+    "endLine": 156,
+    "textDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
+    "sample": "`data` có cấu trúc (trường tên rõ nghĩa), không phải câu xác nhận cho\nngười — verb đọc trả thẳng đối tượng kết quả, verb ghi trả đúng những\ntrường vừa đổi. Đường lỗi KHÔNG bọc phon",
+    "identityFingerprint": "01a3b167cedff01696bcb854f33c46c3250c9f5d0d9e0633245f9bdbbdae944f",
+    "ancestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ],
+    "text": "`data` có cấu trúc (trường tên rõ nghĩa), không phải câu xác nhận cho\nngười — verb đọc trả thẳng đối tượng kết quả, verb ghi trả đúng những\ntrường vừa đổi. Đường lỗi KHÔNG bọc phong bì: chẩn đoán đi `stderr`, thành/\nbại phân biệt bằng **exit code**, không bao giờ bằng nội dung chuỗi."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-18",
+      "githubAnchor": "unheaded-block-18",
+      "stableAnchor": "unheaded-block-18",
+      "title": "Unheaded block 18",
+      "startLine": 153,
+      "endLine": 156,
+      "textDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
+      "sample": "`data` có cấu trúc (trường tên rõ nghĩa), không phải câu xác nhận cho\nngười — verb đọc trả thẳng đối tượng kết quả, verb ghi trả đúng những\ntrường vừa đổi. Đường lỗi KHÔNG bọc phon",
+      "identityFingerprint": "01a3b167cedff01696bcb854f33c46c3250c9f5d0d9e0633245f9bdbbdae944f",
+      "ancestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Envelope Shape"
+      ],
+      "text": "`data` có cấu trúc (trường tên rõ nghĩa), không phải câu xác nhận cho\nngười — verb đọc trả thẳng đối tượng kết quả, verb ghi trả đúng những\ntrường vừa đổi. Đường lỗi KHÔNG bọc phong bì: chẩn đoán đi `stderr`, thành/\nbại phân biệt bằng **exit code**, không bao giờ bằng nội dung chuỗi."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee"
+}
+```
+
+## Entry claim_5e282fb457ff9ef02e88cf329556cf34
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
+    "sourceUnitDigest": "6a5b9a01b0427971",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-21",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "One envelope per call for fgos.mjs and one single-line envelope per --once/--watch cycle for fgos-runner, carried verbatim under Runner Stdout Envelope; duplicate of work-state.md 641-645 (map section 6). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Runner Stdout Envelope"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
+    "sourceUnitDigest": "6a5b9a01b0427971",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-21",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "reviewed",
+    "rationale": "One envelope per call for fgos.mjs and one single-line envelope per --once/--watch cycle for fgos-runner, carried verbatim under Runner Stdout Envelope; duplicate of work-state.md 641-645 (map section 6). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-21 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Runner Stdout Envelope"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "716ba1ed20e3b9ba335f8aea5899f5e842f85892ea40fcd2a0233237ae61b12d",
+    "identityFingerprint": "716ba1ed20e3b9ba335f8aea5899f5e842f85892ea40fcd2a0233237ae61b12d",
+    "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
+    "sourceAnchor": "unheaded-block-12",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-12",
+      "githubAnchor": "unheaded-block-12",
+      "stableAnchor": "unheaded-block-12",
+      "title": "Unheaded block 12",
+      "startLine": 72,
+      "endLine": 76,
+      "textDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
+      "sample": "**`fgos.mjs` in đúng một dòng phong bì mỗi lời gọi** (một-shot, nên in\nnhiều dòng cho dễ đọc). **`fgos-runner` in MỘT phong bì mỗi lượt `--once`\nhoặc mỗi chu kỳ `--watch`, liền một",
+      "identityFingerprint": "716ba1ed20e3b9ba335f8aea5899f5e842f85892ea40fcd2a0233237ae61b12d",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Chiều ra — envelope thống nhất"
+      ],
+      "text": "**`fgos.mjs` in đúng một dòng phong bì mỗi lời gọi** (một-shot, nên in\nnhiều dòng cho dễ đọc). **`fgos-runner` in MỘT phong bì mỗi lượt `--once`\nhoặc mỗi chu kỳ `--watch`, liền một dòng** — vì `--watch` phát nhiều phong\nbì nối tiếp theo thời gian, mỗi cái phải trọn trong đúng một dòng để bên\nđọc tách được cái này với cái kia; con trỏ (dưới) áp dụng cùng lý do."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-21",
+    "githubAnchor": "unheaded-block-21",
+    "stableAnchor": "unheaded-block-21",
+    "title": "Unheaded block 21",
+    "startLine": 173,
+    "endLine": 177,
+    "textDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
+    "sample": "**`fgos.mjs` in đúng một dòng phong bì mỗi lời gọi** (một-shot, nên in\nnhiều dòng cho dễ đọc). **`fgos-runner` in MỘT phong bì mỗi lượt `--once`\nhoặc mỗi chu kỳ `--watch`, liền một",
+    "identityFingerprint": "716ba1ed20e3b9ba335f8aea5899f5e842f85892ea40fcd2a0233237ae61b12d",
+    "ancestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Runner Stdout Envelope"
+    ],
+    "text": "**`fgos.mjs` in đúng một dòng phong bì mỗi lời gọi** (một-shot, nên in\nnhiều dòng cho dễ đọc). **`fgos-runner` in MỘT phong bì mỗi lượt `--once`\nhoặc mỗi chu kỳ `--watch`, liền một dòng** — vì `--watch` phát nhiều phong\nbì nối tiếp theo thời gian, mỗi cái phải trọn trong đúng một dòng để bên\nđọc tách được cái này với cái kia; con trỏ (dưới) áp dụng cùng lý do."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-21",
+      "githubAnchor": "unheaded-block-21",
+      "stableAnchor": "unheaded-block-21",
+      "title": "Unheaded block 21",
+      "startLine": 173,
+      "endLine": 177,
+      "textDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
+      "sample": "**`fgos.mjs` in đúng một dòng phong bì mỗi lời gọi** (một-shot, nên in\nnhiều dòng cho dễ đọc). **`fgos-runner` in MỘT phong bì mỗi lượt `--once`\nhoặc mỗi chu kỳ `--watch`, liền một",
+      "identityFingerprint": "716ba1ed20e3b9ba335f8aea5899f5e842f85892ea40fcd2a0233237ae61b12d",
+      "ancestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Runner Stdout Envelope"
+      ],
+      "text": "**`fgos.mjs` in đúng một dòng phong bì mỗi lời gọi** (một-shot, nên in\nnhiều dòng cho dễ đọc). **`fgos-runner` in MỘT phong bì mỗi lượt `--once`\nhoặc mỗi chu kỳ `--watch`, liền một dòng** — vì `--watch` phát nhiều phong\nbì nối tiếp theo thời gian, mỗi cái phải trọn trong đúng một dòng để bên\nđọc tách được cái này với cái kia; con trỏ (dưới) áp dụng cùng lý do."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_5e282fb457ff9ef02e88cf329556cf34"
+}
+```
+
+## Entry claim_5b930b5ce84afec3d4b2c383c7f85925
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
+    "sourceUnitDigest": "bdeca0144b587f82",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-22",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Real-envelope recognition rule (parse JSON, check contract === 'fgos.v1', never a text heuristic) carried verbatim under the new H3 Recognizing A Real Envelope; no counterpart in work-state.md. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Recognizing A Real Envelope"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
+    "sourceUnitDigest": "bdeca0144b587f82",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-22",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Real-envelope recognition rule (parse JSON, check contract === 'fgos.v1', never a text heuristic) carried verbatim under the new H3 Recognizing A Real Envelope; no counterpart in work-state.md. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-22 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Recognizing A Real Envelope"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "ba5e63678191dc9c6bae6aa99c65efd2c8f670d3dd9b38c8aaee891fe5787197",
+    "identityFingerprint": "ba5e63678191dc9c6bae6aa99c65efd2c8f670d3dd9b38c8aaee891fe5787197",
+    "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
+    "sourceAnchor": "unheaded-block-13",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-13",
+      "githubAnchor": "unheaded-block-13",
+      "stableAnchor": "unheaded-block-13",
+      "title": "Unheaded block 13",
+      "startLine": 78,
+      "endLine": 81,
+      "textDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
+      "sample": "**Nhận diện một phong bì thật:** parse một dòng stdout ra JSON rồi kiểm\n`contract === 'fgos.v1'` — KHÔNG BAO GIỜ bằng heuristic văn bản (vd \"dòng\nbắt đầu bằng `{`\"), vì luồng progr",
+      "identityFingerprint": "ba5e63678191dc9c6bae6aa99c65efd2c8f670d3dd9b38c8aaee891fe5787197",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Chiều ra — envelope thống nhất"
+      ],
+      "text": "**Nhận diện một phong bì thật:** parse một dòng stdout ra JSON rồi kiểm\n`contract === 'fgos.v1'` — KHÔNG BAO GIỜ bằng heuristic văn bản (vd \"dòng\nbắt đầu bằng `{`\"), vì luồng progress-trace của `fgos-runner` (xem \"Ngoại\nlệ có lý do\" dưới) có thể tự chứa output của trợ lý bắt đầu bằng `{`."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-22",
+    "githubAnchor": "unheaded-block-22",
+    "stableAnchor": "unheaded-block-22",
+    "title": "Unheaded block 22",
+    "startLine": 181,
+    "endLine": 184,
+    "textDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
+    "sample": "**Nhận diện một phong bì thật:** parse một dòng stdout ra JSON rồi kiểm\n`contract === 'fgos.v1'` — KHÔNG BAO GIỜ bằng heuristic văn bản (vd \"dòng\nbắt đầu bằng `{`\"), vì luồng progr",
+    "identityFingerprint": "ba5e63678191dc9c6bae6aa99c65efd2c8f670d3dd9b38c8aaee891fe5787197",
+    "ancestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Recognizing A Real Envelope"
+    ],
+    "text": "**Nhận diện một phong bì thật:** parse một dòng stdout ra JSON rồi kiểm\n`contract === 'fgos.v1'` — KHÔNG BAO GIỜ bằng heuristic văn bản (vd \"dòng\nbắt đầu bằng `{`\"), vì luồng progress-trace của `fgos-runner` (xem \"Ngoại\nlệ có lý do\" dưới) có thể tự chứa output của trợ lý bắt đầu bằng `{`."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-22",
+      "githubAnchor": "unheaded-block-22",
+      "stableAnchor": "unheaded-block-22",
+      "title": "Unheaded block 22",
+      "startLine": 181,
+      "endLine": 184,
+      "textDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
+      "sample": "**Nhận diện một phong bì thật:** parse một dòng stdout ra JSON rồi kiểm\n`contract === 'fgos.v1'` — KHÔNG BAO GIỜ bằng heuristic văn bản (vd \"dòng\nbắt đầu bằng `{`\"), vì luồng progr",
+      "identityFingerprint": "ba5e63678191dc9c6bae6aa99c65efd2c8f670d3dd9b38c8aaee891fe5787197",
+      "ancestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Recognizing A Real Envelope"
+      ],
+      "text": "**Nhận diện một phong bì thật:** parse một dòng stdout ra JSON rồi kiểm\n`contract === 'fgos.v1'` — KHÔNG BAO GIỜ bằng heuristic văn bản (vd \"dòng\nbắt đầu bằng `{`\"), vì luồng progress-trace của `fgos-runner` (xem \"Ngoại\nlệ có lý do\" dưới) có thể tự chứa output của trợ lý bắt đầu bằng `{`."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_5b930b5ce84afec3d4b2c383c7f85925"
+}
+```
+
+## Entry claim_da21278ab32966f6631c82420552ed2b
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_da21278ab32966f6631c82420552ed2b",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_da21278ab32966f6631c82420552ed2b",
+    "sourceUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-29",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_da21278ab32966f6631c82420552ed2b",
+    "sourceUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-29",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-29 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "30d43ecb2d28400d920c9b3e23e93ead71b4cb92aecb62d15a14115f3ceb9363",
+    "identityFingerprint": "30d43ecb2d28400d920c9b3e23e93ead71b4cb92aecb62d15a14115f3ceb9363",
+    "claimId": "claim_da21278ab32966f6631c82420552ed2b",
+    "sourceAnchor": "unheaded-block-18",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-18",
+      "githubAnchor": "unheaded-block-18",
+      "stableAnchor": "unheaded-block-18",
+      "title": "Unheaded block 18",
+      "startLine": 120,
+      "endLine": 129,
+      "textDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+      "sample": "Bốn verb trả tập có thể lớn tuỳ dữ liệu mang phân trang tuỳ chọn:\n`ready` · `triage` · `evolve` (lượt liệt-kê không cờ) · `list`'s khoá\n`work`. Không truyền `--cursor`/`--limit` → ",
+      "identityFingerprint": "30d43ecb2d28400d920c9b3e23e93ead71b4cb92aecb62d15a14115f3ceb9363",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Chiều ra — envelope thống nhất",
+        "Phân trang — con trỏ đục"
+      ],
+      "text": "Bốn verb trả tập có thể lớn tuỳ dữ liệu mang phân trang tuỳ chọn:\n`ready` · `triage` · `evolve` (lượt liệt-kê không cờ) · `list`'s khoá\n`work`. Không truyền `--cursor`/`--limit` → kết quả đầy đủ, y hệt không có\ntính năng này. Truyền một trong hai → kết quả đổi hình dạng thành\n`{items, nextCursor}`. Con trỏ là một chuỗi đục hoàn toàn — sinh bởi máy\nchủ, người gọi chỉ trả lại nguyên văn, không bao giờ tự phân tích hay tự\nchế. `nextCursor` là `null` khi đã tới cuối tập. Một con trỏ trỏ tới mục đã\nrời tập là lỗi phạm trù `validation`, thông điệp tự nêu cách sửa (bắt đầu\nlại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang — mỗi dòng của\nnó là một cặp `(a,b)`, không có khoá riêng cho một dòng."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-29",
+    "githubAnchor": "unheaded-block-29",
+    "stableAnchor": "unheaded-block-29",
+    "title": "Unheaded block 29",
+    "startLine": 251,
+    "endLine": 260,
+    "textDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+    "sample": "Bốn verb trả tập có thể lớn tuỳ dữ liệu mang phân trang tuỳ chọn:\n`ready` · `triage` · `evolve` (lượt liệt-kê không cờ) · `list`'s khoá\n`work`. Không truyền `--cursor`/`--limit` → ",
+    "identityFingerprint": "30d43ecb2d28400d920c9b3e23e93ead71b4cb92aecb62d15a14115f3ceb9363",
+    "ancestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ],
+    "text": "Bốn verb trả tập có thể lớn tuỳ dữ liệu mang phân trang tuỳ chọn:\n`ready` · `triage` · `evolve` (lượt liệt-kê không cờ) · `list`'s khoá\n`work`. Không truyền `--cursor`/`--limit` → kết quả đầy đủ, y hệt không có\ntính năng này. Truyền một trong hai → kết quả đổi hình dạng thành\n`{items, nextCursor}`. Con trỏ là một chuỗi đục hoàn toàn — sinh bởi máy\nchủ, người gọi chỉ trả lại nguyên văn, không bao giờ tự phân tích hay tự\nchế. `nextCursor` là `null` khi đã tới cuối tập. Một con trỏ trỏ tới mục đã\nrời tập là lỗi phạm trù `validation`, thông điệp tự nêu cách sửa (bắt đầu\nlại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang — mỗi dòng của\nnó là một cặp `(a,b)`, không có khoá riêng cho một dòng."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-29",
+      "githubAnchor": "unheaded-block-29",
+      "stableAnchor": "unheaded-block-29",
+      "title": "Unheaded block 29",
+      "startLine": 251,
+      "endLine": 260,
+      "textDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+      "sample": "Bốn verb trả tập có thể lớn tuỳ dữ liệu mang phân trang tuỳ chọn:\n`ready` · `triage` · `evolve` (lượt liệt-kê không cờ) · `list`'s khoá\n`work`. Không truyền `--cursor`/`--limit` → ",
+      "identityFingerprint": "30d43ecb2d28400d920c9b3e23e93ead71b4cb92aecb62d15a14115f3ceb9363",
+      "ancestry": [
+        "CLI I/O Contract",
+        "6. Cursor Pagination"
+      ],
+      "text": "Bốn verb trả tập có thể lớn tuỳ dữ liệu mang phân trang tuỳ chọn:\n`ready` · `triage` · `evolve` (lượt liệt-kê không cờ) · `list`'s khoá\n`work`. Không truyền `--cursor`/`--limit` → kết quả đầy đủ, y hệt không có\ntính năng này. Truyền một trong hai → kết quả đổi hình dạng thành\n`{items, nextCursor}`. Con trỏ là một chuỗi đục hoàn toàn — sinh bởi máy\nchủ, người gọi chỉ trả lại nguyên văn, không bao giờ tự phân tích hay tự\nchế. `nextCursor` là `null` khi đã tới cuối tập. Một con trỏ trỏ tới mục đã\nrời tập là lỗi phạm trù `validation`, thông điệp tự nêu cách sửa (bắt đầu\nlại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang — mỗi dòng của\nnó là một cặp `(a,b)`, không có khoá riêng cho một dòng."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_da21278ab32966f6631c82420552ed2b"
+}
+```
+
+## Entry claim_b38e730cc466114aa1e1ebba6fa880ed
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+    "sourceUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-30",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+    "sourceUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-30",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-30 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "f7db584629456ff7dc7809a7269b5323e94ec40e570d416c5cd29d45ea82206d",
+    "identityFingerprint": "f7db584629456ff7dc7809a7269b5323e94ec40e570d416c5cd29d45ea82206d",
+    "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+    "sourceAnchor": "unheaded-block-19",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-19",
+      "githubAnchor": "unheaded-block-19",
+      "stableAnchor": "unheaded-block-19",
+      "title": "Unheaded block 19",
+      "startLine": 131,
+      "endLine": 132,
+      "textDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+      "sample": "Sổ verb tự khai verb nào phân trang qua trường `paginated` (đúng/sai, mặt\ntrên MỌI verb).",
+      "identityFingerprint": "f7db584629456ff7dc7809a7269b5323e94ec40e570d416c5cd29d45ea82206d",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Chiều ra — envelope thống nhất",
+        "Phân trang — con trỏ đục"
+      ],
+      "text": "Sổ verb tự khai verb nào phân trang qua trường `paginated` (đúng/sai, mặt\ntrên MỌI verb)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-30",
+    "githubAnchor": "unheaded-block-30",
+    "stableAnchor": "unheaded-block-30",
+    "title": "Unheaded block 30",
+    "startLine": 262,
+    "endLine": 263,
+    "textDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+    "sample": "Sổ verb tự khai verb nào phân trang qua trường `paginated` (đúng/sai, mặt\ntrên MỌI verb).",
+    "identityFingerprint": "f7db584629456ff7dc7809a7269b5323e94ec40e570d416c5cd29d45ea82206d",
+    "ancestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ],
+    "text": "Sổ verb tự khai verb nào phân trang qua trường `paginated` (đúng/sai, mặt\ntrên MỌI verb)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-30",
+      "githubAnchor": "unheaded-block-30",
+      "stableAnchor": "unheaded-block-30",
+      "title": "Unheaded block 30",
+      "startLine": 262,
+      "endLine": 263,
+      "textDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+      "sample": "Sổ verb tự khai verb nào phân trang qua trường `paginated` (đúng/sai, mặt\ntrên MỌI verb).",
+      "identityFingerprint": "f7db584629456ff7dc7809a7269b5323e94ec40e570d416c5cd29d45ea82206d",
+      "ancestry": [
+        "CLI I/O Contract",
+        "6. Cursor Pagination"
+      ],
+      "text": "Sổ verb tự khai verb nào phân trang qua trường `paginated` (đúng/sai, mặt\ntrên MỌI verb)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_b38e730cc466114aa1e1ebba6fa880ed"
+}
+```
+
+## Entry claim_535f1aeb31d616e2138a5b3719cb4cd0
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+    "sourceUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-36",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Entry Fields And Effect Axes"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+    "sourceUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-36",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-36 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Entry Fields And Effect Axes"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "09c3e021c9425c045fe449a643d34c2a0822b5ab6874cf19bff4bead073bf38c",
+    "identityFingerprint": "09c3e021c9425c045fe449a643d34c2a0822b5ab6874cf19bff4bead073bf38c",
+    "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+    "sourceAnchor": "unheaded-block-22",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-22",
+      "githubAnchor": "unheaded-block-22",
+      "stableAnchor": "unheaded-block-22",
+      "title": "Unheaded block 22",
+      "startLine": 160,
+      "endLine": 161,
+      "textDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+      "sample": "Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38.",
+      "identityFingerprint": "09c3e021c9425c045fe449a643d34c2a0822b5ab6874cf19bff4bead073bf38c",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Sổ verb máy-đọc — CLI tự mô tả"
+      ],
+      "text": "Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-36",
+    "githubAnchor": "unheaded-block-36",
+    "stableAnchor": "unheaded-block-36",
+    "title": "Unheaded block 36",
+    "startLine": 338,
+    "endLine": 339,
+    "textDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+    "sample": "Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38.",
+    "identityFingerprint": "09c3e021c9425c045fe449a643d34c2a0822b5ab6874cf19bff4bead073bf38c",
+    "ancestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Entry Fields And Effect Axes"
+    ],
+    "text": "Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-36",
+      "githubAnchor": "unheaded-block-36",
+      "stableAnchor": "unheaded-block-36",
+      "title": "Unheaded block 36",
+      "startLine": 338,
+      "endLine": 339,
+      "textDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+      "sample": "Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38.",
+      "identityFingerprint": "09c3e021c9425c045fe449a643d34c2a0822b5ab6874cf19bff4bead073bf38c",
+      "ancestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Entry Fields And Effect Axes"
+      ],
+      "text": "Cả hai trục `touchesState`/`externalEffect` vẫn thuần **khai báo** — chưa\nnối vào điều phối hay xác danh; cổng \"ai được nói verb nào\" thuộc STR38."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_535f1aeb31d616e2138a5b3719cb4cd0"
+}
+```
+
+## Entry claim_d0e16d088cdecf2dd0b491f819009aa6
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
+    "sourceUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-38",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "8. Multi-Value Flag Convention"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
+    "sourceUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-38",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-38 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "8. Multi-Value Flag Convention"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "391c047e1504392d5753fa672f78780cdcb8fe38297709666e38396a5d65e1e6",
+    "identityFingerprint": "391c047e1504392d5753fa672f78780cdcb8fe38297709666e38396a5d65e1e6",
+    "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
+    "sourceAnchor": "unheaded-block-23",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-23",
+      "githubAnchor": "unheaded-block-23",
+      "stableAnchor": "unheaded-block-23",
+      "title": "Unheaded block 23",
+      "startLine": 165,
+      "endLine": 169,
+      "textDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+      "sample": "Tham số nào mang nhiều giá trị khai `multiValueFormat`: `'csv'` (phân tách\ndấu phẩy — `deps`/`refs`/`footprint`/`targets`) hay `'json-array'` (chuỗi\nJSON-hoá — `acceptance`, CỐ Ý k",
+      "identityFingerprint": "391c047e1504392d5753fa672f78780cdcb8fe38297709666e38396a5d65e1e6",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Sổ verb máy-đọc — CLI tự mô tả",
+        "Quy ước cờ nhiều-giá-trị"
+      ],
+      "text": "Tham số nào mang nhiều giá trị khai `multiValueFormat`: `'csv'` (phân tách\ndấu phẩy — `deps`/`refs`/`footprint`/`targets`) hay `'json-array'` (chuỗi\nJSON-hoá — `acceptance`, CỐ Ý không phẩy vì văn bản một clause có thể tự\nchứa dấu phẩy). Trước STR46, khác biệt này chỉ nằm trong văn xuôi mô tả;\nnay đọc được bằng máy."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-38",
+    "githubAnchor": "unheaded-block-38",
+    "stableAnchor": "unheaded-block-38",
+    "title": "Unheaded block 38",
+    "startLine": 352,
+    "endLine": 356,
+    "textDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+    "sample": "Tham số nào mang nhiều giá trị khai `multiValueFormat`: `'csv'` (phân tách\ndấu phẩy — `deps`/`refs`/`footprint`/`targets`) hay `'json-array'` (chuỗi\nJSON-hoá — `acceptance`, CỐ Ý k",
+    "identityFingerprint": "391c047e1504392d5753fa672f78780cdcb8fe38297709666e38396a5d65e1e6",
+    "ancestry": [
+      "CLI I/O Contract",
+      "8. Multi-Value Flag Convention"
+    ],
+    "text": "Tham số nào mang nhiều giá trị khai `multiValueFormat`: `'csv'` (phân tách\ndấu phẩy — `deps`/`refs`/`footprint`/`targets`) hay `'json-array'` (chuỗi\nJSON-hoá — `acceptance`, CỐ Ý không phẩy vì văn bản một clause có thể tự\nchứa dấu phẩy). Trước STR46, khác biệt này chỉ nằm trong văn xuôi mô tả;\nnay đọc được bằng máy."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-38",
+      "githubAnchor": "unheaded-block-38",
+      "stableAnchor": "unheaded-block-38",
+      "title": "Unheaded block 38",
+      "startLine": 352,
+      "endLine": 356,
+      "textDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+      "sample": "Tham số nào mang nhiều giá trị khai `multiValueFormat`: `'csv'` (phân tách\ndấu phẩy — `deps`/`refs`/`footprint`/`targets`) hay `'json-array'` (chuỗi\nJSON-hoá — `acceptance`, CỐ Ý k",
+      "identityFingerprint": "391c047e1504392d5753fa672f78780cdcb8fe38297709666e38396a5d65e1e6",
+      "ancestry": [
+        "CLI I/O Contract",
+        "8. Multi-Value Flag Convention"
+      ],
+      "text": "Tham số nào mang nhiều giá trị khai `multiValueFormat`: `'csv'` (phân tách\ndấu phẩy — `deps`/`refs`/`footprint`/`targets`) hay `'json-array'` (chuỗi\nJSON-hoá — `acceptance`, CỐ Ý không phẩy vì văn bản một clause có thể tự\nchứa dấu phẩy). Trước STR46, khác biệt này chỉ nằm trong văn xuôi mô tả;\nnay đọc được bằng máy."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_d0e16d088cdecf2dd0b491f819009aa6"
+}
+```
+
+## Entry claim_e9ee744c6e1847ef25b3eb0bf180f577
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+    "sourceUnitDigest": "ae0e60ec193e0ac5ad026b2cf78a37ba3156fea7043460714946bfe66311ab5e",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-42",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+    "sourceUnitDigest": "ae0e60ec193e0ac5ad026b2cf78a37ba3156fea7043460714946bfe66311ab5e",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-42",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: source block 24 and target block 42 differ only in the link destination (decisions/0011-version-tuong-minh-cho-moi-contract.md became ../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract, anchor ok), an allowed change and unchanged since the earlier ok at the same digests; the generic rationale does not name the rewrite, which I accept on the earlier verdict and flag as a wording gap; anchor 42 and unit are correct after the shift",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "2df9f5fa04ff7038ba5082547bea7f14594ba0bedda12729cf337e9f24f85bfc",
+    "identityFingerprint": "2df9f5fa04ff7038ba5082547bea7f14594ba0bedda12729cf337e9f24f85bfc",
+    "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+    "sourceAnchor": "unheaded-block-24",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "ae0e60ec193e0ac5ad026b2cf78a37ba3156fea7043460714946bfe66311ab5e",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-24",
+      "githubAnchor": "unheaded-block-24",
+      "stableAnchor": "unheaded-block-24",
+      "title": "Unheaded block 24",
+      "startLine": 173,
+      "endLine": 174,
+      "textDigest": "ae0e60ec193e0ac5ad026b2cf78a37ba3156fea7043460714946bfe66311ab5e",
+      "sample": "Theo [0011](decisions/0011-version-tuong-minh-cho-moi-contract.md): mỗi\ncontract mang version tường minh trong định danh của chính nó.",
+      "identityFingerprint": "2df9f5fa04ff7038ba5082547bea7f14594ba0bedda12729cf337e9f24f85bfc",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Version token"
+      ],
+      "text": "Theo [0011](decisions/0011-version-tuong-minh-cho-moi-contract.md): mỗi\ncontract mang version tường minh trong định danh của chính nó."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-42",
+    "githubAnchor": "unheaded-block-42",
+    "stableAnchor": "unheaded-block-42",
+    "title": "Unheaded block 42",
+    "startLine": 397,
+    "endLine": 398,
+    "textDigest": "a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532",
+    "sample": "Theo [0011](../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract): mỗi\ncontract mang version tường minh trong định danh của chính nó.",
+    "identityFingerprint": "88147338a93e7d589904d36f6d85470d19e7d0e75ac270e2a2e465f1255292a7",
+    "ancestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ],
+    "text": "Theo [0011](../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract): mỗi\ncontract mang version tường minh trong định danh của chính nó."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_e9ee744c6e1847ef25b3eb0bf180f577"
+}
+```
+
+## Entry claim_6f7c99f38f64abb5af7f07c1e2690730
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
+    "sourceUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-43",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
+    "sourceUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-43",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-43 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "d147ec28828230700ab1bfea679f7deb623328c37da2976e6c6d1b6fe70fa67d",
+    "identityFingerprint": "d147ec28828230700ab1bfea679f7deb623328c37da2976e6c6d1b6fe70fa67d",
+    "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
+    "sourceAnchor": "unheaded-block-25",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-25",
+      "githubAnchor": "unheaded-block-25",
+      "stableAnchor": "unheaded-block-25",
+      "title": "Unheaded block 25",
+      "startLine": 176,
+      "endLine": 182,
+      "textDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+      "sample": "| Bề mặt | Token | Hiện thân |\n|---|---|---|\n| Phong bì CLI (CTR001) | `fgos.v1` | field `contract` trên mọi phong bì, cả hai binary |\n| Stdout của `fgos-runner` (CTR003, riêng phầ",
+      "identityFingerprint": "d147ec28828230700ab1bfea679f7deb623328c37da2976e6c6d1b6fe70fa67d",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Version token"
+      ],
+      "text": "| Bề mặt | Token | Hiện thân |\n|---|---|---|\n| Phong bì CLI (CTR001) | `fgos.v1` | field `contract` trên mọi phong bì, cả hai binary |\n| Stdout của `fgos-runner` (CTR003, riêng phần bề mặt ra) | dùng lại `fgos.v1` | KHÔNG đúc token CTR003 riêng — bề mặt này tái dùng đúng cơ chế `fgos.v1` của CTR001 |\n| Sổ verb (manifest) | `2.0` | field `schema_version` trong `{schema_version, commands[]}` |\n| Sự kiện (event log) | `3` | field `v` trên mỗi event, `SCHEMA_VERSION` (`work.mjs`) |\n| `gates[id]` (ask/answer, CTR004) | `CTR004/v1` | hiện thân qua `SCHEMA_VERSION` của sự kiện `work.move` nó fold ra — KHÔNG một field version riêng (thêm field thứ hai cho cùng dữ liệu phá DRY) |"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-43",
+    "githubAnchor": "unheaded-block-43",
+    "stableAnchor": "unheaded-block-43",
+    "title": "Unheaded block 43",
+    "startLine": 400,
+    "endLine": 406,
+    "textDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+    "sample": "| Bề mặt | Token | Hiện thân |\n|---|---|---|\n| Phong bì CLI (CTR001) | `fgos.v1` | field `contract` trên mọi phong bì, cả hai binary |\n| Stdout của `fgos-runner` (CTR003, riêng phầ",
+    "identityFingerprint": "d147ec28828230700ab1bfea679f7deb623328c37da2976e6c6d1b6fe70fa67d",
+    "ancestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ],
+    "text": "| Bề mặt | Token | Hiện thân |\n|---|---|---|\n| Phong bì CLI (CTR001) | `fgos.v1` | field `contract` trên mọi phong bì, cả hai binary |\n| Stdout của `fgos-runner` (CTR003, riêng phần bề mặt ra) | dùng lại `fgos.v1` | KHÔNG đúc token CTR003 riêng — bề mặt này tái dùng đúng cơ chế `fgos.v1` của CTR001 |\n| Sổ verb (manifest) | `2.0` | field `schema_version` trong `{schema_version, commands[]}` |\n| Sự kiện (event log) | `3` | field `v` trên mỗi event, `SCHEMA_VERSION` (`work.mjs`) |\n| `gates[id]` (ask/answer, CTR004) | `CTR004/v1` | hiện thân qua `SCHEMA_VERSION` của sự kiện `work.move` nó fold ra — KHÔNG một field version riêng (thêm field thứ hai cho cùng dữ liệu phá DRY) |"
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-43",
+      "githubAnchor": "unheaded-block-43",
+      "stableAnchor": "unheaded-block-43",
+      "title": "Unheaded block 43",
+      "startLine": 400,
+      "endLine": 406,
+      "textDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+      "sample": "| Bề mặt | Token | Hiện thân |\n|---|---|---|\n| Phong bì CLI (CTR001) | `fgos.v1` | field `contract` trên mọi phong bì, cả hai binary |\n| Stdout của `fgos-runner` (CTR003, riêng phầ",
+      "identityFingerprint": "d147ec28828230700ab1bfea679f7deb623328c37da2976e6c6d1b6fe70fa67d",
+      "ancestry": [
+        "CLI I/O Contract",
+        "10. Version Tokens"
+      ],
+      "text": "| Bề mặt | Token | Hiện thân |\n|---|---|---|\n| Phong bì CLI (CTR001) | `fgos.v1` | field `contract` trên mọi phong bì, cả hai binary |\n| Stdout của `fgos-runner` (CTR003, riêng phần bề mặt ra) | dùng lại `fgos.v1` | KHÔNG đúc token CTR003 riêng — bề mặt này tái dùng đúng cơ chế `fgos.v1` của CTR001 |\n| Sổ verb (manifest) | `2.0` | field `schema_version` trong `{schema_version, commands[]}` |\n| Sự kiện (event log) | `3` | field `v` trên mỗi event, `SCHEMA_VERSION` (`work.mjs`) |\n| `gates[id]` (ask/answer, CTR004) | `CTR004/v1` | hiện thân qua `SCHEMA_VERSION` của sự kiện `work.move` nó fold ra — KHÔNG một field version riêng (thêm field thứ hai cho cùng dữ liệu phá DRY) |"
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_6f7c99f38f64abb5af7f07c1e2690730"
+}
+```
+
+## Entry claim_ea280fa29dca090fe3306f6161ac6ae7
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
+    "sourceUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-44",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
+    "sourceUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-44",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-44 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "e0550b3dffbcc1e7cca3870dcaba9bc25ff6b8faf4890803a7c9c02fdaf3f477",
+    "identityFingerprint": "e0550b3dffbcc1e7cca3870dcaba9bc25ff6b8faf4890803a7c9c02fdaf3f477",
+    "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
+    "sourceAnchor": "unheaded-block-26",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-26",
+      "githubAnchor": "unheaded-block-26",
+      "stableAnchor": "unheaded-block-26",
+      "title": "Unheaded block 26",
+      "startLine": 184,
+      "endLine": 185,
+      "textDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+      "sample": "CTR006 (routing-handoff) nằm NGOÀI: nó là spec đầy đủ nhưng chưa có code,\ndán version lên thứ chưa chạy là đóng dấu cho giả định.",
+      "identityFingerprint": "e0550b3dffbcc1e7cca3870dcaba9bc25ff6b8faf4890803a7c9c02fdaf3f477",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Version token"
+      ],
+      "text": "CTR006 (routing-handoff) nằm NGOÀI: nó là spec đầy đủ nhưng chưa có code,\ndán version lên thứ chưa chạy là đóng dấu cho giả định."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-44",
+    "githubAnchor": "unheaded-block-44",
+    "stableAnchor": "unheaded-block-44",
+    "title": "Unheaded block 44",
+    "startLine": 408,
+    "endLine": 409,
+    "textDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+    "sample": "CTR006 (routing-handoff) nằm NGOÀI: nó là spec đầy đủ nhưng chưa có code,\ndán version lên thứ chưa chạy là đóng dấu cho giả định.",
+    "identityFingerprint": "e0550b3dffbcc1e7cca3870dcaba9bc25ff6b8faf4890803a7c9c02fdaf3f477",
+    "ancestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ],
+    "text": "CTR006 (routing-handoff) nằm NGOÀI: nó là spec đầy đủ nhưng chưa có code,\ndán version lên thứ chưa chạy là đóng dấu cho giả định."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-44",
+      "githubAnchor": "unheaded-block-44",
+      "stableAnchor": "unheaded-block-44",
+      "title": "Unheaded block 44",
+      "startLine": 408,
+      "endLine": 409,
+      "textDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+      "sample": "CTR006 (routing-handoff) nằm NGOÀI: nó là spec đầy đủ nhưng chưa có code,\ndán version lên thứ chưa chạy là đóng dấu cho giả định.",
+      "identityFingerprint": "e0550b3dffbcc1e7cca3870dcaba9bc25ff6b8faf4890803a7c9c02fdaf3f477",
+      "ancestry": [
+        "CLI I/O Contract",
+        "10. Version Tokens"
+      ],
+      "text": "CTR006 (routing-handoff) nằm NGOÀI: nó là spec đầy đủ nhưng chưa có code,\ndán version lên thứ chưa chạy là đóng dấu cho giả định."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_ea280fa29dca090fe3306f6161ac6ae7"
+}
+```
+
+## Entry claim_8999e61e46d6c02b407b84263d7a2d67
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
+    "sourceUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-45",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
+    "sourceUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-45",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-45 ok; section placement matches the source section and the rebound sentence in the rationale is true; the generic pointer to the earlier accounting is carried over from the reviewed row",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "a835a7428bc1398d720acb13ab8296532880e72b4898d3899de3d7769b4d82c1",
+    "identityFingerprint": "a835a7428bc1398d720acb13ab8296532880e72b4898d3899de3d7769b4d82c1",
+    "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
+    "sourceAnchor": "unheaded-block-27",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-27",
+      "githubAnchor": "unheaded-block-27",
+      "stableAnchor": "unheaded-block-27",
+      "title": "Unheaded block 27",
+      "startLine": 189,
+      "endLine": 191,
+      "textDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+      "sample": "STR46 hợp nhất chiều vào/ra hôm nay đang có, KHÔNG mở rộng nó thành chủ\nđộng (push). Ba việc sau đã locked ngoài biên khi mở exploring, mỗi việc có\nnhà riêng:",
+      "identityFingerprint": "a835a7428bc1398d720acb13ab8296532880e72b4898d3899de3d7769b4d82c1",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Ranh giới — điều gì KHÔNG thuộc hợp đồng này"
+      ],
+      "text": "STR46 hợp nhất chiều vào/ra hôm nay đang có, KHÔNG mở rộng nó thành chủ\nđộng (push). Ba việc sau đã locked ngoài biên khi mở exploring, mỗi việc có\nnhà riêng:"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-45",
+    "githubAnchor": "unheaded-block-45",
+    "stableAnchor": "unheaded-block-45",
+    "title": "Unheaded block 45",
+    "startLine": 413,
+    "endLine": 415,
+    "textDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+    "sample": "STR46 hợp nhất chiều vào/ra hôm nay đang có, KHÔNG mở rộng nó thành chủ\nđộng (push). Ba việc sau đã locked ngoài biên khi mở exploring, mỗi việc có\nnhà riêng:",
+    "identityFingerprint": "a835a7428bc1398d720acb13ab8296532880e72b4898d3899de3d7769b4d82c1",
+    "ancestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ],
+    "text": "STR46 hợp nhất chiều vào/ra hôm nay đang có, KHÔNG mở rộng nó thành chủ\nđộng (push). Ba việc sau đã locked ngoài biên khi mở exploring, mỗi việc có\nnhà riêng:"
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-45",
+      "githubAnchor": "unheaded-block-45",
+      "stableAnchor": "unheaded-block-45",
+      "title": "Unheaded block 45",
+      "startLine": 413,
+      "endLine": 415,
+      "textDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+      "sample": "STR46 hợp nhất chiều vào/ra hôm nay đang có, KHÔNG mở rộng nó thành chủ\nđộng (push). Ba việc sau đã locked ngoài biên khi mở exploring, mỗi việc có\nnhà riêng:",
+      "identityFingerprint": "a835a7428bc1398d720acb13ab8296532880e72b4898d3899de3d7769b4d82c1",
+      "ancestry": [
+        "CLI I/O Contract",
+        "11. Scope Boundary"
+      ],
+      "text": "STR46 hợp nhất chiều vào/ra hôm nay đang có, KHÔNG mở rộng nó thành chủ\nđộng (push). Ba việc sau đã locked ngoài biên khi mở exploring, mỗi việc có\nnhà riêng:"
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_8999e61e46d6c02b407b84263d7a2d67"
+}
+```
+
+## Entry claim_f10fba22a20755dc700bb1720f98f451
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
+    "sourceUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-46",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
+    "sourceUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-46",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-46 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "a29bb933980ea4913cae817f4ebe6cac7f0a9646a72058f4553d41243dd446a0",
+    "identityFingerprint": "a29bb933980ea4913cae817f4ebe6cac7f0a9646a72058f4553d41243dd446a0",
+    "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
+    "sourceAnchor": "unheaded-block-28",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-28",
+      "githubAnchor": "unheaded-block-28",
+      "stableAnchor": "unheaded-block-28",
+      "title": "Unheaded block 28",
+      "startLine": 193,
+      "endLine": 198,
+      "textDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+      "sample": "- **Chiều-ra khởi-xướng (\"cần bạn\")** — một kênh attention/push có\n  delivery-semantics riêng (at-least-once, dedup, routing, ack,\n  escalation) — thuộc STR48, sống ở consumer/daem",
+      "identityFingerprint": "a29bb933980ea4913cae817f4ebe6cac7f0a9646a72058f4553d41243dd446a0",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Ranh giới — điều gì KHÔNG thuộc hợp đồng này"
+      ],
+      "text": "- **Chiều-ra khởi-xướng (\"cần bạn\")** — một kênh attention/push có\n  delivery-semantics riêng (at-least-once, dedup, routing, ack,\n  escalation) — thuộc STR48, sống ở consumer/daemon, KHÔNG phải core fgOS.\n- **Increment terminal/pane + chat item-scoped** — thuộc STR83/STR38.\n- **Tầng phân quyền** (\"ai được gọi verb nào\", caller chưa xác danh có bị\n  chặn hay không) — thuộc STR38."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-46",
+    "githubAnchor": "unheaded-block-46",
+    "stableAnchor": "unheaded-block-46",
+    "title": "Unheaded block 46",
+    "startLine": 417,
+    "endLine": 422,
+    "textDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+    "sample": "- **Chiều-ra khởi-xướng (\"cần bạn\")** — một kênh attention/push có\n  delivery-semantics riêng (at-least-once, dedup, routing, ack,\n  escalation) — thuộc STR48, sống ở consumer/daem",
+    "identityFingerprint": "a29bb933980ea4913cae817f4ebe6cac7f0a9646a72058f4553d41243dd446a0",
+    "ancestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ],
+    "text": "- **Chiều-ra khởi-xướng (\"cần bạn\")** — một kênh attention/push có\n  delivery-semantics riêng (at-least-once, dedup, routing, ack,\n  escalation) — thuộc STR48, sống ở consumer/daemon, KHÔNG phải core fgOS.\n- **Increment terminal/pane + chat item-scoped** — thuộc STR83/STR38.\n- **Tầng phân quyền** (\"ai được gọi verb nào\", caller chưa xác danh có bị\n  chặn hay không) — thuộc STR38."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-46",
+      "githubAnchor": "unheaded-block-46",
+      "stableAnchor": "unheaded-block-46",
+      "title": "Unheaded block 46",
+      "startLine": 417,
+      "endLine": 422,
+      "textDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+      "sample": "- **Chiều-ra khởi-xướng (\"cần bạn\")** — một kênh attention/push có\n  delivery-semantics riêng (at-least-once, dedup, routing, ack,\n  escalation) — thuộc STR48, sống ở consumer/daem",
+      "identityFingerprint": "a29bb933980ea4913cae817f4ebe6cac7f0a9646a72058f4553d41243dd446a0",
+      "ancestry": [
+        "CLI I/O Contract",
+        "11. Scope Boundary"
+      ],
+      "text": "- **Chiều-ra khởi-xướng (\"cần bạn\")** — một kênh attention/push có\n  delivery-semantics riêng (at-least-once, dedup, routing, ack,\n  escalation) — thuộc STR48, sống ở consumer/daemon, KHÔNG phải core fgOS.\n- **Increment terminal/pane + chat item-scoped** — thuộc STR83/STR38.\n- **Tầng phân quyền** (\"ai được gọi verb nào\", caller chưa xác danh có bị\n  chặn hay không) — thuộc STR38."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_f10fba22a20755dc700bb1720f98f451"
+}
+```
+
+## Entry claim_cf56f4a8b7679435c6bf59abd8c23093
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
+    "sourceUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-47",
+    "claimKind": "historical-context",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
+    "sourceUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-47",
+    "claimKind": "historical-context",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-47 ok; section placement matches the source section and the rebound sentence in the rationale is true; the generic pointer to the earlier accounting is carried over from the reviewed row",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "8bd38f6ba0f85b2d742a0454a7907d8516563078c2d8099856d856f1f2710db9",
+    "identityFingerprint": "8bd38f6ba0f85b2d742a0454a7907d8516563078c2d8099856d856f1f2710db9",
+    "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
+    "sourceAnchor": "unheaded-block-29",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-29",
+      "githubAnchor": "unheaded-block-29",
+      "stableAnchor": "unheaded-block-29",
+      "title": "Unheaded block 29",
+      "startLine": 200,
+      "endLine": 202,
+      "textDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+      "sample": "Đây là lý do CoS gốc của STR46 (bản khai lúc mở backlog) bị thu hẹp có chủ\ný: chỉ vế \"có một spec hợp đồng in/out tự-mô-tả\" là việc của STR46; hai vế\ncòn lại (chiều-ra khởi-xướng, ",
+      "identityFingerprint": "8bd38f6ba0f85b2d742a0454a7907d8516563078c2d8099856d856f1f2710db9",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Ranh giới — điều gì KHÔNG thuộc hợp đồng này"
+      ],
+      "text": "Đây là lý do CoS gốc của STR46 (bản khai lúc mở backlog) bị thu hẹp có chủ\ný: chỉ vế \"có một spec hợp đồng in/out tự-mô-tả\" là việc của STR46; hai vế\ncòn lại (chiều-ra khởi-xướng, increment terminal/pane) thuộc PBI khác."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-47",
+    "githubAnchor": "unheaded-block-47",
+    "stableAnchor": "unheaded-block-47",
+    "title": "Unheaded block 47",
+    "startLine": 424,
+    "endLine": 426,
+    "textDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+    "sample": "Đây là lý do CoS gốc của STR46 (bản khai lúc mở backlog) bị thu hẹp có chủ\ný: chỉ vế \"có một spec hợp đồng in/out tự-mô-tả\" là việc của STR46; hai vế\ncòn lại (chiều-ra khởi-xướng, ",
+    "identityFingerprint": "8bd38f6ba0f85b2d742a0454a7907d8516563078c2d8099856d856f1f2710db9",
+    "ancestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ],
+    "text": "Đây là lý do CoS gốc của STR46 (bản khai lúc mở backlog) bị thu hẹp có chủ\ný: chỉ vế \"có một spec hợp đồng in/out tự-mô-tả\" là việc của STR46; hai vế\ncòn lại (chiều-ra khởi-xướng, increment terminal/pane) thuộc PBI khác."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-47",
+      "githubAnchor": "unheaded-block-47",
+      "stableAnchor": "unheaded-block-47",
+      "title": "Unheaded block 47",
+      "startLine": 424,
+      "endLine": 426,
+      "textDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+      "sample": "Đây là lý do CoS gốc của STR46 (bản khai lúc mở backlog) bị thu hẹp có chủ\ný: chỉ vế \"có một spec hợp đồng in/out tự-mô-tả\" là việc của STR46; hai vế\ncòn lại (chiều-ra khởi-xướng, ",
+      "identityFingerprint": "8bd38f6ba0f85b2d742a0454a7907d8516563078c2d8099856d856f1f2710db9",
+      "ancestry": [
+        "CLI I/O Contract",
+        "11. Scope Boundary"
+      ],
+      "text": "Đây là lý do CoS gốc của STR46 (bản khai lúc mở backlog) bị thu hẹp có chủ\ný: chỉ vế \"có một spec hợp đồng in/out tự-mô-tả\" là việc của STR46; hai vế\ncòn lại (chiều-ra khởi-xướng, increment terminal/pane) thuộc PBI khác."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_cf56f4a8b7679435c6bf59abd8c23093"
+}
+```
+
+## Entry claim_deb4b4da2abbc3d6190dfce1c75cabf2
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
+    "sourceUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-48",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
+    "sourceUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-48",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-48 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "6cd92acba46a3c7426f42a13e11e56a76332f8eec064c096fc0b761fef543213",
+    "identityFingerprint": "6cd92acba46a3c7426f42a13e11e56a76332f8eec064c096fc0b761fef543213",
+    "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
+    "sourceAnchor": "unheaded-block-30",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-30",
+      "githubAnchor": "unheaded-block-30",
+      "stableAnchor": "unheaded-block-30",
+      "title": "Unheaded block 30",
+      "startLine": 204,
+      "endLine": 207,
+      "textDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+      "sample": "Cũng nằm ngoài: daemon (chưa xây), tách core verb-logic thành lib độc lập\nCLI (prerequisite của kiến trúc daemon tương lai, refactor thuần không đổi\nhành vi), và khối `fgos-discove",
+      "identityFingerprint": "6cd92acba46a3c7426f42a13e11e56a76332f8eec064c096fc0b761fef543213",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Ranh giới — điều gì KHÔNG thuộc hợp đồng này"
+      ],
+      "text": "Cũng nằm ngoài: daemon (chưa xây), tách core verb-logic thành lib độc lập\nCLI (prerequisite của kiến trúc daemon tương lai, refactor thuần không đổi\nhành vi), và khối `fgos-discovered` (giao thức worker→runner, không phải\ncửa ra tới người)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-48",
+    "githubAnchor": "unheaded-block-48",
+    "stableAnchor": "unheaded-block-48",
+    "title": "Unheaded block 48",
+    "startLine": 428,
+    "endLine": 431,
+    "textDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+    "sample": "Cũng nằm ngoài: daemon (chưa xây), tách core verb-logic thành lib độc lập\nCLI (prerequisite của kiến trúc daemon tương lai, refactor thuần không đổi\nhành vi), và khối `fgos-discove",
+    "identityFingerprint": "6cd92acba46a3c7426f42a13e11e56a76332f8eec064c096fc0b761fef543213",
+    "ancestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ],
+    "text": "Cũng nằm ngoài: daemon (chưa xây), tách core verb-logic thành lib độc lập\nCLI (prerequisite của kiến trúc daemon tương lai, refactor thuần không đổi\nhành vi), và khối `fgos-discovered` (giao thức worker→runner, không phải\ncửa ra tới người)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-48",
+      "githubAnchor": "unheaded-block-48",
+      "stableAnchor": "unheaded-block-48",
+      "title": "Unheaded block 48",
+      "startLine": 428,
+      "endLine": 431,
+      "textDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+      "sample": "Cũng nằm ngoài: daemon (chưa xây), tách core verb-logic thành lib độc lập\nCLI (prerequisite của kiến trúc daemon tương lai, refactor thuần không đổi\nhành vi), và khối `fgos-discove",
+      "identityFingerprint": "6cd92acba46a3c7426f42a13e11e56a76332f8eec064c096fc0b761fef543213",
+      "ancestry": [
+        "CLI I/O Contract",
+        "11. Scope Boundary"
+      ],
+      "text": "Cũng nằm ngoài: daemon (chưa xây), tách core verb-logic thành lib độc lập\nCLI (prerequisite của kiến trúc daemon tương lai, refactor thuần không đổi\nhành vi), và khối `fgos-discovered` (giao thức worker→runner, không phải\ncửa ra tới người)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2"
+}
+```
+
+## Entry claim_d802aabd387ae98595c102f0e857f9b1
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
+    "sourceUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-49",
+    "claimKind": "navigation",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "12. References"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
+    "sourceUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-49",
+    "claimKind": "navigation",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-49 ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "12. References"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/io-contract.md",
+    "unitDigest": "a7e6134a0d237d4c3430f1d677f25907055cfb0e76bdc47225a0c1da5843c4ff",
+    "identityFingerprint": "a7e6134a0d237d4c3430f1d677f25907055cfb0e76bdc47225a0c1da5843c4ff",
+    "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
+    "sourceAnchor": "unheaded-block-31",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-31",
+      "githubAnchor": "unheaded-block-31",
+      "stableAnchor": "unheaded-block-31",
+      "title": "Unheaded block 31",
+      "startLine": 211,
+      "endLine": 217,
+      "textDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+      "sample": "`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (kiến trúc cửa) ·\n`docs/decisions/0011-version-tuong-minh-cho-moi-contract.md` (version) ·\n`docs/specs/work-state.md` §envel",
+      "identityFingerprint": "a7e6134a0d237d4c3430f1d677f25907055cfb0e76bdc47225a0c1da5843c4ff",
+      "ancestry": [
+        "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
+        "Tham chiếu"
+      ],
+      "text": "`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (kiến trúc cửa) ·\n`docs/decisions/0011-version-tuong-minh-cho-moi-contract.md` (version) ·\n`docs/specs/work-state.md` §envelope, §Sổ verb máy-đọc, §Danh tính người\nghi (chi tiết trường/hành vi) · `docs/specs/runner.md` RUL61 (envelope\nstdout runner) · `docs/architecture-map.md` CTR001/CTR003/CTR004 (sổ đăng\nký contract) · `docs/history/str46-io-contract/` (CONTEXT.md 37 quyết định\nkhoá, plan.md bốn lát)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-49",
+    "githubAnchor": "unheaded-block-49",
+    "stableAnchor": "unheaded-block-49",
+    "title": "Unheaded block 49",
+    "startLine": 435,
+    "endLine": 441,
+    "textDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+    "sample": "`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (kiến trúc cửa) ·\n`docs/decisions/0011-version-tuong-minh-cho-moi-contract.md` (version) ·\n`docs/specs/work-state.md` §envel",
+    "identityFingerprint": "a7e6134a0d237d4c3430f1d677f25907055cfb0e76bdc47225a0c1da5843c4ff",
+    "ancestry": [
+      "CLI I/O Contract",
+      "12. References"
+    ],
+    "text": "`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (kiến trúc cửa) ·\n`docs/decisions/0011-version-tuong-minh-cho-moi-contract.md` (version) ·\n`docs/specs/work-state.md` §envelope, §Sổ verb máy-đọc, §Danh tính người\nghi (chi tiết trường/hành vi) · `docs/specs/runner.md` RUL61 (envelope\nstdout runner) · `docs/architecture-map.md` CTR001/CTR003/CTR004 (sổ đăng\nký contract) · `docs/history/str46-io-contract/` (CONTEXT.md 37 quyết định\nkhoá, plan.md bốn lát)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-49",
+      "githubAnchor": "unheaded-block-49",
+      "stableAnchor": "unheaded-block-49",
+      "title": "Unheaded block 49",
+      "startLine": 435,
+      "endLine": 441,
+      "textDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+      "sample": "`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (kiến trúc cửa) ·\n`docs/decisions/0011-version-tuong-minh-cho-moi-contract.md` (version) ·\n`docs/specs/work-state.md` §envel",
+      "identityFingerprint": "a7e6134a0d237d4c3430f1d677f25907055cfb0e76bdc47225a0c1da5843c4ff",
+      "ancestry": [
+        "CLI I/O Contract",
+        "12. References"
+      ],
+      "text": "`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (kiến trúc cửa) ·\n`docs/decisions/0011-version-tuong-minh-cho-moi-contract.md` (version) ·\n`docs/specs/work-state.md` §envelope, §Sổ verb máy-đọc, §Danh tính người\nghi (chi tiết trường/hành vi) · `docs/specs/runner.md` RUL61 (envelope\nstdout runner) · `docs/architecture-map.md` CTR001/CTR003/CTR004 (sổ đăng\nký contract) · `docs/history/str46-io-contract/` (CONTEXT.md 37 quyết định\nkhoá, plan.md bốn lát)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_d802aabd387ae98595c102f0e857f9b1"
+}
+```
+
+## Entry claim_0a800ae3d8a50ecdf22bf6c4604167d5
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_0a800ae3d8a50ecdf22bf6c4604167d5",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_0a800ae3d8a50ecdf22bf6c4604167d5",
+    "sourceUnitDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#always-do as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_0a800ae3d8a50ecdf22bf6c4604167d5",
+    "sourceUnitDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#always-do as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#always-do source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "e7fc714a9a73a84cbd1d93c998bc3f55888c9b537891eb0b0caf9771fb8cde98",
+    "identityFingerprint": "c869c48c9abaf53e8f0d5566184b23c92991743b2b6726980b3111dafc540cd4",
+    "claimId": "claim_0a800ae3d8a50ecdf22bf6c4604167d5",
+    "sourceAnchor": "always-do",
+    "unitKind": "heading",
+    "sourceUnitDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Always Do",
+      "anchor": "always-do",
+      "githubAnchor": "always-do",
+      "stableAnchor": "h-7851705f0b6d",
+      "startLine": 219,
+      "endLine": 219,
+      "textDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+      "sample": "Always Do",
+      "sectionPayloadDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+      "followingBlockDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+      "identityFingerprint": "c869c48c9abaf53e8f0d5566184b23c92991743b2b6726980b3111dafc540cd4",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## Always Do",
+      "sectionText": "## Always Do\n\n- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: \"symbolName\", direction: \"upstream\"})` and report the blast radius (direct callers, affected processes, risk level) to the user.\n- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: \"compare\", base_ref: \"main\"})`.\n- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.\n- When exploring unfamiliar code, use `query({search_query: \"concept\"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.\n- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: \"symbolName\"})`.\n- For security review, `explain({target: \"fileOrSymbol\"})` lists taint findings (source→sink flows; needs `analyze --pdg`)."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_0a800ae3d8a50ecdf22bf6c4604167d5"
+}
+```
+
+## Entry claim_fa3bda92497320da1952eb67f4d954ef
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_fa3bda92497320da1952eb67f4d954ef",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_fa3bda92497320da1952eb67f4d954ef",
+    "sourceUnitDigest": "8e8826de669f94e45cffc5920f71ccb772d818f5b1651501ca305f53124acf35",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#before-touching-code as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_fa3bda92497320da1952eb67f4d954ef",
+    "sourceUnitDigest": "8e8826de669f94e45cffc5920f71ccb772d818f5b1651501ca305f53124acf35",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#before-touching-code as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#before-touching-code source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "9de1b1241ef403eadd82f74614ceb84b29fa92d787cd492004fdc7b6968d3dac",
+    "identityFingerprint": "b1291c96e28472dec7f8f53799be8bffe8985cf97b31f1079e39c740fb991242",
+    "claimId": "claim_fa3bda92497320da1952eb67f4d954ef",
+    "sourceAnchor": "before-touching-code",
+    "unitKind": "heading",
+    "sourceUnitDigest": "8e8826de669f94e45cffc5920f71ccb772d818f5b1651501ca305f53124acf35",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Before touching code",
+      "anchor": "before-touching-code",
+      "githubAnchor": "before-touching-code",
+      "stableAnchor": "h-b06af558e03c",
+      "startLine": 37,
+      "endLine": 37,
+      "textDigest": "8e8826de669f94e45cffc5920f71ccb772d818f5b1651501ca305f53124acf35",
+      "sample": "Before touching code",
+      "sectionPayloadDigest": "5156b1a159ea85fd1d9648644bd16f20345fa3a0645bf21e781010edd54a0dea",
+      "followingBlockDigest": "4c9c8cc9ca45762d287d773c9625e674f5eed86e549fceb7f42325667a575d80",
+      "identityFingerprint": "b1291c96e28472dec7f8f53799be8bffe8985cf97b31f1079e39c740fb991242",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Before touching code",
+      "sectionText": "## Before touching code\n\nRead `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever\nyou're about to change. Specs are the state layer — BA-grade, tech-agnostic — read\nthe spec before the code.\n\n**Prior art before design.** Before designing a mechanism, find out what already existed\nand why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term,\nalso under the executor ids and names the thing had before the renames (ids were renamed and\ndormant ones deleted), and read the area spec's \"Lịch sử quyết định\" and settled-facts\nsections. A plan's facts phase answers \"what existed before, and which change removed it,\nand was that intended?\" next to its questions about current code. Reuse or extend what is\nfound; say in the plan what was reused and what was missing.\n**Convention paths.** For report, plan, and journal names and locations—including paths placed in briefs for other agents—use `fgos convention name|path --json`, never construct them; parallel agents MUST choose distinct slugs, and pre-commit `convention check` warnings do not block commits."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_fa3bda92497320da1952eb67f4d954ef"
+}
+```
+
+## Entry claim_00ee16658d1baf1ac05b8e371408fd01
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_00ee16658d1baf1ac05b8e371408fd01",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_00ee16658d1baf1ac05b8e371408fd01",
+    "sourceUnitDigest": "52fb0a5c25e6db85488c58b5926c5346395ba8cfdeb8a8bc42d14336424b38dd",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#changing-a-locked-law as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_00ee16658d1baf1ac05b8e371408fd01",
+    "sourceUnitDigest": "52fb0a5c25e6db85488c58b5926c5346395ba8cfdeb8a8bc42d14336424b38dd",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#changing-a-locked-law as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: AGENTS.md#changing-a-locked-law source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design; unit text read (## Changing a locked law) and unchanged since base, retain-outside-platform fits an always-loaded instruction",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "93017f7499889ed3adbc83ef2718abca2283dfa02243c88e8cf8e9d0bdce2c17",
+    "identityFingerprint": "a3c1ea9b5b6b0a3e4323e71b6d24f6f6b6e8bdb0c40503ef33f1692ffb268add",
+    "claimId": "claim_00ee16658d1baf1ac05b8e371408fd01",
+    "sourceAnchor": "changing-a-locked-law",
+    "unitKind": "heading",
+    "sourceUnitDigest": "52fb0a5c25e6db85488c58b5926c5346395ba8cfdeb8a8bc42d14336424b38dd",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Changing a locked law",
+      "anchor": "changing-a-locked-law",
+      "githubAnchor": "changing-a-locked-law",
+      "stableAnchor": "h-055a54753f87",
+      "startLine": 133,
+      "endLine": 133,
+      "textDigest": "52fb0a5c25e6db85488c58b5926c5346395ba8cfdeb8a8bc42d14336424b38dd",
+      "sample": "Changing a locked law",
+      "sectionPayloadDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+      "followingBlockDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+      "identityFingerprint": "a3c1ea9b5b6b0a3e4323e71b6d24f6f6b6e8bdb0c40503ef33f1692ffb268add",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Changing a locked law",
+      "sectionText": "## Changing a locked law\n\nLaws in `docs/platform-foundations.md` are fixed until their named review\nthreshold is hit. Changing one supersedes its decision ID — never edit it in place."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_00ee16658d1baf1ac05b8e371408fd01"
+}
+```
+
+## Entry claim_7b36640f7d6ced0d3f089a419f5d26ff
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_7b36640f7d6ced0d3f089a419f5d26ff",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_7b36640f7d6ced0d3f089a419f5d26ff",
+    "sourceUnitDigest": "ed59f3cfa95f9a1572033e2cafba1fc7e0a12ae65bec9ca0e8740ca99ff2261e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#cli as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_7b36640f7d6ced0d3f089a419f5d26ff",
+    "sourceUnitDigest": "ed59f3cfa95f9a1572033e2cafba1fc7e0a12ae65bec9ca0e8740ca99ff2261e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#cli as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#cli source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f4d3636f9a037f355fde489879d19dd6cfa50b39b98d44e4d741fc04b2cc8e21",
+    "identityFingerprint": "0faf8e782d75a0c1cbc8c3aedfd14a39cb946e0444b318605efd05d7c1ea2fc3",
+    "claimId": "claim_7b36640f7d6ced0d3f089a419f5d26ff",
+    "sourceAnchor": "cli",
+    "unitKind": "heading",
+    "sourceUnitDigest": "ed59f3cfa95f9a1572033e2cafba1fc7e0a12ae65bec9ca0e8740ca99ff2261e",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "CLI",
+      "anchor": "cli",
+      "githubAnchor": "cli",
+      "stableAnchor": "h-4fc3d3c7fcef",
+      "startLine": 244,
+      "endLine": 244,
+      "textDigest": "ed59f3cfa95f9a1572033e2cafba1fc7e0a12ae65bec9ca0e8740ca99ff2261e",
+      "sample": "CLI",
+      "sectionPayloadDigest": "e2fffb19db664dbd8503e4c376974a3ffeb814760f3d7680221b615ec1e02003",
+      "followingBlockDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+      "identityFingerprint": "0faf8e782d75a0c1cbc8c3aedfd14a39cb946e0444b318605efd05d7c1ea2fc3",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## CLI",
+      "sectionText": "## CLI\n\n| Task | Read this skill file |\n|------|---------------------|\n| Understand architecture / \"How does X work?\" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |\n| Blast radius / \"What breaks if I change X?\" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |\n| Trace bugs / \"Why is X failing?\" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |\n| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |\n| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |\n| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |\n\n<!-- gitnexus:end -->\n\n<!-- fgos:instruction-projection:start -->\n<!-- generated by fgos instruction projection; edit canonical instruction sources, not this block -->\n<!-- effective-set: .fgos/instructions/effective/repo.json; key=repo; host=* -->"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_7b36640f7d6ced0d3f089a419f5d26ff"
+}
+```
+
+## Entry claim_a700bf68bba6456dc5d22693e0a42ff4
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_a700bf68bba6456dc5d22693e0a42ff4",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_a700bf68bba6456dc5d22693e0a42ff4",
+    "sourceUnitDigest": "e1f3e3fd66dbac0da5125fc9c981101e44757f5b285e6fe0d6b083c9a28cdb42",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#decision-question-template as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_a700bf68bba6456dc5d22693e0a42ff4",
+    "sourceUnitDigest": "e1f3e3fd66dbac0da5125fc9c981101e44757f5b285e6fe0d6b083c9a28cdb42",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#decision-question-template as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#decision-question-template source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "cd15c048c6a853f2c487a4f71f984c8f69b17371f0ddc86856a7bfe6c3905811",
+    "identityFingerprint": "51d1919097cdb97874b7d2d607d209fa4442b27bc286cbd35a0d9caff5eb9645",
+    "claimId": "claim_a700bf68bba6456dc5d22693e0a42ff4",
+    "sourceAnchor": "decision-question-template",
+    "unitKind": "heading",
+    "sourceUnitDigest": "e1f3e3fd66dbac0da5125fc9c981101e44757f5b285e6fe0d6b083c9a28cdb42",
+    "claimKind": "decision",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Decision Question Template",
+      "anchor": "decision-question-template",
+      "githubAnchor": "decision-question-template",
+      "stableAnchor": "h-8e3193aaa4eb",
+      "startLine": 265,
+      "endLine": 265,
+      "textDigest": "e1f3e3fd66dbac0da5125fc9c981101e44757f5b285e6fe0d6b083c9a28cdb42",
+      "sample": "Decision Question Template",
+      "sectionPayloadDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+      "followingBlockDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+      "identityFingerprint": "51d1919097cdb97874b7d2d607d209fa4442b27bc286cbd35a0d9caff5eb9645",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "fgOS Effective Instructions",
+        "law"
+      ],
+      "text": "#### Decision Question Template",
+      "sectionText": "#### Decision Question Template\n\n- id: `decision-question-template`\n- source: `core/instructions/decision-question.md`"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_a700bf68bba6456dc5d22693e0a42ff4"
+}
+```
+
+## Entry claim_e922726b8953ed0cc00db6c4cdad3b48
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_e922726b8953ed0cc00db6c4cdad3b48",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_e922726b8953ed0cc00db6c4cdad3b48",
+    "sourceUnitDigest": "0083e74994df923befc95fcd51a367519f38136583b1b5af81b103a14f77ad0c",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#decision-question-template-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_e922726b8953ed0cc00db6c4cdad3b48",
+    "sourceUnitDigest": "0083e74994df923befc95fcd51a367519f38136583b1b5af81b103a14f77ad0c",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#decision-question-template-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#decision-question-template-1 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "d15b9adab02129db231b0c66a0ab64e06e6456c28f08620647e22732f1da0b6e",
+    "identityFingerprint": "c5d92e9611e773253acb3248d087caa5abab3806f1638839c62e3c85cb49d69d",
+    "claimId": "claim_e922726b8953ed0cc00db6c4cdad3b48",
+    "sourceAnchor": "decision-question-template-1",
+    "unitKind": "heading",
+    "sourceUnitDigest": "0083e74994df923befc95fcd51a367519f38136583b1b5af81b103a14f77ad0c",
+    "claimKind": "decision",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 1,
+      "title": "Decision Question Template",
+      "anchor": "decision-question-template-1",
+      "githubAnchor": "decision-question-template-1",
+      "stableAnchor": "h-731347805dd9",
+      "startLine": 270,
+      "endLine": 270,
+      "textDigest": "0083e74994df923befc95fcd51a367519f38136583b1b5af81b103a14f77ad0c",
+      "sample": "Decision Question Template",
+      "sectionPayloadDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+      "followingBlockDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+      "identityFingerprint": "c5d92e9611e773253acb3248d087caa5abab3806f1638839c62e3c85cb49d69d",
+      "ancestry": [],
+      "text": "# Decision Question Template",
+      "sectionText": "# Decision Question Template\n\nEvery question asking the owner to choose a direction carries five parts: what is happening, cause, options with cost, recommendation, and scope of the answer. Full template: `core/skills/_shared/decision-question.md`. Inside the approved frame (scope + budget set at approval) decide and report; about to leave it, stop and ask in this template."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_e922726b8953ed0cc00db6c4cdad3b48"
+}
+```
+
+## Entry claim_22c44c85aa5a35949e59c1fa1a36bd1a
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_22c44c85aa5a35949e59c1fa1a36bd1a",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_22c44c85aa5a35949e59c1fa1a36bd1a",
+    "sourceUnitDigest": "660e492187a6eb5ca8607cfa85b81c83daaaa7ac5d7fd2c5e553f20d3db084f6",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#definition-of-done-platform-foundations-l5 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_22c44c85aa5a35949e59c1fa1a36bd1a",
+    "sourceUnitDigest": "660e492187a6eb5ca8607cfa85b81c83daaaa7ac5d7fd2c5e553f20d3db084f6",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#definition-of-done-platform-foundations-l5 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#definition-of-done-platform-foundations-l5 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "30f6e72edbe2a3bfe7a18e984297bfd4e32ae43afcdd28a014fae6fcd6f4edf7",
+    "identityFingerprint": "0756c7cf80fcc132917ea5a31778087b175b99d1710bf3ac2762db8ebf8a3bd0",
+    "claimId": "claim_22c44c85aa5a35949e59c1fa1a36bd1a",
+    "sourceAnchor": "definition-of-done-platform-foundations-l5",
+    "unitKind": "heading",
+    "sourceUnitDigest": "660e492187a6eb5ca8607cfa85b81c83daaaa7ac5d7fd2c5e553f20d3db084f6",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Definition of done (platform-foundations L5)",
+      "anchor": "definition-of-done-platform-foundations-l5",
+      "githubAnchor": "definition-of-done-platform-foundations-l5",
+      "stableAnchor": "h-907e08faa8b0",
+      "startLine": 52,
+      "endLine": 52,
+      "textDigest": "660e492187a6eb5ca8607cfa85b81c83daaaa7ac5d7fd2c5e553f20d3db084f6",
+      "sample": "Definition of done (platform-foundations L5)",
+      "sectionPayloadDigest": "e1ea0ee8f64de13392ecb2737536248aee607ad1487f98b780891a6dcdf49108",
+      "followingBlockDigest": "0ac33ce3b212c69bd641ab67172cc109ba70735d9242bbee1b913ae1ff922aa1",
+      "identityFingerprint": "0756c7cf80fcc132917ea5a31778087b175b99d1710bf3ac2762db8ebf8a3bd0",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Definition of done (platform-foundations L5)",
+      "sectionText": "## Definition of done (platform-foundations L5)\n\nA stranger agent with no chat history should be able to answer, for any change:\n\n1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n2. **What kind of work is this?** Check it against the area's spec and\n   `docs/backlog.md`; a new product area gets a spec before it gets code.\n3. **What contract does it touch?** `docs/routing-handoff-contract.md` for\n   agent-to-agent boundaries; the area spec's Shared Entities table for\n   in-process contracts.\n4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,\n   or existing covered behavior in the test suite? Either raises the bar.\n5. **What proof means done?** `npm test` (state + cli + runner + e2e suite) green;\n   new or changed behavior gets a matching test. Green must come from real\n   behavior: never add an env switch, flag, or test-only code branch that skips\n   checks to make tests pass; fix production code or the fixture instead.\n6. **What learning gets left behind?** A settled decision goes into\n   `docs/decisions/`; a settled spec fact goes into the relevant\n   `docs/specs/<area>.md`."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_22c44c85aa5a35949e59c1fa1a36bd1a"
+}
+```
+
+## Entry claim_67eb8d55ba3230adf56b929b3b549cdc
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_67eb8d55ba3230adf56b929b3b549cdc",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_67eb8d55ba3230adf56b929b3b549cdc",
+    "sourceUnitDigest": "3bbd7ce498a66733e262dc20e3185319b3c9ca346d5bf4c114d2ea7b37e3fe75",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#dispatch-routing-work-to-an-executor as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_67eb8d55ba3230adf56b929b3b549cdc",
+    "sourceUnitDigest": "3bbd7ce498a66733e262dc20e3185319b3c9ca346d5bf4c114d2ea7b37e3fe75",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#dispatch-routing-work-to-an-executor as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#dispatch-routing-work-to-an-executor source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "be96cf98081517744945cfc57aff8119c2ad286b234a2fc393c05d71af2fc1f7",
+    "identityFingerprint": "d3617ecd8feadb081e5491d54fea96b1715ad1fd6848478f5a4eb0133268999a",
+    "claimId": "claim_67eb8d55ba3230adf56b929b3b549cdc",
+    "sourceAnchor": "dispatch-routing-work-to-an-executor",
+    "unitKind": "heading",
+    "sourceUnitDigest": "3bbd7ce498a66733e262dc20e3185319b3c9ca346d5bf4c114d2ea7b37e3fe75",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Dispatch — routing work to an executor",
+      "anchor": "dispatch-routing-work-to-an-executor",
+      "githubAnchor": "dispatch-routing-work-to-an-executor",
+      "stableAnchor": "h-75c460f74b21",
+      "startLine": 150,
+      "endLine": 150,
+      "textDigest": "3bbd7ce498a66733e262dc20e3185319b3c9ca346d5bf4c114d2ea7b37e3fe75",
+      "sample": "Dispatch — routing work to an executor",
+      "sectionPayloadDigest": "28dccb7256cea333d921a8a0fe4b25e76a04b9acfceeec65f5be825af8b6face",
+      "followingBlockDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+      "identityFingerprint": "d3617ecd8feadb081e5491d54fea96b1715ad1fd6848478f5a4eb0133268999a",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Dispatch — routing work to an executor",
+      "sectionText": "## Dispatch — routing work to an executor\n\n`fgos run` is the primary door for executing new work in the execution core.\n\n**Two doors, one runUnit — the preferred path for new work.** One task: `fgos run \"<prompt>\" [--provider <id>] [--writes <paths> --worktree <path>]` builds a Unit from the prompt (read-only without `--writes`; `--writes` needs a linked worktree; `--provider` is a soft preference, not a pin). Planned work: `fgos workflow start <preset>|--units <file>`, one step per Unit. Both bind through `bind()`; the runner commits only the Unit's declared `writes` after a passing round, and the worker never runs `git add`/`git commit`. These two doors are the only ones that execute work; `fgos dispatch` keeps only the lower-level reads (`decide`, `inspect`, `reconcile`, `probe-account`).\n\nFor routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment.\n\n**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or compatibility alias `node src/runner/dispatch.mjs decide`; `--work` only through `fgos dispatch decide`) first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`.\n\nFour ways to call `decide`, for four different situations:\n\n- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.\n- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.\n- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name.\n\nAdd `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed.\n\nThree possible `mechanism` results, each needing a different response:\n\n- **`\"unavailable\"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.\n- **`\"in-process\"`** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.\n- **`\"out-of-process\"`** — run `fgos run \"<prompt>\" --provider <executorId> --capability <purpose> [--writes <paths> --worktree <linked-worktree>]` (or `fgos run --unit <file>`), passing the same capability `decide` was asked for (left out, it defaults to the writing capability `execute`). `--provider` takes agent executors only: when the decided executor is a `kind: \"tool\"` executor, `fgos run` refuses it, so call that tool directly instead. Never run the resolved command yourself through Bash: `fgos run` binds, runs and settles the Unit and records its provenance under `.fgos/assignments/<unitRunId>/`, so there is nothing to log by hand. With `--writes` the runner commits only those paths after a passing round; with `--json` read the result at `data.results[-1].runResult.agentClaim.summary` and `data.results[-1].commit`.\n\nEvery result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.\nA skill that dispatches should not re-derive any of this. Reference `../_shared/executor-dispatch-fallback.md` from the skill; its canonical source is `core/skills/_shared/executor-dispatch-fallback.md`. `.agents/skills/` and `plugins/fgOS/skills/` are generated render surfaces carrying source headers, rebuilt with `npm run build:skills`; never edit them by hand. For fgOS thin wrappers, `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_67eb8d55ba3230adf56b929b3b549cdc"
+}
+```
+
+## Entry claim_2e45cfdcd3f2bf602787b37feac667f3
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_2e45cfdcd3f2bf602787b37feac667f3",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_2e45cfdcd3f2bf602787b37feac667f3",
+    "sourceUnitDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#documentation-viewing-mdview as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_2e45cfdcd3f2bf602787b37feac667f3",
+    "sourceUnitDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#documentation-viewing-mdview as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#documentation-viewing-mdview source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0f88b95c0f0147c03c08add070d474d7ef4c3a939596793c8c59454d131e5012",
+    "identityFingerprint": "a85309a1368c7071897daf4e20c262bcb79dd91fbe446b59da8b88d773bbed8e",
+    "claimId": "claim_2e45cfdcd3f2bf602787b37feac667f3",
+    "sourceAnchor": "documentation-viewing-mdview",
+    "unitKind": "heading",
+    "sourceUnitDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Documentation Viewing (MDView)",
+      "anchor": "documentation-viewing-mdview",
+      "githubAnchor": "documentation-viewing-mdview",
+      "stableAnchor": "h-a0d8481e7c93",
+      "startLine": 183,
+      "endLine": 183,
+      "textDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+      "sample": "Documentation Viewing (MDView)",
+      "sectionPayloadDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+      "followingBlockDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+      "identityFingerprint": "a85309a1368c7071897daf4e20c262bcb79dd91fbe446b59da8b88d773bbed8e",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Documentation Viewing (MDView)",
+      "sectionText": "## Documentation Viewing (MDView)\n\nAfter creating or updating any markdown file, make it viewable in ONE call —\nno project registration step needed:"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_2e45cfdcd3f2bf602787b37feac667f3"
+}
+```
+
+## Entry claim_6acc93d03a89146ebf7f4903938fabd9
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_6acc93d03a89146ebf7f4903938fabd9",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_6acc93d03a89146ebf7f4903938fabd9",
+    "sourceUnitDigest": "10e4f148b6be98e0dd1bbe35554836c6d8ab0bbb981b9a8d25a38460cb6cf137",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#fgos-effective-instructions as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_6acc93d03a89146ebf7f4903938fabd9",
+    "sourceUnitDigest": "10e4f148b6be98e0dd1bbe35554836c6d8ab0bbb981b9a8d25a38460cb6cf137",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#fgos-effective-instructions as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#fgos-effective-instructions source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "bcd4ee82489105df3562bef9a377f5d3048852978098654513d14af88bd358b3",
+    "identityFingerprint": "8c746a55cb5fbbead40a732f0e05e776b3f02b56ef96e9ade1101e523c7b13e7",
+    "claimId": "claim_6acc93d03a89146ebf7f4903938fabd9",
+    "sourceAnchor": "fgos-effective-instructions",
+    "unitKind": "heading",
+    "sourceUnitDigest": "10e4f148b6be98e0dd1bbe35554836c6d8ab0bbb981b9a8d25a38460cb6cf137",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "fgOS Effective Instructions",
+      "anchor": "fgos-effective-instructions",
+      "githubAnchor": "fgos-effective-instructions",
+      "stableAnchor": "h-bea8a881dbff",
+      "startLine": 261,
+      "endLine": 261,
+      "textDigest": "10e4f148b6be98e0dd1bbe35554836c6d8ab0bbb981b9a8d25a38460cb6cf137",
+      "sample": "fgOS Effective Instructions",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "8c746a55cb5fbbead40a732f0e05e776b3f02b56ef96e9ade1101e523c7b13e7",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## fgOS Effective Instructions",
+      "sectionText": "## fgOS Effective Instructions"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_6acc93d03a89146ebf7f4903938fabd9"
+}
+```
+
+## Entry claim_9039ff2ea2cb745f4758ba64efaf4d1b
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_9039ff2ea2cb745f4758ba64efaf4d1b",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_9039ff2ea2cb745f4758ba64efaf4d1b",
+    "sourceUnitDigest": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#forgent as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_9039ff2ea2cb745f4758ba64efaf4d1b",
+    "sourceUnitDigest": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#forgent as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: AGENTS.md#forgent source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design; unit text read (# forgent) and unchanged since base, retain-outside-platform fits an always-loaded instruction",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0c34769d657f24071ee0db8625b4b1dd7e6031ee550c3262d8f11913020dbe5d",
+    "identityFingerprint": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+    "claimId": "claim_9039ff2ea2cb745f4758ba64efaf4d1b",
+    "sourceAnchor": "forgent",
+    "unitKind": "heading",
+    "sourceUnitDigest": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 1,
+      "title": "forgent",
+      "anchor": "forgent",
+      "githubAnchor": "forgent",
+      "stableAnchor": "h-289558a71b11",
+      "startLine": 1,
+      "endLine": 1,
+      "textDigest": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+      "sample": "forgent",
+      "sectionPayloadDigest": "c88ead802ce5e5513955e1c3c6ff5783c1e8bbdb5e8cfe240d436b3176556806",
+      "followingBlockDigest": "0e1c4d453af7446fe6407a536afd028a8ba765267631778c410e15f2b8c03d3a",
+      "identityFingerprint": "0c141b80ec54c16e0ee9165ede524471c64520c1b5baff0ced2438c2aa65f675",
+      "ancestry": [],
+      "text": "# forgent",
+      "sectionText": "# forgent\n\n**The Foundation for Generative Agents.**\n\nForgent (fgOS) is the platform layer for building and running agent applications — the infrastructure, skills, and automation that sit beneath every agent app, so developers can forge new agents instead of building everything from scratch.\n\n- README.md — product description + documentation index\n- docs/platform-foundations.md — L1-L8 locked design laws; L5 is this repo's definition of done (six questions, below)\n- docs/specs/system-overview.md — area map, shared entities, cross-area flows\n- docs/specs/reading-map.md — where every doc and source path in this repo lives\n- docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)\n- docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary\n- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own \"Lịch sử quyết định\" sections (tsk-1lv-4)\n- domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_9039ff2ea2cb745f4758ba64efaf4d1b"
+}
+```
+
+## Entry claim_fd05edc9de6352f95be164482329687d
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_fd05edc9de6352f95be164482329687d",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_fd05edc9de6352f95be164482329687d",
+    "sourceUnitDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#gitnexus-code-intelligence as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_fd05edc9de6352f95be164482329687d",
+    "sourceUnitDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#gitnexus-code-intelligence as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#gitnexus-code-intelligence source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "7e21885df02fa86d9033eceab65bd533c10a1d3f2050558e15d06ff344688416",
+    "identityFingerprint": "90f2c0bea757e4b6d760c9285e2e357ff406f5b7e86be8712c375ef5f13385ed",
+    "claimId": "claim_fd05edc9de6352f95be164482329687d",
+    "sourceAnchor": "gitnexus-code-intelligence",
+    "unitKind": "heading",
+    "sourceUnitDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 1,
+      "title": "GitNexus — Code Intelligence",
+      "anchor": "gitnexus-code-intelligence",
+      "githubAnchor": "gitnexus-code-intelligence",
+      "stableAnchor": "h-e383fa84e852",
+      "startLine": 213,
+      "endLine": 213,
+      "textDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+      "sample": "GitNexus — Code Intelligence",
+      "sectionPayloadDigest": "1eda83dbf1720e219c9f3e3f46b9c2f3450fbfe82710ae49935a0d7a105d8db9",
+      "followingBlockDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+      "identityFingerprint": "90f2c0bea757e4b6d760c9285e2e357ff406f5b7e86be8712c375ef5f13385ed",
+      "ancestry": [],
+      "text": "# GitNexus — Code Intelligence",
+      "sectionText": "# GitNexus — Code Intelligence\n\nThis project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.\n\n> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939)."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_fd05edc9de6352f95be164482329687d"
+}
+```
+
+## Entry claim_ac6849769045271a57023dd684980fe6
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_ac6849769045271a57023dd684980fe6",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_ac6849769045271a57023dd684980fe6",
+    "sourceUnitDigest": "4739566357f3acd72b7f74ebe9d971eb577b915a0927fca5c39c2cae5cfe5c65",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#installsetupdoctor-gate as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_ac6849769045271a57023dd684980fe6",
+    "sourceUnitDigest": "4739566357f3acd72b7f74ebe9d971eb577b915a0927fca5c39c2cae5cfe5c65",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#installsetupdoctor-gate as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#installsetupdoctor-gate source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "1fc7aa45e22dc10c2dbc4fcd5a2230c58bb86de5870af58e58151a499f9f8643",
+    "identityFingerprint": "63d04279fd2a1fc54070dcb38bdd5267b829ff597a2fe745710d7f94768fba4e",
+    "claimId": "claim_ac6849769045271a57023dd684980fe6",
+    "sourceAnchor": "installsetupdoctor-gate",
+    "unitKind": "heading",
+    "sourceUnitDigest": "4739566357f3acd72b7f74ebe9d971eb577b915a0927fca5c39c2cae5cfe5c65",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Install/setup/doctor gate",
+      "anchor": "installsetupdoctor-gate",
+      "githubAnchor": "installsetupdoctor-gate",
+      "stableAnchor": "h-dc63102c2570",
+      "startLine": 113,
+      "endLine": 113,
+      "textDigest": "4739566357f3acd72b7f74ebe9d971eb577b915a0927fca5c39c2cae5cfe5c65",
+      "sample": "Install/setup/doctor gate",
+      "sectionPayloadDigest": "136a17be664535a0899cf7112c5981d1786393916d863ca3f783899ad5aaf2eb",
+      "followingBlockDigest": "3f149be4bf754b1ad1a12eb8d3e7a24a1db97ca4aa3cf15fd7cf3bae732b7f3f",
+      "identityFingerprint": "63d04279fd2a1fc54070dcb38bdd5267b829ff597a2fe745710d7f94768fba4e",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Install/setup/doctor gate",
+      "sectionText": "## Install/setup/doctor gate\n\n`docs/distribution-vision.md` sets the direction for this repo's own\ncài đặt/setup/doctor story. Before any change is done, ask:\n\n- Does this add a config default, env var, or infra dependency (a new\n  file it expects to exist, a tool it shells out to, a directory it\n  assumes is writable)? If yes, it must register into `fgos setup`'s\n  config-merge and `fgos doctor`'s check registry (`src/setup/checks.mjs`)\n  — not stand alone, undiscoverable by `doctor`.\n- Never hardcode an assumption about which install level (global vs\n  project) is active — per the vision doc, project config always\n  overwrites global, and fgOS stays aware of both without conflict.\n- If the change touches how fgOS gets installed, upgraded, or diagnosed at\n  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`\n  first — a new module gets a spec/config-registry entry before it gets\n  code, same bar as a new product area (question 2 above).\n- Does this change something a user of fgOS would see? If yes, add a line\n  to `## [Unreleased]` in `CHANGELOG.md`."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_ac6849769045271a57023dd684980fe6"
+}
+```
+
+## Entry claim_9474ae42b4d6e079fcf33fec49e746fa
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_9474ae42b4d6e079fcf33fec49e746fa",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_9474ae42b4d6e079fcf33fec49e746fa",
+    "sourceUnitDigest": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#law as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_9474ae42b4d6e079fcf33fec49e746fa",
+    "sourceUnitDigest": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#law as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: AGENTS.md#law source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design; unit text read (### law) and unchanged since base, retain-outside-platform fits an always-loaded instruction",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "de1df04a038983af8c2904d37bd118fe0cf79e183304076cc9136fe07b464757",
+    "identityFingerprint": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+    "claimId": "claim_9474ae42b4d6e079fcf33fec49e746fa",
+    "sourceAnchor": "law",
+    "unitKind": "heading",
+    "sourceUnitDigest": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "law",
+      "anchor": "law",
+      "githubAnchor": "law",
+      "stableAnchor": "h-88306b6a336c",
+      "startLine": 263,
+      "endLine": 263,
+      "textDigest": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+      "sample": "law",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "28440004ae9b19f77cd7e12234d43d8f163fcfe5868fb96b470f55d196de8861",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "fgOS Effective Instructions"
+      ],
+      "text": "### law",
+      "sectionText": "### law"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_9474ae42b4d6e079fcf33fec49e746fa"
+}
+```
+
+## Entry claim_133b6f931d35a06604813e97ac11bd8f
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_133b6f931d35a06604813e97ac11bd8f",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_133b6f931d35a06604813e97ac11bd8f",
+    "sourceUnitDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#never-do as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_133b6f931d35a06604813e97ac11bd8f",
+    "sourceUnitDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#never-do as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#never-do source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "e873cf37f739248eee0224ea543d02a9977ac6de94f24baae620e4996419e733",
+    "identityFingerprint": "8af2b2f9f6ea42011e3c43d9d4e6c9dea0fbdb647c5d036f260eab9912d97535",
+    "claimId": "claim_133b6f931d35a06604813e97ac11bd8f",
+    "sourceAnchor": "never-do",
+    "unitKind": "heading",
+    "sourceUnitDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Never Do",
+      "anchor": "never-do",
+      "githubAnchor": "never-do",
+      "stableAnchor": "h-4ebfd4d2d745",
+      "startLine": 228,
+      "endLine": 228,
+      "textDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+      "sample": "Never Do",
+      "sectionPayloadDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+      "followingBlockDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+      "identityFingerprint": "8af2b2f9f6ea42011e3c43d9d4e6c9dea0fbdb647c5d036f260eab9912d97535",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## Never Do",
+      "sectionText": "## Never Do\n\n- NEVER edit a function, class, or method without first running `impact` on it.\n- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.\n- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.\n- NEVER commit changes without running `detect_changes()` to check affected scope."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_133b6f931d35a06604813e97ac11bd8f"
+}
+```
+
+## Entry claim_fde89656fbadabacb69e8f793b223377
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_fde89656fbadabacb69e8f793b223377",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_fde89656fbadabacb69e8f793b223377",
+    "sourceUnitDigest": "dc48182c384ef81504a14678e50d3c47a3358a2170c301b4cff15a0de7f7725a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#platform-operating-laws as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_fde89656fbadabacb69e8f793b223377",
+    "sourceUnitDigest": "dc48182c384ef81504a14678e50d3c47a3358a2170c301b4cff15a0de7f7725a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#platform-operating-laws as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#platform-operating-laws source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0354536faa4153dc95db6df263f73275e4a25d99efe037da70354410e7f4c970",
+    "identityFingerprint": "32b040fb71f2f208f769259bca815d0bf06cda230b31e065b765cf776c7bac21",
+    "claimId": "claim_fde89656fbadabacb69e8f793b223377",
+    "sourceAnchor": "platform-operating-laws",
+    "unitKind": "heading",
+    "sourceUnitDigest": "dc48182c384ef81504a14678e50d3c47a3358a2170c301b4cff15a0de7f7725a",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Platform Operating Laws",
+      "anchor": "platform-operating-laws",
+      "githubAnchor": "platform-operating-laws",
+      "stableAnchor": "h-ef2efa553f3f",
+      "startLine": 274,
+      "endLine": 274,
+      "textDigest": "dc48182c384ef81504a14678e50d3c47a3358a2170c301b4cff15a0de7f7725a",
+      "sample": "Platform Operating Laws",
+      "sectionPayloadDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+      "followingBlockDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+      "identityFingerprint": "32b040fb71f2f208f769259bca815d0bf06cda230b31e065b765cf776c7bac21",
+      "ancestry": [
+        "Decision Question Template"
+      ],
+      "text": "#### Platform Operating Laws",
+      "sectionText": "#### Platform Operating Laws\n\n- id: `platform-operating-laws`\n- source: `core/instructions/platform-laws.md`"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_fde89656fbadabacb69e8f793b223377"
+}
+```
+
+## Entry claim_8231e682b35899eed43b85ce92dbc6ba
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_8231e682b35899eed43b85ce92dbc6ba",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_8231e682b35899eed43b85ce92dbc6ba",
+    "sourceUnitDigest": "192d7bf6d359979a7ee22a18c66efd97acc8704687f07c222cc20bdf2cc14389",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#platform-operating-laws-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_8231e682b35899eed43b85ce92dbc6ba",
+    "sourceUnitDigest": "192d7bf6d359979a7ee22a18c66efd97acc8704687f07c222cc20bdf2cc14389",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#platform-operating-laws-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: AGENTS.md#platform-operating-laws-1 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design; unit text read (# Platform Operating Laws) and unchanged since base, retain-outside-platform fits an always-loaded instruction",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f3c82916dd872269bef1ac1d81471c525fad070e463f3c14107a957b72db4877",
+    "identityFingerprint": "9d6dcb22bd41cdf5a71ede72b70557de9da3f1342df41b8501d212e2f9070bf1",
+    "claimId": "claim_8231e682b35899eed43b85ce92dbc6ba",
+    "sourceAnchor": "platform-operating-laws-1",
+    "unitKind": "heading",
+    "sourceUnitDigest": "192d7bf6d359979a7ee22a18c66efd97acc8704687f07c222cc20bdf2cc14389",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 1,
+      "title": "Platform Operating Laws",
+      "anchor": "platform-operating-laws-1",
+      "githubAnchor": "platform-operating-laws-1",
+      "stableAnchor": "h-b5c9113b820e",
+      "startLine": 279,
+      "endLine": 279,
+      "textDigest": "192d7bf6d359979a7ee22a18c66efd97acc8704687f07c222cc20bdf2cc14389",
+      "sample": "Platform Operating Laws",
+      "sectionPayloadDigest": "af2187fac10d6b881f350198038d5aed0e8043091dead5b59a26b375f12394b5",
+      "followingBlockDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+      "identityFingerprint": "9d6dcb22bd41cdf5a71ede72b70557de9da3f1342df41b8501d212e2f9070bf1",
+      "ancestry": [],
+      "text": "# Platform Operating Laws",
+      "sectionText": "# Platform Operating Laws\n\nPlatform laws L1-L8 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:\n\n- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)\n- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)\n- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)\n- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)\n- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)\n- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)\n- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)\n- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)\n\nAuthoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place.\n\n<!-- fgos:instruction-projection:end -->"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_8231e682b35899eed43b85ce92dbc6ba"
+}
+```
+
+## Entry claim_dadecacb903167be7252b40d75033a56
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_dadecacb903167be7252b40d75033a56",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_dadecacb903167be7252b40d75033a56",
+    "sourceUnitDigest": "7a863d1c86d51e3842a3abdd6ab13b94240b726f456143e1e129be217e939bc6",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_dadecacb903167be7252b40d75033a56",
+    "sourceUnitDigest": "7a863d1c86d51e3842a3abdd6ab13b94240b726f456143e1e129be217e939bc6",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "b23e5d50ce12bca6c31aa4cb5a1623155014fa1857af46db82a691211d154f68",
+    "identityFingerprint": "e0c69764781bb2c94ed8565f9eea8f2259a9950831e630a818a3c6331e53c58c",
+    "claimId": "claim_dadecacb903167be7252b40d75033a56",
+    "sourceAnchor": "product-priority-order-d-adr0030-docsspecsrunnermd",
+    "unitKind": "heading",
+    "sourceUnitDigest": "7a863d1c86d51e3842a3abdd6ab13b94240b726f456143e1e129be217e939bc6",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Product priority order (D-ADR0030, docs/specs/runner.md)",
+      "anchor": "product-priority-order-d-adr0030-docsspecsrunnermd",
+      "githubAnchor": "product-priority-order-d-adr0030-docsspecsrunnermd",
+      "stableAnchor": "h-068daad8f921",
+      "startLine": 16,
+      "endLine": 16,
+      "textDigest": "7a863d1c86d51e3842a3abdd6ab13b94240b726f456143e1e129be217e939bc6",
+      "sample": "Product priority order (D-ADR0030, docs/specs/runner.md)",
+      "sectionPayloadDigest": "88a81016769ea1d2903cfb176c5a8b27145f6d4bdcfcc6b2a27f820814143a15",
+      "followingBlockDigest": "1647ee808cc12762f3eebd5a3caa23b1b24da3fddbd71297903d0ddb798ed718",
+      "identityFingerprint": "e0c69764781bb2c94ed8565f9eea8f2259a9950831e630a818a3c6331e53c58c",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Product priority order (D-ADR0030, docs/specs/runner.md)",
+      "sectionText": "## Product priority order (D-ADR0030, docs/specs/runner.md)\n\n1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp; mỗi câu theo mẫu câu hỏi quyết định (`core/skills/_shared/decision-question.md`). Tự quyết trong khung đã duyệt (phạm vi + ngân sách ghi lúc duyệt); sắp vượt khung thì dừng và hỏi theo mẫu. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.\n   Khi phân tích của chính agent đã chọn rõ một phương án, hãy quyết và báo cáo, không hỏi lại. Chỉ hỏi khi các phương án thật sự ngang nhau hoặc phụ thuộc vào ý định của người dùng.\n3. **DoD** — reproducibly verifiable result + evidence-linked documentation.\n4. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope.\n\nTốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn.\n\nThứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_dadecacb903167be7252b40d75033a56"
+}
+```
+
+## Entry claim_2c843f49586c14b6d70149ae591d47f9
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_2c843f49586c14b6d70149ae591d47f9",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_2c843f49586c14b6d70149ae591d47f9",
+    "sourceUnitDigest": "b0c5afec8bbc85b96206854945bcd84f6ca85f3995ba34cd7efc69907c0d5a29",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_2c843f49586c14b6d70149ae591d47f9",
+    "sourceUnitDigest": "b0c5afec8bbc85b96206854945bcd84f6ca85f3995ba34cd7efc69907c0d5a29",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "b95650b3b0b8b23330947abe9f4622c3aef7d43f9f31eb139740144b2be6ef48",
+    "identityFingerprint": "36a6e08c9c128784285c5a96c1cb67ae78e2f153f6d389f9bdbb355f86a9ebe4",
+    "claimId": "claim_2c843f49586c14b6d70149ae591d47f9",
+    "sourceAnchor": "ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd",
+    "unitKind": "heading",
+    "sourceUnitDigest": "b0c5afec8bbc85b96206854945bcd84f6ca85f3995ba34cd7efc69907c0d5a29",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)",
+      "anchor": "ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd",
+      "githubAnchor": "ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd",
+      "stableAnchor": "h-24d05552722a",
+      "startLine": 28,
+      "endLine": 28,
+      "textDigest": "b0c5afec8bbc85b96206854945bcd84f6ca85f3995ba34cd7efc69907c0d5a29",
+      "sample": "Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)",
+      "sectionPayloadDigest": "aaa7d6e4db6d375f3fa0da034424e3cdfef4b3486d7ff842f1fd9e6e11ad6f31",
+      "followingBlockDigest": "2f43e6ba7d13c017035a4295381b83e9a4d21eaf658d0c1f90f4bbf9608c137f",
+      "identityFingerprint": "36a6e08c9c128784285c5a96c1cb67ae78e2f153f6d389f9bdbb355f86a9ebe4",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)",
+      "sectionText": "## Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)\n\nfgOS tồn tại để: \n 1. phát triển các project khác \n 2. làm nền vận hành các business base workflow \n \nfgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi \"sửa fgOS\" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/specs/platform-foundations.md's \"Lịch sử quyết định\" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_2c843f49586c14b6d70149ae591d47f9"
+}
+```
+
+## Entry claim_42108ffe5c72a9f3ca2c7ef904fd14ec
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_42108ffe5c72a9f3ca2c7ef904fd14ec",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_42108ffe5c72a9f3ca2c7ef904fd14ec",
+    "sourceUnitDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#resources as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_42108ffe5c72a9f3ca2c7ef904fd14ec",
+    "sourceUnitDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#resources as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#resources source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "47c3568ddec4bc9a7f6ec4204979a30b266331dcb09c21d41582d97a07d97b47",
+    "identityFingerprint": "833eaa198037a7b8bb2619b6a371f2efa587939fd9b66541b45b5e8c14a02d93",
+    "claimId": "claim_42108ffe5c72a9f3ca2c7ef904fd14ec",
+    "sourceAnchor": "resources",
+    "unitKind": "heading",
+    "sourceUnitDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Resources",
+      "anchor": "resources",
+      "githubAnchor": "resources",
+      "stableAnchor": "h-8c6a93fa209d",
+      "startLine": 235,
+      "endLine": 235,
+      "textDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+      "sample": "Resources",
+      "sectionPayloadDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+      "followingBlockDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+      "identityFingerprint": "833eaa198037a7b8bb2619b6a371f2efa587939fd9b66541b45b5e8c14a02d93",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "## Resources",
+      "sectionText": "## Resources\n\n| Resource | Use for |\n|----------|---------|\n| `gitnexus://repo/forgent/context` | Codebase overview, check index freshness |\n| `gitnexus://repo/forgent/clusters` | All functional areas |\n| `gitnexus://repo/forgent/processes` | All execution flows |\n| `gitnexus://repo/forgent/process/{name}` | Step-by-step execution trace |"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_42108ffe5c72a9f3ca2c7ef904fd14ec"
+}
+```
+
+## Entry claim_5f15ada3e8a013ad4b1c962bd082ea68
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_5f15ada3e8a013ad4b1c962bd082ea68",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_5f15ada3e8a013ad4b1c962bd082ea68",
+    "sourceUnitDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_5f15ada3e8a013ad4b1c962bd082ea68",
+    "sourceUnitDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "9c29970d9665aa032e9021ce1ac20794d0d5531d1319052264dabd4c87686a4d",
+    "identityFingerprint": "4dbcd5d22c9272810b60cf3b65b18893f6fec1a78034dde8fd217fec2524b728",
+    "claimId": "claim_5f15ada3e8a013ad4b1c962bd082ea68",
+    "sourceAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd",
+    "unitKind": "heading",
+    "sourceUnitDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
+    "claimKind": "decision",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)",
+      "anchor": "rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd",
+      "githubAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd",
+      "stableAnchor": "h-21214f60de5c",
+      "startLine": 138,
+      "endLine": 138,
+      "textDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
+      "sample": "RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)",
+      "sectionPayloadDigest": "d5348e589de1e3d325ade1ee9ad282e22a625a581c92c6360897dd5e19b193ac",
+      "followingBlockDigest": "38f511a5d090b7f9fc9b928ea29af5d75e01bfe5c18e3287977d5a335e2a7fcf",
+      "identityFingerprint": "4dbcd5d22c9272810b60cf3b65b18893f6fec1a78034dde8fd217fec2524b728",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)",
+      "sectionText": "## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)\n\nViệc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của\ntình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum trong phạm vi\nviệc đang làm, gom lại — gom tới khi hết; quy mô không bao giờ là lý do miễn\ntrừ. Tùm lum thấy ngoài phạm vi thì ghi thành item riêng; gom mà phải xây\ncông cụ mới là một câu hỏi quyết định. Đích của mọi lần gom\nlà một hình dạng duy nhất: ranh giới rõ, contract tường minh, đổi và biến\nhình dễ, không chắp vá.\n\nkhong phai no nang ma no tum lum"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_5f15ada3e8a013ad4b1c962bd082ea68"
+}
+```
+
+## Entry claim_12e5db9cba7b51a5d83d737740f873f3
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_12e5db9cba7b51a5d83d737740f873f3",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_12e5db9cba7b51a5d83d737740f873f3",
+    "sourceUnitDigest": "960948ac07d48bbfa4a8aacadb3243d066876e5789243ea58d067719ef620c85",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#scratch-artifacts as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_12e5db9cba7b51a5d83d737740f873f3",
+    "sourceUnitDigest": "960948ac07d48bbfa4a8aacadb3243d066876e5789243ea58d067719ef620c85",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#scratch-artifacts as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#scratch-artifacts source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "447cd419cf40ea458f036ce4af2c7e37323d3e8a6579393bb74138e9a0cea917",
+    "identityFingerprint": "89686e887dfa5b4776c167cf9d391470ac239da19d2e94781308b47c4d7ff297",
+    "claimId": "claim_12e5db9cba7b51a5d83d737740f873f3",
+    "sourceAnchor": "scratch-artifacts",
+    "unitKind": "heading",
+    "sourceUnitDigest": "960948ac07d48bbfa4a8aacadb3243d066876e5789243ea58d067719ef620c85",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Scratch artifacts",
+      "anchor": "scratch-artifacts",
+      "githubAnchor": "scratch-artifacts",
+      "stableAnchor": "h-1dfd5f9c30aa",
+      "startLine": 72,
+      "endLine": 72,
+      "textDigest": "960948ac07d48bbfa4a8aacadb3243d066876e5789243ea58d067719ef620c85",
+      "sample": "Scratch artifacts",
+      "sectionPayloadDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+      "followingBlockDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+      "identityFingerprint": "89686e887dfa5b4776c167cf9d391470ac239da19d2e94781308b47c4d7ff297",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Scratch artifacts",
+      "sectionText": "## Scratch artifacts\n\nKeep draft scripts, logs, patches and dumps out of the repository root. Use\n`.fgos/runtime/tmp/`, falling back to `${TMPDIR:-/tmp}/fgos-work/`.\n`.githooks/pre-commit` owns the single root-file allowlist and refuses new root\nfiles outside it, including linked worktrees. Legitimate root additions require\nan allowlist change in a separate commit, landed on main before the addition.\nThe hook runs only when wired via `npm run setup:hooks`; `fgos doctor` checks\nthat wiring with `main-checkout-hook-wired`. `MERGE_HEAD` skips only the root\nguard, never existing data-loss guards."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_12e5db9cba7b51a5d83d737740f873f3"
+}
+```
+
+## Entry claim_9dd28187a839e2ce10f2e9dd3f020cdf
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_9dd28187a839e2ce10f2e9dd3f020cdf",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_9dd28187a839e2ce10f2e9dd3f020cdf",
+    "sourceUnitDigest": "ea437289b5b734237fdab9974e6b10855573dcba1c6a707ea7f51dc0d5c60c1e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#starting-the-fgos-gateway-one-door-never-a-raw-process as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_9dd28187a839e2ce10f2e9dd3f020cdf",
+    "sourceUnitDigest": "ea437289b5b734237fdab9974e6b10855573dcba1c6a707ea7f51dc0d5c60c1e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#starting-the-fgos-gateway-one-door-never-a-raw-process as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#starting-the-fgos-gateway-one-door-never-a-raw-process source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "25e50de9c5068dbf869d761965a07d7e23c716d006daf288c1186b30e7daf364",
+    "identityFingerprint": "cce8c70423a062205dfc24d7706bc6ad3ee008e3de1a9752d90fef8ebc9fa1c3",
+    "claimId": "claim_9dd28187a839e2ce10f2e9dd3f020cdf",
+    "sourceAnchor": "starting-the-fgos-gateway-one-door-never-a-raw-process",
+    "unitKind": "heading",
+    "sourceUnitDigest": "ea437289b5b734237fdab9974e6b10855573dcba1c6a707ea7f51dc0d5c60c1e",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Starting the fgos gateway — one door, never a raw process",
+      "anchor": "starting-the-fgos-gateway-one-door-never-a-raw-process",
+      "githubAnchor": "starting-the-fgos-gateway-one-door-never-a-raw-process",
+      "stableAnchor": "h-4a1d4cf49fd0",
+      "startLine": 178,
+      "endLine": 178,
+      "textDigest": "ea437289b5b734237fdab9974e6b10855573dcba1c6a707ea7f51dc0d5c60c1e",
+      "sample": "Starting the fgos gateway — one door, never a raw process",
+      "sectionPayloadDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+      "followingBlockDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+      "identityFingerprint": "cce8c70423a062205dfc24d7706bc6ad3ee008e3de1a9752d90fef8ebc9fa1c3",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "## Starting the fgos gateway — one door, never a raw process",
+      "sectionText": "## Starting the fgos gateway — one door, never a raw process\n\n**If a task needs the fgos gateway (REST API + web dashboard, binary `fgos-gateway` built from `apps/fgos-gateway`) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** (tsk-31v) This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `apps/fgos-gateway/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.\n\n<!-- mdview:START -->"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_9dd28187a839e2ce10f2e9dd3f020cdf"
+}
+```
+
+## Entry claim_89185e56cc8ad38646b1045d993b3eb3
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_89185e56cc8ad38646b1045d993b3eb3",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_89185e56cc8ad38646b1045d993b3eb3",
+    "sourceUnitDigest": "0e1c4d453af7446fe6407a536afd028a8ba765267631778c410e15f2b8c03d3a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_89185e56cc8ad38646b1045d993b3eb3",
+    "sourceUnitDigest": "0e1c4d453af7446fe6407a536afd028a8ba765267631778c410e15f2b8c03d3a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: AGENTS.md#unheaded-block-1 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design; unit text read (**The Foundation for Generat) and unchanged since base, retain-outside-platform fits an always-loaded instruction",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "7abfe542e18d9618e720a67ffe6328458d08df20f7468d1974f71a558535bf7d",
+    "identityFingerprint": "7abfe542e18d9618e720a67ffe6328458d08df20f7468d1974f71a558535bf7d",
+    "claimId": "claim_89185e56cc8ad38646b1045d993b3eb3",
+    "sourceAnchor": "unheaded-block-1",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0e1c4d453af7446fe6407a536afd028a8ba765267631778c410e15f2b8c03d3a",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-1",
+      "githubAnchor": "unheaded-block-1",
+      "stableAnchor": "unheaded-block-1",
+      "title": "Unheaded block 1",
+      "startLine": 3,
+      "endLine": 3,
+      "textDigest": "0e1c4d453af7446fe6407a536afd028a8ba765267631778c410e15f2b8c03d3a",
+      "sample": "**The Foundation for Generative Agents.**",
+      "identityFingerprint": "7abfe542e18d9618e720a67ffe6328458d08df20f7468d1974f71a558535bf7d",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "**The Foundation for Generative Agents.**"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_89185e56cc8ad38646b1045d993b3eb3"
+}
+```
+
+## Entry claim_ea03152273de3a7844527cc84b92cdfd
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_ea03152273de3a7844527cc84b92cdfd",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_ea03152273de3a7844527cc84b92cdfd",
+    "sourceUnitDigest": "d511b50a182ac22df8994c43e7b61c81d2826a9279fa331e4a09a65d8d233874",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-10 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_ea03152273de3a7844527cc84b92cdfd",
+    "sourceUnitDigest": "d511b50a182ac22df8994c43e7b61c81d2826a9279fa331e4a09a65d8d233874",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-10 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-10 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "2bd9f2cc8633ecc85a74f179e9b3055d331cad945ef9793df35773a2aab2cec4",
+    "identityFingerprint": "2bd9f2cc8633ecc85a74f179e9b3055d331cad945ef9793df35773a2aab2cec4",
+    "claimId": "claim_ea03152273de3a7844527cc84b92cdfd",
+    "sourceAnchor": "unheaded-block-10",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d511b50a182ac22df8994c43e7b61c81d2826a9279fa331e4a09a65d8d233874",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-10",
+      "githubAnchor": "unheaded-block-10",
+      "stableAnchor": "unheaded-block-10",
+      "title": "Unheaded block 10",
+      "startLine": 43,
+      "endLine": 50,
+      "textDigest": "d511b50a182ac22df8994c43e7b61c81d2826a9279fa331e4a09a65d8d233874",
+      "sample": "**Prior art before design.** Before designing a mechanism, find out what already existed\nand why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term",
+      "identityFingerprint": "2bd9f2cc8633ecc85a74f179e9b3055d331cad945ef9793df35773a2aab2cec4",
+      "ancestry": [
+        "forgent",
+        "Before touching code"
+      ],
+      "text": "**Prior art before design.** Before designing a mechanism, find out what already existed\nand why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term,\nalso under the executor ids and names the thing had before the renames (ids were renamed and\ndormant ones deleted), and read the area spec's \"Lịch sử quyết định\" and settled-facts\nsections. A plan's facts phase answers \"what existed before, and which change removed it,\nand was that intended?\" next to its questions about current code. Reuse or extend what is\nfound; say in the plan what was reused and what was missing.\n**Convention paths.** For report, plan, and journal names and locations—including paths placed in briefs for other agents—use `fgos convention name|path --json`, never construct them; parallel agents MUST choose distinct slugs, and pre-commit `convention check` warnings do not block commits."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_ea03152273de3a7844527cc84b92cdfd"
+}
+```
+
+## Entry claim_8ce5210314473b1e660025261f39ae5a
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_8ce5210314473b1e660025261f39ae5a",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_8ce5210314473b1e660025261f39ae5a",
+    "sourceUnitDigest": "0ac33ce3b212c69bd641ab67172cc109ba70735d9242bbee1b913ae1ff922aa1",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-11 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_8ce5210314473b1e660025261f39ae5a",
+    "sourceUnitDigest": "0ac33ce3b212c69bd641ab67172cc109ba70735d9242bbee1b913ae1ff922aa1",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-11 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-11 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "829ea882876aaf6865eee624f2f63ed8c3a3a0a55a419ba7ae9e5225f9862bc9",
+    "identityFingerprint": "829ea882876aaf6865eee624f2f63ed8c3a3a0a55a419ba7ae9e5225f9862bc9",
+    "claimId": "claim_8ce5210314473b1e660025261f39ae5a",
+    "sourceAnchor": "unheaded-block-11",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0ac33ce3b212c69bd641ab67172cc109ba70735d9242bbee1b913ae1ff922aa1",
+    "claimKind": "historical-context",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-11",
+      "githubAnchor": "unheaded-block-11",
+      "stableAnchor": "unheaded-block-11",
+      "title": "Unheaded block 11",
+      "startLine": 54,
+      "endLine": 54,
+      "textDigest": "0ac33ce3b212c69bd641ab67172cc109ba70735d9242bbee1b913ae1ff922aa1",
+      "sample": "A stranger agent with no chat history should be able to answer, for any change:",
+      "identityFingerprint": "829ea882876aaf6865eee624f2f63ed8c3a3a0a55a419ba7ae9e5225f9862bc9",
+      "ancestry": [
+        "forgent",
+        "Definition of done (platform-foundations L5)"
+      ],
+      "text": "A stranger agent with no chat history should be able to answer, for any change:"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_8ce5210314473b1e660025261f39ae5a"
+}
+```
+
+## Entry claim_d0e83fdb2650d447afd25c0f61efc4ec
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_d0e83fdb2650d447afd25c0f61efc4ec",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_d0e83fdb2650d447afd25c0f61efc4ec",
+    "sourceUnitDigest": "b390474069d64b0572bd78c4c0e0e47c2da91a5114360b4da7eb36cfea82a3b4",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-12 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_d0e83fdb2650d447afd25c0f61efc4ec",
+    "sourceUnitDigest": "b390474069d64b0572bd78c4c0e0e47c2da91a5114360b4da7eb36cfea82a3b4",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-12 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: AGENTS.md#unheaded-block-12 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design; unit text read (1. **What to read first?** `) and unchanged since base, retain-outside-platform fits an always-loaded instruction",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "6aefb1fae238d8a78b7361cc040a66e5fb04ddd786e1f3f990a8ad03da84cedc",
+    "identityFingerprint": "6aefb1fae238d8a78b7361cc040a66e5fb04ddd786e1f3f990a8ad03da84cedc",
+    "claimId": "claim_d0e83fdb2650d447afd25c0f61efc4ec",
+    "sourceAnchor": "unheaded-block-12",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b390474069d64b0572bd78c4c0e0e47c2da91a5114360b4da7eb36cfea82a3b4",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-12",
+      "githubAnchor": "unheaded-block-12",
+      "stableAnchor": "unheaded-block-12",
+      "title": "Unheaded block 12",
+      "startLine": 56,
+      "endLine": 70,
+      "textDigest": "b390474069d64b0572bd78c4c0e0e47c2da91a5114360b4da7eb36cfea82a3b4",
+      "sample": "1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n2. **What kind of work is this?** Check it against the area's spec and\n   `docs/backlog.md`; a ",
+      "identityFingerprint": "6aefb1fae238d8a78b7361cc040a66e5fb04ddd786e1f3f990a8ad03da84cedc",
+      "ancestry": [
+        "forgent",
+        "Definition of done (platform-foundations L5)"
+      ],
+      "text": "1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n2. **What kind of work is this?** Check it against the area's spec and\n   `docs/backlog.md`; a new product area gets a spec before it gets code.\n3. **What contract does it touch?** `docs/routing-handoff-contract.md` for\n   agent-to-agent boundaries; the area spec's Shared Entities table for\n   in-process contracts.\n4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,\n   or existing covered behavior in the test suite? Either raises the bar.\n5. **What proof means done?** `npm test` (state + cli + runner + e2e suite) green;\n   new or changed behavior gets a matching test. Green must come from real\n   behavior: never add an env switch, flag, or test-only code branch that skips\n   checks to make tests pass; fix production code or the fixture instead.\n6. **What learning gets left behind?** A settled decision goes into\n   `docs/decisions/`; a settled spec fact goes into the relevant\n   `docs/specs/<area>.md`."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_d0e83fdb2650d447afd25c0f61efc4ec"
+}
+```
+
+## Entry claim_ad994bc3d2c97fb0d69e749535454434
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_ad994bc3d2c97fb0d69e749535454434",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_ad994bc3d2c97fb0d69e749535454434",
+    "sourceUnitDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-13 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_ad994bc3d2c97fb0d69e749535454434",
+    "sourceUnitDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-13 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-13 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c4dd883ef0fa26ab86a407e188a73a12f925f0e9537b2348c8c865c033b58926",
+    "identityFingerprint": "c4dd883ef0fa26ab86a407e188a73a12f925f0e9537b2348c8c865c033b58926",
+    "claimId": "claim_ad994bc3d2c97fb0d69e749535454434",
+    "sourceAnchor": "unheaded-block-13",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-13",
+      "githubAnchor": "unheaded-block-13",
+      "stableAnchor": "unheaded-block-13",
+      "title": "Unheaded block 13",
+      "startLine": 74,
+      "endLine": 81,
+      "textDigest": "ce273268d1c631cd2401722d415ec5e2fed97fab11ed089d8f81259f80152f80",
+      "sample": "Keep draft scripts, logs, patches and dumps out of the repository root. Use\n`.fgos/runtime/tmp/`, falling back to `${TMPDIR:-/tmp}/fgos-work/`.\n`.githooks/pre-commit` owns the sing",
+      "identityFingerprint": "c4dd883ef0fa26ab86a407e188a73a12f925f0e9537b2348c8c865c033b58926",
+      "ancestry": [
+        "forgent",
+        "Scratch artifacts"
+      ],
+      "text": "Keep draft scripts, logs, patches and dumps out of the repository root. Use\n`.fgos/runtime/tmp/`, falling back to `${TMPDIR:-/tmp}/fgos-work/`.\n`.githooks/pre-commit` owns the single root-file allowlist and refuses new root\nfiles outside it, including linked worktrees. Legitimate root additions require\nan allowlist change in a separate commit, landed on main before the addition.\nThe hook runs only when wired via `npm run setup:hooks`; `fgos doctor` checks\nthat wiring with `main-checkout-hook-wired`. `MERGE_HEAD` skips only the root\nguard, never existing data-loss guards."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_ad994bc3d2c97fb0d69e749535454434"
+}
+```
+
+## Entry claim_bb94912817abe39b4f476ea70b22d3ae
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_bb94912817abe39b4f476ea70b22d3ae",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_bb94912817abe39b4f476ea70b22d3ae",
+    "sourceUnitDigest": "1eaa0634f12da821254d772ea6bed7a0e6ecd4541de713eba0f573ab4b2c1052",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-15 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_bb94912817abe39b4f476ea70b22d3ae",
+    "sourceUnitDigest": "1eaa0634f12da821254d772ea6bed7a0e6ecd4541de713eba0f573ab4b2c1052",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-15 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-15 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c44506d16346f698e2b2a257e746d89512e0b7fe7bbf602f1dd3ce5da8ba2568",
+    "identityFingerprint": "c44506d16346f698e2b2a257e746d89512e0b7fe7bbf602f1dd3ce5da8ba2568",
+    "claimId": "claim_bb94912817abe39b4f476ea70b22d3ae",
+    "sourceAnchor": "unheaded-block-15",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "1eaa0634f12da821254d772ea6bed7a0e6ecd4541de713eba0f573ab4b2c1052",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-15",
+      "githubAnchor": "unheaded-block-15",
+      "stableAnchor": "unheaded-block-15",
+      "title": "Unheaded block 15",
+      "startLine": 96,
+      "endLine": 102,
+      "textDigest": "1eaa0634f12da821254d772ea6bed7a0e6ecd4541de713eba0f573ab4b2c1052",
+      "sample": "Plain `fgos` runs the activated release recorded in\n`.fgos/installation/activation.json`, not newly edited `bin/` or `src/` bytes.\nUse `npm run fgos:dev -- <verb> [args]` to run wo",
+      "identityFingerprint": "c44506d16346f698e2b2a257e746d89512e0b7fe7bbf602f1dd3ce5da8ba2568",
+      "ancestry": [
+        "forgent",
+        "Legacy-Node CLI Ownership Boundary"
+      ],
+      "text": "Plain `fgos` runs the activated release recorded in\n`.fgos/installation/activation.json`, not newly edited `bin/` or `src/` bytes.\nUse `npm run fgos:dev -- <verb> [args]` to run working-tree code through the Rust\nhost. It preserves caller cwd via `INIT_CWD`, honors `CARGO_TARGET_DIR`, and\nmaterializes confined per-invocation artifacts under `.fgos/runtime/dev-host/`,\nremoving only its own directory after the child exits. Serialize invocations\nacross worktrees only where their Cargo target is actually shared."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_bb94912817abe39b4f476ea70b22d3ae"
+}
+```
+
+## Entry claim_01354c596b32d883dcceda730047e156
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_01354c596b32d883dcceda730047e156",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_01354c596b32d883dcceda730047e156",
+    "sourceUnitDigest": "879d83e8c8148a4e7cdc6086a8b06d7d7093e97e9cdddb7c0db1412443574e50",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-16 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_01354c596b32d883dcceda730047e156",
+    "sourceUnitDigest": "879d83e8c8148a4e7cdc6086a8b06d7d7093e97e9cdddb7c0db1412443574e50",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-16 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-16 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "d23d1df6cd4978077e3cf266d13f225875ed20e6e7e2565660b4b1187e0a2d84",
+    "identityFingerprint": "d23d1df6cd4978077e3cf266d13f225875ed20e6e7e2565660b4b1187e0a2d84",
+    "claimId": "claim_01354c596b32d883dcceda730047e156",
+    "sourceAnchor": "unheaded-block-16",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "879d83e8c8148a4e7cdc6086a8b06d7d7093e97e9cdddb7c0db1412443574e50",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-16",
+      "githubAnchor": "unheaded-block-16",
+      "stableAnchor": "unheaded-block-16",
+      "title": "Unheaded block 16",
+      "startLine": 104,
+      "endLine": 111,
+      "textDigest": "879d83e8c8148a4e7cdc6086a8b06d7d7093e97e9cdddb7c0db1412443574e50",
+      "sample": "`fgos doctor` check `active-release-matches-checkout` compares the owned source\ncheckout's working-tree Node payload with its activation; it does not certify\nRust freshness. Depend",
+      "identityFingerprint": "d23d1df6cd4978077e3cf266d13f225875ed20e6e7e2565660b4b1187e0a2d84",
+      "ancestry": [
+        "forgent",
+        "Legacy-Node CLI Ownership Boundary"
+      ],
+      "text": "`fgos doctor` check `active-release-matches-checkout` compares the owned source\ncheckout's working-tree Node payload with its activation; it does not certify\nRust freshness. Dependencies do not count as drift, but symlink/unsafe manifest\nentries still fail. It skips activation owned by main from a linked worktree\nand the same-checkout dev manifest. To update plain `fgos`, build/stage/activate\nthe intended tree, then verify doctor through the installed shim. Old-release\n`fgos setup` can overwrite generated render headers until that release is\nrestaged; activation never refreshes itself merely because source was edited."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_01354c596b32d883dcceda730047e156"
+}
+```
+
+## Entry claim_143633192ebdc23ebdd1b38df0ae42b0
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_143633192ebdc23ebdd1b38df0ae42b0",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_143633192ebdc23ebdd1b38df0ae42b0",
+    "sourceUnitDigest": "3f149be4bf754b1ad1a12eb8d3e7a24a1db97ca4aa3cf15fd7cf3bae732b7f3f",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-17 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_143633192ebdc23ebdd1b38df0ae42b0",
+    "sourceUnitDigest": "3f149be4bf754b1ad1a12eb8d3e7a24a1db97ca4aa3cf15fd7cf3bae732b7f3f",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-17 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-17 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "1f4df04e8a093a9e4b545f4fc3b8f13f8779e11f879d4d329ed60ff33a202e11",
+    "identityFingerprint": "1f4df04e8a093a9e4b545f4fc3b8f13f8779e11f879d4d329ed60ff33a202e11",
+    "claimId": "claim_143633192ebdc23ebdd1b38df0ae42b0",
+    "sourceAnchor": "unheaded-block-17",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3f149be4bf754b1ad1a12eb8d3e7a24a1db97ca4aa3cf15fd7cf3bae732b7f3f",
+    "claimKind": "vision",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-17",
+      "githubAnchor": "unheaded-block-17",
+      "stableAnchor": "unheaded-block-17",
+      "title": "Unheaded block 17",
+      "startLine": 115,
+      "endLine": 116,
+      "textDigest": "3f149be4bf754b1ad1a12eb8d3e7a24a1db97ca4aa3cf15fd7cf3bae732b7f3f",
+      "sample": "`docs/distribution-vision.md` sets the direction for this repo's own\ncài đặt/setup/doctor story. Before any change is done, ask:",
+      "identityFingerprint": "1f4df04e8a093a9e4b545f4fc3b8f13f8779e11f879d4d329ed60ff33a202e11",
+      "ancestry": [
+        "forgent",
+        "Install/setup/doctor gate"
+      ],
+      "text": "`docs/distribution-vision.md` sets the direction for this repo's own\ncài đặt/setup/doctor story. Before any change is done, ask:"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_143633192ebdc23ebdd1b38df0ae42b0"
+}
+```
+
+## Entry claim_423281216eb15889f63560a84ca0959a
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_423281216eb15889f63560a84ca0959a",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_423281216eb15889f63560a84ca0959a",
+    "sourceUnitDigest": "e33601b47f3590f43b695faa7647181ca8e7d5ee83cb8944bcf976ff4e801197",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-18 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_423281216eb15889f63560a84ca0959a",
+    "sourceUnitDigest": "e33601b47f3590f43b695faa7647181ca8e7d5ee83cb8944bcf976ff4e801197",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-18 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-18 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f1db613f54535e0036ed5c2f758b8e4f15e9f78fc89f3d3e30282c24507e9147",
+    "identityFingerprint": "f1db613f54535e0036ed5c2f758b8e4f15e9f78fc89f3d3e30282c24507e9147",
+    "claimId": "claim_423281216eb15889f63560a84ca0959a",
+    "sourceAnchor": "unheaded-block-18",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e33601b47f3590f43b695faa7647181ca8e7d5ee83cb8944bcf976ff4e801197",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-18",
+      "githubAnchor": "unheaded-block-18",
+      "stableAnchor": "unheaded-block-18",
+      "title": "Unheaded block 18",
+      "startLine": 118,
+      "endLine": 131,
+      "textDigest": "e33601b47f3590f43b695faa7647181ca8e7d5ee83cb8944bcf976ff4e801197",
+      "sample": "- Does this add a config default, env var, or infra dependency (a new\n  file it expects to exist, a tool it shells out to, a directory it\n  assumes is writable)? If yes, it must re",
+      "identityFingerprint": "f1db613f54535e0036ed5c2f758b8e4f15e9f78fc89f3d3e30282c24507e9147",
+      "ancestry": [
+        "forgent",
+        "Install/setup/doctor gate"
+      ],
+      "text": "- Does this add a config default, env var, or infra dependency (a new\n  file it expects to exist, a tool it shells out to, a directory it\n  assumes is writable)? If yes, it must register into `fgos setup`'s\n  config-merge and `fgos doctor`'s check registry (`src/setup/checks.mjs`)\n  — not stand alone, undiscoverable by `doctor`.\n- Never hardcode an assumption about which install level (global vs\n  project) is active — per the vision doc, project config always\n  overwrites global, and fgOS stays aware of both without conflict.\n- If the change touches how fgOS gets installed, upgraded, or diagnosed at\n  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`\n  first — a new module gets a spec/config-registry entry before it gets\n  code, same bar as a new product area (question 2 above).\n- Does this change something a user of fgOS would see? If yes, add a line\n  to `## [Unreleased]` in `CHANGELOG.md`."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_423281216eb15889f63560a84ca0959a"
+}
+```
+
+## Entry claim_2240f88d1d1a961cc8ce6c8517572f36
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_2240f88d1d1a961cc8ce6c8517572f36",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_2240f88d1d1a961cc8ce6c8517572f36",
+    "sourceUnitDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-19 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_2240f88d1d1a961cc8ce6c8517572f36",
+    "sourceUnitDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-19 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-19 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "cad0dc701ee2d9490016c461844c4577a74e05715278200a6f89553950039951",
+    "identityFingerprint": "cad0dc701ee2d9490016c461844c4577a74e05715278200a6f89553950039951",
+    "claimId": "claim_2240f88d1d1a961cc8ce6c8517572f36",
+    "sourceAnchor": "unheaded-block-19",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+    "claimKind": "decision",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-19",
+      "githubAnchor": "unheaded-block-19",
+      "stableAnchor": "unheaded-block-19",
+      "title": "Unheaded block 19",
+      "startLine": 135,
+      "endLine": 136,
+      "textDigest": "d8b0fa240f28f96e7b3f9f24704c72a898d7b0d64a37662d2179c5f0c7216a71",
+      "sample": "Laws in `docs/platform-foundations.md` are fixed until their named review\nthreshold is hit. Changing one supersedes its decision ID — never edit it in place.",
+      "identityFingerprint": "cad0dc701ee2d9490016c461844c4577a74e05715278200a6f89553950039951",
+      "ancestry": [
+        "forgent",
+        "Changing a locked law"
+      ],
+      "text": "Laws in `docs/platform-foundations.md` are fixed until their named review\nthreshold is hit. Changing one supersedes its decision ID — never edit it in place."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_2240f88d1d1a961cc8ce6c8517572f36"
+}
+```
+
+## Entry claim_9651770c2d3f7530312292fe3e96176b
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_9651770c2d3f7530312292fe3e96176b",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_9651770c2d3f7530312292fe3e96176b",
+    "sourceUnitDigest": "babd3d9aafc706794ad0a450194ec0cc7eef902802d73a383fb4ddf3e94392e5",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-2 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_9651770c2d3f7530312292fe3e96176b",
+    "sourceUnitDigest": "babd3d9aafc706794ad0a450194ec0cc7eef902802d73a383fb4ddf3e94392e5",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-2 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-2 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "3d1392fda430780460dfe609f7d4bebbfa0f030252e2501aafc922a6df323dab",
+    "identityFingerprint": "3d1392fda430780460dfe609f7d4bebbfa0f030252e2501aafc922a6df323dab",
+    "claimId": "claim_9651770c2d3f7530312292fe3e96176b",
+    "sourceAnchor": "unheaded-block-2",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "babd3d9aafc706794ad0a450194ec0cc7eef902802d73a383fb4ddf3e94392e5",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-2",
+      "githubAnchor": "unheaded-block-2",
+      "stableAnchor": "unheaded-block-2",
+      "title": "Unheaded block 2",
+      "startLine": 5,
+      "endLine": 5,
+      "textDigest": "babd3d9aafc706794ad0a450194ec0cc7eef902802d73a383fb4ddf3e94392e5",
+      "sample": "Forgent (fgOS) is the platform layer for building and running agent applications — the infrastructure, skills, and automation that sit beneath every agent app, so developers can fo",
+      "identityFingerprint": "3d1392fda430780460dfe609f7d4bebbfa0f030252e2501aafc922a6df323dab",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "Forgent (fgOS) is the platform layer for building and running agent applications — the infrastructure, skills, and automation that sit beneath every agent app, so developers can forge new agents instead of building everything from scratch."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_9651770c2d3f7530312292fe3e96176b"
+}
+```
+
+## Entry claim_bb0f60933b1e135c60b80e82db86625d
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_bb0f60933b1e135c60b80e82db86625d",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_bb0f60933b1e135c60b80e82db86625d",
+    "sourceUnitDigest": "38f511a5d090b7f9fc9b928ea29af5d75e01bfe5c18e3287977d5a335e2a7fcf",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-20 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_bb0f60933b1e135c60b80e82db86625d",
+    "sourceUnitDigest": "38f511a5d090b7f9fc9b928ea29af5d75e01bfe5c18e3287977d5a335e2a7fcf",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-20 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: AGENTS.md#unheaded-block-20 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design; unit text read (Việc trở nặng không vì bản c) and unchanged since base, retain-outside-platform fits an always-loaded instruction",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c55032e5be8b07532df393b7d063e8b759b9c801cb118cb611059d08f021481a",
+    "identityFingerprint": "c55032e5be8b07532df393b7d063e8b759b9c801cb118cb611059d08f021481a",
+    "claimId": "claim_bb0f60933b1e135c60b80e82db86625d",
+    "sourceAnchor": "unheaded-block-20",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "38f511a5d090b7f9fc9b928ea29af5d75e01bfe5c18e3287977d5a335e2a7fcf",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-20",
+      "githubAnchor": "unheaded-block-20",
+      "stableAnchor": "unheaded-block-20",
+      "title": "Unheaded block 20",
+      "startLine": 140,
+      "endLine": 146,
+      "textDigest": "38f511a5d090b7f9fc9b928ea29af5d75e01bfe5c18e3287977d5a335e2a7fcf",
+      "sample": "Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của\ntình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum trong phạm vi\nviệc đang làm, gom lại — gom tới",
+      "identityFingerprint": "c55032e5be8b07532df393b7d063e8b759b9c801cb118cb611059d08f021481a",
+      "ancestry": [
+        "forgent",
+        "RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)"
+      ],
+      "text": "Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của\ntình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum trong phạm vi\nviệc đang làm, gom lại — gom tới khi hết; quy mô không bao giờ là lý do miễn\ntrừ. Tùm lum thấy ngoài phạm vi thì ghi thành item riêng; gom mà phải xây\ncông cụ mới là một câu hỏi quyết định. Đích của mọi lần gom\nlà một hình dạng duy nhất: ranh giới rõ, contract tường minh, đổi và biến\nhình dễ, không chắp vá."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_bb0f60933b1e135c60b80e82db86625d"
+}
+```
+
+## Entry claim_442a4d4d948d6535b15da70f73519395
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_442a4d4d948d6535b15da70f73519395",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_442a4d4d948d6535b15da70f73519395",
+    "sourceUnitDigest": "48a48fccb2f49e68118ccf48cd466cc2fda6ecfd606caeaac32f64a387c72841",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-21 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_442a4d4d948d6535b15da70f73519395",
+    "sourceUnitDigest": "48a48fccb2f49e68118ccf48cd466cc2fda6ecfd606caeaac32f64a387c72841",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-21 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-21 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "58845dac9fa56af575c4751d6eb9bb4917924c7aae974a87177386224194eebb",
+    "identityFingerprint": "58845dac9fa56af575c4751d6eb9bb4917924c7aae974a87177386224194eebb",
+    "claimId": "claim_442a4d4d948d6535b15da70f73519395",
+    "sourceAnchor": "unheaded-block-21",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "48a48fccb2f49e68118ccf48cd466cc2fda6ecfd606caeaac32f64a387c72841",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-21",
+      "githubAnchor": "unheaded-block-21",
+      "stableAnchor": "unheaded-block-21",
+      "title": "Unheaded block 21",
+      "startLine": 148,
+      "endLine": 148,
+      "textDigest": "48a48fccb2f49e68118ccf48cd466cc2fda6ecfd606caeaac32f64a387c72841",
+      "sample": "khong phai no nang ma no tum lum",
+      "identityFingerprint": "58845dac9fa56af575c4751d6eb9bb4917924c7aae974a87177386224194eebb",
+      "ancestry": [
+        "forgent",
+        "RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)"
+      ],
+      "text": "khong phai no nang ma no tum lum"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_442a4d4d948d6535b15da70f73519395"
+}
+```
+
+## Entry claim_bfd24ffa5a43c26830bb9771c04de7f1
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_bfd24ffa5a43c26830bb9771c04de7f1",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_bfd24ffa5a43c26830bb9771c04de7f1",
+    "sourceUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-22 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_bfd24ffa5a43c26830bb9771c04de7f1",
+    "sourceUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-22 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-22 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "32131ae0ab24fa7ab8ccc53bf267eee749d6b8ce58bd17d7f0b960d4e21c35ae",
+    "identityFingerprint": "32131ae0ab24fa7ab8ccc53bf267eee749d6b8ce58bd17d7f0b960d4e21c35ae",
+    "claimId": "claim_bfd24ffa5a43c26830bb9771c04de7f1",
+    "sourceAnchor": "unheaded-block-22",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-22",
+      "githubAnchor": "unheaded-block-22",
+      "stableAnchor": "unheaded-block-22",
+      "title": "Unheaded block 22",
+      "startLine": 152,
+      "endLine": 152,
+      "textDigest": "b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8",
+      "sample": "`fgos run` is the primary door for executing new work in the execution core.",
+      "identityFingerprint": "32131ae0ab24fa7ab8ccc53bf267eee749d6b8ce58bd17d7f0b960d4e21c35ae",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "`fgos run` is the primary door for executing new work in the execution core."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_bfd24ffa5a43c26830bb9771c04de7f1"
+}
+```
+
+## Entry claim_33713bd504d89af5cfb1eb5d6fa16d01
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_33713bd504d89af5cfb1eb5d6fa16d01",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_33713bd504d89af5cfb1eb5d6fa16d01",
+    "sourceUnitDigest": "88710807df8d6f060e3bd95f8ead6bdab4cca68dd6aed10fad45ebd46ac64333",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-23 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_33713bd504d89af5cfb1eb5d6fa16d01",
+    "sourceUnitDigest": "88710807df8d6f060e3bd95f8ead6bdab4cca68dd6aed10fad45ebd46ac64333",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-23 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-23 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f835ee42aee59e3f916f5f10376a6e0fbde1b9d8e35407abaf21a7632a89ebdb",
+    "identityFingerprint": "f835ee42aee59e3f916f5f10376a6e0fbde1b9d8e35407abaf21a7632a89ebdb",
+    "claimId": "claim_33713bd504d89af5cfb1eb5d6fa16d01",
+    "sourceAnchor": "unheaded-block-23",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "88710807df8d6f060e3bd95f8ead6bdab4cca68dd6aed10fad45ebd46ac64333",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-23",
+      "githubAnchor": "unheaded-block-23",
+      "stableAnchor": "unheaded-block-23",
+      "title": "Unheaded block 23",
+      "startLine": 154,
+      "endLine": 154,
+      "textDigest": "88710807df8d6f060e3bd95f8ead6bdab4cca68dd6aed10fad45ebd46ac64333",
+      "sample": "**Two doors, one runUnit — the preferred path for new work.** One task: `fgos run \"<prompt>\" [--provider <id>] [--writes <paths> --worktree <path>]` builds a Unit from the prompt (",
+      "identityFingerprint": "f835ee42aee59e3f916f5f10376a6e0fbde1b9d8e35407abaf21a7632a89ebdb",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "**Two doors, one runUnit — the preferred path for new work.** One task: `fgos run \"<prompt>\" [--provider <id>] [--writes <paths> --worktree <path>]` builds a Unit from the prompt (read-only without `--writes`; `--writes` needs a linked worktree; `--provider` is a soft preference, not a pin). Planned work: `fgos workflow start <preset>|--units <file>`, one step per Unit. Both bind through `bind()`; the runner commits only the Unit's declared `writes` after a passing round, and the worker never runs `git add`/`git commit`. These two doors are the only ones that execute work; `fgos dispatch` keeps only the lower-level reads (`decide`, `inspect`, `reconcile`, `probe-account`)."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_33713bd504d89af5cfb1eb5d6fa16d01"
+}
+```
+
+## Entry claim_7d42588d114718c42e806e4070f1a22c
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_7d42588d114718c42e806e4070f1a22c",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_7d42588d114718c42e806e4070f1a22c",
+    "sourceUnitDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-25 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_7d42588d114718c42e806e4070f1a22c",
+    "sourceUnitDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-25 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-25 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "625f4030ba1ea8e1d56a46b00a5b59f507074f02edaea2b7c91cb2addaee929d",
+    "identityFingerprint": "625f4030ba1ea8e1d56a46b00a5b59f507074f02edaea2b7c91cb2addaee929d",
+    "claimId": "claim_7d42588d114718c42e806e4070f1a22c",
+    "sourceAnchor": "unheaded-block-25",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-25",
+      "githubAnchor": "unheaded-block-25",
+      "stableAnchor": "unheaded-block-25",
+      "title": "Unheaded block 25",
+      "startLine": 158,
+      "endLine": 158,
+      "textDigest": "22f293adbd476c3d765f9b9a328ce2ca00f6acb474d5817225c0cc1c2da49ace",
+      "sample": "**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or",
+      "identityFingerprint": "625f4030ba1ea8e1d56a46b00a5b59f507074f02edaea2b7c91cb2addaee929d",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or compatibility alias `node src/runner/dispatch.mjs decide`; `--work` only through `fgos dispatch decide`) first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_7d42588d114718c42e806e4070f1a22c"
+}
+```
+
+## Entry claim_2e415bdb6f89215b30a9306f2b525bf7
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_2e415bdb6f89215b30a9306f2b525bf7",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_2e415bdb6f89215b30a9306f2b525bf7",
+    "sourceUnitDigest": "19dace9440953c3a6867e37dd8cc45293a339d4a4fae79d7ff7c870461afb2d3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-26 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_2e415bdb6f89215b30a9306f2b525bf7",
+    "sourceUnitDigest": "19dace9440953c3a6867e37dd8cc45293a339d4a4fae79d7ff7c870461afb2d3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-26 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-26 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "3af6c481b85cf5330944b67a068233bbce008b9eecd028a58868db3a3a2f6135",
+    "identityFingerprint": "3af6c481b85cf5330944b67a068233bbce008b9eecd028a58868db3a3a2f6135",
+    "claimId": "claim_2e415bdb6f89215b30a9306f2b525bf7",
+    "sourceAnchor": "unheaded-block-26",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "19dace9440953c3a6867e37dd8cc45293a339d4a4fae79d7ff7c870461afb2d3",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-26",
+      "githubAnchor": "unheaded-block-26",
+      "stableAnchor": "unheaded-block-26",
+      "title": "Unheaded block 26",
+      "startLine": 160,
+      "endLine": 160,
+      "textDigest": "19dace9440953c3a6867e37dd8cc45293a339d4a4fae79d7ff7c870461afb2d3",
+      "sample": "Four ways to call `decide`, for four different situations:",
+      "identityFingerprint": "3af6c481b85cf5330944b67a068233bbce008b9eecd028a58868db3a3a2f6135",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "Four ways to call `decide`, for four different situations:"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_2e415bdb6f89215b30a9306f2b525bf7"
+}
+```
+
+## Entry claim_351e6c4a4690c52f77aee859728d1140
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_351e6c4a4690c52f77aee859728d1140",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_351e6c4a4690c52f77aee859728d1140",
+    "sourceUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-27 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_351e6c4a4690c52f77aee859728d1140",
+    "sourceUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-27 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-27 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+    "identityFingerprint": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+    "claimId": "claim_351e6c4a4690c52f77aee859728d1140",
+    "sourceAnchor": "unheaded-block-27",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-27",
+      "githubAnchor": "unheaded-block-27",
+      "stableAnchor": "unheaded-block-27",
+      "title": "Unheaded block 27",
+      "startLine": 162,
+      "endLine": 165,
+      "textDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+      "sample": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not wh",
+      "identityFingerprint": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.\n- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.\n- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_351e6c4a4690c52f77aee859728d1140"
+}
+```
+
+## Entry claim_c43cebec858362eb7b73975080dba714
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_c43cebec858362eb7b73975080dba714",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_c43cebec858362eb7b73975080dba714",
+    "sourceUnitDigest": "d932c8e6777b05420fd75005a2aea166004ff704dab07cafd9a35695b3750940",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-28 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_c43cebec858362eb7b73975080dba714",
+    "sourceUnitDigest": "d932c8e6777b05420fd75005a2aea166004ff704dab07cafd9a35695b3750940",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-28 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-28 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "bd8bd2692f026c8b10fc6009af3b67974948e083ca17847aefa3700ebf5302ab",
+    "identityFingerprint": "bd8bd2692f026c8b10fc6009af3b67974948e083ca17847aefa3700ebf5302ab",
+    "claimId": "claim_c43cebec858362eb7b73975080dba714",
+    "sourceAnchor": "unheaded-block-28",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d932c8e6777b05420fd75005a2aea166004ff704dab07cafd9a35695b3750940",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-28",
+      "githubAnchor": "unheaded-block-28",
+      "stableAnchor": "unheaded-block-28",
+      "title": "Unheaded block 28",
+      "startLine": 167,
+      "endLine": 167,
+      "textDigest": "d932c8e6777b05420fd75005a2aea166004ff704dab07cafd9a35695b3750940",
+      "sample": "Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, neve",
+      "identityFingerprint": "bd8bd2692f026c8b10fc6009af3b67974948e083ca17847aefa3700ebf5302ab",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_c43cebec858362eb7b73975080dba714"
+}
+```
+
+## Entry claim_664343a3da26204b9baf654b1ca4cb58
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_664343a3da26204b9baf654b1ca4cb58",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_664343a3da26204b9baf654b1ca4cb58",
+    "sourceUnitDigest": "53d8b06d46db5384e659a463daf9bd99ef4cfb443fc6ef9c8d236b22bb8a7686",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-29 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_664343a3da26204b9baf654b1ca4cb58",
+    "sourceUnitDigest": "53d8b06d46db5384e659a463daf9bd99ef4cfb443fc6ef9c8d236b22bb8a7686",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-29 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-29 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "2500ad7016fa51069d642e93439d66c25560d763a57d9232d7860f733ed44daf",
+    "identityFingerprint": "2500ad7016fa51069d642e93439d66c25560d763a57d9232d7860f733ed44daf",
+    "claimId": "claim_664343a3da26204b9baf654b1ca4cb58",
+    "sourceAnchor": "unheaded-block-29",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "53d8b06d46db5384e659a463daf9bd99ef4cfb443fc6ef9c8d236b22bb8a7686",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-29",
+      "githubAnchor": "unheaded-block-29",
+      "stableAnchor": "unheaded-block-29",
+      "title": "Unheaded block 29",
+      "startLine": 169,
+      "endLine": 169,
+      "textDigest": "53d8b06d46db5384e659a463daf9bd99ef4cfb443fc6ef9c8d236b22bb8a7686",
+      "sample": "Three possible `mechanism` results, each needing a different response:",
+      "identityFingerprint": "2500ad7016fa51069d642e93439d66c25560d763a57d9232d7860f733ed44daf",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "Three possible `mechanism` results, each needing a different response:"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_664343a3da26204b9baf654b1ca4cb58"
+}
+```
+
+## Entry claim_2d6f7d92e02f721eb5133494e12686e0
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_2d6f7d92e02f721eb5133494e12686e0",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_2d6f7d92e02f721eb5133494e12686e0",
+    "sourceUnitDigest": "d8043519ce093af41d14fb81d784bc4e63eb1718c0201f2e28299b1649b588b5",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-3 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_2d6f7d92e02f721eb5133494e12686e0",
+    "sourceUnitDigest": "d8043519ce093af41d14fb81d784bc4e63eb1718c0201f2e28299b1649b588b5",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-3 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-3 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "30a2996cd78d52f99f29835f0112ecd47f019b8afc568fd4131577d291164c4f",
+    "identityFingerprint": "30a2996cd78d52f99f29835f0112ecd47f019b8afc568fd4131577d291164c4f",
+    "claimId": "claim_2d6f7d92e02f721eb5133494e12686e0",
+    "sourceAnchor": "unheaded-block-3",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d8043519ce093af41d14fb81d784bc4e63eb1718c0201f2e28299b1649b588b5",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-3",
+      "githubAnchor": "unheaded-block-3",
+      "stableAnchor": "unheaded-block-3",
+      "title": "Unheaded block 3",
+      "startLine": 7,
+      "endLine": 14,
+      "textDigest": "d8043519ce093af41d14fb81d784bc4e63eb1718c0201f2e28299b1649b588b5",
+      "sample": "- README.md — product description + documentation index\n- docs/platform-foundations.md — L1-L8 locked design laws; L5 is this repo's definition of done (six questions, below)\n- doc",
+      "identityFingerprint": "30a2996cd78d52f99f29835f0112ecd47f019b8afc568fd4131577d291164c4f",
+      "ancestry": [
+        "forgent"
+      ],
+      "text": "- README.md — product description + documentation index\n- docs/platform-foundations.md — L1-L8 locked design laws; L5 is this repo's definition of done (six questions, below)\n- docs/specs/system-overview.md — area map, shared entities, cross-area flows\n- docs/specs/reading-map.md — where every doc and source path in this repo lives\n- docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)\n- docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary\n- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own \"Lịch sử quyết định\" sections (tsk-1lv-4)\n- domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_2d6f7d92e02f721eb5133494e12686e0"
+}
+```
+
+## Entry claim_25243986083e5e07c7bfd524504fb054
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_25243986083e5e07c7bfd524504fb054",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_25243986083e5e07c7bfd524504fb054",
+    "sourceUnitDigest": "6617933a8600b16d505f88c3484e3d98d692c62896c674f5f7fc0f2fc550cc3a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-30 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_25243986083e5e07c7bfd524504fb054",
+    "sourceUnitDigest": "6617933a8600b16d505f88c3484e3d98d692c62896c674f5f7fc0f2fc550cc3a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-30 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-30 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "06e5d2f155fd144e5e394c6182e72d48ea04f8db04da33afbfd8d5b607d64928",
+    "identityFingerprint": "06e5d2f155fd144e5e394c6182e72d48ea04f8db04da33afbfd8d5b607d64928",
+    "claimId": "claim_25243986083e5e07c7bfd524504fb054",
+    "sourceAnchor": "unheaded-block-30",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6617933a8600b16d505f88c3484e3d98d692c62896c674f5f7fc0f2fc550cc3a",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-30",
+      "githubAnchor": "unheaded-block-30",
+      "stableAnchor": "unheaded-block-30",
+      "title": "Unheaded block 30",
+      "startLine": 171,
+      "endLine": 173,
+      "textDigest": "6617933a8600b16d505f88c3484e3d98d692c62896c674f5f7fc0f2fc550cc3a",
+      "sample": "- **`\"unavailable\"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.\n- **`\"in-process\"`** — call it yourself, with your own live capability: pass t",
+      "identityFingerprint": "06e5d2f155fd144e5e394c6182e72d48ea04f8db04da33afbfd8d5b607d64928",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "- **`\"unavailable\"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.\n- **`\"in-process\"`** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.\n- **`\"out-of-process\"`** — run `fgos run \"<prompt>\" --provider <executorId> --capability <purpose> [--writes <paths> --worktree <linked-worktree>]` (or `fgos run --unit <file>`), passing the same capability `decide` was asked for (left out, it defaults to the writing capability `execute`). `--provider` takes agent executors only: when the decided executor is a `kind: \"tool\"` executor, `fgos run` refuses it, so call that tool directly instead. Never run the resolved command yourself through Bash: `fgos run` binds, runs and settles the Unit and records its provenance under `.fgos/assignments/<unitRunId>/`, so there is nothing to log by hand. With `--writes` the runner commits only those paths after a passing round; with `--json` read the result at `data.results[-1].runResult.agentClaim.summary` and `data.results[-1].commit`."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_25243986083e5e07c7bfd524504fb054"
+}
+```
+
+## Entry claim_1c85e6258b0455d9b44d738f833e1bb9
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_1c85e6258b0455d9b44d738f833e1bb9",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_1c85e6258b0455d9b44d738f833e1bb9",
+    "sourceUnitDigest": "5c6ae58482c007eee6f3544b2a64bc96a8d552c66ffd091912d420004312f020",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-31 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_1c85e6258b0455d9b44d738f833e1bb9",
+    "sourceUnitDigest": "5c6ae58482c007eee6f3544b2a64bc96a8d552c66ffd091912d420004312f020",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-31 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-31 source digest recomputed and equal, rationale anchor and re-pin SHA256 47f3a4e5 at 59b9b7087 and 19ca8de23 verified, no target by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "36f9cfda82b5d55a787b61051920caace74fe341bbb8fc15c02d512ad7c6392f",
+    "identityFingerprint": "36f9cfda82b5d55a787b61051920caace74fe341bbb8fc15c02d512ad7c6392f",
+    "claimId": "claim_1c85e6258b0455d9b44d738f833e1bb9",
+    "sourceAnchor": "unheaded-block-31",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "5c6ae58482c007eee6f3544b2a64bc96a8d552c66ffd091912d420004312f020",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-31",
+      "githubAnchor": "unheaded-block-31",
+      "stableAnchor": "unheaded-block-31",
+      "title": "Unheaded block 31",
+      "startLine": 175,
+      "endLine": 176,
+      "textDigest": "5c6ae58482c007eee6f3544b2a64bc96a8d552c66ffd091912d420004312f020",
+      "sample": "Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is ",
+      "identityFingerprint": "36f9cfda82b5d55a787b61051920caace74fe341bbb8fc15c02d512ad7c6392f",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.\nA skill that dispatches should not re-derive any of this. Reference `../_shared/executor-dispatch-fallback.md` from the skill; its canonical source is `core/skills/_shared/executor-dispatch-fallback.md`. `.agents/skills/` and `plugins/fgOS/skills/` are generated render surfaces carrying source headers, rebuilt with `npm run build:skills`; never edit them by hand. For fgOS thin wrappers, `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_1c85e6258b0455d9b44d738f833e1bb9"
+}
+```
+
+## Entry claim_1e668e7697680b80953d4a1bc8bd65e4
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_1e668e7697680b80953d4a1bc8bd65e4",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_1e668e7697680b80953d4a1bc8bd65e4",
+    "sourceUnitDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-32 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_1e668e7697680b80953d4a1bc8bd65e4",
+    "sourceUnitDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-32 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-32 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "dac441c5b82c994c40baff041d438bbd38846691f0bb8dd3098f64b1f4168bde",
+    "identityFingerprint": "dac441c5b82c994c40baff041d438bbd38846691f0bb8dd3098f64b1f4168bde",
+    "claimId": "claim_1e668e7697680b80953d4a1bc8bd65e4",
+    "sourceAnchor": "unheaded-block-32",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-32",
+      "githubAnchor": "unheaded-block-32",
+      "stableAnchor": "unheaded-block-32",
+      "title": "Unheaded block 32",
+      "startLine": 180,
+      "endLine": 182,
+      "textDigest": "ef5cbba01528872900e82f37785833b107cd0e4ee5d95379c8e9cae8a6f1a90c",
+      "sample": "**If a task needs the fgos gateway (REST API + web dashboard, binary `fgos-gateway` built from `apps/fgos-gateway`) running, run `fgos gateway start` — never a hand-rolled `cargo r",
+      "identityFingerprint": "dac441c5b82c994c40baff041d438bbd38846691f0bb8dd3098f64b1f4168bde",
+      "ancestry": [
+        "forgent",
+        "Starting the fgos gateway — one door, never a raw process"
+      ],
+      "text": "**If a task needs the fgos gateway (REST API + web dashboard, binary `fgos-gateway` built from `apps/fgos-gateway`) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** (tsk-31v) This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `apps/fgos-gateway/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.\n\n<!-- mdview:START -->"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_1e668e7697680b80953d4a1bc8bd65e4"
+}
+```
+
+## Entry claim_ae5e7954251083afc5130d73333ef771
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_ae5e7954251083afc5130d73333ef771",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_ae5e7954251083afc5130d73333ef771",
+    "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-33 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_ae5e7954251083afc5130d73333ef771",
+    "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-33 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: sampled; the unit text at L185-186 (After creating or updating any markdown) is present verbatim in AGENTS.md at HEAD, digest recomputed by the extractor equals the shown one, anchor unheaded-block-33 resolves, target none, rationale pin 59b9b7087 gives SHA256 47f3a4e5 which equals the committed AGENTS.md; retain-only so nothing is lost or added",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+    "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+    "claimId": "claim_ae5e7954251083afc5130d73333ef771",
+    "sourceAnchor": "unheaded-block-33",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-33",
+      "githubAnchor": "unheaded-block-33",
+      "stableAnchor": "unheaded-block-33",
+      "title": "Unheaded block 33",
+      "startLine": 185,
+      "endLine": 186,
+      "textDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+      "sample": "After creating or updating any markdown file, make it viewable in ONE call —\nno project registration step needed:",
+      "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "After creating or updating any markdown file, make it viewable in ONE call —\nno project registration step needed:"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_ae5e7954251083afc5130d73333ef771"
+}
+```
+
+## Entry claim_6a2cb3a88c1fb4c7faf143fa5ec076f3
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_6a2cb3a88c1fb4c7faf143fa5ec076f3",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_6a2cb3a88c1fb4c7faf143fa5ec076f3",
+    "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-34 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_6a2cb3a88c1fb4c7faf143fa5ec076f3",
+    "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-34 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: sampled; the unit text at L190-190 (Call `mdview_view_file` with:) is present verbatim in AGENTS.md at HEAD, digest recomputed by the extractor equals the shown one, anchor unheaded-block-34 resolves, target none, rationale pin 59b9b7087 gives SHA256 47f3a4e5 which equals the committed AGENTS.md; retain-only so nothing is lost or added",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+    "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+    "claimId": "claim_6a2cb3a88c1fb4c7faf143fa5ec076f3",
+    "sourceAnchor": "unheaded-block-34",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-34",
+      "githubAnchor": "unheaded-block-34",
+      "stableAnchor": "unheaded-block-34",
+      "title": "Unheaded block 34",
+      "startLine": 190,
+      "endLine": 190,
+      "textDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+      "sample": "Call `mdview_view_file` with:",
+      "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "Using MCP (preferred)"
+      ],
+      "text": "Call `mdview_view_file` with:"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_6a2cb3a88c1fb4c7faf143fa5ec076f3"
+}
+```
+
+## Entry claim_d18c939cc9436e830dae9214808c21ae
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_d18c939cc9436e830dae9214808c21ae",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_d18c939cc9436e830dae9214808c21ae",
+    "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-35 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_d18c939cc9436e830dae9214808c21ae",
+    "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-35 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-35 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+    "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+    "claimId": "claim_d18c939cc9436e830dae9214808c21ae",
+    "sourceAnchor": "unheaded-block-35",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-35",
+      "githubAnchor": "unheaded-block-35",
+      "stableAnchor": "unheaded-block-35",
+      "title": "Unheaded block 35",
+      "startLine": 192,
+      "endLine": 193,
+      "textDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+      "sample": "- `project_root`: absolute path to the project root\n- `relative_path`: the file path relative to that root",
+      "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "Using MCP (preferred)"
+      ],
+      "text": "- `project_root`: absolute path to the project root\n- `relative_path`: the file path relative to that root"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_d18c939cc9436e830dae9214808c21ae"
+}
+```
+
+## Entry claim_74542e8562e9dd16128fadd8a2dbfaca
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_74542e8562e9dd16128fadd8a2dbfaca",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_74542e8562e9dd16128fadd8a2dbfaca",
+    "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-36 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_74542e8562e9dd16128fadd8a2dbfaca",
+    "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-36 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-36 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+    "identityFingerprint": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+    "claimId": "claim_74542e8562e9dd16128fadd8a2dbfaca",
+    "sourceAnchor": "unheaded-block-36",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-36",
+      "githubAnchor": "unheaded-block-36",
+      "stableAnchor": "unheaded-block-36",
+      "title": "Unheaded block 36",
+      "startLine": 195,
+      "endLine": 197,
+      "textDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+      "sample": "It returns a browser `url`. Tell the user: \"You can view this at: `<url>`\".\nThe server auto-registers the project on first use and indexes the file\nimmediately.",
+      "identityFingerprint": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "Using MCP (preferred)"
+      ],
+      "text": "It returns a browser `url`. Tell the user: \"You can view this at: `<url>`\".\nThe server auto-registers the project on first use and indexes the file\nimmediately."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_74542e8562e9dd16128fadd8a2dbfaca"
+}
+```
+
+## Entry claim_351eb1f4f67c8aaee59631dad24f99d8
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_351eb1f4f67c8aaee59631dad24f99d8",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_351eb1f4f67c8aaee59631dad24f99d8",
+    "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-37 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_351eb1f4f67c8aaee59631dad24f99d8",
+    "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-37 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: sampled; the unit text at L201-203 (```sh mdview open <absolute-path-to-file) is present verbatim in AGENTS.md at HEAD, digest recomputed by the extractor equals the shown one, anchor unheaded-block-37 resolves, target none, rationale pin 59b9b7087 gives SHA256 47f3a4e5 which equals the committed AGENTS.md; retain-only so nothing is lost or added",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+    "identityFingerprint": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+    "claimId": "claim_351eb1f4f67c8aaee59631dad24f99d8",
+    "sourceAnchor": "unheaded-block-37",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-37",
+      "githubAnchor": "unheaded-block-37",
+      "stableAnchor": "unheaded-block-37",
+      "title": "Unheaded block 37",
+      "startLine": 201,
+      "endLine": 203,
+      "textDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+      "sample": "```sh\nmdview open <absolute-path-to-file.md>\n```",
+      "identityFingerprint": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "Using CLI fallback"
+      ],
+      "text": "```sh\nmdview open <absolute-path-to-file.md>\n```"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_351eb1f4f67c8aaee59631dad24f99d8"
+}
+```
+
+## Entry claim_95164f1150b3c485deff5673f7b4ef15
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_95164f1150b3c485deff5673f7b4ef15",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_95164f1150b3c485deff5673f7b4ef15",
+    "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-38 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_95164f1150b3c485deff5673f7b4ef15",
+    "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-38 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-38 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+    "identityFingerprint": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+    "claimId": "claim_95164f1150b3c485deff5673f7b4ef15",
+    "sourceAnchor": "unheaded-block-38",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-38",
+      "githubAnchor": "unheaded-block-38",
+      "stableAnchor": "unheaded-block-38",
+      "title": "Unheaded block 38",
+      "startLine": 207,
+      "endLine": 210,
+      "textDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+      "sample": "Spin up a preview for long docs, tables, Mermaid diagrams, multi-file document\nsets, or when the user asks to \"preview\"/\"render\". Skip it for short, trivial\nsnippets.\n<!-- mdview:E",
+      "identityFingerprint": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "When to render"
+      ],
+      "text": "Spin up a preview for long docs, tables, Mermaid diagrams, multi-file document\nsets, or when the user asks to \"preview\"/\"render\". Skip it for short, trivial\nsnippets.\n<!-- mdview:END -->"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_95164f1150b3c485deff5673f7b4ef15"
+}
+```
+
+## Entry claim_7e77c676144c5ca6cdc3351f5a5ef632
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_7e77c676144c5ca6cdc3351f5a5ef632",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_7e77c676144c5ca6cdc3351f5a5ef632",
+    "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-39 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_7e77c676144c5ca6cdc3351f5a5ef632",
+    "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-39 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-39 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+    "identityFingerprint": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+    "claimId": "claim_7e77c676144c5ca6cdc3351f5a5ef632",
+    "sourceAnchor": "unheaded-block-39",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-39",
+      "githubAnchor": "unheaded-block-39",
+      "stableAnchor": "unheaded-block-39",
+      "title": "Unheaded block 39",
+      "startLine": 212,
+      "endLine": 212,
+      "textDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+      "sample": "<!-- gitnexus:start -->",
+      "identityFingerprint": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)",
+        "When to render"
+      ],
+      "text": "<!-- gitnexus:start -->"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_7e77c676144c5ca6cdc3351f5a5ef632"
+}
+```
+
+## Entry claim_c1dcdd55c1f539b738ff1ad9467d95b6
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_c1dcdd55c1f539b738ff1ad9467d95b6",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_c1dcdd55c1f539b738ff1ad9467d95b6",
+    "sourceUnitDigest": "1647ee808cc12762f3eebd5a3caa23b1b24da3fddbd71297903d0ddb798ed718",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-4 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_c1dcdd55c1f539b738ff1ad9467d95b6",
+    "sourceUnitDigest": "1647ee808cc12762f3eebd5a3caa23b1b24da3fddbd71297903d0ddb798ed718",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-4 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-4 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "786bf9c6c89ff23cf46664e3460d7191c787ecfd9c05860c351b4319abb97e50",
+    "identityFingerprint": "786bf9c6c89ff23cf46664e3460d7191c787ecfd9c05860c351b4319abb97e50",
+    "claimId": "claim_c1dcdd55c1f539b738ff1ad9467d95b6",
+    "sourceAnchor": "unheaded-block-4",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "1647ee808cc12762f3eebd5a3caa23b1b24da3fddbd71297903d0ddb798ed718",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-4",
+      "githubAnchor": "unheaded-block-4",
+      "stableAnchor": "unheaded-block-4",
+      "title": "Unheaded block 4",
+      "startLine": 18,
+      "endLine": 22,
+      "textDigest": "1647ee808cc12762f3eebd5a3caa23b1b24da3fddbd71297903d0ddb798ed718",
+      "sample": "1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thố",
+      "identityFingerprint": "786bf9c6c89ff23cf46664e3460d7191c787ecfd9c05860c351b4319abb97e50",
+      "ancestry": [
+        "forgent",
+        "Product priority order (D-ADR0030, docs/specs/runner.md)"
+      ],
+      "text": "1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp; mỗi câu theo mẫu câu hỏi quyết định (`core/skills/_shared/decision-question.md`). Tự quyết trong khung đã duyệt (phạm vi + ngân sách ghi lúc duyệt); sắp vượt khung thì dừng và hỏi theo mẫu. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.\n   Khi phân tích của chính agent đã chọn rõ một phương án, hãy quyết và báo cáo, không hỏi lại. Chỉ hỏi khi các phương án thật sự ngang nhau hoặc phụ thuộc vào ý định của người dùng.\n3. **DoD** — reproducibly verifiable result + evidence-linked documentation.\n4. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_c1dcdd55c1f539b738ff1ad9467d95b6"
+}
+```
+
+## Entry claim_08f8581721e89c08f589e3bb8002b6ce
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_08f8581721e89c08f589e3bb8002b6ce",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_08f8581721e89c08f589e3bb8002b6ce",
+    "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-40 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_08f8581721e89c08f589e3bb8002b6ce",
+    "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-40 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: sampled; the unit text at L215-215 (This project is indexed by GitNexus as *) is present verbatim in AGENTS.md at HEAD, digest recomputed by the extractor and by hand sha256 of the lines equals the shown one, anchor unheaded-block-40 resolves, target none, rationale pin 59b9b7087 gives SHA256 47f3a4e5 which equals the committed AGENTS.md; retain-only so nothing is lost or added",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+    "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+    "claimId": "claim_08f8581721e89c08f589e3bb8002b6ce",
+    "sourceAnchor": "unheaded-block-40",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-40",
+      "githubAnchor": "unheaded-block-40",
+      "stableAnchor": "unheaded-block-40",
+      "title": "Unheaded block 40",
+      "startLine": 215,
+      "endLine": 215,
+      "textDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+      "sample": "This project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navi",
+      "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "This project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_08f8581721e89c08f589e3bb8002b6ce"
+}
+```
+
+## Entry claim_d6a9e43c0997b6993a5d9670af469258
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_d6a9e43c0997b6993a5d9670af469258",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_d6a9e43c0997b6993a5d9670af469258",
+    "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-41 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_d6a9e43c0997b6993a5d9670af469258",
+    "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-41 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: sampled; the unit text at L217-217 (> Index stale? Run `node .gitnexus/run.c) is present verbatim in AGENTS.md at HEAD, digest recomputed by the extractor and by hand sha256 of the lines equals the shown one, anchor unheaded-block-41 resolves, target none, rationale pin 59b9b7087 gives SHA256 47f3a4e5 which equals the committed AGENTS.md; retain-only so nothing is lost or added",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+    "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+    "claimId": "claim_d6a9e43c0997b6993a5d9670af469258",
+    "sourceAnchor": "unheaded-block-41",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-41",
+      "githubAnchor": "unheaded-block-41",
+      "stableAnchor": "unheaded-block-41",
+      "title": "Unheaded block 41",
+      "startLine": 217,
+      "endLine": 217,
+      "textDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+      "sample": "> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → ",
+      "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+      "ancestry": [
+        "GitNexus — Code Intelligence"
+      ],
+      "text": "> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939)."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_d6a9e43c0997b6993a5d9670af469258"
+}
+```
+
+## Entry claim_f2afc3a44e09eb918aa8c59d42ffe195
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+    "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-42 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+    "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-42 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-42 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+    "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+    "claimId": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+    "sourceAnchor": "unheaded-block-42",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-42",
+      "githubAnchor": "unheaded-block-42",
+      "stableAnchor": "unheaded-block-42",
+      "title": "Unheaded block 42",
+      "startLine": 221,
+      "endLine": 226,
+      "textDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+      "sample": "- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: \"symbolName\", direction: \"upstream\"})` and report the ",
+      "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "Always Do"
+      ],
+      "text": "- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: \"symbolName\", direction: \"upstream\"})` and report the blast radius (direct callers, affected processes, risk level) to the user.\n- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: \"compare\", base_ref: \"main\"})`.\n- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.\n- When exploring unfamiliar code, use `query({search_query: \"concept\"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.\n- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: \"symbolName\"})`.\n- For security review, `explain({target: \"fileOrSymbol\"})` lists taint findings (source→sink flows; needs `analyze --pdg`)."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_f2afc3a44e09eb918aa8c59d42ffe195"
+}
+```
+
+## Entry claim_3ca28ff7ed502c1bfd8e695a7387f753
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_3ca28ff7ed502c1bfd8e695a7387f753",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_3ca28ff7ed502c1bfd8e695a7387f753",
+    "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-43 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_3ca28ff7ed502c1bfd8e695a7387f753",
+    "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-43 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: sampled; the unit text at L230-233 (- NEVER edit a function, class, or metho) is present verbatim in AGENTS.md at HEAD, digest recomputed by the extractor equals the shown one, anchor unheaded-block-43 resolves, target none, rationale pin 59b9b7087 gives SHA256 47f3a4e5 which equals the committed AGENTS.md; retain-only so nothing is lost or added",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+    "identityFingerprint": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+    "claimId": "claim_3ca28ff7ed502c1bfd8e695a7387f753",
+    "sourceAnchor": "unheaded-block-43",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-43",
+      "githubAnchor": "unheaded-block-43",
+      "stableAnchor": "unheaded-block-43",
+      "title": "Unheaded block 43",
+      "startLine": 230,
+      "endLine": 233,
+      "textDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+      "sample": "- NEVER edit a function, class, or method without first running `impact` on it.\n- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.\n- NEVER rename symbols with find",
+      "identityFingerprint": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "Never Do"
+      ],
+      "text": "- NEVER edit a function, class, or method without first running `impact` on it.\n- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.\n- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.\n- NEVER commit changes without running `detect_changes()` to check affected scope."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_3ca28ff7ed502c1bfd8e695a7387f753"
+}
+```
+
+## Entry claim_11685a19f556cf213ef62e11a1d2d5c6
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_11685a19f556cf213ef62e11a1d2d5c6",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_11685a19f556cf213ef62e11a1d2d5c6",
+    "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-44 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_11685a19f556cf213ef62e11a1d2d5c6",
+    "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-44 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-44 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+    "identityFingerprint": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+    "claimId": "claim_11685a19f556cf213ef62e11a1d2d5c6",
+    "sourceAnchor": "unheaded-block-44",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-44",
+      "githubAnchor": "unheaded-block-44",
+      "stableAnchor": "unheaded-block-44",
+      "title": "Unheaded block 44",
+      "startLine": 237,
+      "endLine": 242,
+      "textDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+      "sample": "| Resource | Use for |\n|----------|---------|\n| `gitnexus://repo/forgent/context` | Codebase overview, check index freshness |\n| `gitnexus://repo/forgent/clusters` | All functional",
+      "identityFingerprint": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "Resources"
+      ],
+      "text": "| Resource | Use for |\n|----------|---------|\n| `gitnexus://repo/forgent/context` | Codebase overview, check index freshness |\n| `gitnexus://repo/forgent/clusters` | All functional areas |\n| `gitnexus://repo/forgent/processes` | All execution flows |\n| `gitnexus://repo/forgent/process/{name}` | Step-by-step execution trace |"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_11685a19f556cf213ef62e11a1d2d5c6"
+}
+```
+
+## Entry claim_1661543368ff1c7e6f57d20e2345cf4d
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_1661543368ff1c7e6f57d20e2345cf4d",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_1661543368ff1c7e6f57d20e2345cf4d",
+    "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-45 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_1661543368ff1c7e6f57d20e2345cf4d",
+    "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-45 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-45 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+    "identityFingerprint": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+    "claimId": "claim_1661543368ff1c7e6f57d20e2345cf4d",
+    "sourceAnchor": "unheaded-block-45",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+    "claimKind": "architecture",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-45",
+      "githubAnchor": "unheaded-block-45",
+      "stableAnchor": "unheaded-block-45",
+      "title": "Unheaded block 45",
+      "startLine": 246,
+      "endLine": 255,
+      "textDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+      "sample": "| Task | Read this skill file |\n|------|---------------------|\n| Understand architecture / \"How does X work?\" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |\n| Blast radi",
+      "identityFingerprint": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "CLI"
+      ],
+      "text": "| Task | Read this skill file |\n|------|---------------------|\n| Understand architecture / \"How does X work?\" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |\n| Blast radius / \"What breaks if I change X?\" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |\n| Trace bugs / \"Why is X failing?\" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |\n| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |\n| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |\n| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |\n\n<!-- gitnexus:end -->"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_1661543368ff1c7e6f57d20e2345cf4d"
+}
+```
+
+## Entry claim_2165e8fcd1ec571e64eae458439bb309
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_2165e8fcd1ec571e64eae458439bb309",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_2165e8fcd1ec571e64eae458439bb309",
+    "sourceUnitDigest": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-46 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_2165e8fcd1ec571e64eae458439bb309",
+    "sourceUnitDigest": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-46 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-46 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "a85fe9414c1a3cf1695e14b11411af38501670dcd1d04450dba4f35f51f5c697",
+    "identityFingerprint": "a85fe9414c1a3cf1695e14b11411af38501670dcd1d04450dba4f35f51f5c697",
+    "claimId": "claim_2165e8fcd1ec571e64eae458439bb309",
+    "sourceAnchor": "unheaded-block-46",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-46",
+      "githubAnchor": "unheaded-block-46",
+      "stableAnchor": "unheaded-block-46",
+      "title": "Unheaded block 46",
+      "startLine": 257,
+      "endLine": 259,
+      "textDigest": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101",
+      "sample": "<!-- fgos:instruction-projection:start -->\n<!-- generated by fgos instruction projection; edit canonical instruction sources, not this block -->\n<!-- effective-set: .fgos/instructi",
+      "identityFingerprint": "a85fe9414c1a3cf1695e14b11411af38501670dcd1d04450dba4f35f51f5c697",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "CLI"
+      ],
+      "text": "<!-- fgos:instruction-projection:start -->\n<!-- generated by fgos instruction projection; edit canonical instruction sources, not this block -->\n<!-- effective-set: .fgos/instructions/effective/repo.json; key=repo; host=* -->"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_2165e8fcd1ec571e64eae458439bb309"
+}
+```
+
+## Entry claim_1ac1158b31cf27d233825c9e70232fdb
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_1ac1158b31cf27d233825c9e70232fdb",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_1ac1158b31cf27d233825c9e70232fdb",
+    "sourceUnitDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-47 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_1ac1158b31cf27d233825c9e70232fdb",
+    "sourceUnitDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-47 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-47 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "429a4f29dac7ef512da7d79c1d342bf071f8fb22d5e861477bbb0447a8914d6c",
+    "identityFingerprint": "429a4f29dac7ef512da7d79c1d342bf071f8fb22d5e861477bbb0447a8914d6c",
+    "claimId": "claim_1ac1158b31cf27d233825c9e70232fdb",
+    "sourceAnchor": "unheaded-block-47",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+    "claimKind": "decision",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-47",
+      "githubAnchor": "unheaded-block-47",
+      "stableAnchor": "unheaded-block-47",
+      "title": "Unheaded block 47",
+      "startLine": 267,
+      "endLine": 268,
+      "textDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+      "sample": "- id: `decision-question-template`\n- source: `core/instructions/decision-question.md`",
+      "identityFingerprint": "429a4f29dac7ef512da7d79c1d342bf071f8fb22d5e861477bbb0447a8914d6c",
+      "ancestry": [
+        "GitNexus — Code Intelligence",
+        "fgOS Effective Instructions",
+        "law",
+        "Decision Question Template"
+      ],
+      "text": "- id: `decision-question-template`\n- source: `core/instructions/decision-question.md`"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_1ac1158b31cf27d233825c9e70232fdb"
+}
+```
+
+## Entry claim_1c0fa8ed450e9b4d240269ee06fbb6d2
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_1c0fa8ed450e9b4d240269ee06fbb6d2",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_1c0fa8ed450e9b4d240269ee06fbb6d2",
+    "sourceUnitDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-48 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_1c0fa8ed450e9b4d240269ee06fbb6d2",
+    "sourceUnitDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-48 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-48 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "ea404dddeafc115ecadb052516f26f57d720590f44181ba73275fc4711565b48",
+    "identityFingerprint": "ea404dddeafc115ecadb052516f26f57d720590f44181ba73275fc4711565b48",
+    "claimId": "claim_1c0fa8ed450e9b4d240269ee06fbb6d2",
+    "sourceAnchor": "unheaded-block-48",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-48",
+      "githubAnchor": "unheaded-block-48",
+      "stableAnchor": "unheaded-block-48",
+      "title": "Unheaded block 48",
+      "startLine": 272,
+      "endLine": 272,
+      "textDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+      "sample": "Every question asking the owner to choose a direction carries five parts: what is happening, cause, options with cost, recommendation, and scope of the answer. Full template: `core",
+      "identityFingerprint": "ea404dddeafc115ecadb052516f26f57d720590f44181ba73275fc4711565b48",
+      "ancestry": [
+        "Decision Question Template"
+      ],
+      "text": "Every question asking the owner to choose a direction carries five parts: what is happening, cause, options with cost, recommendation, and scope of the answer. Full template: `core/skills/_shared/decision-question.md`. Inside the approved frame (scope + budget set at approval) decide and report; about to leave it, stop and ask in this template."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_1c0fa8ed450e9b4d240269ee06fbb6d2"
+}
+```
+
+## Entry claim_b70e7c39975314f130e9a2501156721d
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_b70e7c39975314f130e9a2501156721d",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_b70e7c39975314f130e9a2501156721d",
+    "sourceUnitDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-49 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_b70e7c39975314f130e9a2501156721d",
+    "sourceUnitDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-49 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-49 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+    "identityFingerprint": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+    "claimId": "claim_b70e7c39975314f130e9a2501156721d",
+    "sourceAnchor": "unheaded-block-49",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-49",
+      "githubAnchor": "unheaded-block-49",
+      "stableAnchor": "unheaded-block-49",
+      "title": "Unheaded block 49",
+      "startLine": 276,
+      "endLine": 277,
+      "textDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+      "sample": "- id: `platform-operating-laws`\n- source: `core/instructions/platform-laws.md`",
+      "identityFingerprint": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+      "ancestry": [
+        "Decision Question Template",
+        "Platform Operating Laws"
+      ],
+      "text": "- id: `platform-operating-laws`\n- source: `core/instructions/platform-laws.md`"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_b70e7c39975314f130e9a2501156721d"
+}
+```
+
+## Entry claim_0b999bb17fb999e00f51a138af84c8a2
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_0b999bb17fb999e00f51a138af84c8a2",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_0b999bb17fb999e00f51a138af84c8a2",
+    "sourceUnitDigest": "f553a3334af338a1e4d76df5657adc8ac73d99d8971bd031043545b288db1cc7",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-5 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_0b999bb17fb999e00f51a138af84c8a2",
+    "sourceUnitDigest": "f553a3334af338a1e4d76df5657adc8ac73d99d8971bd031043545b288db1cc7",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-5 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-5 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c43d5590635cae129f1d97db2c2be44025969986827e132d5e4c46ce40bbf85c",
+    "identityFingerprint": "c43d5590635cae129f1d97db2c2be44025969986827e132d5e4c46ce40bbf85c",
+    "claimId": "claim_0b999bb17fb999e00f51a138af84c8a2",
+    "sourceAnchor": "unheaded-block-5",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "f553a3334af338a1e4d76df5657adc8ac73d99d8971bd031043545b288db1cc7",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-5",
+      "githubAnchor": "unheaded-block-5",
+      "stableAnchor": "unheaded-block-5",
+      "title": "Unheaded block 5",
+      "startLine": 24,
+      "endLine": 24,
+      "textDigest": "f553a3334af338a1e4d76df5657adc8ac73d99d8971bd031043545b288db1cc7",
+      "sample": "Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọ",
+      "identityFingerprint": "c43d5590635cae129f1d97db2c2be44025969986827e132d5e4c46ce40bbf85c",
+      "ancestry": [
+        "forgent",
+        "Product priority order (D-ADR0030, docs/specs/runner.md)"
+      ],
+      "text": "Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_0b999bb17fb999e00f51a138af84c8a2"
+}
+```
+
+## Entry claim_cace4724d966bb5a40bc0b17768520c1
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_cace4724d966bb5a40bc0b17768520c1",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_cace4724d966bb5a40bc0b17768520c1",
+    "sourceUnitDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-50 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_cace4724d966bb5a40bc0b17768520c1",
+    "sourceUnitDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-50 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-50 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+    "identityFingerprint": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+    "claimId": "claim_cace4724d966bb5a40bc0b17768520c1",
+    "sourceAnchor": "unheaded-block-50",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-50",
+      "githubAnchor": "unheaded-block-50",
+      "stableAnchor": "unheaded-block-50",
+      "title": "Unheaded block 50",
+      "startLine": 281,
+      "endLine": 281,
+      "textDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+      "sample": "Platform laws L1-L8 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:",
+      "identityFingerprint": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+      "ancestry": [
+        "Platform Operating Laws"
+      ],
+      "text": "Platform laws L1-L8 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_cace4724d966bb5a40bc0b17768520c1"
+}
+```
+
+## Entry claim_07e83f30731906c4f25c96625cd95e26
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_07e83f30731906c4f25c96625cd95e26",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_07e83f30731906c4f25c96625cd95e26",
+    "sourceUnitDigest": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-51 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_07e83f30731906c4f25c96625cd95e26",
+    "sourceUnitDigest": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-51 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: sampled; the unit text at L283-290 (- **L1 — Hai vật lý của tri thức: Log vs) is present verbatim in AGENTS.md at HEAD, digest recomputed by the extractor equals the shown one, anchor unheaded-block-51 resolves, target none, rationale pin 59b9b7087 gives SHA256 47f3a4e5 which equals the committed AGENTS.md; retain-only so nothing is lost or added",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0602222a6b64b5c7ddf675a474b8c83ee9ac159bca286dd50d3f543e9e542583",
+    "identityFingerprint": "0602222a6b64b5c7ddf675a474b8c83ee9ac159bca286dd50d3f543e9e542583",
+    "claimId": "claim_07e83f30731906c4f25c96625cd95e26",
+    "sourceAnchor": "unheaded-block-51",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-51",
+      "githubAnchor": "unheaded-block-51",
+      "stableAnchor": "unheaded-block-51",
+      "title": "Unheaded block 51",
+      "startLine": 283,
+      "endLine": 290,
+      "textDigest": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc",
+      "sample": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)\n- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundati",
+      "identityFingerprint": "0602222a6b64b5c7ddf675a474b8c83ee9ac159bca286dd50d3f543e9e542583",
+      "ancestry": [
+        "Platform Operating Laws"
+      ],
+      "text": "- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)\n- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)\n- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)\n- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)\n- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)\n- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)\n- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)\n- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_07e83f30731906c4f25c96625cd95e26"
+}
+```
+
+## Entry claim_4c8b5dcba297831ece58a92091e942d6
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_4c8b5dcba297831ece58a92091e942d6",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_4c8b5dcba297831ece58a92091e942d6",
+    "sourceUnitDigest": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-52 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_4c8b5dcba297831ece58a92091e942d6",
+    "sourceUnitDigest": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-52 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-52 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "f00d38c2a727238520d4481c55505b14c6a1d67c2f2a570b6f30a8239e792616",
+    "identityFingerprint": "f00d38c2a727238520d4481c55505b14c6a1d67c2f2a570b6f30a8239e792616",
+    "claimId": "claim_4c8b5dcba297831ece58a92091e942d6",
+    "sourceAnchor": "unheaded-block-52",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb",
+    "claimKind": "verification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-52",
+      "githubAnchor": "unheaded-block-52",
+      "stableAnchor": "unheaded-block-52",
+      "title": "Unheaded block 52",
+      "startLine": 292,
+      "endLine": 292,
+      "textDigest": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb",
+      "sample": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires supersedin",
+      "identityFingerprint": "f00d38c2a727238520d4481c55505b14c6a1d67c2f2a570b6f30a8239e792616",
+      "ancestry": [
+        "Platform Operating Laws"
+      ],
+      "text": "Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_4c8b5dcba297831ece58a92091e942d6"
+}
+```
+
+## Entry claim_e59f80485141f1b75d155dca7272c34e
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_e59f80485141f1b75d155dca7272c34e",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_e59f80485141f1b75d155dca7272c34e",
+    "sourceUnitDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-53 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_e59f80485141f1b75d155dca7272c34e",
+    "sourceUnitDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-53 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: sampled; the unit text at L294-294 (<!-- fgos:instruction-projection:end -->) is present verbatim in AGENTS.md at HEAD, digest recomputed by the extractor and by hand sha256 of the lines equals the shown one, anchor unheaded-block-53 resolves, target none, rationale pin 59b9b7087 gives SHA256 47f3a4e5 which equals the committed AGENTS.md; retain-only so nothing is lost or added",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+    "identityFingerprint": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+    "claimId": "claim_e59f80485141f1b75d155dca7272c34e",
+    "sourceAnchor": "unheaded-block-53",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-53",
+      "githubAnchor": "unheaded-block-53",
+      "stableAnchor": "unheaded-block-53",
+      "title": "Unheaded block 53",
+      "startLine": 294,
+      "endLine": 294,
+      "textDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+      "sample": "<!-- fgos:instruction-projection:end -->",
+      "identityFingerprint": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+      "ancestry": [
+        "Platform Operating Laws"
+      ],
+      "text": "<!-- fgos:instruction-projection:end -->"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_e59f80485141f1b75d155dca7272c34e"
+}
+```
+
+## Entry claim_77dd0bf33d012bb3b23d9a8e8f0f7d3e
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_77dd0bf33d012bb3b23d9a8e8f0f7d3e",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_77dd0bf33d012bb3b23d9a8e8f0f7d3e",
+    "sourceUnitDigest": "60091b05c3c7e85182c3645da54621b6e3b9fdb4da2666cdd5ede92dbe6c9b9a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-6 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_77dd0bf33d012bb3b23d9a8e8f0f7d3e",
+    "sourceUnitDigest": "60091b05c3c7e85182c3645da54621b6e3b9fdb4da2666cdd5ede92dbe6c9b9a",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-6 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-6 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "38c535b908324eeb35b8cd8e372768f2038aacd6f4fef2c624decb7ee11a4422",
+    "identityFingerprint": "38c535b908324eeb35b8cd8e372768f2038aacd6f4fef2c624decb7ee11a4422",
+    "claimId": "claim_77dd0bf33d012bb3b23d9a8e8f0f7d3e",
+    "sourceAnchor": "unheaded-block-6",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "60091b05c3c7e85182c3645da54621b6e3b9fdb4da2666cdd5ede92dbe6c9b9a",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-6",
+      "githubAnchor": "unheaded-block-6",
+      "stableAnchor": "unheaded-block-6",
+      "title": "Unheaded block 6",
+      "startLine": 26,
+      "endLine": 26,
+      "textDigest": "60091b05c3c7e85182c3645da54621b6e3b9fdb4da2666cdd5ede92dbe6c9b9a",
+      "sample": "Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus ",
+      "identityFingerprint": "38c535b908324eeb35b8cd8e372768f2038aacd6f4fef2c624decb7ee11a4422",
+      "ancestry": [
+        "forgent",
+        "Product priority order (D-ADR0030, docs/specs/runner.md)"
+      ],
+      "text": "Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's \"Lịch sử quyết định\" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_77dd0bf33d012bb3b23d9a8e8f0f7d3e"
+}
+```
+
+## Entry claim_f5c89fb59effe1dbfc4f83d06a78aefa
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_f5c89fb59effe1dbfc4f83d06a78aefa",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_f5c89fb59effe1dbfc4f83d06a78aefa",
+    "sourceUnitDigest": "2f43e6ba7d13c017035a4295381b83e9a4d21eaf658d0c1f90f4bbf9608c137f",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-7 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_f5c89fb59effe1dbfc4f83d06a78aefa",
+    "sourceUnitDigest": "2f43e6ba7d13c017035a4295381b83e9a4d21eaf658d0c1f90f4bbf9608c137f",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-7 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-7 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "cb71ba812d7994a469718956fc59a066abed3919eca5abdde7715883526fb4fe",
+    "identityFingerprint": "cb71ba812d7994a469718956fc59a066abed3919eca5abdde7715883526fb4fe",
+    "claimId": "claim_f5c89fb59effe1dbfc4f83d06a78aefa",
+    "sourceAnchor": "unheaded-block-7",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "2f43e6ba7d13c017035a4295381b83e9a4d21eaf658d0c1f90f4bbf9608c137f",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-7",
+      "githubAnchor": "unheaded-block-7",
+      "stableAnchor": "unheaded-block-7",
+      "title": "Unheaded block 7",
+      "startLine": 30,
+      "endLine": 32,
+      "textDigest": "2f43e6ba7d13c017035a4295381b83e9a4d21eaf658d0c1f90f4bbf9608c137f",
+      "sample": "fgOS tồn tại để: \n 1. phát triển các project khác \n 2. làm nền vận hành các business base workflow",
+      "identityFingerprint": "cb71ba812d7994a469718956fc59a066abed3919eca5abdde7715883526fb4fe",
+      "ancestry": [
+        "forgent",
+        "Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)"
+      ],
+      "text": "fgOS tồn tại để: \n 1. phát triển các project khác \n 2. làm nền vận hành các business base workflow"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_f5c89fb59effe1dbfc4f83d06a78aefa"
+}
+```
+
+## Entry claim_a719410d0483e23da77bdbc36c01983a
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_a719410d0483e23da77bdbc36c01983a",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_a719410d0483e23da77bdbc36c01983a",
+    "sourceUnitDigest": "0423f98e178718c6acb150ab0fe91edf12bdcbaac258e1c213aeb912fd1d625f",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-8 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_a719410d0483e23da77bdbc36c01983a",
+    "sourceUnitDigest": "0423f98e178718c6acb150ab0fe91edf12bdcbaac258e1c213aeb912fd1d625f",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-8 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-8 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "9f2d17b816d3b450fa285c1ba97b8151c25703960a00b4a1411c5bb5dad7d75c",
+    "identityFingerprint": "9f2d17b816d3b450fa285c1ba97b8151c25703960a00b4a1411c5bb5dad7d75c",
+    "claimId": "claim_a719410d0483e23da77bdbc36c01983a",
+    "sourceAnchor": "unheaded-block-8",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0423f98e178718c6acb150ab0fe91edf12bdcbaac258e1c213aeb912fd1d625f",
+    "claimKind": "vision",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-8",
+      "githubAnchor": "unheaded-block-8",
+      "stableAnchor": "unheaded-block-8",
+      "title": "Unheaded block 8",
+      "startLine": 34,
+      "endLine": 34,
+      "textDigest": "0423f98e178718c6acb150ab0fe91edf12bdcbaac258e1c213aeb912fd1d625f",
+      "sample": "fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên c",
+      "identityFingerprint": "9f2d17b816d3b450fa285c1ba97b8151c25703960a00b4a1411c5bb5dad7d75c",
+      "ancestry": [
+        "forgent",
+        "Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)"
+      ],
+      "text": "fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi \"sửa fgOS\" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/specs/platform-foundations.md's \"Lịch sử quyết định\" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4)."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_a719410d0483e23da77bdbc36c01983a"
+}
+```
+
+## Entry claim_5225c43306e2c6004040bcdc1c833b9b
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_5225c43306e2c6004040bcdc1c833b9b",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_5225c43306e2c6004040bcdc1c833b9b",
+    "sourceUnitDigest": "4c9c8cc9ca45762d287d773c9625e674f5eed86e549fceb7f42325667a575d80",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-9 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_5225c43306e2c6004040bcdc1c833b9b",
+    "sourceUnitDigest": "4c9c8cc9ca45762d287d773c9625e674f5eed86e549fceb7f42325667a575d80",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#unheaded-block-9 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#unheaded-block-9 digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "a863722d44f7db7055c38f38bbd28d772628298088c27befedbfbf9b93531f48",
+    "identityFingerprint": "a863722d44f7db7055c38f38bbd28d772628298088c27befedbfbf9b93531f48",
+    "claimId": "claim_5225c43306e2c6004040bcdc1c833b9b",
+    "sourceAnchor": "unheaded-block-9",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "4c9c8cc9ca45762d287d773c9625e674f5eed86e549fceb7f42325667a575d80",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-9",
+      "githubAnchor": "unheaded-block-9",
+      "stableAnchor": "unheaded-block-9",
+      "title": "Unheaded block 9",
+      "startLine": 39,
+      "endLine": 41,
+      "textDigest": "4c9c8cc9ca45762d287d773c9625e674f5eed86e549fceb7f42325667a575d80",
+      "sample": "Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever\nyou're about to change. Specs are the state layer — BA-grade, tech-agnostic — read\nthe spec be",
+      "identityFingerprint": "a863722d44f7db7055c38f38bbd28d772628298088c27befedbfbf9b93531f48",
+      "ancestry": [
+        "forgent",
+        "Before touching code"
+      ],
+      "text": "Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever\nyou're about to change. Specs are the state layer — BA-grade, tech-agnostic — read\nthe spec before the code."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_5225c43306e2c6004040bcdc1c833b9b"
+}
+```
+
+## Entry claim_33fda3508cbed38745f7b6796ea65709
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_33fda3508cbed38745f7b6796ea65709",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_33fda3508cbed38745f7b6796ea65709",
+    "sourceUnitDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#using-cli-fallback as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_33fda3508cbed38745f7b6796ea65709",
+    "sourceUnitDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#using-cli-fallback as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: sampled; the unit text at L199-199 (### Using CLI fallback) is present verbatim in AGENTS.md at HEAD, digest recomputed by the extractor equals the shown one, anchor using-cli-fallback resolves, target none, rationale pin 59b9b7087 gives SHA256 47f3a4e5 which equals the committed AGENTS.md; retain-only so nothing is lost or added",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0792cde98de8f0ac84eac0a49f473981a04bb641227e8f1f3d3508fa878a4f69",
+    "identityFingerprint": "ac55ea750c0493c91beb4800994cd142fc91a14dd4a3a5328e6669db560f9c31",
+    "claimId": "claim_33fda3508cbed38745f7b6796ea65709",
+    "sourceAnchor": "using-cli-fallback",
+    "unitKind": "heading",
+    "sourceUnitDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "Using CLI fallback",
+      "anchor": "using-cli-fallback",
+      "githubAnchor": "using-cli-fallback",
+      "stableAnchor": "h-395b6f7b6edc",
+      "startLine": 199,
+      "endLine": 199,
+      "textDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+      "sample": "Using CLI fallback",
+      "sectionPayloadDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+      "followingBlockDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+      "identityFingerprint": "ac55ea750c0493c91beb4800994cd142fc91a14dd4a3a5328e6669db560f9c31",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "### Using CLI fallback",
+      "sectionText": "### Using CLI fallback\n\n```sh\nmdview open <absolute-path-to-file.md>\n```"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_33fda3508cbed38745f7b6796ea65709"
+}
+```
+
+## Entry claim_9f129b46b75d0c4d4e7119da265c74b0
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_9f129b46b75d0c4d4e7119da265c74b0",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_9f129b46b75d0c4d4e7119da265c74b0",
+    "sourceUnitDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#using-mcp-preferred as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_9f129b46b75d0c4d4e7119da265c74b0",
+    "sourceUnitDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#using-mcp-preferred as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "mechanical: AGENTS.md#using-mcp-preferred digest recomputed by the extractor at 19ca8de23 and at HEAD equals the shown digest, anchor resolves, target none, rationale SHA256 47f3a4e5 at pin 59b9b7087 equals the committed file; unit text was not read",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "add9ae634458efb15c314541de6a24d7d31d6075f980993b30645461042f9c24",
+    "identityFingerprint": "80bcdb5b6c8e6e58e4a9f9f08e7d0eac18adc118c19dafae2a1271ae0766abca",
+    "claimId": "claim_9f129b46b75d0c4d4e7119da265c74b0",
+    "sourceAnchor": "using-mcp-preferred",
+    "unitKind": "heading",
+    "sourceUnitDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "Using MCP (preferred)",
+      "anchor": "using-mcp-preferred",
+      "githubAnchor": "using-mcp-preferred",
+      "stableAnchor": "h-d8b172b58703",
+      "startLine": 188,
+      "endLine": 188,
+      "textDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+      "sample": "Using MCP (preferred)",
+      "sectionPayloadDigest": "3ca5741759261d7ba84669ad09a2b7bb5b94acd64316912ea79fead73397a330",
+      "followingBlockDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+      "identityFingerprint": "80bcdb5b6c8e6e58e4a9f9f08e7d0eac18adc118c19dafae2a1271ae0766abca",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "### Using MCP (preferred)",
+      "sectionText": "### Using MCP (preferred)\n\nCall `mdview_view_file` with:\n\n- `project_root`: absolute path to the project root\n- `relative_path`: the file path relative to that root\n\nIt returns a browser `url`. Tell the user: \"You can view this at: `<url>`\".\nThe server auto-registers the project on first use and indexes the file\nimmediately."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_9f129b46b75d0c4d4e7119da265c74b0"
+}
+```
+
+## Entry claim_73ca3e1b87514a160d7114e22318f1e9
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_73ca3e1b87514a160d7114e22318f1e9",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_73ca3e1b87514a160d7114e22318f1e9",
+    "sourceUnitDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#when-to-render as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_73ca3e1b87514a160d7114e22318f1e9",
+    "sourceUnitDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "L10-3: retain AGENTS.md#when-to-render as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewNote": "deep: sampled; the unit text at L205-205 (### When to render) is present verbatim in AGENTS.md at HEAD, digest recomputed by the extractor equals the shown one, anchor when-to-render resolves, target none, rationale pin 59b9b7087 gives SHA256 47f3a4e5 which equals the committed AGENTS.md; retain-only so nothing is lost or added",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "3dae37d5d36974bbfdb4a9fe17a2e07d382905b25c6272be1058cdfbd2db26b6",
+    "identityFingerprint": "147222488a836b02a9081f3efb61f8a098a36bc197ecec6248a4ab3b828c5cfe",
+    "claimId": "claim_73ca3e1b87514a160d7114e22318f1e9",
+    "sourceAnchor": "when-to-render",
+    "unitKind": "heading",
+    "sourceUnitDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+    "claimKind": "unclassified",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "When to render",
+      "anchor": "when-to-render",
+      "githubAnchor": "when-to-render",
+      "stableAnchor": "h-78815ec6e3bb",
+      "startLine": 205,
+      "endLine": 205,
+      "textDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+      "sample": "When to render",
+      "sectionPayloadDigest": "8772b52c2f648e9051b5724741ea577dfae619775654c3f3dddb52774e71c37e",
+      "followingBlockDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+      "identityFingerprint": "147222488a836b02a9081f3efb61f8a098a36bc197ecec6248a4ab3b828c5cfe",
+      "ancestry": [
+        "forgent",
+        "Documentation Viewing (MDView)"
+      ],
+      "text": "### When to render",
+      "sectionText": "### When to render\n\nSpin up a preview for long docs, tables, Mermaid diagrams, multi-file document\nsets, or when the user asks to \"preview\"/\"render\". Skip it for short, trivial\nsnippets.\n<!-- mdview:END -->\n\n<!-- gitnexus:start -->"
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_73ca3e1b87514a160d7114e22318f1e9"
+}
+```
+
+## Entry claim_3de04e2fc7142ed6f2d1d6639e4c3dda
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_3de04e2fc7142ed6f2d1d6639e4c3dda",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_3de04e2fc7142ed6f2d1d6639e4c3dda",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-10",
+    "sourceUnitDigest": "3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_3de04e2fc7142ed6f2d1d6639e4c3dda records the historical native instruction identity AGENTS.md#unheaded-block-10 (digest 3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_3de04e2fc7142ed6f2d1d6639e4c3dda",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-10",
+    "sourceUnitDigest": "3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_3de04e2fc7142ed6f2d1d6639e4c3dda records the historical native instruction identity AGENTS.md#unheaded-block-10 (digest 3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: historical identity AGENTS.md#unheaded-block-10; the witness text (L43-49, f33612119) hashes to the shown digest, is present in AGENTS.md at that commit and the rationale states plainly that the old text is not claimed to be the current unit at this anchor; target none, nothing carried, pin SHA256 47f3a4e5 checked",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "77e986e5a5738181f9b53b050e28075b2532eea0ededca45ff2e58263a9cb78d",
+    "identityFingerprint": "77e986e5a5738181f9b53b050e28075b2532eea0ededca45ff2e58263a9cb78d",
+    "claimId": "claim_3de04e2fc7142ed6f2d1d6639e4c3dda",
+    "sourceAnchor": "unheaded-block-10",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-10 is not a stable heading anchor"
+  },
+  "sourceWitness": {
+    "commit": "f33612119f1158716b6797859598033cda6eb89c",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-10",
+      "githubAnchor": "unheaded-block-10",
+      "stableAnchor": "unheaded-block-10",
+      "title": "Unheaded block 10",
+      "startLine": 43,
+      "endLine": 49,
+      "textDigest": "3e31a6424a4469dd4a7d238a9113fca9ab926a0deacd65b4192f36dd1c4c6d89",
+      "sample": "**Prior art before design.** Before designing a mechanism, find out what already existed\nand why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term",
+      "identityFingerprint": "77e986e5a5738181f9b53b050e28075b2532eea0ededca45ff2e58263a9cb78d",
+      "ancestry": [
+        "forgent",
+        "Before touching code"
+      ],
+      "text": "**Prior art before design.** Before designing a mechanism, find out what already existed\nand why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term,\nalso under the executor ids and names the thing had before the renames (ids were renamed and\ndormant ones deleted), and read the area spec's \"Lịch sử quyết định\" and settled-facts\nsections. A plan's facts phase answers \"what existed before, and which change removed it,\nand was that intended?\" next to its questions about current code. Reuse or extend what is\nfound; say in the plan what was reused and what was missing."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_3de04e2fc7142ed6f2d1d6639e4c3dda"
+}
+```
+
+## Entry claim_d8880e475680012ef18a447f529e9d4f
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_d8880e475680012ef18a447f529e9d4f",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_d8880e475680012ef18a447f529e9d4f",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-12",
+    "sourceUnitDigest": "29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_d8880e475680012ef18a447f529e9d4f records the historical native instruction identity AGENTS.md#unheaded-block-12 (digest 29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_d8880e475680012ef18a447f529e9d4f",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-12",
+    "sourceUnitDigest": "29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_d8880e475680012ef18a447f529e9d4f records the historical native instruction identity AGENTS.md#unheaded-block-12 (digest 29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: historical identity AGENTS.md#unheaded-block-12; the witness text (L54-66, 5df843bdb) hashes to the shown digest, is present in AGENTS.md at that commit and the rationale states plainly that the old text is not claimed to be the current unit at this anchor; target none, nothing carried, pin SHA256 47f3a4e5 checked",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "26f06b5d24cda6b910ccbe8f60010e41bdc7d9f5c3890371c508fbe3afa2c668",
+    "identityFingerprint": "26f06b5d24cda6b910ccbe8f60010e41bdc7d9f5c3890371c508fbe3afa2c668",
+    "claimId": "claim_d8880e475680012ef18a447f529e9d4f",
+    "sourceAnchor": "unheaded-block-12",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-12 is not a stable heading anchor"
+  },
+  "sourceWitness": {
+    "commit": "5df843bdb90527b326974a71cc9d288fac4393bc",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-12",
+      "githubAnchor": "unheaded-block-12",
+      "stableAnchor": "unheaded-block-12",
+      "title": "Unheaded block 12",
+      "startLine": 54,
+      "endLine": 66,
+      "textDigest": "29f993be5c8705744b12957cb1dfd328fc338ca8d6a368c78876e8d82d8f4109",
+      "sample": "1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n2. **What kind of work is this?** Check it against the area's spec and\n   `docs/backlog.md`; a ",
+      "identityFingerprint": "26f06b5d24cda6b910ccbe8f60010e41bdc7d9f5c3890371c508fbe3afa2c668",
+      "ancestry": [
+        "forgent",
+        "Definition of done (platform-foundations L5)"
+      ],
+      "text": "1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.\n2. **What kind of work is this?** Check it against the area's spec and\n   `docs/backlog.md`; a new product area gets a spec before it gets code.\n3. **What contract does it touch?** `docs/routing-handoff-contract.md` for\n   agent-to-agent boundaries; the area spec's Shared Entities table for\n   in-process contracts.\n4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,\n   or existing covered behavior in the test suite? Either raises the bar.\n5. **What proof means done?** `npm test` (state + cli + runner + e2e suite) green;\n   new or changed behavior gets a matching test.\n6. **What learning gets left behind?** A settled decision goes into\n   `docs/decisions/`; a settled spec fact goes into the relevant\n   `docs/specs/<area>.md`."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_d8880e475680012ef18a447f529e9d4f"
+}
+```
+
+## Entry claim_903d53d47d24348c7f74569a2b68db7e
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_903d53d47d24348c7f74569a2b68db7e",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_903d53d47d24348c7f74569a2b68db7e",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-13",
+    "sourceUnitDigest": "91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_903d53d47d24348c7f74569a2b68db7e records the historical native instruction identity AGENTS.md#unheaded-block-13 (digest 91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_903d53d47d24348c7f74569a2b68db7e",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-13",
+    "sourceUnitDigest": "91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_903d53d47d24348c7f74569a2b68db7e records the historical native instruction identity AGENTS.md#unheaded-block-13 (digest 91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: historical identity AGENTS.md#unheaded-block-13; the witness text (L70-70, 5df843bdb) hashes to the shown digest, is present in AGENTS.md at that commit and the rationale states plainly that the old text is not claimed to be the current unit at this anchor; target none, nothing carried, pin SHA256 47f3a4e5 checked",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "5268d0f87d9491a512401824c12594347e7dd8fcef7829cc9afa97569c1067f4",
+    "identityFingerprint": "5268d0f87d9491a512401824c12594347e7dd8fcef7829cc9afa97569c1067f4",
+    "claimId": "claim_903d53d47d24348c7f74569a2b68db7e",
+    "sourceAnchor": "unheaded-block-13",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-13 is not a stable heading anchor"
+  },
+  "sourceWitness": {
+    "commit": "5df843bdb90527b326974a71cc9d288fac4393bc",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-13",
+      "githubAnchor": "unheaded-block-13",
+      "stableAnchor": "unheaded-block-13",
+      "title": "Unheaded block 13",
+      "startLine": 70,
+      "endLine": 70,
+      "textDigest": "91cfb1a76c93278e5944afad4fc06073798af2103066f2558cd659de938d3ec3",
+      "sample": "`bin/fgos.mjs` is the `legacy-node` payload entry, staged whole under a release's `components.legacyNode.root` and exec'd by the Rust host at `components.legacyNode.entry` — never ",
+      "identityFingerprint": "5268d0f87d9491a512401824c12594347e7dd8fcef7829cc9afa97569c1067f4",
+      "ancestry": [
+        "forgent",
+        "Legacy-Node CLI Ownership Boundary"
+      ],
+      "text": "`bin/fgos.mjs` is the `legacy-node` payload entry, staged whole under a release's `components.legacyNode.root` and exec'd by the Rust host at `components.legacyNode.entry` — never relocated, never renamed in the source tree. The Rust host resolves this file only through the release manifest's `components.legacyNode` fields, never PATH, never cwd, never hardcoded outside the manifest. Global npm `bin.fgos` and fallback `node bin/fgos.mjs` remain compatibility channels that call this file directly."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_903d53d47d24348c7f74569a2b68db7e"
+}
+```
+
+## Entry claim_4bc8eb18f4e9c507c2f05a9467a16b4c
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_4bc8eb18f4e9c507c2f05a9467a16b4c",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_4bc8eb18f4e9c507c2f05a9467a16b4c",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-20",
+    "sourceUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_4bc8eb18f4e9c507c2f05a9467a16b4c records the historical native instruction identity AGENTS.md#unheaded-block-20 (digest 227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_4bc8eb18f4e9c507c2f05a9467a16b4c",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-20",
+    "sourceUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_4bc8eb18f4e9c507c2f05a9467a16b4c records the historical native instruction identity AGENTS.md#unheaded-block-20 (digest 227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: historical identity AGENTS.md#unheaded-block-20; the witness text (L159-162, 2300d6557) hashes to the shown digest, is present in AGENTS.md at that commit and the rationale states plainly that the old text is not claimed to be the current unit at this anchor; target none, nothing carried, pin SHA256 47f3a4e5 checked",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+    "identityFingerprint": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+    "claimId": "claim_4bc8eb18f4e9c507c2f05a9467a16b4c",
+    "sourceAnchor": "unheaded-block-20",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-20 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-20",
+    "dispositionRationale": "unit reworked; successor unit needs content review",
+    "dispositionEvidence": [
+      "classification real-edit"
+    ],
+    "dispositionSource": "carry-forward-classification",
+    "dispositionConfidence": "needs-owner-review",
+    "dispositionReviewer": "lead 2026-10-06"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-27",
+      "githubAnchor": "unheaded-block-27",
+      "stableAnchor": "unheaded-block-27",
+      "title": "Unheaded block 27",
+      "startLine": 162,
+      "endLine": 165,
+      "textDigest": "227ca5a5e89112140bd9827bb072840016509dd62d8868ad83d5feccd5715906",
+      "sample": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not wh",
+      "identityFingerprint": "c8cebad809cd76a514660363a0b440cb9f9b4dbbcdbabe6d74e83d5fcc239369",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.\n- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.\n- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_4bc8eb18f4e9c507c2f05a9467a16b4c"
+}
+```
+
+## Entry claim_8e643b64b72bef823e75904425fc6d07
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_8e643b64b72bef823e75904425fc6d07",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_8e643b64b72bef823e75904425fc6d07",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-20",
+    "sourceUnitDigest": "2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_8e643b64b72bef823e75904425fc6d07 records the historical native instruction identity AGENTS.md#unheaded-block-20 (digest 2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_8e643b64b72bef823e75904425fc6d07",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-20",
+    "sourceUnitDigest": "2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_8e643b64b72bef823e75904425fc6d07 records the historical native instruction identity AGENTS.md#unheaded-block-20 (digest 2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: historical identity AGENTS.md#unheaded-block-20; the witness text (L136-140, b33876bce) hashes to the shown digest by hand sha256 as well, is present in AGENTS.md at that commit and the rationale states plainly that the old text is not claimed to be the current unit at this anchor; target none, nothing carried, pin SHA256 47f3a4e5 checked",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "0453782a9e27e1d01b4d54d9b47445a8e378ee47c9b9bcd47a68f8091b543e42",
+    "identityFingerprint": "0453782a9e27e1d01b4d54d9b47445a8e378ee47c9b9bcd47a68f8091b543e42",
+    "claimId": "claim_8e643b64b72bef823e75904425fc6d07",
+    "sourceAnchor": "unheaded-block-20",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-20 is not a stable heading anchor"
+  },
+  "sourceWitness": {
+    "commit": "b33876bce00d485d7ef238b784a154e6015fac4b",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-20",
+      "githubAnchor": "unheaded-block-20",
+      "stableAnchor": "unheaded-block-20",
+      "title": "Unheaded block 20",
+      "startLine": 136,
+      "endLine": 140,
+      "textDigest": "2921133d68f4ba5dfc0428f6e63c3eafc839091ef150a7d174a7ec0925bb185e",
+      "sample": "Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của\ntình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum, gom lại — gom\ntới khi hết; quy mô không bao g",
+      "identityFingerprint": "0453782a9e27e1d01b4d54d9b47445a8e378ee47c9b9bcd47a68f8091b543e42",
+      "ancestry": [
+        "forgent",
+        "RUL11 — tùm lum, không phải nặng (D-ADR0036, docs/specs/platform-foundations.md)"
+      ],
+      "text": "Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của\ntình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum, gom lại — gom\ntới khi hết; quy mô không bao giờ là lý do miễn trừ. Đích của mọi lần gom\nlà một hình dạng duy nhất: ranh giới rõ, contract tường minh, đổi và biến\nhình dễ, không chắp vá."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_8e643b64b72bef823e75904425fc6d07"
+}
+```
+
+## Entry claim_5c520fcb1a68ba27e2093341834258c7
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-22",
+    "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-2 supersedes the earlier A34 source-to-self partial-carry acceptance with reclassify-out-of-platform-scope, pending independent review. The historical two-line unit claim_5c520fcb1a68ba27e2093341834258c7 has old digest 938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895. Both complete original lines are retained in the always-loaded AGENTS.md, outside platform documentation authority: (1) `fgos run` is the primary door for executing new work in the execution core. (2) For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment. The first retained native identity is claim_bfd24ffa5a43c26830bb9771c04de7f1 at AGENTS.md#unheaded-block-22 with digest b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8; the second is claim_2ae81c7bed935553943d6777b81e2114 at AGENTS.md#unheaded-block-24 with digest e4e33c148710cfb9775867b0160ed6e82d2e469d0f118ad9ba5ae33ce79c2484. Residual evidence plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json has SHA256 d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d. Both native identities are preserved; the claim_2ae81c7bed935553943d6777b81e2114 decision remains byte-for-byte unchanged in its existing shard. No platform instruction copy is created. Q5a and L10-3 retain all root doctrine outside platform authority. This reclassification is not source-to-self carry proof, truth certification or approval carry. Source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at HEAD 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-22",
+    "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-2 supersedes the earlier A34 source-to-self partial-carry acceptance with reclassify-out-of-platform-scope, pending independent review. The historical two-line unit claim_5c520fcb1a68ba27e2093341834258c7 has old digest 938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895. Both complete original lines are retained in the always-loaded AGENTS.md, outside platform documentation authority: (1) `fgos run` is the primary door for executing new work in the execution core. (2) For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment. The first retained native identity is claim_bfd24ffa5a43c26830bb9771c04de7f1 at AGENTS.md#unheaded-block-22 with digest b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8; the second is claim_2ae81c7bed935553943d6777b81e2114 at AGENTS.md#unheaded-block-24 with digest e4e33c148710cfb9775867b0160ed6e82d2e469d0f118ad9ba5ae33ce79c2484. Residual evidence plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json has SHA256 d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d. Both native identities are preserved; the claim_2ae81c7bed935553943d6777b81e2114 decision remains byte-for-byte unchanged in its existing shard. No platform instruction copy is created. Q5a and L10-3 retain all root doctrine outside platform authority. This reclassification is not source-to-self carry proof, truth certification or approval carry. Source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at HEAD 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: the two-line unit (digest 938342cd) is recomputed from the witness text; both lines are present in AGENTS.md at HEAD (lines 152 and 156) as units unheaded-block-22 and 24 whose digests b093c6fb and e4e33c14 match the rationale; the residual evidence file sha256 d4bd139d is right; claim_2ae81c7b is byte-identical to its state at the comparison base; target none, nothing carried",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "82eaf1f6b88b8e45913b626cd3d3d3a1dc1a1bbe6603647cc3c6707171c0d089",
+    "identityFingerprint": "82eaf1f6b88b8e45913b626cd3d3d3a1dc1a1bbe6603647cc3c6707171c0d089",
+    "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+    "sourceAnchor": "unheaded-block-22",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-22 is not a stable heading anchor"
+  },
+  "sourceWitness": {
+    "commit": "461e12d12a2186c53ae2eec0953bcd7cec83192b",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-22",
+      "githubAnchor": "unheaded-block-22",
+      "stableAnchor": "unheaded-block-22",
+      "title": "Unheaded block 22",
+      "startLine": 149,
+      "endLine": 150,
+      "textDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
+      "sample": "`fgos run` is the primary door for executing new work in the execution core.\nFor routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (",
+      "identityFingerprint": "82eaf1f6b88b8e45913b626cd3d3d3a1dc1a1bbe6603647cc3c6707171c0d089",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "`fgos run` is the primary door for executing new work in the execution core.\nFor routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_5c520fcb1a68ba27e2093341834258c7"
+}
+```
+
+## Entry claim_0bf7d168f64e5d7bf9add3470f4b6ec4
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-23",
+    "sourceUnitDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_0bf7d168f64e5d7bf9add3470f4b6ec4 records the historical native instruction identity AGENTS.md#unheaded-block-23 (digest d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-23",
+    "sourceUnitDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_0bf7d168f64e5d7bf9add3470f4b6ec4 records the historical native instruction identity AGENTS.md#unheaded-block-23 (digest d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: historical identity AGENTS.md#unheaded-block-23; the witness text (L155-155, fba5d0426) hashes to the shown digest, is present in AGENTS.md at that commit and the rationale states plainly that the old text is not claimed to be the current unit at this anchor; target none, nothing carried, pin SHA256 47f3a4e5 checked",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "67652c25cf281e56be58d02505683c4b9b29f8e8cd1067879d05ad93ef5fe61b",
+    "identityFingerprint": "67652c25cf281e56be58d02505683c4b9b29f8e8cd1067879d05ad93ef5fe61b",
+    "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
+    "sourceAnchor": "unheaded-block-23",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-23 is not a stable heading anchor"
+  },
+  "sourceWitness": {
+    "commit": "fba5d042675c4348fb46fb39464e495517ed3eb7",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-25",
+      "githubAnchor": "unheaded-block-25",
+      "stableAnchor": "unheaded-block-25",
+      "title": "Unheaded block 25",
+      "startLine": 155,
+      "endLine": 155,
+      "textDigest": "d7739e01344e0690261be6b9b224533f7adeae09df56f59f5cd8d474aad51207",
+      "sample": "**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or",
+      "identityFingerprint": "67652c25cf281e56be58d02505683c4b9b29f8e8cd1067879d05ad93ef5fe61b",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or compatibility alias `node src/runner/dispatch.mjs decide`) first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4"
+}
+```
+
+## Entry claim_47e8159f8179edd8e17fd67c744d1e89
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-25",
+    "sourceUnitDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_47e8159f8179edd8e17fd67c744d1e89 records the historical native instruction identity AGENTS.md#unheaded-block-25 (digest 0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-25",
+    "sourceUnitDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_47e8159f8179edd8e17fd67c744d1e89 records the historical native instruction identity AGENTS.md#unheaded-block-25 (digest 0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: historical identity AGENTS.md#unheaded-block-25; the witness text (L159-162, ab8cd3fc9) hashes to the shown digest, is present in AGENTS.md at that commit and the rationale states plainly that the old text is not claimed to be the current unit at this anchor; target none, nothing carried, pin SHA256 47f3a4e5 checked",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "9f88d13d3001cff6fdc45961d3453270c5092b5b014b649638e0085070d7a335",
+    "identityFingerprint": "9f88d13d3001cff6fdc45961d3453270c5092b5b014b649638e0085070d7a335",
+    "claimId": "claim_47e8159f8179edd8e17fd67c744d1e89",
+    "sourceAnchor": "unheaded-block-25",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-25 is not a stable heading anchor"
+  },
+  "sourceWitness": {
+    "commit": "ab8cd3fc93741085b7a6af67c77d13478a1f0cdf",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-27",
+      "githubAnchor": "unheaded-block-27",
+      "stableAnchor": "unheaded-block-27",
+      "title": "Unheaded block 27",
+      "startLine": 159,
+      "endLine": 162,
+      "textDigest": "0f92ddb61556abcd67763a48ab1ad339f83d77aab6c2f4b399ef7418672b5a09",
+      "sample": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not wh",
+      "identityFingerprint": "9f88d13d3001cff6fdc45961d3453270c5092b5b014b649638e0085070d7a335",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to an executor"
+      ],
+      "text": "- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).\n- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.\n- `decide --work <id> [--step <step>]` — you have a real work item and want it dispatched.\n- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_47e8159f8179edd8e17fd67c744d1e89"
+}
+```
+
+## Entry claim_56d2e0f6f92f0430dab1e197c01d67ad
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_56d2e0f6f92f0430dab1e197c01d67ad",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_56d2e0f6f92f0430dab1e197c01d67ad",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-25",
+    "sourceUnitDigest": "3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_56d2e0f6f92f0430dab1e197c01d67ad records the historical native instruction identity AGENTS.md#unheaded-block-25 (digest 3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_56d2e0f6f92f0430dab1e197c01d67ad",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-25",
+    "sourceUnitDigest": "3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_56d2e0f6f92f0430dab1e197c01d67ad records the historical native instruction identity AGENTS.md#unheaded-block-25 (digest 3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: historical identity AGENTS.md#unheaded-block-25; the witness text (L120-120, 120af6b3d) hashes to the shown digest, is present in AGENTS.md at that commit and the rationale states plainly that the old text is not claimed to be the current unit at this anchor; target none, nothing carried, pin SHA256 47f3a4e5 checked",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "86502b551eee4640bc4b6439aef3e3d4088ec5ef35278252d1965d4133f770ba",
+    "identityFingerprint": "86502b551eee4640bc4b6439aef3e3d4088ec5ef35278252d1965d4133f770ba",
+    "claimId": "claim_56d2e0f6f92f0430dab1e197c01d67ad",
+    "sourceAnchor": "unheaded-block-25",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-25 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-25",
+    "dispositionRationale": "content unchanged, unit boundary or position moved within the same file",
+    "dispositionEvidence": [
+      "classification renumbered-only"
+    ],
+    "dispositionSource": "carry-forward-classification",
+    "dispositionConfidence": "high",
+    "dispositionReviewer": "lead 2026-10-06"
+  },
+  "sourceWitness": {
+    "commit": "120af6b3de826faec4e98cf72a92d8bcf1a21dff",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-25",
+      "githubAnchor": "unheaded-block-25",
+      "stableAnchor": "unheaded-block-25",
+      "title": "Unheaded block 25",
+      "startLine": 120,
+      "endLine": 120,
+      "textDigest": "3502656dc385cc030c054352caaca9a331d186bfc1470f990ac9126fa1f86d45",
+      "sample": "A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.agents/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-iden",
+      "identityFingerprint": "86502b551eee4640bc4b6439aef3e3d4088ec5ef35278252d1965d4133f770ba",
+      "ancestry": [
+        "forgent",
+        "Dispatch — routing work to a executor"
+      ],
+      "text": "A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.agents/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `plugins/fgOS/skills/_shared/`). `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_56d2e0f6f92f0430dab1e197c01d67ad"
+}
+```
+
+## Entry claim_a55aa524e35b109695acc79c3c4d7c75
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_a55aa524e35b109695acc79c3c4d7c75",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_a55aa524e35b109695acc79c3c4d7c75",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-26",
+    "sourceUnitDigest": "d3121f545f6a84c5ffe0eea34fff6dbaf7578c9c6573ecfda87214959a872021",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_a55aa524e35b109695acc79c3c4d7c75 records the historical native instruction identity AGENTS.md#unheaded-block-26 (digest d3121f545f6a84c5ffe0eea34fff6dbaf7578c9c6573ecfda87214959a872021). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_a55aa524e35b109695acc79c3c4d7c75",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-26",
+    "sourceUnitDigest": "d3121f545f6a84c5ffe0eea34fff6dbaf7578c9c6573ecfda87214959a872021",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_a55aa524e35b109695acc79c3c4d7c75 records the historical native instruction identity AGENTS.md#unheaded-block-26 (digest d3121f545f6a84c5ffe0eea34fff6dbaf7578c9c6573ecfda87214959a872021). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: historical AGENTS.md#unheaded-block-26 has no witness text (stated limitation kept from the earlier accepted review), so its digest could not be recomputed from text; the shown digest equals the rationale digest, the anchor resolves, target none, pin SHA256 47f3a4e5 equals the committed file; no text approved",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "29b90db2b3d1c85a3c1a74152b171f1855b1390bb2808caaa7160b59c2b64754",
+    "identityFingerprint": "29b90db2b3d1c85a3c1a74152b171f1855b1390bb2808caaa7160b59c2b64754",
+    "claimId": "claim_a55aa524e35b109695acc79c3c4d7c75",
+    "sourceAnchor": "unheaded-block-26",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "d3121f545f6a84c5ffe0eea34fff6dbaf7578c9c6573ecfda87214959a872021",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-26 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-26",
+    "dispositionRationale": "unit reworked; successor unit needs content review",
+    "dispositionEvidence": [
+      "classification real-edit"
+    ],
+    "dispositionSource": "carry-forward-classification",
+    "dispositionConfidence": "needs-owner-review",
+    "dispositionReviewer": "lead 2026-10-06"
+  },
+  "sourceWitness": {
+    "commit": null,
+    "unit": null,
+    "limitation": "Historical text unavailable in the authenticated current/prior content and earlier review pack witnesses; no ordinal reconstruction or new conservation approval."
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_a55aa524e35b109695acc79c3c4d7c75"
+}
+```
+
+## Entry claim_adc150a41d48dfde06422405a5b0f277
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_adc150a41d48dfde06422405a5b0f277",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_adc150a41d48dfde06422405a5b0f277",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-30",
+    "sourceUnitDigest": "e19ff915b019695296a84779c61f78737d18266ded2094e5f712297bbb701861",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_adc150a41d48dfde06422405a5b0f277 records the historical native instruction identity AGENTS.md#unheaded-block-30 (digest e19ff915b019695296a84779c61f78737d18266ded2094e5f712297bbb701861). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_adc150a41d48dfde06422405a5b0f277",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-30",
+    "sourceUnitDigest": "e19ff915b019695296a84779c61f78737d18266ded2094e5f712297bbb701861",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_adc150a41d48dfde06422405a5b0f277 records the historical native instruction identity AGENTS.md#unheaded-block-30 (digest e19ff915b019695296a84779c61f78737d18266ded2094e5f712297bbb701861). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: historical AGENTS.md#unheaded-block-30 has no witness text (stated limitation kept from the earlier accepted review), so its digest could not be recomputed from text; the shown digest equals the rationale digest, the anchor resolves, target none, pin SHA256 47f3a4e5 equals the committed file; no text approved",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "73625595e3a68219005df56df6dbf3543b433c522764a449fef46e065c2ff3c6",
+    "identityFingerprint": "73625595e3a68219005df56df6dbf3543b433c522764a449fef46e065c2ff3c6",
+    "claimId": "claim_adc150a41d48dfde06422405a5b0f277",
+    "sourceAnchor": "unheaded-block-30",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e19ff915b019695296a84779c61f78737d18266ded2094e5f712297bbb701861",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-30 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-30",
+    "dispositionRationale": "unit extended by an adjacent short block that the extraction rule now includes (or its successor heading follows an extended block); the same text is carried by the unit at the successor anchor",
+    "dispositionEvidence": [
+      "classification extraction-rule-change",
+      "every added line of the successor unit is a non-blank line that no unit covered before (checked by script)"
+    ],
+    "dispositionSource": "carry-forward-classification",
+    "dispositionConfidence": "high",
+    "dispositionReviewer": "lead delegate 2026-10-07"
+  },
+  "sourceWitness": {
+    "commit": null,
+    "unit": null,
+    "limitation": "Historical text unavailable in the authenticated current/prior content and earlier review pack witnesses; no ordinal reconstruction or new conservation approval."
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_adc150a41d48dfde06422405a5b0f277"
+}
+```
+
+## Entry claim_39027736ba305981f20a973555300669
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_39027736ba305981f20a973555300669",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_39027736ba305981f20a973555300669",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-4",
+    "sourceUnitDigest": "5bc803f5f5d7289345ff1ae9ce0619a5417e0d7d5b9c452c9496b0e190a7da23",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_39027736ba305981f20a973555300669 records the historical native instruction identity AGENTS.md#unheaded-block-4 (digest 5bc803f5f5d7289345ff1ae9ce0619a5417e0d7d5b9c452c9496b0e190a7da23). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_39027736ba305981f20a973555300669",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-4",
+    "sourceUnitDigest": "5bc803f5f5d7289345ff1ae9ce0619a5417e0d7d5b9c452c9496b0e190a7da23",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_39027736ba305981f20a973555300669 records the historical native instruction identity AGENTS.md#unheaded-block-4 (digest 5bc803f5f5d7289345ff1ae9ce0619a5417e0d7d5b9c452c9496b0e190a7da23). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: historical identity AGENTS.md#unheaded-block-4; the witness text (L18-22, 3d3d32648) hashes to the shown digest, is present in AGENTS.md at that commit and the rationale states plainly that the old text is not claimed to be the current unit at this anchor; target none, nothing carried, pin SHA256 47f3a4e5 checked",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "5268ee65de4580be535cb0cae458658a6be88396ba0ca9b098d21945a4c1f62e",
+    "identityFingerprint": "5268ee65de4580be535cb0cae458658a6be88396ba0ca9b098d21945a4c1f62e",
+    "claimId": "claim_39027736ba305981f20a973555300669",
+    "sourceAnchor": "unheaded-block-4",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "5bc803f5f5d7289345ff1ae9ce0619a5417e0d7d5b9c452c9496b0e190a7da23",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-4 is not a stable heading anchor"
+  },
+  "sourceWitness": {
+    "commit": "3d3d32648e7e34816c30c1973652dea35debc19e",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-4",
+      "githubAnchor": "unheaded-block-4",
+      "stableAnchor": "unheaded-block-4",
+      "title": "Unheaded block 4",
+      "startLine": 18,
+      "endLine": 22,
+      "textDigest": "5bc803f5f5d7289345ff1ae9ce0619a5417e0d7d5b9c452c9496b0e190a7da23",
+      "sample": "1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thố",
+      "identityFingerprint": "5268ee65de4580be535cb0cae458658a6be88396ba0ca9b098d21945a4c1f62e",
+      "ancestry": [
+        "forgent",
+        "Product priority order (D-ADR0030, docs/specs/runner.md)"
+      ],
+      "text": "1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.\n   Khi phân tích của chính agent đã chọn rõ một phương án, hãy quyết và báo cáo, không hỏi lại. Chỉ hỏi khi các phương án thật sự ngang nhau hoặc phụ thuộc vào ý định của người dùng.\n3. **DoD** — reproducibly verifiable result + evidence-linked documentation.\n4. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_39027736ba305981f20a973555300669"
+}
+```
+
+## Entry claim_f3d9a6f6cc27c52855bc0ce2a3706e2c
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_f3d9a6f6cc27c52855bc0ce2a3706e2c",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_f3d9a6f6cc27c52855bc0ce2a3706e2c",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-4",
+    "sourceUnitDigest": "cdd2dfdef553a8b466bbf6f6316228592dd13e9038a90f4eeae2bf8af3b4fb9d",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_f3d9a6f6cc27c52855bc0ce2a3706e2c records the historical native instruction identity AGENTS.md#unheaded-block-4 (digest cdd2dfdef553a8b466bbf6f6316228592dd13e9038a90f4eeae2bf8af3b4fb9d). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_f3d9a6f6cc27c52855bc0ce2a3706e2c",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-4",
+    "sourceUnitDigest": "cdd2dfdef553a8b466bbf6f6316228592dd13e9038a90f4eeae2bf8af3b4fb9d",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_f3d9a6f6cc27c52855bc0ce2a3706e2c records the historical native instruction identity AGENTS.md#unheaded-block-4 (digest cdd2dfdef553a8b466bbf6f6316228592dd13e9038a90f4eeae2bf8af3b4fb9d). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "deep: historical identity AGENTS.md#unheaded-block-4; the witness text (L18-21, 5df843bdb) hashes to the shown digest, is present in AGENTS.md at that commit and the rationale states plainly that the old text is not claimed to be the current unit at this anchor; target none, nothing carried, pin SHA256 47f3a4e5 checked",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "96b3b0208b42d8266a036a7d3d149a27f2f213689c406b6d5cfe57dfd80b4fea",
+    "identityFingerprint": "96b3b0208b42d8266a036a7d3d149a27f2f213689c406b6d5cfe57dfd80b4fea",
+    "claimId": "claim_f3d9a6f6cc27c52855bc0ce2a3706e2c",
+    "sourceAnchor": "unheaded-block-4",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "cdd2dfdef553a8b466bbf6f6316228592dd13e9038a90f4eeae2bf8af3b4fb9d",
+    "claimKind": "unclassified",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-4 is not a stable heading anchor"
+  },
+  "sourceWitness": {
+    "commit": "5df843bdb90527b326974a71cc9d288fac4393bc",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-4",
+      "githubAnchor": "unheaded-block-4",
+      "stableAnchor": "unheaded-block-4",
+      "title": "Unheaded block 4",
+      "startLine": 18,
+      "endLine": 21,
+      "textDigest": "cdd2dfdef553a8b466bbf6f6316228592dd13e9038a90f4eeae2bf8af3b4fb9d",
+      "sample": "1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thố",
+      "identityFingerprint": "96b3b0208b42d8266a036a7d3d149a27f2f213689c406b6d5cfe57dfd80b4fea",
+      "ancestry": [
+        "forgent",
+        "Product priority order (D-ADR0030, docs/specs/runner.md)"
+      ],
+      "text": "1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.\n2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.\n3. **DoD** — reproducibly verifiable result + evidence-linked documentation.\n4. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope."
+    }
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_f3d9a6f6cc27c52855bc0ce2a3706e2c"
+}
+```
+
+## Entry claim_839bc9774b75e893f078d20ecbbb39f0
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "registryGaps",
+  "claimId": "claim_839bc9774b75e893f078d20ecbbb39f0",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_839bc9774b75e893f078d20ecbbb39f0",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-43",
+    "sourceUnitDigest": "a95a9f895ef3158dcea414aad702a9ed3fedd57533c2e08637853324ab897fc8",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_839bc9774b75e893f078d20ecbbb39f0 records the historical native instruction identity AGENTS.md#unheaded-block-43 (digest a95a9f895ef3158dcea414aad702a9ed3fedd57533c2e08637853324ab897fc8). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "pending",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_839bc9774b75e893f078d20ecbbb39f0",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-43",
+    "sourceUnitDigest": "a95a9f895ef3158dcea414aad702a9ed3fedd57533c2e08637853324ab897fc8",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-3: claim_839bc9774b75e893f078d20ecbbb39f0 records the historical native instruction identity AGENTS.md#unheaded-block-43 (digest a95a9f895ef3158dcea414aad702a9ed3fedd57533c2e08637853324ab897fc8). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
+    "reviewStatus": "reviewed",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "mechanical: historical AGENTS.md#unheaded-block-43 has no witness text (stated limitation kept from the earlier accepted review), so its digest could not be recomputed from text; the shown digest equals the rationale digest, the anchor resolves, target none, pin SHA256 47f3a4e5 equals the committed file; no text approved",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "60373c29aba65fc2ade43198c361c0f4d8f6d0b7488a54d6c40b925a8952e739",
+    "identityFingerprint": "60373c29aba65fc2ade43198c361c0f4d8f6d0b7488a54d6c40b925a8952e739",
+    "claimId": "claim_839bc9774b75e893f078d20ecbbb39f0",
+    "sourceAnchor": "unheaded-block-43",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a95a9f895ef3158dcea414aad702a9ed3fedd57533c2e08637853324ab897fc8",
+    "claimKind": "architecture",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-43 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "unheaded-block-43",
+    "dispositionRationale": "unit extended by an adjacent short block that the extraction rule now includes (or its successor heading follows an extended block); the same text is carried by the unit at the successor anchor",
+    "dispositionEvidence": [
+      "classification extraction-rule-change",
+      "every added line of the successor unit is a non-blank line that no unit covered before (checked by script)"
+    ],
+    "dispositionSource": "carry-forward-classification",
+    "dispositionConfidence": "high",
+    "dispositionReviewer": "lead delegate 2026-10-07"
+  },
+  "sourceWitness": {
+    "commit": null,
+    "unit": null,
+    "limitation": "Historical text unavailable in the authenticated current/prior content and earlier review pack witnesses; no ordinal reconstruction or new conservation approval."
+  },
+  "currentTarget": null,
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "Historical witness or no carriage target"
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_839bc9774b75e893f078d20ecbbb39f0"
+}
+```
+
+## Entry claim_83c033652dd933ee9b5fc5e519a2b6fb
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+    "sourcePath": "docs/architecture-manifest.json",
+    "sourceUnitDigest": "6e362a74d975a16c477b8f474f062c5ec769515a149a15dfbba1de7f6e7650a3",
+    "disposition": "supersede",
+    "targetOwner": "docs/architecture-manifest.json",
+    "targetAnchor": "file-block",
+    "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetAncestry": [],
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+    "sourcePath": "docs/architecture-manifest.json",
+    "sourceUnitDigest": "6e362a74d975a16c477b8f474f062c5ec769515a149a15dfbba1de7f6e7650a3",
+    "disposition": "supersede",
+    "targetOwner": "docs/architecture-manifest.json",
+    "targetAnchor": "file-block",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "reviewed",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "deep: file-block; sha256 of docs/architecture-manifest.json at the witness commit 6f67a4441 and of the target at HEAD equal the shown digests; JSON diff read: dispatch-log.mjs entry removed (file is gone from src/runner), fanout-batch and work-dispatch move infra to use-case, 13 entries added; upstream manifest edit, same file, so supersede fits",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "targetAncestry": [],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "docs/architecture-manifest.json",
+    "unitDigest": "30f6722486914ef19a443e32e68409a6b200773f5dc208495f07d6cd85c28c40",
+    "identityFingerprint": "30f6722486914ef19a443e32e68409a6b200773f5dc208495f07d6cd85c28c40",
+    "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+    "sourceAnchor": "file-block",
+    "unitKind": "file-block",
+    "sourceUnitDigest": "6e362a74d975a16c477b8f474f062c5ec769515a149a15dfbba1de7f6e7650a3",
+    "claimKind": "contract",
+    "status": "future",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor file-block is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "docs/architecture-manifest.json",
+    "targetAnchor": "file-block",
+    "dispositionRationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+  },
+  "sourceWitness": {
+    "commit": "6f67a444175e111b1e83c9341319a9908544a595",
+    "unit": {
+      "unitKind": "file-block",
+      "anchor": "file-block",
+      "githubAnchor": "file-block",
+      "stableAnchor": "file-block",
+      "title": "architecture-manifest.json",
+      "startLine": 1,
+      "endLine": 257,
+      "textDigest": "6e362a74d975a16c477b8f474f062c5ec769515a149a15dfbba1de7f6e7650a3",
+      "identityFingerprint": "30f6722486914ef19a443e32e68409a6b200773f5dc208495f07d6cd85c28c40",
+      "sample": "{\n  \"contract\": \"architecture-manifest.v1\",\n  \"map\": \"docs/architecture-map.md\",\n  \"layers\": [\n    \"entry\",\n    \"use-case\",\n    \"infra\",\n    \"domain\",\n    \"kernel\"\n  ],\n  \"rules\": ",
+      "ancestry": [],
+      "text": "{\n  \"contract\": \"architecture-manifest.v1\",\n  \"map\": \"docs/architecture-map.md\",\n  \"layers\": [\n    \"entry\",\n    \"use-case\",\n    \"infra\",\n    \"domain\",\n    \"kernel\"\n  ],\n  \"rules\": [\n    \"one-directional-layer\",\n    \"domain-siloing\"\n  ],\n  \"components\": [\n    \"packaging-distribution\"\n  ],\n  \"domains\": [\n    \"coding\",\n    \"marketing\"\n  ],\n  \"files\": {\n    \"bin/fgos.mjs\": \"entry\",\n    \"bin/fgos-runner.mjs\": \"entry\",\n    \"src/runner/loop.mjs\": \"use-case\",\n    \"src/runner/paths.mjs\": \"infra\",\n    \"src/runner/dispatch.mjs\": \"infra\",\n    \"src/runner/operation-capability.mjs\": \"domain\",\n    \"src/runner/rigor.mjs\": \"kernel\",\n    \"src/runner/dispatch-log.mjs\": \"infra\",\n    \"src/runner/fanout-batch.mjs\": \"infra\",\n    \"src/runner/work-compat.mjs\": \"infra\",\n    \"src/runner/dispatch/adapters.mjs\": \"infra\",\n    \"src/runner/dispatch/config.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/policies.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/bypass-pairing.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/backend-registry.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/authority.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/request.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/resources.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/cleanup.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/attestation-store.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/drivers/bwrap.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/probes/harness.mjs\": \"infra\",\n    \"src/runner/dispatch/resolve.mjs\": \"infra\",\n    \"src/runner/dispatch/mechanism.mjs\": \"infra\",\n    \"src/runner/dispatch/plan.mjs\": \"infra\",\n    \"src/runner/dispatch/transport.mjs\": \"infra\",\n    \"src/runner/dispatch/prepare.mjs\": \"infra\",\n    \"src/runner/dispatch/result-ladder.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-layout.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-normalizer.mjs\": \"infra\",\n    \"src/runner/dispatch/execution-contract.mjs\": \"infra\",\n    \"src/runner/dispatch/effective-execution-contract.mjs\": \"infra\",\n    \"src/runner/dispatch/agent-result-claim-contract.mjs\": \"infra\",\n    \"src/runner/dispatch/evidence-attribution.mjs\": \"infra\",\n    \"src/runner/dispatch/run-result.mjs\": \"infra\",\n    \"src/runner/dispatch/usage-parsers.mjs\": \"infra\",\n    \"src/runner/dispatch/runtime-inspection.mjs\": \"infra\",\n    \"src/runner/dispatch/reconciliation-planner.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-policy.mjs\": \"infra\",\n    \"src/runner/dispatch/operation-prompt-templates.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-adapter.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-capacity.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-auth-failure.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-credential-probe.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-runner.mjs\": \"infra\",\n    \"src/runner/dispatch/settlement.mjs\": \"infra\",\n    \"src/runner/dispatch/reconcile-cli-spawn.mjs\": \"infra\",\n    \"src/runner/dispatch/cli.mjs\": \"infra\",\n    \"src/runner/dispatch/detached-run-supervisor.mjs\": \"infra\",\n    \"src/runner/prompt-templates.mjs\": \"infra\",\n    \"src/runner/worker-log.mjs\": \"infra\",\n    \"src/runner/agent-roster.mjs\": \"infra\",\n    \"src/runner/agent-definitions.mjs\": \"infra\",\n    \"src/runner/agent-listing.mjs\": \"infra\",\n    \"src/runner/worktree.mjs\": \"infra\",\n    \"src/runner/promote-preflight.mjs\": \"infra\",\n    \"src/runner/promote-engine.mjs\": \"infra\",\n    \"src/runner/session.mjs\": \"infra\",\n    \"src/runner/gateway-control.mjs\": \"infra\",\n    \"src/runner/goal-check.mjs\": \"infra\",\n    \"src/runner/iron-law-gate.mjs\": \"infra\",\n    \"src/runner/frozen-judge.mjs\": \"domain\",\n    \"src/runner/merge.mjs\": \"infra\",\n    \"src/runner/main-checkout-lock.mjs\": \"infra\",\n    \"src/runner/main-checkout-reset-guard.mjs\": \"infra\",\n    \"src/runner/github-adapter.mjs\": \"infra\",\n    \"src/state/drift-status.mjs\": \"infra\",\n    \"src/state/postland-drift.mjs\": \"infra\",\n    \"src/state/store.mjs\": \"infra\",\n    \"src/state/gate-bypass.mjs\": \"infra\",\n    \"src/state/cursor.mjs\": \"use-case\",\n    \"src/state/porting-store.mjs\": \"infra\",\n    \"src/state/tool-registry.mjs\": \"domain\",\n    \"src/install/coexist.mjs\": \"infra\",\n    \"src/runner/recovery.mjs\": \"domain\",\n    \"src/runner/anti-loop.mjs\": \"domain\",\n    \"src/runner/attestation-guard.mjs\": \"domain\",\n    \"src/runner/claim-port.mjs\": \"infra\",\n    \"src/runner/claim-liveness.mjs\": \"infra\",\n    \"src/runner/lock-wait.mjs\": \"infra\",\n    \"src/runner/write-queue.mjs\": \"domain\",\n    \"src/runner/root-affinity.mjs\": \"domain\",\n    \"src/state/status-fsm.mjs\": \"domain\",\n    \"src/state/decision-question.mjs\": \"domain\",\n    \"src/state/handoff.mjs\": \"domain\",\n    \"src/state/porting.mjs\": \"domain\",\n    \"src/state/frontier.mjs\": \"domain\",\n    \"src/state/impact.mjs\": \"domain\",\n    \"src/state/priority-formula.mjs\": \"domain\",\n    \"src/state/replay.mjs\": \"domain\",\n    \"src/state/events-compaction.mjs\": \"domain\",\n    \"src/state/dep-graph.mjs\": \"domain\",\n    \"src/state/graph-harness.mjs\": \"domain\",\n    \"src/state/graph-metrics.mjs\": \"domain\",\n    \"src/state/awaiting-context.mjs\": \"domain\",\n    \"src/state/cleanup-harness.mjs\": \"domain\",\n    \"src/state/cleanup-pool.mjs\": \"domain\",\n    \"src/state/discover-pool.mjs\": \"domain\",\n    \"src/state/plan-pool.mjs\": \"domain\",\n    \"src/state/retro-pool.mjs\": \"domain\",\n    \"src/state/retrospective-doors.mjs\": \"domain\",\n    \"src/state/worker-slots.mjs\": \"domain\",\n    \"src/intake/discovery.mjs\": \"use-case\",\n    \"src/intake/plan.mjs\": \"use-case\",\n    \"src/intake/plan-verdict-from-plan-md.mjs\": \"use-case\",\n    \"src/intake/verify-pattern-check.mjs\": \"kernel\",\n    \"src/cli/command-registry.mjs\": \"kernel\",\n    \"src/cli/deprecation.mjs\": \"kernel\",\n    \"src/cli/version.mjs\": \"kernel\",\n    \"src/cli/invocation-fault-log.mjs\": \"infra\",\n    \"src/cli/approve-fault-log.mjs\": \"infra\",\n    \"src/report/enduser-index.mjs\": \"domain\",\n    \"src/report/enduser-index-generate.mjs\": \"infra\",\n    \"src/report/decision-index.mjs\": \"infra\",\n    \"src/report/capability-plan-lint.mjs\": \"infra\",\n    \"src/report/context-render.mjs\": \"domain\",\n    \"src/report/frontmatter.mjs\": \"domain\",\n    \"src/report/authoritative-match.mjs\": \"domain\",\n    \"src/evolve/iron-law.mjs\": \"domain\",\n    \"src/state/events.mjs\": \"kernel\",\n    \"src/state/events-jsonl-truncation-guard.mjs\": \"kernel\",\n    \"src/state/main-checkout-guard-warnings.mjs\": \"kernel\",\n    \"src/state/work.mjs\": \"kernel\",\n    \"src/state/envelope.mjs\": \"kernel\",\n    \"src/intake/risk-keywords.mjs\": \"kernel\",\n    \"src/verbs/merge/merge.mjs\": \"use-case\",\n    \"src/verbs/merge/iron-law-level.mjs\": \"use-case\",\n    \"src/verbs/merge/approve.mjs\": \"use-case\",\n    \"src/verbs/merge/review.mjs\": \"use-case\",\n    \"src/verbs/merge/sync-root.mjs\": \"use-case\",\n    \"src/verbs/merge/catchup.mjs\": \"use-case\",\n    \"src/verbs/merge/reject.mjs\": \"use-case\",\n    \"src/verbs/merge/promote-to-component.mjs\": \"use-case\",\n    \"src/verbs/state/edit.mjs\": \"use-case\",\n    \"src/verbs/state/move.mjs\": \"use-case\",\n    \"src/verbs/state/read.mjs\": \"use-case\",\n    \"src/verbs/dispatch/show-run.mjs\": \"use-case\",\n    \"src/verbs/dispatch/inspect.mjs\": \"use-case\",\n    \"src/verbs/dispatch/reconcile.mjs\": \"use-case\",\n    \"src/verbs/dispatch/watch.mjs\": \"use-case\",\n    \"src/verbs/dispatch/recover.mjs\": \"use-case\",\n    \"src/report/item-trace.mjs\": \"domain\",\n    \"src/util/format-bytes.mjs\": \"kernel\",\n    \"src/util/format-duration.mjs\": \"kernel\",\n    \"src/util/normalize-path.mjs\": \"kernel\",\n    \"src/util/release-binary-path.mjs\": \"kernel\",\n    \"src/util/release-targets.mjs\": \"kernel\",\n    \"src/util/session-identity.mjs\": \"kernel\",\n    \"src/util/unique-tmp-tag.mjs\": \"kernel\",\n    \"src/util/host-bin.mjs\": \"infra\",\n    \"src/convention/convention-client.mjs\": \"infra\",\n    \"src/observe/friction-client.mjs\": \"infra\",\n    \"src/intake/classify.mjs\": \"use-case\",\n    \"src/setup/ansi.mjs\": \"domain\",\n    \"src/setup/config-merge.mjs\": \"domain\",\n    \"src/setup/shell-rc.mjs\": \"infra\",\n    \"src/setup/bin-discovery.mjs\": \"infra\",\n    \"src/setup/skill-wrappers.mjs\": \"infra\",\n    \"src/setup/instruction-registry.mjs\": \"infra\",\n    \"src/setup/git-hooks.mjs\": \"infra\",\n    \"src/setup/claude-code-hooks.mjs\": \"infra\",\n    \"src/setup/agent-hooks.mjs\": \"infra\",\n    \"src/setup/agy-permissions.mjs\": \"infra\",\n    \"src/setup/agent-cli-trust.mjs\": \"infra\",\n    \"src/setup/blind-steps-proven-pools.mjs\": \"use-case\",\n    \"src/setup/workflow-pool-independence.mjs\": \"use-case\",\n    \"src/setup/checks.mjs\": \"use-case\",\n    \"src/setup/executor-profile-warnings.mjs\": \"infra\",\n    \"src/config/global-config.mjs\": \"infra\",\n    \"src/setup/registrations.mjs\": \"use-case\",\n    \"src/config/shared-config-file.mjs\": \"domain\",\n    \"src/state/knowledge-registry.mjs\": \"domain\",\n    \"src/report/knowledge-resolver.mjs\": \"domain\",\n    \"src/report/knowledge-projection.mjs\": \"domain\",\n    \"src/state/fgos-file-registry.mjs\": \"kernel\",\n    \"src/state/runtime-coordination.mjs\": \"infra\",\n    \"src/runner/dispatch/brief.mjs\": \"infra\",\n    \"src/runner/dispatch/dispatch-error.mjs\": \"infra\",\n    \"src/runner/dispatch/proof-helpers.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-agent.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-diagnosis.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-round.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-reconcile.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-artifacts.mjs\": \"infra\",\n    \"src/runner/dispatch/liveness.mjs\": \"infra\",\n    \"src/runner/dispatch/visibility-session.mjs\": \"infra\",\n    \"src/runner/dispatch/recovery-planner.mjs\": \"infra\",\n    \"src/runner/dispatch/run-lock.mjs\": \"infra\",\n    \"src/runner/dispatch/process-identity.mjs\": \"infra\",\n    \"src/runner/dispatch/trust-store.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-home.mjs\": \"infra\",\n    \"src/runner/dispatch/stop-processes-inside.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-session.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-session-boot.mjs\": \"infra\",\n    \"src/runner/dispatch/recovery.mjs\": \"infra\",\n    \"src/setup/instruction-composition.mjs\": \"infra\",\n    \"src/setup/instruction-projections.mjs\": \"infra\",\n    \"src/runner/execution/unit.mjs\": \"infra\",\n    \"src/runner/execution/bind.mjs\": \"infra\",\n    \"src/runner/execution/account-rotation.mjs\": \"infra\",\n    \"src/runner/execution/dry-bind.mjs\": \"infra\",\n    \"src/runner/execution/role-ledger.mjs\": \"infra\",\n    \"src/runner/execution/commit-unit-work.mjs\": \"infra\",\n    \"src/runner/execution/handoff-refs.mjs\": \"infra\",\n    \"src/runner/execution/unit-run-history.mjs\": \"infra\",\n    \"src/runner/execution/unit-summary.mjs\": \"infra\",\n    \"src/runner/execution/run.mjs\": \"use-case\",\n    \"src/runner/execution/patterns/index.mjs\": \"domain\",\n    \"src/runner/execution/patterns/panel.mjs\": \"domain\",\n    \"src/runner/execution/patterns/presets.mjs\": \"domain\",\n    \"src/runner/execution/patterns/reviewed.mjs\": \"domain\",\n    \"src/runner/execution/patterns/role-tasks.mjs\": \"domain\",\n    \"src/runner/execution/patterns/solo.mjs\": \"domain\",\n    \"src/workflow/definition.mjs\": \"kernel\",\n    \"src/workflow/dir-guard.mjs\": \"infra\",\n    \"src/workflow/loader.mjs\": \"infra\",\n    \"src/workflow/store.mjs\": \"infra\",\n    \"src/workflow/integrate.mjs\": \"infra\",\n    \"src/workflow/plan-source.mjs\": \"infra\",\n    \"src/workflow/runner.mjs\": \"use-case\",\n    \"src/workflow/index.mjs\": \"use-case\",\n    \"src/workflow/checked.mjs\": \"infra\",\n    \"src/workflow/ref-digests.mjs\": \"infra\",\n    \"src/workflow/seat-providers.mjs\": \"infra\",\n    \"src/workflow/seats.mjs\": \"infra\",\n    \"src/workflow/steps.mjs\": \"kernel\",\n    \"src/state/domain-registry.mjs\": \"kernel\",\n    \"src/state/step-fsm.mjs\": \"domain\",\n    \"src/verbs/state/step.mjs\": \"use-case\",\n    \"src/runner/operation-choice.mjs\": \"use-case\",\n    \"src/runner/work-dispatch.mjs\": \"infra\"\n  }\n}"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "file-block",
+    "anchor": "file-block",
+    "githubAnchor": "file-block",
+    "stableAnchor": "file-block",
+    "title": "architecture-manifest.json",
+    "startLine": 1,
+    "endLine": 269,
+    "textDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "identityFingerprint": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+    "sample": "{\n  \"contract\": \"architecture-manifest.v1\",\n  \"map\": \"docs/architecture-map.md\",\n  \"layers\": [\n    \"entry\",\n    \"use-case\",\n    \"infra\",\n    \"domain\",\n    \"kernel\"\n  ],\n  \"rules\": ",
+    "ancestry": [],
+    "text": "{\n  \"contract\": \"architecture-manifest.v1\",\n  \"map\": \"docs/architecture-map.md\",\n  \"layers\": [\n    \"entry\",\n    \"use-case\",\n    \"infra\",\n    \"domain\",\n    \"kernel\"\n  ],\n  \"rules\": [\n    \"one-directional-layer\",\n    \"domain-siloing\"\n  ],\n  \"components\": [\n    \"packaging-distribution\"\n  ],\n  \"domains\": [\n    \"coding\",\n    \"marketing\"\n  ],\n  \"files\": {\n    \"bin/fgos.mjs\": \"entry\",\n    \"bin/fgos-runner.mjs\": \"entry\",\n    \"src/runner/loop.mjs\": \"use-case\",\n    \"src/runner/paths.mjs\": \"infra\",\n    \"src/runner/dispatch.mjs\": \"infra\",\n    \"src/runner/operation-capability.mjs\": \"domain\",\n    \"src/runner/rigor.mjs\": \"kernel\",\n    \"src/runner/fanout-batch.mjs\": \"use-case\",\n    \"src/runner/work-compat.mjs\": \"infra\",\n    \"src/runner/dispatch/adapters.mjs\": \"infra\",\n    \"src/runner/dispatch/config.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/policies.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/bypass-pairing.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/backend-registry.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/authority.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/request.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/resources.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/cleanup.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/attestation-store.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/drivers/bwrap.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/probes/harness.mjs\": \"infra\",\n    \"src/runner/dispatch/resolve.mjs\": \"infra\",\n    \"src/runner/dispatch/mechanism.mjs\": \"infra\",\n    \"src/runner/dispatch/plan.mjs\": \"infra\",\n    \"src/runner/dispatch/transport.mjs\": \"infra\",\n    \"src/runner/dispatch/prepare.mjs\": \"infra\",\n    \"src/runner/dispatch/result-ladder.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-layout.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-normalizer.mjs\": \"infra\",\n    \"src/runner/dispatch/execution-contract.mjs\": \"infra\",\n    \"src/runner/dispatch/effective-execution-contract.mjs\": \"infra\",\n    \"src/runner/dispatch/agent-result-claim-contract.mjs\": \"infra\",\n    \"src/runner/dispatch/evidence-attribution.mjs\": \"infra\",\n    \"src/runner/dispatch/write-scope.mjs\": \"kernel\",\n    \"src/runner/dispatch/run-timeout.mjs\": \"kernel\",\n    \"src/runner/dispatch/run-result.mjs\": \"infra\",\n    \"src/runner/dispatch/usage-parsers.mjs\": \"infra\",\n    \"src/runner/dispatch/runtime-inspection.mjs\": \"infra\",\n    \"src/runner/dispatch/reconciliation-planner.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-policy.mjs\": \"infra\",\n    \"src/runner/dispatch/operation-prompt-templates.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-adapter.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-capacity.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-auth-failure.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-credential-probe.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-account-probe.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-credential-renewal.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-runner.mjs\": \"infra\",\n    \"src/runner/dispatch/settlement.mjs\": \"infra\",\n    \"src/runner/dispatch/reconcile-cli-spawn.mjs\": \"infra\",\n    \"src/runner/dispatch/cli.mjs\": \"infra\",\n    \"src/runner/dispatch/detached-run-supervisor.mjs\": \"infra\",\n    \"src/runner/prompt-templates.mjs\": \"infra\",\n    \"src/runner/worker-log.mjs\": \"infra\",\n    \"src/runner/agent-roster.mjs\": \"infra\",\n    \"src/runner/agent-definitions.mjs\": \"infra\",\n    \"src/runner/agent-listing.mjs\": \"infra\",\n    \"src/runner/worktree.mjs\": \"infra\",\n    \"src/runner/promote-preflight.mjs\": \"infra\",\n    \"src/runner/promote-engine.mjs\": \"infra\",\n    \"src/runner/session.mjs\": \"infra\",\n    \"src/runner/gateway-control.mjs\": \"infra\",\n    \"src/runner/goal-check.mjs\": \"infra\",\n    \"src/runner/iron-law-gate.mjs\": \"infra\",\n    \"src/runner/frozen-judge.mjs\": \"domain\",\n    \"src/runner/merge.mjs\": \"infra\",\n    \"src/runner/main-checkout-lock.mjs\": \"infra\",\n    \"src/runner/main-checkout-activity.mjs\": \"infra\",\n    \"src/runner/main-checkout-reset-guard.mjs\": \"infra\",\n    \"src/runner/github-adapter.mjs\": \"infra\",\n    \"src/state/drift-status.mjs\": \"infra\",\n    \"src/state/postland-drift.mjs\": \"infra\",\n    \"src/state/store.mjs\": \"infra\",\n    \"src/state/gate-bypass.mjs\": \"infra\",\n    \"src/state/cursor.mjs\": \"use-case\",\n    \"src/state/porting-store.mjs\": \"infra\",\n    \"src/state/tool-registry.mjs\": \"domain\",\n    \"src/install/coexist.mjs\": \"infra\",\n    \"src/runner/recovery.mjs\": \"domain\",\n    \"src/runner/anti-loop.mjs\": \"domain\",\n    \"src/runner/attestation-guard.mjs\": \"domain\",\n    \"src/runner/claim-port.mjs\": \"infra\",\n    \"src/runner/claim-liveness.mjs\": \"infra\",\n    \"src/runner/lock-wait.mjs\": \"infra\",\n    \"src/runner/write-queue.mjs\": \"domain\",\n    \"src/runner/root-affinity.mjs\": \"domain\",\n    \"src/state/status-fsm.mjs\": \"domain\",\n    \"src/state/decision-question.mjs\": \"domain\",\n    \"src/state/handoff.mjs\": \"domain\",\n    \"src/state/porting.mjs\": \"domain\",\n    \"src/state/frontier.mjs\": \"domain\",\n    \"src/state/impact.mjs\": \"domain\",\n    \"src/state/priority-formula.mjs\": \"domain\",\n    \"src/state/replay.mjs\": \"domain\",\n    \"src/state/events-compaction.mjs\": \"domain\",\n    \"src/state/dep-graph.mjs\": \"domain\",\n    \"src/state/graph-harness.mjs\": \"domain\",\n    \"src/state/graph-metrics.mjs\": \"domain\",\n    \"src/state/awaiting-context.mjs\": \"domain\",\n    \"src/state/cleanup-harness.mjs\": \"domain\",\n    \"src/state/cleanup-pool.mjs\": \"domain\",\n    \"src/state/discover-pool.mjs\": \"domain\",\n    \"src/state/plan-pool.mjs\": \"domain\",\n    \"src/state/retro-pool.mjs\": \"domain\",\n    \"src/state/retrospective-doors.mjs\": \"domain\",\n    \"src/state/worker-slots.mjs\": \"domain\",\n    \"src/intake/discovery.mjs\": \"use-case\",\n    \"src/intake/plan.mjs\": \"use-case\",\n    \"src/intake/plan-verdict-from-plan-md.mjs\": \"use-case\",\n    \"src/intake/verify-pattern-check.mjs\": \"kernel\",\n    \"src/cli/command-registry.mjs\": \"kernel\",\n    \"src/cli/deprecation.mjs\": \"kernel\",\n    \"src/cli/version.mjs\": \"kernel\",\n    \"src/cli/invocation-fault-log.mjs\": \"infra\",\n    \"src/cli/approve-fault-log.mjs\": \"infra\",\n    \"src/report/enduser-index.mjs\": \"domain\",\n    \"src/report/enduser-index-generate.mjs\": \"infra\",\n    \"src/report/decision-index.mjs\": \"infra\",\n    \"src/report/capability-plan-lint.mjs\": \"infra\",\n    \"src/report/context-render.mjs\": \"domain\",\n    \"src/report/frontmatter.mjs\": \"domain\",\n    \"src/report/authoritative-match.mjs\": \"domain\",\n    \"src/evolve/iron-law.mjs\": \"domain\",\n    \"src/state/events.mjs\": \"kernel\",\n    \"src/state/events-jsonl-truncation-guard.mjs\": \"kernel\",\n    \"src/state/main-checkout-guard-warnings.mjs\": \"kernel\",\n    \"src/state/work.mjs\": \"kernel\",\n    \"src/state/envelope.mjs\": \"kernel\",\n    \"src/intake/risk-keywords.mjs\": \"kernel\",\n    \"src/verbs/merge/merge.mjs\": \"use-case\",\n    \"src/verbs/merge/iron-law-level.mjs\": \"use-case\",\n    \"src/verbs/merge/approve.mjs\": \"use-case\",\n    \"src/verbs/merge/review.mjs\": \"use-case\",\n    \"src/verbs/merge/sync-root.mjs\": \"use-case\",\n    \"src/verbs/merge/catchup.mjs\": \"use-case\",\n    \"src/verbs/merge/reject.mjs\": \"use-case\",\n    \"src/verbs/merge/promote-to-component.mjs\": \"use-case\",\n    \"src/verbs/state/edit.mjs\": \"use-case\",\n    \"src/verbs/state/move.mjs\": \"use-case\",\n    \"src/verbs/state/read.mjs\": \"use-case\",\n    \"src/verbs/dispatch/show-run.mjs\": \"use-case\",\n    \"src/verbs/dispatch/inspect.mjs\": \"use-case\",\n    \"src/verbs/dispatch/reconcile.mjs\": \"use-case\",\n    \"src/verbs/dispatch/watch.mjs\": \"use-case\",\n    \"src/verbs/dispatch/recover.mjs\": \"use-case\",\n    \"src/report/item-trace.mjs\": \"domain\",\n    \"src/util/format-bytes.mjs\": \"kernel\",\n    \"src/util/format-duration.mjs\": \"kernel\",\n    \"src/util/normalize-path.mjs\": \"kernel\",\n    \"src/util/git-paths.mjs\": \"kernel\",\n    \"src/util/release-binary-path.mjs\": \"kernel\",\n    \"src/util/release-targets.mjs\": \"kernel\",\n    \"src/util/session-identity.mjs\": \"kernel\",\n    \"src/util/host-bin-path.mjs\": \"kernel\",\n    \"src/util/unique-tmp-tag.mjs\": \"kernel\",\n    \"src/util/host-bin.mjs\": \"infra\",\n    \"src/convention/convention-client.mjs\": \"infra\",\n    \"src/observe/friction-client.mjs\": \"infra\",\n    \"src/intake/classify.mjs\": \"use-case\",\n    \"src/setup/ansi.mjs\": \"domain\",\n    \"src/setup/config-merge.mjs\": \"domain\",\n    \"src/setup/shell-rc.mjs\": \"infra\",\n    \"src/setup/project-launcher.mjs\": \"infra\",\n    \"src/setup/bin-discovery.mjs\": \"infra\",\n    \"src/setup/skill-wrappers.mjs\": \"infra\",\n    \"src/setup/instruction-registry.mjs\": \"infra\",\n    \"src/setup/git-hooks.mjs\": \"infra\",\n    \"src/setup/claude-code-hooks.mjs\": \"infra\",\n    \"src/setup/agent-hooks.mjs\": \"infra\",\n    \"src/setup/agy-permissions.mjs\": \"infra\",\n    \"src/setup/agent-cli-trust.mjs\": \"infra\",\n    \"src/setup/blind-steps-proven-pools.mjs\": \"use-case\",\n    \"src/setup/workflow-pool-independence.mjs\": \"use-case\",\n    \"src/setup/checks.mjs\": \"use-case\",\n    \"src/setup/executor-profile-warnings.mjs\": \"infra\",\n    \"src/config/global-config.mjs\": \"infra\",\n    \"src/setup/registrations.mjs\": \"use-case\",\n    \"src/setup/executor-posture-coverage.mjs\": \"use-case\",\n    \"src/config/shared-config-file.mjs\": \"domain\",\n    \"src/state/knowledge-registry.mjs\": \"domain\",\n    \"src/report/knowledge-resolver.mjs\": \"domain\",\n    \"src/report/knowledge-projection.mjs\": \"domain\",\n    \"src/state/fgos-file-registry.mjs\": \"kernel\",\n    \"src/state/runtime-coordination.mjs\": \"infra\",\n    \"src/runner/dispatch/brief.mjs\": \"infra\",\n    \"src/runner/dispatch/dispatch-error.mjs\": \"infra\",\n    \"src/runner/dispatch/proof-helpers.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-agent.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-diagnosis.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-round.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-reconcile.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-artifacts.mjs\": \"infra\",\n    \"src/runner/dispatch/liveness.mjs\": \"infra\",\n    \"src/runner/dispatch/visibility-session.mjs\": \"infra\",\n    \"src/runner/dispatch/recovery-planner.mjs\": \"infra\",\n    \"src/runner/dispatch/run-lock.mjs\": \"infra\",\n    \"src/runner/dispatch/process-identity.mjs\": \"infra\",\n    \"src/runner/dispatch/trust-store.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-home.mjs\": \"infra\",\n    \"src/runner/dispatch/stop-processes-inside.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-session.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-session-boot.mjs\": \"infra\",\n    \"src/runner/dispatch/recovery.mjs\": \"infra\",\n    \"src/setup/instruction-composition.mjs\": \"infra\",\n    \"src/setup/instruction-projections.mjs\": \"infra\",\n    \"src/runner/execution/unit.mjs\": \"infra\",\n    \"src/runner/execution/bind.mjs\": \"infra\",\n    \"src/runner/execution/account-pin.mjs\": \"infra\",\n    \"src/runner/execution/account-rotation.mjs\": \"infra\",\n    \"src/runner/execution/dry-bind.mjs\": \"infra\",\n    \"src/runner/execution/role-ledger.mjs\": \"infra\",\n    \"src/runner/execution/commit-unit-work.mjs\": \"infra\",\n    \"src/runner/execution/partial-writes.mjs\": \"infra\",\n    \"src/runner/execution/unit-sync.mjs\": \"infra\",\n    \"src/runner/execution/handoff-refs.mjs\": \"infra\",\n    \"src/runner/execution/unit-run-history.mjs\": \"infra\",\n    \"src/runner/execution/unit-summary.mjs\": \"infra\",\n    \"src/runner/execution/run.mjs\": \"use-case\",\n    \"src/runner/execution/patterns/index.mjs\": \"domain\",\n    \"src/runner/execution/patterns/panel.mjs\": \"domain\",\n    \"src/runner/execution/patterns/presets.mjs\": \"domain\",\n    \"src/runner/execution/patterns/reviewed.mjs\": \"domain\",\n    \"src/runner/execution/patterns/role-tasks.mjs\": \"domain\",\n    \"src/runner/execution/patterns/solo.mjs\": \"domain\",\n    \"src/workflow/definition.mjs\": \"kernel\",\n    \"src/workflow/dir-guard.mjs\": \"infra\",\n    \"src/workflow/loader.mjs\": \"infra\",\n    \"src/workflow/store.mjs\": \"infra\",\n    \"src/workflow/integrate.mjs\": \"infra\",\n    \"src/workflow/plan-source.mjs\": \"infra\",\n    \"src/workflow/units-source.mjs\": \"infra\",\n    \"src/workflow/runner.mjs\": \"use-case\",\n    \"src/workflow/index.mjs\": \"use-case\",\n    \"src/workflow/checked.mjs\": \"infra\",\n    \"src/workflow/ref-digests.mjs\": \"infra\",\n    \"src/workflow/seat-providers.mjs\": \"infra\",\n    \"src/workflow/seats.mjs\": \"infra\",\n    \"src/workflow/steps.mjs\": \"kernel\",\n    \"src/state/domain-registry.mjs\": \"kernel\",\n    \"src/state/step-fsm.mjs\": \"domain\",\n    \"src/verbs/state/step.mjs\": \"use-case\",\n    \"src/runner/operation-choice.mjs\": \"use-case\",\n    \"src/runner/work-dispatch.mjs\": \"use-case\"\n  }\n}"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_83c033652dd933ee9b5fc5e519a2b6fb"
+}
+```
+
+## Entry claim_af89c4e6063eb43c4e690c3fdd430677
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+    "sourcePath": "docs/platform/component-boundary.md",
+    "sourceUnitDigest": "e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/component-boundary.md",
+    "targetAnchor": "unheaded-block-11",
+    "targetUnitDigest": "973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetAncestry": [
+      "Component Boundary",
+      "4. Current High-Level Components"
+    ],
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+    "sourcePath": "docs/platform/component-boundary.md",
+    "sourceUnitDigest": "e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/component-boundary.md",
+    "targetAnchor": "unheaded-block-11",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "reviewed",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "deep: diff read: the Dispatch Transport row gains the credential-renewal clause and one new Session Identity row is appended (its link session-identity/spec.md resolves); 15 of 16 old lines identical; line map 60-75 at 209824610 to 66-81 at HEAD equals bound unit-11; upstream edit under A31, generic rationale holds",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95",
+    "targetAncestry": [
+      "Component Boundary",
+      "4. Current High-Level Components"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "docs/platform/component-boundary.md",
+    "unitDigest": "6c33ffeeed98e42a14524201b26d016c4ab15914cea99546eb7022165cf946b6",
+    "identityFingerprint": "6c33ffeeed98e42a14524201b26d016c4ab15914cea99546eb7022165cf946b6",
+    "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+    "sourceAnchor": "unheaded-block-11",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b",
+    "claimKind": "contract",
+    "status": "future",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-11 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/component-boundary.md",
+    "targetAnchor": "unheaded-block-11",
+    "dispositionRationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+  },
+  "sourceWitness": {
+    "commit": "2098246100d88c7e218066e23838c921e8748cb4",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-11",
+      "githubAnchor": "unheaded-block-11",
+      "stableAnchor": "unheaded-block-11",
+      "title": "Unheaded block 11",
+      "startLine": 60,
+      "endLine": 75,
+      "textDigest": "e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b",
+      "sample": "| Component | Current role | Current source |\n| --- | --- | --- |\n| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gat",
+      "identityFingerprint": "6c33ffeeed98e42a14524201b26d016c4ab15914cea99546eb7022165cf946b6",
+      "ancestry": [
+        "Component Boundary",
+        "4. Current High-Level Components"
+      ],
+      "text": "| Component | Current role | Current source |\n| --- | --- | --- |\n| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gates. Does not own stage or sequencing (owned by Workflow runner). Owns worker slots (`OccupancyPort`), and fail-safe claim settlement (`fgos return --to blocked`). | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |\n| Workflow (Định nghĩa + Run + Runner + Tích hợp) | Domain-neutral step & Unit DAG scheduling (`src/workflow/**`), human review gates, pure git integration. Single sequencer for plans, workflows, and multi-unit tasks. | [../specs/runner.md](../specs/runner.md) |\n| Execution Core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture) | Single authority for \"ai làm / model / persona / cơ chế\" (`src/runner/execution/bind.mjs`), single run door for new work (`fgos run` via `src/runner/execution/run.mjs`, herdr pane default, cli fallback), OS confinement posture for both herdr and cli, verifiable mutating gate. Strictly forbids L3 Work lifecycle dependencies (`src/state/**`). | [../specs/runner.md](../specs/runner.md) |\n| Collaboration Patterns (Execution Core) | Domain-neutral small collaboration loops (`solo`, `reviewed`, `panel`) and presets (`consult`, `research-fan-out`, `rfc`). Replaces retired coordination engine. | [../specs/runner.md](../specs/runner.md) |\n| Herdr (Transport chính + Bề mặt quan sát) | Transport mặc định cho out-of-process runs, pane execution liveness, plugin `herdr-dashboard/` (TUI trong pane herdr + pick/pane supervisor; herdr nạp qua `herdr-plugin.toml`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| fgos Gateway | Tiến trình detached duy nhất phục vụ REST API (`/v1`, hợp đồng CTR010), MCP `search`/`execute` trên cùng cổng, và bundle web dashboard nhúng sẵn (`apps/fgos-gateway/`: `gateway.rs`, `mcp.rs`, `cf_access.rs`, `remote_invocation.rs`, `web/`). Vòng đời duy nhất qua `fgos gateway start\\|status\\|stop`; không phải một phần của herdr và không phải \"herdr-gateway\" (tên đó chỉ repo tham chiếu ngoài). Dùng chung với `herdr-dashboard` lớp adapter CLI fgos tại `packages/herdr-fgos-common/rust` (`fgos.rs`, `settings.rs`, trait `WorkItemSource`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| Dispatch Transport & Confinement | Machine backend registry, isolation confinement (`bwrap` v1 driver, attestation storage, fail-closed probes), executor adapters. | [../specs/confinement-authority.md](../specs/confinement-authority.md) |\n| Run Result Evaluator | Evidence/confidence boundary for assignment run results. | [../architect/agent-coordination/architecture/evidence-and-results.md](../architect/agent-coordination/architecture/evidence-and-results.md) |\n| Domain Components And Extension Layer | Domain-specific behavior, workflows, skills, task specs, doctrine. L2 prose no longer picks executors or mechanisms (lớp matching L2 cũ đã thu hồi per 0048); thin driver `fgos-run` delegates directly to Workflow runner and P1 Execution Core. | [../../domains/](../../domains/), [../architect/domainization/](../architect/domainization/) |\n| Host And Surface Layer | CLI, fgos Gateway (REST/MCP/web), `herdr-dashboard` plugin and other Herdr surfaces into platform engines. | Host invocation and gateway docs |\n| Packaging-Distribution | Runtime packaging, install, activation, setup/doctor readiness. | [packaging-distribution/README.md](packaging-distribution/README.md) |\n| Knowledge, Learning, And Documentation Registry | Retrospective learning, doc registry, end-user docs index, trace/evolve signals. | Knowledge and docs registry docs |\n| Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](../specs/observe.md) |\n| Convention (Executable Names & Placement) | Platform-core authority for deterministic artifact names, repository-relative placement, path classification, and conformance checking. Implemented; owns no state and depends only on `fgos-host-runtime`. | [convention/spec.md](convention/spec.md) |"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-11",
+    "githubAnchor": "unheaded-block-11",
+    "stableAnchor": "unheaded-block-11",
+    "title": "Unheaded block 11",
+    "startLine": 66,
+    "endLine": 82,
+    "textDigest": "973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95",
+    "sample": "| Component | Current role | Current source |\n| --- | --- | --- |\n| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gat",
+    "identityFingerprint": "1eb32495a818576f51d52fc28c8508608cac0f86337d2bc7927375109906c516",
+    "ancestry": [
+      "Component Boundary",
+      "4. Current High-Level Components"
+    ],
+    "text": "| Component | Current role | Current source |\n| --- | --- | --- |\n| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status board, claim/return, human gates. Does not own stage or sequencing (owned by Workflow runner). Owns worker slots (`OccupancyPort`), and fail-safe claim settlement (`fgos return --to blocked`). | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |\n| Workflow (Định nghĩa + Run + Runner + Tích hợp) | Domain-neutral step & Unit DAG scheduling (`src/workflow/**`), human review gates, pure git integration. Single sequencer for plans, workflows, and multi-unit tasks. | [../specs/runner.md](../specs/runner.md) |\n| Execution Core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture) | Single authority for \"ai làm / model / persona / cơ chế\" (`src/runner/execution/bind.mjs`), single run door for new work (`fgos run` via `src/runner/execution/run.mjs`, herdr pane default, cli fallback), OS confinement posture for both herdr and cli, verifiable mutating gate. Strictly forbids L3 Work lifecycle dependencies (`src/state/**`). | [../specs/runner.md](../specs/runner.md) |\n| Collaboration Patterns (Execution Core) | Domain-neutral small collaboration loops (`solo`, `reviewed`, `panel`) and presets (`consult`, `research-fan-out`, `rfc`). Replaces retired coordination engine. | [../specs/runner.md](../specs/runner.md) |\n| Herdr (Transport chính + Bề mặt quan sát) | Transport mặc định cho out-of-process runs, pane execution liveness, plugin `herdr-dashboard/` (TUI trong pane herdr + pick/pane supervisor; herdr nạp qua `herdr-plugin.toml`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| fgos Gateway | Tiến trình detached duy nhất phục vụ REST API (`/v1`, hợp đồng CTR010), MCP `search`/`execute` trên cùng cổng, và bundle web dashboard nhúng sẵn (`apps/fgos-gateway/`: `gateway.rs`, `mcp.rs`, `cf_access.rs`, `remote_invocation.rs`, `web/`). Vòng đời duy nhất qua `fgos gateway start\\|status\\|stop`; không phải một phần của herdr và không phải \"herdr-gateway\" (tên đó chỉ repo tham chiếu ngoài). Dùng chung với `herdr-dashboard` lớp adapter CLI fgos tại `packages/herdr-fgos-common/rust` (`fgos.rs`, `settings.rs`, trait `WorkItemSource`). | [../specs/herdr-web-dashboard.md](../specs/herdr-web-dashboard.md) |\n| Dispatch Transport & Confinement | Machine backend registry, isolation confinement (`bwrap` v1 driver, attestation storage, fail-closed probes), executor adapters; the `bwrap` driver calls the credential renewal module at provisioning (`copyCredentialFiles`, the write-back marker) and removing a private home (`confinement/cleanup.mjs`) calls it again for write-back (dependency confinement → provider capacity, for the account lock only). | [../specs/confinement-authority.md](../specs/confinement-authority.md) |\n| Run Result Evaluator | Evidence/confidence boundary for assignment run results. | [../architect/agent-coordination/architecture/evidence-and-results.md](../architect/agent-coordination/architecture/evidence-and-results.md) |\n| Domain Components And Extension Layer | Domain-specific behavior, workflows, skills, task specs, doctrine. L2 prose no longer picks executors or mechanisms (lớp matching L2 cũ đã thu hồi per 0048); thin driver `fgos-run` delegates directly to Workflow runner and P1 Execution Core. | [../../domains/](../../domains/), [../architect/domainization/](../architect/domainization/) |\n| Host And Surface Layer | CLI, fgos Gateway (REST/MCP/web), `herdr-dashboard` plugin and other Herdr surfaces into platform engines. | Host invocation and gateway docs |\n| Packaging-Distribution | Runtime packaging, install, activation, setup/doctor readiness. | [packaging-distribution/README.md](packaging-distribution/README.md) |\n| Knowledge, Learning, And Documentation Registry | Retrospective learning, doc registry, end-user docs index, trace/evolve signals. | Knowledge and docs registry docs |\n| Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](../specs/observe.md) |\n| Convention (Executable Names & Placement) | Platform-core authority for deterministic artifact names, repository-relative placement, path classification, and conformance checking. Implemented; owns no state and depends only on `fgos-host-runtime`. | [convention/spec.md](convention/spec.md) |\n| Session Identity (Writer Identity) | Foundation authority for \"who is the writer of this process\" (`{id, source}`). One implementation, the Rust crate `fgos-session-identity` (`packages/session-identity/rust`, native verb `fgos identity`); Observe calls it in process, Node through the facade `src/util/session-identity.mjs`. Owns no state and depends only on `fgos-host-runtime`; Observe depends on it. Grants no lock or claim authority. | [session-identity/spec.md](session-identity/spec.md) |"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_af89c4e6063eb43c4e690c3fdd430677"
+}
+```
+
+## Entry claim_9c0e5bb670fb2957bb0998cbe5d8d51e
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
+    "sourcePath": "docs/platform/packaging-distribution/spec.md",
+    "sourceUnitDigest": "c068f5dddf466e0aa502a6524b019543a8bff6ed6b34ebed2a18adb3d5d1b745",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "unheaded-block-4",
+    "targetUnitDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "2. Entry Points"
+    ],
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
+    "sourcePath": "docs/platform/packaging-distribution/spec.md",
+    "sourceUnitDigest": "c068f5dddf466e0aa502a6524b019543a8bff6ed6b34ebed2a18adb3d5d1b745",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "unheaded-block-4",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "reviewed",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "deep: diff read: a new fgos launcher row is inserted and the fgctl upgrade row is rewritten (release choice by --from, FGCTL_FROM, FGCTL_VERSION, latest); all other rows identical; line map 28-42 to 36-51 equals bound unit-4; same-file upstream edit",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "2. Entry Points"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "docs/platform/packaging-distribution/spec.md",
+    "unitDigest": "1a20e2d8b2217376e231bd80314979064b0f0be79887270f43057268545dade9",
+    "identityFingerprint": "1a20e2d8b2217376e231bd80314979064b0f0be79887270f43057268545dade9",
+    "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
+    "sourceAnchor": "unheaded-block-4",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "c068f5dddf466e0aa502a6524b019543a8bff6ed6b34ebed2a18adb3d5d1b745",
+    "claimKind": "specification",
+    "status": "future",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-4 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "unheaded-block-4",
+    "dispositionRationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+  },
+  "sourceWitness": {
+    "commit": "67a276b0d3534840bd669839776d122ff829ff67",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-4",
+      "githubAnchor": "unheaded-block-4",
+      "stableAnchor": "unheaded-block-4",
+      "title": "Unheaded block 4",
+      "startLine": 28,
+      "endLine": 42,
+      "textDigest": "c068f5dddf466e0aa502a6524b019543a8bff6ed6b34ebed2a18adb3d5d1b745",
+      "sample": "| Entry point | Status | Purpose |\n| --- | --- | --- |\n| `install.sh` | Implemented | Installs `fgctl` from release assets into a machine-local install directory. |\n| `install.ps1`",
+      "identityFingerprint": "1a20e2d8b2217376e231bd80314979064b0f0be79887270f43057268545dade9",
+      "ancestry": [
+        "Spec: Packaging-Distribution",
+        "2. Entry Points"
+      ],
+      "text": "| Entry point | Status | Purpose |\n| --- | --- | --- |\n| `install.sh` | Implemented | Installs `fgctl` from release assets into a machine-local install directory. |\n| `install.ps1` | Implemented preview | The Windows counterpart of `install.sh` (PowerShell 5.1 or later, no administrator rights, no `PATH` change): installs `fgctl.exe` for `x86_64-pc-windows-msvc` with the same `FGCTL_VERSION` / `FGCTL_INSTALL_DIR` / `FGCTL_ASSET_BASE_URL` / `FGCTL_TARGET` semantics and a mandatory `SHA256SUMS` check (rule RUL16 (Windows is a native release target: same assets, an installer and launchers that need no POSIX shell) in `docs/specs/distribution.md`). |\n| `fgctl init` | Implemented preview | Initializes a project/workspace from a release chosen by `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the committed pin > the latest GitHub release; a downloaded asset is checksum-verified against `SHA256SUMS` before staging (rule RUL15 (fgctl init downloads a checksum-verified release when no source is given) in `docs/specs/distribution.md`). |\n| `fgctl upgrade` | Implemented preview | Moves a workspace activation to another release when supplied; current preview proof covers no-op upgrade against the verified asset. |\n| `fgctl repair` | Implemented preview | Repairs a workspace installation under the selected release model; current preview proof covers repair after activation. |\n| `.fgos/installation/bin/fgos` | Implemented preview | Stable workspace command surface after activation; current preview proof reports `host: \"rust\"` and the activated `artifactDigest`. |\n| `.fgos/installation/bin/fgos.cmd`, `fgos-runner.cmd` | Implemented preview | The same stable surface for PowerShell and `cmd.exe`, written by `fgctl init`/`repair` next to the `sh` pair and needing no POSIX shell; `fgctl verify` reports a missing or edited launcher and `fgctl repair` regenerates it. |\n| `npm install -g github:vantt/forgent` | Implemented legacy deprecated | Installs the legacy Node `fgos` and `fgos-runner` entry points; explicit deprecated escape hatch during the compatibility window, not the public/default posture. |\n| `scripts/fgos-shell-integration.sh` | Implemented | Contributor/dev helper that resolves fgOS command tiers from shell functions. |\n| local `fgos init` | Partial target | Adopts/materializes workspace state after `fgctl` publishes a ready activation. |\n| `fgos doctor` | Implemented | Reports environment checks without writing by default. |\n| `fgos doctor --fix` | Implemented | Runs registered fixes and then reports checks. |\n| `fgos setup` | Implemented deprecated legacy compatibility | Wires local development support and runs registered environment repairs in the current Node CLI; command surfaces point workspace onboarding to `fgctl init` plus local `fgos doctor --fix`/`fgos doctor`, while shell/global integration remains compatibility behavior through the 30-day preview fallback window unless a later release decision replaces it. |"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 36,
+    "endLine": 51,
+    "textDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
+    "sample": "| Entry point | Status | Purpose |\n| --- | --- | --- |\n| `install.sh` | Implemented | Installs `fgctl` from release assets into a machine-local install directory. |\n| `install.ps1`",
+    "identityFingerprint": "6d5dff1056c4b1264f2b8dbca3497ad4dc3d269e20e7c2fa68d6f88dd06eb90a",
+    "ancestry": [
+      "Spec: Packaging-Distribution",
+      "2. Entry Points"
+    ],
+    "text": "| Entry point | Status | Purpose |\n| --- | --- | --- |\n| `install.sh` | Implemented | Installs `fgctl` from release assets into a machine-local install directory. |\n| `install.ps1` | Implemented preview | The Windows counterpart of `install.sh` (PowerShell 5.1 or later, no administrator rights, no `PATH` change): installs `fgctl.exe` for `x86_64-pc-windows-msvc` with the same `FGCTL_VERSION` / `FGCTL_INSTALL_DIR` / `FGCTL_ASSET_BASE_URL` / `FGCTL_TARGET` semantics and a mandatory `SHA256SUMS` check (rule RUL16 (Windows is a native release target: same assets, an installer and launchers that need no POSIX shell) in `docs/specs/distribution.md`). |\n| `fgctl init` | Implemented preview | Initializes a project/workspace from a release chosen by `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the committed pin > the latest GitHub release; a downloaded asset is checksum-verified against `SHA256SUMS` before staging (rule RUL15 (fgctl init downloads a checksum-verified release when no source is given) in `docs/specs/distribution.md`). |\n| `fgos` launcher | Implemented preview | One `fgos` (`fgos.cmd` on Windows) written next to `fgctl` by `fgos doctor --fix` (which `fgctl init` runs): it walks up to the nearest `.fgos/installation/bin/fgos` and runs it, so each project runs its own activated release with no absolute path and no rc edit. A different `fgos` found first on `PATH` is reported, never overwritten. See distribution spec RUL17 (one fgos on PATH runs each project's own activated fgos). |\n| `fgctl upgrade` | Implemented preview | Moves a workspace activation to a new release chosen by `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the latest GitHub release (checksum-verified against `SHA256SUMS` when downloaded), records the previous release for rollback, and updates `.fgos/distribution.json` (including `releaseVersion` when downloaded). |\n| `fgctl repair` | Implemented preview | Repairs a workspace installation under the selected release model; current preview proof covers repair after activation. |\n| `.fgos/installation/bin/fgos` | Implemented preview | Stable workspace command surface after activation; current preview proof reports `host: \"rust\"` and the activated `artifactDigest`. |\n| `.fgos/installation/bin/fgos.cmd`, `fgos-runner.cmd` | Implemented preview | The same stable surface for PowerShell and `cmd.exe`, written by `fgctl init`/`repair` next to the `sh` pair and needing no POSIX shell; `fgctl verify` reports a missing or edited launcher and `fgctl repair` regenerates it. |\n| `npm install -g github:vantt/forgent` | Implemented legacy deprecated | Installs the legacy Node `fgos` and `fgos-runner` entry points; explicit deprecated escape hatch during the compatibility window, not the public/default posture. |\n| `scripts/fgos-shell-integration.sh` | Implemented | Contributor/dev helper that resolves fgOS command tiers from shell functions. |\n| local `fgos init` | Partial target | Adopts/materializes workspace state after `fgctl` publishes a ready activation. |\n| `fgos doctor` | Implemented | Reports environment checks without writing by default. |\n| `fgos doctor --fix` | Implemented | Runs registered fixes and then reports checks. |\n| `fgos setup` | Implemented deprecated legacy compatibility | Wires local development support and runs registered environment repairs in the current Node CLI; command surfaces point workspace onboarding to `fgctl init` plus local `fgos doctor --fix`/`fgos doctor`, while shell/global integration remains compatibility behavior through the 30-day preview fallback window unless a later release decision replaces it. |"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e"
+}
+```
+
+## Entry claim_65b61a54c10aa48c0dc423cf65cff0a2
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceUnitDigest": "fa3f748914efbaea7c57bef01798385bca7de83421cb30c59670cc603d278f54",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/distribution.md",
+    "targetAnchor": "unheaded-block-14",
+    "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetAncestry": [
+      "Spec: Distribution",
+      "Business Rules"
+    ],
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceUnitDigest": "fa3f748914efbaea7c57bef01798385bca7de83421cb30c59670cc603d278f54",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/distribution.md",
+    "targetAnchor": "unheaded-block-14",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "reviewed",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "deep: diff read: RUL14 becomes a moved pointer to runner.md RUL74 (RUL74 exists there), RUL15 upgrade lines edited, RUL17 launcher rule added; best-matching unit by line overlap (0.79) is the bound unit-14 and the line map 297-315 to 297-320 agrees; upstream edit, the RUL14 body now lives in runner.md",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+    "targetAncestry": [
+      "Spec: Distribution",
+      "Business Rules"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "docs/specs/distribution.md",
+    "unitDigest": "a04c7db8ac89382616e92cd92f248744ee586839186b270bffb36af423901856",
+    "identityFingerprint": "a04c7db8ac89382616e92cd92f248744ee586839186b270bffb36af423901856",
+    "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+    "sourceAnchor": "unheaded-block-14",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "fa3f748914efbaea7c57bef01798385bca7de83421cb30c59670cc603d278f54",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-14 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/distribution.md",
+    "targetAnchor": "unheaded-block-14",
+    "dispositionRationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+  },
+  "sourceWitness": {
+    "commit": "67a276b0d3534840bd669839776d122ff829ff67",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-14",
+      "githubAnchor": "unheaded-block-14",
+      "stableAnchor": "unheaded-block-14",
+      "title": "Unheaded block 14",
+      "startLine": 297,
+      "endLine": 315,
+      "textDigest": "fa3f748914efbaea7c57bef01798385bca7de83421cb30c59670cc603d278f54",
+      "sample": "- **RUL14 (the lazy-probe unlock rule: an account locked for a dead login unlocks itself after one real call that succeeds).** An account quarantined as `auth-token` has no end tim",
+      "identityFingerprint": "a04c7db8ac89382616e92cd92f248744ee586839186b270bffb36af423901856",
+      "ancestry": [
+        "Spec: Distribution",
+        "Business Rules"
+      ],
+      "text": "- **RUL14 (the lazy-probe unlock rule: an account locked for a dead login unlocks itself after one real call that succeeds).** An account quarantined as `auth-token` has no end time: the owner logs in again by hand and fgOS cannot see it. Instead of waiting for a person to run the clear command, a dispatch that finds **no usable account of the provider** makes one real, cheap call per such account (Codex: `codex exec`; a pi account directory: `pi -p`), against the account's own home, not a copy, because a login that rotates its refresh token on renewal would use the token up in a throwaway copy. A call that answers clears the lock (audited as `fgos provider-capacity probe`) and the dispatch goes on; one that does not keeps the lock and records the attempt, and no new call is made for that account within a 30 minute cooldown, however many dispatches ask. Only `auth-token` locks are probed: a quota limit ends by itself and any other manual lock is a person's decision. The call is never made while another account of the provider is usable, runs outside the state lock, stops at the first account that answers, and a failure to probe never blocks the dispatch. A credential layout fgOS cannot name (the agy homes of Gemini) has no call, so that account stays locked for a person. The probe is passed to the dispatch by its callers; a caller that passes none changes nothing.\n- **RUL15 (`fgctl init` needs no hand-downloaded tarball: it picks its release by a fixed precedence and downloads it checksum-verified; 2026-10-12).** The release `fgctl init` installs comes from the first of these that is set:\n  1. `--from <path | URL>` on the command line;\n  2. the `FGCTL_FROM=<path | URL>` environment variable (same meaning as the flag, for a non-release build: a `.tar.gz`, a release directory, or a URL);\n  3. `FGCTL_VERSION=<tag>`, which downloads exactly that tag's asset (needed for a pre-release, which \"latest\" never selects);\n  4. the release pinned by the project's committed `.fgos/distribution.json` (no network when that release is staged on the machine; otherwise see \"The pin records the tag\" below);\n  5. otherwise the latest GitHub release, found by following `<repo>/releases/latest` to its tag.\n  - An explicit source (1-3) beats a pin; the pin then only validates what was fetched (a different digest is refused as a pin mismatch, as for `--from` today). The inputs are read per invocation; nothing is remembered.\n  - **The pin records the tag.** When `fgctl init` installs from a download (latest or `FGCTL_VERSION`) and writes a new `.fgos/distribution.json`, it stores the resolved tag in `projectRuntime.releaseVersion` next to the digest (a local or URL source writes a digest-only pin with a null `releaseVersion`, never the build's own manifest version, which is not a download name; an existing pin is never rewritten). A pin with a tag whose digest is not staged on this machine (a teammate's fresh clone, or a quarantined release) makes a plain `fgctl init` download that tag, checksum-verified; the pin's digest must equal what was fetched, else `pin-mismatch` and nothing is activated. A tag written without the leading `v` (a hand-edited pin, for example `0.2.0`) is read as `v0.2.0`, the form releases are tagged in; if the download still fails, the error names the pinned tag and points to `FGCTL_VERSION` and `FGCTL_FROM` instead of surfacing a bare HTTP error. A digest-only pin (no tag) keeps the old behavior: it needs `--from`, `FGCTL_FROM` or `FGCTL_VERSION` on a machine that has not staged it. `fgctl upgrade` writes no tag (it takes a local path), so an upgraded pin goes back to digest-only unless the manifest carries its own version.\n  - A download fetches `fgos-<tag>-<target>.tar.gz` and `SHA256SUMS` through the system `curl` with the same flags, timeouts and `FGCTL_ASSET_BASE_URL` override as `install.sh`; there is no HTTP/TLS library in `fgctl`. The target is detected the way the installers do (`FGCTL_TARGET` overrides; `x86_64-unknown-linux-gnu` and `x86_64-pc-windows-msvc` are supported, see RUL16 (Windows is a native release target: same assets, an installer and launchers that need no POSIX shell)) and an unsupported target refuses before any request.\n  - Verification is mandatory: the asset's own entry in `SHA256SUMS` (file name matched exactly) must equal the downloaded file's SHA-256, otherwise `fgctl init` refuses and writes nothing (no staging, no pin, no activation). A URL source must have `SHA256SUMS` in the same directory; a local path is trusted as given. The download lives in a private scratch directory under `${TMPDIR:-/tmp}/fgos-work/` that is removed when init returns, success or not.\n  - The project must be inside a git repository, checked before any request is made (unchanged). `fgctl upgrade` and `fgctl stage` still take only `--from <path>`; they do not download.\n  - `curl` is an assumed tool (on Windows, the `curl.exe` that ships with Windows 10 and later): the `curl-available` doctor check reports it.\n- **RUL16 (Windows is a native release target: same assets, an installer and launchers that need no POSIX shell; 2026-10-13).** fgOS runs from a plain PowerShell or `cmd.exe` session on Windows 10 and later, with no Git Bash and no WSL.\n  - **Assets.** A release publishes, per target, `fgos-<tag>-<target>.tar.gz` and `fgctl-<tag>-<target>.tar.gz` for `x86_64-unknown-linux-gnu` and `x86_64-pc-windows-msvc`, one `SHA256SUMS` covering every asset, and both installers (`install.sh`, and `install.ps1`, which lives at `scripts/install.ps1` in the repository because the root-file allowlist is closed and is published under the name `install.ps1`). `tar.gz` is the one archive format on every target: Windows 10 and later ship `tar.exe` and `curl.exe`, and the Rust extractor already reads it. The Windows `fgos` tree carries the host as `bin/fgos.exe` (and `bin/fgos`, the manifest's entry name), a `bin/fgos-runner.cmd` beside the `sh` form of `bin/fgos-runner`, and declares `target: {os: windows, arch: x64}`. The Linux asset is built on `ubuntu-22.04`, and the build fails when a shipped binary needs a glibc symbol newer than `GLIBC_2.35` (`scripts/check-glibc-ceiling.sh`), so a binary never prints a loader error on the oldest supported distribution. A new platform is one row in `src/util/release-targets.mjs`, one in the Rust `host_target` table, one in each installer and one release-workflow matrix entry; macOS is not published.\n  - **`install.ps1`.** Same contract as `install.sh`: `FGCTL_VERSION`, `FGCTL_INSTALL_DIR` (default `%LOCALAPPDATA%\\fgos\\bin`), `FGCTL_ASSET_BASE_URL` (http, https or `file://`), `FGCTL_TARGET`; the tarball's own `SHA256SUMS` entry must match or nothing is installed; a symlinked `fgctl.exe` is refused; every request is bounded by a timeout. It needs no administrator rights (an elevated session is refused unless `FGCTL_ALLOW_ROOT=1`, as `install.sh` refuses root), never changes `PATH`, and prints the commands that do. Like `install.sh`, with no `FGCTL_VERSION` it installs the latest NON-prerelease, so a pre-release needs `FGCTL_VERSION`.\n  - **Workspace launchers.** `fgctl init` and `fgctl repair` write four launchers into `.fgos/installation/bin/`: the `sh` pair `fgos`, `fgos-runner` (Linux, macOS, Git Bash) and the batch pair `fgos.cmd`, `fgos-runner.cmd` (PowerShell, `cmd.exe`; no `sh` involved). Each reads `activation.json`, refuses with exit 3 unless `status` is `ready`, and runs the active release's entry. A directory on `PATH` holding them makes `fgos` resolve in PowerShell through `PATHEXT`. The post-activation tail (`init`, `doctor --fix`, `doctor`) runs the `.cmd` form on a Windows host. `fgctl verify` checks that the launchers its host needs (the `sh` pair everywhere, the batch pair too on Windows) exist and equal what this `fgctl` writes; a missing or edited one is reported with `run fgctl repair` and never quarantines the (intact) release.\n  - **Proof.** Pushing a release tag builds both targets and runs a consumer proof on each, and only when both pass does the publish job run; publishing exists only in `release.yml`. The Windows proof (`scripts/ci-external-consumer.ps1`, under Windows PowerShell 5.1 and PowerShell 7) installs `fgctl` with `install.ps1`, runs `fgctl init` against a local release server, runs the activated `fgos` from PowerShell and from `cmd.exe`, and checks that a tampered download is refused by both the installer and `fgctl init`.\n  - **Not covered.** Windows ARM64 and macOS have no asset. The machine release store stays at `%USERPROFILE%\\.local\\state\\fgos` (`FGOS_STATE_HOME` moves it); relocating it to `%LOCALAPPDATA%` is a separate decision."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-14",
+    "githubAnchor": "unheaded-block-14",
+    "stableAnchor": "unheaded-block-14",
+    "title": "Unheaded block 14",
+    "startLine": 297,
+    "endLine": 320,
+    "textDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+    "sample": "- **RUL14 (the lazy-probe unlock rule: moved).** The rule that unlocks an account locked for a dead login with one real call now lives with the provider-capacity rules in `docs/spe",
+    "identityFingerprint": "7053f6281f4df7e7ed6215a5ede6a5fe52d0387f6870f3f1296978abf81b3768",
+    "ancestry": [
+      "Spec: Distribution",
+      "Business Rules"
+    ],
+    "text": "- **RUL14 (the lazy-probe unlock rule: moved).** The rule that unlocks an account locked for a dead login with one real call now lives with the provider-capacity rules in `docs/specs/runner.md` (RUL74 (lazy-probe unlock: an account locked for a dead login unlocks itself after one real call that succeeds)), together with the refresh-ahead and write-back rules for a rotating login (RUL75 (a rotating provider login is renewed once at the source, in a copy fgOS holds, and a login renewed inside a private home is written back)). This document keeps only where the state lives (row 5d).\n- **RUL15 (`fgctl init` needs no hand-downloaded tarball: it picks its release by a fixed precedence and downloads it checksum-verified; 2026-10-12).** The release `fgctl init` installs comes from the first of these that is set:\n  1. `--from <path | URL>` on the command line;\n  2. the `FGCTL_FROM=<path | URL>` environment variable (same meaning as the flag, for a non-release build: a `.tar.gz`, a release directory, or a URL);\n  3. `FGCTL_VERSION=<tag>`, which downloads exactly that tag's asset (needed for a pre-release, which \"latest\" never selects);\n  4. the release pinned by the project's committed `.fgos/distribution.json` (no network when that release is staged on the machine; otherwise see \"The pin records the tag\" below);\n  5. otherwise the latest GitHub release, found by following `<repo>/releases/latest` to its tag.\n  - An explicit source (1-3) beats a pin; the pin then only validates what was fetched (a different digest is refused as a pin mismatch, as for `--from` today). The inputs are read per invocation; nothing is remembered.\n  - **The pin records the tag.** When `fgctl init` or `fgctl upgrade` installs from a download (latest or `FGCTL_VERSION`) and writes `.fgos/distribution.json`, it stores the resolved tag in `projectRuntime.releaseVersion` next to the digest (a local or URL source writes a digest-only pin with a null `releaseVersion`, never the build's own manifest version, which is not a download name; `init` never rewrites an existing pin, while `upgrade` rewrites the pin to the upgraded release). A pin with a tag whose digest is not staged on this machine (a teammate's fresh clone, or a quarantined release) makes a plain `fgctl init` download that tag, checksum-verified; the pin's digest must equal what was fetched, else `pin-mismatch` and nothing is activated. A tag written without the leading `v` (a hand-edited pin, for example `0.2.0`) is read as `v0.2.0`, the form releases are tagged in; if the download still fails, the error names the pinned tag and points to `FGCTL_VERSION` and `FGCTL_FROM` instead of surfacing a bare HTTP error. A digest-only pin (no tag) keeps the old behavior: it needs `--from`, `FGCTL_FROM` or `FGCTL_VERSION` on a machine that has not staged it.\n  - A download fetches `fgos-<tag>-<target>.tar.gz` and `SHA256SUMS` through the system `curl` with the same flags, timeouts and `FGCTL_ASSET_BASE_URL` override as `install.sh`; there is no HTTP/TLS library in `fgctl`. The target is detected the way the installers do (`FGCTL_TARGET` overrides; `x86_64-unknown-linux-gnu` and `x86_64-pc-windows-msvc` are supported, see RUL16 (Windows is a native release target: same assets, an installer and launchers that need no POSIX shell)) and an unsupported target refuses before any request.\n  - Verification is mandatory: the asset's own entry in `SHA256SUMS` (file name matched exactly) must equal the downloaded file's SHA-256, otherwise `fgctl init` / `fgctl upgrade` refuses and writes nothing (no staging, no pin, no activation). A URL source must have `SHA256SUMS` in the same directory; a local path is trusted as given. The download lives in a private scratch directory under `${TMPDIR:-/tmp}/fgos-work/` that is removed when the command returns, success or not.\n  - The project must be inside a git repository, checked before any request is made (unchanged). `fgctl upgrade` resolves its candidate by `--from <path | URL>` > `FGCTL_FROM` > `FGCTL_VERSION` > the latest GitHub release (it ignores the current pin so a plain `fgctl upgrade` moves to the latest release). `fgctl stage` still takes only `--from <path>`; it does not download.\n  - `curl` is an assumed tool (on Windows, the `curl.exe` that ships with Windows 10 and later): the `curl-available` doctor check reports it.\n- **RUL16 (Windows is a native release target: same assets, an installer and launchers that need no POSIX shell; 2026-10-13).** fgOS runs from a plain PowerShell or `cmd.exe` session on Windows 10 and later, with no Git Bash and no WSL.\n  - **Assets.** A release publishes, per target, `fgos-<tag>-<target>.tar.gz` and `fgctl-<tag>-<target>.tar.gz` for `x86_64-unknown-linux-gnu` and `x86_64-pc-windows-msvc`, one `SHA256SUMS` covering every asset, and both installers (`install.sh`, and `install.ps1`, which lives at `scripts/install.ps1` in the repository because the root-file allowlist is closed and is published under the name `install.ps1`). `tar.gz` is the one archive format on every target: Windows 10 and later ship `tar.exe` and `curl.exe`, and the Rust extractor already reads it. The Windows `fgos` tree carries the host as `bin/fgos.exe` (and `bin/fgos`, the manifest's entry name), a `bin/fgos-runner.cmd` beside the `sh` form of `bin/fgos-runner`, and declares `target: {os: windows, arch: x64}`. The Linux asset is built on `ubuntu-22.04`, and the build fails when a shipped binary needs a glibc symbol newer than `GLIBC_2.35` (`scripts/check-glibc-ceiling.sh`), so a binary never prints a loader error on the oldest supported distribution. A new platform is one row in `src/util/release-targets.mjs`, one in the Rust `host_target` table, one in each installer and one release-workflow matrix entry; macOS is not published.\n  - **`install.ps1`.** Same contract as `install.sh`: `FGCTL_VERSION`, `FGCTL_INSTALL_DIR` (default `%LOCALAPPDATA%\\fgos\\bin`), `FGCTL_ASSET_BASE_URL` (http, https or `file://`), `FGCTL_TARGET`; the tarball's own `SHA256SUMS` entry must match or nothing is installed; a symlinked `fgctl.exe` is refused; every request is bounded by a timeout. It needs no administrator rights (an elevated session is refused unless `FGCTL_ALLOW_ROOT=1`, as `install.sh` refuses root), never changes `PATH`, and prints the commands that do. Like `install.sh`, with no `FGCTL_VERSION` it installs the latest NON-prerelease, so a pre-release needs `FGCTL_VERSION`.\n  - **Workspace launchers.** `fgctl init` and `fgctl repair` write four launchers into `.fgos/installation/bin/`: the `sh` pair `fgos`, `fgos-runner` (Linux, macOS, Git Bash) and the batch pair `fgos.cmd`, `fgos-runner.cmd` (PowerShell, `cmd.exe`; no `sh` involved). Each reads `activation.json`, refuses with exit 3 unless `status` is `ready`, and runs the active release's entry. A directory on `PATH` holding them makes `fgos` resolve in PowerShell through `PATHEXT`. The post-activation tail (`init`, `doctor --fix`, `doctor`) runs the `.cmd` form on a Windows host. `fgctl verify` checks that the launchers its host needs (the `sh` pair everywhere, the batch pair too on Windows) exist and equal what this `fgctl` writes; a missing or edited one is reported with `run fgctl repair` and never quarantines the (intact) release.\n  - **Proof.** Pushing a release tag builds both targets and runs a consumer proof on each, and only when both pass does the publish job run; publishing exists only in `release.yml`. The Windows proof (`scripts/ci-external-consumer.ps1`, under Windows PowerShell 5.1 and PowerShell 7) installs `fgctl` with `install.ps1`, runs `fgctl init` against a local release server, runs the activated `fgos` from PowerShell and from `cmd.exe`, and checks that a tampered download is refused by both the installer and `fgctl init`.\n  - **Not covered.** Windows ARM64 and macOS have no asset. The machine release store stays at `%USERPROFILE%\\.local\\state\\fgos` (`FGOS_STATE_HOME` moves it); relocating it to `%LOCALAPPDATA%` is a separate decision.\n- **RUL17 (one `fgos` on PATH runs each project's own activated fgos; `doctor --fix` provides it; 2026-10-13).** A release install puts only `fgctl` on PATH and `fgctl init` activates a release per project, so a plain `fgos` used to need an absolute path. `fgos doctor` check `project-fgos-launcher` and its registered fix own the answer, and `fgctl init` already ends by running `doctor --fix`:\n  - The fix writes one small launcher named `fgos` (`fgos.cmd` on Windows) into the directory `fgctl` was found in on `PATH`. The launcher walks up from the working directory to the nearest `.fgos/installation/bin/fgos` and runs it with the same arguments, so each project runs the release it activated, from any subdirectory, in any shell, interactive or not; it edits no rc file. Outside a project it exits 127 and says to run `fgctl init`.\n  - The launcher carries a marker line. The check reports `ready`, an out-of-date copy (rewritten by the fix), a foreign `fgos` found first on `PATH` (never overwritten; the check names it), no `fgos` with `fgctl` on `PATH` (the fix writes it), or neither on `PATH` (the check says to add the directory `fgctl` was installed into).\n  - A source checkout keeps the sourced shell-integration script and needs no launcher; the check passes there.\n  - Proof: `test/setup/project-launcher.test.mjs` (two projects and a nested one each run their own fgos; the `cmd` launcher runs on Windows in the focused Windows job)."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_65b61a54c10aa48c0dc423cf65cff0a2"
+}
+```
+
+## Entry claim_0f4d968b593902731bd334f9ed2af711
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceUnitDigest": "cdf23ebc6949803aa19ec83913121c79ebc370e9ef29134c0fb3bf49af44a99c",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/distribution.md",
+    "targetAnchor": "unheaded-block-5",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "targetAncestry": [
+      "Spec: Distribution",
+      "Data Dictionary"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceUnitDigest": "cdf23ebc6949803aa19ec83913121c79ebc370e9ef29134c0fb3bf49af44a99c",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/distribution.md",
+    "targetAnchor": "unheaded-block-5",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "reviewed",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "deep: diff read: table rows 5d, 7 and 7b edited upstream (project-fgos-launcher check, credential-copies-retained fix), the other 14 rows identical; line map 57-73 to 57-73 equals bound unit-5",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "targetAncestry": [
+      "Spec: Distribution",
+      "Data Dictionary"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "docs/specs/distribution.md",
+    "unitDigest": "63f4576d2f6b2a442d5624f667d17600f49e2293139ac0b85738359a7ba2a7ca",
+    "identityFingerprint": "63f4576d2f6b2a442d5624f667d17600f49e2293139ac0b85738359a7ba2a7ca",
+    "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+    "sourceAnchor": "unheaded-block-5",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "cdf23ebc6949803aa19ec83913121c79ebc370e9ef29134c0fb3bf49af44a99c",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-5 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/distribution.md",
+    "targetAnchor": "unheaded-block-5",
+    "dispositionRationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+  },
+  "sourceWitness": {
+    "commit": "67a276b0d3534840bd669839776d122ff829ff67",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-5",
+      "githubAnchor": "unheaded-block-5",
+      "stableAnchor": "unheaded-block-5",
+      "title": "Unheaded block 5",
+      "startLine": 57,
+      "endLine": 73,
+      "textDigest": "cdf23ebc6949803aa19ec83913121c79ebc370e9ef29134c0fb3bf49af44a99c",
+      "sample": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Package name | The npm package identity used for the git-based i",
+      "identityFingerprint": "63f4576d2f6b2a442d5624f667d17600f49e2293139ac0b85738359a7ba2a7ca",
+      "ancestry": [
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "text": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Package name | The npm package identity used for the git-based install command | `forgent` | yes | — |\n| 2 | Package version | A semantic version string tooling (e.g. packaging commands) needs to treat the package as valid | semver string | yes | `0.1.0` |\n| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `scripts`, `core`, `domains`, `.agents`, `README.md`, `LICENSE`, the end-user documentation subset (`docs/how-to`, `docs/explanation`, and `docs/enduser-docs-index.json`), plus `packages/convention/contracts/convention.rules.v1.json`, which installed doctor needs to interpret per-rule cutoffs without duplicating native rule data | yes | — |\n| 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |\n| 4b | Claude Code plugin skill set | `plugins/fgOS/skills/` — the Claude Code plugin's own skill bundle, distributed via the Claude Code plugin marketplace mechanism (a separate distribution channel from the npm-installed `fgos`/`fgos-runner` CLI above). Ships two layers: hand-authored CLI-wrapper skills (`cook`, `discover`, `pick`, `submit`, ...) and mirrored `fgos-*` dev-skills plus `_shared/` for plugin-only consumers. Dev-skills are authored in `core/skills/` or `domains/*/skills/`; run `npm run build:skills` in the fgOS source repo to assemble `.agents/skills/`, generate `.claude/skills/` thin wrappers and references, and mirror dev-skills/shared fragments into the plugin. Plugin mirrors stay byte-identical to `.agents/skills/`, while Claude `SKILL.md` files are thin redirects with byte-identical frontmatter (`test/skills/fgos-mirror.test.mjs`). Assembled Markdown carries a generated-from source header. Do not hand-edit `.agents`, generated `.claude` files, or plugin mirrors; hand-authored CLI-wrapper skills remain sources. `plugin-dev-skills-packaged` (doctor check, row 7 below) detects missing or stale plugin mirrors | mirrored dev-skills + shared fragments + hand-authored CLI-wrapper skills | yes (the mirrors let plugin-only consumers dispatch dev-skills without a source checkout) | — |\n| 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |\n| 5b | Global config file | `~/.fgos/config.json` — same schema as the project-local shared config file, initialized/kept current by `fgos setup` (tsk-1ri) the same way it already handles the project-local file; project always wins any key present in both (`mergeWithGlobalConfig`, `src/config/global-config.mjs`) | one file, home-dir-relative | no (optional; a missing file is not an error, resolves to `{}`) | not created by anything except `fgos setup` |\n| 5c | Machine backend registry file | `~/.fgos/confinement-backends.json` (overridable via `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH`) — machine-local backend registry declaring confinement backends (e.g. `bwrap`, container) available on the host (`confinement-backend-registry.v1`); managed by `fgos doctor --fix` (not project-over-global merge), trust store for security isolation drivers | one file, machine-local path | no (optional; bootstrap creates default bwrap backend on demand) | `~/.fgos/confinement-backends.json` |\n| 5d | Provider-capacity runtime state | `~/.fgos/runtime/provider-capacity/state.json` plus lock `state.lock` — machine-local selected-account lease/quarantine state for provider-capacity rotation. Intentionally host-global only (never project-overridden) so multiple projects sharing provider accounts coordinate concurrency and rate limits safely without starvation. It is never packaged, never committed, and never repaired by `doctor`; `fgos dispatch inspect --provider-capacity` and the `provider-capacity-state` doctor check report it, while manual clear goes through `fgos dispatch reconcile provider-capacity clear-quarantine ...`. An account locked for a dead login is also unlocked by one real call when a dispatch would otherwise find no usable account (the lazy-probe unlock rule below). | one runtime directory, home-dir-relative | no (created only when a provider account lease/quarantine/write occurs) | absent/inactive |\n| 5e | Confinement attestation store state | `~/.local/state/fgos/attestations/` (or `$XDG_STATE_HOME/fgos/attestations`, overridable via `FGOS_CONFINEMENT_ATTESTATION_STORE_PATH`) — host-global security attestation records. Intentionally host-global only (outside all agent write grants) so confined agents can never tamper with their own audit trails, preserving immutable attestation integrity across projects. | one directory, machine-local path | no (created on first confined dispatch attestation) | absent/inactive |\n| 5f | Workspace customization folder | `fgos/` at the project root: tracked in the project's own git, written once as a skeleton at onboarding and never edited by fgOS afterwards. Holds the customer's own agent definitions (`fgos/agents/<name>.yaml`), which win over a definition of the same name in the installed set (RUL13 (customer customization lives in one tracked workspace folder)). Read by `--seats @name` (runner decision 0057); the `fgctl init` skeleton is not built yet | directory | no | absent — the installed set alone applies |\n| 6 | Config staleness | Whether a config file (project-local or global — same computation, tsk-1ri) already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |\n| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); a check registration and a config-default registration are independent, never a forced pairing — a module may register only a check, only a config-default, or both. Today's registered checks: `convention-conformance`, `node-version-and-git`, `cli-version-visible` (tsk-2ej), `shell-integration-sourced`, `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `work-classification-vocabulary`, `work-step-vocabulary` (tsk-64h), `domain-workflow-operations-coverage`, `root-drift`, `delivered-not-on-trunk` (tsk-1l9), `config-awareness`, `provider-capacity-state` (reports account lease/quarantine state and never auto-clears), `provider-capacity-lock-stale` (Phase 06 C2c: the provider-capacity state.lock file, if any, is not held by a dead process; read-only, never reclaims), `dependencies-installed`, `gate-bypass-configured`, `claude-plugin-marketplace`, `plugin-skill-cli-reachable`, `plugin-dev-skills-packaged` (tsk-32b), `changelog-unreleased-stale`, `herdr-launcher-configured`, `herdr-web-dashboard-configured` (tsk-48w), `enduser-docs-index-stale` (tsk-1m0), `invariant-checks-configured` (tsk-516), `invocation-git-write-grants` (warns when an invocation or executor still grants a git add or git commit tool; the runner commits, workers only edit files; read-only, never rewrites user config), `worktree-setup-configured` (a present worktreeSetup section is a list of non-empty shell commands every runner-created worktree runs after its dependency install; never executes them), `events-jsonl-not-truncated` (tsk-cgg), `worker-slots-ceiling-usable` (tsk-1oz), `gateway-token-configured` (tsk-4r1), `readme-install-tag-exists` (tsk-2t8), `iron-law-configured` (tsk-1y6-1), `leaf-notify-drift` (tsk-1el), `task-specs-resolve` (tsk-2t9c), `agent-claims-resolve` (tsk-2t9c), `agent-type-names-unique` (tsk-397-12; names unique within each tier fgos/agents, domains/*/agents, core/agents, a higher tier replaces a lower one whole, the fgos/agents files checked for shape), `domain-registry-compiled` (every domain's compiled.json file under domains — the YAML-free form of the registry and workflow YAML the Work lifecycle reads, regenerated by the build:domains npm script; a drift test keeps it equal to the YAML), `dispatch-decide-hook-wired` (tsk-60f; also requires the AskUserQuestion decision-question hook), `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `decision-index-stale` (tsk-1lv-2/tsk-1lv), `advise-execute-capabilities-configured` (tsk-2uf-3), `workflow-capabilities-configured` (every capability a core/domain Workflow unit names resolves in runner.capabilities by exact name or bare verb, the way bind() looks it up, and fails when it does not; one that resolves but has no \"prefer\" pool on either name is reported as a warning because bind() refuses its unit headless; fgos setup registers every shipped Workflow's capabilities as description-only defaults, so a fresh project starts with that warning, and never overwrites a project's own entry), `capability-serves-valid` (I19: every runner.capabilities entry's serves attribute set is well-formed, no two entries declare the identical set, and the review slot is present), `agy-permissions-configured` (tsk-1xm), `agy-sub-homes-configured`, `bwrap-available`, `curl-available` (curl runs, because fgctl init downloads a release through it; a missing curl is a warning that only blocks the download paths, never a failure, see RUL15 (fgctl init downloads a checksum-verified release when no source is given)), `main-checkout-guard-warnings` (tsk-1vc-3), `events-compaction-verified` (tsk-3ve-6), `no-stuck-merge-abort` (tsk-40a), `doc-registry-enforce` (tsk-28x), `doc-registry-stale` (tsk-28x), `doc-alias-broken` (tsk-28x), `doc-active-duplicate` (tsk-28x), `doc-near-duplicate` (tsk-28x), `doc-provisional-aged` (tsk-28x), `doc-topic-oversized` (tsk-28x), `doc-role-underused` (tsk-28x), `doc-source-conservation` (tsk-28x), `doc-current-path-missing` (tsk-3uc), `doc-source-unreachable` (tsk-3uc), `coordination-protocol-fixtures-valid` (retired; confirms legacy definition fixtures retired), `operation-prompt-templates-valid` (Phase 03 I04: every discoverable operation prompt template validates against bounded variables and schema), `coordination-example-requests-valid` (Step 08 Phase 07 R3: published fgos coordination run example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef), `herdr-available`, `trust-store-readable`, `non-claude-trust-stores-readable` (Phase 07 herdr-trust-supervisor R3: every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, using the same reader the live dispatch will use), `confined-pane-accounts` (every confined herdr invocation that binds a private home has an account in the machine-global provider account inventory whose credential files exist, so its pane starts logged in; see RUL65b in the runner spec), `agent-cli-project-trusted` (the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a \"Trust this folder?\" prompt until its timeout; reads only a yes/no for the one path, names the exact line a person must add, never edits the CLI's config; not applicable when the root is not a git repository or no codex/agy executor is configured), `workflow-pools-satisfy-independence` (for every panel or reviewed Workflow unit, drives the runner's own pattern code through bind() without dispatching anything and fails when the capability prefer pool cannot supply enough distinct provider families for every role (three panelists plus a synthesizer need four); a provider out of quota or blocked on a trust prompt is invisible to bind() and not counted), `blind-steps-use-proven-pools` (for every Workflow unit declared blind, walks each role's candidates through bind() without dispatching anything and fails when the capability prefer pool can bind an executor whose provider family, transport and confinement backend are not in the table of canary-proven pairs kept in the check's own module; read-only, no model call; not applicable when no unit is blind), `executor-confinement` (dispatch visibility V0 Phase 01 group D: the transport an interactive dispatch needs, a readable folder-trust store so a fresh worktree can be pre-trusted instead of stopping at a dialog, and a second reading of the rule that an executor may only declare bypass permission mode alongside full confinement), `herdr-executor-kinds` (Phase 05 R3: every executor dispatched through a herdr pane names an agent kind herdr can actually start, and none depends on an integration hook herdr reports as outdated -- an installed-but-stale hook is believed by herdr and may report the wrong agent state, while a missing one only degrades detection), `executor-profile-warnings` (Phase 06 executor-policy-dispatch-seams: legacy executor/capability entries hardcoding policy-shaped flags, policy-overrides-as-identity, or account-pool-shaped env, each named with its documented migration target -- informational only, never a hard failure), `active-release-matches-checkout` (read-only Node payload contents against doctor dir working tree, not HEAD or Rust binary freshness; reports changed/missing/extra source files while excluding staged dependencies, skips outside source checkouts and main-owned activation in linked worktrees; use fgos:dev for working-tree code or restage/activate for plain fgos), `rust-host-binary-present`, `rust-host-target-supported`, `legacy-node-payload-present`, `command-routes-drift`, `confinement-policies-declared`, `confinement-backend-registry-readable`, `confinement-bwrap-platform`, `confinement-probe-freshness`, `confinement-blind-read` (a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker; reports pass, fail, or backend-unsupported, in which case every blind unit is refused), `confinement-strict-readiness`, `confinement-orphaned-resources-reaped` (Phase 04 M8: no confinement temp resource is left behind by a dead owning process, and no confinement temp root is readable beyond its owner; a home kept for a still-open pane is not orphaned; the fix tightens the root to 0700 and reaps), `confinement-herdr-maturity`, `instruction-projections-stale`, `coordination-abandoned-claims`, `runner-coordination-orgPolicy-shape`, `operation-capability-resolves` (Unit I21: every discoverable operation's declared policy.capability resolves against the live runner config, reporting reachable provider-family diversity), `shadow-binder-divergence` (dispatch-engine-liveness-hardening Phase 7 C1: real PlacementPolicy/ProviderAdapter shadow-binder divergence is durably recorded to a local JSONL under .fgos/dispatch/, not only an ephemeral stderr line; informational, never fails), `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `observe-run-coverage`, `runner-rigor-config` (validates project/global rigor-to-tier mappings and retired capability overrides), `coordination-protocol-dead-vocabulary` (validates definitions against dead vocabulary), `model-policy-tier-coverage` (validates model policies cover all tiers required by rigor-to-tier), `tier-vocabulary-dead-keys` (validates project and global config do not contain retired tier/rigor keys), `runner-patterns-config` (validates presence, valid checkers, and cumulative checkersByRigor for runner patterns), `mutating-assignment-binding-snapshot` (validates that mutating assignment RunResult bindings match unit.json snapshot). The registry is open, but this list is not a snapshot — it names every registered check, and a module adding one updates this row in the same change | yes | — |\n| 7b | Doctor fix | One named repair `fgos doctor --fix` can run before re-reporting checks | not a fixed list — an extensible registry (`registerFix`), independent of `registerCheck`/`registerConfigDefault` (per tsk-2cs). Today's registered fixes: `gate-bypass-configured` (tsk-2qz, the registry's first entry to register all three capabilities at once), `claude-plugin-marketplace` (tsk-4xg), `enduser-docs-index-stale` (tsk-1m0), `bin-discovery-cache` (tsk-2qc-1), `gateway-token-configured` (tsk-4r1), `iron-law-configured` (tsk-1y6-1), `decision-index-stale` (tsk-1lv-2/tsk-1lv), `agy-permissions-configured` (tsk-1xm), `no-stuck-merge-abort` (tsk-40a), `doc-registry-stale` (tsk-28x), `confinement-backend-registry-readable`, `confinement-orphaned-resources-reaped` (Phase 04 M8), `instruction-projections-stale`, `coordination-abandoned-claims`, `runner-coordination-orgPolicy-shape`, `dispatch-decide-hook-wired`, `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`. Same rule as #7: the registry is open, but this list names every registered fix and a module adding one updates this row in the same change | yes | — |\n| 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-5",
+    "githubAnchor": "unheaded-block-5",
+    "stableAnchor": "unheaded-block-5",
+    "title": "Unheaded block 5",
+    "startLine": 57,
+    "endLine": 73,
+    "textDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "sample": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Package name | The npm package identity used for the git-based i",
+    "identityFingerprint": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+    "ancestry": [
+      "Spec: Distribution",
+      "Data Dictionary"
+    ],
+    "text": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Package name | The npm package identity used for the git-based install command | `forgent` | yes | — |\n| 2 | Package version | A semantic version string tooling (e.g. packaging commands) needs to treat the package as valid | semver string | yes | `0.1.0` |\n| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `scripts`, `core`, `domains`, `.agents`, `README.md`, `LICENSE`, the end-user documentation subset (`docs/how-to`, `docs/explanation`, and `docs/enduser-docs-index.json`), plus `packages/convention/contracts/convention.rules.v1.json`, which installed doctor needs to interpret per-rule cutoffs without duplicating native rule data | yes | — |\n| 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |\n| 4b | Claude Code plugin skill set | `plugins/fgOS/skills/` — the Claude Code plugin's own skill bundle, distributed via the Claude Code plugin marketplace mechanism (a separate distribution channel from the npm-installed `fgos`/`fgos-runner` CLI above). Ships two layers: hand-authored CLI-wrapper skills (`cook`, `discover`, `pick`, `submit`, ...) and mirrored `fgos-*` dev-skills plus `_shared/` for plugin-only consumers. Dev-skills are authored in `core/skills/` or `domains/*/skills/`; run `npm run build:skills` in the fgOS source repo to assemble `.agents/skills/`, generate `.claude/skills/` thin wrappers and references, and mirror dev-skills/shared fragments into the plugin. Plugin mirrors stay byte-identical to `.agents/skills/`, while Claude `SKILL.md` files are thin redirects with byte-identical frontmatter (`test/skills/fgos-mirror.test.mjs`). Assembled Markdown carries a generated-from source header. Do not hand-edit `.agents`, generated `.claude` files, or plugin mirrors; hand-authored CLI-wrapper skills remain sources. `plugin-dev-skills-packaged` (doctor check, row 7 below) detects missing or stale plugin mirrors | mirrored dev-skills + shared fragments + hand-authored CLI-wrapper skills | yes (the mirrors let plugin-only consumers dispatch dev-skills without a source checkout) | — |\n| 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |\n| 5b | Global config file | `~/.fgos/config.json` — same schema as the project-local shared config file, initialized/kept current by `fgos setup` (tsk-1ri) the same way it already handles the project-local file; project always wins any key present in both (`mergeWithGlobalConfig`, `src/config/global-config.mjs`) | one file, home-dir-relative | no (optional; a missing file is not an error, resolves to `{}`) | not created by anything except `fgos setup` |\n| 5c | Machine backend registry file | `~/.fgos/confinement-backends.json` (overridable via `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH`) — machine-local backend registry declaring confinement backends (e.g. `bwrap`, container) available on the host (`confinement-backend-registry.v1`); managed by `fgos doctor --fix` (not project-over-global merge), trust store for security isolation drivers | one file, machine-local path | no (optional; bootstrap creates default bwrap backend on demand) | `~/.fgos/confinement-backends.json` |\n| 5d | Provider-capacity runtime state | `~/.fgos/runtime/provider-capacity/state.json` plus lock `state.lock` — machine-local selected-account lease/quarantine state for provider-capacity rotation. Intentionally host-global only (never project-overridden) so multiple projects sharing provider accounts coordinate concurrency and rate limits safely without starvation. It is never packaged, never committed, and never repaired by `doctor`; `fgos dispatch inspect --provider-capacity` and the `provider-capacity-state` doctor check report it, while manual clear goes through `fgos dispatch reconcile provider-capacity clear-quarantine ...`. An account locked for a dead login is also unlocked by one real call when a dispatch would otherwise find no usable account (the lazy-probe unlock rule, now in `docs/specs/runner.md`). The same directory holds `account-locks/<provider>/<account>/`: the per-account lock, copies of a login renewed elsewhere and waiting to be applied, a scratch home while a renewal runs, and the renewal failure cooldown; it is created only when a renewal or write-back runs and holds no credential outside those copies. | one runtime directory, home-dir-relative | no (created only when a provider account lease/quarantine/write occurs) | absent/inactive |\n| 5e | Confinement attestation store state | `~/.local/state/fgos/attestations/` (or `$XDG_STATE_HOME/fgos/attestations`, overridable via `FGOS_CONFINEMENT_ATTESTATION_STORE_PATH`) — host-global security attestation records. Intentionally host-global only (outside all agent write grants) so confined agents can never tamper with their own audit trails, preserving immutable attestation integrity across projects. | one directory, machine-local path | no (created on first confined dispatch attestation) | absent/inactive |\n| 5f | Workspace customization folder | `fgos/` at the project root: tracked in the project's own git, written once as a skeleton at onboarding and never edited by fgOS afterwards. Holds the customer's own agent definitions (`fgos/agents/<name>.yaml`), which win over a definition of the same name in the installed set (RUL13 (customer customization lives in one tracked workspace folder)). Read by `--seats @name` (runner decision 0057); the `fgctl init` skeleton is not built yet | directory | no | absent — the installed set alone applies |\n| 6 | Config staleness | Whether a config file (project-local or global — same computation, tsk-1ri) already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |\n| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); a check registration and a config-default registration are independent, never a forced pairing — a module may register only a check, only a config-default, or both. Today's registered checks: `convention-conformance`, `node-version-and-git`, `cli-version-visible` (tsk-2ej), `shell-integration-sourced`, `project-fgos-launcher` (a release install has one fgos launcher on PATH that runs each project's own activated fgos, see RUL17 (one fgos on PATH runs each project's own activated fgos)), `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `work-classification-vocabulary`, `work-step-vocabulary` (tsk-64h), `domain-workflow-operations-coverage`, `root-drift`, `delivered-not-on-trunk` (tsk-1l9), `config-awareness`, `provider-capacity-state` (reports account lease/quarantine state and never auto-clears), `credential-copies-retained` (login copies still pending for a renewal after a day, and private homes held after repeated staging failures, counted by provider/account and age; read-only, a held home fails, copies waiting for a renewal only warn, and, when the machine-global provider inventory was read, copies of any age in a store directory the account's login store layout no longer reads fail, naming the directory for hand recovery (when the global config cannot be read or is refused by the validator the check fails, says the layout was not checked with the reason, lists copies at any age and promises nothing about a dispatch); interrupted stagings (pending/.tmp-*) are reported too once their writer is gone and they have sat for ten minutes, and the over-limit line names the store; kept homes under a registered backend's temp and private-home roots are scanned, which the orphan reaper check does not do, and one there counts as held at once because nothing retries it; the check itself never deletes and never prints a value), `provider-capacity-lock-stale` (Phase 06 C2c: the provider-capacity state.lock file, if any, is not held by a dead process; read-only, never reclaims), `dependencies-installed`, `gate-bypass-configured`, `claude-plugin-marketplace`, `plugin-skill-cli-reachable`, `plugin-dev-skills-packaged` (tsk-32b), `changelog-unreleased-stale`, `herdr-launcher-configured`, `herdr-web-dashboard-configured` (tsk-48w), `enduser-docs-index-stale` (tsk-1m0), `invariant-checks-configured` (tsk-516), `invocation-git-write-grants` (warns when an invocation or executor still grants a git add or git commit tool; the runner commits, workers only edit files; read-only, never rewrites user config), `worktree-setup-configured` (a present worktreeSetup section is a list of non-empty shell commands every runner-created worktree runs after its dependency install; never executes them), `events-jsonl-not-truncated` (tsk-cgg), `worker-slots-ceiling-usable` (tsk-1oz), `gateway-token-configured` (tsk-4r1), `readme-install-tag-exists` (tsk-2t8), `iron-law-configured` (tsk-1y6-1), `leaf-notify-drift` (tsk-1el), `task-specs-resolve` (tsk-2t9c), `agent-claims-resolve` (tsk-2t9c), `agent-type-names-unique` (tsk-397-12; names unique within each tier fgos/agents, domains/*/agents, core/agents, a higher tier replaces a lower one whole, the fgos/agents files checked for shape), `domain-registry-compiled` (every domain's compiled.json file under domains — the YAML-free form of the registry and workflow YAML the Work lifecycle reads, regenerated by the build:domains npm script; a drift test keeps it equal to the YAML), `dispatch-decide-hook-wired` (tsk-60f; also requires the AskUserQuestion decision-question hook), `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `decision-index-stale` (tsk-1lv-2/tsk-1lv), `advise-execute-capabilities-configured` (tsk-2uf-3), `workflow-capabilities-configured` (every capability a core/domain Workflow unit names resolves in runner.capabilities by exact name or bare verb, the way bind() looks it up, and fails when it does not; one that resolves but has no \"prefer\" pool on either name is reported as a warning because bind() refuses its unit headless; fgos setup registers every shipped Workflow's capabilities as description-only defaults, so a fresh project starts with that warning, and never overwrites a project's own entry), `capability-serves-valid` (I19: every runner.capabilities entry's serves attribute set is well-formed, no two entries declare the identical set, and the review slot is present), `agy-permissions-configured` (tsk-1xm), `agy-sub-homes-configured`, `bwrap-available`, `curl-available` (curl runs, because fgctl init downloads a release through it; a missing curl is a warning that only blocks the download paths, never a failure, see RUL15 (fgctl init downloads a checksum-verified release when no source is given)), `main-checkout-guard-warnings` (tsk-1vc-3), `events-compaction-verified` (tsk-3ve-6), `no-stuck-merge-abort` (tsk-40a), `doc-registry-enforce` (tsk-28x), `doc-registry-stale` (tsk-28x), `doc-alias-broken` (tsk-28x), `doc-active-duplicate` (tsk-28x), `doc-near-duplicate` (tsk-28x), `doc-provisional-aged` (tsk-28x), `doc-topic-oversized` (tsk-28x), `doc-role-underused` (tsk-28x), `doc-source-conservation` (tsk-28x), `doc-current-path-missing` (tsk-3uc), `doc-source-unreachable` (tsk-3uc), `coordination-protocol-fixtures-valid` (retired; confirms legacy definition fixtures retired), `operation-prompt-templates-valid` (Phase 03 I04: every discoverable operation prompt template validates against bounded variables and schema), `coordination-example-requests-valid` (Step 08 Phase 07 R3: published fgos coordination run example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef), `herdr-available`, `trust-store-readable`, `non-claude-trust-stores-readable` (Phase 07 herdr-trust-supervisor R3: every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, using the same reader the live dispatch will use), `confined-pane-accounts` (every confined herdr invocation that binds a private home has an account in the machine-global provider account inventory whose credential files exist, so its pane starts logged in; see RUL65b in the runner spec), `agent-cli-project-trusted` (the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a \"Trust this folder?\" prompt until its timeout; reads only a yes/no for the one path, names the exact line a person must add, never edits the CLI's config; not applicable when the root is not a git repository or no codex/agy executor is configured), `workflow-pools-satisfy-independence` (for every panel or reviewed Workflow unit, drives the runner's own pattern code through bind() without dispatching anything and fails when the capability prefer pool cannot supply enough distinct provider families for every role (three panelists plus a synthesizer need four); a provider out of quota or blocked on a trust prompt is invisible to bind() and not counted), `blind-steps-use-proven-pools` (for every Workflow unit declared blind, walks each role's candidates through bind() without dispatching anything and fails when the capability prefer pool can bind an executor whose provider family, transport and confinement backend are not in the table of canary-proven pairs kept in the check's own module; read-only, no model call; not applicable when no unit is blind), `executor-posture-coverage` (core capabilities execute, code:implement, and capabilities declaring a pool have at least one candidate executor capable of applying required posture; dry simulation via bind(), no process spawn), `executor-confinement` (dispatch visibility V0 Phase 01 group D: the transport an interactive dispatch needs, a readable folder-trust store so a fresh worktree can be pre-trusted instead of stopping at a dialog, and a second reading of the rule that an executor may only declare bypass permission mode alongside full confinement), `herdr-executor-kinds` (Phase 05 R3: every executor dispatched through a herdr pane names an agent kind herdr can actually start, and none depends on an integration hook herdr reports as outdated -- an installed-but-stale hook is believed by herdr and may report the wrong agent state, while a missing one only degrades detection), `executor-profile-warnings` (Phase 06 executor-policy-dispatch-seams: legacy executor/capability entries hardcoding policy-shaped flags, policy-overrides-as-identity, or account-pool-shaped env, each named with its documented migration target -- informational only, never a hard failure), `active-release-matches-checkout` (read-only Node payload contents against doctor dir working tree, not HEAD or Rust binary freshness; reports changed/missing/extra source files while excluding staged dependencies, skips outside source checkouts and main-owned activation in linked worktrees; use fgos:dev for working-tree code or restage/activate for plain fgos), `rust-host-binary-present`, `rust-host-target-supported`, `legacy-node-payload-present`, `command-routes-drift`, `confinement-policies-declared`, `confinement-backend-registry-readable`, `confinement-bwrap-platform`, `confinement-probe-freshness`, `confinement-blind-read` (a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker; reports pass, fail, or backend-unsupported, in which case every blind unit is refused), `confinement-strict-readiness`, `confinement-orphaned-resources-reaped` (Phase 04 M8: no confinement temp resource is left behind by a dead owning process, and no confinement temp root is readable beyond its owner; a home kept for a still-open pane is not orphaned; the fix tightens the root to 0700 and reaps), `confinement-herdr-maturity`, `instruction-projections-stale`, `coordination-abandoned-claims`, `runner-coordination-orgPolicy-shape`, `operation-capability-resolves` (Unit I21: every discoverable operation's declared policy.capability resolves against the live runner config, reporting reachable provider-family diversity), `shadow-binder-divergence` (dispatch-engine-liveness-hardening Phase 7 C1: real PlacementPolicy/ProviderAdapter shadow-binder divergence is durably recorded to a local JSONL under .fgos/dispatch/, not only an ephemeral stderr line; informational, never fails), `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `writer-identity-resolvable` (the writer identity resolves through the Rust host for both the running host and the workspace activation a plain git commit hook uses; each binary is asked directly, so an older activated release shows as a version mismatch), `observe-run-coverage`, `runner-rigor-config` (validates project/global rigor-to-tier mappings and retired capability overrides), `coordination-protocol-dead-vocabulary` (validates definitions against dead vocabulary), `model-policy-tier-coverage` (validates model policies cover all tiers required by rigor-to-tier), `tier-vocabulary-dead-keys` (validates project and global config do not contain retired tier/rigor keys), `runner-patterns-config` (validates presence, valid checkers, and cumulative checkersByRigor for runner patterns), `runner-generated-paths` (validates runner.generatedPaths source-to-render-target mappings), `mutating-assignment-binding-snapshot` (validates that mutating assignment RunResult bindings match unit.json snapshot). The registry is open, but this list is not a snapshot — it names every registered check, and a module adding one updates this row in the same change | yes | — |\n| 7b | Doctor fix | One named repair `fgos doctor --fix` can run before re-reporting checks | not a fixed list — an extensible registry (`registerFix`), independent of `registerCheck`/`registerConfigDefault` (per tsk-2cs). Today's registered fixes: `credential-copies-retained` (re-checks private homes held after repeated staging failures, and any kept home under a registered backend's own root, which nothing else retries, under the account lock, and removes one only when its login is shown applied or obsolete; also removes an interrupted staging (pending/.tmp-*) only after claiming it by rename, when its writer is gone and it is empty, identical to a copy already kept, or shown no newer than the source login under the account lock; never removes on age), `gate-bypass-configured` (tsk-2qz, the registry's first entry to register all three capabilities at once), `claude-plugin-marketplace` (tsk-4xg), `enduser-docs-index-stale` (tsk-1m0), `bin-discovery-cache` (tsk-2qc-1), `gateway-token-configured` (tsk-4r1), `iron-law-configured` (tsk-1y6-1), `decision-index-stale` (tsk-1lv-2/tsk-1lv), `agy-permissions-configured` (tsk-1xm), `no-stuck-merge-abort` (tsk-40a), `doc-registry-stale` (tsk-28x), `confinement-backend-registry-readable`, `confinement-orphaned-resources-reaped` (Phase 04 M8), `instruction-projections-stale`, `coordination-abandoned-claims`, `runner-coordination-orgPolicy-shape`, `project-fgos-launcher`, `dispatch-decide-hook-wired`, `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`. Same rule as #7: the registry is open, but this list names every registered fix and a module adding one updates this row in the same change | yes | — |\n| 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_0f4d968b593902731bd334f9ed2af711"
+}
+```
+
+## Entry claim_76d404ea624a10455d7a14debe2b2a95
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "9070d65058bf41570d8fb1fbaef63f8decdc54c10b932c90d069a15d5f780677",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-9",
+    "targetUnitDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Data Dictionary"
+    ],
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "9070d65058bf41570d8fb1fbaef63f8decdc54c10b932c90d069a15d5f780677",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-9",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewStatus": "reviewed",
+    "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "deep: diff read: two Data Dictionary table rows (1, 1b) edited upstream, 13 of 15 lines identical; line map 73-87 equals bound unit-9",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Data Dictionary"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "docs/specs/runner.md",
+    "unitDigest": "e370e14f3e5b7fc95fa14ea31aa5417ee11db59879e994a29d0a52fbb2b15d86",
+    "identityFingerprint": "e370e14f3e5b7fc95fa14ea31aa5417ee11db59879e994a29d0a52fbb2b15d86",
+    "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",
+    "sourceAnchor": "unheaded-block-9",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "9070d65058bf41570d8fb1fbaef63f8decdc54c10b932c90d069a15d5f780677",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-9 is not a stable heading anchor",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-9",
+    "dispositionRationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+  },
+  "sourceWitness": {
+    "commit": "c3272bc6fc70015e995921e1c458658b084b0b11",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-9",
+      "githubAnchor": "unheaded-block-9",
+      "stableAnchor": "unheaded-block-9",
+      "title": "Unheaded block 9",
+      "startLine": 73,
+      "endLine": 87,
+      "textDigest": "9070d65058bf41570d8fb1fbaef63f8decdc54c10b932c90d069a15d5f780677",
+      "sample": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực th",
+      "identityFingerprint": "e370e14f3e5b7fc95fa14ea31aa5417ee11db59879e994a29d0a52fbb2b15d86",
+      "ancestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Data Dictionary"
+      ],
+      "text": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực thi — LÀ CONFIG THỰC THI ĐƯỢC: ai sửa nó điều khiển tiến trình được spawn (đầu vào tin cậy) | `executor` — mẫu lệnh gọi trợ lý (thay thế `{prompt}`/`{model}` theo từng phần tử, không bao giờ qua shell), tùy chọn `adapter` (mặc định `cli-spawn`) · `executors` — catalog executor theo danh tính provider/cách gọi, không mang khẩu vị chất lượng · `modelPolicies` — bảng bắt buộc provider→tier→model với tier cung `nano|mini|standard|advanced|flagship|frontier` · `rigorToTier` — bảng bắt buộc ánh xạ đủ bốn mức cầu `low|standard|high|critical` sang tier cung · `capabilities.<name>.rigor` — sàn cầu tùy chọn, chỉ nâng; khối `capabilities.<name>.overrides` bị từ chối · `timeoutMs` — trần thời gian một worker · `confinement`/`confinementPolicies` — chính sách giam giữ · `capabilities` — catalog lời hứa hành vi và binding executor/invocation | yes | tự sinh khi vắng mặt tại đường dẫn mặc định (không kèm `--config`); `fgos setup` điền `rigorToTier`, `fgos doctor` kiểm bảng này và các khoá placement đã retired; một `--config <path>` tường minh trỏ vào đường vắng mặt vẫn báo lỗi ngay |\n| 1b | Provider-capacity inventory/state (slice 1) | Pool account cho một provider agent CLI khi provider đó có quota/capacity theo account. Inventory là machine-local secret-bearing config, không phải project policy; state/lease/quarantine là runtime-local evidence. | Inventory chỉ đọc từ `~/.fgos/config.json` tại `runner.providers.<provider>.accounts.<accountId>`; account là keyed object, không phải array. Slice 1 hỗ trợ `openai-codex` account với `label?` và `credentialSource: { kind: \"codex-home\", home }`. Account entry bị từ chối nếu khai placement/runtime policy (`executor`, `capability`, `model`, `modelTier`, `mutation`, `confinement`, `tool`, `fallback`, `runtimeClass`, `providerRuntimes`, ...). Project-local `.fgos/config.json` bị từ chối nếu chứa `runner.providers.*.accounts`. State ở `~/.fgos/runtime/provider-capacity/state.json`, lock ở `~/.fgos/runtime/provider-capacity/state.lock`. | no | vắng inventory nghĩa là mọi dispatch giữ hành vi cũ, không selection/lease |\n| 2 | Nhánh đề xuất | Không gian kết quả của một worker, tên mang tiền tố nhận diện `fgw/<id>` | — | — | — |\n| 3 | Bảng phục hồi | Lớp-lỗi → hành-động, máy đọc được | 8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi → hành động ∈ thử-lại (có trần) / đỗ-lại / dừng; lớp LẠ → dừng (an toàn trước) | — | — |\n| 4 | Bộ đếm chống-lặp (lifetime) | visitCount: số lần một việc vào `doing` TÍNH TỪ ĐẦU đời việc — dẫn xuất từ nhật ký sự kiện, không trường mới; dùng cho các bản ghi outcome/metric đã ship (KHÔNG dùng để chặn dispatch nữa — xem #4b) | — | — | — |\n| 4b | Ngân sách cổng chống-lặp (kể từ can thiệp người) | visitsSinceLastHumanEvent: số lần việc vào `doing` **ở stage executing** TÍNH TỪ sự kiện người CUỐI CÙNG của chính việc đó — đây là con số CỔNG dùng để chặn/park dispatch (thay `visitCount` ở vai trò này); một can thiệp người (xem trigger-set) đưa ngân sách về lại đủ 3 cho vòng kế tiếp. Executing-phase-only scoping (claim-lock): trước đây, pick/take chỉ mở frontier (executing-phase), nên counting mọi `todo→doing` move tương đương dispatch attempts. Claim-lock cho phép `pick` cầm stage khác — claim-release cycle ở các stage đầu vòng (`discovery`/`exploring`/`planning`, cộng tên di sản `decompose`) không được tính vào ngân sách executing-phase (per claim-lock code-review finding) | — | — | trần mặc định 3, dùng chung `MAX_VISITS` |\n| 5 | Cầu dao (breaker) | Số lần chấm-trượt liên tiếp trong MỘT lần chạy (bộ nhớ trong phiên, không dẫn xuất từ nhật ký — chủ đích, vì nhật ký không phân biệt người/máy ghi); trần mặc định 3, đếm RIÊNG cho từng việc dưới dispatch song song (một việc chấm-trượt không kéo cầu dao của việc khác). **Trơ trong `--once`:** một việc đỗ lại (park) tối đa sau `maxRetries` (mặc định 2) lần thử trong CÙNG một lượt `--once`, nên không bao giờ chạm trần 3 của cầu dao trong một lượt đơn — cầu dao chỉ có thể kéo khi có một cơ chế chia-sẻ/nhiều-lượt tích luỹ miss xuyên lượt (chưa xây, xem Open Gaps) | — | — | — |\n| 6 | Trần song song hai tầng | Giới hạn số việc chạy đồng thời trong một mẻ, đọc từ cấu hình committed | tầng 1 — số việc GỐC đồng thời; tầng 2 — số việc CON đồng thời trong MỖI gốc; mỗi lần nạp mẻ lấy `min(trần, số việc sẵn-sàng sau lọc quyền-sở-hữu-gốc)` | no (có mặc định) | 4 gốc × 4 con mỗi gốc |\n| 7 | Quyền sở-hữu gốc | Ai đang cầm mọi việc CON của một gốc trong MỘT lượt chạy — gắn lúc con đầu tiên của gốc được nhận, xả khi gốc xong; sống trong bộ nhớ của lượt chạy, KHÔNG bền qua lượt chạy khác/tiến trình khác | một định danh (per lượt chạy) | — | chưa-chủ |\n| 8 | Bản ghi output cục bộ (một file mỗi việc) | Lưu lại output của trợ lý cho MỌI lượt dispatch của một việc — đọc được sau khi console đã cuộn qua; không bao giờ vào cây committed. Cùng file còn nhận chunk stdout/stderr LIVE khi worker đang chạy (STR39, xem \"Xem live output worker khi đang chạy\") — `tail -f` thấy được ngay, không đợi khối kết-cục cuối | mỗi khối kết-cục: dấu thời gian, số lần thử, loại kết cục (đề xuất/quá-giờ/hỏng-spawn/…), output (khi trợ lý kịp sinh ra); xen giữa các khối kết-cục là chunk thô không bọc, ghi ngay khi đến | no (chỉ tồn tại sau lượt dispatch đầu tiên của việc) | — |\n| 9 | Candidate (Gate A, self-improve loop STR13 Slice 1) | Một việc mang ít nhất một bản ghi friction chưa ngã-ngũ, xếp hạng làm ứng viên tự cải thiện — dẫn xuất TỪ friction đã ghi, không phải một bản ghi độc lập, không bền qua lần `evolve` khác | id, disposition, errorClass, layer, detail, attempts (tất cả lấy từ bản ghi friction MỚI NHẤT theo dấu thời gian của id đó khi id có nhiều bản ghi chưa ngã-ngũ), score (cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, không chỉ bản mới nhất) | — | dẫn xuất mỗi lần gọi `evolve` |\n| 10 | Phán quyết Iron Law (self-improve loop STR13 Slice 2/3) | Kết quả của phép tính hai-cửa (module + từ khóa) trên MỘT candidate fix — dẫn xuất thuần từ đầu vào truyền vào, không bền. Gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội bộ), ngay trước bước kiểm cây sạch, cho MỌI đề xuất nguồn runner đang land LÊN TRUNK (thu hẹp về ranh giới trunk per `0032`) — xem \"Cổng duyệt PR nội bộ\" và \"Iron Law\" dưới, Business Rules RUL36 (`evolve --submit` là hành động ghi duy nhất trên bề mặt evolve, tái dùng chính cửa `submit`)/RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`) | required (có/không cần chứng minh test-đỏ-trước), matchedFlags (danh sách từ khóa rủi ro nặng khớp trong mô tả fix), matchedModules (danh sách file khớp danh sách module minh họa) | — | required mặc định `false` khi cả hai phép thử đều không khớp |\n| 11 | Prompt template worker (STR49, `src/runner/prompt-templates/`) | Nội dung chữ nghĩa của `buildPrompt`, tách khỏi code sang file committed — sửa prompt là sửa MỘT file, không đụng code | `selectTemplate({kind, tier, domain})` — bảng luật cơ học, wildcard cuối luôn khớp (từ STR91: luật `domain: 'coding'` khớp TRƯỚC wildcard — domain vắng mặt hay không nhận diện được đều fold về `coding` giống mọi nơi khác trong hệ, không phải một fallback riêng — trỏ `worker-prompt-skill-pointer.txt`; mọi domain đã đăng ký khác `coding` (vd `synthetic`) vẫn rơi về wildcard, trỏ `worker-prompt-default.txt` như trước STR91) · `renderTemplate` — substitution `{placeholder}` string-replace thuần, không engine · `hashTemplate` — sha256 nội dung raw file, ghi kèm dispatch log (xem RUL44 (đã xây — STR49, `src/runner/prompt-templates.mjs`)) · template `worker-prompt-skill-pointer.txt` giữ đủ 6 mục cố định sẵn có, CHỈ thêm đúng một mục `# Agent skill` trỏ `SKILL.md` của domain đó — đường dẫn luôn resolve qua sổ đăng ký domain→skill (`skillForStage`, spec Work-State \"Mô hình domain\"), không bao giờ hardcode (xem RUL52 (luật template theo domain `coding` khớp trước wildcard; domain lạ/vắng mặt fold về `coding`)) | yes (một template mặc định luôn có) | `worker-prompt-default.txt`, `worker-prompt-skill-pointer.txt` |"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-9",
+    "githubAnchor": "unheaded-block-9",
+    "stableAnchor": "unheaded-block-9",
+    "title": "Unheaded block 9",
+    "startLine": 73,
+    "endLine": 87,
+    "textDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+    "sample": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực th",
+    "identityFingerprint": "156792a91288937ec4222d0036cc22e1fde964343a223afbed781377dfc5022d",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Data Dictionary"
+    ],
+    "text": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực thi — LÀ CONFIG THỰC THI ĐƯỢC: ai sửa nó điều khiển tiến trình được spawn (đầu vào tin cậy) | `executor` — mẫu lệnh gọi trợ lý (thay thế `{prompt}`/`{model}` theo từng phần tử, không bao giờ qua shell), tùy chọn `adapter` (mặc định `cli-spawn`) · `executors` — catalog executor theo danh tính provider/cách gọi, không mang khẩu vị chất lượng · `modelPolicies` — bảng bắt buộc provider→tier→model với tier cung `nano|mini|standard|advanced|flagship|frontier` · `rigorToTier` — bảng bắt buộc ánh xạ đủ bốn mức cầu `low|standard|high|critical` sang tier cung · `capabilities.<name>.rigor` — sàn cầu tùy chọn, chỉ nâng; khối `capabilities.<name>.overrides` bị từ chối · `timeoutMs` — trần thời gian mặc định của một worker, tối đa 4h; một lượt chạy có thể xin thời gian riêng (RUL96 (one run may take its own timeout)) · `confinement`/`confinementPolicies` — chính sách giam giữ · `capabilities` — catalog lời hứa hành vi và binding executor/invocation | yes | tự sinh khi vắng mặt tại đường dẫn mặc định (không kèm `--config`); `fgos setup` điền `rigorToTier`, `fgos doctor` kiểm bảng này và các khoá placement đã retired; một `--config <path>` tường minh trỏ vào đường vắng mặt vẫn báo lỗi ngay (`fgos discover`/`plan`; `fgos-runner` không còn `--config`, RUL93 (the runner loop's worker and the fan-out batch run as one Unit run each)) |\n| 1b | Provider-capacity inventory/state (slice 1) | Pool account cho một provider agent CLI khi provider đó có quota/capacity theo account. Inventory là machine-local secret-bearing config, không phải project policy; state/lease/quarantine là runtime-local evidence. | Inventory chỉ đọc từ `~/.fgos/config.json` tại `runner.providers.<provider>.accounts.<accountId>`; account là keyed object, không phải array. Slice 1 hỗ trợ `openai-codex` account với `label?` và `credentialSource: { kind: \"codex-home\", home }`; nay mỗi account khai đúng một trong `credentialSource` (một store cho mọi CLI, kind `codex-home` hoặc `home-files`) hoặc `credentialSources` (một store cho mỗi CLI, key là tên lệnh `codex`/`pi`/`omp`/`agy`; RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Account entry bị từ chối nếu khai placement/runtime policy (`executor`, `capability`, `model`, `modelTier`, `mutation`, `confinement`, `tool`, `fallback`, `runtimeClass`, `providerRuntimes`, ...). Project-local `.fgos/config.json` bị từ chối nếu chứa `runner.providers.*.accounts`. State ở `~/.fgos/runtime/provider-capacity/state.json`, lock ở `~/.fgos/runtime/provider-capacity/state.lock`. | no | vắng inventory nghĩa là mọi dispatch giữ hành vi cũ, không selection/lease |\n| 2 | Nhánh đề xuất | Không gian kết quả của một worker, tên mang tiền tố nhận diện `fgw/<id>` | — | — | — |\n| 3 | Bảng phục hồi | Lớp-lỗi → hành-động, máy đọc được | 8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi → hành động ∈ thử-lại (có trần) / đỗ-lại / dừng; lớp LẠ → dừng (an toàn trước) | — | — |\n| 4 | Bộ đếm chống-lặp (lifetime) | visitCount: số lần một việc vào `doing` TÍNH TỪ ĐẦU đời việc — dẫn xuất từ nhật ký sự kiện, không trường mới; dùng cho các bản ghi outcome/metric đã ship (KHÔNG dùng để chặn dispatch nữa — xem #4b) | — | — | — |\n| 4b | Ngân sách cổng chống-lặp (kể từ can thiệp người) | visitsSinceLastHumanEvent: số lần việc vào `doing` **ở stage executing** TÍNH TỪ sự kiện người CUỐI CÙNG của chính việc đó — đây là con số CỔNG dùng để chặn/park dispatch (thay `visitCount` ở vai trò này); một can thiệp người (xem trigger-set) đưa ngân sách về lại đủ 3 cho vòng kế tiếp. Executing-phase-only scoping (claim-lock): trước đây, pick/take chỉ mở frontier (executing-phase), nên counting mọi `todo→doing` move tương đương dispatch attempts. Claim-lock cho phép `pick` cầm stage khác — claim-release cycle ở các stage đầu vòng (`discovery`/`exploring`/`planning`, cộng tên di sản `decompose`) không được tính vào ngân sách executing-phase (per claim-lock code-review finding) | — | — | trần mặc định 3, dùng chung `MAX_VISITS` |\n| 5 | Cầu dao (breaker) | Số lần chấm-trượt liên tiếp trong MỘT lần chạy (bộ nhớ trong phiên, không dẫn xuất từ nhật ký — chủ đích, vì nhật ký không phân biệt người/máy ghi); trần mặc định 3, đếm RIÊNG cho từng việc dưới dispatch song song (một việc chấm-trượt không kéo cầu dao của việc khác). **Trơ trong `--once`:** một việc đỗ lại (park) tối đa sau `maxRetries` (mặc định 2) lần thử trong CÙNG một lượt `--once`, nên không bao giờ chạm trần 3 của cầu dao trong một lượt đơn — cầu dao chỉ có thể kéo khi có một cơ chế chia-sẻ/nhiều-lượt tích luỹ miss xuyên lượt (chưa xây, xem Open Gaps) | — | — | — |\n| 6 | Trần song song hai tầng | Giới hạn số việc chạy đồng thời trong một mẻ, đọc từ cấu hình committed | tầng 1 — số việc GỐC đồng thời; tầng 2 — số việc CON đồng thời trong MỖI gốc; mỗi lần nạp mẻ lấy `min(trần, số việc sẵn-sàng sau lọc quyền-sở-hữu-gốc)` | no (có mặc định) | 4 gốc × 4 con mỗi gốc |\n| 7 | Quyền sở-hữu gốc | Ai đang cầm mọi việc CON của một gốc trong MỘT lượt chạy — gắn lúc con đầu tiên của gốc được nhận, xả khi gốc xong; sống trong bộ nhớ của lượt chạy, KHÔNG bền qua lượt chạy khác/tiến trình khác | một định danh (per lượt chạy) | — | chưa-chủ |\n| 8 | Bản ghi output cục bộ (một file mỗi việc) | Lưu lại output của trợ lý cho MỌI lượt dispatch của một việc — đọc được sau khi console đã cuộn qua; không bao giờ vào cây committed. Cùng file còn nhận chunk stdout/stderr LIVE khi worker đang chạy (STR39, xem \"Xem live output worker khi đang chạy\") — `tail -f` thấy được ngay, không đợi khối kết-cục cuối | mỗi khối kết-cục: dấu thời gian, số lần thử, loại kết cục (đề xuất/quá-giờ/hỏng-spawn/…), output (khi trợ lý kịp sinh ra); xen giữa các khối kết-cục là chunk thô không bọc, ghi ngay khi đến | no (chỉ tồn tại sau lượt dispatch đầu tiên của việc) | — |\n| 9 | Candidate (Gate A, self-improve loop STR13 Slice 1) | Một việc mang ít nhất một bản ghi friction chưa ngã-ngũ, xếp hạng làm ứng viên tự cải thiện — dẫn xuất TỪ friction đã ghi, không phải một bản ghi độc lập, không bền qua lần `evolve` khác | id, disposition, errorClass, layer, detail, attempts (tất cả lấy từ bản ghi friction MỚI NHẤT theo dấu thời gian của id đó khi id có nhiều bản ghi chưa ngã-ngũ), score (cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, không chỉ bản mới nhất) | — | dẫn xuất mỗi lần gọi `evolve` |\n| 10 | Phán quyết Iron Law (self-improve loop STR13 Slice 2/3) | Kết quả của phép tính hai-cửa (module + từ khóa) trên MỘT candidate fix — dẫn xuất thuần từ đầu vào truyền vào, không bền. Gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội bộ), ngay trước bước kiểm cây sạch, cho MỌI đề xuất nguồn runner đang land LÊN TRUNK (thu hẹp về ranh giới trunk per `0032`) — xem \"Cổng duyệt PR nội bộ\" và \"Iron Law\" dưới, Business Rules RUL36 (`evolve --submit` là hành động ghi duy nhất trên bề mặt evolve, tái dùng chính cửa `submit`)/RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`) | required (có/không cần chứng minh test-đỏ-trước), matchedFlags (danh sách từ khóa rủi ro nặng khớp trong mô tả fix), matchedModules (danh sách file khớp danh sách module minh họa) | — | required mặc định `false` khi cả hai phép thử đều không khớp |\n| 11 | Prompt template worker (STR49, `src/runner/prompt-templates/`) | Nội dung chữ nghĩa của `buildPrompt`, tách khỏi code sang file committed — sửa prompt là sửa MỘT file, không đụng code | `selectTemplate({kind, tier, domain})` — bảng luật cơ học, wildcard cuối luôn khớp (từ STR91: luật `domain: 'coding'` khớp TRƯỚC wildcard — domain vắng mặt hay không nhận diện được đều fold về `coding` giống mọi nơi khác trong hệ, không phải một fallback riêng — trỏ `worker-prompt-skill-pointer.txt`; mọi domain đã đăng ký khác `coding` (vd `synthetic`) vẫn rơi về wildcard, trỏ `worker-prompt-default.txt` như trước STR91) · `renderTemplate` — substitution `{placeholder}` string-replace thuần, không engine · `hashTemplate` — sha256 nội dung raw file, ghi kèm dispatch log (xem RUL44 (đã xây — STR49, `src/runner/prompt-templates.mjs`)) · template `worker-prompt-skill-pointer.txt` giữ đủ 6 mục cố định sẵn có, CHỈ thêm đúng một mục `# Agent skill` trỏ `SKILL.md` của domain đó — đường dẫn luôn resolve qua sổ đăng ký domain→skill (`skillForStage`, spec Work-State \"Mô hình domain\"), không bao giờ hardcode (xem RUL52 (luật template theo domain `coding` khớp trước wildcard; domain lạ/vắng mặt fold về `coding`)) | yes (một template mặc định luôn có) | `worker-prompt-default.txt`, `worker-prompt-skill-pointer.txt` |"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_76d404ea624a10455d7a14debe2b2a95"
+}
+```
+
+## Entry claim_04f0605dc840e350f63e53d0e1e96843
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+    "sourceUnitDigest": "e9f472117d68d8c826f9f9b15946883a24addeedf3c298765032fc081f37cb2d",
+    "claimKind": "architecture",
+    "kind": "architecture",
+    "disposition": "partial-carry",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "targetAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path at docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` ). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "remainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` ).",
+    "targetUnitDigest": "bcaecc76a91e2cd04d8a432c31285c9d795a274e2ae8dcba92ccfd94780daddf",
+    "targetAncestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+    "sourceUnitDigest": "e9f472117d68d8c826f9f9b15946883a24addeedf3c298765032fc081f37cb2d",
+    "claimKind": "architecture",
+    "kind": "architecture",
+    "disposition": "partial-carry",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "targetAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path at docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` ). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "deep: partial-carry; source section differs from the target only by H2 to H4, link spelling, removal of the bin.fgos paragraph (283 chars, unit-14) and two paragraphs labelled Added in candidate; the removed paragraph is verbatim inside the restoration block of release-boundaries.md, the named anchor resolves, and sibling claim_6a37273a (supersede, reviewed) accounts for unit-14 at release-boundaries unit-24; remainder named, nothing silently dropped",
+    "remainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` ).",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "bcaecc76a91e2cd04d8a432c31285c9d795a274e2ae8dcba92ccfd94780daddf",
+    "targetAncestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "unitDigest": "c1a1ac958f888cc626ca85a2b38219781d12c6375073b2f9a002135e3ff36f85",
+    "identityFingerprint": "fb7cc258dc05206d132fc94bb086f94b7c0cd11df20059cbcbe90b86c5a65e59",
+    "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+    "sourceAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+    "unitKind": "heading",
+    "sourceUnitDigest": "e9f472117d68d8c826f9f9b15946883a24addeedf3c298765032fc081f37cb2d",
+    "claimKind": "architecture",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "2. Legacy Payload Identity, Ownership, And Repair Path",
+      "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "githubAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "stableAnchor": "h-161656a0cd5d",
+      "startLine": 34,
+      "endLine": 34,
+      "textDigest": "e9f472117d68d8c826f9f9b15946883a24addeedf3c298765032fc081f37cb2d",
+      "sample": "2. Legacy Payload Identity, Ownership, And Repair Path",
+      "sectionPayloadDigest": "5501641da4f536faa95f668b83b823fbe275c8919184266fa6f4017cfe6b3f39",
+      "followingBlockDigest": "3254fda9f7179fc52f68274cf803c9cfe550a6ea9f66d975cd3438100aaf804a",
+      "identityFingerprint": "fb7cc258dc05206d132fc94bb086f94b7c0cd11df20059cbcbe90b86c5a65e59",
+      "ancestry": [
+        "Legacy CLI Transition"
+      ],
+      "text": "## 2. Legacy Payload Identity, Ownership, And Repair Path",
+      "sectionText": "## 2. Legacy Payload Identity, Ownership, And Repair Path\n\nThree things are separated that the name `bin/fgos.mjs` currently conflates:\n\n| | Today | After R1 |\n|---|---|---|\n| Public name people type | `fgos` → Node | `fgos` → Rust host (workspace shim / PATH) |\n| Payload identity the Rust host execs | none | `legacy-node` — the release manifest's `components.legacyNode` and the `legacy_payload` field of every `legacy-cli` `CommandRouteDescriptor` |\n| File location | `bin/fgos.mjs` at the repo root | unchanged |\n\n**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imports `../src/...` relatively, so moving the entry alone breaks it, and moving the whole Node package would decide the Node-side repo layout that [Repo Layout Vision](../component-boundary/repo-layout-vision.md) §7 deliberately defers (and would mislabel `src/state`, `src/runner` — which `fgos-runner` keeps using — as \"legacy\"). The payload is therefore the current npm package exactly as `package.json` `files` defines it, staged whole by the release builder under the manifest's `components.legacyNode.root` (`libexec/legacy-node/` in a staged release) with the same relative layout as the source tree — zero import changes, `bin/fgos.mjs` and `bin/fgos-runner.mjs` both inside it. The identity is renamed (`legacy-node`), the file is not; a filesystem rename happens only when the payload is deleted.\n\nThe public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)` read from the activation binding's manifest — never from `PATH`, never from the caller's cwd, never as an alternate package-manager `bin` entry, and never hardcoded. A `dev:<rev>` source activation declares `root: \".\"`, `entry: \"bin/fgos.mjs\"`, `entries.fgos: \"target/release/fgos\"`; a staged release declares `root: \"libexec/legacy-node\"`, `entries.fgos: \"bin/fgos\"`. One mechanism serves dogfood and production ([Runtime Identity And Activation](../packaging-distribution/runtime-identity-and-activation.md) §5).\n\n`package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` stays until the runner migrates. A header in `bin/fgos.mjs` and the root `AGENTS.md` state the ownership rule for editors already at that path.\n\n**Callers of the old path.** A grep for `bin/fgos.mjs` finds ~150 hits; only ~9 are real call sites, all of them variants of \"where is `fgos`?\": the shell function's tier-1 (`scripts/fgos-shell-integration.sh`), Herdr's three `Command::new(\"node\")` sites (`fgos.rs`, `gateway.rs`, `main.rs`), the dispatch CLI path (`src/runner/dispatch/cli.mjs`), the iron-law footprint matcher (`src/evolve/iron-law.mjs`), the doctor reachability check (`src/setup/registrations.mjs`), the plugin-skill fallback (`core/skills/_shared/fgos-cli-fallback.md` — the single source the ~20 `.agents`/`plugins` copies render from), and `package.json` `bin`. The fix is not a substitution: add one **tier 0 = workspace shim `.fgos/installation/bin/fgos`** to the single resolver each runtime already has (`src/setup/bin-discovery.mjs` for Node, the shell function for shells, one `resolve_fgos` for Herdr) and make the nine sites use it, with the old `node bin/fgos.mjs` path kept only as the fallback for a project that has not run `fgctl init`. The ~75 Node tests that spawn `bin/fgos.mjs` directly stay as they are — they test the Node payload's behavior with the Node payload. Comments are not callers.\n\nEvery selector has exactly one generated `CommandRouteDescriptor`, derived from the Node command registry plus checked migration annotations. Its minimum fields:\n\n```txt\nselector               # canonical command/subcommand selector\nroute_kind             # legacy-cli | native\noperation_id           # required only for native semantic routing\nlegacy_payload         # required only for legacy-cli; named payload identity\nowner_path             # canonical implementation boundary to edit\ncompatibility_tests    # named parity/vector suites required for a repair\n```\n\n`legacy-cli` means the Node payload owns argument parsing and behavior; the Rust host must only recognize the checked selector and preserve the remaining `OsString` argv. `native` means the typed provider owns the operation and the legacy implementation is retained only as an explicitly bounded rollback oracle. A descriptor may not name both paths as active, and an unlisted selector fails the build rather than choosing a fallback.\n\nThe descriptor is both the routing input and the contributor repair map. A repository-local `scripts/explain-command-route.mjs <selector>` reads the same checked artifact and prints route kind, owner path, payload identity, and required compatibility suites. CI rejects a descriptor whose owner or required proof is missing, drift between the Node registry and descriptor, a direct production spawn of the private payload outside `LegacyCliPassthroughProvider` (test fixtures excepted), or a legacy payload removal before its compatibility binding is removed.\n\n**Rollback:** configuration can never replace a built-in provider (kernel contract §7), and there is no runtime provider-selection swap to roll back a native operation. Rollback of a native operation in R1–R2 is a **release rollback through `fgctl`** — the previous release still ships both the native provider and the Node payload during the observation window. There is no \"roll back by changing provider selection\" mechanism; none is promised anywhere in this stack."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 4,
+    "title": "2. Legacy Payload Identity, Ownership, And Repair Path",
+    "anchor": "2-legacy-payload-identity-ownership-and-repair-path",
+    "githubAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+    "stableAnchor": "h-9d420859bd14",
+    "startLine": 94,
+    "endLine": 94,
+    "textDigest": "bcaecc76a91e2cd04d8a432c31285c9d795a274e2ae8dcba92ccfd94780daddf",
+    "sample": "2. Legacy Payload Identity, Ownership, And Repair Path",
+    "sectionPayloadDigest": "42a73e8acb1c7233b3b2b4621504459c837df1c5eb5548006b5c207c1d0b7430",
+    "followingBlockDigest": "3254fda9f7179fc52f68274cf803c9cfe550a6ea9f66d975cd3438100aaf804a",
+    "identityFingerprint": "e3bba4f3dfed74b0c1b7218ce608018f3a3669dd97b409dc61670e2ebe9d0f4a",
+    "ancestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition"
+    ],
+    "text": "#### 2. Legacy Payload Identity, Ownership, And Repair Path",
+    "sectionText": "#### 2. Legacy Payload Identity, Ownership, And Repair Path\n\nThree things are separated that the name `bin/fgos.mjs` currently conflates:\n\n| | Today | After R1 |\n|---|---|---|\n| Public name people type | `fgos` → Node | `fgos` → Rust host (workspace shim / PATH) |\n| Payload identity the Rust host execs | none | `legacy-node` — the release manifest's `components.legacyNode` and the `legacy_payload` field of every `legacy-cli` `CommandRouteDescriptor` |\n| File location | `bin/fgos.mjs` at the repo root | unchanged |\n\n**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imports `../src/...` relatively, so moving the entry alone breaks it, and moving the whole Node package would decide the Node-side repo layout that [Repo Layout Vision](../../../architect/component-boundary/repo-layout-vision.md) §7 deliberately defers (and would mislabel `src/state`, `src/runner` — which `fgos-runner` keeps using — as \"legacy\"). The payload is therefore the current npm package exactly as `package.json` `files` defines it, staged whole by the release builder under the manifest's `components.legacyNode.root` (`libexec/legacy-node/` in a staged release) with the same relative layout as the source tree — zero import changes, `bin/fgos.mjs` and `bin/fgos-runner.mjs` both inside it. The identity is renamed (`legacy-node`), the file is not; a filesystem rename happens only when the payload is deleted.\n\nThe public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)` read from the activation binding's manifest — never from `PATH`, never from the caller's cwd, never as an alternate package-manager `bin` entry, and never hardcoded. A `dev:<rev>` source activation declares `root: \".\"`, `entry: \"bin/fgos.mjs\"`, `entries.fgos: \"target/release/fgos\"`; a staged release declares `root: \"libexec/legacy-node\"`, `entries.fgos: \"bin/fgos\"`. One mechanism serves dogfood and production ([Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md) §5).\n\nAdded in candidate — checked resolver status (2026-10-13): the preceding activation-binding paragraph is retained selected design. `apps/fgos/src/legacy_exec.rs:69-154` selects the release root from explicit release/dev environment bindings or executable-relative manifest discovery, then verifies the manifest and confined entry. The target identity status in spec.md remains `accepted-not-implemented`; checked resolver behavior does not certify the entire target contract. The ownership rule remains never from PATH, never from caller cwd, never as an alternate package-manager bin entry, and never hardcoded.\n\nAdded in candidate: this retained source detail is carried verbatim in [the dropped-010 restoration](release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea).\n\n\n**Callers of the old path.** A grep for `bin/fgos.mjs` finds ~150 hits; only ~9 are real call sites, all of them variants of \"where is `fgos`?\": the shell function's tier-1 (`scripts/fgos-shell-integration.sh`), Herdr's three `Command::new(\"node\")` sites (`fgos.rs`, `gateway.rs`, `main.rs`), the dispatch CLI path (`src/runner/dispatch/cli.mjs`), the iron-law footprint matcher (`src/evolve/iron-law.mjs`), the doctor reachability check (`src/setup/registrations.mjs`), the plugin-skill fallback (`core/skills/_shared/fgos-cli-fallback.md` — the single source the ~20 `.agents`/`plugins` copies render from), and `package.json` `bin`. The fix is not a substitution: add one **tier 0 = workspace shim `.fgos/installation/bin/fgos`** to the single resolver each runtime already has (`src/setup/bin-discovery.mjs` for Node, the shell function for shells, one `resolve_fgos` for Herdr) and make the nine sites use it, with the old `node bin/fgos.mjs` path kept only as the fallback for a project that has not run `fgctl init`. The ~75 Node tests that spawn `bin/fgos.mjs` directly stay as they are — they test the Node payload's behavior with the Node payload. Comments are not callers.\n\nEvery selector has exactly one generated `CommandRouteDescriptor`, derived from the Node command registry plus checked migration annotations. Its minimum fields:\n\n```txt\nselector               # canonical command/subcommand selector\nroute_kind             # legacy-cli | native\noperation_id           # required only for native semantic routing\nlegacy_payload         # required only for legacy-cli; named payload identity\nowner_path             # canonical implementation boundary to edit\ncompatibility_tests    # named parity/vector suites required for a repair\n```\n\n`legacy-cli` means the Node payload owns argument parsing and behavior; the Rust host must only recognize the checked selector and preserve the remaining `OsString` argv. `native` means the typed provider owns the operation and the legacy implementation is retained only as an explicitly bounded rollback oracle. A descriptor may not name both paths as active, and an unlisted selector fails the build rather than choosing a fallback.\n\nThe descriptor is both the routing input and the contributor repair map. A repository-local `scripts/explain-command-route.mjs <selector>` reads the same checked artifact and prints route kind, owner path, payload identity, and required compatibility suites. CI rejects a descriptor whose owner or required proof is missing, drift between the Node registry and descriptor, a direct production spawn of the private payload outside `LegacyCliPassthroughProvider` (test fixtures excepted), or a legacy payload removal before its compatibility binding is removed.\n\n**Rollback:** configuration can never replace a built-in provider (kernel contract §7), and there is no runtime provider-selection swap to roll back a native operation. Rollback of a native operation in R1–R2 is a **release rollback through `fgctl`** — the previous release still ships both the native provider and the Node payload during the observation window. There is no \"roll back by changing provider selection\" mechanism; none is promised anywhere in this stack."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_04f0605dc840e350f63e53d0e1e96843"
+}
+```
+
+## Entry claim_b098afd80d02a32e6c6dd6c0f1e23284
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_b098afd80d02a32e6c6dd6c0f1e23284",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_b098afd80d02a32e6c6dd6c0f1e23284",
+    "sourceUnitDigest": "dfa5106e5a2c65608b2fb1bb8b7869265d23a7c499d3288b30249487c34142ce",
+    "claimKind": "decision",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "targetAnchor": "unheaded-block-18",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Move the complete direct unheaded-block unit \"**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imp\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-12 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-18. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "118885816abfb7f4aab2be95229d48b5f9d505ee4d781ced7fff9c43ce7dd95e",
+    "targetAncestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition",
+      "2. Legacy Payload Identity, Ownership, And Repair Path"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_b098afd80d02a32e6c6dd6c0f1e23284",
+    "sourceUnitDigest": "dfa5106e5a2c65608b2fb1bb8b7869265d23a7c499d3288b30249487c34142ce",
+    "claimKind": "decision",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "targetAnchor": "unheaded-block-18",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Move the complete direct unheaded-block unit \"**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imp\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-12 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-18. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "deep: move; line diff masked for link destinations and heading depth is empty; one link (Repo Layout Vision) is spelled to the same legacy file; digest differs only by that destination; anchor resolves; rationale accurate",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "118885816abfb7f4aab2be95229d48b5f9d505ee4d781ced7fff9c43ce7dd95e",
+    "targetAncestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition",
+      "2. Legacy Payload Identity, Ownership, And Repair Path"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "unitDigest": "edb8eef561e767da1bdd1abc4b5c22cfdb6f7123f83bbeec0e9a26a363e2330e",
+    "identityFingerprint": "edb8eef561e767da1bdd1abc4b5c22cfdb6f7123f83bbeec0e9a26a363e2330e",
+    "claimId": "claim_b098afd80d02a32e6c6dd6c0f1e23284",
+    "sourceAnchor": "unheaded-block-12",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "dfa5106e5a2c65608b2fb1bb8b7869265d23a7c499d3288b30249487c34142ce",
+    "claimKind": "decision",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-12",
+      "githubAnchor": "unheaded-block-12",
+      "stableAnchor": "unheaded-block-12",
+      "title": "Unheaded block 12",
+      "startLine": 44,
+      "endLine": 44,
+      "textDigest": "dfa5106e5a2c65608b2fb1bb8b7869265d23a7c499d3288b30249487c34142ce",
+      "sample": "**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imports `../s",
+      "identityFingerprint": "edb8eef561e767da1bdd1abc4b5c22cfdb6f7123f83bbeec0e9a26a363e2330e",
+      "ancestry": [
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "text": "**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imports `../src/...` relatively, so moving the entry alone breaks it, and moving the whole Node package would decide the Node-side repo layout that [Repo Layout Vision](../component-boundary/repo-layout-vision.md) §7 deliberately defers (and would mislabel `src/state`, `src/runner` — which `fgos-runner` keeps using — as \"legacy\"). The payload is therefore the current npm package exactly as `package.json` `files` defines it, staged whole by the release builder under the manifest's `components.legacyNode.root` (`libexec/legacy-node/` in a staged release) with the same relative layout as the source tree — zero import changes, `bin/fgos.mjs` and `bin/fgos-runner.mjs` both inside it. The identity is renamed (`legacy-node`), the file is not; a filesystem rename happens only when the payload is deleted."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-18",
+    "githubAnchor": "unheaded-block-18",
+    "stableAnchor": "unheaded-block-18",
+    "title": "Unheaded block 18",
+    "startLine": 104,
+    "endLine": 104,
+    "textDigest": "118885816abfb7f4aab2be95229d48b5f9d505ee4d781ced7fff9c43ce7dd95e",
+    "sample": "**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imports `../s",
+    "identityFingerprint": "e437e7ba1e266f7f29b2e2b065bb1ae15269757e458e09ab62ddfb8fcea3d16d",
+    "ancestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition",
+      "2. Legacy Payload Identity, Ownership, And Repair Path"
+    ],
+    "text": "**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imports `../src/...` relatively, so moving the entry alone breaks it, and moving the whole Node package would decide the Node-side repo layout that [Repo Layout Vision](../../../architect/component-boundary/repo-layout-vision.md) §7 deliberately defers (and would mislabel `src/state`, `src/runner` — which `fgos-runner` keeps using — as \"legacy\"). The payload is therefore the current npm package exactly as `package.json` `files` defines it, staged whole by the release builder under the manifest's `components.legacyNode.root` (`libexec/legacy-node/` in a staged release) with the same relative layout as the source tree — zero import changes, `bin/fgos.mjs` and `bin/fgos-runner.mjs` both inside it. The identity is renamed (`legacy-node`), the file is not; a filesystem rename happens only when the payload is deleted."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_b098afd80d02a32e6c6dd6c0f1e23284"
+}
+```
+
+## Entry claim_c1993044e428f031329f23c67bc2a1d6
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_c1993044e428f031329f23c67bc2a1d6",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_c1993044e428f031329f23c67bc2a1d6",
+    "sourceUnitDigest": "dd06d97ff0ed979559a570366b424ec49ae1661c6916fa89364ec9f6c1bc3716",
+    "claimKind": "architecture",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "targetAnchor": "unheaded-block-19",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Move the complete direct unheaded-block unit \"The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-13 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-19. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "c3301ca9cc5d4bc1b53296a7edf3a3afb1726f1280db021c8c3131b554354f95",
+    "targetAncestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition",
+      "2. Legacy Payload Identity, Ownership, And Repair Path"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_c1993044e428f031329f23c67bc2a1d6",
+    "sourceUnitDigest": "dd06d97ff0ed979559a570366b424ec49ae1661c6916fa89364ec9f6c1bc3716",
+    "claimKind": "architecture",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "targetAnchor": "unheaded-block-19",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Move the complete direct unheaded-block unit \"The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-13 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-19. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (replace). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "deep: move; masked line diff empty; the one changed link keeps its legacy destination docs/architect/packaging-distribution/runtime-identity-and-activation.md as L10-18 requires; anchor resolves; rationale accurate",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "c3301ca9cc5d4bc1b53296a7edf3a3afb1726f1280db021c8c3131b554354f95",
+    "targetAncestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition",
+      "2. Legacy Payload Identity, Ownership, And Repair Path"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "unitDigest": "f3fb263e7ef38a0816b49ee242952dc02e4a8ed7a94467de940e34e82a4e3f41",
+    "identityFingerprint": "f3fb263e7ef38a0816b49ee242952dc02e4a8ed7a94467de940e34e82a4e3f41",
+    "claimId": "claim_c1993044e428f031329f23c67bc2a1d6",
+    "sourceAnchor": "unheaded-block-13",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "dd06d97ff0ed979559a570366b424ec49ae1661c6916fa89364ec9f6c1bc3716",
+    "claimKind": "architecture",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-13",
+      "githubAnchor": "unheaded-block-13",
+      "stableAnchor": "unheaded-block-13",
+      "title": "Unheaded block 13",
+      "startLine": 46,
+      "endLine": 46,
+      "textDigest": "dd06d97ff0ed979559a570366b424ec49ae1661c6916fa89364ec9f6c1bc3716",
+      "sample": "The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)` read fr",
+      "identityFingerprint": "f3fb263e7ef38a0816b49ee242952dc02e4a8ed7a94467de940e34e82a4e3f41",
+      "ancestry": [
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "text": "The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)` read from the activation binding's manifest — never from `PATH`, never from the caller's cwd, never as an alternate package-manager `bin` entry, and never hardcoded. A `dev:<rev>` source activation declares `root: \".\"`, `entry: \"bin/fgos.mjs\"`, `entries.fgos: \"target/release/fgos\"`; a staged release declares `root: \"libexec/legacy-node\"`, `entries.fgos: \"bin/fgos\"`. One mechanism serves dogfood and production ([Runtime Identity And Activation](../packaging-distribution/runtime-identity-and-activation.md) §5)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-19",
+    "githubAnchor": "unheaded-block-19",
+    "stableAnchor": "unheaded-block-19",
+    "title": "Unheaded block 19",
+    "startLine": 106,
+    "endLine": 106,
+    "textDigest": "c3301ca9cc5d4bc1b53296a7edf3a3afb1726f1280db021c8c3131b554354f95",
+    "sample": "The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)` read fr",
+    "identityFingerprint": "cbed3b1e5d142d62ecd68763de88406df26d441b845ab7aabde9e4f20ea70f83",
+    "ancestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition",
+      "2. Legacy Payload Identity, Ownership, And Repair Path"
+    ],
+    "text": "The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)` read from the activation binding's manifest — never from `PATH`, never from the caller's cwd, never as an alternate package-manager `bin` entry, and never hardcoded. A `dev:<rev>` source activation declares `root: \".\"`, `entry: \"bin/fgos.mjs\"`, `entries.fgos: \"target/release/fgos\"`; a staged release declares `root: \"libexec/legacy-node\"`, `entries.fgos: \"bin/fgos\"`. One mechanism serves dogfood and production ([Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md) §5)."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_c1993044e428f031329f23c67bc2a1d6"
+}
+```
+
+## Entry claim_b1e44493c254c54dc18efa2088b0018a
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+    "sourceUnitDigest": "ded8adca384e6ae2de3bd7fe2c03692191f0bf14248ca807ff434b43e2efeeab",
+    "claimKind": "architecture",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "targetAnchor": "related-documents",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Move the complete direct heading unit \"## Related Documents\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#related-documents to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#related-documents. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "954b3dcc8c61cac86072dbe20d9c6aa044d2ddc3387979c743c81bfd69ae9337",
+    "targetAncestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+    "sourceUnitDigest": "ded8adca384e6ae2de3bd7fe2c03692191f0bf14248ca807ff434b43e2efeeab",
+    "claimKind": "architecture",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "targetAnchor": "related-documents",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Move the complete direct heading unit \"## Related Documents\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#related-documents to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#related-documents. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "deep: move of the Related Documents heading section; masked diff empty after H2 to H4; two links repointed to candidate carriers (host-invocation spec.md, external-provider-protocol.md) and one keeps its legacy destination; all resolve at HEAD; the rationale names resolved link destination rewrites",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "954b3dcc8c61cac86072dbe20d9c6aa044d2ddc3387979c743c81bfd69ae9337",
+    "targetAncestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "unitDigest": "7be1122ab80f2289a3f0e2a2b76cc4740b6b0e81d2cd6eb55faecd8a5a02b1f3",
+    "identityFingerprint": "407da90c295f529ffea11dd7a869b8eab88f64a6b3af28c26a08e7869701c235",
+    "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+    "sourceAnchor": "related-documents",
+    "unitKind": "heading",
+    "sourceUnitDigest": "ded8adca384e6ae2de3bd7fe2c03692191f0bf14248ca807ff434b43e2efeeab",
+    "claimKind": "architecture",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Related Documents",
+      "anchor": "related-documents",
+      "githubAnchor": "related-documents",
+      "stableAnchor": "h-2ce0b12649cd",
+      "startLine": 93,
+      "endLine": 93,
+      "textDigest": "ded8adca384e6ae2de3bd7fe2c03692191f0bf14248ca807ff434b43e2efeeab",
+      "sample": "Related Documents",
+      "sectionPayloadDigest": "42cc4ac1d11d27794f03b4cb8c1981441babf36f7b6a207ae7d6513e1e90aaa7",
+      "followingBlockDigest": "42cc4ac1d11d27794f03b4cb8c1981441babf36f7b6a207ae7d6513e1e90aaa7",
+      "identityFingerprint": "407da90c295f529ffea11dd7a869b8eab88f64a6b3af28c26a08e7869701c235",
+      "ancestry": [
+        "Legacy CLI Transition"
+      ],
+      "text": "## Related Documents",
+      "sectionText": "## Related Documents\n\n- [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — kernel contract this document depends on.\n- [External Provider Protocol](./external-provider-protocol.md)\n- [Runtime Identity And Activation](../packaging-distribution/runtime-identity-and-activation.md) — owns the legacy payload's actual on-disk location, `fgctl` rollback mechanics, and the `fgos init` / `fgos doctor --fix` / `fgos doctor` tail that supersedes deprecated legacy `fgos setup` onboarding behavior."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 4,
+    "title": "Related Documents",
+    "anchor": "related-documents",
+    "githubAnchor": "related-documents",
+    "stableAnchor": "h-e9eb6e81a5e8",
+    "startLine": 160,
+    "endLine": 160,
+    "textDigest": "954b3dcc8c61cac86072dbe20d9c6aa044d2ddc3387979c743c81bfd69ae9337",
+    "sample": "Related Documents",
+    "sectionPayloadDigest": "79a8711ca2d89312fa54c5f3518f6e8541db0883c16b6de74b945a0c78b886a0",
+    "followingBlockDigest": "79a8711ca2d89312fa54c5f3518f6e8541db0883c16b6de74b945a0c78b886a0",
+    "identityFingerprint": "5c9bd548a241831ffd900294f28f5fc28e9a667892cbd1154065e6f52cbdb564",
+    "ancestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition"
+    ],
+    "text": "#### Related Documents",
+    "sectionText": "#### Related Documents\n\n- [Host Invocation And Provider Routing](../spec.md) — kernel contract this document depends on.\n- [External Provider Protocol](external-provider-protocol.md)\n- [Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md) — owns the legacy payload's actual on-disk location, `fgctl` rollback mechanics, and the `fgos init` / `fgos doctor --fix` / `fgos doctor` tail that supersedes deprecated legacy `fgos setup` onboarding behavior."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_b1e44493c254c54dc18efa2088b0018a"
+}
+```
+
+## Entry claim_949229109da1c08a1d85f8503ea3ee9d
+
+```json
+{
+  "kind": "changed-review-application-confirmation",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_949229109da1c08a1d85f8503ea3ee9d",
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "before": {
+    "claimId": "claim_949229109da1c08a1d85f8503ea3ee9d",
+    "sourceUnitDigest": "42cc4ac1d11d27794f03b4cb8c1981441babf36f7b6a207ae7d6513e1e90aaa7",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "targetAnchor": "unheaded-block-37",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Move the complete direct unheaded-block unit \"- [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — kernel contract this document depends on. - [External Provider Protocol](./external-prov\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-30 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-36. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "79a8711ca2d89312fa54c5f3518f6e8541db0883c16b6de74b945a0c78b886a0",
+    "targetAncestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition",
+      "Related Documents"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_949229109da1c08a1d85f8503ea3ee9d",
+    "sourceUnitDigest": "42cc4ac1d11d27794f03b4cb8c1981441babf36f7b6a207ae7d6513e1e90aaa7",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "targetAnchor": "unheaded-block-37",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Move the complete direct unheaded-block unit \"- [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — kernel contract this document depends on. - [External Provider Protocol](./external-prov\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-30 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-36. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "deep: move of the Related Documents list block; masked diff empty; same three links as the heading row, two repointed to candidate carriers, one legacy; all resolve",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "79a8711ca2d89312fa54c5f3518f6e8541db0883c16b6de74b945a0c78b886a0",
+    "targetAncestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition",
+      "Related Documents"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+    "unitDigest": "b4fedcd296aed6e757f4647925c74f4ed902bcbe30935dffeeac5ecce4eca036",
+    "identityFingerprint": "b4fedcd296aed6e757f4647925c74f4ed902bcbe30935dffeeac5ecce4eca036",
+    "claimId": "claim_949229109da1c08a1d85f8503ea3ee9d",
+    "sourceAnchor": "unheaded-block-30",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "42cc4ac1d11d27794f03b4cb8c1981441babf36f7b6a207ae7d6513e1e90aaa7",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-30",
+      "githubAnchor": "unheaded-block-30",
+      "stableAnchor": "unheaded-block-30",
+      "title": "Unheaded block 30",
+      "startLine": 95,
+      "endLine": 97,
+      "textDigest": "42cc4ac1d11d27794f03b4cb8c1981441babf36f7b6a207ae7d6513e1e90aaa7",
+      "sample": "- [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — kernel contract this document depends on.\n- [External Provider Protocol](./external-provider-proto",
+      "identityFingerprint": "b4fedcd296aed6e757f4647925c74f4ed902bcbe30935dffeeac5ecce4eca036",
+      "ancestry": [
+        "Legacy CLI Transition",
+        "Related Documents"
+      ],
+      "text": "- [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — kernel contract this document depends on.\n- [External Provider Protocol](./external-provider-protocol.md)\n- [Runtime Identity And Activation](../packaging-distribution/runtime-identity-and-activation.md) — owns the legacy payload's actual on-disk location, `fgctl` rollback mechanics, and the `fgos init` / `fgos doctor --fix` / `fgos doctor` tail that supersedes deprecated legacy `fgos setup` onboarding behavior."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-37",
+    "githubAnchor": "unheaded-block-37",
+    "stableAnchor": "unheaded-block-37",
+    "title": "Unheaded block 37",
+    "startLine": 162,
+    "endLine": 164,
+    "textDigest": "79a8711ca2d89312fa54c5f3518f6e8541db0883c16b6de74b945a0c78b886a0",
+    "sample": "- [Host Invocation And Provider Routing](../spec.md) — kernel contract this document depends on.\n- [External Provider Protocol](external-provider-protocol.md)\n- [Runtime Identity A",
+    "identityFingerprint": "ca0d7493d2cbaf0bd673ce1b7048bc23e89b582bb0b3070d7a737276ed0f7827",
+    "ancestry": [
+      "Architecture: Legacy CLI Transition",
+      "Retained selected source material",
+      "Legacy CLI Transition",
+      "Related Documents"
+    ],
+    "text": "- [Host Invocation And Provider Routing](../spec.md) — kernel contract this document depends on.\n- [External Provider Protocol](external-provider-protocol.md)\n- [Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md) — owns the legacy payload's actual on-disk location, `fgctl` rollback mechanics, and the `fgos init` / `fgos doctor --fix` / `fgos doctor` tail that supersedes deprecated legacy `fgos setup` onboarding behavior."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Confirm exact committed ordinary application and unchanged content; do not revoke or generate new approval from packaging.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_949229109da1c08a1d85f8503ea3ee9d"
+}
+```
+

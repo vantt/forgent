@@ -1,0 +1,124 @@
+# Bounded re-review: ownership, part 1
+
+Author session: `codex-session:unit-run-1792093168554-f28af963@2026-10-16`
+Packaged by: `codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16`
+Content pin / SYNC: `345f15d95663260976200be66d1b9a6c648bcd6d`
+Comparison base: `4a18f35ff5d6a9b7a07e955bd64418282c6a91b2`
+Entries: **2**, maximum120 per request.
+
+[Single request index](review-request-step10-index-345f15d95.md). [A36 exact lists](step10-sync345-A36.json). This is one combined bounded request set for all changes at345f15d95 and the current package. Historical before records are witnesses, not current dispositions. Source authors and current row authors remain exact. No producer seed, draw or verdict is selected.
+
+Every submitted manual claim gets digest recomputation, anchor and shard/pack equality checks and an ordinary verdict with a `deep` or `mechanical` note. All unequal source/target digests, partial carries and historical claims are deep. All explicitly marked re-anchor, link, rationale, L10-22, tool, content and accounting deltas are deep. The independent reviewer seeds at least 69/460 Weak-exact/Judgment rows, records seed/sample IDs, and deep-reads the whole pack if >3% of deep rows need rework. Existing truth samples and checkpoint obligations remain unchanged.
+
+Only decisions/historical entries request claim verdicts. Anchors, rationale proofs, native tuples and other accounting entries request item-specific review; they do not create additional claim approvals. Entries marked `changed-review-application-confirmation` preserve existing committed ordinary approvals and request confirmation of exact application; packaging does not revoke or approve them. New/changed pending rows carry no old approval. The runner's package commit supplies the new predecessor shard and request files; immutable document/helper bytes are pinned above.
+
+## Entry l10-22-claim_c3ef3a4ddc116883db10a70d55ba7bd5
+
+```json
+{
+  "kind": "L10-22-duplicate-removal",
+  "entryId": "l10-22-claim_c3ef3a4ddc116883db10a70d55ba7bd5",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "removedPendingRow": {
+    "claimId": "claim_c3ef3a4ddc116883db10a70d55ba7bd5",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd",
+    "sourceUnitDigest": "4485eb54512289665baad03b45714d0d19bdb4b46f1ce565850aea8aa969b940",
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-16 / L10-3: claim_c3ef3a4ddc116883db10a70d55ba7bd5 records the historical native instruction identity AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd (digest 4485eb54512289665baad03b45714d0d19bdb4b46f1ce565850aea8aa969b940). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Pending bounded independent re-review after Step 10 author corrections; no approval carried."
+  },
+  "preservedNativeDisposition": {
+    "kind": "retiredUnits",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "68bd036dcb1c088227e41c53d967140ee4ba34b3adfe2f3669044f4aa463dddd",
+    "identityFingerprint": "6f882a01917473e188404cf5d22111820f6dbf1e80e8c69ba66d7a9eeb2464ef",
+    "claimId": "claim_c3ef3a4ddc116883db10a70d55ba7bd5",
+    "sourceAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd",
+    "unitKind": "heading",
+    "sourceUnitDigest": "4485eb54512289665baad03b45714d0d19bdb4b46f1ce565850aea8aa969b940",
+    "claimKind": "unclassified",
+    "status": "removed-pending-disposition",
+    "priorStatus": "current",
+    "retiredAtCommit": "d98a5c5e75e4529cd99dd9c8bce95a0032806d95",
+    "retiredReason": "no counterpart in current source",
+    "disposition": "supersede",
+    "targetOwner": "AGENTS.md",
+    "targetAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd",
+    "targetUnitDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
+    "shownTargetDigest": "53ac9f9ff1a0476287e5746059f0dd1681d73d704b010f7ef12b61b325d1d9fe",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:1@2026-10-08",
+    "mainCommit": "f33612119f1158716b6797859598033cda6eb89c",
+    "rationale": "Owner A13 supersede: main commit f33612119f1158716b6797859598033cda6eb89c renames the RUL11 heading from D-ADR0036 to D-ADR0054, explicitly retaining the superseded decision reference. This is instruction identity accounting only; no law or instruction text is edited.",
+    "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+    "reviewedAt": "2026-10-09",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-retired-unit.md",
+    "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a",
+    "reviewNote": "Supersede from AGENTS.md#rul11-...-d-adr0036-... to the heading renamed in f33612119. Old unit digest 4485eb54 and successor unit digest 52ff86d6 recomputed with the repository extractor at f33612119^ and f33612119; shown successor text hashes to the recorded shown digest. Every old clause survives in the successor, which adds only the owner-decided ADR0054 scope refinement; vocabulary supersede (target replaces the whole unit, possibly reworded) fits and no AGENTS.md text is touched."
+  },
+  "remainingExplicitDispositions": [],
+  "deepRequired": true,
+  "reviewScope": "Confirm only one earlier reviewed disposition per claim survives; native disposition is historical evidence, not packaging approval.",
+  "packagedBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d"
+}
+```
+
+## Entry l10-22-claim_500d588a939fd6109cf102b8343484bb
+
+```json
+{
+  "kind": "L10-22-duplicate-removal",
+  "entryId": "l10-22-claim_500d588a939fd6109cf102b8343484bb",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "removedPendingRow": {
+    "claimId": "claim_500d588a939fd6109cf102b8343484bb",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-28",
+    "sourceUnitDigest": "45945b0c37c8cca3414b5e11c8b0dba3c210d8dcf30d34fc26a1d794e848801e",
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "L10-16 / L10-3: claim_500d588a939fd6109cf102b8343484bb records the historical native instruction identity AGENTS.md#unheaded-block-28 (digest 45945b0c37c8cca3414b5e11c8b0dba3c210d8dcf30d34fc26a1d794e848801e). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Pending bounded independent re-review after Step 10 author corrections; no approval carried."
+  },
+  "preservedNativeDisposition": {
+    "kind": "retiredUnits",
+    "sourcePath": "AGENTS.md",
+    "unitDigest": "875b03c309d71842d09c8647b525586e9c79e529c46804487926d99f46550b89",
+    "identityFingerprint": "875b03c309d71842d09c8647b525586e9c79e529c46804487926d99f46550b89",
+    "claimId": "claim_500d588a939fd6109cf102b8343484bb",
+    "sourceAnchor": "unheaded-block-28",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "45945b0c37c8cca3414b5e11c8b0dba3c210d8dcf30d34fc26a1d794e848801e",
+    "claimKind": "unclassified",
+    "status": "removed-pending-disposition",
+    "priorStatus": "current",
+    "retiredAtCommit": "6c6a65e8543fa72012bd55f8999f13f9ed6193c4",
+    "retiredReason": "no counterpart in current source",
+    "disposition": "retain-as-evidence",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:27@2026-10-14",
+    "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
+    "reviewNote": "deep: AGENTS.md dispatch bullet list: the out-of-process bullet was rewritten upstream (dispatch execute to fgos run); 2 of 3 lines verbatim; old unit retained as git evidence and the missing line is in the main hunk",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-15",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+  },
+  "remainingExplicitDispositions": [],
+  "deepRequired": true,
+  "reviewScope": "Confirm only one earlier reviewed disposition per claim survives; native disposition is historical evidence, not packaging approval.",
+  "packagedBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d"
+}
+```
+

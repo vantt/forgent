@@ -1,0 +1,6 @@
+{
+  "status": "failed-assertion",
+  "location": "author package audit only; native D all three pass",
+  "reason": "The initial audit matched removed L10-22 rows by claim ID alone. Both IDs still exist under their preserved earlier reviewed dispositions, so ID-absence was the wrong predicate.",
+  "repair": "Compare complete pending before record, require absence of that record, exactly one current reviewed row per ID, and full equality to the preserved native disposition. No gate, checker, row, registry or request changed."
+}

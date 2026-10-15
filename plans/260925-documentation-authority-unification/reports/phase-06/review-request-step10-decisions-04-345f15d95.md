@@ -1,0 +1,14626 @@
+# Bounded re-review: decisions, part 4
+
+Author session: `codex-session:unit-run-1792093168554-f28af963@2026-10-16`
+Packaged by: `codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16`
+Content pin / SYNC: `345f15d95663260976200be66d1b9a6c648bcd6d`
+Comparison base: `4a18f35ff5d6a9b7a07e955bd64418282c6a91b2`
+Entries: **120**, maximum120 per request.
+
+[Single request index](review-request-step10-index-345f15d95.md). [A36 exact lists](step10-sync345-A36.json). This is one combined bounded request set for all changes at345f15d95 and the current package. Historical before records are witnesses, not current dispositions. Source authors and current row authors remain exact. No producer seed, draw or verdict is selected.
+
+Every submitted manual claim gets digest recomputation, anchor and shard/pack equality checks and an ordinary verdict with a `deep` or `mechanical` note. All unequal source/target digests, partial carries and historical claims are deep. All explicitly marked re-anchor, link, rationale, L10-22, tool, content and accounting deltas are deep. The independent reviewer seeds at least 69/460 Weak-exact/Judgment rows, records seed/sample IDs, and deep-reads the whole pack if >3% of deep rows need rework. Existing truth samples and checkpoint obligations remain unchanged.
+
+Only decisions/historical entries request claim verdicts. Anchors, rationale proofs, native tuples and other accounting entries request item-specific review; they do not create additional claim approvals. Entries marked `changed-review-application-confirmation` preserve existing committed ordinary approvals and request confirmation of exact application; packaging does not revoke or approve them. New/changed pending rows carry no old approval. The runner's package commit supplies the new predecessor shard and request files; immutable document/helper bytes are pinned above.
+
+## Entry claim_320ba6224015cc3877738795b80dabb7
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_320ba6224015cc3877738795b80dabb7",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_320ba6224015cc3877738795b80dabb7",
+    "sourceUnitDigest": "96b669468dbe4f3a",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-65",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the add verb section (source lines 835-840) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-65 of spec.md under the add verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries.",
+    "authoredBy": "codex-session:22@2026-10-14",
+    "reviewNote": "deep: source lines 835-840 against target 707-712 differ only in the U8 required-flags clause and the id and test-file clauses already accepted last round; no word lost or added elsewhere; the lead sentence of the rationale says byte-identical which describes the pre-correction candidate but the same rationale discloses the correction, so not misleading.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-rework2.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Add Verb"
+    ],
+    "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3"
+  },
+  "currentDecision": {
+    "claimId": "claim_320ba6224015cc3877738795b80dabb7",
+    "sourceUnitDigest": "96b669468dbe4f3a",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-65",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "rationale": "Body of the add verb section (source lines 866-871) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-65 of spec.md under the add verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Add Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "122c77d8d851b87f87d20990e87dd9034674ebe0a3d6d658d6169c61fa626edd",
+    "identityFingerprint": "122c77d8d851b87f87d20990e87dd9034674ebe0a3d6d658d6169c61fa626edd",
+    "claimId": "claim_320ba6224015cc3877738795b80dabb7",
+    "sourceAnchor": "unheaded-block-78",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "96b669468dbe4f3a8fd6eaa112986cead07ae88fa9de2b233f8fbf27314f9d16",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-78",
+      "githubAnchor": "unheaded-block-78",
+      "stableAnchor": "unheaded-block-78",
+      "title": "Unheaded block 78",
+      "startLine": 866,
+      "endLine": 871,
+      "textDigest": "96b669468dbe4f3a8fd6eaa112986cead07ae88fa9de2b233f8fbf27314f9d16",
+      "sample": "`add` không còn là cửa vào của câu chuyện public (đó là `submit`, per stage-intake) — vẫn hoạt động nguyên vẹn cho test/tooling nội bộ, đòi người\ngọi tự điền mọi trường (kể cả tự đ",
+      "identityFingerprint": "122c77d8d851b87f87d20990e87dd9034674ebe0a3d6d658d6169c61fa626edd",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Khai việc (add) — bề mặt nội bộ"
+      ],
+      "text": "`add` không còn là cửa vào của câu chuyện public (đó là `submit`, per stage-intake) — vẫn hoạt động nguyên vẹn cho test/tooling nội bộ, đòi người\ngọi tự điền mọi trường (kể cả tự đặt id kebab-case), khác hẳn UX \"nộp rồi đi\"\ncủa `submit`. **Đã quyết (STR22, per work-item-verb-surface): giữ `add`\nlàm bề mặt nội bộ, không xóa** — bộ test hiện dùng `add` để tự điền id/field\ntrực tiếp (9 file) tiếp tục dùng nguyên trạng; tài liệu/spec không giới thiệu\n`add` như một cửa vào public ở bất kỳ đâu khác."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-65",
+    "githubAnchor": "unheaded-block-65",
+    "stableAnchor": "unheaded-block-65",
+    "title": "Unheaded block 65",
+    "startLine": 715,
+    "endLine": 720,
+    "textDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
+    "sample": "`add` không còn là cửa vào của câu chuyện public (đó là `submit`, per stage-intake) — vẫn hoạt động nguyên vẹn cho test/tooling nội bộ, đòi người\ngọi điền đủ các cờ bắt buộc `--tit",
+    "identityFingerprint": "a42a524fe1aed241b74514be89d9cedcd83f03c8ec29ddcbc7f1980301271ce6",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Add Verb"
+    ],
+    "text": "`add` không còn là cửa vào của câu chuyện public (đó là `submit`, per stage-intake) — vẫn hoạt động nguyên vẹn cho test/tooling nội bộ, đòi người\ngọi điền đủ các cờ bắt buộc `--title`, `--description`, `--kind`, `--risk` và `--verify`; `--id` tùy chọn, khi vắng thì `generateId`\nsinh id `tsk-<hash>` chống trùng từ title, khác UX \"nộp rồi đi\" của `submit`. **Đã quyết (STR22, per work-item-verb-surface): giữ `add`\nlàm bề mặt nội bộ, không xóa** — bộ test hiện dùng `add` để tự điền id/field\ntrực tiếp trong nhiều file tiếp tục dùng nguyên trạng (ví dụ `test/cli/fgos-intake-7.test.mjs` và `test/e2e/pr-gate.test.mjs`); tài liệu/spec không giới thiệu\n`add` như một cửa vào public ở bất kỳ đâu khác."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_320ba6224015cc3877738795b80dabb7"
+}
+```
+
+## Entry claim_22efb604ffdcadbc5fd3d9a3df00d539
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_22efb604ffdcadbc5fd3d9a3df00d539",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_22efb604ffdcadbc5fd3d9a3df00d539",
+    "sourceUnitDigest": "dd49a6c2fced83ce",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-66",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the add verb section (source lines 842-855) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-66 of spec.md under the add verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 842-855 to spec.md#unheaded-block-66 under 'Add Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "dd49a6c2fced83cebc38d9acb4a40dc3954a7776b9c56c825e3fc71c95407fd6",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Add Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_22efb604ffdcadbc5fd3d9a3df00d539",
+    "sourceUnitDigest": "dd49a6c2fced83ce",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-66",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the add verb section (source lines 873-886) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-66 of spec.md under the add verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "dd49a6c2fced83cebc38d9acb4a40dc3954a7776b9c56c825e3fc71c95407fd6",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Add Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "566a7d7dc620564a8d0cb22baa7a32b8e3d02f4c28c4ea85c771c6e57f8a2b9f",
+    "identityFingerprint": "566a7d7dc620564a8d0cb22baa7a32b8e3d02f4c28c4ea85c771c6e57f8a2b9f",
+    "claimId": "claim_22efb604ffdcadbc5fd3d9a3df00d539",
+    "sourceAnchor": "unheaded-block-79",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "dd49a6c2fced83cebc38d9acb4a40dc3954a7776b9c56c825e3fc71c95407fd6",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-79",
+      "githubAnchor": "unheaded-block-79",
+      "stableAnchor": "unheaded-block-79",
+      "title": "Unheaded block 79",
+      "startLine": 873,
+      "endLine": 886,
+      "textDigest": "dd49a6c2fced83cebc38d9acb4a40dc3954a7776b9c56c825e3fc71c95407fd6",
+      "sample": "- **Blocked when:** thiếu trường bắt buộc, id sai dạng kebab-case, id trùng, dep trỏ id không tồn tại, `--domain` không khớp domain nào trong sổ đăng ký — tất cả trả phạm trù `vali",
+      "identityFingerprint": "566a7d7dc620564a8d0cb22baa7a32b8e3d02f4c28c4ea85c771c6e57f8a2b9f",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Khai việc (add) — bề mặt nội bộ"
+      ],
+      "text": "- **Blocked when:** thiếu trường bắt buộc, id sai dạng kebab-case, id trùng, dep trỏ id không tồn tại, `--domain` không khớp domain nào trong sổ đăng ký — tất cả trả phạm trù `validation` (mã 4), KHÔNG sự kiện nào được ghi.\n- **What changes:** một sự kiện khai-item vào nhật ký, item xuất hiện trong bản chiếu ở `todo`.\n  - **domain** — tùy chọn qua `--domain <tên>`; vắng mặt đọc ra `coding` (mặc\n    định lazy). `add` KHÔNG truyền `--stage` — vắng mặt `stage` tự đọc ra\n    stage thỏa bước Thực-thi của domain đó (per \"Mô hình domain\" trên), nên\n    một item `add --domain synthetic` (domain chỉ có một stage, thỏa Thực-thi)\n    sẵn sàng dispatch ngay, không cần qua context-discovery/chia-việc.\n  - **acceptance** — tùy chọn qua `--acceptance '<json>'` (mảng `{text,evidence}`,\n    Data Dictionary #24); giá trị hỏng dạng (không parse được, không phải\n    mảng, một clause thiếu/rỗng `text`) bị chặn ở `validation` (mã 4) trước\n    khi merge, cùng khuôn mọi trường khác của `add`; vắng cờ thì\n    `item.acceptance` vắng mặt hoàn toàn, không mặc định mảng rỗng (RUL58 (acceptance-clause gate — chặn ở cửa delivered, không phải cửa done)).\n- **Side effects:** không.\n- **Afterwards:** người/agent thấy item trong `list`; clone khác thấy sau khi nhận commit chứa nhật ký."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-66",
+    "githubAnchor": "unheaded-block-66",
+    "stableAnchor": "unheaded-block-66",
+    "title": "Unheaded block 66",
+    "startLine": 722,
+    "endLine": 735,
+    "textDigest": "dd49a6c2fced83cebc38d9acb4a40dc3954a7776b9c56c825e3fc71c95407fd6",
+    "sample": "- **Blocked when:** thiếu trường bắt buộc, id sai dạng kebab-case, id trùng, dep trỏ id không tồn tại, `--domain` không khớp domain nào trong sổ đăng ký — tất cả trả phạm trù `vali",
+    "identityFingerprint": "566a7d7dc620564a8d0cb22baa7a32b8e3d02f4c28c4ea85c771c6e57f8a2b9f",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Add Verb"
+    ],
+    "text": "- **Blocked when:** thiếu trường bắt buộc, id sai dạng kebab-case, id trùng, dep trỏ id không tồn tại, `--domain` không khớp domain nào trong sổ đăng ký — tất cả trả phạm trù `validation` (mã 4), KHÔNG sự kiện nào được ghi.\n- **What changes:** một sự kiện khai-item vào nhật ký, item xuất hiện trong bản chiếu ở `todo`.\n  - **domain** — tùy chọn qua `--domain <tên>`; vắng mặt đọc ra `coding` (mặc\n    định lazy). `add` KHÔNG truyền `--stage` — vắng mặt `stage` tự đọc ra\n    stage thỏa bước Thực-thi của domain đó (per \"Mô hình domain\" trên), nên\n    một item `add --domain synthetic` (domain chỉ có một stage, thỏa Thực-thi)\n    sẵn sàng dispatch ngay, không cần qua context-discovery/chia-việc.\n  - **acceptance** — tùy chọn qua `--acceptance '<json>'` (mảng `{text,evidence}`,\n    Data Dictionary #24); giá trị hỏng dạng (không parse được, không phải\n    mảng, một clause thiếu/rỗng `text`) bị chặn ở `validation` (mã 4) trước\n    khi merge, cùng khuôn mọi trường khác của `add`; vắng cờ thì\n    `item.acceptance` vắng mặt hoàn toàn, không mặc định mảng rỗng (RUL58 (acceptance-clause gate — chặn ở cửa delivered, không phải cửa done)).\n- **Side effects:** không.\n- **Afterwards:** người/agent thấy item trong `list`; clone khác thấy sau khi nhận commit chứa nhật ký."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-66",
+      "githubAnchor": "unheaded-block-66",
+      "stableAnchor": "unheaded-block-66",
+      "title": "Unheaded block 66",
+      "startLine": 722,
+      "endLine": 735,
+      "textDigest": "dd49a6c2fced83cebc38d9acb4a40dc3954a7776b9c56c825e3fc71c95407fd6",
+      "sample": "- **Blocked when:** thiếu trường bắt buộc, id sai dạng kebab-case, id trùng, dep trỏ id không tồn tại, `--domain` không khớp domain nào trong sổ đăng ký — tất cả trả phạm trù `vali",
+      "identityFingerprint": "566a7d7dc620564a8d0cb22baa7a32b8e3d02f4c28c4ea85c771c6e57f8a2b9f",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Add Verb"
+      ],
+      "text": "- **Blocked when:** thiếu trường bắt buộc, id sai dạng kebab-case, id trùng, dep trỏ id không tồn tại, `--domain` không khớp domain nào trong sổ đăng ký — tất cả trả phạm trù `validation` (mã 4), KHÔNG sự kiện nào được ghi.\n- **What changes:** một sự kiện khai-item vào nhật ký, item xuất hiện trong bản chiếu ở `todo`.\n  - **domain** — tùy chọn qua `--domain <tên>`; vắng mặt đọc ra `coding` (mặc\n    định lazy). `add` KHÔNG truyền `--stage` — vắng mặt `stage` tự đọc ra\n    stage thỏa bước Thực-thi của domain đó (per \"Mô hình domain\" trên), nên\n    một item `add --domain synthetic` (domain chỉ có một stage, thỏa Thực-thi)\n    sẵn sàng dispatch ngay, không cần qua context-discovery/chia-việc.\n  - **acceptance** — tùy chọn qua `--acceptance '<json>'` (mảng `{text,evidence}`,\n    Data Dictionary #24); giá trị hỏng dạng (không parse được, không phải\n    mảng, một clause thiếu/rỗng `text`) bị chặn ở `validation` (mã 4) trước\n    khi merge, cùng khuôn mọi trường khác của `add`; vắng cờ thì\n    `item.acceptance` vắng mặt hoàn toàn, không mặc định mảng rỗng (RUL58 (acceptance-clause gate — chặn ở cửa delivered, không phải cửa done)).\n- **Side effects:** không.\n- **Afterwards:** người/agent thấy item trong `list`; clone khác thấy sau khi nhận commit chứa nhật ký."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_22efb604ffdcadbc5fd3d9a3df00d539"
+}
+```
+
+## Entry claim_51cd8773ebe1fd970ca4d3dd8c718b17
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_51cd8773ebe1fd970ca4d3dd8c718b17",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_51cd8773ebe1fd970ca4d3dd8c718b17",
+    "sourceUnitDigest": "876c0093197ca07d",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-69",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the plan verb section (source lines 954-974) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-69 of spec.md under the plan verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 954-974 to spec.md#unheaded-block-69 under 'Plan Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "876c0093197ca07debf3dbbc4844f926cfb2268f897bef63fca4254c50bd55f7",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Plan Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_51cd8773ebe1fd970ca4d3dd8c718b17",
+    "sourceUnitDigest": "876c0093197ca07d",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-69",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the plan verb section (source lines 985-1005) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-69 of spec.md under the plan verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "876c0093197ca07debf3dbbc4844f926cfb2268f897bef63fca4254c50bd55f7",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Plan Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "81afff62c82f6ec6928472cd08c125a1f5cfa32885423088016bce150f527bb4",
+    "identityFingerprint": "81afff62c82f6ec6928472cd08c125a1f5cfa32885423088016bce150f527bb4",
+    "claimId": "claim_51cd8773ebe1fd970ca4d3dd8c718b17",
+    "sourceAnchor": "unheaded-block-82",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "876c0093197ca07debf3dbbc4844f926cfb2268f897bef63fca4254c50bd55f7",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-82",
+      "githubAnchor": "unheaded-block-82",
+      "stableAnchor": "unheaded-block-82",
+      "title": "Unheaded block 82",
+      "startLine": 985,
+      "endLine": 1005,
+      "textDigest": "876c0093197ca07debf3dbbc4844f926cfb2268f897bef63fca4254c50bd55f7",
+      "sample": "- **Runs when:** người/agent gọi\n  `fgos plan <id> [--verdict pass-through|decompose|need-human] [--children <json>]`\n  — verb RIÊNG cho stage `planning` (và bí danh di sản `decomp",
+      "identityFingerprint": "81afff62c82f6ec6928472cd08c125a1f5cfa32885423088016bce150f527bb4",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Chạy phán chia-việc (plan)"
+      ],
+      "text": "- **Runs when:** người/agent gọi\n  `fgos plan <id> [--verdict pass-through|decompose|need-human] [--children <json>]`\n  — verb RIÊNG cho stage `planning` (và bí danh di sản `decompose`), tách bạch\n  khỏi `discover` ở trên: một item đứng sai stage bị từ chối rõ lý do thay vì\n  được dispatch nhầm phép phán. Vòng tự hành quét bước này NGAY SAU lượt quét\n  soi-rõ và TRƯỚC khi giao việc thi công.\n- **Blocked when:** item không tồn tại — `validation`; item không ở stage\n  lập-kế-hoạch — chỉ sang `discover`. Verdict chia mà có bất kỳ con nào thiếu\n  `verify` thật là verdict KHÔNG HỢP LỆ toàn bộ: không con nào được ghi, item\n  ở nguyên trạng cho lượt sau (fail-safe, không bao giờ throw).\n- **What changes:** HOẶC một sự kiện đổi-stage `planning → executing`\n  (pass-through, hoặc sau khi sinh đủ con), HOẶC các sự kiện khai-con cộng sự\n  kiện đổi-stage của gốc (verdict chia), HOẶC một sự kiện đổi-status sang\n  `awaiting-human` mang đề xuất chia (cần người quyết), HOẶC không gì cả nếu\n  verdict không hợp lệ (xem \"Giai đoạn Lập-kế-hoạch\" trên).\n- **Side effects:** không có lời gọi model nào từ bên trong verb — cùng lý do\n  với `discover` ở trên. Khi item tới `executing`, verb NHẢ luôn claim của\n  item về `todo`: phiên nào cầm tiếp việc thi công phải claim lại qua cửa pull.\n- **Afterwards:** pass-through hoặc chia xong → item/gốc sang `executing`,\n  xuất hiện trong `ready` khi deps/lineage cũng đã mở; cần người quyết →\n  `awaiting-human` mang đề xuất chia, trả lời xong thì phán lại từ đầu."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-69",
+    "githubAnchor": "unheaded-block-69",
+    "stableAnchor": "unheaded-block-69",
+    "title": "Unheaded block 69",
+    "startLine": 835,
+    "endLine": 855,
+    "textDigest": "876c0093197ca07debf3dbbc4844f926cfb2268f897bef63fca4254c50bd55f7",
+    "sample": "- **Runs when:** người/agent gọi\n  `fgos plan <id> [--verdict pass-through|decompose|need-human] [--children <json>]`\n  — verb RIÊNG cho stage `planning` (và bí danh di sản `decomp",
+    "identityFingerprint": "81afff62c82f6ec6928472cd08c125a1f5cfa32885423088016bce150f527bb4",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Plan Verb"
+    ],
+    "text": "- **Runs when:** người/agent gọi\n  `fgos plan <id> [--verdict pass-through|decompose|need-human] [--children <json>]`\n  — verb RIÊNG cho stage `planning` (và bí danh di sản `decompose`), tách bạch\n  khỏi `discover` ở trên: một item đứng sai stage bị từ chối rõ lý do thay vì\n  được dispatch nhầm phép phán. Vòng tự hành quét bước này NGAY SAU lượt quét\n  soi-rõ và TRƯỚC khi giao việc thi công.\n- **Blocked when:** item không tồn tại — `validation`; item không ở stage\n  lập-kế-hoạch — chỉ sang `discover`. Verdict chia mà có bất kỳ con nào thiếu\n  `verify` thật là verdict KHÔNG HỢP LỆ toàn bộ: không con nào được ghi, item\n  ở nguyên trạng cho lượt sau (fail-safe, không bao giờ throw).\n- **What changes:** HOẶC một sự kiện đổi-stage `planning → executing`\n  (pass-through, hoặc sau khi sinh đủ con), HOẶC các sự kiện khai-con cộng sự\n  kiện đổi-stage của gốc (verdict chia), HOẶC một sự kiện đổi-status sang\n  `awaiting-human` mang đề xuất chia (cần người quyết), HOẶC không gì cả nếu\n  verdict không hợp lệ (xem \"Giai đoạn Lập-kế-hoạch\" trên).\n- **Side effects:** không có lời gọi model nào từ bên trong verb — cùng lý do\n  với `discover` ở trên. Khi item tới `executing`, verb NHẢ luôn claim của\n  item về `todo`: phiên nào cầm tiếp việc thi công phải claim lại qua cửa pull.\n- **Afterwards:** pass-through hoặc chia xong → item/gốc sang `executing`,\n  xuất hiện trong `ready` khi deps/lineage cũng đã mở; cần người quyết →\n  `awaiting-human` mang đề xuất chia, trả lời xong thì phán lại từ đầu."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-69",
+      "githubAnchor": "unheaded-block-69",
+      "stableAnchor": "unheaded-block-69",
+      "title": "Unheaded block 69",
+      "startLine": 835,
+      "endLine": 855,
+      "textDigest": "876c0093197ca07debf3dbbc4844f926cfb2268f897bef63fca4254c50bd55f7",
+      "sample": "- **Runs when:** người/agent gọi\n  `fgos plan <id> [--verdict pass-through|decompose|need-human] [--children <json>]`\n  — verb RIÊNG cho stage `planning` (và bí danh di sản `decomp",
+      "identityFingerprint": "81afff62c82f6ec6928472cd08c125a1f5cfa32885423088016bce150f527bb4",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Plan Verb"
+      ],
+      "text": "- **Runs when:** người/agent gọi\n  `fgos plan <id> [--verdict pass-through|decompose|need-human] [--children <json>]`\n  — verb RIÊNG cho stage `planning` (và bí danh di sản `decompose`), tách bạch\n  khỏi `discover` ở trên: một item đứng sai stage bị từ chối rõ lý do thay vì\n  được dispatch nhầm phép phán. Vòng tự hành quét bước này NGAY SAU lượt quét\n  soi-rõ và TRƯỚC khi giao việc thi công.\n- **Blocked when:** item không tồn tại — `validation`; item không ở stage\n  lập-kế-hoạch — chỉ sang `discover`. Verdict chia mà có bất kỳ con nào thiếu\n  `verify` thật là verdict KHÔNG HỢP LỆ toàn bộ: không con nào được ghi, item\n  ở nguyên trạng cho lượt sau (fail-safe, không bao giờ throw).\n- **What changes:** HOẶC một sự kiện đổi-stage `planning → executing`\n  (pass-through, hoặc sau khi sinh đủ con), HOẶC các sự kiện khai-con cộng sự\n  kiện đổi-stage của gốc (verdict chia), HOẶC một sự kiện đổi-status sang\n  `awaiting-human` mang đề xuất chia (cần người quyết), HOẶC không gì cả nếu\n  verdict không hợp lệ (xem \"Giai đoạn Lập-kế-hoạch\" trên).\n- **Side effects:** không có lời gọi model nào từ bên trong verb — cùng lý do\n  với `discover` ở trên. Khi item tới `executing`, verb NHẢ luôn claim của\n  item về `todo`: phiên nào cầm tiếp việc thi công phải claim lại qua cửa pull.\n- **Afterwards:** pass-through hoặc chia xong → item/gốc sang `executing`,\n  xuất hiện trong `ready` khi deps/lineage cũng đã mở; cần người quyết →\n  `awaiting-human` mang đề xuất chia, trả lời xong thì phán lại từ đầu."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_51cd8773ebe1fd970ca4d3dd8c718b17"
+}
+```
+
+## Entry claim_c43065f0988aa74de6c17c9a17ea138b
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_c43065f0988aa74de6c17c9a17ea138b",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_c43065f0988aa74de6c17c9a17ea138b",
+    "sourceUnitDigest": "03e628ac0acb982a",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-70",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the move verb section (source lines 978-981) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-70 of spec.md under the move verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 978-981 to spec.md#unheaded-block-70 under 'Move Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "03e628ac0acb982ad74952d25a5455b032f21664ed147ecf3d8a7fb8c880bf18",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Move Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_c43065f0988aa74de6c17c9a17ea138b",
+    "sourceUnitDigest": "03e628ac0acb982a",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-70",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the move verb section (source lines 1009-1012) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-70 of spec.md under the move verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "03e628ac0acb982ad74952d25a5455b032f21664ed147ecf3d8a7fb8c880bf18",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Move Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "0dcd5ed07dda8f8c5802a106785fee43d1cf973acc5ffa40f336e70bf723b013",
+    "identityFingerprint": "0dcd5ed07dda8f8c5802a106785fee43d1cf973acc5ffa40f336e70bf723b013",
+    "claimId": "claim_c43065f0988aa74de6c17c9a17ea138b",
+    "sourceAnchor": "unheaded-block-83",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "03e628ac0acb982ad74952d25a5455b032f21664ed147ecf3d8a7fb8c880bf18",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-83",
+      "githubAnchor": "unheaded-block-83",
+      "stableAnchor": "unheaded-block-83",
+      "title": "Unheaded block 83",
+      "startLine": 1009,
+      "endLine": 1012,
+      "textDigest": "03e628ac0acb982ad74952d25a5455b032f21664ed147ecf3d8a7fb8c880bf18",
+      "sample": "- **Blocked when:** (a) cạnh chuyển không có trong bảng — `todo→doing`, `doing→delivered`, `doing→awaiting-approval`, `awaiting-approval→delivered`, `delivered→retrospective`, `ret",
+      "identityFingerprint": "0dcd5ed07dda8f8c5802a106785fee43d1cf973acc5ffa40f336e70bf723b013",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Chuyển trạng thái (move)"
+      ],
+      "text": "- **Blocked when:** (a) cạnh chuyển không có trong bảng — `todo→doing`, `doing→delivered`, `doing→awaiting-approval`, `awaiting-approval→delivered`, `delivered→retrospective`, `retrospective→cleanup`, `cleanup→done`, `cleanup→blocked`, `blocked→delivered`, `awaiting-approval→todo` (bắt buộc lý do), `awaiting-approval→blocked` (bắt buộc lý do — per pr-lifecycle / 1359ab5e, cạnh gate duyệt gãy: merge conflict hoặc verify đỏ sau merge, xem spec Runner \"Cổng duyệt PR nội bộ\"), `todo/doing→blocked`, `blocked→todo/doing`, `blocked→awaiting-approval` (per fan-out-parallel — cạnh cơ học, KHÔNG bắt buộc lý do, dành riêng cho một lần đồng bộ-lại/catch-up sạch, xem spec Runner \"Đồng bộ lại một việc đỗ (catch-up)\"), `todo/doing→awaiting-human` (bắt buộc câu hỏi), `awaiting-human→todo` (bắt buộc câu trả lời) là toàn bộ cạnh hợp lệ — trả `precondition` (mã 2); (a2) cạnh từ-chối `awaiting-approval→todo` hoặc cạnh gate-gãy `awaiting-approval→blocked` thiếu/rỗng lý do, hoặc cạnh vào chờ thiếu/rỗng câu hỏi, hoặc cạnh rời chờ thiếu/rỗng câu trả lời — trả `validation` (mã 4); (b) trạng thái thực khác `--expect` — trả `conflict` (mã 3); (c) cờ thiếu giá trị hoặc rỗng (`--to` trống, `--expect \"\"`) — trả `validation` (mã 4), không bao giờ lọt sang phạm trù 2/3; (d) **`--to delivered` khi nhánh `fgw/<id>` tồn tại mà CHƯA reachable từ trunk** (per tsk-5dk — `git merge-base --is-ancestor`, đo trực tiếp trong `case 'move'`, không tái dùng đường suy-luận-từ-git của cleanup-harness) — trả `validation` (mã 4), TRỪ KHI cờ `--override-reason \"<lý do>\"` được truyền kèm giá trị không rỗng; item không có nhánh `fgw/<id>` (item pull/legacy, hoặc fixture trạng thái thuần) hoặc có nhánh nhưng ĐÃ reachable không bị chặn — xem Data Dictionary #28/#29. Bốn trường hợp trên KHÔNG ghi sự kiện nào.\n- **What changes:** một sự kiện chuyển-trạng-thái (kèm from/to) vào nhật ký, rồi bản chiếu cập nhật — luôn theo thứ tự nhật-ký-trước, bản-chiếu-sau.\n- **Side effects:** không, TRỪ đường override ở (d) — khi `--override-reason` cho phép một `--to delivered` vượt qua kiểm reachability, một bản ghi `decision` (kind `engine`) được ghi TRƯỚC sự kiện chuyển-trạng-thái, mang chính lý do đó làm `rationale` — luôn kiểm được sau này qua nhật ký quyết định của item, không âm thầm.\n- **Afterwards:** `done` là cửa một chiều ra: item đã done thì mọi lần move tiếp theo đều bị `precondition`; nay chỉ tới được `done` qua đúng một cạnh `cleanup→done`, sau khi item đã đi hết chuỗi đuôi `delivered → retrospective → cleanup`. Item bị từ chối về `todo` mang lý do trong nhật ký, vào lại hàng chờ làm tiếp. Cạnh `awaiting-approval→todo` (reject) hoặc `awaiting-approval→blocked` (gate gãy) mang `reason`: giá trị MỚI NHẤT còn được fold thêm lên chính item (`item.reason`, Data Dictionary #18, latest-wins) — không chỉ nằm trong nhật ký sự kiện, để consumer sau (prompt worker, người đọc `list`) thấy lý do mới nhất mà không cần lục nhật ký (per worker-execution STR33 / 396d9d9e, xem spec Runner RUL23 (hợp đồng con — verify thật, không placeholder)). Cạnh `blocked→awaiting-approval` (per fan-out-parallel) là cạnh DUY NHẤT rời `blocked` không mang `reason` và không đi qua `doing` — dành riêng cho một lần đồng bộ-lại (catch-up) sạch, phân biệt với người chọn cầm việc qua cửa pull để tự làm-lại tay (`blocked→doing`, đi qua chống-lặp bình thường như mọi lần nhận việc khác); xem spec Runner \"Đồng bộ lại một việc đỗ (catch-up)\"."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-70",
+    "githubAnchor": "unheaded-block-70",
+    "stableAnchor": "unheaded-block-70",
+    "title": "Unheaded block 70",
+    "startLine": 859,
+    "endLine": 862,
+    "textDigest": "03e628ac0acb982ad74952d25a5455b032f21664ed147ecf3d8a7fb8c880bf18",
+    "sample": "- **Blocked when:** (a) cạnh chuyển không có trong bảng — `todo→doing`, `doing→delivered`, `doing→awaiting-approval`, `awaiting-approval→delivered`, `delivered→retrospective`, `ret",
+    "identityFingerprint": "0dcd5ed07dda8f8c5802a106785fee43d1cf973acc5ffa40f336e70bf723b013",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Move Verb"
+    ],
+    "text": "- **Blocked when:** (a) cạnh chuyển không có trong bảng — `todo→doing`, `doing→delivered`, `doing→awaiting-approval`, `awaiting-approval→delivered`, `delivered→retrospective`, `retrospective→cleanup`, `cleanup→done`, `cleanup→blocked`, `blocked→delivered`, `awaiting-approval→todo` (bắt buộc lý do), `awaiting-approval→blocked` (bắt buộc lý do — per pr-lifecycle / 1359ab5e, cạnh gate duyệt gãy: merge conflict hoặc verify đỏ sau merge, xem spec Runner \"Cổng duyệt PR nội bộ\"), `todo/doing→blocked`, `blocked→todo/doing`, `blocked→awaiting-approval` (per fan-out-parallel — cạnh cơ học, KHÔNG bắt buộc lý do, dành riêng cho một lần đồng bộ-lại/catch-up sạch, xem spec Runner \"Đồng bộ lại một việc đỗ (catch-up)\"), `todo/doing→awaiting-human` (bắt buộc câu hỏi), `awaiting-human→todo` (bắt buộc câu trả lời) là toàn bộ cạnh hợp lệ — trả `precondition` (mã 2); (a2) cạnh từ-chối `awaiting-approval→todo` hoặc cạnh gate-gãy `awaiting-approval→blocked` thiếu/rỗng lý do, hoặc cạnh vào chờ thiếu/rỗng câu hỏi, hoặc cạnh rời chờ thiếu/rỗng câu trả lời — trả `validation` (mã 4); (b) trạng thái thực khác `--expect` — trả `conflict` (mã 3); (c) cờ thiếu giá trị hoặc rỗng (`--to` trống, `--expect \"\"`) — trả `validation` (mã 4), không bao giờ lọt sang phạm trù 2/3; (d) **`--to delivered` khi nhánh `fgw/<id>` tồn tại mà CHƯA reachable từ trunk** (per tsk-5dk — `git merge-base --is-ancestor`, đo trực tiếp trong `case 'move'`, không tái dùng đường suy-luận-từ-git của cleanup-harness) — trả `validation` (mã 4), TRỪ KHI cờ `--override-reason \"<lý do>\"` được truyền kèm giá trị không rỗng; item không có nhánh `fgw/<id>` (item pull/legacy, hoặc fixture trạng thái thuần) hoặc có nhánh nhưng ĐÃ reachable không bị chặn — xem Data Dictionary #28/#29. Bốn trường hợp trên KHÔNG ghi sự kiện nào.\n- **What changes:** một sự kiện chuyển-trạng-thái (kèm from/to) vào nhật ký, rồi bản chiếu cập nhật — luôn theo thứ tự nhật-ký-trước, bản-chiếu-sau.\n- **Side effects:** không, TRỪ đường override ở (d) — khi `--override-reason` cho phép một `--to delivered` vượt qua kiểm reachability, một bản ghi `decision` (kind `engine`) được ghi TRƯỚC sự kiện chuyển-trạng-thái, mang chính lý do đó làm `rationale` — luôn kiểm được sau này qua nhật ký quyết định của item, không âm thầm.\n- **Afterwards:** `done` là cửa một chiều ra: item đã done thì mọi lần move tiếp theo đều bị `precondition`; nay chỉ tới được `done` qua đúng một cạnh `cleanup→done`, sau khi item đã đi hết chuỗi đuôi `delivered → retrospective → cleanup`. Item bị từ chối về `todo` mang lý do trong nhật ký, vào lại hàng chờ làm tiếp. Cạnh `awaiting-approval→todo` (reject) hoặc `awaiting-approval→blocked` (gate gãy) mang `reason`: giá trị MỚI NHẤT còn được fold thêm lên chính item (`item.reason`, Data Dictionary #18, latest-wins) — không chỉ nằm trong nhật ký sự kiện, để consumer sau (prompt worker, người đọc `list`) thấy lý do mới nhất mà không cần lục nhật ký (per worker-execution STR33 / 396d9d9e, xem spec Runner RUL23 (hợp đồng con — verify thật, không placeholder)). Cạnh `blocked→awaiting-approval` (per fan-out-parallel) là cạnh DUY NHẤT rời `blocked` không mang `reason` và không đi qua `doing` — dành riêng cho một lần đồng bộ-lại (catch-up) sạch, phân biệt với người chọn cầm việc qua cửa pull để tự làm-lại tay (`blocked→doing`, đi qua chống-lặp bình thường như mọi lần nhận việc khác); xem spec Runner \"Đồng bộ lại một việc đỗ (catch-up)\"."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-70",
+      "githubAnchor": "unheaded-block-70",
+      "stableAnchor": "unheaded-block-70",
+      "title": "Unheaded block 70",
+      "startLine": 859,
+      "endLine": 862,
+      "textDigest": "03e628ac0acb982ad74952d25a5455b032f21664ed147ecf3d8a7fb8c880bf18",
+      "sample": "- **Blocked when:** (a) cạnh chuyển không có trong bảng — `todo→doing`, `doing→delivered`, `doing→awaiting-approval`, `awaiting-approval→delivered`, `delivered→retrospective`, `ret",
+      "identityFingerprint": "0dcd5ed07dda8f8c5802a106785fee43d1cf973acc5ffa40f336e70bf723b013",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Move Verb"
+      ],
+      "text": "- **Blocked when:** (a) cạnh chuyển không có trong bảng — `todo→doing`, `doing→delivered`, `doing→awaiting-approval`, `awaiting-approval→delivered`, `delivered→retrospective`, `retrospective→cleanup`, `cleanup→done`, `cleanup→blocked`, `blocked→delivered`, `awaiting-approval→todo` (bắt buộc lý do), `awaiting-approval→blocked` (bắt buộc lý do — per pr-lifecycle / 1359ab5e, cạnh gate duyệt gãy: merge conflict hoặc verify đỏ sau merge, xem spec Runner \"Cổng duyệt PR nội bộ\"), `todo/doing→blocked`, `blocked→todo/doing`, `blocked→awaiting-approval` (per fan-out-parallel — cạnh cơ học, KHÔNG bắt buộc lý do, dành riêng cho một lần đồng bộ-lại/catch-up sạch, xem spec Runner \"Đồng bộ lại một việc đỗ (catch-up)\"), `todo/doing→awaiting-human` (bắt buộc câu hỏi), `awaiting-human→todo` (bắt buộc câu trả lời) là toàn bộ cạnh hợp lệ — trả `precondition` (mã 2); (a2) cạnh từ-chối `awaiting-approval→todo` hoặc cạnh gate-gãy `awaiting-approval→blocked` thiếu/rỗng lý do, hoặc cạnh vào chờ thiếu/rỗng câu hỏi, hoặc cạnh rời chờ thiếu/rỗng câu trả lời — trả `validation` (mã 4); (b) trạng thái thực khác `--expect` — trả `conflict` (mã 3); (c) cờ thiếu giá trị hoặc rỗng (`--to` trống, `--expect \"\"`) — trả `validation` (mã 4), không bao giờ lọt sang phạm trù 2/3; (d) **`--to delivered` khi nhánh `fgw/<id>` tồn tại mà CHƯA reachable từ trunk** (per tsk-5dk — `git merge-base --is-ancestor`, đo trực tiếp trong `case 'move'`, không tái dùng đường suy-luận-từ-git của cleanup-harness) — trả `validation` (mã 4), TRỪ KHI cờ `--override-reason \"<lý do>\"` được truyền kèm giá trị không rỗng; item không có nhánh `fgw/<id>` (item pull/legacy, hoặc fixture trạng thái thuần) hoặc có nhánh nhưng ĐÃ reachable không bị chặn — xem Data Dictionary #28/#29. Bốn trường hợp trên KHÔNG ghi sự kiện nào.\n- **What changes:** một sự kiện chuyển-trạng-thái (kèm from/to) vào nhật ký, rồi bản chiếu cập nhật — luôn theo thứ tự nhật-ký-trước, bản-chiếu-sau.\n- **Side effects:** không, TRỪ đường override ở (d) — khi `--override-reason` cho phép một `--to delivered` vượt qua kiểm reachability, một bản ghi `decision` (kind `engine`) được ghi TRƯỚC sự kiện chuyển-trạng-thái, mang chính lý do đó làm `rationale` — luôn kiểm được sau này qua nhật ký quyết định của item, không âm thầm.\n- **Afterwards:** `done` là cửa một chiều ra: item đã done thì mọi lần move tiếp theo đều bị `precondition`; nay chỉ tới được `done` qua đúng một cạnh `cleanup→done`, sau khi item đã đi hết chuỗi đuôi `delivered → retrospective → cleanup`. Item bị từ chối về `todo` mang lý do trong nhật ký, vào lại hàng chờ làm tiếp. Cạnh `awaiting-approval→todo` (reject) hoặc `awaiting-approval→blocked` (gate gãy) mang `reason`: giá trị MỚI NHẤT còn được fold thêm lên chính item (`item.reason`, Data Dictionary #18, latest-wins) — không chỉ nằm trong nhật ký sự kiện, để consumer sau (prompt worker, người đọc `list`) thấy lý do mới nhất mà không cần lục nhật ký (per worker-execution STR33 / 396d9d9e, xem spec Runner RUL23 (hợp đồng con — verify thật, không placeholder)). Cạnh `blocked→awaiting-approval` (per fan-out-parallel) là cạnh DUY NHẤT rời `blocked` không mang `reason` và không đi qua `doing` — dành riêng cho một lần đồng bộ-lại (catch-up) sạch, phân biệt với người chọn cầm việc qua cửa pull để tự làm-lại tay (`blocked→doing`, đi qua chống-lặp bình thường như mọi lần nhận việc khác); xem spec Runner \"Đồng bộ lại một việc đỗ (catch-up)\"."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_c43065f0988aa74de6c17c9a17ea138b"
+}
+```
+
+## Entry claim_c0b05f63cf59ca8de5eb30a847394aca
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_c0b05f63cf59ca8de5eb30a847394aca",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_c0b05f63cf59ca8de5eb30a847394aca",
+    "sourceUnitDigest": "62894935652369b5",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-71",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the edit verb section (source lines 985-999) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-71 of spec.md under the edit verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 985-999 to spec.md#unheaded-block-71 under 'Edit Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (seeded sample)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "62894935652369b5403e491ef4abbb29b006389988bc1e3e25fc20253ba48bc4",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Edit Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_c0b05f63cf59ca8de5eb30a847394aca",
+    "sourceUnitDigest": "62894935652369b5",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-71",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the edit verb section (source lines 1016-1030) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-71 of spec.md under the edit verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "62894935652369b5403e491ef4abbb29b006389988bc1e3e25fc20253ba48bc4",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Edit Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "8ec105a9ff925582c0aeecfecdca8d00d7605c3654adb13dec67c727cdc9233d",
+    "identityFingerprint": "8ec105a9ff925582c0aeecfecdca8d00d7605c3654adb13dec67c727cdc9233d",
+    "claimId": "claim_c0b05f63cf59ca8de5eb30a847394aca",
+    "sourceAnchor": "unheaded-block-84",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "62894935652369b5403e491ef4abbb29b006389988bc1e3e25fc20253ba48bc4",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-84",
+      "githubAnchor": "unheaded-block-84",
+      "stableAnchor": "unheaded-block-84",
+      "title": "Unheaded block 84",
+      "startLine": 1016,
+      "endLine": 1030,
+      "textDigest": "62894935652369b5403e491ef4abbb29b006389988bc1e3e25fc20253ba48bc4",
+      "sample": "`edit` là cửa công khai để sửa đè các trường trên một item ĐÃ có sẵn — đóng\nkhoảng trống \"luôn ghi đè được\" mà `submit`'s phân loại cơ học (mechanical\nclassification) để lại (item ",
+      "identityFingerprint": "8ec105a9ff925582c0aeecfecdca8d00d7605c3654adb13dec67c727cdc9233d",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Sửa việc (edit) — luôn ghi đè được (STR23, per work-item-verb-surface)"
+      ],
+      "text": "`edit` là cửa công khai để sửa đè các trường trên một item ĐÃ có sẵn — đóng\nkhoảng trống \"luôn ghi đè được\" mà `submit`'s phân loại cơ học (mechanical\nclassification) để lại (item vào qua `submit` không có cơ hội sửa lại field\nđã phân loại sai). Ghi qua CÙNG một cửa ghi duy nhất (CTR002, `src/state/\nstore.mjs`) như `add`/`move` — không tạo cửa ghi thứ hai. Danh sách trường\nđược sửa (RỘNG): `title`, `kind`, `risk`, `verify`, `tier`, `refs`,\n`deps`, `acceptance` (per str73-done-flip-cos-check — Data Dictionary #24,\nRUL58 (acceptance-clause gate — chặn ở cửa delivered, không phải cửa done); ghi qua `JSON.parse`, không phải `parseListFlag` của `refs`/`deps`,\nvì text clause có thể chứa dấu phẩy), `priority`, `intent` (per str7-str8-priority-intent —\nData Dictionary #25/#26; `--priority` ép kiểu số nguyên không âm, `--intent` ép\nkiểu số nguyên bất kỳ dấu; truyền cờ KHÔNG kèm giá trị theo sau bị chặn tường\nminh — không bao giờ âm thầm biến thành số nhờ ép kiểu boolean). Cố tình KHÔNG sửa được `id` (định danh bất biến), `status` (thuộc\n`move`), `stage` (thuộc `moveStage` nội bộ, chưa có verb công khai), hay\n`domain` — mỗi trường đó đã có cửa ghi riêng, gộp vào `edit` sẽ tạo cửa\nghi thứ hai cho cùng một trường."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-71",
+    "githubAnchor": "unheaded-block-71",
+    "stableAnchor": "unheaded-block-71",
+    "title": "Unheaded block 71",
+    "startLine": 866,
+    "endLine": 880,
+    "textDigest": "62894935652369b5403e491ef4abbb29b006389988bc1e3e25fc20253ba48bc4",
+    "sample": "`edit` là cửa công khai để sửa đè các trường trên một item ĐÃ có sẵn — đóng\nkhoảng trống \"luôn ghi đè được\" mà `submit`'s phân loại cơ học (mechanical\nclassification) để lại (item ",
+    "identityFingerprint": "8ec105a9ff925582c0aeecfecdca8d00d7605c3654adb13dec67c727cdc9233d",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Edit Verb"
+    ],
+    "text": "`edit` là cửa công khai để sửa đè các trường trên một item ĐÃ có sẵn — đóng\nkhoảng trống \"luôn ghi đè được\" mà `submit`'s phân loại cơ học (mechanical\nclassification) để lại (item vào qua `submit` không có cơ hội sửa lại field\nđã phân loại sai). Ghi qua CÙNG một cửa ghi duy nhất (CTR002, `src/state/\nstore.mjs`) như `add`/`move` — không tạo cửa ghi thứ hai. Danh sách trường\nđược sửa (RỘNG): `title`, `kind`, `risk`, `verify`, `tier`, `refs`,\n`deps`, `acceptance` (per str73-done-flip-cos-check — Data Dictionary #24,\nRUL58 (acceptance-clause gate — chặn ở cửa delivered, không phải cửa done); ghi qua `JSON.parse`, không phải `parseListFlag` của `refs`/`deps`,\nvì text clause có thể chứa dấu phẩy), `priority`, `intent` (per str7-str8-priority-intent —\nData Dictionary #25/#26; `--priority` ép kiểu số nguyên không âm, `--intent` ép\nkiểu số nguyên bất kỳ dấu; truyền cờ KHÔNG kèm giá trị theo sau bị chặn tường\nminh — không bao giờ âm thầm biến thành số nhờ ép kiểu boolean). Cố tình KHÔNG sửa được `id` (định danh bất biến), `status` (thuộc\n`move`), `stage` (thuộc `moveStage` nội bộ, chưa có verb công khai), hay\n`domain` — mỗi trường đó đã có cửa ghi riêng, gộp vào `edit` sẽ tạo cửa\nghi thứ hai cho cùng một trường."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-71",
+      "githubAnchor": "unheaded-block-71",
+      "stableAnchor": "unheaded-block-71",
+      "title": "Unheaded block 71",
+      "startLine": 866,
+      "endLine": 880,
+      "textDigest": "62894935652369b5403e491ef4abbb29b006389988bc1e3e25fc20253ba48bc4",
+      "sample": "`edit` là cửa công khai để sửa đè các trường trên một item ĐÃ có sẵn — đóng\nkhoảng trống \"luôn ghi đè được\" mà `submit`'s phân loại cơ học (mechanical\nclassification) để lại (item ",
+      "identityFingerprint": "8ec105a9ff925582c0aeecfecdca8d00d7605c3654adb13dec67c727cdc9233d",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Edit Verb"
+      ],
+      "text": "`edit` là cửa công khai để sửa đè các trường trên một item ĐÃ có sẵn — đóng\nkhoảng trống \"luôn ghi đè được\" mà `submit`'s phân loại cơ học (mechanical\nclassification) để lại (item vào qua `submit` không có cơ hội sửa lại field\nđã phân loại sai). Ghi qua CÙNG một cửa ghi duy nhất (CTR002, `src/state/\nstore.mjs`) như `add`/`move` — không tạo cửa ghi thứ hai. Danh sách trường\nđược sửa (RỘNG): `title`, `kind`, `risk`, `verify`, `tier`, `refs`,\n`deps`, `acceptance` (per str73-done-flip-cos-check — Data Dictionary #24,\nRUL58 (acceptance-clause gate — chặn ở cửa delivered, không phải cửa done); ghi qua `JSON.parse`, không phải `parseListFlag` của `refs`/`deps`,\nvì text clause có thể chứa dấu phẩy), `priority`, `intent` (per str7-str8-priority-intent —\nData Dictionary #25/#26; `--priority` ép kiểu số nguyên không âm, `--intent` ép\nkiểu số nguyên bất kỳ dấu; truyền cờ KHÔNG kèm giá trị theo sau bị chặn tường\nminh — không bao giờ âm thầm biến thành số nhờ ép kiểu boolean). Cố tình KHÔNG sửa được `id` (định danh bất biến), `status` (thuộc\n`move`), `stage` (thuộc `moveStage` nội bộ, chưa có verb công khai), hay\n`domain` — mỗi trường đó đã có cửa ghi riêng, gộp vào `edit` sẽ tạo cửa\nghi thứ hai cho cùng một trường."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_c0b05f63cf59ca8de5eb30a847394aca"
+}
+```
+
+## Entry claim_ff435eb0a41c23d9066c658cdbd2c2b9
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_ff435eb0a41c23d9066c658cdbd2c2b9",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_ff435eb0a41c23d9066c658cdbd2c2b9",
+    "sourceUnitDigest": "c36313e9a59bc69c",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-72",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the edit verb section (source lines 1001-1025) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-72 of spec.md under the edit verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1001-1025 to spec.md#unheaded-block-72 under 'Edit Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "c36313e9a59bc69c1f04a65dc22c55bd72e374e693fd9f4351a3534d1ccf1493",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Edit Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_ff435eb0a41c23d9066c658cdbd2c2b9",
+    "sourceUnitDigest": "c36313e9a59bc69c",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-72",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the edit verb section (source lines 1032-1056) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-72 of spec.md under the edit verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "c36313e9a59bc69c1f04a65dc22c55bd72e374e693fd9f4351a3534d1ccf1493",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Edit Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "e5999e1d664fcf888b29e78ef7951bcf97d74a1f2c7ec2afd5e0ef754d9d94bf",
+    "identityFingerprint": "e5999e1d664fcf888b29e78ef7951bcf97d74a1f2c7ec2afd5e0ef754d9d94bf",
+    "claimId": "claim_ff435eb0a41c23d9066c658cdbd2c2b9",
+    "sourceAnchor": "unheaded-block-85",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "c36313e9a59bc69c1f04a65dc22c55bd72e374e693fd9f4351a3534d1ccf1493",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-85",
+      "githubAnchor": "unheaded-block-85",
+      "stableAnchor": "unheaded-block-85",
+      "title": "Unheaded block 85",
+      "startLine": 1032,
+      "endLine": 1056,
+      "textDigest": "c36313e9a59bc69c1f04a65dc22c55bd72e374e693fd9f4351a3534d1ccf1493",
+      "sample": "- **Blocked when:** id không tồn tại — `validation` (mã 4); patch rỗng\n  (không cờ `--<field>` nào được truyền) — `validation`; patch chứa một\n  trường ngoài danh sách ở trên (kể c",
+      "identityFingerprint": "e5999e1d664fcf888b29e78ef7951bcf97d74a1f2c7ec2afd5e0ef754d9d94bf",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Sửa việc (edit) — luôn ghi đè được (STR23, per work-item-verb-surface)"
+      ],
+      "text": "- **Blocked when:** id không tồn tại — `validation` (mã 4); patch rỗng\n  (không cờ `--<field>` nào được truyền) — `validation`; patch chứa một\n  trường ngoài danh sách ở trên (kể cả cố tình truyền `id`/`status`/\n  `stage`/`domain`) — `validation`, bị chặn TRƯỚC khi merge vào bản ghi; giá\n  trị sau merge không qua được `validateWork` (vd `--tier` ngoài domain,\n  `--deps` trỏ id không tồn tại, `--priority` âm) — `validation`; `--priority`/\n  `--intent` truyền không kèm giá trị — `validation`, không bao giờ ghi `1`.\n  Cả các trường hợp trên KHÔNG ghi sự kiện nào.\n- **What changes:** một sự kiện `work.edit` mang patch (CHỈ những trường\n  thật sự đổi, không phải toàn bộ bản ghi) vào nhật ký; bản chiếu gộp thêm\n  (Object.assign) đúng những trường đó lên item — additive, không bao giờ\n  ghi đè lại một sự kiện cũ (per RUL11 (tiến hóa schema)).\n- **Side effects:** không.\n- **Afterwards:** hai lần `edit` liên tiếp trên cùng item đều đọng lại —\n  patch sau không xóa mất trường patch trước đã đổi (mỗi lần chỉ gộp đúng\n  các key nó mang). Bỏ qua một cờ `--refs`/`--deps` giữ nguyên trường đó;\n  truyền cờ với giá trị rỗng (`--refs ''`) XÓA trường về `[]` — hai trường\n  hợp này phân biệt được, không lẫn vào nhau (cùng cơ chế `parseListFlag`\n  `add` đã dùng). `edit --acceptance '<json>'` GHI ĐÈ TOÀN MẢNG mỗi lần\n  (latest-wins), cùng ý nghĩa nhưng qua `JSON.parse` riêng — không có cơ chế\n  sửa-từng-clause (RUL58 (acceptance-clause gate — chặn ở cửa delivered, không phải cửa done)). `edit` chạy được y hệt bất kể `status` hiện tại của item\n  là gì — verb này không bao giờ tự đổi `status`. Không có cơ chế CAS/\n  `--expect` ở slice này (mỗi `edit` đã là một sự kiện cộng thêm nên giá trị\n  cũ luôn phục hồi được qua nhật ký, không như một ghi-đè thật trong kho có\n  thể biến đổi)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-72",
+    "githubAnchor": "unheaded-block-72",
+    "stableAnchor": "unheaded-block-72",
+    "title": "Unheaded block 72",
+    "startLine": 882,
+    "endLine": 906,
+    "textDigest": "c36313e9a59bc69c1f04a65dc22c55bd72e374e693fd9f4351a3534d1ccf1493",
+    "sample": "- **Blocked when:** id không tồn tại — `validation` (mã 4); patch rỗng\n  (không cờ `--<field>` nào được truyền) — `validation`; patch chứa một\n  trường ngoài danh sách ở trên (kể c",
+    "identityFingerprint": "e5999e1d664fcf888b29e78ef7951bcf97d74a1f2c7ec2afd5e0ef754d9d94bf",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Edit Verb"
+    ],
+    "text": "- **Blocked when:** id không tồn tại — `validation` (mã 4); patch rỗng\n  (không cờ `--<field>` nào được truyền) — `validation`; patch chứa một\n  trường ngoài danh sách ở trên (kể cả cố tình truyền `id`/`status`/\n  `stage`/`domain`) — `validation`, bị chặn TRƯỚC khi merge vào bản ghi; giá\n  trị sau merge không qua được `validateWork` (vd `--tier` ngoài domain,\n  `--deps` trỏ id không tồn tại, `--priority` âm) — `validation`; `--priority`/\n  `--intent` truyền không kèm giá trị — `validation`, không bao giờ ghi `1`.\n  Cả các trường hợp trên KHÔNG ghi sự kiện nào.\n- **What changes:** một sự kiện `work.edit` mang patch (CHỈ những trường\n  thật sự đổi, không phải toàn bộ bản ghi) vào nhật ký; bản chiếu gộp thêm\n  (Object.assign) đúng những trường đó lên item — additive, không bao giờ\n  ghi đè lại một sự kiện cũ (per RUL11 (tiến hóa schema)).\n- **Side effects:** không.\n- **Afterwards:** hai lần `edit` liên tiếp trên cùng item đều đọng lại —\n  patch sau không xóa mất trường patch trước đã đổi (mỗi lần chỉ gộp đúng\n  các key nó mang). Bỏ qua một cờ `--refs`/`--deps` giữ nguyên trường đó;\n  truyền cờ với giá trị rỗng (`--refs ''`) XÓA trường về `[]` — hai trường\n  hợp này phân biệt được, không lẫn vào nhau (cùng cơ chế `parseListFlag`\n  `add` đã dùng). `edit --acceptance '<json>'` GHI ĐÈ TOÀN MẢNG mỗi lần\n  (latest-wins), cùng ý nghĩa nhưng qua `JSON.parse` riêng — không có cơ chế\n  sửa-từng-clause (RUL58 (acceptance-clause gate — chặn ở cửa delivered, không phải cửa done)). `edit` chạy được y hệt bất kể `status` hiện tại của item\n  là gì — verb này không bao giờ tự đổi `status`. Không có cơ chế CAS/\n  `--expect` ở slice này (mỗi `edit` đã là một sự kiện cộng thêm nên giá trị\n  cũ luôn phục hồi được qua nhật ký, không như một ghi-đè thật trong kho có\n  thể biến đổi)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-72",
+      "githubAnchor": "unheaded-block-72",
+      "stableAnchor": "unheaded-block-72",
+      "title": "Unheaded block 72",
+      "startLine": 882,
+      "endLine": 906,
+      "textDigest": "c36313e9a59bc69c1f04a65dc22c55bd72e374e693fd9f4351a3534d1ccf1493",
+      "sample": "- **Blocked when:** id không tồn tại — `validation` (mã 4); patch rỗng\n  (không cờ `--<field>` nào được truyền) — `validation`; patch chứa một\n  trường ngoài danh sách ở trên (kể c",
+      "identityFingerprint": "e5999e1d664fcf888b29e78ef7951bcf97d74a1f2c7ec2afd5e0ef754d9d94bf",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Edit Verb"
+      ],
+      "text": "- **Blocked when:** id không tồn tại — `validation` (mã 4); patch rỗng\n  (không cờ `--<field>` nào được truyền) — `validation`; patch chứa một\n  trường ngoài danh sách ở trên (kể cả cố tình truyền `id`/`status`/\n  `stage`/`domain`) — `validation`, bị chặn TRƯỚC khi merge vào bản ghi; giá\n  trị sau merge không qua được `validateWork` (vd `--tier` ngoài domain,\n  `--deps` trỏ id không tồn tại, `--priority` âm) — `validation`; `--priority`/\n  `--intent` truyền không kèm giá trị — `validation`, không bao giờ ghi `1`.\n  Cả các trường hợp trên KHÔNG ghi sự kiện nào.\n- **What changes:** một sự kiện `work.edit` mang patch (CHỈ những trường\n  thật sự đổi, không phải toàn bộ bản ghi) vào nhật ký; bản chiếu gộp thêm\n  (Object.assign) đúng những trường đó lên item — additive, không bao giờ\n  ghi đè lại một sự kiện cũ (per RUL11 (tiến hóa schema)).\n- **Side effects:** không.\n- **Afterwards:** hai lần `edit` liên tiếp trên cùng item đều đọng lại —\n  patch sau không xóa mất trường patch trước đã đổi (mỗi lần chỉ gộp đúng\n  các key nó mang). Bỏ qua một cờ `--refs`/`--deps` giữ nguyên trường đó;\n  truyền cờ với giá trị rỗng (`--refs ''`) XÓA trường về `[]` — hai trường\n  hợp này phân biệt được, không lẫn vào nhau (cùng cơ chế `parseListFlag`\n  `add` đã dùng). `edit --acceptance '<json>'` GHI ĐÈ TOÀN MẢNG mỗi lần\n  (latest-wins), cùng ý nghĩa nhưng qua `JSON.parse` riêng — không có cơ chế\n  sửa-từng-clause (RUL58 (acceptance-clause gate — chặn ở cửa delivered, không phải cửa done)). `edit` chạy được y hệt bất kể `status` hiện tại của item\n  là gì — verb này không bao giờ tự đổi `status`. Không có cơ chế CAS/\n  `--expect` ở slice này (mỗi `edit` đã là một sự kiện cộng thêm nên giá trị\n  cũ luôn phục hồi được qua nhật ký, không như một ghi-đè thật trong kho có\n  thể biến đổi)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_ff435eb0a41c23d9066c658cdbd2c2b9"
+}
+```
+
+## Entry claim_b96048ae94d1c4ef2735793bd5243751
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_b96048ae94d1c4ef2735793bd5243751",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_b96048ae94d1c4ef2735793bd5243751",
+    "sourceUnitDigest": "8e520755293c85e5",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-73",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the decision verb section (source lines 1029-1030) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-73 of spec.md under the decision verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1029-1030 to spec.md#unheaded-block-73 under 'Decision Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Decision Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_b96048ae94d1c4ef2735793bd5243751",
+    "sourceUnitDigest": "8e520755293c85e5",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-73",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the decision verb section (source lines 1060-1061) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-73 of spec.md under the decision verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Decision Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "c97bf2f5ca326ed7bde75795fb59bb27c6da78b996868b2f3315d0f4b1aa0724",
+    "identityFingerprint": "c97bf2f5ca326ed7bde75795fb59bb27c6da78b996868b2f3315d0f4b1aa0724",
+    "claimId": "claim_b96048ae94d1c4ef2735793bd5243751",
+    "sourceAnchor": "unheaded-block-86",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-86",
+      "githubAnchor": "unheaded-block-86",
+      "stableAnchor": "unheaded-block-86",
+      "title": "Unheaded block 86",
+      "startLine": 1060,
+      "endLine": 1061,
+      "textDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
+      "sample": "- **Blocked when:** thiếu nội dung chữ — `validation`.\n- **What changes:** một sự kiện quyết-định vào nhật ký; quyết định đọc được lại từ bản chiếu sau replay.",
+      "identityFingerprint": "c97bf2f5ca326ed7bde75795fb59bb27c6da78b996868b2f3315d0f4b1aa0724",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Ghi quyết định (decision)"
+      ],
+      "text": "- **Blocked when:** thiếu nội dung chữ — `validation`.\n- **What changes:** một sự kiện quyết-định vào nhật ký; quyết định đọc được lại từ bản chiếu sau replay."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-73",
+    "githubAnchor": "unheaded-block-73",
+    "stableAnchor": "unheaded-block-73",
+    "title": "Unheaded block 73",
+    "startLine": 910,
+    "endLine": 911,
+    "textDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
+    "sample": "- **Blocked when:** thiếu nội dung chữ — `validation`.\n- **What changes:** một sự kiện quyết-định vào nhật ký; quyết định đọc được lại từ bản chiếu sau replay.",
+    "identityFingerprint": "c97bf2f5ca326ed7bde75795fb59bb27c6da78b996868b2f3315d0f4b1aa0724",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Decision Verb"
+    ],
+    "text": "- **Blocked when:** thiếu nội dung chữ — `validation`.\n- **What changes:** một sự kiện quyết-định vào nhật ký; quyết định đọc được lại từ bản chiếu sau replay."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-73",
+      "githubAnchor": "unheaded-block-73",
+      "stableAnchor": "unheaded-block-73",
+      "title": "Unheaded block 73",
+      "startLine": 910,
+      "endLine": 911,
+      "textDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
+      "sample": "- **Blocked when:** thiếu nội dung chữ — `validation`.\n- **What changes:** một sự kiện quyết-định vào nhật ký; quyết định đọc được lại từ bản chiếu sau replay.",
+      "identityFingerprint": "c97bf2f5ca326ed7bde75795fb59bb27c6da78b996868b2f3315d0f4b1aa0724",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Decision Verb"
+      ],
+      "text": "- **Blocked when:** thiếu nội dung chữ — `validation`.\n- **What changes:** một sự kiện quyết-định vào nhật ký; quyết định đọc được lại từ bản chiếu sau replay."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_b96048ae94d1c4ef2735793bd5243751"
+}
+```
+
+## Entry claim_6542850539c0c00e6ec1f1fa5b31f6a5
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_6542850539c0c00e6ec1f1fa5b31f6a5",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_6542850539c0c00e6ec1f1fa5b31f6a5",
+    "sourceUnitDigest": "3934104c59667221",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-74",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the ask verb section (source lines 1034-1038) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-74 of spec.md under the ask verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1034-1038 to spec.md#unheaded-block-74 under 'Ask Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "3934104c59667221af37e30f52693b53c87032c9b95729315ceb9d18273f62bc",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Ask Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_6542850539c0c00e6ec1f1fa5b31f6a5",
+    "sourceUnitDigest": "3934104c59667221",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-74",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the ask verb section (source lines 1065-1069) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-74 of spec.md under the ask verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "3934104c59667221af37e30f52693b53c87032c9b95729315ceb9d18273f62bc",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Ask Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "dee1d1a2447092d6cd20d92a36163c24781c770c12a3a3f29c6f95a8c4227876",
+    "identityFingerprint": "dee1d1a2447092d6cd20d92a36163c24781c770c12a3a3f29c6f95a8c4227876",
+    "claimId": "claim_6542850539c0c00e6ec1f1fa5b31f6a5",
+    "sourceAnchor": "unheaded-block-87",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3934104c59667221af37e30f52693b53c87032c9b95729315ceb9d18273f62bc",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-87",
+      "githubAnchor": "unheaded-block-87",
+      "stableAnchor": "unheaded-block-87",
+      "title": "Unheaded block 87",
+      "startLine": 1065,
+      "endLine": 1069,
+      "textDigest": "3934104c59667221af37e30f52693b53c87032c9b95729315ceb9d18273f62bc",
+      "sample": "- **Runs when:** người/agent gọi `fgos ask <id> --text \"...\"` để đậu một việc lại chờ người quyết.\n- **Blocked when:** item không ở `todo`/`doing` (cạnh vào chờ không hợp lệ) — `pr",
+      "identityFingerprint": "dee1d1a2447092d6cd20d92a36163c24781c770c12a3a3f29c6f95a8c4227876",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Đưa vào chờ người (ask)"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos ask <id> --text \"...\"` để đậu một việc lại chờ người quyết.\n- **Blocked when:** item không ở `todo`/`doing` (cạnh vào chờ không hợp lệ) — `precondition`; câu hỏi thiếu/rỗng — `validation`; trạng thái thực khác `--expect` — `conflict`. Không ghi sự kiện nào.\n- **What changes:** một sự kiện chuyển-trạng-thái mang câu hỏi vào nhật ký; item sang `awaiting-human`, bản chiếu gộp câu hỏi vào bản ghi cổng của item (theo id).\n- **Side effects:** không.\n- **Afterwards:** `list` hiện item ở `awaiting-human` kèm câu hỏi; `ready` không còn liệt kê item; mọi việc khác vẫn chạy bình thường — cổng bất đồng bộ, không chặn tiến trình khác. Việc đậu vô thời hạn cho tới khi có người trả lời."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-74",
+    "githubAnchor": "unheaded-block-74",
+    "stableAnchor": "unheaded-block-74",
+    "title": "Unheaded block 74",
+    "startLine": 915,
+    "endLine": 919,
+    "textDigest": "3934104c59667221af37e30f52693b53c87032c9b95729315ceb9d18273f62bc",
+    "sample": "- **Runs when:** người/agent gọi `fgos ask <id> --text \"...\"` để đậu một việc lại chờ người quyết.\n- **Blocked when:** item không ở `todo`/`doing` (cạnh vào chờ không hợp lệ) — `pr",
+    "identityFingerprint": "dee1d1a2447092d6cd20d92a36163c24781c770c12a3a3f29c6f95a8c4227876",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Ask Verb"
+    ],
+    "text": "- **Runs when:** người/agent gọi `fgos ask <id> --text \"...\"` để đậu một việc lại chờ người quyết.\n- **Blocked when:** item không ở `todo`/`doing` (cạnh vào chờ không hợp lệ) — `precondition`; câu hỏi thiếu/rỗng — `validation`; trạng thái thực khác `--expect` — `conflict`. Không ghi sự kiện nào.\n- **What changes:** một sự kiện chuyển-trạng-thái mang câu hỏi vào nhật ký; item sang `awaiting-human`, bản chiếu gộp câu hỏi vào bản ghi cổng của item (theo id).\n- **Side effects:** không.\n- **Afterwards:** `list` hiện item ở `awaiting-human` kèm câu hỏi; `ready` không còn liệt kê item; mọi việc khác vẫn chạy bình thường — cổng bất đồng bộ, không chặn tiến trình khác. Việc đậu vô thời hạn cho tới khi có người trả lời."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-74",
+      "githubAnchor": "unheaded-block-74",
+      "stableAnchor": "unheaded-block-74",
+      "title": "Unheaded block 74",
+      "startLine": 915,
+      "endLine": 919,
+      "textDigest": "3934104c59667221af37e30f52693b53c87032c9b95729315ceb9d18273f62bc",
+      "sample": "- **Runs when:** người/agent gọi `fgos ask <id> --text \"...\"` để đậu một việc lại chờ người quyết.\n- **Blocked when:** item không ở `todo`/`doing` (cạnh vào chờ không hợp lệ) — `pr",
+      "identityFingerprint": "dee1d1a2447092d6cd20d92a36163c24781c770c12a3a3f29c6f95a8c4227876",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Ask Verb"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos ask <id> --text \"...\"` để đậu một việc lại chờ người quyết.\n- **Blocked when:** item không ở `todo`/`doing` (cạnh vào chờ không hợp lệ) — `precondition`; câu hỏi thiếu/rỗng — `validation`; trạng thái thực khác `--expect` — `conflict`. Không ghi sự kiện nào.\n- **What changes:** một sự kiện chuyển-trạng-thái mang câu hỏi vào nhật ký; item sang `awaiting-human`, bản chiếu gộp câu hỏi vào bản ghi cổng của item (theo id).\n- **Side effects:** không.\n- **Afterwards:** `list` hiện item ở `awaiting-human` kèm câu hỏi; `ready` không còn liệt kê item; mọi việc khác vẫn chạy bình thường — cổng bất đồng bộ, không chặn tiến trình khác. Việc đậu vô thời hạn cho tới khi có người trả lời."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_6542850539c0c00e6ec1f1fa5b31f6a5"
+}
+```
+
+## Entry claim_14629503e9cad5ebf8241447b03649cc
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_14629503e9cad5ebf8241447b03649cc",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_14629503e9cad5ebf8241447b03649cc",
+    "sourceUnitDigest": "504b6a5b42d39ff1",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-75",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the answer verb section (source lines 1042-1046) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-75 of spec.md under the answer verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: answer body, source text equals the resume-tree target byte for byte before correction (digest 504b6a5b) and the new target differs only in the two corrected U3 lines; the corrected text was read in the truth part and is true. Supersede with named successor is right; digests recomputed match the shard, ancestry equal under Answer Verb.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Answer Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_14629503e9cad5ebf8241447b03649cc",
+    "sourceUnitDigest": "504b6a5b42d39ff1",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-75",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "rationale": "Body of the answer verb section (source lines 1073-1077) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-75 of spec.md under the answer verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Answer Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "14512045aca84d9b7e9c5f6bd6abb8bbc1128a8b70f8bf2e582301f69c758575",
+    "identityFingerprint": "14512045aca84d9b7e9c5f6bd6abb8bbc1128a8b70f8bf2e582301f69c758575",
+    "claimId": "claim_14629503e9cad5ebf8241447b03649cc",
+    "sourceAnchor": "unheaded-block-88",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "504b6a5b42d39ff1886b7e1865b5cd54713406e8caff7f6c22e0b3085efb755d",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-88",
+      "githubAnchor": "unheaded-block-88",
+      "stableAnchor": "unheaded-block-88",
+      "title": "Unheaded block 88",
+      "startLine": 1073,
+      "endLine": 1077,
+      "textDigest": "504b6a5b42d39ff1886b7e1865b5cd54713406e8caff7f6c22e0b3085efb755d",
+      "sample": "- **Runs when:** người gọi `fgos answer <id> --text \"...\"` để trả lời câu hỏi của một việc đang chờ.\n- **Blocked when:** item không ở `awaiting-human` (không có cạnh rời chờ từ trạ",
+      "identityFingerprint": "14512045aca84d9b7e9c5f6bd6abb8bbc1128a8b70f8bf2e582301f69c758575",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Trả lời (answer)"
+      ],
+      "text": "- **Runs when:** người gọi `fgos answer <id> --text \"...\"` để trả lời câu hỏi của một việc đang chờ.\n- **Blocked when:** item không ở `awaiting-human` (không có cạnh rời chờ từ trạng thái khác) — `precondition`; câu trả lời thiếu/rỗng — `validation`; trạng thái thực khác `--expect` — `conflict`. Không ghi sự kiện nào.\n- **What changes:** một sự kiện chuyển-trạng-thái mang câu trả lời vào nhật ký; item về status trước lúc `ask` đậu nó (`statusAtAsk`, ghi lúc `ask`, mặc định `todo` khi vắng — log cũ/gate không mang field này) — **`todo`** nếu item chưa bị cầm claim lúc hỏi, hoặc **`doing`** nếu một claim `pick`/`take` đang sống lúc hỏi (claim-lock §5.1: trước đây LUÔN về `todo` trần, làm rớt claim đang giữ nếu `ask` xảy ra giữa lúc item `doing` — đã sửa). Bản chiếu gộp câu trả lời vào bản ghi cổng (cạnh câu hỏi đã có vẫn còn — cộng thêm, không đè).\n- **Side effects:** không.\n- **Afterwards:** item lại actionable — về `todo` thì xuất hiện trong `ready` khi deps đủ điều kiện; về `doing` thì KHÔNG xuất hiện trong `ready` (claim vẫn đang giữ, chờ `fgos return` như bình thường). Bản ghi cổng giữ cả câu hỏi lẫn câu trả lời để tra sau."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-75",
+    "githubAnchor": "unheaded-block-75",
+    "stableAnchor": "unheaded-block-75",
+    "title": "Unheaded block 75",
+    "startLine": 923,
+    "endLine": 927,
+    "textDigest": "31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c",
+    "sample": "- **Runs when:** người gọi `fgos answer <id> --text \"...\"` để trả lời câu hỏi của một việc đang chờ.\n- **Blocked when:** item không ở `awaiting-human` (không có cạnh rời chờ từ trạ",
+    "identityFingerprint": "e242278916d91e18e851a4de104b1980a64ae4c219e3e3d6d7f4942cf41d47aa",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Answer Verb"
+    ],
+    "text": "- **Runs when:** người gọi `fgos answer <id> --text \"...\"` để trả lời câu hỏi của một việc đang chờ.\n- **Blocked when:** item không ở `awaiting-human` (không có cạnh rời chờ từ trạng thái khác) — `precondition`; câu trả lời thiếu/rỗng — `validation`; trạng thái thực khác `--expect` — `conflict`. Không ghi sự kiện nào.\n- **What changes:** một sự kiện chuyển-trạng-thái mang câu trả lời vào nhật ký; item về durable status trước lúc `ask` đậu nó (`durableStatusAtAsk`, do cửa ghi tính từ status bền); log cũ thiếu trường này dùng `statusAtAsk`, thiếu cả hai mặc định `todo`, và mọi giá trị `doing` đều được clamp về `todo`. `putInAwaiting` đã settle và nhả claim lúc đậu, nên trả lời không phục hồi claim cũ. Bản chiếu gộp câu trả lời vào bản ghi cổng (cạnh câu hỏi đã có vẫn còn — cộng thêm, không đè).\n- **Side effects:** không.\n- **Afterwards:** item không resume về `doing`; trường hợp resume về `todo` xuất hiện trong `ready` khi deps, workflow step và lineage đủ điều kiện; một lần `take` sau đó lấy claim mới. Bản ghi cổng giữ cả câu hỏi lẫn câu trả lời để tra sau."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_14629503e9cad5ebf8241447b03649cc"
+}
+```
+
+## Entry claim_80498f2c23623a2165e2fe2bf39af2d8
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_80498f2c23623a2165e2fe2bf39af2d8",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_80498f2c23623a2165e2fe2bf39af2d8",
+    "sourceUnitDigest": "def08282f651f17f",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-76",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the outcome verb section (source lines 1050-1054) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-76 of spec.md under the outcome verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1050-1054 to spec.md#unheaded-block-76 under 'Outcome Recording': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (seeded sample)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Outcome Recording"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_80498f2c23623a2165e2fe2bf39af2d8",
+    "sourceUnitDigest": "def08282f651f17f",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-76",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the outcome verb section (source lines 1081-1085) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-76 of spec.md under the outcome verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Outcome Recording"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "51da807c58aa101aef16dfc7efd1c0a75fa441d93f96d74450296e4350e090ea",
+    "identityFingerprint": "51da807c58aa101aef16dfc7efd1c0a75fa441d93f96d74450296e4350e090ea",
+    "claimId": "claim_80498f2c23623a2165e2fe2bf39af2d8",
+    "sourceAnchor": "unheaded-block-89",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-89",
+      "githubAnchor": "unheaded-block-89",
+      "stableAnchor": "unheaded-block-89",
+      "title": "Unheaded block 89",
+      "startLine": 1081,
+      "endLine": 1085,
+      "textDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
+      "sample": "- **Runs when:** không qua verb CLI riêng — được ghi từ bên trong vòng tự hành (spec Runner): nửa dự đoán ngay khi item được nhận việc; nửa thực tế khi item tới trạng thái cuối, CẢ",
+      "identityFingerprint": "51da807c58aa101aef16dfc7efd1c0a75fa441d93f96d74450296e4350e090ea",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Ghi kết quả dự đoán/thực tế (outcome)"
+      ],
+      "text": "- **Runs when:** không qua verb CLI riêng — được ghi từ bên trong vòng tự hành (spec Runner): nửa dự đoán ngay khi item được nhận việc; nửa thực tế khi item tới trạng thái cuối, CẢ khi thành công lẫn khi thất bại.\n- **Blocked when:** thiếu id — `validation`.\n- **What changes:** một sự kiện outcome vào nhật ký cho MỖI nửa (hai sự kiện riêng biệt, cùng id, đến ở hai thời điểm khác nhau); bản chiếu gộp hai nửa theo id — nửa đến sau CỘNG THÊM vào nửa đã có, không bao giờ đè mất.\n- **Side effects:** không.\n- **Afterwards:** `fgos check` đọc được cả hai nửa cho item đó ngay khi chúng tồn tại; item chưa từng chạy hoàn toàn không xuất hiện trong `check`."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-76",
+    "githubAnchor": "unheaded-block-76",
+    "stableAnchor": "unheaded-block-76",
+    "title": "Unheaded block 76",
+    "startLine": 931,
+    "endLine": 935,
+    "textDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
+    "sample": "- **Runs when:** không qua verb CLI riêng — được ghi từ bên trong vòng tự hành (spec Runner): nửa dự đoán ngay khi item được nhận việc; nửa thực tế khi item tới trạng thái cuối, CẢ",
+    "identityFingerprint": "51da807c58aa101aef16dfc7efd1c0a75fa441d93f96d74450296e4350e090ea",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Outcome Recording"
+    ],
+    "text": "- **Runs when:** không qua verb CLI riêng — được ghi từ bên trong vòng tự hành (spec Runner): nửa dự đoán ngay khi item được nhận việc; nửa thực tế khi item tới trạng thái cuối, CẢ khi thành công lẫn khi thất bại.\n- **Blocked when:** thiếu id — `validation`.\n- **What changes:** một sự kiện outcome vào nhật ký cho MỖI nửa (hai sự kiện riêng biệt, cùng id, đến ở hai thời điểm khác nhau); bản chiếu gộp hai nửa theo id — nửa đến sau CỘNG THÊM vào nửa đã có, không bao giờ đè mất.\n- **Side effects:** không.\n- **Afterwards:** `fgos check` đọc được cả hai nửa cho item đó ngay khi chúng tồn tại; item chưa từng chạy hoàn toàn không xuất hiện trong `check`."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-76",
+      "githubAnchor": "unheaded-block-76",
+      "stableAnchor": "unheaded-block-76",
+      "title": "Unheaded block 76",
+      "startLine": 931,
+      "endLine": 935,
+      "textDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
+      "sample": "- **Runs when:** không qua verb CLI riêng — được ghi từ bên trong vòng tự hành (spec Runner): nửa dự đoán ngay khi item được nhận việc; nửa thực tế khi item tới trạng thái cuối, CẢ",
+      "identityFingerprint": "51da807c58aa101aef16dfc7efd1c0a75fa441d93f96d74450296e4350e090ea",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Outcome Recording"
+      ],
+      "text": "- **Runs when:** không qua verb CLI riêng — được ghi từ bên trong vòng tự hành (spec Runner): nửa dự đoán ngay khi item được nhận việc; nửa thực tế khi item tới trạng thái cuối, CẢ khi thành công lẫn khi thất bại.\n- **Blocked when:** thiếu id — `validation`.\n- **What changes:** một sự kiện outcome vào nhật ký cho MỖI nửa (hai sự kiện riêng biệt, cùng id, đến ở hai thời điểm khác nhau); bản chiếu gộp hai nửa theo id — nửa đến sau CỘNG THÊM vào nửa đã có, không bao giờ đè mất.\n- **Side effects:** không.\n- **Afterwards:** `fgos check` đọc được cả hai nửa cho item đó ngay khi chúng tồn tại; item chưa từng chạy hoàn toàn không xuất hiện trong `check`."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_80498f2c23623a2165e2fe2bf39af2d8"
+}
+```
+
+## Entry claim_4d0a469da5aa54fe21e1f0ba954dee18
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_4d0a469da5aa54fe21e1f0ba954dee18",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_4d0a469da5aa54fe21e1f0ba954dee18",
+    "sourceUnitDigest": "4a561ae476fb9a96",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-77",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the check verb section (source lines 1058-1061) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-77 of spec.md under the check verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1058-1061 to spec.md#unheaded-block-77 under 'Check Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "4a561ae476fb9a96d25fdd9172c3a452704f5ecedc7c131b71b85b6a5883d20d",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Check Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_4d0a469da5aa54fe21e1f0ba954dee18",
+    "sourceUnitDigest": "4a561ae476fb9a96",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-77",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the check verb section (source lines 1089-1092) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-77 of spec.md under the check verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "4a561ae476fb9a96d25fdd9172c3a452704f5ecedc7c131b71b85b6a5883d20d",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Check Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "f0cfa798f4ec813f7cb33ba322c32de0447ebeb82e4563b9de0de2a94d7b0548",
+    "identityFingerprint": "f0cfa798f4ec813f7cb33ba322c32de0447ebeb82e4563b9de0de2a94d7b0548",
+    "claimId": "claim_4d0a469da5aa54fe21e1f0ba954dee18",
+    "sourceAnchor": "unheaded-block-90",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "4a561ae476fb9a96d25fdd9172c3a452704f5ecedc7c131b71b85b6a5883d20d",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-90",
+      "githubAnchor": "unheaded-block-90",
+      "stableAnchor": "unheaded-block-90",
+      "title": "Unheaded block 90",
+      "startLine": 1089,
+      "endLine": 1092,
+      "textDigest": "4a561ae476fb9a96d25fdd9172c3a452704f5ecedc7c131b71b85b6a5883d20d",
+      "sample": "- **Runs when:** người/agent gọi `fgos check [id]`.\n- **Blocked when:** nhật ký hỏng → `corrupt-log`. Không bao giờ ghi gì — đọc thuần, cùng họ với `list`/`ready`.\n- **What changes",
+      "identityFingerprint": "f0cfa798f4ec813f7cb33ba322c32de0447ebeb82e4563b9de0de2a94d7b0548",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Đọc kết quả (check)"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos check [id]`.\n- **Blocked when:** nhật ký hỏng → `corrupt-log`. Không bao giờ ghi gì — đọc thuần, cùng họ với `list`/`ready`.\n- **What changes:** không gì.\n- **Afterwards:** truyền id → in đúng một khối cho item đó, mỗi nửa (dự đoán/thực tế) in giá trị thật nếu đã có, hoặc thông báo \"chưa có dữ liệu\" nếu nửa đó chưa tới; không truyền id → in một khối cho mỗi item ĐANG có ít nhất một nửa outcome; kho/log không mang bản ghi outcome nào → in đúng một dòng \"chưa có dữ liệu\" — thành công, không phải lỗi."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-77",
+    "githubAnchor": "unheaded-block-77",
+    "stableAnchor": "unheaded-block-77",
+    "title": "Unheaded block 77",
+    "startLine": 939,
+    "endLine": 942,
+    "textDigest": "4a561ae476fb9a96d25fdd9172c3a452704f5ecedc7c131b71b85b6a5883d20d",
+    "sample": "- **Runs when:** người/agent gọi `fgos check [id]`.\n- **Blocked when:** nhật ký hỏng → `corrupt-log`. Không bao giờ ghi gì — đọc thuần, cùng họ với `list`/`ready`.\n- **What changes",
+    "identityFingerprint": "f0cfa798f4ec813f7cb33ba322c32de0447ebeb82e4563b9de0de2a94d7b0548",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Check Verb"
+    ],
+    "text": "- **Runs when:** người/agent gọi `fgos check [id]`.\n- **Blocked when:** nhật ký hỏng → `corrupt-log`. Không bao giờ ghi gì — đọc thuần, cùng họ với `list`/`ready`.\n- **What changes:** không gì.\n- **Afterwards:** truyền id → in đúng một khối cho item đó, mỗi nửa (dự đoán/thực tế) in giá trị thật nếu đã có, hoặc thông báo \"chưa có dữ liệu\" nếu nửa đó chưa tới; không truyền id → in một khối cho mỗi item ĐANG có ít nhất một nửa outcome; kho/log không mang bản ghi outcome nào → in đúng một dòng \"chưa có dữ liệu\" — thành công, không phải lỗi."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-77",
+      "githubAnchor": "unheaded-block-77",
+      "stableAnchor": "unheaded-block-77",
+      "title": "Unheaded block 77",
+      "startLine": 939,
+      "endLine": 942,
+      "textDigest": "4a561ae476fb9a96d25fdd9172c3a452704f5ecedc7c131b71b85b6a5883d20d",
+      "sample": "- **Runs when:** người/agent gọi `fgos check [id]`.\n- **Blocked when:** nhật ký hỏng → `corrupt-log`. Không bao giờ ghi gì — đọc thuần, cùng họ với `list`/`ready`.\n- **What changes",
+      "identityFingerprint": "f0cfa798f4ec813f7cb33ba322c32de0447ebeb82e4563b9de0de2a94d7b0548",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Check Verb"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos check [id]`.\n- **Blocked when:** nhật ký hỏng → `corrupt-log`. Không bao giờ ghi gì — đọc thuần, cùng họ với `list`/`ready`.\n- **What changes:** không gì.\n- **Afterwards:** truyền id → in đúng một khối cho item đó, mỗi nửa (dự đoán/thực tế) in giá trị thật nếu đã có, hoặc thông báo \"chưa có dữ liệu\" nếu nửa đó chưa tới; không truyền id → in một khối cho mỗi item ĐANG có ít nhất một nửa outcome; kho/log không mang bản ghi outcome nào → in đúng một dòng \"chưa có dữ liệu\" — thành công, không phải lỗi."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_4d0a469da5aa54fe21e1f0ba954dee18"
+}
+```
+
+## Entry claim_39cbc86a2ed322069e28cf4ed8efdbfd
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_39cbc86a2ed322069e28cf4ed8efdbfd",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_39cbc86a2ed322069e28cf4ed8efdbfd",
+    "sourceUnitDigest": "fc9cf98c574c23b2",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-78",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the docs-index verb section (source lines 1065-1068) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-78 of spec.md under the docs-index verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1065-1068 to spec.md#unheaded-block-78 under 'Docs Index Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "fc9cf98c574c23b2d1cadd3b9c0c73dd84c2bfee51494ced1f60fa2a3cac637b",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Docs Index Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_39cbc86a2ed322069e28cf4ed8efdbfd",
+    "sourceUnitDigest": "fc9cf98c574c23b2",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-78",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the docs-index verb section (source lines 1096-1099) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-78 of spec.md under the docs-index verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "fc9cf98c574c23b2d1cadd3b9c0c73dd84c2bfee51494ced1f60fa2a3cac637b",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Docs Index Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "b7e09e0d59fcd35255e0648caf5a439f2bf3bd620cfcae95f09d8be6065fb959",
+    "identityFingerprint": "b7e09e0d59fcd35255e0648caf5a439f2bf3bd620cfcae95f09d8be6065fb959",
+    "claimId": "claim_39cbc86a2ed322069e28cf4ed8efdbfd",
+    "sourceAnchor": "unheaded-block-91",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "fc9cf98c574c23b2d1cadd3b9c0c73dd84c2bfee51494ced1f60fa2a3cac637b",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-91",
+      "githubAnchor": "unheaded-block-91",
+      "stableAnchor": "unheaded-block-91",
+      "title": "Unheaded block 91",
+      "startLine": 1096,
+      "endLine": 1099,
+      "textDigest": "fc9cf98c574c23b2d1cadd3b9c0c73dd84c2bfee51494ced1f60fa2a3cac637b",
+      "sample": "- **Runs when:** người/agent gọi `fgos docs-index`.\n- **Blocked when:** không có điều kiện chặn riêng — verb đọc-thuần với trạng thái item (quyền `read`): nó đọc bản chiếu outcome ",
+      "identityFingerprint": "b7e09e0d59fcd35255e0648caf5a439f2bf3bd620cfcae95f09d8be6065fb959",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Sinh chỉ mục đọc-theo-tag tài liệu người-dùng-cuối (docs-index)"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos docs-index`.\n- **Blocked when:** không có điều kiện chặn riêng — verb đọc-thuần với trạng thái item (quyền `read`): nó đọc bản chiếu outcome để truy ngược linkage và đọc cây tài liệu trên đĩa; nhật ký hỏng thì tầng đọc chung báo `corrupt-log` như mọi bên đọc. Không bao giờ ghi sự kiện, không đổi trạng thái item, không sửa tài liệu nào.\n- **What changes:** ghi/ghi-đè đúng một tệp manifest `docs/enduser-docs-index.json` — một artifact dẫn xuất, không phải sự kiện hay bản chiếu trạng thái.\n- **Afterwards:** manifest liệt kê mỗi tài liệu người-dùng-cuối tìm thấy dưới các thư mục quadrant, kèm linkage ngược về capture đã sinh nó (hoặc `null` cho tài liệu di sản chưa có linkage). Cơ chế đầy đủ (hình dạng manifest, ánh xạ quadrant→mục-đích/đối-tượng, cách truy linkage, tính idempotent, dung sai thư mục quadrant vắng) đặc tả ở area **`enduser-docs-index`** — bề mặt CLI sống ở đây (cửa lệnh `fgos` một cửa), hành vi chi tiết sống ở spec area đó, cùng khuôn `review`/`approve` trỏ sang spec Runner."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-78",
+    "githubAnchor": "unheaded-block-78",
+    "stableAnchor": "unheaded-block-78",
+    "title": "Unheaded block 78",
+    "startLine": 946,
+    "endLine": 949,
+    "textDigest": "fc9cf98c574c23b2d1cadd3b9c0c73dd84c2bfee51494ced1f60fa2a3cac637b",
+    "sample": "- **Runs when:** người/agent gọi `fgos docs-index`.\n- **Blocked when:** không có điều kiện chặn riêng — verb đọc-thuần với trạng thái item (quyền `read`): nó đọc bản chiếu outcome ",
+    "identityFingerprint": "b7e09e0d59fcd35255e0648caf5a439f2bf3bd620cfcae95f09d8be6065fb959",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Docs Index Verb"
+    ],
+    "text": "- **Runs when:** người/agent gọi `fgos docs-index`.\n- **Blocked when:** không có điều kiện chặn riêng — verb đọc-thuần với trạng thái item (quyền `read`): nó đọc bản chiếu outcome để truy ngược linkage và đọc cây tài liệu trên đĩa; nhật ký hỏng thì tầng đọc chung báo `corrupt-log` như mọi bên đọc. Không bao giờ ghi sự kiện, không đổi trạng thái item, không sửa tài liệu nào.\n- **What changes:** ghi/ghi-đè đúng một tệp manifest `docs/enduser-docs-index.json` — một artifact dẫn xuất, không phải sự kiện hay bản chiếu trạng thái.\n- **Afterwards:** manifest liệt kê mỗi tài liệu người-dùng-cuối tìm thấy dưới các thư mục quadrant, kèm linkage ngược về capture đã sinh nó (hoặc `null` cho tài liệu di sản chưa có linkage). Cơ chế đầy đủ (hình dạng manifest, ánh xạ quadrant→mục-đích/đối-tượng, cách truy linkage, tính idempotent, dung sai thư mục quadrant vắng) đặc tả ở area **`enduser-docs-index`** — bề mặt CLI sống ở đây (cửa lệnh `fgos` một cửa), hành vi chi tiết sống ở spec area đó, cùng khuôn `review`/`approve` trỏ sang spec Runner."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-78",
+      "githubAnchor": "unheaded-block-78",
+      "stableAnchor": "unheaded-block-78",
+      "title": "Unheaded block 78",
+      "startLine": 946,
+      "endLine": 949,
+      "textDigest": "fc9cf98c574c23b2d1cadd3b9c0c73dd84c2bfee51494ced1f60fa2a3cac637b",
+      "sample": "- **Runs when:** người/agent gọi `fgos docs-index`.\n- **Blocked when:** không có điều kiện chặn riêng — verb đọc-thuần với trạng thái item (quyền `read`): nó đọc bản chiếu outcome ",
+      "identityFingerprint": "b7e09e0d59fcd35255e0648caf5a439f2bf3bd620cfcae95f09d8be6065fb959",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Docs Index Verb"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos docs-index`.\n- **Blocked when:** không có điều kiện chặn riêng — verb đọc-thuần với trạng thái item (quyền `read`): nó đọc bản chiếu outcome để truy ngược linkage và đọc cây tài liệu trên đĩa; nhật ký hỏng thì tầng đọc chung báo `corrupt-log` như mọi bên đọc. Không bao giờ ghi sự kiện, không đổi trạng thái item, không sửa tài liệu nào.\n- **What changes:** ghi/ghi-đè đúng một tệp manifest `docs/enduser-docs-index.json` — một artifact dẫn xuất, không phải sự kiện hay bản chiếu trạng thái.\n- **Afterwards:** manifest liệt kê mỗi tài liệu người-dùng-cuối tìm thấy dưới các thư mục quadrant, kèm linkage ngược về capture đã sinh nó (hoặc `null` cho tài liệu di sản chưa có linkage). Cơ chế đầy đủ (hình dạng manifest, ánh xạ quadrant→mục-đích/đối-tượng, cách truy linkage, tính idempotent, dung sai thư mục quadrant vắng) đặc tả ở area **`enduser-docs-index`** — bề mặt CLI sống ở đây (cửa lệnh `fgos` một cửa), hành vi chi tiết sống ở spec area đó, cùng khuôn `review`/`approve` trỏ sang spec Runner."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_39cbc86a2ed322069e28cf4ed8efdbfd"
+}
+```
+
+## Entry claim_87f14f490b3dc3b8d34fba3dbf4a35f1
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_87f14f490b3dc3b8d34fba3dbf4a35f1",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_87f14f490b3dc3b8d34fba3dbf4a35f1",
+    "sourceUnitDigest": "8df771b9a95fb4b3",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-79",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the rollup verb section (source lines 1072-1075) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-79 of spec.md under the rollup verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1072-1075 to spec.md#unheaded-block-79 under 'Rollup Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (seeded sample)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "8df771b9a95fb4b30a9156cd5e9d7a356eb45b338bdbe27701e457bb31b93f2d",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Rollup Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_87f14f490b3dc3b8d34fba3dbf4a35f1",
+    "sourceUnitDigest": "8df771b9a95fb4b3",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-79",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the rollup verb section (source lines 1103-1106) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-79 of spec.md under the rollup verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "8df771b9a95fb4b30a9156cd5e9d7a356eb45b338bdbe27701e457bb31b93f2d",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Rollup Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "6a14eca8fc020f382b77a5923e43279875560d79a30c00be3d3430e38f303234",
+    "identityFingerprint": "6a14eca8fc020f382b77a5923e43279875560d79a30c00be3d3430e38f303234",
+    "claimId": "claim_87f14f490b3dc3b8d34fba3dbf4a35f1",
+    "sourceAnchor": "unheaded-block-92",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "8df771b9a95fb4b30a9156cd5e9d7a356eb45b338bdbe27701e457bb31b93f2d",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-92",
+      "githubAnchor": "unheaded-block-92",
+      "stableAnchor": "unheaded-block-92",
+      "title": "Unheaded block 92",
+      "startLine": 1103,
+      "endLine": 1106,
+      "textDigest": "8df771b9a95fb4b30a9156cd5e9d7a356eb45b338bdbe27701e457bb31b93f2d",
+      "sample": "- **Runs when:** người/agent gọi `fgos rollup <id>` để hỏi \"việc tôi nộp tới đâu rồi\" cho một item gốc (per stage-clarify / STR24).\n- **Blocked when:** thiếu id — `validation`; id ",
+      "identityFingerprint": "6a14eca8fc020f382b77a5923e43279875560d79a30c00be3d3430e38f303234",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Xem tiến độ theo bộ (rollup)"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos rollup <id>` để hỏi \"việc tôi nộp tới đâu rồi\" cho một item gốc (per stage-clarify / STR24).\n- **Blocked when:** thiếu id — `validation`; id không tồn tại trong bản chiếu — `validation`, cùng khuôn `requireField`/not-found với `review`/`approve`. Không bao giờ ghi gì — đọc thuần, cùng họ với `check`/`list`/`ready`.\n- **What changes:** không gì.\n- **Afterwards:** in item gốc (title + status), rồi đếm con TRỰC TIẾP (qua `parent`, dựng từ STR16 decompose) đã `done` trên tổng số con (`k/n done`), rồi liệt kê từng con kèm status riêng của nó; item gốc không có con nào vẫn in `0/0 done` cộng một ghi chú rõ ràng \"không có con\" — không throw, không coi là lỗi."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-79",
+    "githubAnchor": "unheaded-block-79",
+    "stableAnchor": "unheaded-block-79",
+    "title": "Unheaded block 79",
+    "startLine": 953,
+    "endLine": 956,
+    "textDigest": "8df771b9a95fb4b30a9156cd5e9d7a356eb45b338bdbe27701e457bb31b93f2d",
+    "sample": "- **Runs when:** người/agent gọi `fgos rollup <id>` để hỏi \"việc tôi nộp tới đâu rồi\" cho một item gốc (per stage-clarify / STR24).\n- **Blocked when:** thiếu id — `validation`; id ",
+    "identityFingerprint": "6a14eca8fc020f382b77a5923e43279875560d79a30c00be3d3430e38f303234",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Rollup Verb"
+    ],
+    "text": "- **Runs when:** người/agent gọi `fgos rollup <id>` để hỏi \"việc tôi nộp tới đâu rồi\" cho một item gốc (per stage-clarify / STR24).\n- **Blocked when:** thiếu id — `validation`; id không tồn tại trong bản chiếu — `validation`, cùng khuôn `requireField`/not-found với `review`/`approve`. Không bao giờ ghi gì — đọc thuần, cùng họ với `check`/`list`/`ready`.\n- **What changes:** không gì.\n- **Afterwards:** in item gốc (title + status), rồi đếm con TRỰC TIẾP (qua `parent`, dựng từ STR16 decompose) đã `done` trên tổng số con (`k/n done`), rồi liệt kê từng con kèm status riêng của nó; item gốc không có con nào vẫn in `0/0 done` cộng một ghi chú rõ ràng \"không có con\" — không throw, không coi là lỗi."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-79",
+      "githubAnchor": "unheaded-block-79",
+      "stableAnchor": "unheaded-block-79",
+      "title": "Unheaded block 79",
+      "startLine": 953,
+      "endLine": 956,
+      "textDigest": "8df771b9a95fb4b30a9156cd5e9d7a356eb45b338bdbe27701e457bb31b93f2d",
+      "sample": "- **Runs when:** người/agent gọi `fgos rollup <id>` để hỏi \"việc tôi nộp tới đâu rồi\" cho một item gốc (per stage-clarify / STR24).\n- **Blocked when:** thiếu id — `validation`; id ",
+      "identityFingerprint": "6a14eca8fc020f382b77a5923e43279875560d79a30c00be3d3430e38f303234",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Rollup Verb"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos rollup <id>` để hỏi \"việc tôi nộp tới đâu rồi\" cho một item gốc (per stage-clarify / STR24).\n- **Blocked when:** thiếu id — `validation`; id không tồn tại trong bản chiếu — `validation`, cùng khuôn `requireField`/not-found với `review`/`approve`. Không bao giờ ghi gì — đọc thuần, cùng họ với `check`/`list`/`ready`.\n- **What changes:** không gì.\n- **Afterwards:** in item gốc (title + status), rồi đếm con TRỰC TIẾP (qua `parent`, dựng từ STR16 decompose) đã `done` trên tổng số con (`k/n done`), rồi liệt kê từng con kèm status riêng của nó; item gốc không có con nào vẫn in `0/0 done` cộng một ghi chú rõ ràng \"không có con\" — không throw, không coi là lỗi."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_87f14f490b3dc3b8d34fba3dbf4a35f1"
+}
+```
+
+## Entry claim_49246718fefa63a9fa016017a2072f1e
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_49246718fefa63a9fa016017a2072f1e",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_49246718fefa63a9fa016017a2072f1e",
+    "sourceUnitDigest": "595c67ae94bc2fe4",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-80",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the triage verb section (source lines 1079-1082) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-80 of spec.md under the triage verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1079-1082 to spec.md#unheaded-block-80 under 'Triage Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "595c67ae94bc2fe4f46251ba6d6d35f16a9fbdb8fe0d09e92c87bfb810fb3070",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Triage Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_49246718fefa63a9fa016017a2072f1e",
+    "sourceUnitDigest": "595c67ae94bc2fe4",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-80",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the triage verb section (source lines 1110-1113) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-80 of spec.md under the triage verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "595c67ae94bc2fe4f46251ba6d6d35f16a9fbdb8fe0d09e92c87bfb810fb3070",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Triage Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "be25b880cb99a622ca2f230b84ea486f3ba2082bf5cd0f649da6e2d7a825fbc5",
+    "identityFingerprint": "be25b880cb99a622ca2f230b84ea486f3ba2082bf5cd0f649da6e2d7a825fbc5",
+    "claimId": "claim_49246718fefa63a9fa016017a2072f1e",
+    "sourceAnchor": "unheaded-block-93",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "595c67ae94bc2fe4f46251ba6d6d35f16a9fbdb8fe0d09e92c87bfb810fb3070",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-93",
+      "githubAnchor": "unheaded-block-93",
+      "stableAnchor": "unheaded-block-93",
+      "title": "Unheaded block 93",
+      "startLine": 1110,
+      "endLine": 1113,
+      "textDigest": "595c67ae94bc2fe4f46251ba6d6d35f16a9fbdb8fe0d09e92c87bfb810fb3070",
+      "sample": "- **Runs when:** người/agent gọi `fgos triage` để hỏi \"việc nào nổi lên chú ý\" — cửa 2 của triage, phân biệt với STR14 intake-triage (cửa 1, phân loại rủi ro/lane lúc submit) — per",
+      "identityFingerprint": "be25b880cb99a622ca2f230b84ea486f3ba2082bf5cd0f649da6e2d7a825fbc5",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Xếp hạng tác động backlog (triage)"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos triage` để hỏi \"việc nào nổi lên chú ý\" — cửa 2 của triage, phân biệt với STR14 intake-triage (cửa 1, phân loại rủi ro/lane lúc submit) — per deep-dive work-item-management.md, STR21.\n- **Blocked when:** nhật ký hỏng → `corrupt-log`. Không bao giờ ghi gì — đọc thuần, cùng họ với `rollup`/`check`/`list`/`ready`.\n- **What changes:** không gì.\n- **Afterwards:** in mọi item CHƯA `done`, xếp hạng theo `blocks` — số item khác CŨNG CHƯA `done` đang liệt kê id đó trong `deps` — giảm dần, tie-break id tăng dần; item `done` không bao giờ xuất hiện trong danh sách VÀ không bao giờ được đếm vào `blocks` của item khác (một dep đã `done` không còn \"chặn\" ai); backlog rỗng hoặc mọi item đã `done` → một dòng thông báo rõ ràng, không throw. `blocks` là một proxy tác động (fan-out chặn), KHÔNG phải trường `priority` trên schema (đó là phạm vi STR7/STR8, còn `awaiting-approval`) — một derive thuần trên `deps` sẵn có, cùng tinh thần với `frontier.mjs`'s derive trên `parent`."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-80",
+    "githubAnchor": "unheaded-block-80",
+    "stableAnchor": "unheaded-block-80",
+    "title": "Unheaded block 80",
+    "startLine": 960,
+    "endLine": 963,
+    "textDigest": "595c67ae94bc2fe4f46251ba6d6d35f16a9fbdb8fe0d09e92c87bfb810fb3070",
+    "sample": "- **Runs when:** người/agent gọi `fgos triage` để hỏi \"việc nào nổi lên chú ý\" — cửa 2 của triage, phân biệt với STR14 intake-triage (cửa 1, phân loại rủi ro/lane lúc submit) — per",
+    "identityFingerprint": "be25b880cb99a622ca2f230b84ea486f3ba2082bf5cd0f649da6e2d7a825fbc5",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Triage Verb"
+    ],
+    "text": "- **Runs when:** người/agent gọi `fgos triage` để hỏi \"việc nào nổi lên chú ý\" — cửa 2 của triage, phân biệt với STR14 intake-triage (cửa 1, phân loại rủi ro/lane lúc submit) — per deep-dive work-item-management.md, STR21.\n- **Blocked when:** nhật ký hỏng → `corrupt-log`. Không bao giờ ghi gì — đọc thuần, cùng họ với `rollup`/`check`/`list`/`ready`.\n- **What changes:** không gì.\n- **Afterwards:** in mọi item CHƯA `done`, xếp hạng theo `blocks` — số item khác CŨNG CHƯA `done` đang liệt kê id đó trong `deps` — giảm dần, tie-break id tăng dần; item `done` không bao giờ xuất hiện trong danh sách VÀ không bao giờ được đếm vào `blocks` của item khác (một dep đã `done` không còn \"chặn\" ai); backlog rỗng hoặc mọi item đã `done` → một dòng thông báo rõ ràng, không throw. `blocks` là một proxy tác động (fan-out chặn), KHÔNG phải trường `priority` trên schema (đó là phạm vi STR7/STR8, còn `awaiting-approval`) — một derive thuần trên `deps` sẵn có, cùng tinh thần với `frontier.mjs`'s derive trên `parent`."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-80",
+      "githubAnchor": "unheaded-block-80",
+      "stableAnchor": "unheaded-block-80",
+      "title": "Unheaded block 80",
+      "startLine": 960,
+      "endLine": 963,
+      "textDigest": "595c67ae94bc2fe4f46251ba6d6d35f16a9fbdb8fe0d09e92c87bfb810fb3070",
+      "sample": "- **Runs when:** người/agent gọi `fgos triage` để hỏi \"việc nào nổi lên chú ý\" — cửa 2 của triage, phân biệt với STR14 intake-triage (cửa 1, phân loại rủi ro/lane lúc submit) — per",
+      "identityFingerprint": "be25b880cb99a622ca2f230b84ea486f3ba2082bf5cd0f649da6e2d7a825fbc5",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Triage Verb"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos triage` để hỏi \"việc nào nổi lên chú ý\" — cửa 2 của triage, phân biệt với STR14 intake-triage (cửa 1, phân loại rủi ro/lane lúc submit) — per deep-dive work-item-management.md, STR21.\n- **Blocked when:** nhật ký hỏng → `corrupt-log`. Không bao giờ ghi gì — đọc thuần, cùng họ với `rollup`/`check`/`list`/`ready`.\n- **What changes:** không gì.\n- **Afterwards:** in mọi item CHƯA `done`, xếp hạng theo `blocks` — số item khác CŨNG CHƯA `done` đang liệt kê id đó trong `deps` — giảm dần, tie-break id tăng dần; item `done` không bao giờ xuất hiện trong danh sách VÀ không bao giờ được đếm vào `blocks` của item khác (một dep đã `done` không còn \"chặn\" ai); backlog rỗng hoặc mọi item đã `done` → một dòng thông báo rõ ràng, không throw. `blocks` là một proxy tác động (fan-out chặn), KHÔNG phải trường `priority` trên schema (đó là phạm vi STR7/STR8, còn `awaiting-approval`) — một derive thuần trên `deps` sẵn có, cùng tinh thần với `frontier.mjs`'s derive trên `parent`."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_49246718fefa63a9fa016017a2072f1e"
+}
+```
+
+## Entry claim_2e4a2eebcc3ac6e8600590e0df9d3282
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_2e4a2eebcc3ac6e8600590e0df9d3282",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_2e4a2eebcc3ac6e8600590e0df9d3282",
+    "sourceUnitDigest": "c353e48e7f6e9d09",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-81",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the take verb section (source lines 1086-1090) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-81 of spec.md under the take verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1086-1090 to spec.md#unheaded-block-81 under 'Take Verb': source and target text identical by recomputed sha256 on both sides, hand-recomputed from file lines; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "c353e48e7f6e9d099ed7acc8db76b98bef4e8decacc1b68e6603f8fd009a58c5",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Take Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_2e4a2eebcc3ac6e8600590e0df9d3282",
+    "sourceUnitDigest": "c353e48e7f6e9d09",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-81",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the take verb section (source lines 1117-1121) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-81 of spec.md under the take verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "c353e48e7f6e9d099ed7acc8db76b98bef4e8decacc1b68e6603f8fd009a58c5",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Take Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "d8f796772d8a9b40d0fed55cf77ca807b88d85a3b2d6e97eb63bc54535bc1f0e",
+    "identityFingerprint": "d8f796772d8a9b40d0fed55cf77ca807b88d85a3b2d6e97eb63bc54535bc1f0e",
+    "claimId": "claim_2e4a2eebcc3ac6e8600590e0df9d3282",
+    "sourceAnchor": "unheaded-block-94",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "c353e48e7f6e9d099ed7acc8db76b98bef4e8decacc1b68e6603f8fd009a58c5",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-94",
+      "githubAnchor": "unheaded-block-94",
+      "stableAnchor": "unheaded-block-94",
+      "title": "Unheaded block 94",
+      "startLine": 1117,
+      "endLine": 1121,
+      "textDigest": "c353e48e7f6e9d099ed7acc8db76b98bef4e8decacc1b68e6603f8fd009a58c5",
+      "sample": "- **Runs when:** một tác nhân ngoài runner gọi `fgos take [--id <id>] [--role human|session]`.\n- **Blocked when:** `--role` khác `human`/`session` — `validation`; không truyền `--i",
+      "identityFingerprint": "d8f796772d8a9b40d0fed55cf77ca807b88d85a3b2d6e97eb63bc54535bc1f0e",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Cầm việc qua cửa pull (take)"
+      ],
+      "text": "- **Runs when:** một tác nhân ngoài runner gọi `fgos take [--id <id>] [--role human|session]`.\n- **Blocked when:** `--role` khác `human`/`session` — `validation`; không truyền `--id` và frontier rỗng — `validation`; `--id` truyền một id không tồn tại — `validation`; `--id` truyền một item còn `todo` nhưng CHƯA nằm trong frontier (stage/deps/lineage chưa mở) — `validation`, thông điệp nói rõ \"take chỉ mở đúng tập runner dispatch-được\"; `--id` truyền một item đã bị cầm/đỗ/kẹt — rơi thẳng xuống CAS của pre-claim status, báo `conflict` thật (mã 3). Mọi nhánh chặn KHÔNG ghi sự kiện nào.\n- **What changes:** Tạo một bản ghi runtime claim (`.fgos/runtime/claims/<id>.json`) lưu `role` (`human`), `headAtTake` (Data Dictionary #14/#15), `preClaimStatus` (`todo` hoặc `blocked`), `preClaimRevision`. Mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` vào nhật ký sự kiện (*new claims do not durably write into doing*); trạng thái bền giữ nguyên pre-claim, trạng thái hiệu lực hiển thị `doing` qua lớp phủ runtime (`buildEffectiveView`). Một sự kiện outcome nửa DỰ ĐOÁN (tier/số dep/số lần nhận trước đó) được ghi cho cùng item — đối xứng claim của runner (xem spec Runner).\n- **Side effects:** không.\n- **Afterwards:** item hiển thị trạng thái hiệu lực `doing`, biến mất khỏi frontier (giống mọi claim khác); `fgos check` đọc được nửa dự đoán ngay; item chờ một `fgos return` để tới kết cục."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-81",
+    "githubAnchor": "unheaded-block-81",
+    "stableAnchor": "unheaded-block-81",
+    "title": "Unheaded block 81",
+    "startLine": 967,
+    "endLine": 971,
+    "textDigest": "c353e48e7f6e9d099ed7acc8db76b98bef4e8decacc1b68e6603f8fd009a58c5",
+    "sample": "- **Runs when:** một tác nhân ngoài runner gọi `fgos take [--id <id>] [--role human|session]`.\n- **Blocked when:** `--role` khác `human`/`session` — `validation`; không truyền `--i",
+    "identityFingerprint": "d8f796772d8a9b40d0fed55cf77ca807b88d85a3b2d6e97eb63bc54535bc1f0e",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Take Verb"
+    ],
+    "text": "- **Runs when:** một tác nhân ngoài runner gọi `fgos take [--id <id>] [--role human|session]`.\n- **Blocked when:** `--role` khác `human`/`session` — `validation`; không truyền `--id` và frontier rỗng — `validation`; `--id` truyền một id không tồn tại — `validation`; `--id` truyền một item còn `todo` nhưng CHƯA nằm trong frontier (stage/deps/lineage chưa mở) — `validation`, thông điệp nói rõ \"take chỉ mở đúng tập runner dispatch-được\"; `--id` truyền một item đã bị cầm/đỗ/kẹt — rơi thẳng xuống CAS của pre-claim status, báo `conflict` thật (mã 3). Mọi nhánh chặn KHÔNG ghi sự kiện nào.\n- **What changes:** Tạo một bản ghi runtime claim (`.fgos/runtime/claims/<id>.json`) lưu `role` (`human`), `headAtTake` (Data Dictionary #14/#15), `preClaimStatus` (`todo` hoặc `blocked`), `preClaimRevision`. Mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` vào nhật ký sự kiện (*new claims do not durably write into doing*); trạng thái bền giữ nguyên pre-claim, trạng thái hiệu lực hiển thị `doing` qua lớp phủ runtime (`buildEffectiveView`). Một sự kiện outcome nửa DỰ ĐOÁN (tier/số dep/số lần nhận trước đó) được ghi cho cùng item — đối xứng claim của runner (xem spec Runner).\n- **Side effects:** không.\n- **Afterwards:** item hiển thị trạng thái hiệu lực `doing`, biến mất khỏi frontier (giống mọi claim khác); `fgos check` đọc được nửa dự đoán ngay; item chờ một `fgos return` để tới kết cục."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-81",
+      "githubAnchor": "unheaded-block-81",
+      "stableAnchor": "unheaded-block-81",
+      "title": "Unheaded block 81",
+      "startLine": 967,
+      "endLine": 971,
+      "textDigest": "c353e48e7f6e9d099ed7acc8db76b98bef4e8decacc1b68e6603f8fd009a58c5",
+      "sample": "- **Runs when:** một tác nhân ngoài runner gọi `fgos take [--id <id>] [--role human|session]`.\n- **Blocked when:** `--role` khác `human`/`session` — `validation`; không truyền `--i",
+      "identityFingerprint": "d8f796772d8a9b40d0fed55cf77ca807b88d85a3b2d6e97eb63bc54535bc1f0e",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Take Verb"
+      ],
+      "text": "- **Runs when:** một tác nhân ngoài runner gọi `fgos take [--id <id>] [--role human|session]`.\n- **Blocked when:** `--role` khác `human`/`session` — `validation`; không truyền `--id` và frontier rỗng — `validation`; `--id` truyền một id không tồn tại — `validation`; `--id` truyền một item còn `todo` nhưng CHƯA nằm trong frontier (stage/deps/lineage chưa mở) — `validation`, thông điệp nói rõ \"take chỉ mở đúng tập runner dispatch-được\"; `--id` truyền một item đã bị cầm/đỗ/kẹt — rơi thẳng xuống CAS của pre-claim status, báo `conflict` thật (mã 3). Mọi nhánh chặn KHÔNG ghi sự kiện nào.\n- **What changes:** Tạo một bản ghi runtime claim (`.fgos/runtime/claims/<id>.json`) lưu `role` (`human`), `headAtTake` (Data Dictionary #14/#15), `preClaimStatus` (`todo` hoặc `blocked`), `preClaimRevision`. Mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` vào nhật ký sự kiện (*new claims do not durably write into doing*); trạng thái bền giữ nguyên pre-claim, trạng thái hiệu lực hiển thị `doing` qua lớp phủ runtime (`buildEffectiveView`). Một sự kiện outcome nửa DỰ ĐOÁN (tier/số dep/số lần nhận trước đó) được ghi cho cùng item — đối xứng claim của runner (xem spec Runner).\n- **Side effects:** không.\n- **Afterwards:** item hiển thị trạng thái hiệu lực `doing`, biến mất khỏi frontier (giống mọi claim khác); `fgos check` đọc được nửa dự đoán ngay; item chờ một `fgos return` để tới kết cục."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_2e4a2eebcc3ac6e8600590e0df9d3282"
+}
+```
+
+## Entry claim_39a6cc5306f849af650f26e27e473d2a
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_39a6cc5306f849af650f26e27e473d2a",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_39a6cc5306f849af650f26e27e473d2a",
+    "sourceUnitDigest": "09be94379bedfc46",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-82",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the pick verb section (source lines 1094-1098) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-82 of spec.md under the pick verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1094-1098 to spec.md#unheaded-block-82 under 'Pick Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "09be94379bedfc46f88f54503e52daa53a53e96f472cd8035e80db873e923ffe",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Pick Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_39a6cc5306f849af650f26e27e473d2a",
+    "sourceUnitDigest": "09be94379bedfc46",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-82",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the pick verb section (source lines 1125-1129) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-82 of spec.md under the pick verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "09be94379bedfc46f88f54503e52daa53a53e96f472cd8035e80db873e923ffe",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Pick Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "f72e733f3e37f1453d951d6fe479e572c2df7301deda10d0177f4a1851c0c75c",
+    "identityFingerprint": "f72e733f3e37f1453d951d6fe479e572c2df7301deda10d0177f4a1851c0c75c",
+    "claimId": "claim_39a6cc5306f849af650f26e27e473d2a",
+    "sourceAnchor": "unheaded-block-95",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "09be94379bedfc46f88f54503e52daa53a53e96f472cd8035e80db873e923ffe",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-95",
+      "githubAnchor": "unheaded-block-95",
+      "stableAnchor": "unheaded-block-95",
+      "title": "Unheaded block 95",
+      "startLine": 1125,
+      "endLine": 1129,
+      "textDigest": "09be94379bedfc46f88f54503e52daa53a53e96f472cd8035e80db873e923ffe",
+      "sample": "- **Runs when:** một tác nhân ngoài runner gọi `fgos pick [id]` — cùng cửa pull với `take`/`return`, nhưng gộp thêm bước dựng workspace trong MỘT lệnh.\n- **Blocked when:** không tr",
+      "identityFingerprint": "f72e733f3e37f1453d951d6fe479e572c2df7301deda10d0177f4a1851c0c75c",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Cầm việc + dựng workspace (pick)"
+      ],
+      "text": "- **Runs when:** một tác nhân ngoài runner gọi `fgos pick [id]` — cùng cửa pull với `take`/`return`, nhưng gộp thêm bước dựng workspace trong MỘT lệnh.\n- **Blocked when:** không truyền `id` và frontier rỗng — `validation` (no-id mở frontier-head như `take`); `id` truyền một id không tồn tại — `validation`; `id` truyền một item đã bị cầm/đỗ/kẹt — rơi thẳng xuống CAS của pre-claim status, báo `conflict` thật (mã 3) — HỆT `take`, không có cờ `--role` (role LUÔN `session`, không đọc/chấp nhận cờ đó). **Khác `take`: explicit `--id` không kiểm frontier** (claim-lock §3a) — `pick` nên cầm item ở BẤT KỲ stage nào nếu còn `status: 'todo'` (item đang ở `discovery`/`exploring`/`planning` đều được), miễn status chưa thay (CAS trong `moveWork` là guard thật).\n- **What changes:** Tạo một bản ghi runtime claim (`.fgos/runtime/claims/<id>.json`) lưu `role: 'session'` + `headAtTake` (hoặc `branchHeadAtTake` cho đường nguồn-nhánh), `preClaimStatus`, `preClaimRevision`. Mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` vào nhật ký (*new claims do not durably write into doing*); trạng thái bền giữ pre-claim, trạng thái hiệu lực hiển thị `doing`. Một sự kiện outcome nửa DỰ ĐOÁN được ghi cho cùng item, HỆT `take`. NGAY SAU claim thành công, một worktree + nhánh `fgw/<id>` được dựng (hoặc tái dùng nếu đã sống) qua CHÍNH `createWorktree` vòng tự hành dùng — không đường dựng workspace riêng.\n- **Side effects:** nếu dựng workspace thất bại SAU KHI claim đã thành công, lỗi đó lộ ra nguyên vẹn cho người gọi — claim KHÔNG bao giờ bị âm thầm hoàn tác (không rollback tự động); item ở lại trạng thái hiệu lực `doing`, không worktree.\n- **Afterwards:** người/phiên thấy item vừa claim VÀ đường dẫn worktree + tên nhánh của nó; item biến mất khỏi frontier như mọi claim khác; item chờ một `fgos return` để tới kết cục — HỆT vòng đời của một claim qua `take` (per str83-fgos-slash-commands / 757e5dd7)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-82",
+    "githubAnchor": "unheaded-block-82",
+    "stableAnchor": "unheaded-block-82",
+    "title": "Unheaded block 82",
+    "startLine": 975,
+    "endLine": 979,
+    "textDigest": "09be94379bedfc46f88f54503e52daa53a53e96f472cd8035e80db873e923ffe",
+    "sample": "- **Runs when:** một tác nhân ngoài runner gọi `fgos pick [id]` — cùng cửa pull với `take`/`return`, nhưng gộp thêm bước dựng workspace trong MỘT lệnh.\n- **Blocked when:** không tr",
+    "identityFingerprint": "f72e733f3e37f1453d951d6fe479e572c2df7301deda10d0177f4a1851c0c75c",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Pick Verb"
+    ],
+    "text": "- **Runs when:** một tác nhân ngoài runner gọi `fgos pick [id]` — cùng cửa pull với `take`/`return`, nhưng gộp thêm bước dựng workspace trong MỘT lệnh.\n- **Blocked when:** không truyền `id` và frontier rỗng — `validation` (no-id mở frontier-head như `take`); `id` truyền một id không tồn tại — `validation`; `id` truyền một item đã bị cầm/đỗ/kẹt — rơi thẳng xuống CAS của pre-claim status, báo `conflict` thật (mã 3) — HỆT `take`, không có cờ `--role` (role LUÔN `session`, không đọc/chấp nhận cờ đó). **Khác `take`: explicit `--id` không kiểm frontier** (claim-lock §3a) — `pick` nên cầm item ở BẤT KỲ stage nào nếu còn `status: 'todo'` (item đang ở `discovery`/`exploring`/`planning` đều được), miễn status chưa thay (CAS trong `moveWork` là guard thật).\n- **What changes:** Tạo một bản ghi runtime claim (`.fgos/runtime/claims/<id>.json`) lưu `role: 'session'` + `headAtTake` (hoặc `branchHeadAtTake` cho đường nguồn-nhánh), `preClaimStatus`, `preClaimRevision`. Mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` vào nhật ký (*new claims do not durably write into doing*); trạng thái bền giữ pre-claim, trạng thái hiệu lực hiển thị `doing`. Một sự kiện outcome nửa DỰ ĐOÁN được ghi cho cùng item, HỆT `take`. NGAY SAU claim thành công, một worktree + nhánh `fgw/<id>` được dựng (hoặc tái dùng nếu đã sống) qua CHÍNH `createWorktree` vòng tự hành dùng — không đường dựng workspace riêng.\n- **Side effects:** nếu dựng workspace thất bại SAU KHI claim đã thành công, lỗi đó lộ ra nguyên vẹn cho người gọi — claim KHÔNG bao giờ bị âm thầm hoàn tác (không rollback tự động); item ở lại trạng thái hiệu lực `doing`, không worktree.\n- **Afterwards:** người/phiên thấy item vừa claim VÀ đường dẫn worktree + tên nhánh của nó; item biến mất khỏi frontier như mọi claim khác; item chờ một `fgos return` để tới kết cục — HỆT vòng đời của một claim qua `take` (per str83-fgos-slash-commands / 757e5dd7)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-82",
+      "githubAnchor": "unheaded-block-82",
+      "stableAnchor": "unheaded-block-82",
+      "title": "Unheaded block 82",
+      "startLine": 975,
+      "endLine": 979,
+      "textDigest": "09be94379bedfc46f88f54503e52daa53a53e96f472cd8035e80db873e923ffe",
+      "sample": "- **Runs when:** một tác nhân ngoài runner gọi `fgos pick [id]` — cùng cửa pull với `take`/`return`, nhưng gộp thêm bước dựng workspace trong MỘT lệnh.\n- **Blocked when:** không tr",
+      "identityFingerprint": "f72e733f3e37f1453d951d6fe479e572c2df7301deda10d0177f4a1851c0c75c",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Pick Verb"
+      ],
+      "text": "- **Runs when:** một tác nhân ngoài runner gọi `fgos pick [id]` — cùng cửa pull với `take`/`return`, nhưng gộp thêm bước dựng workspace trong MỘT lệnh.\n- **Blocked when:** không truyền `id` và frontier rỗng — `validation` (no-id mở frontier-head như `take`); `id` truyền một id không tồn tại — `validation`; `id` truyền một item đã bị cầm/đỗ/kẹt — rơi thẳng xuống CAS của pre-claim status, báo `conflict` thật (mã 3) — HỆT `take`, không có cờ `--role` (role LUÔN `session`, không đọc/chấp nhận cờ đó). **Khác `take`: explicit `--id` không kiểm frontier** (claim-lock §3a) — `pick` nên cầm item ở BẤT KỲ stage nào nếu còn `status: 'todo'` (item đang ở `discovery`/`exploring`/`planning` đều được), miễn status chưa thay (CAS trong `moveWork` là guard thật).\n- **What changes:** Tạo một bản ghi runtime claim (`.fgos/runtime/claims/<id>.json`) lưu `role: 'session'` + `headAtTake` (hoặc `branchHeadAtTake` cho đường nguồn-nhánh), `preClaimStatus`, `preClaimRevision`. Mọi claim mới KHÔNG BAO GIỜ ghi bền giá trị `doing` vào nhật ký (*new claims do not durably write into doing*); trạng thái bền giữ pre-claim, trạng thái hiệu lực hiển thị `doing`. Một sự kiện outcome nửa DỰ ĐOÁN được ghi cho cùng item, HỆT `take`. NGAY SAU claim thành công, một worktree + nhánh `fgw/<id>` được dựng (hoặc tái dùng nếu đã sống) qua CHÍNH `createWorktree` vòng tự hành dùng — không đường dựng workspace riêng.\n- **Side effects:** nếu dựng workspace thất bại SAU KHI claim đã thành công, lỗi đó lộ ra nguyên vẹn cho người gọi — claim KHÔNG bao giờ bị âm thầm hoàn tác (không rollback tự động); item ở lại trạng thái hiệu lực `doing`, không worktree.\n- **Afterwards:** người/phiên thấy item vừa claim VÀ đường dẫn worktree + tên nhánh của nó; item biến mất khỏi frontier như mọi claim khác; item chờ một `fgos return` để tới kết cục — HỆT vòng đời của một claim qua `take` (per str83-fgos-slash-commands / 757e5dd7)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_39a6cc5306f849af650f26e27e473d2a"
+}
+```
+
+## Entry claim_6cfb40f6b0796d53b8fa927a862e67ce
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_6cfb40f6b0796d53b8fa927a862e67ce",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_6cfb40f6b0796d53b8fa927a862e67ce",
+    "sourceUnitDigest": "b2eaf8daf7008b99",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-83",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the return verb section (source lines 1102-1106) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-83 of spec.md under the return verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1102-1106 to spec.md#unheaded-block-83 under 'Return Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "b2eaf8daf7008b991917f223318d5e1de57fe2575580c0847cbe688ff6397baf",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Return Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_6cfb40f6b0796d53b8fa927a862e67ce",
+    "sourceUnitDigest": "b2eaf8daf7008b99",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-83",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the return verb section (source lines 1133-1137) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-83 of spec.md under the return verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "b2eaf8daf7008b991917f223318d5e1de57fe2575580c0847cbe688ff6397baf",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Return Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "295253f3c20d5d2cd109968156e0ff8f559d2b62abbbbd6bb415f8538b6b1b40",
+    "identityFingerprint": "295253f3c20d5d2cd109968156e0ff8f559d2b62abbbbd6bb415f8538b6b1b40",
+    "claimId": "claim_6cfb40f6b0796d53b8fa927a862e67ce",
+    "sourceAnchor": "unheaded-block-96",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b2eaf8daf7008b991917f223318d5e1de57fe2575580c0847cbe688ff6397baf",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-96",
+      "githubAnchor": "unheaded-block-96",
+      "stableAnchor": "unheaded-block-96",
+      "title": "Unheaded block 96",
+      "startLine": 1133,
+      "endLine": 1137,
+      "textDigest": "b2eaf8daf7008b991917f223318d5e1de57fe2575580c0847cbe688ff6397baf",
+      "sample": "- **Runs when:** người/phiên đang cầm một item qua `take` gọi `fgos return <id> [--timeout <ms>]`.\n- **Blocked when:** item không tồn tại — `validation`; item không mang trạng thái",
+      "identityFingerprint": "295253f3c20d5d2cd109968156e0ff8f559d2b62abbbbd6bb415f8538b6b1b40",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Trả việc qua cửa pull (return)"
+      ],
+      "text": "- **Runs when:** người/phiên đang cầm một item qua `take` gọi `fgos return <id> [--timeout <ms>]`.\n- **Blocked when:** item không tồn tại — `validation`; item không mang trạng thái hiệu lực `doing` — `validation`; item mang trạng thái hiệu lực `doing` nhưng `claimRole` không phải `human`/`session` (claim của runner) — `validation`, `return` chỉ hoàn tất một `take`; item thiếu `headAtTake` (claim di sản/không qua `take`) — `validation`; working tree host repo KHÔNG sạch (loại trừ `.fgos/` — store sống tự mutate bởi chính `return`, không bao giờ tính là bẩn) — `validation`; HEAD chưa tiến so `headAtTake` — `validation`; `--timeout` không phải số dương — `validation`. KHÔNG có nhánh chặn nào ghi sự kiện.\n- **What changes:** verb TỰ CHẠY `verify` thật của item (goal-check) tại HEAD hiện hành, trong thư mục làm việc hiện hành — không bao giờ tin lời người gọi. Verify xanh: `settleClaim` chuyển bền trực tiếp từ `preClaimStatus → awaiting-approval` (mang thêm `headAtReturn`, Data Dictionary #16, per pr-lifecycle / 1359ab5e), giải phóng claim file, cộng một sự kiện outcome nửa THỰC TẾ (kết cục `awaiting-approval`, đạt goal-check, số commit kể từ `headAtTake`). Verify đỏ: `settleClaim` chuyển bền từ `preClaimStatus → blocked` (lý do `verify-fail`), giải phóng claim file, cộng nửa thực tế (kết cục `blocked`, không đạt), cộng một bản ghi friction lớp `verification`.\n- **Side effects:** một tiến trình con chạy `verify` của item (shell, trong `cwd` hiện hành).\n- **Afterwards:** verify xanh → item ở `awaiting-approval` mang `headAtReturn`, chờ người duyệt qua cổng `review`/`approve`/`reject` như mọi đề xuất khác (xem spec Runner \"Cổng duyệt PR nội bộ\" — dải `headAtTake→headAtReturn` là nguồn diff của một đề xuất pull-door) — KHÔNG sinh settlement ở bước này (settlement thuộc cạnh `→done`); verify đỏ → item ở `blocked`, mang một bản ghi friction verification, đi lại đường `blocked → todo` thường như mọi item đỗ khác."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-83",
+    "githubAnchor": "unheaded-block-83",
+    "stableAnchor": "unheaded-block-83",
+    "title": "Unheaded block 83",
+    "startLine": 983,
+    "endLine": 987,
+    "textDigest": "b2eaf8daf7008b991917f223318d5e1de57fe2575580c0847cbe688ff6397baf",
+    "sample": "- **Runs when:** người/phiên đang cầm một item qua `take` gọi `fgos return <id> [--timeout <ms>]`.\n- **Blocked when:** item không tồn tại — `validation`; item không mang trạng thái",
+    "identityFingerprint": "295253f3c20d5d2cd109968156e0ff8f559d2b62abbbbd6bb415f8538b6b1b40",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Return Verb"
+    ],
+    "text": "- **Runs when:** người/phiên đang cầm một item qua `take` gọi `fgos return <id> [--timeout <ms>]`.\n- **Blocked when:** item không tồn tại — `validation`; item không mang trạng thái hiệu lực `doing` — `validation`; item mang trạng thái hiệu lực `doing` nhưng `claimRole` không phải `human`/`session` (claim của runner) — `validation`, `return` chỉ hoàn tất một `take`; item thiếu `headAtTake` (claim di sản/không qua `take`) — `validation`; working tree host repo KHÔNG sạch (loại trừ `.fgos/` — store sống tự mutate bởi chính `return`, không bao giờ tính là bẩn) — `validation`; HEAD chưa tiến so `headAtTake` — `validation`; `--timeout` không phải số dương — `validation`. KHÔNG có nhánh chặn nào ghi sự kiện.\n- **What changes:** verb TỰ CHẠY `verify` thật của item (goal-check) tại HEAD hiện hành, trong thư mục làm việc hiện hành — không bao giờ tin lời người gọi. Verify xanh: `settleClaim` chuyển bền trực tiếp từ `preClaimStatus → awaiting-approval` (mang thêm `headAtReturn`, Data Dictionary #16, per pr-lifecycle / 1359ab5e), giải phóng claim file, cộng một sự kiện outcome nửa THỰC TẾ (kết cục `awaiting-approval`, đạt goal-check, số commit kể từ `headAtTake`). Verify đỏ: `settleClaim` chuyển bền từ `preClaimStatus → blocked` (lý do `verify-fail`), giải phóng claim file, cộng nửa thực tế (kết cục `blocked`, không đạt), cộng một bản ghi friction lớp `verification`.\n- **Side effects:** một tiến trình con chạy `verify` của item (shell, trong `cwd` hiện hành).\n- **Afterwards:** verify xanh → item ở `awaiting-approval` mang `headAtReturn`, chờ người duyệt qua cổng `review`/`approve`/`reject` như mọi đề xuất khác (xem spec Runner \"Cổng duyệt PR nội bộ\" — dải `headAtTake→headAtReturn` là nguồn diff của một đề xuất pull-door) — KHÔNG sinh settlement ở bước này (settlement thuộc cạnh `→done`); verify đỏ → item ở `blocked`, mang một bản ghi friction verification, đi lại đường `blocked → todo` thường như mọi item đỗ khác."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-83",
+      "githubAnchor": "unheaded-block-83",
+      "stableAnchor": "unheaded-block-83",
+      "title": "Unheaded block 83",
+      "startLine": 983,
+      "endLine": 987,
+      "textDigest": "b2eaf8daf7008b991917f223318d5e1de57fe2575580c0847cbe688ff6397baf",
+      "sample": "- **Runs when:** người/phiên đang cầm một item qua `take` gọi `fgos return <id> [--timeout <ms>]`.\n- **Blocked when:** item không tồn tại — `validation`; item không mang trạng thái",
+      "identityFingerprint": "295253f3c20d5d2cd109968156e0ff8f559d2b62abbbbd6bb415f8538b6b1b40",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Return Verb"
+      ],
+      "text": "- **Runs when:** người/phiên đang cầm một item qua `take` gọi `fgos return <id> [--timeout <ms>]`.\n- **Blocked when:** item không tồn tại — `validation`; item không mang trạng thái hiệu lực `doing` — `validation`; item mang trạng thái hiệu lực `doing` nhưng `claimRole` không phải `human`/`session` (claim của runner) — `validation`, `return` chỉ hoàn tất một `take`; item thiếu `headAtTake` (claim di sản/không qua `take`) — `validation`; working tree host repo KHÔNG sạch (loại trừ `.fgos/` — store sống tự mutate bởi chính `return`, không bao giờ tính là bẩn) — `validation`; HEAD chưa tiến so `headAtTake` — `validation`; `--timeout` không phải số dương — `validation`. KHÔNG có nhánh chặn nào ghi sự kiện.\n- **What changes:** verb TỰ CHẠY `verify` thật của item (goal-check) tại HEAD hiện hành, trong thư mục làm việc hiện hành — không bao giờ tin lời người gọi. Verify xanh: `settleClaim` chuyển bền trực tiếp từ `preClaimStatus → awaiting-approval` (mang thêm `headAtReturn`, Data Dictionary #16, per pr-lifecycle / 1359ab5e), giải phóng claim file, cộng một sự kiện outcome nửa THỰC TẾ (kết cục `awaiting-approval`, đạt goal-check, số commit kể từ `headAtTake`). Verify đỏ: `settleClaim` chuyển bền từ `preClaimStatus → blocked` (lý do `verify-fail`), giải phóng claim file, cộng nửa thực tế (kết cục `blocked`, không đạt), cộng một bản ghi friction lớp `verification`.\n- **Side effects:** một tiến trình con chạy `verify` của item (shell, trong `cwd` hiện hành).\n- **Afterwards:** verify xanh → item ở `awaiting-approval` mang `headAtReturn`, chờ người duyệt qua cổng `review`/`approve`/`reject` như mọi đề xuất khác (xem spec Runner \"Cổng duyệt PR nội bộ\" — dải `headAtTake→headAtReturn` là nguồn diff của một đề xuất pull-door) — KHÔNG sinh settlement ở bước này (settlement thuộc cạnh `→done`); verify đỏ → item ở `blocked`, mang một bản ghi friction verification, đi lại đường `blocked → todo` thường như mọi item đỗ khác."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_6cfb40f6b0796d53b8fa927a862e67ce"
+}
+```
+
+## Entry claim_a80bb774c7d1a17e08befd309803e0a2
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_a80bb774c7d1a17e08befd309803e0a2",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_a80bb774c7d1a17e08befd309803e0a2",
+    "sourceUnitDigest": "3b409a02d049a208",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-84",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the rebuild verb section (source lines 1110-1112) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-84 of spec.md under the rebuild verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1110-1112 to spec.md#unheaded-block-84 under 'Rebuild Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (seeded sample)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "3b409a02d049a208d8dd89ec1517d283d06682dcd37aa9ae30e9ebd3028db7e4",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Rebuild Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_a80bb774c7d1a17e08befd309803e0a2",
+    "sourceUnitDigest": "3b409a02d049a208",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-84",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the rebuild verb section (source lines 1141-1143) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-84 of spec.md under the rebuild verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "3b409a02d049a208d8dd89ec1517d283d06682dcd37aa9ae30e9ebd3028db7e4",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Rebuild Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "60b17f35d6a0b5e72c75fd201f1cfd7136c8cc42212ae07227c1026093fcd244",
+    "identityFingerprint": "60b17f35d6a0b5e72c75fd201f1cfd7136c8cc42212ae07227c1026093fcd244",
+    "claimId": "claim_a80bb774c7d1a17e08befd309803e0a2",
+    "sourceAnchor": "unheaded-block-97",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3b409a02d049a208d8dd89ec1517d283d06682dcd37aa9ae30e9ebd3028db7e4",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-97",
+      "githubAnchor": "unheaded-block-97",
+      "stableAnchor": "unheaded-block-97",
+      "title": "Unheaded block 97",
+      "startLine": 1141,
+      "endLine": 1143,
+      "textDigest": "3b409a02d049a208d8dd89ec1517d283d06682dcd37aa9ae30e9ebd3028db7e4",
+      "sample": "- **Runs when:** người/agent gọi, đặc biệt khi bản chiếu mất hoặc nghi lệch so với nhật ký.\n- **What changes:** bản chiếu được dựng lại từ zero bằng phát lại toàn bộ nhật ký — kết ",
+      "identityFingerprint": "60b17f35d6a0b5e72c75fd201f1cfd7136c8cc42212ae07227c1026093fcd244",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Dựng lại (rebuild) — thao tác phục hồi"
+      ],
+      "text": "- **Runs when:** người/agent gọi, đặc biệt khi bản chiếu mất hoặc nghi lệch so với nhật ký.\n- **What changes:** bản chiếu được dựng lại từ zero bằng phát lại toàn bộ nhật ký — kết quả giống hệt bản chiếu trước đó (đã chứng minh bằng test đầu-cuối chạy lệnh thật: xóa bản chiếu → rebuild → so sánh sâu bằng nhau).\n- **On failure:** nhật ký có dòng cuối dở dang (đứt giữa chừng khi ghi) → báo `corrupt-log` (mã 5) nói rõ lỗi, phần nguyên vẹn phía trước vẫn đọc được; hỏng ở GIỮA nhật ký là lỗi cứng, không tự sửa, không nuốt."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-84",
+    "githubAnchor": "unheaded-block-84",
+    "stableAnchor": "unheaded-block-84",
+    "title": "Unheaded block 84",
+    "startLine": 991,
+    "endLine": 993,
+    "textDigest": "3b409a02d049a208d8dd89ec1517d283d06682dcd37aa9ae30e9ebd3028db7e4",
+    "sample": "- **Runs when:** người/agent gọi, đặc biệt khi bản chiếu mất hoặc nghi lệch so với nhật ký.\n- **What changes:** bản chiếu được dựng lại từ zero bằng phát lại toàn bộ nhật ký — kết ",
+    "identityFingerprint": "60b17f35d6a0b5e72c75fd201f1cfd7136c8cc42212ae07227c1026093fcd244",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Rebuild Verb"
+    ],
+    "text": "- **Runs when:** người/agent gọi, đặc biệt khi bản chiếu mất hoặc nghi lệch so với nhật ký.\n- **What changes:** bản chiếu được dựng lại từ zero bằng phát lại toàn bộ nhật ký — kết quả giống hệt bản chiếu trước đó (đã chứng minh bằng test đầu-cuối chạy lệnh thật: xóa bản chiếu → rebuild → so sánh sâu bằng nhau).\n- **On failure:** nhật ký có dòng cuối dở dang (đứt giữa chừng khi ghi) → báo `corrupt-log` (mã 5) nói rõ lỗi, phần nguyên vẹn phía trước vẫn đọc được; hỏng ở GIỮA nhật ký là lỗi cứng, không tự sửa, không nuốt."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-84",
+      "githubAnchor": "unheaded-block-84",
+      "stableAnchor": "unheaded-block-84",
+      "title": "Unheaded block 84",
+      "startLine": 991,
+      "endLine": 993,
+      "textDigest": "3b409a02d049a208d8dd89ec1517d283d06682dcd37aa9ae30e9ebd3028db7e4",
+      "sample": "- **Runs when:** người/agent gọi, đặc biệt khi bản chiếu mất hoặc nghi lệch so với nhật ký.\n- **What changes:** bản chiếu được dựng lại từ zero bằng phát lại toàn bộ nhật ký — kết ",
+      "identityFingerprint": "60b17f35d6a0b5e72c75fd201f1cfd7136c8cc42212ae07227c1026093fcd244",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Rebuild Verb"
+      ],
+      "text": "- **Runs when:** người/agent gọi, đặc biệt khi bản chiếu mất hoặc nghi lệch so với nhật ký.\n- **What changes:** bản chiếu được dựng lại từ zero bằng phát lại toàn bộ nhật ký — kết quả giống hệt bản chiếu trước đó (đã chứng minh bằng test đầu-cuối chạy lệnh thật: xóa bản chiếu → rebuild → so sánh sâu bằng nhau).\n- **On failure:** nhật ký có dòng cuối dở dang (đứt giữa chừng khi ghi) → báo `corrupt-log` (mã 5) nói rõ lỗi, phần nguyên vẹn phía trước vẫn đọc được; hỏng ở GIỮA nhật ký là lỗi cứng, không tự sửa, không nuốt."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_a80bb774c7d1a17e08befd309803e0a2"
+}
+```
+
+## Entry claim_0a1c2b6c0eabf83074bb042b962024d7
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_0a1c2b6c0eabf83074bb042b962024d7",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_0a1c2b6c0eabf83074bb042b962024d7",
+    "sourceUnitDigest": "47f8d1203550fbf1",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-85",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the list and ready verb section (source lines 1116-1118) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-85 of spec.md under the list and ready verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1116-1118 to spec.md#unheaded-block-85 under 'List And Ready Verbs': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "47f8d1203550fbf1cf157dc6f4b44f5dad48385f62994bb16a1834ad21e5b8a0",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "List And Ready Verbs"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_0a1c2b6c0eabf83074bb042b962024d7",
+    "sourceUnitDigest": "47f8d1203550fbf1",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-85",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the list and ready verb section (source lines 1147-1149) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-85 of spec.md under the list and ready verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "47f8d1203550fbf1cf157dc6f4b44f5dad48385f62994bb16a1834ad21e5b8a0",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "List And Ready Verbs"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "6d04e217ce25a71bd8f25f42d4fcbd4bb4f4deab5329b04afe4ed2504675f202",
+    "identityFingerprint": "6d04e217ce25a71bd8f25f42d4fcbd4bb4f4deab5329b04afe4ed2504675f202",
+    "claimId": "claim_0a1c2b6c0eabf83074bb042b962024d7",
+    "sourceAnchor": "unheaded-block-98",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "47f8d1203550fbf1cf157dc6f4b44f5dad48385f62994bb16a1834ad21e5b8a0",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-98",
+      "githubAnchor": "unheaded-block-98",
+      "stableAnchor": "unheaded-block-98",
+      "title": "Unheaded block 98",
+      "startLine": 1147,
+      "endLine": 1149,
+      "textDigest": "47f8d1203550fbf1cf157dc6f4b44f5dad48385f62994bb16a1834ad21e5b8a0",
+      "sample": "- **Blocked when:** nhật ký hỏng → `corrupt-log` (mã 5). Đọc không bao giờ ghi gì — chạy bao nhiêu lần nhật ký cũng không đổi một byte (có test so byte khóa).\n- **ready:** trả danh",
+      "identityFingerprint": "6d04e217ce25a71bd8f25f42d4fcbd4bb4f4deab5329b04afe4ed2504675f202",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Đọc (list / ready)"
+      ],
+      "text": "- **Blocked when:** nhật ký hỏng → `corrupt-log` (mã 5). Đọc không bao giờ ghi gì — chạy bao nhiêu lần nhật ký cũng không đổi một byte (có test so byte khóa).\n- **ready:** trả danh sách việc sẵn-sàng dẫn xuất từ trạng thái (`todo` + mọi dep đã ngã-ngũ thật, tức từ `delivered` trở đi hoặc đã hủy + đang ở stage `executing` + không còn hậu duệ dang dở qua `parent`; dep đang `awaiting-approval`/`doing`/`blocked`/`awaiting-human` KHÔNG mở việc phụ thuộc), thứ tự đúng thứ tự khai việc; kho chưa khởi tạo → danh sách rỗng, thành công. Đầu ra máy-đọc-được. Item `awaiting-human` không lọt vào tập này vì chỉ trạng thái `todo` mới sẵn-sàng — cổng chờ-người được loại \"miễn phí\" bởi chính bộ lọc trạng thái, và một item có dep đang chờ-người cũng không được mở. Item còn ở stage `discovery`/`exploring`/`planning` cũng không lọt vào tập này dù status là `todo` — \"sẵn sàng\" nghĩa là đã qua cả context-discovery lẫn chia-việc, không chỉ đã hết dep. Một item gốc còn hậu duệ dang dở cũng không lọt vào tập này dù bản thân nó `todo`+`executing` — lineage (`parent`) là một chiều lọc riêng, tách khỏi `deps`.\n- **Thứ tự sẵn-sàng là một HỢP ĐỒNG CÓ VERSION (STR43 S4, nâng lên v2 bởi str7-str8-priority-intent).** Thứ tự `ready` trả về là hợp đồng phân-thứ-tự có tên, có số phiên bản — v2 hiện hành: khóa 1 `priority` ASC (Data Dictionary #25, vắng mặt xếp cuối) → khóa 2 `intent` DESC (Data Dictionary #26, vắng mặt xếp cuối) → khóa 3 (tie-break) FIFO theo thứ tự khai việc, chính là toàn bộ khóa của v1. Đây là bề mặt DUY NHẤT quyết định thứ tự cầm-giao việc; sort ổn định (`Array.prototype.sort`) nên một view mà không item nào mang `priority`/`intent` cho kết quả BYTE-GIỐNG-HỆT v1 — v2 không đổi hành vi của bất kỳ nhật ký nào chưa từng dùng hai trường mới."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-85",
+    "githubAnchor": "unheaded-block-85",
+    "stableAnchor": "unheaded-block-85",
+    "title": "Unheaded block 85",
+    "startLine": 997,
+    "endLine": 999,
+    "textDigest": "47f8d1203550fbf1cf157dc6f4b44f5dad48385f62994bb16a1834ad21e5b8a0",
+    "sample": "- **Blocked when:** nhật ký hỏng → `corrupt-log` (mã 5). Đọc không bao giờ ghi gì — chạy bao nhiêu lần nhật ký cũng không đổi một byte (có test so byte khóa).\n- **ready:** trả danh",
+    "identityFingerprint": "6d04e217ce25a71bd8f25f42d4fcbd4bb4f4deab5329b04afe4ed2504675f202",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "List And Ready Verbs"
+    ],
+    "text": "- **Blocked when:** nhật ký hỏng → `corrupt-log` (mã 5). Đọc không bao giờ ghi gì — chạy bao nhiêu lần nhật ký cũng không đổi một byte (có test so byte khóa).\n- **ready:** trả danh sách việc sẵn-sàng dẫn xuất từ trạng thái (`todo` + mọi dep đã ngã-ngũ thật, tức từ `delivered` trở đi hoặc đã hủy + đang ở stage `executing` + không còn hậu duệ dang dở qua `parent`; dep đang `awaiting-approval`/`doing`/`blocked`/`awaiting-human` KHÔNG mở việc phụ thuộc), thứ tự đúng thứ tự khai việc; kho chưa khởi tạo → danh sách rỗng, thành công. Đầu ra máy-đọc-được. Item `awaiting-human` không lọt vào tập này vì chỉ trạng thái `todo` mới sẵn-sàng — cổng chờ-người được loại \"miễn phí\" bởi chính bộ lọc trạng thái, và một item có dep đang chờ-người cũng không được mở. Item còn ở stage `discovery`/`exploring`/`planning` cũng không lọt vào tập này dù status là `todo` — \"sẵn sàng\" nghĩa là đã qua cả context-discovery lẫn chia-việc, không chỉ đã hết dep. Một item gốc còn hậu duệ dang dở cũng không lọt vào tập này dù bản thân nó `todo`+`executing` — lineage (`parent`) là một chiều lọc riêng, tách khỏi `deps`.\n- **Thứ tự sẵn-sàng là một HỢP ĐỒNG CÓ VERSION (STR43 S4, nâng lên v2 bởi str7-str8-priority-intent).** Thứ tự `ready` trả về là hợp đồng phân-thứ-tự có tên, có số phiên bản — v2 hiện hành: khóa 1 `priority` ASC (Data Dictionary #25, vắng mặt xếp cuối) → khóa 2 `intent` DESC (Data Dictionary #26, vắng mặt xếp cuối) → khóa 3 (tie-break) FIFO theo thứ tự khai việc, chính là toàn bộ khóa của v1. Đây là bề mặt DUY NHẤT quyết định thứ tự cầm-giao việc; sort ổn định (`Array.prototype.sort`) nên một view mà không item nào mang `priority`/`intent` cho kết quả BYTE-GIỐNG-HỆT v1 — v2 không đổi hành vi của bất kỳ nhật ký nào chưa từng dùng hai trường mới."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-85",
+      "githubAnchor": "unheaded-block-85",
+      "stableAnchor": "unheaded-block-85",
+      "title": "Unheaded block 85",
+      "startLine": 997,
+      "endLine": 999,
+      "textDigest": "47f8d1203550fbf1cf157dc6f4b44f5dad48385f62994bb16a1834ad21e5b8a0",
+      "sample": "- **Blocked when:** nhật ký hỏng → `corrupt-log` (mã 5). Đọc không bao giờ ghi gì — chạy bao nhiêu lần nhật ký cũng không đổi một byte (có test so byte khóa).\n- **ready:** trả danh",
+      "identityFingerprint": "6d04e217ce25a71bd8f25f42d4fcbd4bb4f4deab5329b04afe4ed2504675f202",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "List And Ready Verbs"
+      ],
+      "text": "- **Blocked when:** nhật ký hỏng → `corrupt-log` (mã 5). Đọc không bao giờ ghi gì — chạy bao nhiêu lần nhật ký cũng không đổi một byte (có test so byte khóa).\n- **ready:** trả danh sách việc sẵn-sàng dẫn xuất từ trạng thái (`todo` + mọi dep đã ngã-ngũ thật, tức từ `delivered` trở đi hoặc đã hủy + đang ở stage `executing` + không còn hậu duệ dang dở qua `parent`; dep đang `awaiting-approval`/`doing`/`blocked`/`awaiting-human` KHÔNG mở việc phụ thuộc), thứ tự đúng thứ tự khai việc; kho chưa khởi tạo → danh sách rỗng, thành công. Đầu ra máy-đọc-được. Item `awaiting-human` không lọt vào tập này vì chỉ trạng thái `todo` mới sẵn-sàng — cổng chờ-người được loại \"miễn phí\" bởi chính bộ lọc trạng thái, và một item có dep đang chờ-người cũng không được mở. Item còn ở stage `discovery`/`exploring`/`planning` cũng không lọt vào tập này dù status là `todo` — \"sẵn sàng\" nghĩa là đã qua cả context-discovery lẫn chia-việc, không chỉ đã hết dep. Một item gốc còn hậu duệ dang dở cũng không lọt vào tập này dù bản thân nó `todo`+`executing` — lineage (`parent`) là một chiều lọc riêng, tách khỏi `deps`.\n- **Thứ tự sẵn-sàng là một HỢP ĐỒNG CÓ VERSION (STR43 S4, nâng lên v2 bởi str7-str8-priority-intent).** Thứ tự `ready` trả về là hợp đồng phân-thứ-tự có tên, có số phiên bản — v2 hiện hành: khóa 1 `priority` ASC (Data Dictionary #25, vắng mặt xếp cuối) → khóa 2 `intent` DESC (Data Dictionary #26, vắng mặt xếp cuối) → khóa 3 (tie-break) FIFO theo thứ tự khai việc, chính là toàn bộ khóa của v1. Đây là bề mặt DUY NHẤT quyết định thứ tự cầm-giao việc; sort ổn định (`Array.prototype.sort`) nên một view mà không item nào mang `priority`/`intent` cho kết quả BYTE-GIỐNG-HỆT v1 — v2 không đổi hành vi của bất kỳ nhật ký nào chưa từng dùng hai trường mới."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_0a1c2b6c0eabf83074bb042b962024d7"
+}
+```
+
+## Entry claim_27804afda28daba4d5a2f2b2c5593294
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_27804afda28daba4d5a2f2b2c5593294",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_27804afda28daba4d5a2f2b2c5593294",
+    "sourceUnitDigest": "6070f51f4128ebf3",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-86",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the graph verb section (source lines 1122-1122) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-86 of spec.md under the graph verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1122-1122 to spec.md#unheaded-block-86 under 'Graph Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (seeded sample)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "6070f51f4128ebf3bdcc18334e1a4ecb281d516142e341777e411b91bb7eaf61",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Graph Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_27804afda28daba4d5a2f2b2c5593294",
+    "sourceUnitDigest": "6070f51f4128ebf3",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-86",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the graph verb section (source lines 1153-1153) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-86 of spec.md under the graph verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "6070f51f4128ebf3bdcc18334e1a4ecb281d516142e341777e411b91bb7eaf61",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Graph Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "8b8cda0eeb567133b8df9c67aee97891304aa966999406ed436e9481952be512",
+    "identityFingerprint": "8b8cda0eeb567133b8df9c67aee97891304aa966999406ed436e9481952be512",
+    "claimId": "claim_27804afda28daba4d5a2f2b2c5593294",
+    "sourceAnchor": "unheaded-block-99",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6070f51f4128ebf3bdcc18334e1a4ecb281d516142e341777e411b91bb7eaf61",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-99",
+      "githubAnchor": "unheaded-block-99",
+      "stableAnchor": "unheaded-block-99",
+      "title": "Unheaded block 99",
+      "startLine": 1153,
+      "endLine": 1153,
+      "textDigest": "6070f51f4128ebf3bdcc18334e1a4ecb281d516142e341777e411b91bb7eaf61",
+      "sample": "Một verb đọc-thuần trả **metrics CƠ HỌC** của đồ thị công việc, fold từ nhật ký, qua envelope CTR001. Không bao giờ ghi, không bao giờ gọi model — chỉ tính SỰ THẬT đồ thị cho một b",
+      "identityFingerprint": "8b8cda0eeb567133b8df9c67aee97891304aa966999406ed436e9481952be512",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Đọc metrics đồ thị (graph) — bề mặt đọc-thuần STR43"
+      ],
+      "text": "Một verb đọc-thuần trả **metrics CƠ HỌC** của đồ thị công việc, fold từ nhật ký, qua envelope CTR001. Không bao giờ ghi, không bao giờ gọi model — chỉ tính SỰ THẬT đồ thị cho một bên đọc (picker STR7, planner-brain STR8) dùng làm đầu vào, thay vì tự suy lại topology (stance RUL42 (runner spec — picker cơ học vĩnh viễn, trí tuệ vào hệ qua field trên item)). Mọi số liệu deterministic (cùng nhật ký → cùng kết quả → `data_hash` ổn định)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-86",
+    "githubAnchor": "unheaded-block-86",
+    "stableAnchor": "unheaded-block-86",
+    "title": "Unheaded block 86",
+    "startLine": 1003,
+    "endLine": 1003,
+    "textDigest": "6070f51f4128ebf3bdcc18334e1a4ecb281d516142e341777e411b91bb7eaf61",
+    "sample": "Một verb đọc-thuần trả **metrics CƠ HỌC** của đồ thị công việc, fold từ nhật ký, qua envelope CTR001. Không bao giờ ghi, không bao giờ gọi model — chỉ tính SỰ THẬT đồ thị cho một b",
+    "identityFingerprint": "8b8cda0eeb567133b8df9c67aee97891304aa966999406ed436e9481952be512",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Graph Verb"
+    ],
+    "text": "Một verb đọc-thuần trả **metrics CƠ HỌC** của đồ thị công việc, fold từ nhật ký, qua envelope CTR001. Không bao giờ ghi, không bao giờ gọi model — chỉ tính SỰ THẬT đồ thị cho một bên đọc (picker STR7, planner-brain STR8) dùng làm đầu vào, thay vì tự suy lại topology (stance RUL42 (runner spec — picker cơ học vĩnh viễn, trí tuệ vào hệ qua field trên item)). Mọi số liệu deterministic (cùng nhật ký → cùng kết quả → `data_hash` ổn định)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-86",
+      "githubAnchor": "unheaded-block-86",
+      "stableAnchor": "unheaded-block-86",
+      "title": "Unheaded block 86",
+      "startLine": 1003,
+      "endLine": 1003,
+      "textDigest": "6070f51f4128ebf3bdcc18334e1a4ecb281d516142e341777e411b91bb7eaf61",
+      "sample": "Một verb đọc-thuần trả **metrics CƠ HỌC** của đồ thị công việc, fold từ nhật ký, qua envelope CTR001. Không bao giờ ghi, không bao giờ gọi model — chỉ tính SỰ THẬT đồ thị cho một b",
+      "identityFingerprint": "8b8cda0eeb567133b8df9c67aee97891304aa966999406ed436e9481952be512",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Graph Verb"
+      ],
+      "text": "Một verb đọc-thuần trả **metrics CƠ HỌC** của đồ thị công việc, fold từ nhật ký, qua envelope CTR001. Không bao giờ ghi, không bao giờ gọi model — chỉ tính SỰ THẬT đồ thị cho một bên đọc (picker STR7, planner-brain STR8) dùng làm đầu vào, thay vì tự suy lại topology (stance RUL42 (runner spec — picker cơ học vĩnh viễn, trí tuệ vào hệ qua field trên item)). Mọi số liệu deterministic (cùng nhật ký → cùng kết quả → `data_hash` ổn định)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_27804afda28daba4d5a2f2b2c5593294"
+}
+```
+
+## Entry claim_82e5b138d21e606463ef458783510a14
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_82e5b138d21e606463ef458783510a14",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_82e5b138d21e606463ef458783510a14",
+    "sourceUnitDigest": "c1a962fe830292f7",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-87",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the graph verb section (source lines 1124-1132) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-87 of spec.md under the graph verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1124-1132 to spec.md#unheaded-block-87 under 'Graph Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "c1a962fe830292f73a80e7dbca5e8d0cf0df5bcb2020de0dbda1439032d85c0c",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Graph Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_82e5b138d21e606463ef458783510a14",
+    "sourceUnitDigest": "c1a962fe830292f7",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-87",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the graph verb section (source lines 1155-1163) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-87 of spec.md under the graph verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "c1a962fe830292f73a80e7dbca5e8d0cf0df5bcb2020de0dbda1439032d85c0c",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Graph Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "ef851b2d0f0033e9f6de7f206992755b2ddbdebdd434cf8ddd7fd60fd366e374",
+    "identityFingerprint": "ef851b2d0f0033e9f6de7f206992755b2ddbdebdd434cf8ddd7fd60fd366e374",
+    "claimId": "claim_82e5b138d21e606463ef458783510a14",
+    "sourceAnchor": "unheaded-block-100",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "c1a962fe830292f73a80e7dbca5e8d0cf0df5bcb2020de0dbda1439032d85c0c",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-100",
+      "githubAnchor": "unheaded-block-100",
+      "stableAnchor": "unheaded-block-100",
+      "title": "Unheaded block 100",
+      "startLine": 1155,
+      "endLine": 1163,
+      "textDigest": "c1a962fe830292f73a80e7dbca5e8d0cf0df5bcb2020de0dbda1439032d85c0c",
+      "sample": "- **Connected-components (mấy mũi song song độc lập):** nhóm các item liên kết qua BẤT KỲ cạnh phụ-thuộc hoặc lineage nào (coi vô hướng) thành từng thành phần. Hai item ở hai thành",
+      "identityFingerprint": "ef851b2d0f0033e9f6de7f206992755b2ddbdebdd434cf8ddd7fd60fd366e374",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Đọc metrics đồ thị (graph) — bề mặt đọc-thuần STR43"
+      ],
+      "text": "- **Connected-components (mấy mũi song song độc lập):** nhóm các item liên kết qua BẤT KỲ cạnh phụ-thuộc hoặc lineage nào (coi vô hướng) thành từng thành phần. Hai item ở hai thành phần khác nhau không chia sẻ dep/lineage → làm song song hoàn toàn được. Item không cạnh nào là một thành phần đơn.\n- **Critical path (đường tới hạn / độ sâu):** chuỗi phụ-thuộc DÀI NHẤT trong đồ thị `deps` (bảo đảm phi-chu-trình ở cửa ghi) — độ dài là số bước tuần tự tối thiểu trước khi item sâu nhất khởi động được.\n- **Stale-blocked (chuỗi kẹt):** các item `todo`/`blocked` còn ≥1 dep chưa `done` (kể cả một dep KHÔNG tồn tại — kẹt vĩnh viễn), kèm danh sách dep đang chặn. Item đã sẵn-sàng (mọi dep done) không liệt kê.\n- **Greedy top-k-unblock (nên làm gì tiếp):** xếp hạng tham-lam dưới-mô-đun các item chưa `done` theo lượng công việc hoàn thành nó sẽ MỞ KHÓA — mỗi lượt chọn item phủ được nhiều hậu-duệ-chưa-done MỚI nhất; báo cả tổng hậu duệ (`unblocks`) lẫn phần mở mới biên (`newlyUnblocks`).\n- **What-if (hoàn thành X → mở khóa gì):** `graph --what-if <id>` trả riêng tác động của một item: tổng hậu-duệ-chưa-done transitive + `newlyReady` (các item phụ thuộc trực-tiếp mà MỌI dep KHÁC đã `done` → hoàn thành X làm chúng thỏa-dep). Là sự thật phụ-thuộc, KHÔNG phải đủ-điều-kiện-frontier (không xét stage/lineage).\n- **Frame (computed/skipped + revision):** mỗi payload metrics kèm một `frame` — `revision` (dấu vân tay view deterministic, S3) để một bên đọc cache theo revision và bỏ qua tính lại khi không đổi; `computed[]`/`skipped[]` nêu metric nào đã chạy: greedy `topUnblock` (metric duy nhất siêu-tuyến-tính) bị BỎ QUA trên đồ thị lớn (quá `maxNodesForGreedy`), giữ đọc luôn có biên.\n- **Blocked when:** như mọi đọc — nhật ký hỏng → `corrupt-log` (mã 5); không bao giờ ghi một byte.\n- Chỉ các id thật (có trong view) được nhóm/tính — một cạnh trỏ tới id không tồn tại (dangling parent/dep) không bao giờ tạo nút ma.\n- **Đầu ra time-relative:** `graph`/`what-if`/components/critical-path là deterministic; chỉ advisory `stale` (dưới) mang thời-gian-thực nên `data_hash` của nó đổi theo thời gian đã trôi — đúng bản chất \"kẹt bao lâu rồi\"."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-87",
+    "githubAnchor": "unheaded-block-87",
+    "stableAnchor": "unheaded-block-87",
+    "title": "Unheaded block 87",
+    "startLine": 1005,
+    "endLine": 1013,
+    "textDigest": "c1a962fe830292f73a80e7dbca5e8d0cf0df5bcb2020de0dbda1439032d85c0c",
+    "sample": "- **Connected-components (mấy mũi song song độc lập):** nhóm các item liên kết qua BẤT KỲ cạnh phụ-thuộc hoặc lineage nào (coi vô hướng) thành từng thành phần. Hai item ở hai thành",
+    "identityFingerprint": "ef851b2d0f0033e9f6de7f206992755b2ddbdebdd434cf8ddd7fd60fd366e374",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Graph Verb"
+    ],
+    "text": "- **Connected-components (mấy mũi song song độc lập):** nhóm các item liên kết qua BẤT KỲ cạnh phụ-thuộc hoặc lineage nào (coi vô hướng) thành từng thành phần. Hai item ở hai thành phần khác nhau không chia sẻ dep/lineage → làm song song hoàn toàn được. Item không cạnh nào là một thành phần đơn.\n- **Critical path (đường tới hạn / độ sâu):** chuỗi phụ-thuộc DÀI NHẤT trong đồ thị `deps` (bảo đảm phi-chu-trình ở cửa ghi) — độ dài là số bước tuần tự tối thiểu trước khi item sâu nhất khởi động được.\n- **Stale-blocked (chuỗi kẹt):** các item `todo`/`blocked` còn ≥1 dep chưa `done` (kể cả một dep KHÔNG tồn tại — kẹt vĩnh viễn), kèm danh sách dep đang chặn. Item đã sẵn-sàng (mọi dep done) không liệt kê.\n- **Greedy top-k-unblock (nên làm gì tiếp):** xếp hạng tham-lam dưới-mô-đun các item chưa `done` theo lượng công việc hoàn thành nó sẽ MỞ KHÓA — mỗi lượt chọn item phủ được nhiều hậu-duệ-chưa-done MỚI nhất; báo cả tổng hậu duệ (`unblocks`) lẫn phần mở mới biên (`newlyUnblocks`).\n- **What-if (hoàn thành X → mở khóa gì):** `graph --what-if <id>` trả riêng tác động của một item: tổng hậu-duệ-chưa-done transitive + `newlyReady` (các item phụ thuộc trực-tiếp mà MỌI dep KHÁC đã `done` → hoàn thành X làm chúng thỏa-dep). Là sự thật phụ-thuộc, KHÔNG phải đủ-điều-kiện-frontier (không xét stage/lineage).\n- **Frame (computed/skipped + revision):** mỗi payload metrics kèm một `frame` — `revision` (dấu vân tay view deterministic, S3) để một bên đọc cache theo revision và bỏ qua tính lại khi không đổi; `computed[]`/`skipped[]` nêu metric nào đã chạy: greedy `topUnblock` (metric duy nhất siêu-tuyến-tính) bị BỎ QUA trên đồ thị lớn (quá `maxNodesForGreedy`), giữ đọc luôn có biên.\n- **Blocked when:** như mọi đọc — nhật ký hỏng → `corrupt-log` (mã 5); không bao giờ ghi một byte.\n- Chỉ các id thật (có trong view) được nhóm/tính — một cạnh trỏ tới id không tồn tại (dangling parent/dep) không bao giờ tạo nút ma.\n- **Đầu ra time-relative:** `graph`/`what-if`/components/critical-path là deterministic; chỉ advisory `stale` (dưới) mang thời-gian-thực nên `data_hash` của nó đổi theo thời gian đã trôi — đúng bản chất \"kẹt bao lâu rồi\"."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-87",
+      "githubAnchor": "unheaded-block-87",
+      "stableAnchor": "unheaded-block-87",
+      "title": "Unheaded block 87",
+      "startLine": 1005,
+      "endLine": 1013,
+      "textDigest": "c1a962fe830292f73a80e7dbca5e8d0cf0df5bcb2020de0dbda1439032d85c0c",
+      "sample": "- **Connected-components (mấy mũi song song độc lập):** nhóm các item liên kết qua BẤT KỲ cạnh phụ-thuộc hoặc lineage nào (coi vô hướng) thành từng thành phần. Hai item ở hai thành",
+      "identityFingerprint": "ef851b2d0f0033e9f6de7f206992755b2ddbdebdd434cf8ddd7fd60fd366e374",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Graph Verb"
+      ],
+      "text": "- **Connected-components (mấy mũi song song độc lập):** nhóm các item liên kết qua BẤT KỲ cạnh phụ-thuộc hoặc lineage nào (coi vô hướng) thành từng thành phần. Hai item ở hai thành phần khác nhau không chia sẻ dep/lineage → làm song song hoàn toàn được. Item không cạnh nào là một thành phần đơn.\n- **Critical path (đường tới hạn / độ sâu):** chuỗi phụ-thuộc DÀI NHẤT trong đồ thị `deps` (bảo đảm phi-chu-trình ở cửa ghi) — độ dài là số bước tuần tự tối thiểu trước khi item sâu nhất khởi động được.\n- **Stale-blocked (chuỗi kẹt):** các item `todo`/`blocked` còn ≥1 dep chưa `done` (kể cả một dep KHÔNG tồn tại — kẹt vĩnh viễn), kèm danh sách dep đang chặn. Item đã sẵn-sàng (mọi dep done) không liệt kê.\n- **Greedy top-k-unblock (nên làm gì tiếp):** xếp hạng tham-lam dưới-mô-đun các item chưa `done` theo lượng công việc hoàn thành nó sẽ MỞ KHÓA — mỗi lượt chọn item phủ được nhiều hậu-duệ-chưa-done MỚI nhất; báo cả tổng hậu duệ (`unblocks`) lẫn phần mở mới biên (`newlyUnblocks`).\n- **What-if (hoàn thành X → mở khóa gì):** `graph --what-if <id>` trả riêng tác động của một item: tổng hậu-duệ-chưa-done transitive + `newlyReady` (các item phụ thuộc trực-tiếp mà MỌI dep KHÁC đã `done` → hoàn thành X làm chúng thỏa-dep). Là sự thật phụ-thuộc, KHÔNG phải đủ-điều-kiện-frontier (không xét stage/lineage).\n- **Frame (computed/skipped + revision):** mỗi payload metrics kèm một `frame` — `revision` (dấu vân tay view deterministic, S3) để một bên đọc cache theo revision và bỏ qua tính lại khi không đổi; `computed[]`/`skipped[]` nêu metric nào đã chạy: greedy `topUnblock` (metric duy nhất siêu-tuyến-tính) bị BỎ QUA trên đồ thị lớn (quá `maxNodesForGreedy`), giữ đọc luôn có biên.\n- **Blocked when:** như mọi đọc — nhật ký hỏng → `corrupt-log` (mã 5); không bao giờ ghi một byte.\n- Chỉ các id thật (có trong view) được nhóm/tính — một cạnh trỏ tới id không tồn tại (dangling parent/dep) không bao giờ tạo nút ma.\n- **Đầu ra time-relative:** `graph`/`what-if`/components/critical-path là deterministic; chỉ advisory `stale` (dưới) mang thời-gian-thực nên `data_hash` của nó đổi theo thời gian đã trôi — đúng bản chất \"kẹt bao lâu rồi\"."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_82e5b138d21e606463ef458783510a14"
+}
+```
+
+## Entry claim_f9746ce25ba57acff13c1e5d7f159f07
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_f9746ce25ba57acff13c1e5d7f159f07",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_f9746ce25ba57acff13c1e5d7f159f07",
+    "sourceUnitDigest": "31897e5272138032",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-88",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the stale verb section (source lines 1136-1136) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-88 of spec.md under the stale verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1136-1136 to spec.md#unheaded-block-88 under 'Stale Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "31897e527213803203f7a7e3fb5b126986d4821eb4c374117f00acf81a38d218",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Stale Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_f9746ce25ba57acff13c1e5d7f159f07",
+    "sourceUnitDigest": "31897e5272138032",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-88",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the stale verb section (source lines 1167-1167) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-88 of spec.md under the stale verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "31897e527213803203f7a7e3fb5b126986d4821eb4c374117f00acf81a38d218",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Stale Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "f71d279927bae42bfbf2208651b97e358961d383fef1678cd8cf718c84ea3943",
+    "identityFingerprint": "f71d279927bae42bfbf2208651b97e358961d383fef1678cd8cf718c84ea3943",
+    "claimId": "claim_f9746ce25ba57acff13c1e5d7f159f07",
+    "sourceAnchor": "unheaded-block-101",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "31897e527213803203f7a7e3fb5b126986d4821eb4c374117f00acf81a38d218",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-101",
+      "githubAnchor": "unheaded-block-101",
+      "stableAnchor": "unheaded-block-101",
+      "title": "Unheaded block 101",
+      "startLine": 1167,
+      "endLine": 1167,
+      "textDigest": "31897e527213803203f7a7e3fb5b126986d4821eb4c374117f00acf81a38d218",
+      "sample": "`stale` phân loại các item đang `doing` là kẹt-hay-không theo NGƯỠNG-THEO-CHỦ, gợi ý — không bao giờ hành động:",
+      "identityFingerprint": "f71d279927bae42bfbf2208651b97e358961d383fef1678cd8cf718c84ea3943",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Cố vấn item kẹt ở `doing` (stale) — đọc-thuần, KHÔNG tự thu hồi (S8)"
+      ],
+      "text": "`stale` phân loại các item đang `doing` là kẹt-hay-không theo NGƯỠNG-THEO-CHỦ, gợi ý — không bao giờ hành động:"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-88",
+    "githubAnchor": "unheaded-block-88",
+    "stableAnchor": "unheaded-block-88",
+    "title": "Unheaded block 88",
+    "startLine": 1017,
+    "endLine": 1017,
+    "textDigest": "31897e527213803203f7a7e3fb5b126986d4821eb4c374117f00acf81a38d218",
+    "sample": "`stale` phân loại các item đang `doing` là kẹt-hay-không theo NGƯỠNG-THEO-CHỦ, gợi ý — không bao giờ hành động:",
+    "identityFingerprint": "f71d279927bae42bfbf2208651b97e358961d383fef1678cd8cf718c84ea3943",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Stale Verb"
+    ],
+    "text": "`stale` phân loại các item đang `doing` là kẹt-hay-không theo NGƯỠNG-THEO-CHỦ, gợi ý — không bao giờ hành động:"
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-88",
+      "githubAnchor": "unheaded-block-88",
+      "stableAnchor": "unheaded-block-88",
+      "title": "Unheaded block 88",
+      "startLine": 1017,
+      "endLine": 1017,
+      "textDigest": "31897e527213803203f7a7e3fb5b126986d4821eb4c374117f00acf81a38d218",
+      "sample": "`stale` phân loại các item đang `doing` là kẹt-hay-không theo NGƯỠNG-THEO-CHỦ, gợi ý — không bao giờ hành động:",
+      "identityFingerprint": "f71d279927bae42bfbf2208651b97e358961d383fef1678cd8cf718c84ea3943",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Stale Verb"
+      ],
+      "text": "`stale` phân loại các item đang `doing` là kẹt-hay-không theo NGƯỠNG-THEO-CHỦ, gợi ý — không bao giờ hành động:"
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_f9746ce25ba57acff13c1e5d7f159f07"
+}
+```
+
+## Entry claim_872c3173f1d52ab7503e3762dc83c091
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_872c3173f1d52ab7503e3762dc83c091",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_872c3173f1d52ab7503e3762dc83c091",
+    "sourceUnitDigest": "6eb3dc776fa680fb",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-89",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the stale verb section (source lines 1138-1140) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-89 of spec.md under the stale verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1138-1140 to spec.md#unheaded-block-89 under 'Stale Verb': source and target text identical by recomputed sha256 on both sides; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (seeded sample)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "6eb3dc776fa680fbcd958d313c4a1a6a7362c13279a59bfaf074d7deb7d510d1",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Stale Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_872c3173f1d52ab7503e3762dc83c091",
+    "sourceUnitDigest": "6eb3dc776fa680fb",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-89",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the stale verb section (source lines 1169-1171) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-89 of spec.md under the stale verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "6eb3dc776fa680fbcd958d313c4a1a6a7362c13279a59bfaf074d7deb7d510d1",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Stale Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "a95c111c747fb7a24952133a69d18c4cf31ec20993f7d0ba406d6ae9528978b8",
+    "identityFingerprint": "a95c111c747fb7a24952133a69d18c4cf31ec20993f7d0ba406d6ae9528978b8",
+    "claimId": "claim_872c3173f1d52ab7503e3762dc83c091",
+    "sourceAnchor": "unheaded-block-102",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6eb3dc776fa680fbcd958d313c4a1a6a7362c13279a59bfaf074d7deb7d510d1",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-102",
+      "githubAnchor": "unheaded-block-102",
+      "stableAnchor": "unheaded-block-102",
+      "title": "Unheaded block 102",
+      "startLine": 1169,
+      "endLine": 1171,
+      "textDigest": "6eb3dc776fa680fbcd958d313c4a1a6a7362c13279a59bfaf074d7deb7d510d1",
+      "sample": "- **Ngưỡng theo chủ (người ≫ agent):** claim của `runner` là claim AGENT (ân hạn ngắn, mặc định 15 phút); claim của `human`/`session`/khác là claim NGƯỜI (ân hạn dài, mặc định 24 g",
+      "identityFingerprint": "a95c111c747fb7a24952133a69d18c4cf31ec20993f7d0ba406d6ae9528978b8",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Cố vấn item kẹt ở `doing` (stale) — đọc-thuần, KHÔNG tự thu hồi (S8)"
+      ],
+      "text": "- **Ngưỡng theo chủ (người ≫ agent):** claim của `runner` là claim AGENT (ân hạn ngắn, mặc định 15 phút); claim của `human`/`session`/khác là claim NGƯỜI (ân hạn dài, mặc định 24 giờ). Cùng một tuổi claim có thể kẹt với agent mà chưa kẹt với người. Ngưỡng ghi đè được.\n- Chỉ liệt kê item kẹt, kèm `ageMs`/`thresholdMs`/`suggestion`. **Gợi ý không bao giờ mô tả thu-hồi tự-động** — đúng luật đã khóa: reap của runner chỉ thu hồi claim của CHÍNH nó khi crash, không bao giờ thu hồi claim của một người. Đây là bên cố-vấn: phân loại + gợi ý, người quyết.\n- Item không tìm được thời-điểm-claim bị bỏ qua (không bao giờ tuổi NaN)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-89",
+    "githubAnchor": "unheaded-block-89",
+    "stableAnchor": "unheaded-block-89",
+    "title": "Unheaded block 89",
+    "startLine": 1019,
+    "endLine": 1021,
+    "textDigest": "6eb3dc776fa680fbcd958d313c4a1a6a7362c13279a59bfaf074d7deb7d510d1",
+    "sample": "- **Ngưỡng theo chủ (người ≫ agent):** claim của `runner` là claim AGENT (ân hạn ngắn, mặc định 15 phút); claim của `human`/`session`/khác là claim NGƯỜI (ân hạn dài, mặc định 24 g",
+    "identityFingerprint": "a95c111c747fb7a24952133a69d18c4cf31ec20993f7d0ba406d6ae9528978b8",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Stale Verb"
+    ],
+    "text": "- **Ngưỡng theo chủ (người ≫ agent):** claim của `runner` là claim AGENT (ân hạn ngắn, mặc định 15 phút); claim của `human`/`session`/khác là claim NGƯỜI (ân hạn dài, mặc định 24 giờ). Cùng một tuổi claim có thể kẹt với agent mà chưa kẹt với người. Ngưỡng ghi đè được.\n- Chỉ liệt kê item kẹt, kèm `ageMs`/`thresholdMs`/`suggestion`. **Gợi ý không bao giờ mô tả thu-hồi tự-động** — đúng luật đã khóa: reap của runner chỉ thu hồi claim của CHÍNH nó khi crash, không bao giờ thu hồi claim của một người. Đây là bên cố-vấn: phân loại + gợi ý, người quyết.\n- Item không tìm được thời-điểm-claim bị bỏ qua (không bao giờ tuổi NaN)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-89",
+      "githubAnchor": "unheaded-block-89",
+      "stableAnchor": "unheaded-block-89",
+      "title": "Unheaded block 89",
+      "startLine": 1019,
+      "endLine": 1021,
+      "textDigest": "6eb3dc776fa680fbcd958d313c4a1a6a7362c13279a59bfaf074d7deb7d510d1",
+      "sample": "- **Ngưỡng theo chủ (người ≫ agent):** claim của `runner` là claim AGENT (ân hạn ngắn, mặc định 15 phút); claim của `human`/`session`/khác là claim NGƯỜI (ân hạn dài, mặc định 24 g",
+      "identityFingerprint": "a95c111c747fb7a24952133a69d18c4cf31ec20993f7d0ba406d6ae9528978b8",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Stale Verb"
+      ],
+      "text": "- **Ngưỡng theo chủ (người ≫ agent):** claim của `runner` là claim AGENT (ân hạn ngắn, mặc định 15 phút); claim của `human`/`session`/khác là claim NGƯỜI (ân hạn dài, mặc định 24 giờ). Cùng một tuổi claim có thể kẹt với agent mà chưa kẹt với người. Ngưỡng ghi đè được.\n- Chỉ liệt kê item kẹt, kèm `ageMs`/`thresholdMs`/`suggestion`. **Gợi ý không bao giờ mô tả thu-hồi tự-động** — đúng luật đã khóa: reap của runner chỉ thu hồi claim của CHÍNH nó khi crash, không bao giờ thu hồi claim của một người. Đây là bên cố-vấn: phân loại + gợi ý, người quyết.\n- Item không tìm được thời-điểm-claim bị bỏ qua (không bao giờ tuổi NaN)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_872c3173f1d52ab7503e3762dc83c091"
+}
+```
+
+## Entry claim_90c314f669a8c8a6e06c8c114d5e8232
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_90c314f669a8c8a6e06c8c114d5e8232",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_90c314f669a8c8a6e06c8c114d5e8232",
+    "sourceUnitDigest": "3694cfa1568e58a1",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-90",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the conflicts verb section (source lines 1144-1144) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-90 of spec.md under the conflicts verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: block src lines 1144-1144 to spec.md#unheaded-block-90 under 'Conflicts Verb': source and target text identical by recomputed sha256 on both sides, hand-recomputed from file lines; rationale line range matches the source unit, ancestry equal, target unit and ancestry unchanged vs resume tree (read in full after the rework threshold was crossed)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "3694cfa1568e58a1b3fb4fa4e447f9cf23a953e2b2eb9dd8809a42c78c85204e",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Conflicts Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_90c314f669a8c8a6e06c8c114d5e8232",
+    "sourceUnitDigest": "3694cfa1568e58a1",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-90",
+    "claimKind": "specification",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Body of the conflicts verb section (source lines 1175-1175) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-90 of spec.md under the conflicts verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "3694cfa1568e58a1b3fb4fa4e447f9cf23a953e2b2eb9dd8809a42c78c85204e",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Conflicts Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "7c9c6fe24392551fb1634b33bac88c02f3f66a39187b7eb39eee3acd947fc07e",
+    "identityFingerprint": "7c9c6fe24392551fb1634b33bac88c02f3f66a39187b7eb39eee3acd947fc07e",
+    "claimId": "claim_90c314f669a8c8a6e06c8c114d5e8232",
+    "sourceAnchor": "unheaded-block-103",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3694cfa1568e58a1b3fb4fa4e447f9cf23a953e2b2eb9dd8809a42c78c85204e",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-103",
+      "githubAnchor": "unheaded-block-103",
+      "stableAnchor": "unheaded-block-103",
+      "title": "Unheaded block 103",
+      "startLine": 1175,
+      "endLine": 1175,
+      "textDigest": "3694cfa1568e58a1b3fb4fa4e447f9cf23a953e2b2eb9dd8809a42c78c85204e",
+      "sample": "`conflicts` tìm rủi ro đụng-độ-file giữa các item CÓ THỂ giao SONG SONG. Tập ứng viên là frontier (`ready` = item giao được ngay bây giờ), nên mỗi xung đột là thật: một runner song",
+      "identityFingerprint": "7c9c6fe24392551fb1634b33bac88c02f3f66a39187b7eb39eee3acd947fc07e",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Cố vấn xung đột dấu chân file (conflicts) — chống đụng độ fan-out song song (S9)"
+      ],
+      "text": "`conflicts` tìm rủi ro đụng-độ-file giữa các item CÓ THỂ giao SONG SONG. Tập ứng viên là frontier (`ready` = item giao được ngay bây giờ), nên mỗi xung đột là thật: một runner song song có thể nhặt cả hai cùng lúc."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-90",
+    "githubAnchor": "unheaded-block-90",
+    "stableAnchor": "unheaded-block-90",
+    "title": "Unheaded block 90",
+    "startLine": 1025,
+    "endLine": 1025,
+    "textDigest": "3694cfa1568e58a1b3fb4fa4e447f9cf23a953e2b2eb9dd8809a42c78c85204e",
+    "sample": "`conflicts` tìm rủi ro đụng-độ-file giữa các item CÓ THỂ giao SONG SONG. Tập ứng viên là frontier (`ready` = item giao được ngay bây giờ), nên mỗi xung đột là thật: một runner song",
+    "identityFingerprint": "7c9c6fe24392551fb1634b33bac88c02f3f66a39187b7eb39eee3acd947fc07e",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Conflicts Verb"
+    ],
+    "text": "`conflicts` tìm rủi ro đụng-độ-file giữa các item CÓ THỂ giao SONG SONG. Tập ứng viên là frontier (`ready` = item giao được ngay bây giờ), nên mỗi xung đột là thật: một runner song song có thể nhặt cả hai cùng lúc."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-90",
+      "githubAnchor": "unheaded-block-90",
+      "stableAnchor": "unheaded-block-90",
+      "title": "Unheaded block 90",
+      "startLine": 1025,
+      "endLine": 1025,
+      "textDigest": "3694cfa1568e58a1b3fb4fa4e447f9cf23a953e2b2eb9dd8809a42c78c85204e",
+      "sample": "`conflicts` tìm rủi ro đụng-độ-file giữa các item CÓ THỂ giao SONG SONG. Tập ứng viên là frontier (`ready` = item giao được ngay bây giờ), nên mỗi xung đột là thật: một runner song",
+      "identityFingerprint": "7c9c6fe24392551fb1634b33bac88c02f3f66a39187b7eb39eee3acd947fc07e",
+      "ancestry": [
+        "Work State Specification",
+        "9. Behaviors And Operations",
+        "Conflicts Verb"
+      ],
+      "text": "`conflicts` tìm rủi ro đụng-độ-file giữa các item CÓ THỂ giao SONG SONG. Tập ứng viên là frontier (`ready` = item giao được ngay bây giờ), nên mỗi xung đột là thật: một runner song song có thể nhặt cả hai cùng lúc."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_90c314f669a8c8a6e06c8c114d5e8232"
+}
+```
+
+## Entry claim_2636bbab8d7aeb5e65b5a30fa56de8a9
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_2636bbab8d7aeb5e65b5a30fa56de8a9",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_2636bbab8d7aeb5e65b5a30fa56de8a9",
+    "sourceUnitDigest": "27a3ba1515c8ffa4",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-91",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "rationale": "Body of the conflicts verb section (source lines 1146-1147) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-91 of spec.md under the conflicts verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
+    "authoredBy": "codex-session:21@2026-10-14",
+    "reviewNote": "deep: footprint block, source text equals the resume-tree target byte for byte before correction (digest 27a3ba15) and the new target differs only by the one corrected first-bullet sentence, which I verified true. Supersede is right; digests recomputed match the shard, ancestry equal under Conflicts Verb.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-14",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Conflicts Verb"
+    ],
+    "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+  },
+  "currentDecision": {
+    "claimId": "claim_2636bbab8d7aeb5e65b5a30fa56de8a9",
+    "sourceUnitDigest": "27a3ba1515c8ffa4",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-91",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "rationale": "Body of the conflicts verb section (source lines 1177-1178) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-91 of spec.md under the conflicts verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Conflicts Verb"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "c7b63fff38b0c31a31d873c3a29486c06a9be2d2ef1d42bbb3f5e15a6f892ae9",
+    "identityFingerprint": "c7b63fff38b0c31a31d873c3a29486c06a9be2d2ef1d42bbb3f5e15a6f892ae9",
+    "claimId": "claim_2636bbab8d7aeb5e65b5a30fa56de8a9",
+    "sourceAnchor": "unheaded-block-104",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "27a3ba1515c8ffa4c6db8e9123168b72f583293dd0d4904824848c7187fe2bf1",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-104",
+      "githubAnchor": "unheaded-block-104",
+      "stableAnchor": "unheaded-block-104",
+      "title": "Unheaded block 104",
+      "startLine": 1177,
+      "endLine": 1178,
+      "textDigest": "27a3ba1515c8ffa4c6db8e9123168b72f583293dd0d4904824848c7187fe2bf1",
+      "sample": "- Mỗi item có thể khai một **`footprint`** — danh sách đường-dẫn file nó dự kiến chạm (`add --footprint a,b`). Trường phụ TÙY CHỌN, cưỡi SCHEMA_VERSION lúc bằng 2 tại thời điểm nó ",
+      "identityFingerprint": "c7b63fff38b0c31a31d873c3a29486c06a9be2d2ef1d42bbb3f5e15a6f892ae9",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Behaviors & Operations",
+        "Cố vấn xung đột dấu chân file (conflicts) — chống đụng độ fan-out song song (S9)"
+      ],
+      "text": "- Mỗi item có thể khai một **`footprint`** — danh sách đường-dẫn file nó dự kiến chạm (`add --footprint a,b`). Trường phụ TÙY CHỌN, cưỡi SCHEMA_VERSION lúc bằng 2 tại thời điểm nó được thêm vào (SCHEMA_VERSION hiện hành nay là 3, per str46-io-contract), vắng-khi-không-khai; là nội dung cụ thể cho hai trường CTR003 có-tên-mà-rỗng (`forbidden_paths`/`required_outputs`). PHI-CHẶN: chỉ nuôi cố-vấn này, không vào cycle-check/frontier.\n- Mỗi cặp ready chia sẻ ≥1 đường-dẫn footprint được nêu kèm đường-dẫn chung + **lựa chọn giải quyết** `sequence`/`hoist`/`re-slice`. Bên cố-vấn CHỈ gợi ý — không bao giờ tự re-slice hay sửa deps. Item không khai footprint không bao giờ xung đột."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-91",
+    "githubAnchor": "unheaded-block-91",
+    "stableAnchor": "unheaded-block-91",
+    "title": "Unheaded block 91",
+    "startLine": 1027,
+    "endLine": 1028,
+    "textDigest": "c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400",
+    "sample": "- Mỗi item có thể khai một **`footprint`** — danh sách đường-dẫn file nó dự kiến chạm (`add --footprint a,b`). Trường phụ TÙY CHỌN, cưỡi SCHEMA_VERSION lúc bằng 2 tại thời điểm nó ",
+    "identityFingerprint": "906e9c30381d772ab056c03f45bef876cc118bfea3ec1fb849b750a071a91d96",
+    "ancestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Conflicts Verb"
+    ],
+    "text": "- Mỗi item có thể khai một **`footprint`** — danh sách đường-dẫn file nó dự kiến chạm (`add --footprint a,b`). Trường phụ TÙY CHỌN, cưỡi SCHEMA_VERSION lúc bằng 2 tại thời điểm nó được thêm vào (SCHEMA_VERSION hiện hành nay là 3, per str46-io-contract), vắng-khi-không-khai; là nội dung cụ thể cho hai trường CTR003 có-tên-mà-rỗng (`forbidden_paths`/`required_outputs`). Không vào cycle-check/frontier; footprint còn chặn đề xuất chia có overlap bằng cổng `awaiting-human`, xếp các item xung đột vào wave khác nhau trong `computeSchedule`, và cung cấp tín hiệu cho `mergeReadiness`.\n- Mỗi cặp ready chia sẻ ≥1 đường-dẫn footprint được nêu kèm đường-dẫn chung + **lựa chọn giải quyết** `sequence`/`hoist`/`re-slice`. Bên cố-vấn CHỈ gợi ý — không bao giờ tự re-slice hay sửa deps. Item không khai footprint không bao giờ xung đột."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_2636bbab8d7aeb5e65b5a30fa56de8a9"
+}
+```
+
+## Entry claim_6dfbaa59a2f49bc668d9729fed01878a
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "claims",
+  "claimId": "claim_6dfbaa59a2f49bc668d9729fed01878a",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_6dfbaa59a2f49bc668d9729fed01878a",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "sourceUnitDigest": "8b3e099723160029",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-14",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Four-field envelope description is stated in both sources; candidate carries the work-state block (this one) plus the io-contract block (lines 49-60 of io) under Envelope Shape, nothing dropped. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Caller Role"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_6dfbaa59a2f49bc668d9729fed01878a",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "sourceUnitDigest": "8b3e099723160029",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-15",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Four-field envelope description is stated in both sources; candidate carries the work-state block (this one) plus the io-contract block (lines 49-60 of io) under Envelope Shape, nothing dropped. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-14 (8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4) to unheaded-block-15 (8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4); inserted paragraphs shift the anchor, prior target text is unchanged.",
+    "targetUnitDigest": "8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "9b12e65fe917f22123f6e96d3bfcf4332c1f8a0d3957624aa853e17ac283ca12",
+    "identityFingerprint": "9b12e65fe917f22123f6e96d3bfcf4332c1f8a0d3957624aa853e17ac283ca12",
+    "claimId": "claim_6dfbaa59a2f49bc668d9729fed01878a",
+    "sourceAnchor": "unheaded-block-63",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-63",
+      "githubAnchor": "unheaded-block-63",
+      "stableAnchor": "unheaded-block-63",
+      "title": "Unheaded block 63",
+      "startLine": 624,
+      "endLine": 634,
+      "textDigest": "8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4",
+      "sample": "**Mọi verb** đều in kết quả thành công bọc trong một phong bì chuẩn duy nhất\nthay vì in thẳng dữ liệu hay câu chữ cho người. Phong bì có bốn trường:\n`contract` (tên+phiên bản chuẩn",
+      "identityFingerprint": "9b12e65fe917f22123f6e96d3bfcf4332c1f8a0d3957624aa853e17ac283ca12",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Data Dictionary",
+        "Phong bì output (envelope) — chuẩn máy-đọc của MỌI verb (per D b2d18cc7, b0da87aa)"
+      ],
+      "text": "**Mọi verb** đều in kết quả thành công bọc trong một phong bì chuẩn duy nhất\nthay vì in thẳng dữ liệu hay câu chữ cho người. Phong bì có bốn trường:\n`contract` (tên+phiên bản chuẩn phong bì), `generated_at` (thời điểm in),\n`data_hash` (dấu vân tay của dữ liệu — bên đọc biết dữ liệu đổi chưa mà không\ncần so từng trường), và `data` (dữ liệu thật của verb đó). Dữ liệu trong `data`\nlà **có cấu trúc** (các trường tên rõ nghĩa), không phải câu xác nhận cho người:\nverb đọc (`list`/`ready`/`check`/…) trả thẳng đối tượng kết quả; verb ghi trả\nđúng những trường nó vừa đổi (ví dụ chuyển trạng thái trả `{id, from, to, seq}`)\n— nhờ vậy một surface bất kỳ đọc kết quả bằng MỘT bộ đọc chung, không phải dò\nregex trên chữ. Phong bì được đóng tại **một cửa in duy nhất**, nên không verb\nnào lọt lưới và không có hai cách in khác nhau."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-15",
+    "githubAnchor": "unheaded-block-15",
+    "stableAnchor": "unheaded-block-15",
+    "title": "Unheaded block 15",
+    "startLine": 133,
+    "endLine": 143,
+    "textDigest": "8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4",
+    "sample": "**Mọi verb** đều in kết quả thành công bọc trong một phong bì chuẩn duy nhất\nthay vì in thẳng dữ liệu hay câu chữ cho người. Phong bì có bốn trường:\n`contract` (tên+phiên bản chuẩn",
+    "identityFingerprint": "9b12e65fe917f22123f6e96d3bfcf4332c1f8a0d3957624aa853e17ac283ca12",
+    "ancestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ],
+    "text": "**Mọi verb** đều in kết quả thành công bọc trong một phong bì chuẩn duy nhất\nthay vì in thẳng dữ liệu hay câu chữ cho người. Phong bì có bốn trường:\n`contract` (tên+phiên bản chuẩn phong bì), `generated_at` (thời điểm in),\n`data_hash` (dấu vân tay của dữ liệu — bên đọc biết dữ liệu đổi chưa mà không\ncần so từng trường), và `data` (dữ liệu thật của verb đó). Dữ liệu trong `data`\nlà **có cấu trúc** (các trường tên rõ nghĩa), không phải câu xác nhận cho người:\nverb đọc (`list`/`ready`/`check`/…) trả thẳng đối tượng kết quả; verb ghi trả\nđúng những trường nó vừa đổi (ví dụ chuyển trạng thái trả `{id, from, to, seq}`)\n— nhờ vậy một surface bất kỳ đọc kết quả bằng MỘT bộ đọc chung, không phải dò\nregex trên chữ. Phong bì được đóng tại **một cửa in duy nhất**, nên không verb\nnào lọt lưới và không có hai cách in khác nhau."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-15",
+      "githubAnchor": "unheaded-block-15",
+      "stableAnchor": "unheaded-block-15",
+      "title": "Unheaded block 15",
+      "startLine": 133,
+      "endLine": 143,
+      "textDigest": "8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4",
+      "sample": "**Mọi verb** đều in kết quả thành công bọc trong một phong bì chuẩn duy nhất\nthay vì in thẳng dữ liệu hay câu chữ cho người. Phong bì có bốn trường:\n`contract` (tên+phiên bản chuẩn",
+      "identityFingerprint": "9b12e65fe917f22123f6e96d3bfcf4332c1f8a0d3957624aa853e17ac283ca12",
+      "ancestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Envelope Shape"
+      ],
+      "text": "**Mọi verb** đều in kết quả thành công bọc trong một phong bì chuẩn duy nhất\nthay vì in thẳng dữ liệu hay câu chữ cho người. Phong bì có bốn trường:\n`contract` (tên+phiên bản chuẩn phong bì), `generated_at` (thời điểm in),\n`data_hash` (dấu vân tay của dữ liệu — bên đọc biết dữ liệu đổi chưa mà không\ncần so từng trường), và `data` (dữ liệu thật của verb đó). Dữ liệu trong `data`\nlà **có cấu trúc** (các trường tên rõ nghĩa), không phải câu xác nhận cho người:\nverb đọc (`list`/`ready`/`check`/…) trả thẳng đối tượng kết quả; verb ghi trả\nđúng những trường nó vừa đổi (ví dụ chuyển trạng thái trả `{id, from, to, seq}`)\n— nhờ vậy một surface bất kỳ đọc kết quả bằng MỘT bộ đọc chung, không phải dò\nregex trên chữ. Phong bì được đóng tại **một cửa in duy nhất**, nên không verb\nnào lọt lưới và không có hai cách in khác nhau."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_6dfbaa59a2f49bc668d9729fed01878a"
+}
+```
+
+## Entry claim_140216d27eb5609e8b5d51f718ecf493
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "claims",
+  "claimId": "claim_140216d27eb5609e8b5d51f718ecf493",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_140216d27eb5609e8b5d51f718ecf493",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "sourceUnitDigest": "5d70ebc5bbf14b46",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-18",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Error path not enveloped (stderr, exit code) is carried verbatim as its own block under Error Path Is Not Enveloped; io-contract states the same claim inside its envelope unit, so it also exists elsewhere in that heading, but this block was not merged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_140216d27eb5609e8b5d51f718ecf493",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "sourceUnitDigest": "5d70ebc5bbf14b46",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-19",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Error path not enveloped (stderr, exit code) is carried verbatim as its own block under Error Path Is Not Enveloped; io-contract states the same claim inside its envelope unit, so it also exists elsewhere in that heading, but this block was not merged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-18 (5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4) to unheaded-block-19 (5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4); inserted paragraphs shift the anchor, prior target text is unchanged.",
+    "targetUnitDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Error Path Is Not Enveloped"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "0f7d6b622276bd60f3607f619d603ba58a4496a16c988a2a4f2f3610470eb526",
+    "identityFingerprint": "0f7d6b622276bd60f3607f619d603ba58a4496a16c988a2a4f2f3610470eb526",
+    "claimId": "claim_140216d27eb5609e8b5d51f718ecf493",
+    "sourceAnchor": "unheaded-block-64",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-64",
+      "githubAnchor": "unheaded-block-64",
+      "stableAnchor": "unheaded-block-64",
+      "title": "Unheaded block 64",
+      "startLine": 636,
+      "endLine": 639,
+      "textDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
+      "sample": "**Đường lỗi không bọc phong bì.** Chỉ đường thành công in phong bì ra `stdout`;\nkhi verb ném lỗi, chẩn đoán đi ra `stderr` kèm mã thoát theo bảng phân loại lỗi\n(stdout=dữ liệu, std",
+      "identityFingerprint": "0f7d6b622276bd60f3607f619d603ba58a4496a16c988a2a4f2f3610470eb526",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Data Dictionary",
+        "Phong bì output (envelope) — chuẩn máy-đọc của MỌI verb (per D b2d18cc7, b0da87aa)"
+      ],
+      "text": "**Đường lỗi không bọc phong bì.** Chỉ đường thành công in phong bì ra `stdout`;\nkhi verb ném lỗi, chẩn đoán đi ra `stderr` kèm mã thoát theo bảng phân loại lỗi\n(stdout=dữ liệu, stderr=chẩn đoán) — bên gọi phân biệt thành/bại bằng mã thoát,\nkhông phải bằng việc dò nội dung phong bì."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-19",
+    "githubAnchor": "unheaded-block-19",
+    "stableAnchor": "unheaded-block-19",
+    "title": "Unheaded block 19",
+    "startLine": 160,
+    "endLine": 163,
+    "textDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
+    "sample": "**Đường lỗi không bọc phong bì.** Chỉ đường thành công in phong bì ra `stdout`;\nkhi verb ném lỗi, chẩn đoán đi ra `stderr` kèm mã thoát theo bảng phân loại lỗi\n(stdout=dữ liệu, std",
+    "identityFingerprint": "0f7d6b622276bd60f3607f619d603ba58a4496a16c988a2a4f2f3610470eb526",
+    "ancestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Error Path Is Not Enveloped"
+    ],
+    "text": "**Đường lỗi không bọc phong bì.** Chỉ đường thành công in phong bì ra `stdout`;\nkhi verb ném lỗi, chẩn đoán đi ra `stderr` kèm mã thoát theo bảng phân loại lỗi\n(stdout=dữ liệu, stderr=chẩn đoán) — bên gọi phân biệt thành/bại bằng mã thoát,\nkhông phải bằng việc dò nội dung phong bì."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-19",
+      "githubAnchor": "unheaded-block-19",
+      "stableAnchor": "unheaded-block-19",
+      "title": "Unheaded block 19",
+      "startLine": 160,
+      "endLine": 163,
+      "textDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
+      "sample": "**Đường lỗi không bọc phong bì.** Chỉ đường thành công in phong bì ra `stdout`;\nkhi verb ném lỗi, chẩn đoán đi ra `stderr` kèm mã thoát theo bảng phân loại lỗi\n(stdout=dữ liệu, std",
+      "identityFingerprint": "0f7d6b622276bd60f3607f619d603ba58a4496a16c988a2a4f2f3610470eb526",
+      "ancestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Error Path Is Not Enveloped"
+      ],
+      "text": "**Đường lỗi không bọc phong bì.** Chỉ đường thành công in phong bì ra `stdout`;\nkhi verb ném lỗi, chẩn đoán đi ra `stderr` kèm mã thoát theo bảng phân loại lỗi\n(stdout=dữ liệu, stderr=chẩn đoán) — bên gọi phân biệt thành/bại bằng mã thoát,\nkhông phải bằng việc dò nội dung phong bì."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_140216d27eb5609e8b5d51f718ecf493"
+}
+```
+
+## Entry claim_52b54d49826d7ff8fd38f29925505f2a
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "claims",
+  "claimId": "claim_52b54d49826d7ff8fd38f29925505f2a",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_52b54d49826d7ff8fd38f29925505f2a",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "sourceUnitDigest": "75bf5b6af00287e0",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-19",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Runner single-line envelope rule is stated in both sources; candidate carries both texts under Runner Stdout Envelope. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Error Path Is Not Enveloped"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_52b54d49826d7ff8fd38f29925505f2a",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "sourceUnitDigest": "75bf5b6af00287e0",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-20",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Runner single-line envelope rule is stated in both sources; candidate carries both texts under Runner Stdout Envelope. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-19 (75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b) to unheaded-block-20 (75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b); inserted paragraphs shift the anchor, prior target text is unchanged.",
+    "targetUnitDigest": "75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Runner Stdout Envelope"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "33f37f423dd766e23819dd4bcb17a93bd66b8500200798a60fab598d29885c62",
+    "identityFingerprint": "33f37f423dd766e23819dd4bcb17a93bd66b8500200798a60fab598d29885c62",
+    "claimId": "claim_52b54d49826d7ff8fd38f29925505f2a",
+    "sourceAnchor": "unheaded-block-65",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-65",
+      "githubAnchor": "unheaded-block-65",
+      "stableAnchor": "unheaded-block-65",
+      "title": "Unheaded block 65",
+      "startLine": 641,
+      "endLine": 645,
+      "textDigest": "75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b",
+      "sample": "**Vòng tự hành (`fgos-runner`) cũng dùng CÙNG phong bì này cho kết cục cuối của\nmỗi lượt/chu kỳ** (per str46-io-contract) — in liền một dòng thay vì nhiều\ndòng như trên, vì một tiế",
+      "identityFingerprint": "33f37f423dd766e23819dd4bcb17a93bd66b8500200798a60fab598d29885c62",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Data Dictionary",
+        "Phong bì output (envelope) — chuẩn máy-đọc của MỌI verb (per D b2d18cc7, b0da87aa)"
+      ],
+      "text": "**Vòng tự hành (`fgos-runner`) cũng dùng CÙNG phong bì này cho kết cục cuối của\nmỗi lượt/chu kỳ** (per str46-io-contract) — in liền một dòng thay vì nhiều\ndòng như trên, vì một tiến trình `--watch` phát nhiều phong bì nối tiếp theo\nthời gian; chi tiết đầy đủ + các luồng output khác nằm ngoài phong bì: xem spec\nRunner RUL61 (writer — danh tính người ghi, tách bạch khỏi vai, không bao giờ chặn verb)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-20",
+    "githubAnchor": "unheaded-block-20",
+    "stableAnchor": "unheaded-block-20",
+    "title": "Unheaded block 20",
+    "startLine": 167,
+    "endLine": 171,
+    "textDigest": "75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b",
+    "sample": "**Vòng tự hành (`fgos-runner`) cũng dùng CÙNG phong bì này cho kết cục cuối của\nmỗi lượt/chu kỳ** (per str46-io-contract) — in liền một dòng thay vì nhiều\ndòng như trên, vì một tiế",
+    "identityFingerprint": "33f37f423dd766e23819dd4bcb17a93bd66b8500200798a60fab598d29885c62",
+    "ancestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Runner Stdout Envelope"
+    ],
+    "text": "**Vòng tự hành (`fgos-runner`) cũng dùng CÙNG phong bì này cho kết cục cuối của\nmỗi lượt/chu kỳ** (per str46-io-contract) — in liền một dòng thay vì nhiều\ndòng như trên, vì một tiến trình `--watch` phát nhiều phong bì nối tiếp theo\nthời gian; chi tiết đầy đủ + các luồng output khác nằm ngoài phong bì: xem spec\nRunner RUL61 (writer — danh tính người ghi, tách bạch khỏi vai, không bao giờ chặn verb)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-20",
+      "githubAnchor": "unheaded-block-20",
+      "stableAnchor": "unheaded-block-20",
+      "title": "Unheaded block 20",
+      "startLine": 167,
+      "endLine": 171,
+      "textDigest": "75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b",
+      "sample": "**Vòng tự hành (`fgos-runner`) cũng dùng CÙNG phong bì này cho kết cục cuối của\nmỗi lượt/chu kỳ** (per str46-io-contract) — in liền một dòng thay vì nhiều\ndòng như trên, vì một tiế",
+      "identityFingerprint": "33f37f423dd766e23819dd4bcb17a93bd66b8500200798a60fab598d29885c62",
+      "ancestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Runner Stdout Envelope"
+      ],
+      "text": "**Vòng tự hành (`fgos-runner`) cũng dùng CÙNG phong bì này cho kết cục cuối của\nmỗi lượt/chu kỳ** (per str46-io-contract) — in liền một dòng thay vì nhiều\ndòng như trên, vì một tiến trình `--watch` phát nhiều phong bì nối tiếp theo\nthời gian; chi tiết đầy đủ + các luồng output khác nằm ngoài phong bì: xem spec\nRunner RUL61 (writer — danh tính người ghi, tách bạch khỏi vai, không bao giờ chặn verb)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_52b54d49826d7ff8fd38f29925505f2a"
+}
+```
+
+## Entry claim_ce947d10ed900598bde4df5b552e0265
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "claims",
+  "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "sourceUnitDigest": "c219ee825c3475e61bb642fd89e50efedc586df24b0252a6d99e58df63f419d8",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-33",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Manifest Shape"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "sourceUnitDigest": "c219ee825c3475e61bb642fd89e50efedc586df24b0252a6d99e58df63f419d8",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-34",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "rationale": "Supersede: the externalEffect sentence replaces the historical claim that only review and approve carry external effects with the fifteen-verb COMMAND_REGISTRY list, excluding coordination. The complete successor is now cli-io-contract.md#unheaded-block-34 after the installation-error insertion; reviewed prior successor text is unchanged. No claim of byte equality to the historical source or current-truth approval.",
+    "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Entry Fields And Effect Axes"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "34a8141d026d5c227cf8c981ea5e640d6b8970bcba699617a66dd40b194085a2",
+    "identityFingerprint": "34a8141d026d5c227cf8c981ea5e640d6b8970bcba699617a66dd40b194085a2",
+    "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
+    "sourceAnchor": "unheaded-block-68",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "c219ee825c3475e61bb642fd89e50efedc586df24b0252a6d99e58df63f419d8",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-68",
+      "githubAnchor": "unheaded-block-68",
+      "stableAnchor": "unheaded-block-68",
+      "title": "Unheaded block 68",
+      "startLine": 679,
+      "endLine": 690,
+      "textDigest": "c219ee825c3475e61bb642fd89e50efedc586df24b0252a6d99e58df63f419d8",
+      "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+      "identityFingerprint": "34a8141d026d5c227cf8c981ea5e640d6b8970bcba699617a66dd40b194085a2",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Data Dictionary",
+        "Sổ verb máy-đọc (manifest) — `--help --json`"
+      ],
+      "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — hôm nay chỉ `review` và\n`approve` mang `externalEffect: true`, đúng chế độ `--github` của chúng;\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-34",
+    "githubAnchor": "unheaded-block-34",
+    "stableAnchor": "unheaded-block-34",
+    "title": "Unheaded block 34",
+    "startLine": 310,
+    "endLine": 320,
+    "textDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
+    "sample": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` ",
+    "identityFingerprint": "abdaf7574d8107b6e5d325a95cb8c7327dac1248939788580176154fa990dace",
+    "ancestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Entry Fields And Effect Axes"
+    ],
+    "text": "**Hai trục thay cho `access` (per str46-io-contract).** Cờ `access`\nđơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —\nlộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một\nPR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái\nfgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`\n(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb\ncó bao giờ gọi một dịch vụ ngoài fgOS hay không — danh sách hiện hành mang `externalEffect: true` lấy từ manifest `COMMAND_REGISTRY` qua `fgos --help --json`: 15 verb, không có `coordination` (ví dụ `review`, `approve`, `run` — dispatch executor thật tính là effect ngoài `.fgos/`);\n`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể\ncả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều\nphối hay xác danh; cổng \"ai được nói verb nào\" vẫn là việc riêng sau này\n(backlog STR38)."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_ce947d10ed900598bde4df5b552e0265"
+}
+```
+
+## Entry claim_15a24dbb1f2d0470f04cdf8900da67a0
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "claims",
+  "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "sourceUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-27",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Cursor pagination superset (adds permanent list --all --json exception and side-log narrowing) is carried verbatim; the io-contract short text follows it in the same section, so both sources are present. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "549dded9fe85b1cfd57f1ec7079141e4feb9e6468a31e93485ab91a2305e79fe",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "5. Reasoned Envelope Exceptions"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "sourceUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-28",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Cursor pagination superset (adds permanent list --all --json exception and side-log narrowing) is carried verbatim; the io-contract short text follows it in the same section, so both sources are present. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-27 (2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9) to unheaded-block-28 (2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9); inserted paragraphs shift the anchor, prior target text is unchanged.",
+    "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "0c4d416214101537d7ba4005ceea36a6978aa90efb8dc69e750359b5ccb0647d",
+    "identityFingerprint": "0c4d416214101537d7ba4005ceea36a6978aa90efb8dc69e750359b5ccb0647d",
+    "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+    "sourceAnchor": "unheaded-block-69",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-69",
+      "githubAnchor": "unheaded-block-69",
+      "stableAnchor": "unheaded-block-69",
+      "title": "Unheaded block 69",
+      "startLine": 692,
+      "endLine": 716,
+      "textDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+      "sample": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `pa",
+      "identityFingerprint": "0c4d416214101537d7ba4005ceea36a6978aa90efb8dc69e750359b5ccb0647d",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Data Dictionary",
+        "Sổ verb máy-đọc (manifest) — `--help --json`"
+      ],
+      "text": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho\nMỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,\n`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn\nverb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không\ntruyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình\ndạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/\n`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/\nfgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp\nđồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,\n`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm\n`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/\n`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang\nthật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không\ntheo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/\n`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả\nđổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục\nhoàn toàn** —\nngười gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền\ntiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã\ntới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ\nlượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa\n(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang\n(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là\nmột cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-28",
+    "githubAnchor": "unheaded-block-28",
+    "stableAnchor": "unheaded-block-28",
+    "title": "Unheaded block 28",
+    "startLine": 225,
+    "endLine": 249,
+    "textDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+    "sample": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `pa",
+    "identityFingerprint": "0c4d416214101537d7ba4005ceea36a6978aa90efb8dc69e750359b5ccb0647d",
+    "ancestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ],
+    "text": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho\nMỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,\n`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn\nverb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không\ntruyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình\ndạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/\n`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/\nfgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp\nđồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,\n`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm\n`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/\n`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang\nthật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không\ntheo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/\n`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả\nđổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục\nhoàn toàn** —\nngười gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền\ntiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã\ntới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ\nlượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa\n(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang\n(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là\nmột cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-28",
+      "githubAnchor": "unheaded-block-28",
+      "stableAnchor": "unheaded-block-28",
+      "title": "Unheaded block 28",
+      "startLine": 225,
+      "endLine": 249,
+      "textDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+      "sample": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `pa",
+      "identityFingerprint": "0c4d416214101537d7ba4005ceea36a6978aa90efb8dc69e750359b5ccb0647d",
+      "ancestry": [
+        "CLI I/O Contract",
+        "6. Cursor Pagination"
+      ],
+      "text": "**Phân trang cho verb trả tập lớn (per str46-io-contract, được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-\nscoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho\nMỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,\n`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn\nverb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không\ntruyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình\ndạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/\n`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/\nfgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp\nđồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,\n`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm\n`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/\n`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang\nthật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không\ntheo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/\n`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả\nđổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục\nhoàn toàn** —\nngười gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền\ntiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã\ntới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ\nlượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa\n(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang\n(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là\nmột cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_15a24dbb1f2d0470f04cdf8900da67a0"
+}
+```
+
+## Entry claim_5dcb56608e17caeb53c197186ae33827
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "claims",
+  "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "sourceUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-36",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Entry Fields And Effect Axes"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "sourceUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-37",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-36 (3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62) to unheaded-block-37 (3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62); inserted paragraphs shift the anchor, prior target text is unchanged.",
+    "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "8. Multi-Value Flag Convention"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "3106ff6efc6244bea6ee9a9696727e25ff45124b65419573616164315cfb46dd",
+    "identityFingerprint": "3106ff6efc6244bea6ee9a9696727e25ff45124b65419573616164315cfb46dd",
+    "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+    "sourceAnchor": "unheaded-block-70",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-70",
+      "githubAnchor": "unheaded-block-70",
+      "stableAnchor": "unheaded-block-70",
+      "title": "Unheaded block 70",
+      "startLine": 718,
+      "endLine": 725,
+      "textDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+      "sample": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trướ",
+      "identityFingerprint": "3106ff6efc6244bea6ee9a9696727e25ff45124b65419573616164315cfb46dd",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Data Dictionary",
+        "Sổ verb máy-đọc (manifest) — `--help --json`"
+      ],
+      "text": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi\nmô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang\n`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang\n`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn\nbản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị\nkhông có trường này."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-37",
+    "githubAnchor": "unheaded-block-37",
+    "stableAnchor": "unheaded-block-37",
+    "title": "Unheaded block 37",
+    "startLine": 343,
+    "endLine": 350,
+    "textDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+    "sample": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trướ",
+    "identityFingerprint": "3106ff6efc6244bea6ee9a9696727e25ff45124b65419573616164315cfb46dd",
+    "ancestry": [
+      "CLI I/O Contract",
+      "8. Multi-Value Flag Convention"
+    ],
+    "text": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi\nmô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang\n`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang\n`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn\nbản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị\nkhông có trường này."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-37",
+      "githubAnchor": "unheaded-block-37",
+      "stableAnchor": "unheaded-block-37",
+      "title": "Unheaded block 37",
+      "startLine": 343,
+      "endLine": 350,
+      "textDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+      "sample": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trướ",
+      "identityFingerprint": "3106ff6efc6244bea6ee9a9696727e25ff45124b65419573616164315cfb46dd",
+      "ancestry": [
+        "CLI I/O Contract",
+        "8. Multi-Value Flag Convention"
+      ],
+      "text": "**Quy ước cờ nhiều-giá-trị (per str46-io-contract).** Sổ verb khai thêm\ntrường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham\nsố nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi\nmô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang\n`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang\n`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn\nbản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị\nkhông có trường này."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_5dcb56608e17caeb53c197186ae33827"
+}
+```
+
+## Entry claim_6fe86521fead9cec7253443e3275a3cf
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "claims",
+  "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "sourceUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-40",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "9b711cb5a088ede56ad00207289f1fed2ccc05887597169bbc41eb2e55429db3",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "9. Per-Verb Help"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "sourceUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-41",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-40 (a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798) to unheaded-block-41 (a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798); inserted paragraphs shift the anchor, prior target text is unchanged.",
+    "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "9. Per-Verb Help"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "a4b8f46267345e4fc04574b601726648feb938131fcf8d1d3ead6872ed968d73",
+    "identityFingerprint": "a4b8f46267345e4fc04574b601726648feb938131fcf8d1d3ead6872ed968d73",
+    "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+    "sourceAnchor": "unheaded-block-73",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-73",
+      "githubAnchor": "unheaded-block-73",
+      "stableAnchor": "unheaded-block-73",
+      "title": "Unheaded block 73",
+      "startLine": 751,
+      "endLine": 762,
+      "textDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+      "sample": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **W",
+      "identityFingerprint": "a4b8f46267345e4fc04574b601726648feb938131fcf8d1d3ead6872ed968d73",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Data Dictionary",
+        "Trợ giúp theo từng verb — `fgos <verb> [<sub>] --help|-h [--json]`"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,\n  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos\n  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).\n- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác\n  dụng phụ khi gọi thật (vd `init`).\n- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát\n  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,\n  dù tham số đó có mặt hay không (per str77-79-doc-gap-fixes / ea8b9a8d — RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ))."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-41",
+    "githubAnchor": "unheaded-block-41",
+    "stableAnchor": "unheaded-block-41",
+    "title": "Unheaded block 41",
+    "startLine": 382,
+    "endLine": 393,
+    "textDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+    "sample": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **W",
+    "identityFingerprint": "a4b8f46267345e4fc04574b601726648feb938131fcf8d1d3ead6872ed968d73",
+    "ancestry": [
+      "CLI I/O Contract",
+      "9. Per-Verb Help"
+    ],
+    "text": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,\n  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos\n  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).\n- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác\n  dụng phụ khi gọi thật (vd `init`).\n- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát\n  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,\n  dù tham số đó có mặt hay không (per str77-79-doc-gap-fixes / ea8b9a8d — RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ))."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-41",
+      "githubAnchor": "unheaded-block-41",
+      "stableAnchor": "unheaded-block-41",
+      "title": "Unheaded block 41",
+      "startLine": 382,
+      "endLine": 393,
+      "textDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+      "sample": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **W",
+      "identityFingerprint": "a4b8f46267345e4fc04574b601726648feb938131fcf8d1d3ead6872ed968d73",
+      "ancestry": [
+        "CLI I/O Contract",
+        "9. Per-Verb Help"
+      ],
+      "text": "- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào\n  trong sổ verb.\n- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp\n  riêng.\n- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,\n  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos\n  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).\n- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác\n  dụng phụ khi gọi thật (vd `init`).\n- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát\n  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,\n  dù tham số đó có mặt hay không (per str77-79-doc-gap-fixes / ea8b9a8d — RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ))."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_6fe86521fead9cec7253443e3275a3cf"
+}
+```
+
+## Entry claim_9959e82e2874baeb627a8441faa07e9a
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "registryGaps",
+  "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "sourceUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-30",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Manifest fields are combined from work-state and io-contract in the single Manifest Shape section; the work-state contribution includes the positional-parameter rule. The source schema_version 2.0 sentence is represented by the corrected schema_version 3.0 successor, with the complete fields carried. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "sourcePath": "docs/specs/work-state.md",
+    "sourceAnchor": "unheaded-block-66",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "sourceUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-31",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Manifest fields are combined from work-state and io-contract in the single Manifest Shape section; the work-state contribution includes the positional-parameter rule. The source schema_version 2.0 sentence is represented by the corrected schema_version 3.0 successor, with the complete fields carried. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-30 (878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe) to unheaded-block-31 (878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe); inserted paragraphs shift the anchor, prior target text is unchanged.",
+    "sourcePath": "docs/specs/work-state.md",
+    "sourceAnchor": "unheaded-block-66",
+    "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Manifest Shape"
+    ]
+  },
+  "native": {
+    "kind": "identityGaps",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "bf7edb27c3307e0712e31435c5507ebd2b1041e52b595337cddfdbbb9baf2734",
+    "identityFingerprint": "bf7edb27c3307e0712e31435c5507ebd2b1041e52b595337cddfdbbb9baf2734",
+    "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+    "sourceAnchor": "unheaded-block-66",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "identity-gap",
+    "gapReason": "edited unit whose anchor unheaded-block-66 is not a stable heading anchor"
+  },
+  "sourceWitness": {
+    "commit": "2636ba229a054750a370bf5c2e9b83f27492bf3d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-66",
+      "githubAnchor": "unheaded-block-66",
+      "stableAnchor": "unheaded-block-66",
+      "title": "Unheaded block 66",
+      "startLine": 649,
+      "endLine": 663,
+      "textDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+      "sample": "CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng\nmáy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành\n`'2.0'`, per str46-io-contr",
+      "identityFingerprint": "bf7edb27c3307e0712e31435c5507ebd2b1041e52b595337cddfdbbb9baf2734",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Data Dictionary",
+        "Sổ verb máy-đọc (manifest) — `--help --json`"
+      ],
+      "text": "CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng\nmáy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành\n`'2.0'`, per str46-io-contract — tăng từ `'1.0'` vì một trường bị xoá,\nxem ngay dưới), mỗi mục mô tả một verb — `name`, cách gọi, mô tả một dòng,\nlược đồ tham số (cờ/positional), ví dụ, và ô `deprecated`. Sổ này để một\nlistener/giao diện **sinh** khung lệnh và khung form từ manifest thay vì\nhard-code từng verb. Bản thân sổ verb là **siêu dữ liệu về CLI**, KHÔNG bọc\ntrong phong bì `data` (nó mô tả CLI, không phải kết quả một verb). Dạng trợ\ngiúp thường (không máy-đọc) in cùng thông tin ở dạng chữ cho người đọc. Với\nmột tham số CHỈ nhận qua vị trí trên dòng lệnh (positional — vd `text` của\n`submit`, đọc từ đối số đầu, không bao giờ qua một cờ `--text`), sổ verb\nđánh dấu riêng tham số đó là positional; dạng trợ giúp chữ cho người đọc in\ndòng \"positional: `<tên>`\" cho tham số này, KHÔNG BAO GIỜ in nhầm thành\n\"required: `--<tên>`\" như một cờ thật — một tham số vừa nhận positional vừa\nnhận qua cờ (vd `id` của `discover`/`take`) in cả hai dạng phân biệt (per str77-79-doc-gap-fixes / ea8b9a8d — RUL54 (sổ verb máy-đọc không in nhầm tham số positional thành cờ bắt buộc))."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-31",
+    "githubAnchor": "unheaded-block-31",
+    "stableAnchor": "unheaded-block-31",
+    "title": "Unheaded block 31",
+    "startLine": 269,
+    "endLine": 284,
+    "textDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+    "sample": "CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng\nmáy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành\n`'3.0'` — tăng từ `'2.0'` k",
+    "identityFingerprint": "32c6dad9c72451cefbaa2daad7d5abc2f6a32ee533e487fb41a7ca37f6994400",
+    "ancestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Manifest Shape"
+    ],
+    "text": "CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng\nmáy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành\n`'3.0'` — tăng từ `'2.0'` khi cờ của verb có sub-verb dời vào\n`subcommands`, xem ngay dưới; `'2.0'` từng tăng từ `'1.0'` vì một trường bị\nxoá, per str46-io-contract), mỗi mục mô tả một verb — `name`, cách gọi, mô tả một dòng,\nlược đồ tham số (cờ/positional), ví dụ, và ô `deprecated`. Sổ này để một\nlistener/giao diện **sinh** khung lệnh và khung form từ manifest thay vì\nhard-code từng verb. Bản thân sổ verb là **siêu dữ liệu về CLI**, KHÔNG bọc\ntrong phong bì `data` (nó mô tả CLI, không phải kết quả một verb). Dạng trợ\ngiúp thường (không máy-đọc) in cùng thông tin ở dạng chữ cho người đọc. Với\nmột tham số CHỈ nhận qua vị trí trên dòng lệnh (positional — vd `text` của\n`submit`, đọc từ đối số đầu, không bao giờ qua một cờ `--text`), sổ verb\nđánh dấu riêng tham số đó là positional; dạng trợ giúp chữ cho người đọc in\ndòng \"positional: `<tên>`\" cho tham số này, KHÔNG BAO GIỜ in nhầm thành\n\"required: `--<tên>`\" như một cờ thật — một tham số vừa nhận positional vừa\nnhận qua cờ (vd `id` của `discover`/`take`) in cả hai dạng phân biệt (per str77-79-doc-gap-fixes / ea8b9a8d — RUL54 (sổ verb máy-đọc không in nhầm tham số positional thành cờ bắt buộc))."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_9959e82e2874baeb627a8441faa07e9a"
+}
+```
+
+## Entry claim_ae1f21106b52006a2ff377f9104a1fce
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_ae1f21106b52006a2ff377f9104a1fce",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_ae1f21106b52006a2ff377f9104a1fce",
+    "sourceUnitDigest": "0e00c9cccba1af1e",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "1-provenance-of-retired-decisions",
+    "claimKind": "historical-context",
+    "disposition": "promote",
+    "rationale": "Source H2 stating where the retired records came from is represented by the frozen H2 \"1. Provenance Of Retired Decisions\"; only the heading title differs (numbered, English, no tsk id in the title). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "260da5fd6eab8c113ea7e756985b782b5e45721aae8f34aab1e50389af0dff24",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_ae1f21106b52006a2ff377f9104a1fce",
+    "sourceUnitDigest": "0e00c9cccba1af1e",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "1-provenance-of-retired-decisions",
+    "claimKind": "historical-context",
+    "disposition": "promote",
+    "rationale": "Source H2 stating where the retired records came from is represented by the frozen H2 \"1. Provenance Of Retired Decisions\"; only the heading title differs (numbered, English, no tsk id in the title). Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "260da5fd6eab8c113ea7e756985b782b5e45721aae8f34aab1e50389af0dff24",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "97c662102e05fb25079a5037e08a754cbb5e6693294eef5512660b2e20d859f2",
+    "identityFingerprint": "a956b6c4b5d3d48c880c1a2f33da63f308f7055b1bf17a2d2a26a06a920fb929",
+    "claimId": "claim_ae1f21106b52006a2ff377f9104a1fce",
+    "sourceAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+    "unitKind": "heading",
+    "sourceUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "anchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+      "githubAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+      "stableAnchor": "h-7e7917fb8f9a",
+      "startLine": 1363,
+      "endLine": 1363,
+      "textDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+      "sample": "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "sectionPayloadDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+      "followingBlockDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+      "identityFingerprint": "a956b6c4b5d3d48c880c1a2f33da63f308f7055b1bf17a2d2a26a06a920fb929",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)"
+      ],
+      "text": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "sectionText": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)\n\nCác ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "1. Provenance Of Retired Decisions",
+    "anchor": "1-provenance-of-retired-decisions",
+    "githubAnchor": "1-provenance-of-retired-decisions",
+    "stableAnchor": "h-0d0ce4e5605c",
+    "startLine": 23,
+    "endLine": 23,
+    "textDigest": "260da5fd6eab8c113ea7e756985b782b5e45721aae8f34aab1e50389af0dff24",
+    "sample": "1. Provenance Of Retired Decisions",
+    "sectionPayloadDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+    "followingBlockDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+    "identityFingerprint": "54794fd9661d2f0496f6e3e7f969b8d41fc8f5a7735e3e816560a85873c5660c",
+    "ancestry": [
+      "Retired Decision History: Work State"
+    ],
+    "text": "## 1. Provenance Of Retired Decisions",
+    "sectionText": "## 1. Provenance Of Retired Decisions\n\nCác ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_ae1f21106b52006a2ff377f9104a1fce"
+}
+```
+
+## Entry claim_192ebab9dbc6cec8b8957683e3ff8c82
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_192ebab9dbc6cec8b8957683e3ff8c82",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_192ebab9dbc6cec8b8957683e3ff8c82",
+    "sourceUnitDigest": "ac2b043c0d4f9fde",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-2",
+    "claimKind": "historical-context",
+    "disposition": "promote",
+    "rationale": "Relocation statement (ADRs moved verbatim from docs/decisions/, corpus retired) carried unchanged as the body of section 1; text identical to the source line. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "1. Provenance Of Retired Decisions"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_192ebab9dbc6cec8b8957683e3ff8c82",
+    "sourceUnitDigest": "ac2b043c0d4f9fde",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-2",
+    "claimKind": "historical-context",
+    "disposition": "promote",
+    "rationale": "Relocation statement (ADRs moved verbatim from docs/decisions/, corpus retired) carried unchanged as the body of section 1; text identical to the source line. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "1. Provenance Of Retired Decisions"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "df26088a86cf8e70766d9e3f94a7f982c443c3a8cd8eabfe0c43ac6e5702f364",
+    "identityFingerprint": "df26088a86cf8e70766d9e3f94a7f982c443c3a8cd8eabfe0c43ac6e5702f364",
+    "claimId": "claim_192ebab9dbc6cec8b8957683e3ff8c82",
+    "sourceAnchor": "unheaded-block-112",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+    "claimKind": "decision",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-112",
+      "githubAnchor": "unheaded-block-112",
+      "stableAnchor": "unheaded-block-112",
+      "title": "Unheaded block 112",
+      "startLine": 1365,
+      "endLine": 1365,
+      "textDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+      "sample": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, ph",
+      "identityFingerprint": "df26088a86cf8e70766d9e3f94a7f982c443c3a8cd8eabfe0c43ac6e5702f364",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+      ],
+      "text": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-2",
+    "githubAnchor": "unheaded-block-2",
+    "stableAnchor": "unheaded-block-2",
+    "title": "Unheaded block 2",
+    "startLine": 25,
+    "endLine": 25,
+    "textDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+    "sample": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, ph",
+    "identityFingerprint": "df26088a86cf8e70766d9e3f94a7f982c443c3a8cd8eabfe0c43ac6e5702f364",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "1. Provenance Of Retired Decisions"
+    ],
+    "text": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-2",
+      "githubAnchor": "unheaded-block-2",
+      "stableAnchor": "unheaded-block-2",
+      "title": "Unheaded block 2",
+      "startLine": 25,
+      "endLine": 25,
+      "textDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+      "sample": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, ph",
+      "identityFingerprint": "df26088a86cf8e70766d9e3f94a7f982c443c3a8cd8eabfe0c43ac6e5702f364",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "1. Provenance Of Retired Decisions"
+      ],
+      "text": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_192ebab9dbc6cec8b8957683e3ff8c82"
+}
+```
+
+## Entry claim_5412ac73c702e4ec33e4b59dd9ad1940
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_5412ac73c702e4ec33e4b59dd9ad1940",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_5412ac73c702e4ec33e4b59dd9ad1940",
+    "sourceUnitDigest": "cb78249b3b34c872",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "2-adr-0002-flat-work-model",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0002 title heading is represented by the frozen H2 \"2. ADR 0002 ...\" (2-adr-0002-flat-work-model); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_5412ac73c702e4ec33e4b59dd9ad1940",
+    "sourceUnitDigest": "cb78249b3b34c872",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "2-adr-0002-flat-work-model",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0002 title heading is represented by the frozen H2 \"2. ADR 0002 ...\" (2-adr-0002-flat-work-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "59209b493e184d082837e5e47a718d3ef971e3b8574aaf3d0a9ee6ff50fdc6a9",
+    "identityFingerprint": "af6c0f154273b5265eb496f0ab4c6a51b54d1eeda329ef6ef6da88e7b635c4fa",
+    "claimId": "claim_5412ac73c702e4ec33e4b59dd9ad1940",
+    "sourceAnchor": "0002-mô-hình-việc-phẳng",
+    "unitKind": "heading",
+    "sourceUnitDigest": "cb78249b3b34c872441f503e5969695e0b15abd05195c856493d6227ff5bbb23",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "0002 — Mô hình việc phẳng",
+      "anchor": "0002-mô-hình-việc-phẳng",
+      "githubAnchor": "0002-mô-hình-việc-phẳng",
+      "stableAnchor": "h-b62445268bca",
+      "startLine": 1368,
+      "endLine": 1368,
+      "textDigest": "cb78249b3b34c872441f503e5969695e0b15abd05195c856493d6227ff5bbb23",
+      "sample": "0002 — Mô hình việc phẳng",
+      "sectionPayloadDigest": "75563525a8cefd7b1bfa75c0b3ee3e7c9c995b17e5af5a25191b64b5ecbf0292",
+      "followingBlockDigest": "75563525a8cefd7b1bfa75c0b3ee3e7c9c995b17e5af5a25191b64b5ecbf0292",
+      "identityFingerprint": "af6c0f154273b5265eb496f0ab4c6a51b54d1eeda329ef6ef6da88e7b635c4fa",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+      ],
+      "text": "### 0002 — Mô hình việc phẳng",
+      "sectionText": "### 0002 — Mô hình việc phẳng\n\n> **Một phần đã supersede bởi [0012](0012-typed-edge-model-supersedes-deps-parent-separation.md):**\n> \"deps và parent tách rời có chủ đích\" nay đọc là \"tách rời về lưu trữ và ngữ\n> nghĩa, nhưng hợp nhất thành một đồ thị typed-edge derive\". Phần còn lại của\n> record này (mô hình việc phẳng, một FSM, \"epic\" là item thường) vẫn hiện hành."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "2. ADR 0002 Flat Work Model",
+    "anchor": "2-adr-0002-flat-work-model",
+    "githubAnchor": "2-adr-0002-flat-work-model",
+    "stableAnchor": "h-9a9367902c5a",
+    "startLine": 27,
+    "endLine": 27,
+    "textDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+    "sample": "2. ADR 0002 Flat Work Model",
+    "sectionPayloadDigest": "0a885e8073f37063ef015b0288f7517cdd829863ae4f866864cf1969ad3260dd",
+    "followingBlockDigest": "0a885e8073f37063ef015b0288f7517cdd829863ae4f866864cf1969ad3260dd",
+    "identityFingerprint": "6dd8a2d894942d90d583deaa4e78aaa9be3269506feb8a89c907b75032431703",
+    "ancestry": [
+      "Retired Decision History: Work State"
+    ],
+    "text": "## 2. ADR 0002 Flat Work Model",
+    "sectionText": "## 2. ADR 0002 Flat Work Model\n\n> **Một phần đã supersede bởi [0012](#8-adr-0012-unified-typed-edge-graph-model):**\n> \"deps và parent tách rời có chủ đích\" nay đọc là \"tách rời về lưu trữ và ngữ\n> nghĩa, nhưng hợp nhất thành một đồ thị typed-edge derive\". Phần còn lại của\n> record này (mô hình việc phẳng, một FSM, \"epic\" là item thường) vẫn hiện hành."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_5412ac73c702e4ec33e4b59dd9ad1940"
+}
+```
+
+## Entry claim_0201a1d648765d578fb8fd96673da674
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_0201a1d648765d578fb8fd96673da674",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_0201a1d648765d578fb8fd96673da674",
+    "sourceUnitDigest": "75563525a8cefd7b",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-3",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession blockquote of ADR 0002 (partly superseded by 0012) carried in the ADR 0002 section; the only change is the link, rewritten from the retired 0012 file path to the in-document anchor #8-adr-0012-unified-typed-edge-graph-model. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "0a885e8073f37063ef015b0288f7517cdd829863ae4f866864cf1969ad3260dd",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_0201a1d648765d578fb8fd96673da674",
+    "sourceUnitDigest": "75563525a8cefd7b",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-3",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession blockquote of ADR 0002 (partly superseded by 0012) carried in the ADR 0002 section; the only change is the link, rewritten from the retired 0012 file path to the in-document anchor #8-adr-0012-unified-typed-edge-graph-model. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "0a885e8073f37063ef015b0288f7517cdd829863ae4f866864cf1969ad3260dd",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "753d95eb526e9cd1f1eb86c92fc9b534b880f00d5a4ad7e5fad1b3a6fd736bb6",
+    "identityFingerprint": "753d95eb526e9cd1f1eb86c92fc9b534b880f00d5a4ad7e5fad1b3a6fd736bb6",
+    "claimId": "claim_0201a1d648765d578fb8fd96673da674",
+    "sourceAnchor": "unheaded-block-113",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "75563525a8cefd7b1bfa75c0b3ee3e7c9c995b17e5af5a25191b64b5ecbf0292",
+    "claimKind": "decision",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-113",
+      "githubAnchor": "unheaded-block-113",
+      "stableAnchor": "unheaded-block-113",
+      "title": "Unheaded block 113",
+      "startLine": 1370,
+      "endLine": 1373,
+      "textDigest": "75563525a8cefd7b1bfa75c0b3ee3e7c9c995b17e5af5a25191b64b5ecbf0292",
+      "sample": "> **Một phần đã supersede bởi [0012](0012-typed-edge-model-supersedes-deps-parent-separation.md):**\n> \"deps và parent tách rời có chủ đích\" nay đọc là \"tách rời về lưu trữ và ngữ\n>",
+      "identityFingerprint": "753d95eb526e9cd1f1eb86c92fc9b534b880f00d5a4ad7e5fad1b3a6fd736bb6",
+      "ancestry": [
+        "Spec: Work-State (tầng quản việc của forgent)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0002 — Mô hình việc phẳng"
+      ],
+      "text": "> **Một phần đã supersede bởi [0012](0012-typed-edge-model-supersedes-deps-parent-separation.md):**\n> \"deps và parent tách rời có chủ đích\" nay đọc là \"tách rời về lưu trữ và ngữ\n> nghĩa, nhưng hợp nhất thành một đồ thị typed-edge derive\". Phần còn lại của\n> record này (mô hình việc phẳng, một FSM, \"epic\" là item thường) vẫn hiện hành."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-3",
+    "githubAnchor": "unheaded-block-3",
+    "stableAnchor": "unheaded-block-3",
+    "title": "Unheaded block 3",
+    "startLine": 29,
+    "endLine": 32,
+    "textDigest": "0a885e8073f37063ef015b0288f7517cdd829863ae4f866864cf1969ad3260dd",
+    "sample": "> **Một phần đã supersede bởi [0012](#8-adr-0012-unified-typed-edge-graph-model):**\n> \"deps và parent tách rời có chủ đích\" nay đọc là \"tách rời về lưu trữ và ngữ\n> nghĩa, nhưng hợ",
+    "identityFingerprint": "25cf88d1dbd35bf4a2bf898727dbfa12abd863150131d4bed547480a047e5573",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ],
+    "text": "> **Một phần đã supersede bởi [0012](#8-adr-0012-unified-typed-edge-graph-model):**\n> \"deps và parent tách rời có chủ đích\" nay đọc là \"tách rời về lưu trữ và ngữ\n> nghĩa, nhưng hợp nhất thành một đồ thị typed-edge derive\". Phần còn lại của\n> record này (mô hình việc phẳng, một FSM, \"epic\" là item thường) vẫn hiện hành."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_0201a1d648765d578fb8fd96673da674"
+}
+```
+
+## Entry claim_f8e2b48d6234ca8a73e15cdaad7d9c07
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
+    "sourceUnitDigest": "a05e96aa58d47c2d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "2-adr-0002-flat-work-model",
+    "claimKind": "decision",
+    "disposition": "merge",
+    "rationale": "Repeated duplicate title \"# 0002 - Mo hinh viec phang\" inside the ADR 0002 text: merged into the single ADR 0002 H2 (no second H1 in the candidate), so no claim is lost but the heading itself does not appear twice. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
+    "sourceUnitDigest": "a05e96aa58d47c2d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "2-adr-0002-flat-work-model",
+    "claimKind": "decision",
+    "disposition": "merge",
+    "rationale": "Repeated duplicate title \"# 0002 - Mo hinh viec phang\" inside the ADR 0002 text: merged into the single ADR 0002 H2 (no second H1 in the candidate), so no claim is lost but the heading itself does not appear twice. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "72fdd79b0ab88a9bf123053e97f6fe3ad4f4287afb6cb3c914aa4f150ecee64d",
+    "identityFingerprint": "60b703193f7a546c227d12320d7c1cbc28d86179bcd2e19da8d1f70ab5fcb05f",
+    "claimId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
+    "sourceAnchor": "0002-mô-hình-việc-phẳng-1",
+    "unitKind": "heading",
+    "sourceUnitDigest": "a05e96aa58d47c2d93aba8822f9e8c38f89b39b979d8c8b8fad842328f65c489",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 1,
+      "title": "0002 — Mô hình việc phẳng",
+      "anchor": "0002-mô-hình-việc-phẳng-1",
+      "githubAnchor": "0002-mô-hình-việc-phẳng-1",
+      "stableAnchor": "h-029ed36517fe",
+      "startLine": 1375,
+      "endLine": 1375,
+      "textDigest": "a05e96aa58d47c2d93aba8822f9e8c38f89b39b979d8c8b8fad842328f65c489",
+      "sample": "0002 — Mô hình việc phẳng",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "60b703193f7a546c227d12320d7c1cbc28d86179bcd2e19da8d1f70ab5fcb05f",
+      "ancestry": [],
+      "text": "# 0002 — Mô hình việc phẳng",
+      "sectionText": "# 0002 — Mô hình việc phẳng"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "2. ADR 0002 Flat Work Model",
+    "anchor": "2-adr-0002-flat-work-model",
+    "githubAnchor": "2-adr-0002-flat-work-model",
+    "stableAnchor": "h-9a9367902c5a",
+    "startLine": 27,
+    "endLine": 27,
+    "textDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+    "sample": "2. ADR 0002 Flat Work Model",
+    "sectionPayloadDigest": "0a885e8073f37063ef015b0288f7517cdd829863ae4f866864cf1969ad3260dd",
+    "followingBlockDigest": "0a885e8073f37063ef015b0288f7517cdd829863ae4f866864cf1969ad3260dd",
+    "identityFingerprint": "6dd8a2d894942d90d583deaa4e78aaa9be3269506feb8a89c907b75032431703",
+    "ancestry": [
+      "Retired Decision History: Work State"
+    ],
+    "text": "## 2. ADR 0002 Flat Work Model",
+    "sectionText": "## 2. ADR 0002 Flat Work Model\n\n> **Một phần đã supersede bởi [0012](#8-adr-0012-unified-typed-edge-graph-model):**\n> \"deps và parent tách rời có chủ đích\" nay đọc là \"tách rời về lưu trữ và ngữ\n> nghĩa, nhưng hợp nhất thành một đồ thị typed-edge derive\". Phần còn lại của\n> record này (mô hình việc phẳng, một FSM, \"epic\" là item thường) vẫn hiện hành."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07"
+}
+```
+
+## Entry claim_faeaa8e46158de47c45810fb0a595dcc
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
+    "sourceUnitDigest": "f014a166cf0c8f3d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0002-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0002 is represented by the frozen H3 \"0002 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "5cd2a9a136e3025d04ed41810213e2a9c383290b3eb3e863644e4af952612d3e",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
+    "sourceUnitDigest": "f014a166cf0c8f3d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0002-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0002 is represented by the frozen H3 \"0002 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "5cd2a9a136e3025d04ed41810213e2a9c383290b3eb3e863644e4af952612d3e",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "269676b0992f962f084352373a1a4cbc736f903ff04a0a670ae82c4e17d70b4b",
+    "identityFingerprint": "7ed9af2d30b8d9a6a61c2751b08aa39d944a915e5cae221e1e5da3388733fec2",
+    "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
+    "sourceAnchor": "bối-cảnh",
+    "unitKind": "heading",
+    "sourceUnitDigest": "f014a166cf0c8f3dc0e0998cbb8b08c1927000c5e341fcc78ea8f052cf420b1d",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Bối cảnh",
+      "anchor": "bối-cảnh",
+      "githubAnchor": "bối-cảnh",
+      "stableAnchor": "h-132f2978e1d8",
+      "startLine": 1377,
+      "endLine": 1377,
+      "textDigest": "f014a166cf0c8f3dc0e0998cbb8b08c1927000c5e341fcc78ea8f052cf420b1d",
+      "sample": "Bối cảnh",
+      "sectionPayloadDigest": "2d791158021d4df9eabbc0897dffa6df940c425a067c7e7edee5c200e9111594",
+      "followingBlockDigest": "2d791158021d4df9eabbc0897dffa6df940c425a067c7e7edee5c200e9111594",
+      "identityFingerprint": "7ed9af2d30b8d9a6a61c2751b08aa39d944a915e5cae221e1e5da3388733fec2",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng"
+      ],
+      "text": "#### Bối cảnh",
+      "sectionText": "#### Bối cảnh\n\nforgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đường cho hướng\nnhiều-agent chạy song song (fan-out). Cám dỗ quen thuộc là dựng cấp bậc entity\nriêng: epic ⊃ story ⊃ task, mỗi cấp một schema. Cách đó nhân bội bề mặt trạng thái\nvà khoá độ mịn công việc vào schema."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0002 Context",
+    "anchor": "0002-context",
+    "githubAnchor": "0002-context",
+    "stableAnchor": "h-2a34e146c40c",
+    "startLine": 34,
+    "endLine": 34,
+    "textDigest": "5cd2a9a136e3025d04ed41810213e2a9c383290b3eb3e863644e4af952612d3e",
+    "sample": "0002 Context",
+    "sectionPayloadDigest": "2d791158021d4df9eabbc0897dffa6df940c425a067c7e7edee5c200e9111594",
+    "followingBlockDigest": "2d791158021d4df9eabbc0897dffa6df940c425a067c7e7edee5c200e9111594",
+    "identityFingerprint": "c03c58251629415667b94198a8721901588f43cc03230b3af8c6b6b44015d3ef",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ],
+    "text": "### 0002 Context",
+    "sectionText": "### 0002 Context\n\nforgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đường cho hướng\nnhiều-agent chạy song song (fan-out). Cám dỗ quen thuộc là dựng cấp bậc entity\nriêng: epic ⊃ story ⊃ task, mỗi cấp một schema. Cách đó nhân bội bề mặt trạng thái\nvà khoá độ mịn công việc vào schema."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_faeaa8e46158de47c45810fb0a595dcc"
+}
+```
+
+## Entry claim_310b7c85756d5a5631a83fd5b6f51450
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_310b7c85756d5a5631a83fd5b6f51450",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_310b7c85756d5a5631a83fd5b6f51450",
+    "sourceUnitDigest": "2d791158021d4df9",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-4",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0002 (source lines 1348-1351, starting \"forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đư\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "2d791158021d4df9eabbc0897dffa6df940c425a067c7e7edee5c200e9111594",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_310b7c85756d5a5631a83fd5b6f51450",
+    "sourceUnitDigest": "2d791158021d4df9",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-4",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0002 (source lines 1379-1382, starting \"forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đư\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "2d791158021d4df9eabbc0897dffa6df940c425a067c7e7edee5c200e9111594",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "63286379708e690f3084fb05126ff301daea9653cab27930f63a9304f88dde72",
+    "identityFingerprint": "63286379708e690f3084fb05126ff301daea9653cab27930f63a9304f88dde72",
+    "claimId": "claim_310b7c85756d5a5631a83fd5b6f51450",
+    "sourceAnchor": "unheaded-block-114",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "2d791158021d4df9eabbc0897dffa6df940c425a067c7e7edee5c200e9111594",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-114",
+      "githubAnchor": "unheaded-block-114",
+      "stableAnchor": "unheaded-block-114",
+      "title": "Unheaded block 114",
+      "startLine": 1379,
+      "endLine": 1382,
+      "textDigest": "2d791158021d4df9eabbc0897dffa6df940c425a067c7e7edee5c200e9111594",
+      "sample": "forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đường cho hướng\nnhiều-agent chạy song song (fan-out). Cám dỗ quen thuộc là dựng cấp bậc entity\nriêng: epic ⊃ sto",
+      "identityFingerprint": "63286379708e690f3084fb05126ff301daea9653cab27930f63a9304f88dde72",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "Bối cảnh"
+      ],
+      "text": "forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đường cho hướng\nnhiều-agent chạy song song (fan-out). Cám dỗ quen thuộc là dựng cấp bậc entity\nriêng: epic ⊃ story ⊃ task, mỗi cấp một schema. Cách đó nhân bội bề mặt trạng thái\nvà khoá độ mịn công việc vào schema."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 36,
+    "endLine": 39,
+    "textDigest": "2d791158021d4df9eabbc0897dffa6df940c425a067c7e7edee5c200e9111594",
+    "sample": "forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đường cho hướng\nnhiều-agent chạy song song (fan-out). Cám dỗ quen thuộc là dựng cấp bậc entity\nriêng: epic ⊃ sto",
+    "identityFingerprint": "63286379708e690f3084fb05126ff301daea9653cab27930f63a9304f88dde72",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Context"
+    ],
+    "text": "forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đường cho hướng\nnhiều-agent chạy song song (fan-out). Cám dỗ quen thuộc là dựng cấp bậc entity\nriêng: epic ⊃ story ⊃ task, mỗi cấp một schema. Cách đó nhân bội bề mặt trạng thái\nvà khoá độ mịn công việc vào schema."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-4",
+      "githubAnchor": "unheaded-block-4",
+      "stableAnchor": "unheaded-block-4",
+      "title": "Unheaded block 4",
+      "startLine": 36,
+      "endLine": 39,
+      "textDigest": "2d791158021d4df9eabbc0897dffa6df940c425a067c7e7edee5c200e9111594",
+      "sample": "forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đường cho hướng\nnhiều-agent chạy song song (fan-out). Cám dỗ quen thuộc là dựng cấp bậc entity\nriêng: epic ⊃ sto",
+      "identityFingerprint": "63286379708e690f3084fb05126ff301daea9653cab27930f63a9304f88dde72",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Context"
+      ],
+      "text": "forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đường cho hướng\nnhiều-agent chạy song song (fan-out). Cám dỗ quen thuộc là dựng cấp bậc entity\nriêng: epic ⊃ story ⊃ task, mỗi cấp một schema. Cách đó nhân bội bề mặt trạng thái\nvà khoá độ mịn công việc vào schema."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_310b7c85756d5a5631a83fd5b6f51450"
+}
+```
+
+## Entry claim_5b6cd72833b3ee7ea7a2862b4eadb328
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
+    "sourceUnitDigest": "d6043b1481fba899",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0002-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0002 is represented by the frozen H3 \"0002 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "6a7b90c72430f1cb8d04a666d3fa97514ec1f6ba3c24cf36641333a9745f4e19",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
+    "sourceUnitDigest": "d6043b1481fba899",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0002-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0002 is represented by the frozen H3 \"0002 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "6a7b90c72430f1cb8d04a666d3fa97514ec1f6ba3c24cf36641333a9745f4e19",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "0afba554fbad95ef516fa96c907ae8917cb2cb7e542ac7f9abc9738d915da4c8",
+    "identityFingerprint": "fd10b0528258c56add2bf9beaed8d27774a6954f92ecdbfac3177bf2348d34b8",
+    "claimId": "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
+    "sourceAnchor": "quyết-định",
+    "unitKind": "heading",
+    "sourceUnitDigest": "d6043b1481fba899bd107a3f203d0eb91b3510c392303fba688d5d8dcd74ea9b",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Quyết định",
+      "anchor": "quyết-định",
+      "githubAnchor": "quyết-định",
+      "stableAnchor": "h-cfbf70cb6ac1",
+      "startLine": 1384,
+      "endLine": 1384,
+      "textDigest": "d6043b1481fba899bd107a3f203d0eb91b3510c392303fba688d5d8dcd74ea9b",
+      "sample": "Quyết định",
+      "sectionPayloadDigest": "6d29bd75988172380cec9e3e8c6d38c00ca34fe475aec97c412f338cf6484ba4",
+      "followingBlockDigest": "6d29bd75988172380cec9e3e8c6d38c00ca34fe475aec97c412f338cf6484ba4",
+      "identityFingerprint": "fd10b0528258c56add2bf9beaed8d27774a6954f92ecdbfac3177bf2348d34b8",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng"
+      ],
+      "text": "#### Quyết định",
+      "sectionText": "#### Quyết định\n\n- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps** vào nhau.\n- **\"Epic\" chỉ là một item thường** được các item khác trỏ deps tới — không phải một\n  cấp entity riêng.\n- Vòng đời cấp-câu-chuyện (bối cảnh, phê duyệt) là **thuộc tính/tài liệu gắn vào\n  item**, không phải entity mới.\n- **Frontier sẵn-sàng** = tập mọi item có toàn bộ deps đã xong, **derive toàn cục**\n  từ trạng thái — không phải danh sách duy trì bằng tay."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0002 Decision",
+    "anchor": "0002-decision",
+    "githubAnchor": "0002-decision",
+    "stableAnchor": "h-d3cd9376e9d4",
+    "startLine": 41,
+    "endLine": 41,
+    "textDigest": "6a7b90c72430f1cb8d04a666d3fa97514ec1f6ba3c24cf36641333a9745f4e19",
+    "sample": "0002 Decision",
+    "sectionPayloadDigest": "6d29bd75988172380cec9e3e8c6d38c00ca34fe475aec97c412f338cf6484ba4",
+    "followingBlockDigest": "6d29bd75988172380cec9e3e8c6d38c00ca34fe475aec97c412f338cf6484ba4",
+    "identityFingerprint": "fd4ae40376d4b56349aa79f12350b13164208997ba972d5ffc1a199f57dba9dd",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ],
+    "text": "### 0002 Decision",
+    "sectionText": "### 0002 Decision\n\n- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps** vào nhau.\n- **\"Epic\" chỉ là một item thường** được các item khác trỏ deps tới — không phải một\n  cấp entity riêng.\n- Vòng đời cấp-câu-chuyện (bối cảnh, phê duyệt) là **thuộc tính/tài liệu gắn vào\n  item**, không phải entity mới.\n- **Frontier sẵn-sàng** = tập mọi item có toàn bộ deps đã xong, **derive toàn cục**\n  từ trạng thái — không phải danh sách duy trì bằng tay."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_5b6cd72833b3ee7ea7a2862b4eadb328"
+}
+```
+
+## Entry claim_6f1392a7f197c9824233896cf218bda9
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_6f1392a7f197c9824233896cf218bda9",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_6f1392a7f197c9824233896cf218bda9",
+    "sourceUnitDigest": "6d29bd7598817238",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-5",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0002 (source lines 1355-1361, starting \"- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps**\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "6d29bd75988172380cec9e3e8c6d38c00ca34fe475aec97c412f338cf6484ba4",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Decision"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_6f1392a7f197c9824233896cf218bda9",
+    "sourceUnitDigest": "6d29bd7598817238",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-5",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0002 (source lines 1386-1392, starting \"- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps**\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "6d29bd75988172380cec9e3e8c6d38c00ca34fe475aec97c412f338cf6484ba4",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "dd74371a8b4e6f4fec41e134971d6e0f9c9135b4b319767bca08f13be42b7c06",
+    "identityFingerprint": "dd74371a8b4e6f4fec41e134971d6e0f9c9135b4b319767bca08f13be42b7c06",
+    "claimId": "claim_6f1392a7f197c9824233896cf218bda9",
+    "sourceAnchor": "unheaded-block-115",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6d29bd75988172380cec9e3e8c6d38c00ca34fe475aec97c412f338cf6484ba4",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-115",
+      "githubAnchor": "unheaded-block-115",
+      "stableAnchor": "unheaded-block-115",
+      "title": "Unheaded block 115",
+      "startLine": 1386,
+      "endLine": 1392,
+      "textDigest": "6d29bd75988172380cec9e3e8c6d38c00ca34fe475aec97c412f338cf6484ba4",
+      "sample": "- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps** vào nhau.\n- **\"Epic\" chỉ là một item thường** được các item khác trỏ deps tới — không phải một\n  cấp entity r",
+      "identityFingerprint": "dd74371a8b4e6f4fec41e134971d6e0f9c9135b4b319767bca08f13be42b7c06",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "Quyết định"
+      ],
+      "text": "- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps** vào nhau.\n- **\"Epic\" chỉ là một item thường** được các item khác trỏ deps tới — không phải một\n  cấp entity riêng.\n- Vòng đời cấp-câu-chuyện (bối cảnh, phê duyệt) là **thuộc tính/tài liệu gắn vào\n  item**, không phải entity mới.\n- **Frontier sẵn-sàng** = tập mọi item có toàn bộ deps đã xong, **derive toàn cục**\n  từ trạng thái — không phải danh sách duy trì bằng tay."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-5",
+    "githubAnchor": "unheaded-block-5",
+    "stableAnchor": "unheaded-block-5",
+    "title": "Unheaded block 5",
+    "startLine": 43,
+    "endLine": 49,
+    "textDigest": "6d29bd75988172380cec9e3e8c6d38c00ca34fe475aec97c412f338cf6484ba4",
+    "sample": "- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps** vào nhau.\n- **\"Epic\" chỉ là một item thường** được các item khác trỏ deps tới — không phải một\n  cấp entity r",
+    "identityFingerprint": "dd74371a8b4e6f4fec41e134971d6e0f9c9135b4b319767bca08f13be42b7c06",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Decision"
+    ],
+    "text": "- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps** vào nhau.\n- **\"Epic\" chỉ là một item thường** được các item khác trỏ deps tới — không phải một\n  cấp entity riêng.\n- Vòng đời cấp-câu-chuyện (bối cảnh, phê duyệt) là **thuộc tính/tài liệu gắn vào\n  item**, không phải entity mới.\n- **Frontier sẵn-sàng** = tập mọi item có toàn bộ deps đã xong, **derive toàn cục**\n  từ trạng thái — không phải danh sách duy trì bằng tay."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-5",
+      "githubAnchor": "unheaded-block-5",
+      "stableAnchor": "unheaded-block-5",
+      "title": "Unheaded block 5",
+      "startLine": 43,
+      "endLine": 49,
+      "textDigest": "6d29bd75988172380cec9e3e8c6d38c00ca34fe475aec97c412f338cf6484ba4",
+      "sample": "- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps** vào nhau.\n- **\"Epic\" chỉ là một item thường** được các item khác trỏ deps tới — không phải một\n  cấp entity r",
+      "identityFingerprint": "dd74371a8b4e6f4fec41e134971d6e0f9c9135b4b319767bca08f13be42b7c06",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Decision"
+      ],
+      "text": "- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps** vào nhau.\n- **\"Epic\" chỉ là một item thường** được các item khác trỏ deps tới — không phải một\n  cấp entity riêng.\n- Vòng đời cấp-câu-chuyện (bối cảnh, phê duyệt) là **thuộc tính/tài liệu gắn vào\n  item**, không phải entity mới.\n- **Frontier sẵn-sàng** = tập mọi item có toàn bộ deps đã xong, **derive toàn cục**\n  từ trạng thái — không phải danh sách duy trì bằng tay."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_6f1392a7f197c9824233896cf218bda9"
+}
+```
+
+## Entry claim_e8b18c86c4297b05e04a14793817bf6a
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e8b18c86c4297b05e04a14793817bf6a",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_e8b18c86c4297b05e04a14793817bf6a",
+    "sourceUnitDigest": "e91bbb5ae8fcb8f8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0002-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0002 is represented by the frozen H3 \"0002 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "fc62699538350fccc923e8874a342f8d5e5f5582ae09db366066bf776b60ef7a",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_e8b18c86c4297b05e04a14793817bf6a",
+    "sourceUnitDigest": "e91bbb5ae8fcb8f8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0002-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0002 is represented by the frozen H3 \"0002 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "fc62699538350fccc923e8874a342f8d5e5f5582ae09db366066bf776b60ef7a",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "795757daa9a2960506cbb243722aa38ca7de53dadfd0547dbc195e6e076fffa6",
+    "identityFingerprint": "aeae31509d30f3174facf1d000b16749ce8e2e29ee458da29ba2903f5f4fd5d2",
+    "claimId": "claim_e8b18c86c4297b05e04a14793817bf6a",
+    "sourceAnchor": "hệ-quả",
+    "unitKind": "heading",
+    "sourceUnitDigest": "e91bbb5ae8fcb8f80cfc0e7d96edacde4801d6b55c38e7d7effdc6e66668fe3d",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Hệ quả",
+      "anchor": "hệ-quả",
+      "githubAnchor": "hệ-quả",
+      "stableAnchor": "h-9d6d58f00bba",
+      "startLine": 1394,
+      "endLine": 1394,
+      "textDigest": "e91bbb5ae8fcb8f80cfc0e7d96edacde4801d6b55c38e7d7effdc6e66668fe3d",
+      "sample": "Hệ quả",
+      "sectionPayloadDigest": "c6b534953ddd2fee4147f46fd86e40b2de3a798e1b1a685985f0d4b547c14e0d",
+      "followingBlockDigest": "a45346dbf45eca841ecf385d6a2d1444175f264ec2bdf3a261f038abc7a84e90",
+      "identityFingerprint": "aeae31509d30f3174facf1d000b16749ce8e2e29ee458da29ba2903f5f4fd5d2",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng"
+      ],
+      "text": "#### Hệ quả",
+      "sectionText": "#### Hệ quả\n\n- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việc làm-được-ngay\n  bất kể chúng thuộc \"epic\" nào.\n- **Việc-kế-tiếp là một truy vấn derive,** không phải danh sách người ta cập nhật tay\n  — đúng tiêu chí \"agent lạ tự tìm việc kế tiếp từ state\".\n- **Độ mịn item là kỷ luật planning, không phải tính chất schema:** muốn nhỏ hơn thì\n  tách item + deps, không cần thêm loại entity.\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0002 Consequences",
+    "anchor": "0002-consequences",
+    "githubAnchor": "0002-consequences",
+    "stableAnchor": "h-d5acec3a8307",
+    "startLine": 51,
+    "endLine": 51,
+    "textDigest": "fc62699538350fccc923e8874a342f8d5e5f5582ae09db366066bf776b60ef7a",
+    "sample": "0002 Consequences",
+    "sectionPayloadDigest": "c6b534953ddd2fee4147f46fd86e40b2de3a798e1b1a685985f0d4b547c14e0d",
+    "followingBlockDigest": "a45346dbf45eca841ecf385d6a2d1444175f264ec2bdf3a261f038abc7a84e90",
+    "identityFingerprint": "ddad75e89de3b89c150c0f7edcff18b78eaf492b9183c4af72e33348ba854f70",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ],
+    "text": "### 0002 Consequences",
+    "sectionText": "### 0002 Consequences\n\n- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việc làm-được-ngay\n  bất kể chúng thuộc \"epic\" nào.\n- **Việc-kế-tiếp là một truy vấn derive,** không phải danh sách người ta cập nhật tay\n  — đúng tiêu chí \"agent lạ tự tìm việc kế tiếp từ state\".\n- **Độ mịn item là kỷ luật planning, không phải tính chất schema:** muốn nhỏ hơn thì\n  tách item + deps, không cần thêm loại entity.\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_e8b18c86c4297b05e04a14793817bf6a"
+}
+```
+
+## Entry claim_6bf5e5b90a15803e49010737491afdb9
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_6bf5e5b90a15803e49010737491afdb9",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_6bf5e5b90a15803e49010737491afdb9",
+    "sourceUnitDigest": "a45346dbf45eca84",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-6",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0002 (source lines 1365-1370, starting \"- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việ\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "a45346dbf45eca841ecf385d6a2d1444175f264ec2bdf3a261f038abc7a84e90",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_6bf5e5b90a15803e49010737491afdb9",
+    "sourceUnitDigest": "a45346dbf45eca84",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-6",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0002 (source lines 1396-1401, starting \"- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việ\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "a45346dbf45eca841ecf385d6a2d1444175f264ec2bdf3a261f038abc7a84e90",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "fee1237e5179605f0628801b52cac2be3aadf634acf468e2d9e316ff85f85462",
+    "identityFingerprint": "fee1237e5179605f0628801b52cac2be3aadf634acf468e2d9e316ff85f85462",
+    "claimId": "claim_6bf5e5b90a15803e49010737491afdb9",
+    "sourceAnchor": "unheaded-block-116",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a45346dbf45eca841ecf385d6a2d1444175f264ec2bdf3a261f038abc7a84e90",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-116",
+      "githubAnchor": "unheaded-block-116",
+      "stableAnchor": "unheaded-block-116",
+      "title": "Unheaded block 116",
+      "startLine": 1396,
+      "endLine": 1401,
+      "textDigest": "a45346dbf45eca841ecf385d6a2d1444175f264ec2bdf3a261f038abc7a84e90",
+      "sample": "- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việc làm-được-ngay\n  bất kể chúng thuộc \"epic\" nào.\n- **Việc-kế-tiếp là một truy vấn derive,** không phải danh sá",
+      "identityFingerprint": "fee1237e5179605f0628801b52cac2be3aadf634acf468e2d9e316ff85f85462",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "Hệ quả"
+      ],
+      "text": "- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việc làm-được-ngay\n  bất kể chúng thuộc \"epic\" nào.\n- **Việc-kế-tiếp là một truy vấn derive,** không phải danh sách người ta cập nhật tay\n  — đúng tiêu chí \"agent lạ tự tìm việc kế tiếp từ state\".\n- **Độ mịn item là kỷ luật planning, không phải tính chất schema:** muốn nhỏ hơn thì\n  tách item + deps, không cần thêm loại entity."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-6",
+    "githubAnchor": "unheaded-block-6",
+    "stableAnchor": "unheaded-block-6",
+    "title": "Unheaded block 6",
+    "startLine": 53,
+    "endLine": 58,
+    "textDigest": "a45346dbf45eca841ecf385d6a2d1444175f264ec2bdf3a261f038abc7a84e90",
+    "sample": "- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việc làm-được-ngay\n  bất kể chúng thuộc \"epic\" nào.\n- **Việc-kế-tiếp là một truy vấn derive,** không phải danh sá",
+    "identityFingerprint": "fee1237e5179605f0628801b52cac2be3aadf634acf468e2d9e316ff85f85462",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Consequences"
+    ],
+    "text": "- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việc làm-được-ngay\n  bất kể chúng thuộc \"epic\" nào.\n- **Việc-kế-tiếp là một truy vấn derive,** không phải danh sách người ta cập nhật tay\n  — đúng tiêu chí \"agent lạ tự tìm việc kế tiếp từ state\".\n- **Độ mịn item là kỷ luật planning, không phải tính chất schema:** muốn nhỏ hơn thì\n  tách item + deps, không cần thêm loại entity."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-6",
+      "githubAnchor": "unheaded-block-6",
+      "stableAnchor": "unheaded-block-6",
+      "title": "Unheaded block 6",
+      "startLine": 53,
+      "endLine": 58,
+      "textDigest": "a45346dbf45eca841ecf385d6a2d1444175f264ec2bdf3a261f038abc7a84e90",
+      "sample": "- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việc làm-được-ngay\n  bất kể chúng thuộc \"epic\" nào.\n- **Việc-kế-tiếp là một truy vấn derive,** không phải danh sá",
+      "identityFingerprint": "fee1237e5179605f0628801b52cac2be3aadf634acf468e2d9e316ff85f85462",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Consequences"
+      ],
+      "text": "- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việc làm-được-ngay\n  bất kể chúng thuộc \"epic\" nào.\n- **Việc-kế-tiếp là một truy vấn derive,** không phải danh sách người ta cập nhật tay\n  — đúng tiêu chí \"agent lạ tự tìm việc kế tiếp từ state\".\n- **Độ mịn item là kỷ luật planning, không phải tính chất schema:** muốn nhỏ hơn thì\n  tách item + deps, không cần thêm loại entity."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_6bf5e5b90a15803e49010737491afdb9"
+}
+```
+
+## Entry claim_c56e0ea4200729ae5cf5542803b2fe10
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_c56e0ea4200729ae5cf5542803b2fe10",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_c56e0ea4200729ae5cf5542803b2fe10",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-7",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0002 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_c56e0ea4200729ae5cf5542803b2fe10",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-7",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0002 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "claimId": "claim_c56e0ea4200729ae5cf5542803b2fe10",
+    "sourceAnchor": "unheaded-block-117",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "carried-forward",
+    "pairedByAnchor": true
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-117",
+      "githubAnchor": "unheaded-block-117",
+      "stableAnchor": "unheaded-block-117",
+      "title": "Unheaded block 117",
+      "startLine": 1403,
+      "endLine": 1403,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "Hệ quả"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-7",
+    "githubAnchor": "unheaded-block-7",
+    "stableAnchor": "unheaded-block-7",
+    "title": "Unheaded block 7",
+    "startLine": 60,
+    "endLine": 60,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model",
+      "0002 Consequences"
+    ],
+    "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "target digest repeats; ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-7",
+      "githubAnchor": "unheaded-block-7",
+      "stableAnchor": "unheaded-block-7",
+      "title": "Unheaded block 7",
+      "startLine": 60,
+      "endLine": 60,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Consequences"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_c56e0ea4200729ae5cf5542803b2fe10"
+}
+```
+
+## Entry claim_0e062808f47ce5c348b6b44a91650ecc
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_0e062808f47ce5c348b6b44a91650ecc",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_0e062808f47ce5c348b6b44a91650ecc",
+    "sourceUnitDigest": "c0dc9acc17db4283",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "3-adr-0003-naming-and-data-layout",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0003 title heading is represented by the frozen H2 \"3. ADR 0003 ...\" (3-adr-0003-naming-and-data-layout); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "eed7c45e529a07ba42be1926c4715e28e71d7ab481a6e270e4db28d1981b35d3",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_0e062808f47ce5c348b6b44a91650ecc",
+    "sourceUnitDigest": "c0dc9acc17db4283",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "3-adr-0003-naming-and-data-layout",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0003 title heading is represented by the frozen H2 \"3. ADR 0003 ...\" (3-adr-0003-naming-and-data-layout); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "eed7c45e529a07ba42be1926c4715e28e71d7ab481a6e270e4db28d1981b35d3",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "7377622014f620c3e11c0449cc8addd3e6cf41de1067c55cc9559653466d4a22",
+    "identityFingerprint": "fd2947643c0c76904c370b5779507e8ee58d2a5a2b6525a938eb45b892a11c10",
+    "claimId": "claim_0e062808f47ce5c348b6b44a91650ecc",
+    "sourceAnchor": "0003-đặt-tên-bố-cục-dữ-liệu",
+    "unitKind": "heading",
+    "sourceUnitDigest": "c0dc9acc17db42831047d749d50611b840aa11185c806d786510a00e63aa5cd0",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "0003 — Đặt tên & bố cục dữ liệu",
+      "anchor": "0003-đặt-tên-bố-cục-dữ-liệu",
+      "githubAnchor": "0003-đặt-tên-bố-cục-dữ-liệu",
+      "stableAnchor": "h-5ae8f8aa7118",
+      "startLine": 1405,
+      "endLine": 1405,
+      "textDigest": "c0dc9acc17db42831047d749d50611b840aa11185c806d786510a00e63aa5cd0",
+      "sample": "0003 — Đặt tên & bố cục dữ liệu",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "fd2947643c0c76904c370b5779507e8ee58d2a5a2b6525a938eb45b892a11c10",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng"
+      ],
+      "text": "### 0003 — Đặt tên & bố cục dữ liệu",
+      "sectionText": "### 0003 — Đặt tên & bố cục dữ liệu"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "3. ADR 0003 Naming And Data Layout",
+    "anchor": "3-adr-0003-naming-and-data-layout",
+    "githubAnchor": "3-adr-0003-naming-and-data-layout",
+    "stableAnchor": "h-e57759d01cbf",
+    "startLine": 62,
+    "endLine": 62,
+    "textDigest": "eed7c45e529a07ba42be1926c4715e28e71d7ab481a6e270e4db28d1981b35d3",
+    "sample": "3. ADR 0003 Naming And Data Layout",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "9d6d77ec7545d57598d4e97d96ee013cb6977c3fc989840268c7a62b2d16790a",
+    "ancestry": [
+      "Retired Decision History: Work State"
+    ],
+    "text": "## 3. ADR 0003 Naming And Data Layout",
+    "sectionText": "## 3. ADR 0003 Naming And Data Layout"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_0e062808f47ce5c348b6b44a91650ecc"
+}
+```
+
+## Entry claim_75f47ef3fd99abd07c138f106f1ca023
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
+    "sourceUnitDigest": "203f9cd3142f933c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0003-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0003 is represented by the frozen H3 \"0003 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "c6a2c64d4858021065b5e9f3a7dd05666d15ee2123b64859bc98ecf175325bd1",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
+    "sourceUnitDigest": "203f9cd3142f933c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0003-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0003 is represented by the frozen H3 \"0003 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "c6a2c64d4858021065b5e9f3a7dd05666d15ee2123b64859bc98ecf175325bd1",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "b7fd927ccf6d9f01ea0ff3fe99fc646b7a0303f729c6811653ff25f8baa17dbc",
+    "identityFingerprint": "07d10ad0044efd244eb7ec7725dfd1f38b118b89de5fdd689d4b1bfa7243ee53",
+    "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
+    "sourceAnchor": "bối-cảnh-1",
+    "unitKind": "heading",
+    "sourceUnitDigest": "203f9cd3142f933c7ed8ebb33a25e956689e857e4cc3d5f54031a06a9a8faa2c",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Bối cảnh",
+      "anchor": "bối-cảnh-1",
+      "githubAnchor": "bối-cảnh-1",
+      "stableAnchor": "h-d23bb65fb552",
+      "startLine": 1407,
+      "endLine": 1407,
+      "textDigest": "203f9cd3142f933c7ed8ebb33a25e956689e857e4cc3d5f54031a06a9a8faa2c",
+      "sample": "Bối cảnh",
+      "sectionPayloadDigest": "152aead220875817c189bb95c64a8e95ae9be24d79d6190afd2c02dfc5992fab",
+      "followingBlockDigest": "152aead220875817c189bb95c64a8e95ae9be24d79d6190afd2c02dfc5992fab",
+      "identityFingerprint": "07d10ad0044efd244eb7ec7725dfd1f38b118b89de5fdd689d4b1bfa7243ee53",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu"
+      ],
+      "text": "#### Bối cảnh",
+      "sectionText": "#### Bối cảnh\n\nCần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước khi viết\ncode, để mọi area sau này nhất quán và để ranh giới truth/view hiện ra ngay trong\nlayout."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0003 Context",
+    "anchor": "0003-context",
+    "githubAnchor": "0003-context",
+    "stableAnchor": "h-d2c3ee6231d8",
+    "startLine": 64,
+    "endLine": 64,
+    "textDigest": "c6a2c64d4858021065b5e9f3a7dd05666d15ee2123b64859bc98ecf175325bd1",
+    "sample": "0003 Context",
+    "sectionPayloadDigest": "152aead220875817c189bb95c64a8e95ae9be24d79d6190afd2c02dfc5992fab",
+    "followingBlockDigest": "152aead220875817c189bb95c64a8e95ae9be24d79d6190afd2c02dfc5992fab",
+    "identityFingerprint": "4cbde9ba3633d71abbeebfad708dc0373053720ca5e581aab105eaad79baad94",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ],
+    "text": "### 0003 Context",
+    "sectionText": "### 0003 Context\n\nCần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước khi viết\ncode, để mọi area sau này nhất quán và để ranh giới truth/view hiện ra ngay trong\nlayout."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_75f47ef3fd99abd07c138f106f1ca023"
+}
+```
+
+## Entry claim_70c83eabb546f46e040404b3b908a02e
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_70c83eabb546f46e040404b3b908a02e",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_70c83eabb546f46e040404b3b908a02e",
+    "sourceUnitDigest": "152aead220875817",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-8",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0003 (source lines 1378-1380, starting \"Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "152aead220875817c189bb95c64a8e95ae9be24d79d6190afd2c02dfc5992fab",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_70c83eabb546f46e040404b3b908a02e",
+    "sourceUnitDigest": "152aead220875817",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-8",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0003 (source lines 1409-1411, starting \"Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "152aead220875817c189bb95c64a8e95ae9be24d79d6190afd2c02dfc5992fab",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "10fbce7840ae1ce6a9b8303fc1a2e5c5a48e4e4042190f8643202bed9bb18446",
+    "identityFingerprint": "10fbce7840ae1ce6a9b8303fc1a2e5c5a48e4e4042190f8643202bed9bb18446",
+    "claimId": "claim_70c83eabb546f46e040404b3b908a02e",
+    "sourceAnchor": "unheaded-block-118",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "152aead220875817c189bb95c64a8e95ae9be24d79d6190afd2c02dfc5992fab",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-118",
+      "githubAnchor": "unheaded-block-118",
+      "stableAnchor": "unheaded-block-118",
+      "title": "Unheaded block 118",
+      "startLine": 1409,
+      "endLine": 1411,
+      "textDigest": "152aead220875817c189bb95c64a8e95ae9be24d79d6190afd2c02dfc5992fab",
+      "sample": "Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước khi viết\ncode, để mọi area sau này nhất quán và để ranh giới truth/view hiện ra ngay trong\nlayout.",
+      "identityFingerprint": "10fbce7840ae1ce6a9b8303fc1a2e5c5a48e4e4042190f8643202bed9bb18446",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu",
+        "Bối cảnh"
+      ],
+      "text": "Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước khi viết\ncode, để mọi area sau này nhất quán và để ranh giới truth/view hiện ra ngay trong\nlayout."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-8",
+    "githubAnchor": "unheaded-block-8",
+    "stableAnchor": "unheaded-block-8",
+    "title": "Unheaded block 8",
+    "startLine": 66,
+    "endLine": 68,
+    "textDigest": "152aead220875817c189bb95c64a8e95ae9be24d79d6190afd2c02dfc5992fab",
+    "sample": "Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước khi viết\ncode, để mọi area sau này nhất quán và để ranh giới truth/view hiện ra ngay trong\nlayout.",
+    "identityFingerprint": "10fbce7840ae1ce6a9b8303fc1a2e5c5a48e4e4042190f8643202bed9bb18446",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Context"
+    ],
+    "text": "Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước khi viết\ncode, để mọi area sau này nhất quán và để ranh giới truth/view hiện ra ngay trong\nlayout."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-8",
+      "githubAnchor": "unheaded-block-8",
+      "stableAnchor": "unheaded-block-8",
+      "title": "Unheaded block 8",
+      "startLine": 66,
+      "endLine": 68,
+      "textDigest": "152aead220875817c189bb95c64a8e95ae9be24d79d6190afd2c02dfc5992fab",
+      "sample": "Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước khi viết\ncode, để mọi area sau này nhất quán và để ranh giới truth/view hiện ra ngay trong\nlayout.",
+      "identityFingerprint": "10fbce7840ae1ce6a9b8303fc1a2e5c5a48e4e4042190f8643202bed9bb18446",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "3. ADR 0003 Naming And Data Layout",
+        "0003 Context"
+      ],
+      "text": "Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước khi viết\ncode, để mọi area sau này nhất quán và để ranh giới truth/view hiện ra ngay trong\nlayout."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_70c83eabb546f46e040404b3b908a02e"
+}
+```
+
+## Entry claim_c6a1314c4583518f5100cc53e78b1979
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_c6a1314c4583518f5100cc53e78b1979",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_c6a1314c4583518f5100cc53e78b1979",
+    "sourceUnitDigest": "798c507e268c8c14",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0003-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0003 is represented by the frozen H3 \"0003 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "d0f79f2a53f7edfc1d92c6e8c71d50e3eecb588a7bccf96f3eb9c97f0a628a7d",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_c6a1314c4583518f5100cc53e78b1979",
+    "sourceUnitDigest": "798c507e268c8c14",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0003-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0003 is represented by the frozen H3 \"0003 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "d0f79f2a53f7edfc1d92c6e8c71d50e3eecb588a7bccf96f3eb9c97f0a628a7d",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "370e0e14c3b84b5a1d1cbb2734ebb40ebb6c0719f6ab913e167ab85c89553d79",
+    "identityFingerprint": "d52fb93707cacf257c061a841e02141da7f2bd2101e944f3c86a865bc6dec9ed",
+    "claimId": "claim_c6a1314c4583518f5100cc53e78b1979",
+    "sourceAnchor": "quyết-định-1",
+    "unitKind": "heading",
+    "sourceUnitDigest": "798c507e268c8c148014c86c19d3e9ba38434eefe0623a8b6606737629e5ae32",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Quyết định",
+      "anchor": "quyết-định-1",
+      "githubAnchor": "quyết-định-1",
+      "stableAnchor": "h-b6541d9a6d39",
+      "startLine": 1413,
+      "endLine": 1413,
+      "textDigest": "798c507e268c8c148014c86c19d3e9ba38434eefe0623a8b6606737629e5ae32",
+      "sample": "Quyết định",
+      "sectionPayloadDigest": "6f7961ba49b014f58ba0ec626d207f11d8fa5ca3852f090640e1521c781db391",
+      "followingBlockDigest": "6f7961ba49b014f58ba0ec626d207f11d8fa5ca3852f090640e1521c781db391",
+      "identityFingerprint": "d52fb93707cacf257c061a841e02141da7f2bd2101e944f3c86a865bc6dec9ed",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu"
+      ],
+      "text": "#### Quyết định",
+      "sectionText": "#### Quyết định\n\n- **CLI = `fgos`** (cửa lệnh của sản phẩm).\n- **Entity đơn vị việc = `work`.**\n- **Data dir = `.fgos/`**, trong đó:\n  - `events.jsonl` — **committed vào git = sự thật** (per 0001).\n  - `state.json` — **bản chiếu, gitignored** (dựng lại được từ replay, không phải\n    sự thật)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0003 Decision",
+    "anchor": "0003-decision",
+    "githubAnchor": "0003-decision",
+    "stableAnchor": "h-920d1af3154b",
+    "startLine": 70,
+    "endLine": 70,
+    "textDigest": "d0f79f2a53f7edfc1d92c6e8c71d50e3eecb588a7bccf96f3eb9c97f0a628a7d",
+    "sample": "0003 Decision",
+    "sectionPayloadDigest": "6f7961ba49b014f58ba0ec626d207f11d8fa5ca3852f090640e1521c781db391",
+    "followingBlockDigest": "6f7961ba49b014f58ba0ec626d207f11d8fa5ca3852f090640e1521c781db391",
+    "identityFingerprint": "fd41f8cf9b97cca24c07106491ddfacf15e6d91e589117a41652e0ff6d0dfafe",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ],
+    "text": "### 0003 Decision",
+    "sectionText": "### 0003 Decision\n\n- **CLI = `fgos`** (cửa lệnh của sản phẩm).\n- **Entity đơn vị việc = `work`.**\n- **Data dir = `.fgos/`**, trong đó:\n  - `events.jsonl` — **committed vào git = sự thật** (per 0001).\n  - `state.json` — **bản chiếu, gitignored** (dựng lại được từ replay, không phải\n    sự thật)."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_c6a1314c4583518f5100cc53e78b1979"
+}
+```
+
+## Entry claim_45c662066b6e70bac4ff5991ee40afca
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_45c662066b6e70bac4ff5991ee40afca",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_45c662066b6e70bac4ff5991ee40afca",
+    "sourceUnitDigest": "6f7961ba49b014f5",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-9",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0003 (source lines 1384-1389, starting \"- **CLI = `fgos`** (cửa lệnh của sản phẩm).\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "6f7961ba49b014f58ba0ec626d207f11d8fa5ca3852f090640e1521c781db391",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Decision"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_45c662066b6e70bac4ff5991ee40afca",
+    "sourceUnitDigest": "6f7961ba49b014f5",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-9",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0003 (source lines 1415-1420, starting \"- **CLI = `fgos`** (cửa lệnh của sản phẩm).\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "6f7961ba49b014f58ba0ec626d207f11d8fa5ca3852f090640e1521c781db391",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "9fb8890ca0eed05053ffd704dc678733beb029045e5060b24c2027f97be98729",
+    "identityFingerprint": "9fb8890ca0eed05053ffd704dc678733beb029045e5060b24c2027f97be98729",
+    "claimId": "claim_45c662066b6e70bac4ff5991ee40afca",
+    "sourceAnchor": "unheaded-block-119",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "6f7961ba49b014f58ba0ec626d207f11d8fa5ca3852f090640e1521c781db391",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-119",
+      "githubAnchor": "unheaded-block-119",
+      "stableAnchor": "unheaded-block-119",
+      "title": "Unheaded block 119",
+      "startLine": 1415,
+      "endLine": 1420,
+      "textDigest": "6f7961ba49b014f58ba0ec626d207f11d8fa5ca3852f090640e1521c781db391",
+      "sample": "- **CLI = `fgos`** (cửa lệnh của sản phẩm).\n- **Entity đơn vị việc = `work`.**\n- **Data dir = `.fgos/`**, trong đó:\n  - `events.jsonl` — **committed vào git = sự thật** (per 0001).",
+      "identityFingerprint": "9fb8890ca0eed05053ffd704dc678733beb029045e5060b24c2027f97be98729",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu",
+        "Quyết định"
+      ],
+      "text": "- **CLI = `fgos`** (cửa lệnh của sản phẩm).\n- **Entity đơn vị việc = `work`.**\n- **Data dir = `.fgos/`**, trong đó:\n  - `events.jsonl` — **committed vào git = sự thật** (per 0001).\n  - `state.json` — **bản chiếu, gitignored** (dựng lại được từ replay, không phải\n    sự thật)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-9",
+    "githubAnchor": "unheaded-block-9",
+    "stableAnchor": "unheaded-block-9",
+    "title": "Unheaded block 9",
+    "startLine": 72,
+    "endLine": 77,
+    "textDigest": "6f7961ba49b014f58ba0ec626d207f11d8fa5ca3852f090640e1521c781db391",
+    "sample": "- **CLI = `fgos`** (cửa lệnh của sản phẩm).\n- **Entity đơn vị việc = `work`.**\n- **Data dir = `.fgos/`**, trong đó:\n  - `events.jsonl` — **committed vào git = sự thật** (per 0001).",
+    "identityFingerprint": "9fb8890ca0eed05053ffd704dc678733beb029045e5060b24c2027f97be98729",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Decision"
+    ],
+    "text": "- **CLI = `fgos`** (cửa lệnh của sản phẩm).\n- **Entity đơn vị việc = `work`.**\n- **Data dir = `.fgos/`**, trong đó:\n  - `events.jsonl` — **committed vào git = sự thật** (per 0001).\n  - `state.json` — **bản chiếu, gitignored** (dựng lại được từ replay, không phải\n    sự thật)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-9",
+      "githubAnchor": "unheaded-block-9",
+      "stableAnchor": "unheaded-block-9",
+      "title": "Unheaded block 9",
+      "startLine": 72,
+      "endLine": 77,
+      "textDigest": "6f7961ba49b014f58ba0ec626d207f11d8fa5ca3852f090640e1521c781db391",
+      "sample": "- **CLI = `fgos`** (cửa lệnh của sản phẩm).\n- **Entity đơn vị việc = `work`.**\n- **Data dir = `.fgos/`**, trong đó:\n  - `events.jsonl` — **committed vào git = sự thật** (per 0001).",
+      "identityFingerprint": "9fb8890ca0eed05053ffd704dc678733beb029045e5060b24c2027f97be98729",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "3. ADR 0003 Naming And Data Layout",
+        "0003 Decision"
+      ],
+      "text": "- **CLI = `fgos`** (cửa lệnh của sản phẩm).\n- **Entity đơn vị việc = `work`.**\n- **Data dir = `.fgos/`**, trong đó:\n  - `events.jsonl` — **committed vào git = sự thật** (per 0001).\n  - `state.json` — **bản chiếu, gitignored** (dựng lại được từ replay, không phải\n    sự thật)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_45c662066b6e70bac4ff5991ee40afca"
+}
+```
+
+## Entry claim_f161fbd15476131b86b7c2fd2f1d8f59
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_f161fbd15476131b86b7c2fd2f1d8f59",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_f161fbd15476131b86b7c2fd2f1d8f59",
+    "sourceUnitDigest": "055bb7583cd58580",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0003-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0003 is represented by the frozen H3 \"0003 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "e6a929b78a9cc9b4254c5e289f33c764837ff88c2f3ff9919376e5f8823b9ff0",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_f161fbd15476131b86b7c2fd2f1d8f59",
+    "sourceUnitDigest": "055bb7583cd58580",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0003-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0003 is represented by the frozen H3 \"0003 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "e6a929b78a9cc9b4254c5e289f33c764837ff88c2f3ff9919376e5f8823b9ff0",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "f54722f67b8113c733a3977cf1261fde1b84c394d1d48da3fa46350c5ebccf59",
+    "identityFingerprint": "26826243f1e0558a24db6705324dbab5fff940b6556feb0ab66ed9d52da84676",
+    "claimId": "claim_f161fbd15476131b86b7c2fd2f1d8f59",
+    "sourceAnchor": "hệ-quả-1",
+    "unitKind": "heading",
+    "sourceUnitDigest": "055bb7583cd585802e14c9c9a6472e7c19df9cce141ecf2b1f8ebcd152343e06",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Hệ quả",
+      "anchor": "hệ-quả-1",
+      "githubAnchor": "hệ-quả-1",
+      "stableAnchor": "h-a3f4f4b3fa65",
+      "startLine": 1422,
+      "endLine": 1422,
+      "textDigest": "055bb7583cd585802e14c9c9a6472e7c19df9cce141ecf2b1f8ebcd152343e06",
+      "sample": "Hệ quả",
+      "sectionPayloadDigest": "f3c97f057c1877d537bbcc2f0b7b24ca62c1eeb8cb6395abb1e05de52fd46291",
+      "followingBlockDigest": "37d75ce7b883a61c5bee0ad0e4bcc382fec55e8223ceeb80d63056d62f71d9e2",
+      "identityFingerprint": "26826243f1e0558a24db6705324dbab5fff940b6556feb0ab66ed9d52da84676",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu"
+      ],
+      "text": "#### Hệ quả",
+      "sectionText": "#### Hệ quả\n\n- **Brand nhất quán** giữa CLI, tài liệu và data dir.\n- **Ranh giới truth/view hiện ngay trong layout:** một file được commit (log), một\n  file bị ignore (view) — đọc `.gitignore` là thấy đâu là sự thật.\n- Vị trí cụ thể của `.fgos/` (đường dẫn, tổ chức con) là quyền quyết định khi thực\n  thi, miễn giữ đúng cặp truth-committed / view-ignored ở trên.\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0003 Consequences",
+    "anchor": "0003-consequences",
+    "githubAnchor": "0003-consequences",
+    "stableAnchor": "h-0a74dd12e07f",
+    "startLine": 79,
+    "endLine": 79,
+    "textDigest": "e6a929b78a9cc9b4254c5e289f33c764837ff88c2f3ff9919376e5f8823b9ff0",
+    "sample": "0003 Consequences",
+    "sectionPayloadDigest": "f3c97f057c1877d537bbcc2f0b7b24ca62c1eeb8cb6395abb1e05de52fd46291",
+    "followingBlockDigest": "37d75ce7b883a61c5bee0ad0e4bcc382fec55e8223ceeb80d63056d62f71d9e2",
+    "identityFingerprint": "1e53cd86bca8c340fb276692e741ceed1ae68094c180fe423e339fe83296c39a",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ],
+    "text": "### 0003 Consequences",
+    "sectionText": "### 0003 Consequences\n\n- **Brand nhất quán** giữa CLI, tài liệu và data dir.\n- **Ranh giới truth/view hiện ngay trong layout:** một file được commit (log), một\n  file bị ignore (view) — đọc `.gitignore` là thấy đâu là sự thật.\n- Vị trí cụ thể của `.fgos/` (đường dẫn, tổ chức con) là quyền quyết định khi thực\n  thi, miễn giữ đúng cặp truth-committed / view-ignored ở trên.\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_f161fbd15476131b86b7c2fd2f1d8f59"
+}
+```
+
+## Entry claim_0f85275ad3f392256b805bf226c9562d
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_0f85275ad3f392256b805bf226c9562d",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_0f85275ad3f392256b805bf226c9562d",
+    "sourceUnitDigest": "37d75ce7b883a61c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-10",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0003 (source lines 1393-1397, starting \"- **Brand nhất quán** giữa CLI, tài liệu và data dir.\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "37d75ce7b883a61c5bee0ad0e4bcc382fec55e8223ceeb80d63056d62f71d9e2",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Consequences"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_0f85275ad3f392256b805bf226c9562d",
+    "sourceUnitDigest": "37d75ce7b883a61c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-10",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0003 (source lines 1424-1428, starting \"- **Brand nhất quán** giữa CLI, tài liệu và data dir.\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "37d75ce7b883a61c5bee0ad0e4bcc382fec55e8223ceeb80d63056d62f71d9e2",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "428b99be0277a1775af1aeb2f99f57b191637e26b195990109899791a0d118bb",
+    "identityFingerprint": "428b99be0277a1775af1aeb2f99f57b191637e26b195990109899791a0d118bb",
+    "claimId": "claim_0f85275ad3f392256b805bf226c9562d",
+    "sourceAnchor": "unheaded-block-120",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "37d75ce7b883a61c5bee0ad0e4bcc382fec55e8223ceeb80d63056d62f71d9e2",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-120",
+      "githubAnchor": "unheaded-block-120",
+      "stableAnchor": "unheaded-block-120",
+      "title": "Unheaded block 120",
+      "startLine": 1424,
+      "endLine": 1428,
+      "textDigest": "37d75ce7b883a61c5bee0ad0e4bcc382fec55e8223ceeb80d63056d62f71d9e2",
+      "sample": "- **Brand nhất quán** giữa CLI, tài liệu và data dir.\n- **Ranh giới truth/view hiện ngay trong layout:** một file được commit (log), một\n  file bị ignore (view) — đọc `.gitignore` ",
+      "identityFingerprint": "428b99be0277a1775af1aeb2f99f57b191637e26b195990109899791a0d118bb",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu",
+        "Hệ quả"
+      ],
+      "text": "- **Brand nhất quán** giữa CLI, tài liệu và data dir.\n- **Ranh giới truth/view hiện ngay trong layout:** một file được commit (log), một\n  file bị ignore (view) — đọc `.gitignore` là thấy đâu là sự thật.\n- Vị trí cụ thể của `.fgos/` (đường dẫn, tổ chức con) là quyền quyết định khi thực\n  thi, miễn giữ đúng cặp truth-committed / view-ignored ở trên."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-10",
+    "githubAnchor": "unheaded-block-10",
+    "stableAnchor": "unheaded-block-10",
+    "title": "Unheaded block 10",
+    "startLine": 81,
+    "endLine": 85,
+    "textDigest": "37d75ce7b883a61c5bee0ad0e4bcc382fec55e8223ceeb80d63056d62f71d9e2",
+    "sample": "- **Brand nhất quán** giữa CLI, tài liệu và data dir.\n- **Ranh giới truth/view hiện ngay trong layout:** một file được commit (log), một\n  file bị ignore (view) — đọc `.gitignore` ",
+    "identityFingerprint": "428b99be0277a1775af1aeb2f99f57b191637e26b195990109899791a0d118bb",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Consequences"
+    ],
+    "text": "- **Brand nhất quán** giữa CLI, tài liệu và data dir.\n- **Ranh giới truth/view hiện ngay trong layout:** một file được commit (log), một\n  file bị ignore (view) — đọc `.gitignore` là thấy đâu là sự thật.\n- Vị trí cụ thể của `.fgos/` (đường dẫn, tổ chức con) là quyền quyết định khi thực\n  thi, miễn giữ đúng cặp truth-committed / view-ignored ở trên."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-10",
+      "githubAnchor": "unheaded-block-10",
+      "stableAnchor": "unheaded-block-10",
+      "title": "Unheaded block 10",
+      "startLine": 81,
+      "endLine": 85,
+      "textDigest": "37d75ce7b883a61c5bee0ad0e4bcc382fec55e8223ceeb80d63056d62f71d9e2",
+      "sample": "- **Brand nhất quán** giữa CLI, tài liệu và data dir.\n- **Ranh giới truth/view hiện ngay trong layout:** một file được commit (log), một\n  file bị ignore (view) — đọc `.gitignore` ",
+      "identityFingerprint": "428b99be0277a1775af1aeb2f99f57b191637e26b195990109899791a0d118bb",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "3. ADR 0003 Naming And Data Layout",
+        "0003 Consequences"
+      ],
+      "text": "- **Brand nhất quán** giữa CLI, tài liệu và data dir.\n- **Ranh giới truth/view hiện ngay trong layout:** một file được commit (log), một\n  file bị ignore (view) — đọc `.gitignore` là thấy đâu là sự thật.\n- Vị trí cụ thể của `.fgos/` (đường dẫn, tổ chức con) là quyền quyết định khi thực\n  thi, miễn giữ đúng cặp truth-committed / view-ignored ở trên."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_0f85275ad3f392256b805bf226c9562d"
+}
+```
+
+## Entry claim_c57c39536b983d5f172833853e8b3344
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_c57c39536b983d5f172833853e8b3344",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_c57c39536b983d5f172833853e8b3344",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-11",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0003 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_c57c39536b983d5f172833853e8b3344",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-11",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0003 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "claimId": "claim_c57c39536b983d5f172833853e8b3344",
+    "sourceAnchor": "unheaded-block-121",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "carried-forward",
+    "pairedByAnchor": true
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-121",
+      "githubAnchor": "unheaded-block-121",
+      "stableAnchor": "unheaded-block-121",
+      "title": "Unheaded block 121",
+      "startLine": 1430,
+      "endLine": 1430,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0003 — Đặt tên & bố cục dữ liệu",
+        "Hệ quả"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-11",
+    "githubAnchor": "unheaded-block-11",
+    "stableAnchor": "unheaded-block-11",
+    "title": "Unheaded block 11",
+    "startLine": 87,
+    "endLine": 87,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout",
+      "0003 Consequences"
+    ],
+    "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "target digest repeats; ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-7",
+      "githubAnchor": "unheaded-block-7",
+      "stableAnchor": "unheaded-block-7",
+      "title": "Unheaded block 7",
+      "startLine": 60,
+      "endLine": 60,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Consequences"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_c57c39536b983d5f172833853e8b3344"
+}
+```
+
+## Entry claim_5908b357cb98d52934398e26e43fcb39
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_5908b357cb98d52934398e26e43fcb39",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_5908b357cb98d52934398e26e43fcb39",
+    "sourceUnitDigest": "a0ff252fe4a05fd8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "4-adr-0004-scope-and-non-goals",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0004 title heading is represented by the frozen H2 \"4. ADR 0004 ...\" (4-adr-0004-scope-and-non-goals); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "2d2db2abca61349471af2e2a3d0f5581e7f87af45a979df1e541c1448a865f8a",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_5908b357cb98d52934398e26e43fcb39",
+    "sourceUnitDigest": "a0ff252fe4a05fd8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "4-adr-0004-scope-and-non-goals",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0004 title heading is represented by the frozen H2 \"4. ADR 0004 ...\" (4-adr-0004-scope-and-non-goals); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "2d2db2abca61349471af2e2a3d0f5581e7f87af45a979df1e541c1448a865f8a",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "7eedf9f1227671a05539a2d3289de25e60e06d4a16437095e3e9358f7a5e5c17",
+    "identityFingerprint": "52460c886911b8a02f6232a971a16a1d23e9884daaea7303af9bad4cda4b2860",
+    "claimId": "claim_5908b357cb98d52934398e26e43fcb39",
+    "sourceAnchor": "0004-phạm-vi-non-goal",
+    "unitKind": "heading",
+    "sourceUnitDigest": "a0ff252fe4a05fd8e693c461f92fec4d11953243fbd4743612353acb3d2aec72",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "0004 — Phạm vi & non-goal",
+      "anchor": "0004-phạm-vi-non-goal",
+      "githubAnchor": "0004-phạm-vi-non-goal",
+      "stableAnchor": "h-3343f8dba746",
+      "startLine": 1432,
+      "endLine": 1432,
+      "textDigest": "a0ff252fe4a05fd8e693c461f92fec4d11953243fbd4743612353acb3d2aec72",
+      "sample": "0004 — Phạm vi & non-goal",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "52460c886911b8a02f6232a971a16a1d23e9884daaea7303af9bad4cda4b2860",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng"
+      ],
+      "text": "### 0004 — Phạm vi & non-goal",
+      "sectionText": "### 0004 — Phạm vi & non-goal"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "4. ADR 0004 Scope And Non-Goals",
+    "anchor": "4-adr-0004-scope-and-non-goals",
+    "githubAnchor": "4-adr-0004-scope-and-non-goals",
+    "stableAnchor": "h-8cc6b5030b0f",
+    "startLine": 89,
+    "endLine": 89,
+    "textDigest": "2d2db2abca61349471af2e2a3d0f5581e7f87af45a979df1e541c1448a865f8a",
+    "sample": "4. ADR 0004 Scope And Non-Goals",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "c54fefb00903383e5e1e6c6cebd43f820e4d26c1e594a38cb5248b6a5f914a6f",
+    "ancestry": [
+      "Retired Decision History: Work State"
+    ],
+    "text": "## 4. ADR 0004 Scope And Non-Goals",
+    "sectionText": "## 4. ADR 0004 Scope And Non-Goals"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_5908b357cb98d52934398e26e43fcb39"
+}
+```
+
+## Entry claim_67494c7de8ad006fcb01b825ea00e6b2
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
+    "sourceUnitDigest": "f27931862e682c2f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0004-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0004 is represented by the frozen H3 \"0004 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "2d45d4866f7526c232afdeaf650c17f9c3efee2a04afd9e6241922d522abffe9",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
+    "sourceUnitDigest": "f27931862e682c2f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0004-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0004 is represented by the frozen H3 \"0004 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "2d45d4866f7526c232afdeaf650c17f9c3efee2a04afd9e6241922d522abffe9",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "92d517c4e1b059a2f0182910247e7e06bee8a6461e0518336a82644f9d32fd4e",
+    "identityFingerprint": "a3a4b2399c08fc189b4255306b0e85a484f69f33859b73fd1f04626654d54813",
+    "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
+    "sourceAnchor": "bối-cảnh-2",
+    "unitKind": "heading",
+    "sourceUnitDigest": "f27931862e682c2f65d58afcf2b0e652f898219a48d79f6ddb16de0d9b4af6fc",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Bối cảnh",
+      "anchor": "bối-cảnh-2",
+      "githubAnchor": "bối-cảnh-2",
+      "stableAnchor": "h-bbd18e97fbd3",
+      "startLine": 1434,
+      "endLine": 1434,
+      "textDigest": "f27931862e682c2f65d58afcf2b0e652f898219a48d79f6ddb16de0d9b4af6fc",
+      "sample": "Bối cảnh",
+      "sectionPayloadDigest": "e82b27df7a787315c3c6f82d848b6a57bd3a882601740804998508397e71ec07",
+      "followingBlockDigest": "e64dd190deebcac53e83492fe91319c1fced7ca4a6054a2b4c4745821020e531",
+      "identityFingerprint": "a3a4b2399c08fc189b4255306b0e85a484f69f33859b73fd1f04626654d54813",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal"
+      ],
+      "text": "#### Bối cảnh",
+      "sectionText": "#### Bối cảnh\n\nTrước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và nó *quan hệ\nthế nào* với harness (bộ công cụ điều phối) đang được dùng để phát triển chính\nforgent. Không chốt hai biên này thì phạm vi trôi và dễ xây thừa.\n\n> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness phát triển nội\n> bộ của dự án. Ở đây viết thuần theo sản phẩm — \"harness phát triển\" — không phụ\n> thuộc tên công cụ cụ thể nào."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0004 Context",
+    "anchor": "0004-context",
+    "githubAnchor": "0004-context",
+    "stableAnchor": "h-dd93e0b9e5a6",
+    "startLine": 91,
+    "endLine": 91,
+    "textDigest": "2d45d4866f7526c232afdeaf650c17f9c3efee2a04afd9e6241922d522abffe9",
+    "sample": "0004 Context",
+    "sectionPayloadDigest": "e82b27df7a787315c3c6f82d848b6a57bd3a882601740804998508397e71ec07",
+    "followingBlockDigest": "e64dd190deebcac53e83492fe91319c1fced7ca4a6054a2b4c4745821020e531",
+    "identityFingerprint": "7f89485d7fcfe64dfbf112d54a9a81c9d2cc84a93f539ccf427198244133cb7a",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ],
+    "text": "### 0004 Context",
+    "sectionText": "### 0004 Context\n\nTrước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và nó *quan hệ\nthế nào* với harness (bộ công cụ điều phối) đang được dùng để phát triển chính\nforgent. Không chốt hai biên này thì phạm vi trôi và dễ xây thừa.\n\n> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness phát triển nội\n> bộ của dự án. Ở đây viết thuần theo sản phẩm — \"harness phát triển\" — không phụ\n> thuộc tên công cụ cụ thể nào."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_67494c7de8ad006fcb01b825ea00e6b2"
+}
+```
+
+## Entry claim_c23f1c3ed45f72de28f6ed3c605bc43a
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_c23f1c3ed45f72de28f6ed3c605bc43a",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_c23f1c3ed45f72de28f6ed3c605bc43a",
+    "sourceUnitDigest": "e64dd190deebcac5",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-12",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0004 (source lines 1405-1407, starting \"Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và \") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "e64dd190deebcac53e83492fe91319c1fced7ca4a6054a2b4c4745821020e531",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_c23f1c3ed45f72de28f6ed3c605bc43a",
+    "sourceUnitDigest": "e64dd190deebcac5",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-12",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0004 (source lines 1436-1438, starting \"Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và \") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "e64dd190deebcac53e83492fe91319c1fced7ca4a6054a2b4c4745821020e531",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "56cb5e29fc7eb03807e217773bb75a37a2f2a367725e645199d33f3be57fec3e",
+    "identityFingerprint": "56cb5e29fc7eb03807e217773bb75a37a2f2a367725e645199d33f3be57fec3e",
+    "claimId": "claim_c23f1c3ed45f72de28f6ed3c605bc43a",
+    "sourceAnchor": "unheaded-block-122",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e64dd190deebcac53e83492fe91319c1fced7ca4a6054a2b4c4745821020e531",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-122",
+      "githubAnchor": "unheaded-block-122",
+      "stableAnchor": "unheaded-block-122",
+      "title": "Unheaded block 122",
+      "startLine": 1436,
+      "endLine": 1438,
+      "textDigest": "e64dd190deebcac53e83492fe91319c1fced7ca4a6054a2b4c4745821020e531",
+      "sample": "Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và nó *quan hệ\nthế nào* với harness (bộ công cụ điều phối) đang được dùng để phát triển chính\nforgent. Không chốt",
+      "identityFingerprint": "56cb5e29fc7eb03807e217773bb75a37a2f2a367725e645199d33f3be57fec3e",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal",
+        "Bối cảnh"
+      ],
+      "text": "Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và nó *quan hệ\nthế nào* với harness (bộ công cụ điều phối) đang được dùng để phát triển chính\nforgent. Không chốt hai biên này thì phạm vi trôi và dễ xây thừa."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-12",
+    "githubAnchor": "unheaded-block-12",
+    "stableAnchor": "unheaded-block-12",
+    "title": "Unheaded block 12",
+    "startLine": 93,
+    "endLine": 95,
+    "textDigest": "e64dd190deebcac53e83492fe91319c1fced7ca4a6054a2b4c4745821020e531",
+    "sample": "Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và nó *quan hệ\nthế nào* với harness (bộ công cụ điều phối) đang được dùng để phát triển chính\nforgent. Không chốt",
+    "identityFingerprint": "56cb5e29fc7eb03807e217773bb75a37a2f2a367725e645199d33f3be57fec3e",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Context"
+    ],
+    "text": "Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và nó *quan hệ\nthế nào* với harness (bộ công cụ điều phối) đang được dùng để phát triển chính\nforgent. Không chốt hai biên này thì phạm vi trôi và dễ xây thừa."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-12",
+      "githubAnchor": "unheaded-block-12",
+      "stableAnchor": "unheaded-block-12",
+      "title": "Unheaded block 12",
+      "startLine": 93,
+      "endLine": 95,
+      "textDigest": "e64dd190deebcac53e83492fe91319c1fced7ca4a6054a2b4c4745821020e531",
+      "sample": "Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và nó *quan hệ\nthế nào* với harness (bộ công cụ điều phối) đang được dùng để phát triển chính\nforgent. Không chốt",
+      "identityFingerprint": "56cb5e29fc7eb03807e217773bb75a37a2f2a367725e645199d33f3be57fec3e",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals",
+        "0004 Context"
+      ],
+      "text": "Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và nó *quan hệ\nthế nào* với harness (bộ công cụ điều phối) đang được dùng để phát triển chính\nforgent. Không chốt hai biên này thì phạm vi trôi và dễ xây thừa."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_c23f1c3ed45f72de28f6ed3c605bc43a"
+}
+```
+
+## Entry claim_4a9e0c360118d90051bb7c03002ff4d9
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_4a9e0c360118d90051bb7c03002ff4d9",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_4a9e0c360118d90051bb7c03002ff4d9",
+    "sourceUnitDigest": "7fa451435e5be174",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-13",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0004 (source lines 1409-1411, starting \"> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness p\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "7fa451435e5be174a0cf5118a1eaccb44b208aaaf561387fbd36a186bfe74f48",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_4a9e0c360118d90051bb7c03002ff4d9",
+    "sourceUnitDigest": "7fa451435e5be174",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-13",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0004 (source lines 1440-1442, starting \"> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness p\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "7fa451435e5be174a0cf5118a1eaccb44b208aaaf561387fbd36a186bfe74f48",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "bafef409ffcbddd73b5ced4c382d669b58496642d3b928892322852fa242d14a",
+    "identityFingerprint": "bafef409ffcbddd73b5ced4c382d669b58496642d3b928892322852fa242d14a",
+    "claimId": "claim_4a9e0c360118d90051bb7c03002ff4d9",
+    "sourceAnchor": "unheaded-block-123",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "7fa451435e5be174a0cf5118a1eaccb44b208aaaf561387fbd36a186bfe74f48",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-123",
+      "githubAnchor": "unheaded-block-123",
+      "stableAnchor": "unheaded-block-123",
+      "title": "Unheaded block 123",
+      "startLine": 1440,
+      "endLine": 1442,
+      "textDigest": "7fa451435e5be174a0cf5118a1eaccb44b208aaaf561387fbd36a186bfe74f48",
+      "sample": "> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness phát triển nội\n> bộ của dự án. Ở đây viết thuần theo sản phẩm — \"harness phát triển\" — không phụ\n> thuộc tên cô",
+      "identityFingerprint": "bafef409ffcbddd73b5ced4c382d669b58496642d3b928892322852fa242d14a",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal",
+        "Bối cảnh"
+      ],
+      "text": "> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness phát triển nội\n> bộ của dự án. Ở đây viết thuần theo sản phẩm — \"harness phát triển\" — không phụ\n> thuộc tên công cụ cụ thể nào."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-13",
+    "githubAnchor": "unheaded-block-13",
+    "stableAnchor": "unheaded-block-13",
+    "title": "Unheaded block 13",
+    "startLine": 97,
+    "endLine": 99,
+    "textDigest": "7fa451435e5be174a0cf5118a1eaccb44b208aaaf561387fbd36a186bfe74f48",
+    "sample": "> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness phát triển nội\n> bộ của dự án. Ở đây viết thuần theo sản phẩm — \"harness phát triển\" — không phụ\n> thuộc tên cô",
+    "identityFingerprint": "bafef409ffcbddd73b5ced4c382d669b58496642d3b928892322852fa242d14a",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Context"
+    ],
+    "text": "> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness phát triển nội\n> bộ của dự án. Ở đây viết thuần theo sản phẩm — \"harness phát triển\" — không phụ\n> thuộc tên công cụ cụ thể nào."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-13",
+      "githubAnchor": "unheaded-block-13",
+      "stableAnchor": "unheaded-block-13",
+      "title": "Unheaded block 13",
+      "startLine": 97,
+      "endLine": 99,
+      "textDigest": "7fa451435e5be174a0cf5118a1eaccb44b208aaaf561387fbd36a186bfe74f48",
+      "sample": "> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness phát triển nội\n> bộ của dự án. Ở đây viết thuần theo sản phẩm — \"harness phát triển\" — không phụ\n> thuộc tên cô",
+      "identityFingerprint": "bafef409ffcbddd73b5ced4c382d669b58496642d3b928892322852fa242d14a",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals",
+        "0004 Context"
+      ],
+      "text": "> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness phát triển nội\n> bộ của dự án. Ở đây viết thuần theo sản phẩm — \"harness phát triển\" — không phụ\n> thuộc tên công cụ cụ thể nào."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_4a9e0c360118d90051bb7c03002ff4d9"
+}
+```
+
+## Entry claim_4063855a9287de7cf5b27cb77d96955f
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_4063855a9287de7cf5b27cb77d96955f",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_4063855a9287de7cf5b27cb77d96955f",
+    "sourceUnitDigest": "b72bf8ee1aea6db6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0004-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0004 is represented by the frozen H3 \"0004 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "59bda06684c6859316ad8f0b236bc7b6ebc9dc72139fca854456d9b38de05252",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_4063855a9287de7cf5b27cb77d96955f",
+    "sourceUnitDigest": "b72bf8ee1aea6db6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0004-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0004 is represented by the frozen H3 \"0004 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "59bda06684c6859316ad8f0b236bc7b6ebc9dc72139fca854456d9b38de05252",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "441305fd6e31a120c6f0b585fd8bbd62201b38bc3261c058b73434eb6c908ae6",
+    "identityFingerprint": "8669560d3b422f556ac1b805d6f97fd64cf8d3400a86ec2efcc88fee3c77ec17",
+    "claimId": "claim_4063855a9287de7cf5b27cb77d96955f",
+    "sourceAnchor": "quyết-định-2",
+    "unitKind": "heading",
+    "sourceUnitDigest": "b72bf8ee1aea6db60efc87e527428e2ea30208408c6d507cb22e94d1aeaa5fef",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Quyết định",
+      "anchor": "quyết-định-2",
+      "githubAnchor": "quyết-định-2",
+      "stableAnchor": "h-ac7def58eb1f",
+      "startLine": 1444,
+      "endLine": 1444,
+      "textDigest": "b72bf8ee1aea6db60efc87e527428e2ea30208408c6d507cb22e94d1aeaa5fef",
+      "sample": "Quyết định",
+      "sectionPayloadDigest": "fc46702e212ac516c32faa5292ce63999a0e60af3361b2dcb7ddbe1dd43d09c7",
+      "followingBlockDigest": "fc46702e212ac516c32faa5292ce63999a0e60af3361b2dcb7ddbe1dd43d09c7",
+      "identityFingerprint": "8669560d3b422f556ac1b805d6f97fd64cf8d3400a86ec2efcc88fee3c77ec17",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal"
+      ],
+      "text": "#### Quyết định",
+      "sectionText": "#### Quyết định\n\n1. **Domain đầu tiên của lớp state là work-state của chính forgent** — việc của\n   repo: item, trạng thái, quyết định. Các consumer khác (ví dụ vùng học từ nguồn\n   tham chiếu) **đến sau**, không thiết kế cho chúng ở bước đầu.\n2. **Non-goal — chạy song song, không thay thế, không interop:** forgent chạy **song\n   song** với harness phát triển đang dùng, **không thay thế nó và không interop**.\n   Việc thay thế harness chỉ được **mở lại khi forgent chạm ngưỡng-có-tên**: một agent\n   lạ tự tìm được việc kế tiếp từ chính state của forgent."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0004 Decision",
+    "anchor": "0004-decision",
+    "githubAnchor": "0004-decision",
+    "stableAnchor": "h-559c181d0d06",
+    "startLine": 101,
+    "endLine": 101,
+    "textDigest": "59bda06684c6859316ad8f0b236bc7b6ebc9dc72139fca854456d9b38de05252",
+    "sample": "0004 Decision",
+    "sectionPayloadDigest": "fc46702e212ac516c32faa5292ce63999a0e60af3361b2dcb7ddbe1dd43d09c7",
+    "followingBlockDigest": "fc46702e212ac516c32faa5292ce63999a0e60af3361b2dcb7ddbe1dd43d09c7",
+    "identityFingerprint": "6e9c85771b052c6f6dc8df7d7efa8cfaf60d6bbc032d0e6913c6e904fd621336",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ],
+    "text": "### 0004 Decision",
+    "sectionText": "### 0004 Decision\n\n1. **Domain đầu tiên của lớp state là work-state của chính forgent** — việc của\n   repo: item, trạng thái, quyết định. Các consumer khác (ví dụ vùng học từ nguồn\n   tham chiếu) **đến sau**, không thiết kế cho chúng ở bước đầu.\n2. **Non-goal — chạy song song, không thay thế, không interop:** forgent chạy **song\n   song** với harness phát triển đang dùng, **không thay thế nó và không interop**.\n   Việc thay thế harness chỉ được **mở lại khi forgent chạm ngưỡng-có-tên**: một agent\n   lạ tự tìm được việc kế tiếp từ chính state của forgent."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_4063855a9287de7cf5b27cb77d96955f"
+}
+```
+
+## Entry claim_93d9f629f8c7258d208b1c2d3fc413ab
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_93d9f629f8c7258d208b1c2d3fc413ab",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_93d9f629f8c7258d208b1c2d3fc413ab",
+    "sourceUnitDigest": "fc46702e212ac516",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-14",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0004 (source lines 1415-1421, starting \"1. **Domain đầu tiên của lớp state là work-state của chính forgent** —\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "fc46702e212ac516c32faa5292ce63999a0e60af3361b2dcb7ddbe1dd43d09c7",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Decision"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_93d9f629f8c7258d208b1c2d3fc413ab",
+    "sourceUnitDigest": "fc46702e212ac516",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-14",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0004 (source lines 1446-1452, starting \"1. **Domain đầu tiên của lớp state là work-state của chính forgent** —\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "fc46702e212ac516c32faa5292ce63999a0e60af3361b2dcb7ddbe1dd43d09c7",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "e2eb82d0776e89faa3611734774f5e8b028081e3acc55537b71debe05831d497",
+    "identityFingerprint": "e2eb82d0776e89faa3611734774f5e8b028081e3acc55537b71debe05831d497",
+    "claimId": "claim_93d9f629f8c7258d208b1c2d3fc413ab",
+    "sourceAnchor": "unheaded-block-124",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "fc46702e212ac516c32faa5292ce63999a0e60af3361b2dcb7ddbe1dd43d09c7",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-124",
+      "githubAnchor": "unheaded-block-124",
+      "stableAnchor": "unheaded-block-124",
+      "title": "Unheaded block 124",
+      "startLine": 1446,
+      "endLine": 1452,
+      "textDigest": "fc46702e212ac516c32faa5292ce63999a0e60af3361b2dcb7ddbe1dd43d09c7",
+      "sample": "1. **Domain đầu tiên của lớp state là work-state của chính forgent** — việc của\n   repo: item, trạng thái, quyết định. Các consumer khác (ví dụ vùng học từ nguồn\n   tham chiếu) **đ",
+      "identityFingerprint": "e2eb82d0776e89faa3611734774f5e8b028081e3acc55537b71debe05831d497",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal",
+        "Quyết định"
+      ],
+      "text": "1. **Domain đầu tiên của lớp state là work-state của chính forgent** — việc của\n   repo: item, trạng thái, quyết định. Các consumer khác (ví dụ vùng học từ nguồn\n   tham chiếu) **đến sau**, không thiết kế cho chúng ở bước đầu.\n2. **Non-goal — chạy song song, không thay thế, không interop:** forgent chạy **song\n   song** với harness phát triển đang dùng, **không thay thế nó và không interop**.\n   Việc thay thế harness chỉ được **mở lại khi forgent chạm ngưỡng-có-tên**: một agent\n   lạ tự tìm được việc kế tiếp từ chính state của forgent."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-14",
+    "githubAnchor": "unheaded-block-14",
+    "stableAnchor": "unheaded-block-14",
+    "title": "Unheaded block 14",
+    "startLine": 103,
+    "endLine": 109,
+    "textDigest": "fc46702e212ac516c32faa5292ce63999a0e60af3361b2dcb7ddbe1dd43d09c7",
+    "sample": "1. **Domain đầu tiên của lớp state là work-state của chính forgent** — việc của\n   repo: item, trạng thái, quyết định. Các consumer khác (ví dụ vùng học từ nguồn\n   tham chiếu) **đ",
+    "identityFingerprint": "e2eb82d0776e89faa3611734774f5e8b028081e3acc55537b71debe05831d497",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Decision"
+    ],
+    "text": "1. **Domain đầu tiên của lớp state là work-state của chính forgent** — việc của\n   repo: item, trạng thái, quyết định. Các consumer khác (ví dụ vùng học từ nguồn\n   tham chiếu) **đến sau**, không thiết kế cho chúng ở bước đầu.\n2. **Non-goal — chạy song song, không thay thế, không interop:** forgent chạy **song\n   song** với harness phát triển đang dùng, **không thay thế nó và không interop**.\n   Việc thay thế harness chỉ được **mở lại khi forgent chạm ngưỡng-có-tên**: một agent\n   lạ tự tìm được việc kế tiếp từ chính state của forgent."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-14",
+      "githubAnchor": "unheaded-block-14",
+      "stableAnchor": "unheaded-block-14",
+      "title": "Unheaded block 14",
+      "startLine": 103,
+      "endLine": 109,
+      "textDigest": "fc46702e212ac516c32faa5292ce63999a0e60af3361b2dcb7ddbe1dd43d09c7",
+      "sample": "1. **Domain đầu tiên của lớp state là work-state của chính forgent** — việc của\n   repo: item, trạng thái, quyết định. Các consumer khác (ví dụ vùng học từ nguồn\n   tham chiếu) **đ",
+      "identityFingerprint": "e2eb82d0776e89faa3611734774f5e8b028081e3acc55537b71debe05831d497",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals",
+        "0004 Decision"
+      ],
+      "text": "1. **Domain đầu tiên của lớp state là work-state của chính forgent** — việc của\n   repo: item, trạng thái, quyết định. Các consumer khác (ví dụ vùng học từ nguồn\n   tham chiếu) **đến sau**, không thiết kế cho chúng ở bước đầu.\n2. **Non-goal — chạy song song, không thay thế, không interop:** forgent chạy **song\n   song** với harness phát triển đang dùng, **không thay thế nó và không interop**.\n   Việc thay thế harness chỉ được **mở lại khi forgent chạm ngưỡng-có-tên**: một agent\n   lạ tự tìm được việc kế tiếp từ chính state của forgent."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_93d9f629f8c7258d208b1c2d3fc413ab"
+}
+```
+
+## Entry claim_0b4d53be3903ac1ce9299b5d7174feab
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_0b4d53be3903ac1ce9299b5d7174feab",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_0b4d53be3903ac1ce9299b5d7174feab",
+    "sourceUnitDigest": "e44f9991b9931d7c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0004-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0004 is represented by the frozen H3 \"0004 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "12d505aab6487945d39c7e3a3f15ad06171917f8bf16b2b27387a9c6efd0d33b",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_0b4d53be3903ac1ce9299b5d7174feab",
+    "sourceUnitDigest": "e44f9991b9931d7c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0004-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0004 is represented by the frozen H3 \"0004 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "12d505aab6487945d39c7e3a3f15ad06171917f8bf16b2b27387a9c6efd0d33b",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "25e4645e315d4aadc2d74ad20e11f1e2dc26887811d0dc6d1d9df9dbb4801667",
+    "identityFingerprint": "5f884d8e4d865929ac76f6b29a64b20aaa753d457b73ec7cdbf204dabfd7a587",
+    "claimId": "claim_0b4d53be3903ac1ce9299b5d7174feab",
+    "sourceAnchor": "hệ-quả-2",
+    "unitKind": "heading",
+    "sourceUnitDigest": "e44f9991b9931d7cb611894760d23de0ccecacc3e6d22456433e9ba8c115f937",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Hệ quả",
+      "anchor": "hệ-quả-2",
+      "githubAnchor": "hệ-quả-2",
+      "stableAnchor": "h-db18447d871a",
+      "startLine": 1454,
+      "endLine": 1454,
+      "textDigest": "e44f9991b9931d7cb611894760d23de0ccecacc3e6d22456433e9ba8c115f937",
+      "sample": "Hệ quả",
+      "sectionPayloadDigest": "d041f67826b52492e2466dd94658e557f0e30a35bfb705f52b0ff7e7ff3005cf",
+      "followingBlockDigest": "9d43cd58043503f832f75d165615f47af07532b2dbf99d50a87a5a553a5ae62c",
+      "identityFingerprint": "5f884d8e4d865929ac76f6b29a64b20aaa753d457b73ec7cdbf204dabfd7a587",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal"
+      ],
+      "text": "#### Hệ quả",
+      "sectionText": "#### Hệ quả\n\n- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối nặng; tập trung\n  chứng minh work-state tự-quản trước.\n- **Ngưỡng mở-lại rõ ràng, không trôi:** \"thay harness\" là một quyết định có điều\n  kiện đặt tên trước, không phải thứ lén mở rộng dọc đường.\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0004 Consequences",
+    "anchor": "0004-consequences",
+    "githubAnchor": "0004-consequences",
+    "stableAnchor": "h-b8251867d602",
+    "startLine": 111,
+    "endLine": 111,
+    "textDigest": "12d505aab6487945d39c7e3a3f15ad06171917f8bf16b2b27387a9c6efd0d33b",
+    "sample": "0004 Consequences",
+    "sectionPayloadDigest": "d041f67826b52492e2466dd94658e557f0e30a35bfb705f52b0ff7e7ff3005cf",
+    "followingBlockDigest": "9d43cd58043503f832f75d165615f47af07532b2dbf99d50a87a5a553a5ae62c",
+    "identityFingerprint": "558e041e5a195ae498d988b185bf2ff5b70a9dd97751041fac9587ef52ad87b2",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ],
+    "text": "### 0004 Consequences",
+    "sectionText": "### 0004 Consequences\n\n- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối nặng; tập trung\n  chứng minh work-state tự-quản trước.\n- **Ngưỡng mở-lại rõ ràng, không trôi:** \"thay harness\" là một quyết định có điều\n  kiện đặt tên trước, không phải thứ lén mở rộng dọc đường.\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_0b4d53be3903ac1ce9299b5d7174feab"
+}
+```
+
+## Entry claim_664fd1639ad346a2d2d240596a2a6604
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_664fd1639ad346a2d2d240596a2a6604",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_664fd1639ad346a2d2d240596a2a6604",
+    "sourceUnitDigest": "9d43cd58043503f8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-15",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0004 (source lines 1425-1428, starting \"- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối n\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "9d43cd58043503f832f75d165615f47af07532b2dbf99d50a87a5a553a5ae62c",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_664fd1639ad346a2d2d240596a2a6604",
+    "sourceUnitDigest": "9d43cd58043503f8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-15",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0004 (source lines 1456-1459, starting \"- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối n\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "9d43cd58043503f832f75d165615f47af07532b2dbf99d50a87a5a553a5ae62c",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "d9b240ead489acb445ca54a55cc1bf8f5dbf0980b98a0b69329a7041199924cb",
+    "identityFingerprint": "d9b240ead489acb445ca54a55cc1bf8f5dbf0980b98a0b69329a7041199924cb",
+    "claimId": "claim_664fd1639ad346a2d2d240596a2a6604",
+    "sourceAnchor": "unheaded-block-125",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "9d43cd58043503f832f75d165615f47af07532b2dbf99d50a87a5a553a5ae62c",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-125",
+      "githubAnchor": "unheaded-block-125",
+      "stableAnchor": "unheaded-block-125",
+      "title": "Unheaded block 125",
+      "startLine": 1456,
+      "endLine": 1459,
+      "textDigest": "9d43cd58043503f832f75d165615f47af07532b2dbf99d50a87a5a553a5ae62c",
+      "sample": "- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối nặng; tập trung\n  chứng minh work-state tự-quản trước.\n- **Ngưỡng mở-lại rõ ràng, không trôi:** \"thay harness\" ",
+      "identityFingerprint": "d9b240ead489acb445ca54a55cc1bf8f5dbf0980b98a0b69329a7041199924cb",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal",
+        "Hệ quả"
+      ],
+      "text": "- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối nặng; tập trung\n  chứng minh work-state tự-quản trước.\n- **Ngưỡng mở-lại rõ ràng, không trôi:** \"thay harness\" là một quyết định có điều\n  kiện đặt tên trước, không phải thứ lén mở rộng dọc đường."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-15",
+    "githubAnchor": "unheaded-block-15",
+    "stableAnchor": "unheaded-block-15",
+    "title": "Unheaded block 15",
+    "startLine": 113,
+    "endLine": 116,
+    "textDigest": "9d43cd58043503f832f75d165615f47af07532b2dbf99d50a87a5a553a5ae62c",
+    "sample": "- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối nặng; tập trung\n  chứng minh work-state tự-quản trước.\n- **Ngưỡng mở-lại rõ ràng, không trôi:** \"thay harness\" ",
+    "identityFingerprint": "d9b240ead489acb445ca54a55cc1bf8f5dbf0980b98a0b69329a7041199924cb",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Consequences"
+    ],
+    "text": "- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối nặng; tập trung\n  chứng minh work-state tự-quản trước.\n- **Ngưỡng mở-lại rõ ràng, không trôi:** \"thay harness\" là một quyết định có điều\n  kiện đặt tên trước, không phải thứ lén mở rộng dọc đường."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-15",
+      "githubAnchor": "unheaded-block-15",
+      "stableAnchor": "unheaded-block-15",
+      "title": "Unheaded block 15",
+      "startLine": 113,
+      "endLine": 116,
+      "textDigest": "9d43cd58043503f832f75d165615f47af07532b2dbf99d50a87a5a553a5ae62c",
+      "sample": "- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối nặng; tập trung\n  chứng minh work-state tự-quản trước.\n- **Ngưỡng mở-lại rõ ràng, không trôi:** \"thay harness\" ",
+      "identityFingerprint": "d9b240ead489acb445ca54a55cc1bf8f5dbf0980b98a0b69329a7041199924cb",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "4. ADR 0004 Scope And Non-Goals",
+        "0004 Consequences"
+      ],
+      "text": "- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối nặng; tập trung\n  chứng minh work-state tự-quản trước.\n- **Ngưỡng mở-lại rõ ràng, không trôi:** \"thay harness\" là một quyết định có điều\n  kiện đặt tên trước, không phải thứ lén mở rộng dọc đường."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_664fd1639ad346a2d2d240596a2a6604"
+}
+```
+
+## Entry claim_7bc17cd130d9b9600e3a8db9bd57ca88
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_7bc17cd130d9b9600e3a8db9bd57ca88",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_7bc17cd130d9b9600e3a8db9bd57ca88",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-16",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0004 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_7bc17cd130d9b9600e3a8db9bd57ca88",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-16",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0004 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "claimId": "claim_7bc17cd130d9b9600e3a8db9bd57ca88",
+    "sourceAnchor": "unheaded-block-126",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "carried-forward",
+    "pairedByAnchor": true
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-126",
+      "githubAnchor": "unheaded-block-126",
+      "stableAnchor": "unheaded-block-126",
+      "title": "Unheaded block 126",
+      "startLine": 1461,
+      "endLine": 1461,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0004 — Phạm vi & non-goal",
+        "Hệ quả"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-16",
+    "githubAnchor": "unheaded-block-16",
+    "stableAnchor": "unheaded-block-16",
+    "title": "Unheaded block 16",
+    "startLine": 118,
+    "endLine": 118,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals",
+      "0004 Consequences"
+    ],
+    "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "target digest repeats; ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-7",
+      "githubAnchor": "unheaded-block-7",
+      "stableAnchor": "unheaded-block-7",
+      "title": "Unheaded block 7",
+      "startLine": 60,
+      "endLine": 60,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Consequences"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_7bc17cd130d9b9600e3a8db9bd57ca88"
+}
+```
+
+## Entry claim_dbc0da98acd1c90327ebd67850cc8983
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_dbc0da98acd1c90327ebd67850cc8983",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_dbc0da98acd1c90327ebd67850cc8983",
+    "sourceUnitDigest": "2ff34201c3aa91d6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "5-adr-0006-proposed-status",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0006 title heading is represented by the frozen H2 \"5. ADR 0006 ...\" (5-adr-0006-proposed-status); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "67c97b2b884ac9505324dc3b688a7989f36bfd27700bf7389751058845c479f0",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_dbc0da98acd1c90327ebd67850cc8983",
+    "sourceUnitDigest": "2ff34201c3aa91d6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "5-adr-0006-proposed-status",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0006 title heading is represented by the frozen H2 \"5. ADR 0006 ...\" (5-adr-0006-proposed-status); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "67c97b2b884ac9505324dc3b688a7989f36bfd27700bf7389751058845c479f0",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "11dc13a6132fbd80301aeee71fc7408ce6b3b0627d033a24b923dd93d532d39a",
+    "identityFingerprint": "5c20c344a51bf2635ef8e338740e5b7dbed0697cd11572546280b9febaa1a21a",
+    "claimId": "claim_dbc0da98acd1c90327ebd67850cc8983",
+    "sourceAnchor": "0006-trạng-thái-proposed",
+    "unitKind": "heading",
+    "sourceUnitDigest": "2ff34201c3aa91d6669a84ed0af602479d1834bc8906cf8447aca5ca588ebac8",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "0006 — Trạng thái `proposed`",
+      "anchor": "0006-trạng-thái-proposed",
+      "githubAnchor": "0006-trạng-thái-proposed",
+      "stableAnchor": "h-d23c388ce29e",
+      "startLine": 1463,
+      "endLine": 1463,
+      "textDigest": "2ff34201c3aa91d6669a84ed0af602479d1834bc8906cf8447aca5ca588ebac8",
+      "sample": "0006 — Trạng thái `proposed`",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "5c20c344a51bf2635ef8e338740e5b7dbed0697cd11572546280b9febaa1a21a",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng"
+      ],
+      "text": "### 0006 — Trạng thái `proposed`",
+      "sectionText": "### 0006 — Trạng thái `proposed`"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "5. ADR 0006 Proposed Status",
+    "anchor": "5-adr-0006-proposed-status",
+    "githubAnchor": "5-adr-0006-proposed-status",
+    "stableAnchor": "h-7baca261d7c9",
+    "startLine": 120,
+    "endLine": 120,
+    "textDigest": "67c97b2b884ac9505324dc3b688a7989f36bfd27700bf7389751058845c479f0",
+    "sample": "5. ADR 0006 Proposed Status",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "acd732b8afb9274665e78a8dc86edfa8757dd71170bec33a7f3fd7a7d4bbbcbf",
+    "ancestry": [
+      "Retired Decision History: Work State"
+    ],
+    "text": "## 5. ADR 0006 Proposed Status",
+    "sectionText": "## 5. ADR 0006 Proposed Status"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_dbc0da98acd1c90327ebd67850cc8983"
+}
+```
+
+## Entry claim_a79114f19bb479ea6b69c50166af8972
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
+    "sourceUnitDigest": "9c8485790cf86a6a",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0006-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0006 is represented by the frozen H3 \"0006 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "6163b36b62dbb7c76e3510b09ab0d83b08f3542562b99abc5c41cd0534b0c789",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
+    "sourceUnitDigest": "9c8485790cf86a6a",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0006-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0006 is represented by the frozen H3 \"0006 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "6163b36b62dbb7c76e3510b09ab0d83b08f3542562b99abc5c41cd0534b0c789",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "f58460693938e87050ab2cbfb4f616d5f8e29cf635537244462061e5f136af16",
+    "identityFingerprint": "3be9c5bdce6238a09f68ccae62bd5c5e7c6587ac5d3662a4cdfee8b29ab4033b",
+    "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
+    "sourceAnchor": "bối-cảnh-3",
+    "unitKind": "heading",
+    "sourceUnitDigest": "9c8485790cf86a6a2235f130eeb8eac8443d0d9c3c6a400e3b969405245ccadf",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Bối cảnh",
+      "anchor": "bối-cảnh-3",
+      "githubAnchor": "bối-cảnh-3",
+      "stableAnchor": "h-4b273bb889b3",
+      "startLine": 1465,
+      "endLine": 1465,
+      "textDigest": "9c8485790cf86a6a2235f130eeb8eac8443d0d9c3c6a400e3b969405245ccadf",
+      "sample": "Bối cảnh",
+      "sectionPayloadDigest": "e8f344662503c022b4e04f9835c5147f963ae3c10bc8dbf33de11166ec4cab9d",
+      "followingBlockDigest": "b2285ceac14bdb7210baf54029fa70b8e167563a09c6804e7cc59330ad886f45",
+      "identityFingerprint": "3be9c5bdce6238a09f68ccae62bd5c5e7c6587ac5d3662a4cdfee8b29ab4033b",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`"
+      ],
+      "text": "#### Bối cảnh",
+      "sectionText": "#### Bối cảnh\n\nRunner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều đó mở ba lỗ:\n\n1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A mới chỉ đề\n   xuất, chưa nhận vào cây chính).\n2. Khi kết quả bị **từ chối**, không có lối ra rõ ràng cho item.\n3. Trạng thái **chờ-duyệt** không nhìn thấy được trong FSM."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0006 Context",
+    "anchor": "0006-context",
+    "githubAnchor": "0006-context",
+    "stableAnchor": "h-078ec0c111b6",
+    "startLine": 122,
+    "endLine": 122,
+    "textDigest": "6163b36b62dbb7c76e3510b09ab0d83b08f3542562b99abc5c41cd0534b0c789",
+    "sample": "0006 Context",
+    "sectionPayloadDigest": "e8f344662503c022b4e04f9835c5147f963ae3c10bc8dbf33de11166ec4cab9d",
+    "followingBlockDigest": "b2285ceac14bdb7210baf54029fa70b8e167563a09c6804e7cc59330ad886f45",
+    "identityFingerprint": "d33fc406201ab1c91c646d0f32e9d55618344ccff4bcc96b968a86f39a333f3e",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ],
+    "text": "### 0006 Context",
+    "sectionText": "### 0006 Context\n\nRunner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều đó mở ba lỗ:\n\n1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A mới chỉ đề\n   xuất, chưa nhận vào cây chính).\n2. Khi kết quả bị **từ chối**, không có lối ra rõ ràng cho item.\n3. Trạng thái **chờ-duyệt** không nhìn thấy được trong FSM."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_a79114f19bb479ea6b69c50166af8972"
+}
+```
+
+## Entry claim_423abdded73e62ffd62a773173555583
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_423abdded73e62ffd62a773173555583",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_423abdded73e62ffd62a773173555583",
+    "sourceUnitDigest": "b2285ceac14bdb72",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-17",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1436-1436, starting \"Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều \") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "b2285ceac14bdb7210baf54029fa70b8e167563a09c6804e7cc59330ad886f45",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_423abdded73e62ffd62a773173555583",
+    "sourceUnitDigest": "b2285ceac14bdb72",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-17",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1467-1467, starting \"Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều \") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "b2285ceac14bdb7210baf54029fa70b8e167563a09c6804e7cc59330ad886f45",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "b05379c26cef2f214a6667d342fecb3ade4416d89c4dcefa8854a3429f436abe",
+    "identityFingerprint": "b05379c26cef2f214a6667d342fecb3ade4416d89c4dcefa8854a3429f436abe",
+    "claimId": "claim_423abdded73e62ffd62a773173555583",
+    "sourceAnchor": "unheaded-block-127",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b2285ceac14bdb7210baf54029fa70b8e167563a09c6804e7cc59330ad886f45",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-127",
+      "githubAnchor": "unheaded-block-127",
+      "stableAnchor": "unheaded-block-127",
+      "title": "Unheaded block 127",
+      "startLine": 1467,
+      "endLine": 1467,
+      "textDigest": "b2285ceac14bdb7210baf54029fa70b8e167563a09c6804e7cc59330ad886f45",
+      "sample": "Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều đó mở ba lỗ:",
+      "identityFingerprint": "b05379c26cef2f214a6667d342fecb3ade4416d89c4dcefa8854a3429f436abe",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`",
+        "Bối cảnh"
+      ],
+      "text": "Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều đó mở ba lỗ:"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-17",
+    "githubAnchor": "unheaded-block-17",
+    "stableAnchor": "unheaded-block-17",
+    "title": "Unheaded block 17",
+    "startLine": 124,
+    "endLine": 124,
+    "textDigest": "b2285ceac14bdb7210baf54029fa70b8e167563a09c6804e7cc59330ad886f45",
+    "sample": "Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều đó mở ba lỗ:",
+    "identityFingerprint": "b05379c26cef2f214a6667d342fecb3ade4416d89c4dcefa8854a3429f436abe",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Context"
+    ],
+    "text": "Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều đó mở ba lỗ:"
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-17",
+      "githubAnchor": "unheaded-block-17",
+      "stableAnchor": "unheaded-block-17",
+      "title": "Unheaded block 17",
+      "startLine": 124,
+      "endLine": 124,
+      "textDigest": "b2285ceac14bdb7210baf54029fa70b8e167563a09c6804e7cc59330ad886f45",
+      "sample": "Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều đó mở ba lỗ:",
+      "identityFingerprint": "b05379c26cef2f214a6667d342fecb3ade4416d89c4dcefa8854a3429f436abe",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Context"
+      ],
+      "text": "Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều đó mở ba lỗ:"
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_423abdded73e62ffd62a773173555583"
+}
+```
+
+## Entry claim_0fe4212f0537cfd4b9232280e9e6781b
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_0fe4212f0537cfd4b9232280e9e6781b",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_0fe4212f0537cfd4b9232280e9e6781b",
+    "sourceUnitDigest": "3077bff801c5d9f0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-18",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1438-1441, starting \"1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "3077bff801c5d9f092db1c250ec563092342fdee17a8941b01e1318f6c3ff827",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_0fe4212f0537cfd4b9232280e9e6781b",
+    "sourceUnitDigest": "3077bff801c5d9f0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-18",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1469-1472, starting \"1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "3077bff801c5d9f092db1c250ec563092342fdee17a8941b01e1318f6c3ff827",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "f3412ac31a4c53e67fa7901beb7cdab9d317854d5b75035a509ea428e2fdf6fc",
+    "identityFingerprint": "f3412ac31a4c53e67fa7901beb7cdab9d317854d5b75035a509ea428e2fdf6fc",
+    "claimId": "claim_0fe4212f0537cfd4b9232280e9e6781b",
+    "sourceAnchor": "unheaded-block-128",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3077bff801c5d9f092db1c250ec563092342fdee17a8941b01e1318f6c3ff827",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-128",
+      "githubAnchor": "unheaded-block-128",
+      "stableAnchor": "unheaded-block-128",
+      "title": "Unheaded block 128",
+      "startLine": 1469,
+      "endLine": 1472,
+      "textDigest": "3077bff801c5d9f092db1c250ec563092342fdee17a8941b01e1318f6c3ff827",
+      "sample": "1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A mới chỉ đề\n   xuất, chưa nhận vào cây chính).\n2. Khi kết quả bị **từ chối**, không có lối ra rõ ràng cho item",
+      "identityFingerprint": "f3412ac31a4c53e67fa7901beb7cdab9d317854d5b75035a509ea428e2fdf6fc",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`",
+        "Bối cảnh"
+      ],
+      "text": "1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A mới chỉ đề\n   xuất, chưa nhận vào cây chính).\n2. Khi kết quả bị **từ chối**, không có lối ra rõ ràng cho item.\n3. Trạng thái **chờ-duyệt** không nhìn thấy được trong FSM."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-18",
+    "githubAnchor": "unheaded-block-18",
+    "stableAnchor": "unheaded-block-18",
+    "title": "Unheaded block 18",
+    "startLine": 126,
+    "endLine": 129,
+    "textDigest": "3077bff801c5d9f092db1c250ec563092342fdee17a8941b01e1318f6c3ff827",
+    "sample": "1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A mới chỉ đề\n   xuất, chưa nhận vào cây chính).\n2. Khi kết quả bị **từ chối**, không có lối ra rõ ràng cho item",
+    "identityFingerprint": "f3412ac31a4c53e67fa7901beb7cdab9d317854d5b75035a509ea428e2fdf6fc",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Context"
+    ],
+    "text": "1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A mới chỉ đề\n   xuất, chưa nhận vào cây chính).\n2. Khi kết quả bị **từ chối**, không có lối ra rõ ràng cho item.\n3. Trạng thái **chờ-duyệt** không nhìn thấy được trong FSM."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-18",
+      "githubAnchor": "unheaded-block-18",
+      "stableAnchor": "unheaded-block-18",
+      "title": "Unheaded block 18",
+      "startLine": 126,
+      "endLine": 129,
+      "textDigest": "3077bff801c5d9f092db1c250ec563092342fdee17a8941b01e1318f6c3ff827",
+      "sample": "1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A mới chỉ đề\n   xuất, chưa nhận vào cây chính).\n2. Khi kết quả bị **từ chối**, không có lối ra rõ ràng cho item",
+      "identityFingerprint": "f3412ac31a4c53e67fa7901beb7cdab9d317854d5b75035a509ea428e2fdf6fc",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Context"
+      ],
+      "text": "1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A mới chỉ đề\n   xuất, chưa nhận vào cây chính).\n2. Khi kết quả bị **từ chối**, không có lối ra rõ ràng cho item.\n3. Trạng thái **chờ-duyệt** không nhìn thấy được trong FSM."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_0fe4212f0537cfd4b9232280e9e6781b"
+}
+```
+
+## Entry claim_99fa84eefd3c917530ef1a453f08be21
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_99fa84eefd3c917530ef1a453f08be21",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_99fa84eefd3c917530ef1a453f08be21",
+    "sourceUnitDigest": "965caf0a03321009",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0006-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0006 is represented by the frozen H3 \"0006 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "ffd717cc616acfaa71c4fb8a61763bcfb0a5272b8345d44b839fc6e10e2afb43",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_99fa84eefd3c917530ef1a453f08be21",
+    "sourceUnitDigest": "965caf0a03321009",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0006-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0006 is represented by the frozen H3 \"0006 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "ffd717cc616acfaa71c4fb8a61763bcfb0a5272b8345d44b839fc6e10e2afb43",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "aa490919014dc6925656275fff8c3de9a5bdaa78ab7409572c316f1bc497b8f9",
+    "identityFingerprint": "1c9162af92860ba3f246f55b72f4af64a966b6985cf612b2e7b8d37afa0f6b3a",
+    "claimId": "claim_99fa84eefd3c917530ef1a453f08be21",
+    "sourceAnchor": "quyết-định-3",
+    "unitKind": "heading",
+    "sourceUnitDigest": "965caf0a033210097211032405753f3000abd6e872fb43f53017528db996c151",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Quyết định",
+      "anchor": "quyết-định-3",
+      "githubAnchor": "quyết-định-3",
+      "stableAnchor": "h-7631d9ed81b3",
+      "startLine": 1474,
+      "endLine": 1474,
+      "textDigest": "965caf0a033210097211032405753f3000abd6e872fb43f53017528db996c151",
+      "sample": "Quyết định",
+      "sectionPayloadDigest": "1b07a03893883ff0963ec90883337a3118e72c3512d5f92891fdba664de49f69",
+      "followingBlockDigest": "bc5ca7e6617538adf69f4c157336e967194051ccd11b686cfb97a85358255643",
+      "identityFingerprint": "1c9162af92860ba3f246f55b72f4af64a966b6985cf612b2e7b8d37afa0f6b3a",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`"
+      ],
+      "text": "#### Quyết định",
+      "sectionText": "#### Quyết định\n\nThêm trạng thái **`proposed`** vào FSM, với các cạnh:\n\n- `doing → proposed` — goal-check pass, runner ghi `proposed`.\n- `proposed → done` — được duyệt/merge.\n- `proposed → todo` — **từ chối:** event mang lý do, item quay lại frontier;\n  anti-loop max-visits chặn lặp vô hạn.\n- `blocked` giữ nguyên hai chiều với `todo`/`doing` (muốn \"park\" thì dùng\n  `todo → blocked` sẵn có).\n\nNgữ nghĩa:\n\n- **`done` vẫn là trạng thái terminal**, và từ nay nghĩa là **\"đã nhận vào cây\n  chính\"** (không chỉ \"worker báo xong\").\n- **Frontier chỉ mở việc phụ thuộc khi dep thật sự `done`** — nên B không bao giờ\n  chạy trên nền thiếu code A."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0006 Decision",
+    "anchor": "0006-decision",
+    "githubAnchor": "0006-decision",
+    "stableAnchor": "h-064356e7bc9a",
+    "startLine": 131,
+    "endLine": 131,
+    "textDigest": "ffd717cc616acfaa71c4fb8a61763bcfb0a5272b8345d44b839fc6e10e2afb43",
+    "sample": "0006 Decision",
+    "sectionPayloadDigest": "1b07a03893883ff0963ec90883337a3118e72c3512d5f92891fdba664de49f69",
+    "followingBlockDigest": "bc5ca7e6617538adf69f4c157336e967194051ccd11b686cfb97a85358255643",
+    "identityFingerprint": "3f09338cbd5f1e4940113627bc8b0c5b5287778da926abe3bea65cab3688a408",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ],
+    "text": "### 0006 Decision",
+    "sectionText": "### 0006 Decision\n\nThêm trạng thái **`proposed`** vào FSM, với các cạnh:\n\n- `doing → proposed` — goal-check pass, runner ghi `proposed`.\n- `proposed → done` — được duyệt/merge.\n- `proposed → todo` — **từ chối:** event mang lý do, item quay lại frontier;\n  anti-loop max-visits chặn lặp vô hạn.\n- `blocked` giữ nguyên hai chiều với `todo`/`doing` (muốn \"park\" thì dùng\n  `todo → blocked` sẵn có).\n\nNgữ nghĩa:\n\n- **`done` vẫn là trạng thái terminal**, và từ nay nghĩa là **\"đã nhận vào cây\n  chính\"** (không chỉ \"worker báo xong\").\n- **Frontier chỉ mở việc phụ thuộc khi dep thật sự `done`** — nên B không bao giờ\n  chạy trên nền thiếu code A."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_99fa84eefd3c917530ef1a453f08be21"
+}
+```
+
+## Entry claim_9283d5a06984f8b7a0bb9b53cb947051
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_9283d5a06984f8b7a0bb9b53cb947051",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_9283d5a06984f8b7a0bb9b53cb947051",
+    "sourceUnitDigest": "bc5ca7e6617538ad",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-19",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1445-1445, starting \"Thêm trạng thái **`proposed`** vào FSM, với các cạnh:\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "bc5ca7e6617538adf69f4c157336e967194051ccd11b686cfb97a85358255643",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Decision"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_9283d5a06984f8b7a0bb9b53cb947051",
+    "sourceUnitDigest": "bc5ca7e6617538ad",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-19",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1476-1476, starting \"Thêm trạng thái **`proposed`** vào FSM, với các cạnh:\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "bc5ca7e6617538adf69f4c157336e967194051ccd11b686cfb97a85358255643",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "ec0e13eb56fa75c9ebd67d23c9d86f6127c5fc1db39d25094ebfd74fed5ac017",
+    "identityFingerprint": "ec0e13eb56fa75c9ebd67d23c9d86f6127c5fc1db39d25094ebfd74fed5ac017",
+    "claimId": "claim_9283d5a06984f8b7a0bb9b53cb947051",
+    "sourceAnchor": "unheaded-block-129",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "bc5ca7e6617538adf69f4c157336e967194051ccd11b686cfb97a85358255643",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-129",
+      "githubAnchor": "unheaded-block-129",
+      "stableAnchor": "unheaded-block-129",
+      "title": "Unheaded block 129",
+      "startLine": 1476,
+      "endLine": 1476,
+      "textDigest": "bc5ca7e6617538adf69f4c157336e967194051ccd11b686cfb97a85358255643",
+      "sample": "Thêm trạng thái **`proposed`** vào FSM, với các cạnh:",
+      "identityFingerprint": "ec0e13eb56fa75c9ebd67d23c9d86f6127c5fc1db39d25094ebfd74fed5ac017",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`",
+        "Quyết định"
+      ],
+      "text": "Thêm trạng thái **`proposed`** vào FSM, với các cạnh:"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-19",
+    "githubAnchor": "unheaded-block-19",
+    "stableAnchor": "unheaded-block-19",
+    "title": "Unheaded block 19",
+    "startLine": 133,
+    "endLine": 133,
+    "textDigest": "bc5ca7e6617538adf69f4c157336e967194051ccd11b686cfb97a85358255643",
+    "sample": "Thêm trạng thái **`proposed`** vào FSM, với các cạnh:",
+    "identityFingerprint": "ec0e13eb56fa75c9ebd67d23c9d86f6127c5fc1db39d25094ebfd74fed5ac017",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Decision"
+    ],
+    "text": "Thêm trạng thái **`proposed`** vào FSM, với các cạnh:"
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-19",
+      "githubAnchor": "unheaded-block-19",
+      "stableAnchor": "unheaded-block-19",
+      "title": "Unheaded block 19",
+      "startLine": 133,
+      "endLine": 133,
+      "textDigest": "bc5ca7e6617538adf69f4c157336e967194051ccd11b686cfb97a85358255643",
+      "sample": "Thêm trạng thái **`proposed`** vào FSM, với các cạnh:",
+      "identityFingerprint": "ec0e13eb56fa75c9ebd67d23c9d86f6127c5fc1db39d25094ebfd74fed5ac017",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Decision"
+      ],
+      "text": "Thêm trạng thái **`proposed`** vào FSM, với các cạnh:"
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_9283d5a06984f8b7a0bb9b53cb947051"
+}
+```
+
+## Entry claim_6175bd55a942311ba1056efd762f44be
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_6175bd55a942311ba1056efd762f44be",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_6175bd55a942311ba1056efd762f44be",
+    "sourceUnitDigest": "23622b5a51f195a4",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-20",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1447-1452, the transition list) carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "23622b5a51f195a41cc870aac9b70d45f4e6bc7f6247da22248bdaa5fea969f3",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Decision"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_6175bd55a942311ba1056efd762f44be",
+    "sourceUnitDigest": "23622b5a51f195a4",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-20",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1478-1483, the transition list) carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "23622b5a51f195a41cc870aac9b70d45f4e6bc7f6247da22248bdaa5fea969f3",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "84e3d7f7c61f0cfefd988611768065625dabe27b233489e2262964773cf6db90",
+    "identityFingerprint": "84e3d7f7c61f0cfefd988611768065625dabe27b233489e2262964773cf6db90",
+    "claimId": "claim_6175bd55a942311ba1056efd762f44be",
+    "sourceAnchor": "unheaded-block-130",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "23622b5a51f195a41cc870aac9b70d45f4e6bc7f6247da22248bdaa5fea969f3",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-130",
+      "githubAnchor": "unheaded-block-130",
+      "stableAnchor": "unheaded-block-130",
+      "title": "Unheaded block 130",
+      "startLine": 1478,
+      "endLine": 1483,
+      "textDigest": "23622b5a51f195a41cc870aac9b70d45f4e6bc7f6247da22248bdaa5fea969f3",
+      "sample": "- `doing → proposed` — goal-check pass, runner ghi `proposed`.\n- `proposed → done` — được duyệt/merge.\n- `proposed → todo` — **từ chối:** event mang lý do, item quay lại frontier;\n",
+      "identityFingerprint": "84e3d7f7c61f0cfefd988611768065625dabe27b233489e2262964773cf6db90",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`",
+        "Quyết định"
+      ],
+      "text": "- `doing → proposed` — goal-check pass, runner ghi `proposed`.\n- `proposed → done` — được duyệt/merge.\n- `proposed → todo` — **từ chối:** event mang lý do, item quay lại frontier;\n  anti-loop max-visits chặn lặp vô hạn.\n- `blocked` giữ nguyên hai chiều với `todo`/`doing` (muốn \"park\" thì dùng\n  `todo → blocked` sẵn có)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-20",
+    "githubAnchor": "unheaded-block-20",
+    "stableAnchor": "unheaded-block-20",
+    "title": "Unheaded block 20",
+    "startLine": 135,
+    "endLine": 140,
+    "textDigest": "23622b5a51f195a41cc870aac9b70d45f4e6bc7f6247da22248bdaa5fea969f3",
+    "sample": "- `doing → proposed` — goal-check pass, runner ghi `proposed`.\n- `proposed → done` — được duyệt/merge.\n- `proposed → todo` — **từ chối:** event mang lý do, item quay lại frontier;\n",
+    "identityFingerprint": "84e3d7f7c61f0cfefd988611768065625dabe27b233489e2262964773cf6db90",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Decision"
+    ],
+    "text": "- `doing → proposed` — goal-check pass, runner ghi `proposed`.\n- `proposed → done` — được duyệt/merge.\n- `proposed → todo` — **từ chối:** event mang lý do, item quay lại frontier;\n  anti-loop max-visits chặn lặp vô hạn.\n- `blocked` giữ nguyên hai chiều với `todo`/`doing` (muốn \"park\" thì dùng\n  `todo → blocked` sẵn có)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-20",
+      "githubAnchor": "unheaded-block-20",
+      "stableAnchor": "unheaded-block-20",
+      "title": "Unheaded block 20",
+      "startLine": 135,
+      "endLine": 140,
+      "textDigest": "23622b5a51f195a41cc870aac9b70d45f4e6bc7f6247da22248bdaa5fea969f3",
+      "sample": "- `doing → proposed` — goal-check pass, runner ghi `proposed`.\n- `proposed → done` — được duyệt/merge.\n- `proposed → todo` — **từ chối:** event mang lý do, item quay lại frontier;\n",
+      "identityFingerprint": "84e3d7f7c61f0cfefd988611768065625dabe27b233489e2262964773cf6db90",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Decision"
+      ],
+      "text": "- `doing → proposed` — goal-check pass, runner ghi `proposed`.\n- `proposed → done` — được duyệt/merge.\n- `proposed → todo` — **từ chối:** event mang lý do, item quay lại frontier;\n  anti-loop max-visits chặn lặp vô hạn.\n- `blocked` giữ nguyên hai chiều với `todo`/`doing` (muốn \"park\" thì dùng\n  `todo → blocked` sẵn có)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_6175bd55a942311ba1056efd762f44be"
+}
+```
+
+## Entry claim_e482cc83d02ca103ac12e881c2a712ee
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e482cc83d02ca103ac12e881c2a712ee",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_e482cc83d02ca103ac12e881c2a712ee",
+    "sourceUnitDigest": "671d794492bb185f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-21",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "The label \"Ngữ nghĩa:\" and the two bullets it introduces (source lines 1454-1459) carried line for line into one block; the extraction rule attaches a short label ending in a colon to the block it introduces, in the candidate as in the source; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "671d794492bb185fc86e5b1cdbca92dc3a96080e0bf8b4319c51715c7a88ca85",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Decision"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_e482cc83d02ca103ac12e881c2a712ee",
+    "sourceUnitDigest": "671d794492bb185f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-21",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "The label \"Ngữ nghĩa:\" and the two bullets it introduces (source lines 1485-1490) carried line for line into one block; the extraction rule attaches a short label ending in a colon to the block it introduces, in the candidate as in the source; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "671d794492bb185fc86e5b1cdbca92dc3a96080e0bf8b4319c51715c7a88ca85",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "296c54787c76d8b7228efbc0c7ec24c9d9ca5803ee8700af3f6b7128af9120b0",
+    "identityFingerprint": "296c54787c76d8b7228efbc0c7ec24c9d9ca5803ee8700af3f6b7128af9120b0",
+    "claimId": "claim_e482cc83d02ca103ac12e881c2a712ee",
+    "sourceAnchor": "unheaded-block-131",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "671d794492bb185fc86e5b1cdbca92dc3a96080e0bf8b4319c51715c7a88ca85",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-131",
+      "githubAnchor": "unheaded-block-131",
+      "stableAnchor": "unheaded-block-131",
+      "title": "Unheaded block 131",
+      "startLine": 1485,
+      "endLine": 1490,
+      "textDigest": "671d794492bb185fc86e5b1cdbca92dc3a96080e0bf8b4319c51715c7a88ca85",
+      "sample": "Ngữ nghĩa:\n\n- **`done` vẫn là trạng thái terminal**, và từ nay nghĩa là **\"đã nhận vào cây\n  chính\"** (không chỉ \"worker báo xong\").\n- **Frontier chỉ mở việc phụ thuộc khi dep thật",
+      "identityFingerprint": "296c54787c76d8b7228efbc0c7ec24c9d9ca5803ee8700af3f6b7128af9120b0",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`",
+        "Quyết định"
+      ],
+      "text": "Ngữ nghĩa:\n\n- **`done` vẫn là trạng thái terminal**, và từ nay nghĩa là **\"đã nhận vào cây\n  chính\"** (không chỉ \"worker báo xong\").\n- **Frontier chỉ mở việc phụ thuộc khi dep thật sự `done`** — nên B không bao giờ\n  chạy trên nền thiếu code A."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-21",
+    "githubAnchor": "unheaded-block-21",
+    "stableAnchor": "unheaded-block-21",
+    "title": "Unheaded block 21",
+    "startLine": 142,
+    "endLine": 147,
+    "textDigest": "671d794492bb185fc86e5b1cdbca92dc3a96080e0bf8b4319c51715c7a88ca85",
+    "sample": "Ngữ nghĩa:\n\n- **`done` vẫn là trạng thái terminal**, và từ nay nghĩa là **\"đã nhận vào cây\n  chính\"** (không chỉ \"worker báo xong\").\n- **Frontier chỉ mở việc phụ thuộc khi dep thật",
+    "identityFingerprint": "296c54787c76d8b7228efbc0c7ec24c9d9ca5803ee8700af3f6b7128af9120b0",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Decision"
+    ],
+    "text": "Ngữ nghĩa:\n\n- **`done` vẫn là trạng thái terminal**, và từ nay nghĩa là **\"đã nhận vào cây\n  chính\"** (không chỉ \"worker báo xong\").\n- **Frontier chỉ mở việc phụ thuộc khi dep thật sự `done`** — nên B không bao giờ\n  chạy trên nền thiếu code A."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-21",
+      "githubAnchor": "unheaded-block-21",
+      "stableAnchor": "unheaded-block-21",
+      "title": "Unheaded block 21",
+      "startLine": 142,
+      "endLine": 147,
+      "textDigest": "671d794492bb185fc86e5b1cdbca92dc3a96080e0bf8b4319c51715c7a88ca85",
+      "sample": "Ngữ nghĩa:\n\n- **`done` vẫn là trạng thái terminal**, và từ nay nghĩa là **\"đã nhận vào cây\n  chính\"** (không chỉ \"worker báo xong\").\n- **Frontier chỉ mở việc phụ thuộc khi dep thật",
+      "identityFingerprint": "296c54787c76d8b7228efbc0c7ec24c9d9ca5803ee8700af3f6b7128af9120b0",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Decision"
+      ],
+      "text": "Ngữ nghĩa:\n\n- **`done` vẫn là trạng thái terminal**, và từ nay nghĩa là **\"đã nhận vào cây\n  chính\"** (không chỉ \"worker báo xong\").\n- **Frontier chỉ mở việc phụ thuộc khi dep thật sự `done`** — nên B không bao giờ\n  chạy trên nền thiếu code A."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_e482cc83d02ca103ac12e881c2a712ee"
+}
+```
+
+## Entry claim_e602fe2731b631f7be06ccebc5cf8e91
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e602fe2731b631f7be06ccebc5cf8e91",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_e602fe2731b631f7be06ccebc5cf8e91",
+    "sourceUnitDigest": "899175d57462b103",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0006-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0006 is represented by the frozen H3 \"0006 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "783e9b5f2b2e44c3010507770e87c9785bcf8ff5b1aae09aecd902440090f996",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_e602fe2731b631f7be06ccebc5cf8e91",
+    "sourceUnitDigest": "899175d57462b103",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0006-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0006 is represented by the frozen H3 \"0006 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "783e9b5f2b2e44c3010507770e87c9785bcf8ff5b1aae09aecd902440090f996",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "622e6b00a586c873eff15bfe77562e7aae3dcd662c8637c7af60d71a3b9ffb2c",
+    "identityFingerprint": "9045fa1e827cb2fdc59ab086222efb505062ab0ed3cd16d89730faa060ce1329",
+    "claimId": "claim_e602fe2731b631f7be06ccebc5cf8e91",
+    "sourceAnchor": "hệ-quả-3",
+    "unitKind": "heading",
+    "sourceUnitDigest": "899175d57462b10345fc181dc2f7dbe36dc232d277f38a317cf156247aa4dcb9",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Hệ quả",
+      "anchor": "hệ-quả-3",
+      "githubAnchor": "hệ-quả-3",
+      "stableAnchor": "h-fc5296903dde",
+      "startLine": 1492,
+      "endLine": 1492,
+      "textDigest": "899175d57462b10345fc181dc2f7dbe36dc232d277f38a317cf156247aa4dcb9",
+      "sample": "Hệ quả",
+      "sectionPayloadDigest": "c9f97f33e615f3067083a65aa84aa7d277bec0e6f76f0fff02322df31525e162",
+      "followingBlockDigest": "b7287de2ff36f57cb44f105c8ee8d259283f0f6445670c63dbe90337489cf97d",
+      "identityFingerprint": "9045fa1e827cb2fdc59ab086222efb505062ab0ed3cd16d89730faa060ce1329",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`"
+      ],
+      "text": "#### Hệ quả",
+      "sectionText": "#### Hệ quả\n\n- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây chính.\n- **Chờ-duyệt hiện rõ:** `proposed` là trạng thái nhìn thấy được, không phải giai\n  đoạn ẩn.\n- **Từ chối có lối ra sạch:** item về `todo` kèm lý do, được anti-loop bảo vệ.\n- Record này **supersede** tập trạng thái FSM của Phase 1; spec work-state phản ánh\n  tập trạng thái mới.\n\n- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)**.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0006 Consequences",
+    "anchor": "0006-consequences",
+    "githubAnchor": "0006-consequences",
+    "stableAnchor": "h-37377cbf6ac8",
+    "startLine": 149,
+    "endLine": 149,
+    "textDigest": "783e9b5f2b2e44c3010507770e87c9785bcf8ff5b1aae09aecd902440090f996",
+    "sample": "0006 Consequences",
+    "sectionPayloadDigest": "c9f97f33e615f3067083a65aa84aa7d277bec0e6f76f0fff02322df31525e162",
+    "followingBlockDigest": "b7287de2ff36f57cb44f105c8ee8d259283f0f6445670c63dbe90337489cf97d",
+    "identityFingerprint": "223c2c992755a7294f93a653948e32b89a4a428fcb43e767c61bdaa90907147d",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ],
+    "text": "### 0006 Consequences",
+    "sectionText": "### 0006 Consequences\n\n- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây chính.\n- **Chờ-duyệt hiện rõ:** `proposed` là trạng thái nhìn thấy được, không phải giai\n  đoạn ẩn.\n- **Từ chối có lối ra sạch:** item về `todo` kèm lý do, được anti-loop bảo vệ.\n- Record này **supersede** tập trạng thái FSM của Phase 1; spec work-state phản ánh\n  tập trạng thái mới.\n\n- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)**.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_e602fe2731b631f7be06ccebc5cf8e91"
+}
+```
+
+## Entry claim_453534a2ccfccba30980d90ae47b6e63
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_453534a2ccfccba30980d90ae47b6e63",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_453534a2ccfccba30980d90ae47b6e63",
+    "sourceUnitDigest": "b7287de2ff36f57c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-22",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1463-1468, starting \"- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây \") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "b7287de2ff36f57cb44f105c8ee8d259283f0f6445670c63dbe90337489cf97d",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_453534a2ccfccba30980d90ae47b6e63",
+    "sourceUnitDigest": "b7287de2ff36f57c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-22",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1494-1499, starting \"- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây \") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "b7287de2ff36f57cb44f105c8ee8d259283f0f6445670c63dbe90337489cf97d",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "84f57cd738ed19764ea5938a9ce0e6a9ee38b1dfdadc7df75dae40495283fa14",
+    "identityFingerprint": "84f57cd738ed19764ea5938a9ce0e6a9ee38b1dfdadc7df75dae40495283fa14",
+    "claimId": "claim_453534a2ccfccba30980d90ae47b6e63",
+    "sourceAnchor": "unheaded-block-132",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b7287de2ff36f57cb44f105c8ee8d259283f0f6445670c63dbe90337489cf97d",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-132",
+      "githubAnchor": "unheaded-block-132",
+      "stableAnchor": "unheaded-block-132",
+      "title": "Unheaded block 132",
+      "startLine": 1494,
+      "endLine": 1499,
+      "textDigest": "b7287de2ff36f57cb44f105c8ee8d259283f0f6445670c63dbe90337489cf97d",
+      "sample": "- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây chính.\n- **Chờ-duyệt hiện rõ:** `proposed` là trạng thái nhìn thấy được, không phải giai\n  đoạn ẩn.\n- **Từ chố",
+      "identityFingerprint": "84f57cd738ed19764ea5938a9ce0e6a9ee38b1dfdadc7df75dae40495283fa14",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`",
+        "Hệ quả"
+      ],
+      "text": "- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây chính.\n- **Chờ-duyệt hiện rõ:** `proposed` là trạng thái nhìn thấy được, không phải giai\n  đoạn ẩn.\n- **Từ chối có lối ra sạch:** item về `todo` kèm lý do, được anti-loop bảo vệ.\n- Record này **supersede** tập trạng thái FSM của Phase 1; spec work-state phản ánh\n  tập trạng thái mới."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-22",
+    "githubAnchor": "unheaded-block-22",
+    "stableAnchor": "unheaded-block-22",
+    "title": "Unheaded block 22",
+    "startLine": 151,
+    "endLine": 156,
+    "textDigest": "b7287de2ff36f57cb44f105c8ee8d259283f0f6445670c63dbe90337489cf97d",
+    "sample": "- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây chính.\n- **Chờ-duyệt hiện rõ:** `proposed` là trạng thái nhìn thấy được, không phải giai\n  đoạn ẩn.\n- **Từ chố",
+    "identityFingerprint": "84f57cd738ed19764ea5938a9ce0e6a9ee38b1dfdadc7df75dae40495283fa14",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Consequences"
+    ],
+    "text": "- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây chính.\n- **Chờ-duyệt hiện rõ:** `proposed` là trạng thái nhìn thấy được, không phải giai\n  đoạn ẩn.\n- **Từ chối có lối ra sạch:** item về `todo` kèm lý do, được anti-loop bảo vệ.\n- Record này **supersede** tập trạng thái FSM của Phase 1; spec work-state phản ánh\n  tập trạng thái mới."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-22",
+      "githubAnchor": "unheaded-block-22",
+      "stableAnchor": "unheaded-block-22",
+      "title": "Unheaded block 22",
+      "startLine": 151,
+      "endLine": 156,
+      "textDigest": "b7287de2ff36f57cb44f105c8ee8d259283f0f6445670c63dbe90337489cf97d",
+      "sample": "- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây chính.\n- **Chờ-duyệt hiện rõ:** `proposed` là trạng thái nhìn thấy được, không phải giai\n  đoạn ẩn.\n- **Từ chố",
+      "identityFingerprint": "84f57cd738ed19764ea5938a9ce0e6a9ee38b1dfdadc7df75dae40495283fa14",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Consequences"
+      ],
+      "text": "- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây chính.\n- **Chờ-duyệt hiện rõ:** `proposed` là trạng thái nhìn thấy được, không phải giai\n  đoạn ẩn.\n- **Từ chối có lối ra sạch:** item về `todo` kèm lý do, được anti-loop bảo vệ.\n- Record này **supersede** tập trạng thái FSM của Phase 1; spec work-state phản ánh\n  tập trạng thái mới."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_453534a2ccfccba30980d90ae47b6e63"
+}
+```
+
+## Entry claim_ad95e550092bec4474133ac2a451649d
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_ad95e550092bec4474133ac2a451649d",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_ad95e550092bec4474133ac2a451649d",
+    "sourceUnitDigest": "12602590029a0f3b",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-23",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1470-1471, starting \"- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-sta\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "12602590029a0f3b8fe58c0ef444d33801cb9c512c751362f2532c0323235155",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_ad95e550092bec4474133ac2a451649d",
+    "sourceUnitDigest": "12602590029a0f3b",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-23",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0006 (source lines 1501-1502, starting \"- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-sta\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "12602590029a0f3b8fe58c0ef444d33801cb9c512c751362f2532c0323235155",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "43d85e947fc35d2c9c99e1fdf2a58c2ae85a6a5d52898064b727638e9c9cb89f",
+    "identityFingerprint": "43d85e947fc35d2c9c99e1fdf2a58c2ae85a6a5d52898064b727638e9c9cb89f",
+    "claimId": "claim_ad95e550092bec4474133ac2a451649d",
+    "sourceAnchor": "unheaded-block-133",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "12602590029a0f3b8fe58c0ef444d33801cb9c512c751362f2532c0323235155",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-133",
+      "githubAnchor": "unheaded-block-133",
+      "stableAnchor": "unheaded-block-133",
+      "title": "Unheaded block 133",
+      "startLine": 1501,
+      "endLine": 1502,
+      "textDigest": "12602590029a0f3b8fe58c0ef444d33801cb9c512c751362f2532c0323235155",
+      "sample": "- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)**.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "43d85e947fc35d2c9c99e1fdf2a58c2ae85a6a5d52898064b727638e9c9cb89f",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0006 — Trạng thái `proposed`",
+        "Hệ quả"
+      ],
+      "text": "- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)**.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-23",
+    "githubAnchor": "unheaded-block-23",
+    "stableAnchor": "unheaded-block-23",
+    "title": "Unheaded block 23",
+    "startLine": 158,
+    "endLine": 159,
+    "textDigest": "12602590029a0f3b8fe58c0ef444d33801cb9c512c751362f2532c0323235155",
+    "sample": "- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)**.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "43d85e947fc35d2c9c99e1fdf2a58c2ae85a6a5d52898064b727638e9c9cb89f",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status",
+      "0006 Consequences"
+    ],
+    "text": "- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)**.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-23",
+      "githubAnchor": "unheaded-block-23",
+      "stableAnchor": "unheaded-block-23",
+      "title": "Unheaded block 23",
+      "startLine": 158,
+      "endLine": 159,
+      "textDigest": "12602590029a0f3b8fe58c0ef444d33801cb9c512c751362f2532c0323235155",
+      "sample": "- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)**.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "43d85e947fc35d2c9c99e1fdf2a58c2ae85a6a5d52898064b727638e9c9cb89f",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "5. ADR 0006 Proposed Status",
+        "0006 Consequences"
+      ],
+      "text": "- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)**.\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_ad95e550092bec4474133ac2a451649d"
+}
+```
+
+## Entry claim_2f1ede55aaf8adff2f15c46ffc646e8d
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
+    "sourceUnitDigest": "0652eaa390a60c98",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "6-adr-0007-schema-and-event-evolution",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0007 title heading is represented by the frozen H2 \"6. ADR 0007 ...\" (6-adr-0007-schema-and-event-evolution); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "38c7e64350e2c0ead7dc9dab84c6ecc28918e7bb019e31a35b07fc88b495842f",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
+    "sourceUnitDigest": "0652eaa390a60c98",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "6-adr-0007-schema-and-event-evolution",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0007 title heading is represented by the frozen H2 \"6. ADR 0007 ...\" (6-adr-0007-schema-and-event-evolution); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "38c7e64350e2c0ead7dc9dab84c6ecc28918e7bb019e31a35b07fc88b495842f",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "17baf702aada02d0cc248e079c6459a5ecfd85621c6b2afd95d8519ea639b22a",
+    "identityFingerprint": "bfcfc3d90aced2b49fe5f2b2bb230929e6decc3963805cda6bf0b4c8bb673ee1",
+    "claimId": "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
+    "sourceAnchor": "0007-tiến-hoá-schema-event",
+    "unitKind": "heading",
+    "sourceUnitDigest": "0652eaa390a60c98405d46d2e62b3aac80aa32d00a54006debdda70257a3ffbf",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "0007 — Tiến hoá schema & event",
+      "anchor": "0007-tiến-hoá-schema-event",
+      "githubAnchor": "0007-tiến-hoá-schema-event",
+      "stableAnchor": "h-8d5842abb6a1",
+      "startLine": 1504,
+      "endLine": 1504,
+      "textDigest": "0652eaa390a60c98405d46d2e62b3aac80aa32d00a54006debdda70257a3ffbf",
+      "sample": "0007 — Tiến hoá schema & event",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "bfcfc3d90aced2b49fe5f2b2bb230929e6decc3963805cda6bf0b4c8bb673ee1",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng"
+      ],
+      "text": "### 0007 — Tiến hoá schema & event",
+      "sectionText": "### 0007 — Tiến hoá schema & event"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "6. ADR 0007 Schema And Event Evolution",
+    "anchor": "6-adr-0007-schema-and-event-evolution",
+    "githubAnchor": "6-adr-0007-schema-and-event-evolution",
+    "stableAnchor": "h-844047ccab87",
+    "startLine": 161,
+    "endLine": 161,
+    "textDigest": "38c7e64350e2c0ead7dc9dab84c6ecc28918e7bb019e31a35b07fc88b495842f",
+    "sample": "6. ADR 0007 Schema And Event Evolution",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "7d685c3c1d17f54497243d7348d34fc39f99558683eb3e99430307249b11ee1e",
+    "ancestry": [
+      "Retired Decision History: Work State"
+    ],
+    "text": "## 6. ADR 0007 Schema And Event Evolution",
+    "sectionText": "## 6. ADR 0007 Schema And Event Evolution"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_2f1ede55aaf8adff2f15c46ffc646e8d"
+}
+```
+
+## Entry claim_208f5cc84da2b23ab24abde2c91c4f06
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
+    "sourceUnitDigest": "5483e14a0ec0d67c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0007-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0007 is represented by the frozen H3 \"0007 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "ab86aba22bff4bd95dfd666582cad23d4a6f3c760c8cf86de79efdac597d4dd2",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
+    "sourceUnitDigest": "5483e14a0ec0d67c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0007-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0007 is represented by the frozen H3 \"0007 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "ab86aba22bff4bd95dfd666582cad23d4a6f3c760c8cf86de79efdac597d4dd2",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "21d990f2d250e13a8263b53094927d3e31c1f05608778c6f0a8779ec3506acc5",
+    "identityFingerprint": "d9581ae2b89be2871fdc0dbff6672574eaad82b1ed8b9525787cc065f30cec70",
+    "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
+    "sourceAnchor": "bối-cảnh-4",
+    "unitKind": "heading",
+    "sourceUnitDigest": "5483e14a0ec0d67c7dc61a0c49e438a7274617176e5f82086ea2d136bae2ad43",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Bối cảnh",
+      "anchor": "bối-cảnh-4",
+      "githubAnchor": "bối-cảnh-4",
+      "stableAnchor": "h-632648f7107e",
+      "startLine": 1506,
+      "endLine": 1506,
+      "textDigest": "5483e14a0ec0d67c7dc61a0c49e438a7274617176e5f82086ea2d136bae2ad43",
+      "sample": "Bối cảnh",
+      "sectionPayloadDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
+      "followingBlockDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
+      "identityFingerprint": "d9581ae2b89be2871fdc0dbff6672574eaad82b1ed8b9525787cc065f30cec70",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event"
+      ],
+      "text": "#### Bối cảnh",
+      "sectionText": "#### Bối cảnh\n\nTrạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ liệu** ghi trên\nmột nhật ký đã committed vào git (0001). Log cũ (viết dưới code cũ) phải tiếp tục\nđọc được dưới code mới, nếu không nguyên lý \"log là sự thật dựng-lại-được\" sụp."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0007 Context",
+    "anchor": "0007-context",
+    "githubAnchor": "0007-context",
+    "stableAnchor": "h-476a41fac501",
+    "startLine": 163,
+    "endLine": 163,
+    "textDigest": "ab86aba22bff4bd95dfd666582cad23d4a6f3c760c8cf86de79efdac597d4dd2",
+    "sample": "0007 Context",
+    "sectionPayloadDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
+    "followingBlockDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
+    "identityFingerprint": "b11469bfde194c0fe3825db04c24294f2433f5b20f9a610cfd57621151563a2f",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ],
+    "text": "### 0007 Context",
+    "sectionText": "### 0007 Context\n\nTrạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ liệu** ghi trên\nmột nhật ký đã committed vào git (0001). Log cũ (viết dưới code cũ) phải tiếp tục\nđọc được dưới code mới, nếu không nguyên lý \"log là sự thật dựng-lại-được\" sụp."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_208f5cc84da2b23ab24abde2c91c4f06"
+}
+```
+
+## Entry claim_5f4f81607ad69719e2fed9631a8dcd2b
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_5f4f81607ad69719e2fed9631a8dcd2b",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_5f4f81607ad69719e2fed9631a8dcd2b",
+    "sourceUnitDigest": "8dd703c9d39dc60b",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-24",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0007 (source lines 1477-1479, starting \"Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ li\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_5f4f81607ad69719e2fed9631a8dcd2b",
+    "sourceUnitDigest": "8dd703c9d39dc60b",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-24",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0007 (source lines 1508-1510, starting \"Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ li\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "c7389aa2302dff9cd556b9c6d4e5e34f9f33e8d1c11f801dabcd510ac53e7b00",
+    "identityFingerprint": "c7389aa2302dff9cd556b9c6d4e5e34f9f33e8d1c11f801dabcd510ac53e7b00",
+    "claimId": "claim_5f4f81607ad69719e2fed9631a8dcd2b",
+    "sourceAnchor": "unheaded-block-134",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-134",
+      "githubAnchor": "unheaded-block-134",
+      "stableAnchor": "unheaded-block-134",
+      "title": "Unheaded block 134",
+      "startLine": 1508,
+      "endLine": 1510,
+      "textDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
+      "sample": "Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ liệu** ghi trên\nmột nhật ký đã committed vào git (0001). Log cũ (viết dưới code cũ) phải tiếp tục\nđọc được dưới ",
+      "identityFingerprint": "c7389aa2302dff9cd556b9c6d4e5e34f9f33e8d1c11f801dabcd510ac53e7b00",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event",
+        "Bối cảnh"
+      ],
+      "text": "Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ liệu** ghi trên\nmột nhật ký đã committed vào git (0001). Log cũ (viết dưới code cũ) phải tiếp tục\nđọc được dưới code mới, nếu không nguyên lý \"log là sự thật dựng-lại-được\" sụp."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-24",
+    "githubAnchor": "unheaded-block-24",
+    "stableAnchor": "unheaded-block-24",
+    "title": "Unheaded block 24",
+    "startLine": 165,
+    "endLine": 167,
+    "textDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
+    "sample": "Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ liệu** ghi trên\nmột nhật ký đã committed vào git (0001). Log cũ (viết dưới code cũ) phải tiếp tục\nđọc được dưới ",
+    "identityFingerprint": "c7389aa2302dff9cd556b9c6d4e5e34f9f33e8d1c11f801dabcd510ac53e7b00",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Context"
+    ],
+    "text": "Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ liệu** ghi trên\nmột nhật ký đã committed vào git (0001). Log cũ (viết dưới code cũ) phải tiếp tục\nđọc được dưới code mới, nếu không nguyên lý \"log là sự thật dựng-lại-được\" sụp."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-24",
+      "githubAnchor": "unheaded-block-24",
+      "stableAnchor": "unheaded-block-24",
+      "title": "Unheaded block 24",
+      "startLine": 165,
+      "endLine": 167,
+      "textDigest": "8dd703c9d39dc60ba48ae30e587eb759cc74eacd6680d54fbc831410a91eb791",
+      "sample": "Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ liệu** ghi trên\nmột nhật ký đã committed vào git (0001). Log cũ (viết dưới code cũ) phải tiếp tục\nđọc được dưới ",
+      "identityFingerprint": "c7389aa2302dff9cd556b9c6d4e5e34f9f33e8d1c11f801dabcd510ac53e7b00",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution",
+        "0007 Context"
+      ],
+      "text": "Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ liệu** ghi trên\nmột nhật ký đã committed vào git (0001). Log cũ (viết dưới code cũ) phải tiếp tục\nđọc được dưới code mới, nếu không nguyên lý \"log là sự thật dựng-lại-được\" sụp."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_5f4f81607ad69719e2fed9631a8dcd2b"
+}
+```
+
+## Entry claim_886f9acc902249e303bacc887ffb9882
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_886f9acc902249e303bacc887ffb9882",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_886f9acc902249e303bacc887ffb9882",
+    "sourceUnitDigest": "eb9a345fe658f7c4",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0007-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0007 is represented by the frozen H3 \"0007 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "08f6311c148ae29221fd5d1a3613d38b0e740914a3dcde683f27d48ee398de27",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_886f9acc902249e303bacc887ffb9882",
+    "sourceUnitDigest": "eb9a345fe658f7c4",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0007-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0007 is represented by the frozen H3 \"0007 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "08f6311c148ae29221fd5d1a3613d38b0e740914a3dcde683f27d48ee398de27",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "a77828dff4f6468d535e2a0e73759ddbed38a9974a53685ddbc24bb3b9135271",
+    "identityFingerprint": "ad448c2cbc8c83c51d770020d139a377d3c21e5e7cf6690a491a44eb26135035",
+    "claimId": "claim_886f9acc902249e303bacc887ffb9882",
+    "sourceAnchor": "quyết-định-4",
+    "unitKind": "heading",
+    "sourceUnitDigest": "eb9a345fe658f7c42e45f2cde5666e0946a8e55f948b709a4afb87d07719356d",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Quyết định",
+      "anchor": "quyết-định-4",
+      "githubAnchor": "quyết-định-4",
+      "stableAnchor": "h-fcff4b1be514",
+      "startLine": 1512,
+      "endLine": 1512,
+      "textDigest": "eb9a345fe658f7c42e45f2cde5666e0946a8e55f948b709a4afb87d07719356d",
+      "sample": "Quyết định",
+      "sectionPayloadDigest": "9b2a7645b435c42fb1c6dd2568178d323036446b37ff8ff679034b570f4dfcbc",
+      "followingBlockDigest": "cc510df779670e7b9c13293a5a14adce6a4890e98d58ab3de5cfca9ba1512f68",
+      "identityFingerprint": "ad448c2cbc8c83c51d770020d139a377d3c21e5e7cf6690a491a44eb26135035",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event"
+      ],
+      "text": "#### Quyết định",
+      "sectionText": "#### Quyết định\n\nBa luật cho mọi tiến hoá schema/event từ đây về sau:\n\n1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration ghi đè event\n   cũ. Sự thật chỉ được thêm, không viết lại.\n2. **Replay backward-compatible, CÓ TEST.** Item/event thiếu trường mới nhận\n   **default khai báo tường minh**. Cụ thể: log của phiên bản trước phải replay được\n   dưới code phiên bản sau — và điều này được một test bảo vệ, không phải giả định.\n3. **Mỗi event mang trường schema version** (từ khi luật này có hiệu lực), để code\n   đọc biết mình đang replay shape nào."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0007 Decision",
+    "anchor": "0007-decision",
+    "githubAnchor": "0007-decision",
+    "stableAnchor": "h-1a8171495841",
+    "startLine": 169,
+    "endLine": 169,
+    "textDigest": "08f6311c148ae29221fd5d1a3613d38b0e740914a3dcde683f27d48ee398de27",
+    "sample": "0007 Decision",
+    "sectionPayloadDigest": "9b2a7645b435c42fb1c6dd2568178d323036446b37ff8ff679034b570f4dfcbc",
+    "followingBlockDigest": "cc510df779670e7b9c13293a5a14adce6a4890e98d58ab3de5cfca9ba1512f68",
+    "identityFingerprint": "83d5f61569359e1c5c272e6d2b2aa301f6386a84f9e1cfbea0c5b680a767864c",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ],
+    "text": "### 0007 Decision",
+    "sectionText": "### 0007 Decision\n\nBa luật cho mọi tiến hoá schema/event từ đây về sau:\n\n1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration ghi đè event\n   cũ. Sự thật chỉ được thêm, không viết lại.\n2. **Replay backward-compatible, CÓ TEST.** Item/event thiếu trường mới nhận\n   **default khai báo tường minh**. Cụ thể: log của phiên bản trước phải replay được\n   dưới code phiên bản sau — và điều này được một test bảo vệ, không phải giả định.\n3. **Mỗi event mang trường schema version** (từ khi luật này có hiệu lực), để code\n   đọc biết mình đang replay shape nào."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_886f9acc902249e303bacc887ffb9882"
+}
+```
+
+## Entry claim_37315ade5a8ca0c583456c157daaecba
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_37315ade5a8ca0c583456c157daaecba",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_37315ade5a8ca0c583456c157daaecba",
+    "sourceUnitDigest": "cc510df779670e7b",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-25",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0007 (source lines 1483-1483, starting \"Ba luật cho mọi tiến hoá schema/event từ đây về sau:\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "cc510df779670e7b9c13293a5a14adce6a4890e98d58ab3de5cfca9ba1512f68",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Decision"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_37315ade5a8ca0c583456c157daaecba",
+    "sourceUnitDigest": "cc510df779670e7b",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-25",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0007 (source lines 1514-1514, starting \"Ba luật cho mọi tiến hoá schema/event từ đây về sau:\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "cc510df779670e7b9c13293a5a14adce6a4890e98d58ab3de5cfca9ba1512f68",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "143b011d2d0830daf21ff4d01dd04a67fc99d4b620ce20f8933fc57aef0b8811",
+    "identityFingerprint": "143b011d2d0830daf21ff4d01dd04a67fc99d4b620ce20f8933fc57aef0b8811",
+    "claimId": "claim_37315ade5a8ca0c583456c157daaecba",
+    "sourceAnchor": "unheaded-block-135",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "cc510df779670e7b9c13293a5a14adce6a4890e98d58ab3de5cfca9ba1512f68",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-135",
+      "githubAnchor": "unheaded-block-135",
+      "stableAnchor": "unheaded-block-135",
+      "title": "Unheaded block 135",
+      "startLine": 1514,
+      "endLine": 1514,
+      "textDigest": "cc510df779670e7b9c13293a5a14adce6a4890e98d58ab3de5cfca9ba1512f68",
+      "sample": "Ba luật cho mọi tiến hoá schema/event từ đây về sau:",
+      "identityFingerprint": "143b011d2d0830daf21ff4d01dd04a67fc99d4b620ce20f8933fc57aef0b8811",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event",
+        "Quyết định"
+      ],
+      "text": "Ba luật cho mọi tiến hoá schema/event từ đây về sau:"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-25",
+    "githubAnchor": "unheaded-block-25",
+    "stableAnchor": "unheaded-block-25",
+    "title": "Unheaded block 25",
+    "startLine": 171,
+    "endLine": 171,
+    "textDigest": "cc510df779670e7b9c13293a5a14adce6a4890e98d58ab3de5cfca9ba1512f68",
+    "sample": "Ba luật cho mọi tiến hoá schema/event từ đây về sau:",
+    "identityFingerprint": "143b011d2d0830daf21ff4d01dd04a67fc99d4b620ce20f8933fc57aef0b8811",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Decision"
+    ],
+    "text": "Ba luật cho mọi tiến hoá schema/event từ đây về sau:"
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-25",
+      "githubAnchor": "unheaded-block-25",
+      "stableAnchor": "unheaded-block-25",
+      "title": "Unheaded block 25",
+      "startLine": 171,
+      "endLine": 171,
+      "textDigest": "cc510df779670e7b9c13293a5a14adce6a4890e98d58ab3de5cfca9ba1512f68",
+      "sample": "Ba luật cho mọi tiến hoá schema/event từ đây về sau:",
+      "identityFingerprint": "143b011d2d0830daf21ff4d01dd04a67fc99d4b620ce20f8933fc57aef0b8811",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution",
+        "0007 Decision"
+      ],
+      "text": "Ba luật cho mọi tiến hoá schema/event từ đây về sau:"
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_37315ade5a8ca0c583456c157daaecba"
+}
+```
+
+## Entry claim_4c29ddf395edf0a905c5cf76729c2d26
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_4c29ddf395edf0a905c5cf76729c2d26",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_4c29ddf395edf0a905c5cf76729c2d26",
+    "sourceUnitDigest": "3544a54900acf99f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-26",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0007 (source lines 1485-1491, starting \"1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "3544a54900acf99fb0dc62fc6dad1f1d86468e495e95968a5c470efad2df6c8c",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Decision"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_4c29ddf395edf0a905c5cf76729c2d26",
+    "sourceUnitDigest": "3544a54900acf99f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-26",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0007 (source lines 1516-1522, starting \"1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "3544a54900acf99fb0dc62fc6dad1f1d86468e495e95968a5c470efad2df6c8c",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "a5e02f5ef482a985e2c9750267a135aa7836f6c04d820bc0f3ceb131afe81085",
+    "identityFingerprint": "a5e02f5ef482a985e2c9750267a135aa7836f6c04d820bc0f3ceb131afe81085",
+    "claimId": "claim_4c29ddf395edf0a905c5cf76729c2d26",
+    "sourceAnchor": "unheaded-block-136",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3544a54900acf99fb0dc62fc6dad1f1d86468e495e95968a5c470efad2df6c8c",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-136",
+      "githubAnchor": "unheaded-block-136",
+      "stableAnchor": "unheaded-block-136",
+      "title": "Unheaded block 136",
+      "startLine": 1516,
+      "endLine": 1522,
+      "textDigest": "3544a54900acf99fb0dc62fc6dad1f1d86468e495e95968a5c470efad2df6c8c",
+      "sample": "1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration ghi đè event\n   cũ. Sự thật chỉ được thêm, không viết lại.\n2. **Replay backward-compatible, CÓ TEST.** Item/e",
+      "identityFingerprint": "a5e02f5ef482a985e2c9750267a135aa7836f6c04d820bc0f3ceb131afe81085",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event",
+        "Quyết định"
+      ],
+      "text": "1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration ghi đè event\n   cũ. Sự thật chỉ được thêm, không viết lại.\n2. **Replay backward-compatible, CÓ TEST.** Item/event thiếu trường mới nhận\n   **default khai báo tường minh**. Cụ thể: log của phiên bản trước phải replay được\n   dưới code phiên bản sau — và điều này được một test bảo vệ, không phải giả định.\n3. **Mỗi event mang trường schema version** (từ khi luật này có hiệu lực), để code\n   đọc biết mình đang replay shape nào."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-26",
+    "githubAnchor": "unheaded-block-26",
+    "stableAnchor": "unheaded-block-26",
+    "title": "Unheaded block 26",
+    "startLine": 173,
+    "endLine": 179,
+    "textDigest": "3544a54900acf99fb0dc62fc6dad1f1d86468e495e95968a5c470efad2df6c8c",
+    "sample": "1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration ghi đè event\n   cũ. Sự thật chỉ được thêm, không viết lại.\n2. **Replay backward-compatible, CÓ TEST.** Item/e",
+    "identityFingerprint": "a5e02f5ef482a985e2c9750267a135aa7836f6c04d820bc0f3ceb131afe81085",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Decision"
+    ],
+    "text": "1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration ghi đè event\n   cũ. Sự thật chỉ được thêm, không viết lại.\n2. **Replay backward-compatible, CÓ TEST.** Item/event thiếu trường mới nhận\n   **default khai báo tường minh**. Cụ thể: log của phiên bản trước phải replay được\n   dưới code phiên bản sau — và điều này được một test bảo vệ, không phải giả định.\n3. **Mỗi event mang trường schema version** (từ khi luật này có hiệu lực), để code\n   đọc biết mình đang replay shape nào."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-26",
+      "githubAnchor": "unheaded-block-26",
+      "stableAnchor": "unheaded-block-26",
+      "title": "Unheaded block 26",
+      "startLine": 173,
+      "endLine": 179,
+      "textDigest": "3544a54900acf99fb0dc62fc6dad1f1d86468e495e95968a5c470efad2df6c8c",
+      "sample": "1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration ghi đè event\n   cũ. Sự thật chỉ được thêm, không viết lại.\n2. **Replay backward-compatible, CÓ TEST.** Item/e",
+      "identityFingerprint": "a5e02f5ef482a985e2c9750267a135aa7836f6c04d820bc0f3ceb131afe81085",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution",
+        "0007 Decision"
+      ],
+      "text": "1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration ghi đè event\n   cũ. Sự thật chỉ được thêm, không viết lại.\n2. **Replay backward-compatible, CÓ TEST.** Item/event thiếu trường mới nhận\n   **default khai báo tường minh**. Cụ thể: log của phiên bản trước phải replay được\n   dưới code phiên bản sau — và điều này được một test bảo vệ, không phải giả định.\n3. **Mỗi event mang trường schema version** (từ khi luật này có hiệu lực), để code\n   đọc biết mình đang replay shape nào."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_4c29ddf395edf0a905c5cf76729c2d26"
+}
+```
+
+## Entry claim_9faf2f6fcfad6a089f7077f61abb3b56
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_9faf2f6fcfad6a089f7077f61abb3b56",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_9faf2f6fcfad6a089f7077f61abb3b56",
+    "sourceUnitDigest": "e5123dd05236e7c9",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0007-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0007 is represented by the frozen H3 \"0007 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "55d9c1f19dff0d40bd97abcc406422ba20f7091135f9eaa20462af0bb2388f82",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_9faf2f6fcfad6a089f7077f61abb3b56",
+    "sourceUnitDigest": "e5123dd05236e7c9",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0007-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0007 is represented by the frozen H3 \"0007 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "55d9c1f19dff0d40bd97abcc406422ba20f7091135f9eaa20462af0bb2388f82",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "63f5761784ebbd33380a0f44efeea8280cbef2fb045d20ab18c83e8516cb49b4",
+    "identityFingerprint": "66bf7a93e7ab4e1d5bf17f0a8ffb1a7620b7c8e3283450baab7b4f6922a650cd",
+    "claimId": "claim_9faf2f6fcfad6a089f7077f61abb3b56",
+    "sourceAnchor": "hệ-quả-4",
+    "unitKind": "heading",
+    "sourceUnitDigest": "e5123dd05236e7c96e5998728159ce6f1528786e13cd7838a3bfc723563abbdb",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Hệ quả",
+      "anchor": "hệ-quả-4",
+      "githubAnchor": "hệ-quả-4",
+      "stableAnchor": "h-a5fe82e0f91d",
+      "startLine": 1524,
+      "endLine": 1524,
+      "textDigest": "e5123dd05236e7c96e5998728159ce6f1528786e13cd7838a3bfc723563abbdb",
+      "sample": "Hệ quả",
+      "sectionPayloadDigest": "7df84eaa2c3889a1458609e253d61e2a1382dd4d20abf7ffe4578e33ecf98034",
+      "followingBlockDigest": "a7f8e3a1618320c0c7ba6fa420ed0cb2286a83cae90d38e2052382c0cb0ed649",
+      "identityFingerprint": "66bf7a93e7ab4e1d5bf17f0a8ffb1a7620b7c8e3283450baab7b4f6922a650cd",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event"
+      ],
+      "text": "#### Hệ quả",
+      "sectionText": "#### Hệ quả\n\n- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì thêm event\n  mới, không sửa event cũ.\n- **Test replay là phòng tuyến:** hồi quy tương thích ngược bị bắt bằng test, không\n  bằng may rủi.\n- **Chi phí:** phải khai default tường minh cho trường mới và duy trì test replay\n  xuyên phiên bản — đổi lại là log không bao giờ \"mục\".\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0007 Consequences",
+    "anchor": "0007-consequences",
+    "githubAnchor": "0007-consequences",
+    "stableAnchor": "h-d5b8f4c2e78b",
+    "startLine": 181,
+    "endLine": 181,
+    "textDigest": "55d9c1f19dff0d40bd97abcc406422ba20f7091135f9eaa20462af0bb2388f82",
+    "sample": "0007 Consequences",
+    "sectionPayloadDigest": "7df84eaa2c3889a1458609e253d61e2a1382dd4d20abf7ffe4578e33ecf98034",
+    "followingBlockDigest": "a7f8e3a1618320c0c7ba6fa420ed0cb2286a83cae90d38e2052382c0cb0ed649",
+    "identityFingerprint": "286754e9e41693b8dbf265c05f690ee417e75f9cee1108929f0574af9f1f2225",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ],
+    "text": "### 0007 Consequences",
+    "sectionText": "### 0007 Consequences\n\n- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì thêm event\n  mới, không sửa event cũ.\n- **Test replay là phòng tuyến:** hồi quy tương thích ngược bị bắt bằng test, không\n  bằng may rủi.\n- **Chi phí:** phải khai default tường minh cho trường mới và duy trì test replay\n  xuyên phiên bản — đổi lại là log không bao giờ \"mục\".\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_9faf2f6fcfad6a089f7077f61abb3b56"
+}
+```
+
+## Entry claim_d0aa35a58456de6d8e5f552bdad1b08c
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_d0aa35a58456de6d8e5f552bdad1b08c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_d0aa35a58456de6d8e5f552bdad1b08c",
+    "sourceUnitDigest": "a7f8e3a1618320c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-27",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0007 (source lines 1495-1500, starting \"- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "a7f8e3a1618320c0c7ba6fa420ed0cb2286a83cae90d38e2052382c0cb0ed649",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_d0aa35a58456de6d8e5f552bdad1b08c",
+    "sourceUnitDigest": "a7f8e3a1618320c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-27",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0007 (source lines 1526-1531, starting \"- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "a7f8e3a1618320c0c7ba6fa420ed0cb2286a83cae90d38e2052382c0cb0ed649",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "bf7af4074e96fdefe98e00d4cbf7fd2ccfc49d4c6ec7d4d6a53facffe1827699",
+    "identityFingerprint": "bf7af4074e96fdefe98e00d4cbf7fd2ccfc49d4c6ec7d4d6a53facffe1827699",
+    "claimId": "claim_d0aa35a58456de6d8e5f552bdad1b08c",
+    "sourceAnchor": "unheaded-block-137",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a7f8e3a1618320c0c7ba6fa420ed0cb2286a83cae90d38e2052382c0cb0ed649",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-137",
+      "githubAnchor": "unheaded-block-137",
+      "stableAnchor": "unheaded-block-137",
+      "title": "Unheaded block 137",
+      "startLine": 1526,
+      "endLine": 1531,
+      "textDigest": "a7f8e3a1618320c0c7ba6fa420ed0cb2286a83cae90d38e2052382c0cb0ed649",
+      "sample": "- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì thêm event\n  mới, không sửa event cũ.\n- **Test replay là phòng tuyến:** hồi quy tương thích ngược bị bắt bằng",
+      "identityFingerprint": "bf7af4074e96fdefe98e00d4cbf7fd2ccfc49d4c6ec7d4d6a53facffe1827699",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event",
+        "Hệ quả"
+      ],
+      "text": "- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì thêm event\n  mới, không sửa event cũ.\n- **Test replay là phòng tuyến:** hồi quy tương thích ngược bị bắt bằng test, không\n  bằng may rủi.\n- **Chi phí:** phải khai default tường minh cho trường mới và duy trì test replay\n  xuyên phiên bản — đổi lại là log không bao giờ \"mục\"."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-27",
+    "githubAnchor": "unheaded-block-27",
+    "stableAnchor": "unheaded-block-27",
+    "title": "Unheaded block 27",
+    "startLine": 183,
+    "endLine": 188,
+    "textDigest": "a7f8e3a1618320c0c7ba6fa420ed0cb2286a83cae90d38e2052382c0cb0ed649",
+    "sample": "- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì thêm event\n  mới, không sửa event cũ.\n- **Test replay là phòng tuyến:** hồi quy tương thích ngược bị bắt bằng",
+    "identityFingerprint": "bf7af4074e96fdefe98e00d4cbf7fd2ccfc49d4c6ec7d4d6a53facffe1827699",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Consequences"
+    ],
+    "text": "- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì thêm event\n  mới, không sửa event cũ.\n- **Test replay là phòng tuyến:** hồi quy tương thích ngược bị bắt bằng test, không\n  bằng may rủi.\n- **Chi phí:** phải khai default tường minh cho trường mới và duy trì test replay\n  xuyên phiên bản — đổi lại là log không bao giờ \"mục\"."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-27",
+      "githubAnchor": "unheaded-block-27",
+      "stableAnchor": "unheaded-block-27",
+      "title": "Unheaded block 27",
+      "startLine": 183,
+      "endLine": 188,
+      "textDigest": "a7f8e3a1618320c0c7ba6fa420ed0cb2286a83cae90d38e2052382c0cb0ed649",
+      "sample": "- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì thêm event\n  mới, không sửa event cũ.\n- **Test replay là phòng tuyến:** hồi quy tương thích ngược bị bắt bằng",
+      "identityFingerprint": "bf7af4074e96fdefe98e00d4cbf7fd2ccfc49d4c6ec7d4d6a53facffe1827699",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "6. ADR 0007 Schema And Event Evolution",
+        "0007 Consequences"
+      ],
+      "text": "- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì thêm event\n  mới, không sửa event cũ.\n- **Test replay là phòng tuyến:** hồi quy tương thích ngược bị bắt bằng test, không\n  bằng may rủi.\n- **Chi phí:** phải khai default tường minh cho trường mới và duy trì test replay\n  xuyên phiên bản — đổi lại là log không bao giờ \"mục\"."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_d0aa35a58456de6d8e5f552bdad1b08c"
+}
+```
+
+## Entry claim_576e295be7d60ab95a555f11ada15da5
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_576e295be7d60ab95a555f11ada15da5",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_576e295be7d60ab95a555f11ada15da5",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-28",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0007 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_576e295be7d60ab95a555f11ada15da5",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-28",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0007 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "claimId": "claim_576e295be7d60ab95a555f11ada15da5",
+    "sourceAnchor": "unheaded-block-138",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "carried-forward",
+    "pairedByAnchor": true
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-138",
+      "githubAnchor": "unheaded-block-138",
+      "stableAnchor": "unheaded-block-138",
+      "title": "Unheaded block 138",
+      "startLine": 1533,
+      "endLine": 1533,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0007 — Tiến hoá schema & event",
+        "Hệ quả"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-28",
+    "githubAnchor": "unheaded-block-28",
+    "stableAnchor": "unheaded-block-28",
+    "title": "Unheaded block 28",
+    "startLine": 190,
+    "endLine": 190,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution",
+      "0007 Consequences"
+    ],
+    "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "target digest repeats; ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-7",
+      "githubAnchor": "unheaded-block-7",
+      "stableAnchor": "unheaded-block-7",
+      "title": "Unheaded block 7",
+      "startLine": 60,
+      "endLine": 60,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Consequences"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_576e295be7d60ab95a555f11ada15da5"
+}
+```
+
+## Entry claim_e375b70390617716823280eb03a82a87
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e375b70390617716823280eb03a82a87",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_e375b70390617716823280eb03a82a87",
+    "sourceUnitDigest": "520a09658b949755",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "7-adr-0011-explicit-version-for-every-contract",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0011 title heading is represented by the frozen H2 \"7. ADR 0011 ...\" (7-adr-0011-explicit-version-for-every-contract); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "7b520a895337dc7ea9a23e4bcc1debc386a39fc1e8120673d0aa77ea4a309457",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_e375b70390617716823280eb03a82a87",
+    "sourceUnitDigest": "520a09658b949755",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "7-adr-0011-explicit-version-for-every-contract",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0011 title heading is represented by the frozen H2 \"7. ADR 0011 ...\" (7-adr-0011-explicit-version-for-every-contract); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "7b520a895337dc7ea9a23e4bcc1debc386a39fc1e8120673d0aa77ea4a309457",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "82013d25a1ad81d81568fb51d3a2cec147dc689a9ed72d891b2f510d0c349edc",
+    "identityFingerprint": "3822b822265f327a360dbcc821358b9c2e6fcc623b9350333e6f98f366d52454",
+    "claimId": "claim_e375b70390617716823280eb03a82a87",
+    "sourceAnchor": "0011-version-tường-minh-cho-mọi-contract",
+    "unitKind": "heading",
+    "sourceUnitDigest": "520a09658b9497557f245c1299a8da65c50068afe1381b53d2f790f1437b025b",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "0011 — Version tường minh cho mọi contract",
+      "anchor": "0011-version-tường-minh-cho-mọi-contract",
+      "githubAnchor": "0011-version-tường-minh-cho-mọi-contract",
+      "stableAnchor": "h-08a988f06b22",
+      "startLine": 1535,
+      "endLine": 1535,
+      "textDigest": "520a09658b9497557f245c1299a8da65c50068afe1381b53d2f790f1437b025b",
+      "sample": "0011 — Version tường minh cho mọi contract",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "3822b822265f327a360dbcc821358b9c2e6fcc623b9350333e6f98f366d52454",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng"
+      ],
+      "text": "### 0011 — Version tường minh cho mọi contract",
+      "sectionText": "### 0011 — Version tường minh cho mọi contract"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "7. ADR 0011 Explicit Version For Every Contract",
+    "anchor": "7-adr-0011-explicit-version-for-every-contract",
+    "githubAnchor": "7-adr-0011-explicit-version-for-every-contract",
+    "stableAnchor": "h-878281756905",
+    "startLine": 192,
+    "endLine": 192,
+    "textDigest": "7b520a895337dc7ea9a23e4bcc1debc386a39fc1e8120673d0aa77ea4a309457",
+    "sample": "7. ADR 0011 Explicit Version For Every Contract",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "3120428837d388dc9ff512adc99db8781fcfc46358238de308c3356996b2d7eb",
+    "ancestry": [
+      "Retired Decision History: Work State"
+    ],
+    "text": "## 7. ADR 0011 Explicit Version For Every Contract",
+    "sectionText": "## 7. ADR 0011 Explicit Version For Every Contract"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_e375b70390617716823280eb03a82a87"
+}
+```
+
+## Entry claim_a93bf40197e2bf32890a9cf931226e15
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
+    "sourceUnitDigest": "f0e519e3d177081f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0011-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0011 is represented by the frozen H3 \"0011 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "e113b11d301e876e8e3b3d3f59eca420dab2ea0aa6f3adc8d3ac076de93317d4",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
+    "sourceUnitDigest": "f0e519e3d177081f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0011-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0011 is represented by the frozen H3 \"0011 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "e113b11d301e876e8e3b3d3f59eca420dab2ea0aa6f3adc8d3ac076de93317d4",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "b00ad9dd9e46709e66b4bb1d7bdc77f01bf9894a8ae69d147416bed0662c629f",
+    "identityFingerprint": "7b009f282b53e19dfd064a814ec55f489c53d7a5837302775f63e29f6c22c9c4",
+    "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
+    "sourceAnchor": "bối-cảnh-5",
+    "unitKind": "heading",
+    "sourceUnitDigest": "f0e519e3d177081f8c87798e69a8bfd6ec2a3721d617d8b81a188532ac67d006",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Bối cảnh",
+      "anchor": "bối-cảnh-5",
+      "githubAnchor": "bối-cảnh-5",
+      "stableAnchor": "h-9f2dd71d3cac",
+      "startLine": 1537,
+      "endLine": 1537,
+      "textDigest": "f0e519e3d177081f8c87798e69a8bfd6ec2a3721d617d8b81a188532ac67d006",
+      "sample": "Bối cảnh",
+      "sectionPayloadDigest": "63cf38e98b7af97c2d52f70f84329d11b8267cfaedb48283c7eb7dbc2591753a",
+      "followingBlockDigest": "3a9e4da78591f573c1cf6b4019c03802f81d41c30be8ea815acaf95df65824bc",
+      "identityFingerprint": "7b009f282b53e19dfd064a814ec55f489c53d7a5837302775f63e29f6c22c9c4",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract"
+      ],
+      "text": "#### Bối cảnh",
+      "sectionText": "#### Bối cảnh\n\n0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS không chỉ\nexpose event ra ngoài code của nó — nó còn expose **schema** (shape của\nwork item, state.json) và **artifact** (file sinh ra cho người/agent khác đọc:\nreport, plan, brief). Cả ba đều là hợp đồng (contract) mà một bên ngoài —\nngười, agent khác, phiên bản code sau — phải đọc đúng shape mà không cần hỏi\nlại. Không khai version ở cả ba là cùng một lỗ hổng 0007 đã vá cho event,\nchỉ chưa vá cho hai loại còn lại.\n\nBằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgOS) đã\ntự giải bài này cho artifact bằng một quy ước cụ thể — frontmatter\n`artifact_contract: bee-plan/v1` trên mọi artifact có shape ổn định\n(`bee-planning`, `bee-briefing`, `bee-xia`: `bee-plan/v1`,\n`bee-walkthrough/v1`, `bee-implement-plan/v1`, `bee-research/v1`). Version\nnhúng thẳng trong định danh — đọc được bằng mắt (không cần mở schema riêng)\nvà bằng code (regex/parse một field), khác với version-là-field-số-rời mà\n0007 dùng cho event."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0011 Context",
+    "anchor": "0011-context",
+    "githubAnchor": "0011-context",
+    "stableAnchor": "h-a5aaa8be6c2e",
+    "startLine": 194,
+    "endLine": 194,
+    "textDigest": "e113b11d301e876e8e3b3d3f59eca420dab2ea0aa6f3adc8d3ac076de93317d4",
+    "sample": "0011 Context",
+    "sectionPayloadDigest": "63cf38e98b7af97c2d52f70f84329d11b8267cfaedb48283c7eb7dbc2591753a",
+    "followingBlockDigest": "3a9e4da78591f573c1cf6b4019c03802f81d41c30be8ea815acaf95df65824bc",
+    "identityFingerprint": "281d6bfcb0842ca5c8c38a558ff79a9d723b6e6e7efd0153503d978af4312ced",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ],
+    "text": "### 0011 Context",
+    "sectionText": "### 0011 Context\n\n0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS không chỉ\nexpose event ra ngoài code của nó — nó còn expose **schema** (shape của\nwork item, state.json) và **artifact** (file sinh ra cho người/agent khác đọc:\nreport, plan, brief). Cả ba đều là hợp đồng (contract) mà một bên ngoài —\nngười, agent khác, phiên bản code sau — phải đọc đúng shape mà không cần hỏi\nlại. Không khai version ở cả ba là cùng một lỗ hổng 0007 đã vá cho event,\nchỉ chưa vá cho hai loại còn lại.\n\nBằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgOS) đã\ntự giải bài này cho artifact bằng một quy ước cụ thể — frontmatter\n`artifact_contract: bee-plan/v1` trên mọi artifact có shape ổn định\n(`bee-planning`, `bee-briefing`, `bee-xia`: `bee-plan/v1`,\n`bee-walkthrough/v1`, `bee-implement-plan/v1`, `bee-research/v1`). Version\nnhúng thẳng trong định danh — đọc được bằng mắt (không cần mở schema riêng)\nvà bằng code (regex/parse một field), khác với version-là-field-số-rời mà\n0007 dùng cho event."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_a93bf40197e2bf32890a9cf931226e15"
+}
+```
+
+## Entry claim_bad3eb429a52fae0b9100c7468c2d4d6
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_bad3eb429a52fae0b9100c7468c2d4d6",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_bad3eb429a52fae0b9100c7468c2d4d6",
+    "sourceUnitDigest": "3a9e4da78591f573",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-29",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0011 (source lines 1508-1514, starting \"0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS kh\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "3a9e4da78591f573c1cf6b4019c03802f81d41c30be8ea815acaf95df65824bc",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_bad3eb429a52fae0b9100c7468c2d4d6",
+    "sourceUnitDigest": "3a9e4da78591f573",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-29",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0011 (source lines 1539-1545, starting \"0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS kh\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "3a9e4da78591f573c1cf6b4019c03802f81d41c30be8ea815acaf95df65824bc",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "c1ba7da3680db2a3eda875330ec6cefe2118077a72e8504cb6885e3d9d821d3f",
+    "identityFingerprint": "c1ba7da3680db2a3eda875330ec6cefe2118077a72e8504cb6885e3d9d821d3f",
+    "claimId": "claim_bad3eb429a52fae0b9100c7468c2d4d6",
+    "sourceAnchor": "unheaded-block-139",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3a9e4da78591f573c1cf6b4019c03802f81d41c30be8ea815acaf95df65824bc",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-139",
+      "githubAnchor": "unheaded-block-139",
+      "stableAnchor": "unheaded-block-139",
+      "title": "Unheaded block 139",
+      "startLine": 1539,
+      "endLine": 1545,
+      "textDigest": "3a9e4da78591f573c1cf6b4019c03802f81d41c30be8ea815acaf95df65824bc",
+      "sample": "0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS không chỉ\nexpose event ra ngoài code của nó — nó còn expose **schema** (shape của\nwork item, state.json) và **ar",
+      "identityFingerprint": "c1ba7da3680db2a3eda875330ec6cefe2118077a72e8504cb6885e3d9d821d3f",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Bối cảnh"
+      ],
+      "text": "0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS không chỉ\nexpose event ra ngoài code của nó — nó còn expose **schema** (shape của\nwork item, state.json) và **artifact** (file sinh ra cho người/agent khác đọc:\nreport, plan, brief). Cả ba đều là hợp đồng (contract) mà một bên ngoài —\nngười, agent khác, phiên bản code sau — phải đọc đúng shape mà không cần hỏi\nlại. Không khai version ở cả ba là cùng một lỗ hổng 0007 đã vá cho event,\nchỉ chưa vá cho hai loại còn lại."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-29",
+    "githubAnchor": "unheaded-block-29",
+    "stableAnchor": "unheaded-block-29",
+    "title": "Unheaded block 29",
+    "startLine": 196,
+    "endLine": 202,
+    "textDigest": "3a9e4da78591f573c1cf6b4019c03802f81d41c30be8ea815acaf95df65824bc",
+    "sample": "0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS không chỉ\nexpose event ra ngoài code của nó — nó còn expose **schema** (shape của\nwork item, state.json) và **ar",
+    "identityFingerprint": "c1ba7da3680db2a3eda875330ec6cefe2118077a72e8504cb6885e3d9d821d3f",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Context"
+    ],
+    "text": "0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS không chỉ\nexpose event ra ngoài code của nó — nó còn expose **schema** (shape của\nwork item, state.json) và **artifact** (file sinh ra cho người/agent khác đọc:\nreport, plan, brief). Cả ba đều là hợp đồng (contract) mà một bên ngoài —\nngười, agent khác, phiên bản code sau — phải đọc đúng shape mà không cần hỏi\nlại. Không khai version ở cả ba là cùng một lỗ hổng 0007 đã vá cho event,\nchỉ chưa vá cho hai loại còn lại."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-29",
+      "githubAnchor": "unheaded-block-29",
+      "stableAnchor": "unheaded-block-29",
+      "title": "Unheaded block 29",
+      "startLine": 196,
+      "endLine": 202,
+      "textDigest": "3a9e4da78591f573c1cf6b4019c03802f81d41c30be8ea815acaf95df65824bc",
+      "sample": "0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS không chỉ\nexpose event ra ngoài code của nó — nó còn expose **schema** (shape của\nwork item, state.json) và **ar",
+      "identityFingerprint": "c1ba7da3680db2a3eda875330ec6cefe2118077a72e8504cb6885e3d9d821d3f",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract",
+        "0011 Context"
+      ],
+      "text": "0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS không chỉ\nexpose event ra ngoài code của nó — nó còn expose **schema** (shape của\nwork item, state.json) và **artifact** (file sinh ra cho người/agent khác đọc:\nreport, plan, brief). Cả ba đều là hợp đồng (contract) mà một bên ngoài —\nngười, agent khác, phiên bản code sau — phải đọc đúng shape mà không cần hỏi\nlại. Không khai version ở cả ba là cùng một lỗ hổng 0007 đã vá cho event,\nchỉ chưa vá cho hai loại còn lại."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_bad3eb429a52fae0b9100c7468c2d4d6"
+}
+```
+
+## Entry claim_33c9953761a4fe99a4072b008cefc634
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_33c9953761a4fe99a4072b008cefc634",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_33c9953761a4fe99a4072b008cefc634",
+    "sourceUnitDigest": "f0eb277249c05d98",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-30",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0011 (source lines 1516-1523, starting \"Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgO\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "f0eb277249c05d987db88e8f1d6b6889788206f611c9b07aa9dc74e49982edee",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_33c9953761a4fe99a4072b008cefc634",
+    "sourceUnitDigest": "f0eb277249c05d98",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-30",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0011 (source lines 1547-1554, starting \"Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgO\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "f0eb277249c05d987db88e8f1d6b6889788206f611c9b07aa9dc74e49982edee",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "0b00adec660c0dace4d0348977ed3ceb1a5170ce436a35318bb026f95a75c35b",
+    "identityFingerprint": "0b00adec660c0dace4d0348977ed3ceb1a5170ce436a35318bb026f95a75c35b",
+    "claimId": "claim_33c9953761a4fe99a4072b008cefc634",
+    "sourceAnchor": "unheaded-block-140",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "f0eb277249c05d987db88e8f1d6b6889788206f611c9b07aa9dc74e49982edee",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-140",
+      "githubAnchor": "unheaded-block-140",
+      "stableAnchor": "unheaded-block-140",
+      "title": "Unheaded block 140",
+      "startLine": 1547,
+      "endLine": 1554,
+      "textDigest": "f0eb277249c05d987db88e8f1d6b6889788206f611c9b07aa9dc74e49982edee",
+      "sample": "Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgOS) đã\ntự giải bài này cho artifact bằng một quy ước cụ thể — frontmatter\n`artifact_contract: bee-plan/v1` trên",
+      "identityFingerprint": "0b00adec660c0dace4d0348977ed3ceb1a5170ce436a35318bb026f95a75c35b",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Bối cảnh"
+      ],
+      "text": "Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgOS) đã\ntự giải bài này cho artifact bằng một quy ước cụ thể — frontmatter\n`artifact_contract: bee-plan/v1` trên mọi artifact có shape ổn định\n(`bee-planning`, `bee-briefing`, `bee-xia`: `bee-plan/v1`,\n`bee-walkthrough/v1`, `bee-implement-plan/v1`, `bee-research/v1`). Version\nnhúng thẳng trong định danh — đọc được bằng mắt (không cần mở schema riêng)\nvà bằng code (regex/parse một field), khác với version-là-field-số-rời mà\n0007 dùng cho event."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-30",
+    "githubAnchor": "unheaded-block-30",
+    "stableAnchor": "unheaded-block-30",
+    "title": "Unheaded block 30",
+    "startLine": 204,
+    "endLine": 211,
+    "textDigest": "f0eb277249c05d987db88e8f1d6b6889788206f611c9b07aa9dc74e49982edee",
+    "sample": "Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgOS) đã\ntự giải bài này cho artifact bằng một quy ước cụ thể — frontmatter\n`artifact_contract: bee-plan/v1` trên",
+    "identityFingerprint": "0b00adec660c0dace4d0348977ed3ceb1a5170ce436a35318bb026f95a75c35b",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Context"
+    ],
+    "text": "Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgOS) đã\ntự giải bài này cho artifact bằng một quy ước cụ thể — frontmatter\n`artifact_contract: bee-plan/v1` trên mọi artifact có shape ổn định\n(`bee-planning`, `bee-briefing`, `bee-xia`: `bee-plan/v1`,\n`bee-walkthrough/v1`, `bee-implement-plan/v1`, `bee-research/v1`). Version\nnhúng thẳng trong định danh — đọc được bằng mắt (không cần mở schema riêng)\nvà bằng code (regex/parse một field), khác với version-là-field-số-rời mà\n0007 dùng cho event."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-30",
+      "githubAnchor": "unheaded-block-30",
+      "stableAnchor": "unheaded-block-30",
+      "title": "Unheaded block 30",
+      "startLine": 204,
+      "endLine": 211,
+      "textDigest": "f0eb277249c05d987db88e8f1d6b6889788206f611c9b07aa9dc74e49982edee",
+      "sample": "Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgOS) đã\ntự giải bài này cho artifact bằng một quy ước cụ thể — frontmatter\n`artifact_contract: bee-plan/v1` trên",
+      "identityFingerprint": "0b00adec660c0dace4d0348977ed3ceb1a5170ce436a35318bb026f95a75c35b",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract",
+        "0011 Context"
+      ],
+      "text": "Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgOS) đã\ntự giải bài này cho artifact bằng một quy ước cụ thể — frontmatter\n`artifact_contract: bee-plan/v1` trên mọi artifact có shape ổn định\n(`bee-planning`, `bee-briefing`, `bee-xia`: `bee-plan/v1`,\n`bee-walkthrough/v1`, `bee-implement-plan/v1`, `bee-research/v1`). Version\nnhúng thẳng trong định danh — đọc được bằng mắt (không cần mở schema riêng)\nvà bằng code (regex/parse một field), khác với version-là-field-số-rời mà\n0007 dùng cho event."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_33c9953761a4fe99a4072b008cefc634"
+}
+```
+
+## Entry claim_ff4510bb2afe125aedac972ed943ce2c
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_ff4510bb2afe125aedac972ed943ce2c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_ff4510bb2afe125aedac972ed943ce2c",
+    "sourceUnitDigest": "03f45ad00ec7a12c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0011-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0011 is represented by the frozen H3 \"0011 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "28cc1686008a465c5f12c2c878349dc018dd023ba3dbd514689390ca5ac61776",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_ff4510bb2afe125aedac972ed943ce2c",
+    "sourceUnitDigest": "03f45ad00ec7a12c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0011-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0011 is represented by the frozen H3 \"0011 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "28cc1686008a465c5f12c2c878349dc018dd023ba3dbd514689390ca5ac61776",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "e2ee72619f551ebdf2a54a76345a513a605da30ddc051cd3a3c1e0fca2bbe28e",
+    "identityFingerprint": "0a77f233858c38c3aca04ccac11ac420f4d32a1f2432de81da53b39286ed6e9b",
+    "claimId": "claim_ff4510bb2afe125aedac972ed943ce2c",
+    "sourceAnchor": "quyết-định-5",
+    "unitKind": "heading",
+    "sourceUnitDigest": "03f45ad00ec7a12c5133d79a3941f5911abce8372d7271c75988bda7ee94c3ec",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Quyết định",
+      "anchor": "quyết-định-5",
+      "githubAnchor": "quyết-định-5",
+      "stableAnchor": "h-eacaf235dfcd",
+      "startLine": 1556,
+      "endLine": 1556,
+      "textDigest": "03f45ad00ec7a12c5133d79a3941f5911abce8372d7271c75988bda7ee94c3ec",
+      "sample": "Quyết định",
+      "sectionPayloadDigest": "ef377baa6c18934633be79d6627fa527f113dedccc8051c058250459b278a270",
+      "followingBlockDigest": "4746d446f503df656947b8c1b4b27210c2d5c43ef909cd2aacb0d99c93bbe6c3",
+      "identityFingerprint": "0a77f233858c38c3aca04ccac11ac420f4d32a1f2432de81da53b39286ed6e9b",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract"
+      ],
+      "text": "#### Quyết định",
+      "sectionText": "#### Quyết định\n\nBa loại contract fgOS expose ra ngoài code của nó — **schema** (shape dữ liệu\nbền: work item, state.json), **artifact** (file sinh cho người/agent khác:\nreport, plan, spec-fragment), và **event** (đã khoá ở 0007) — đều phải khai\nversion tường minh trong định danh của chính nó, theo mẫu `<name>/v<N>`:\n\n1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\n   frontmatter hoặc header của file — không phải một ghi chú rời, mà một\n   field có thể regex/parse được bằng code lẫn đọc được bằng mắt.\n2. **Schema (work item, state.json) mang version trong chính bản thân dữ\n   liệu** — kế thừa nguyên xi cách 0007 đã làm cho event (field version rời,\n   vì đây là dữ liệu máy đọc liên tục, không phải file người mở ra đọc).\n3. **Tăng `vN` khi shape đổi không tương thích ngược** (field bị xoá/đổi\n   nghĩa); thêm field mới an toàn không bắt buộc tăng version (đã có ở 0007\n   cho event, áp dụng chung).\n4. Không có quy ước version nào là non-goal: nếu một artifact/schema mới\n   sinh ra không có kế hoạch đổi shape trong tương lai gần, nó vẫn khai\n   `v1` — khai version rẻ, thiếu version mới đắt (không dò được ai đang đọc\n   shape nào)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0011 Decision",
+    "anchor": "0011-decision",
+    "githubAnchor": "0011-decision",
+    "stableAnchor": "h-1d0383d1a0ae",
+    "startLine": 213,
+    "endLine": 213,
+    "textDigest": "28cc1686008a465c5f12c2c878349dc018dd023ba3dbd514689390ca5ac61776",
+    "sample": "0011 Decision",
+    "sectionPayloadDigest": "ef377baa6c18934633be79d6627fa527f113dedccc8051c058250459b278a270",
+    "followingBlockDigest": "4746d446f503df656947b8c1b4b27210c2d5c43ef909cd2aacb0d99c93bbe6c3",
+    "identityFingerprint": "88724f1ca55bdc9e8fde60b9cf44004357bef14f3831d138d4f535b2ea919479",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ],
+    "text": "### 0011 Decision",
+    "sectionText": "### 0011 Decision\n\nBa loại contract fgOS expose ra ngoài code của nó — **schema** (shape dữ liệu\nbền: work item, state.json), **artifact** (file sinh cho người/agent khác:\nreport, plan, spec-fragment), và **event** (đã khoá ở 0007) — đều phải khai\nversion tường minh trong định danh của chính nó, theo mẫu `<name>/v<N>`:\n\n1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\n   frontmatter hoặc header của file — không phải một ghi chú rời, mà một\n   field có thể regex/parse được bằng code lẫn đọc được bằng mắt.\n2. **Schema (work item, state.json) mang version trong chính bản thân dữ\n   liệu** — kế thừa nguyên xi cách 0007 đã làm cho event (field version rời,\n   vì đây là dữ liệu máy đọc liên tục, không phải file người mở ra đọc).\n3. **Tăng `vN` khi shape đổi không tương thích ngược** (field bị xoá/đổi\n   nghĩa); thêm field mới an toàn không bắt buộc tăng version (đã có ở 0007\n   cho event, áp dụng chung).\n4. Không có quy ước version nào là non-goal: nếu một artifact/schema mới\n   sinh ra không có kế hoạch đổi shape trong tương lai gần, nó vẫn khai\n   `v1` — khai version rẻ, thiếu version mới đắt (không dò được ai đang đọc\n   shape nào)."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_ff4510bb2afe125aedac972ed943ce2c"
+}
+```
+
+## Entry claim_50eed5d7ed0c4f2107e50cca1ffcee82
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_50eed5d7ed0c4f2107e50cca1ffcee82",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_50eed5d7ed0c4f2107e50cca1ffcee82",
+    "sourceUnitDigest": "4746d446f503df65",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-31",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0011 (source lines 1527-1530, starting \"Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape \") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "4746d446f503df656947b8c1b4b27210c2d5c43ef909cd2aacb0d99c93bbe6c3",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Decision"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_50eed5d7ed0c4f2107e50cca1ffcee82",
+    "sourceUnitDigest": "4746d446f503df65",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-31",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0011 (source lines 1558-1561, starting \"Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape \") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "4746d446f503df656947b8c1b4b27210c2d5c43ef909cd2aacb0d99c93bbe6c3",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "6ede83b13188237f113f42222f2fc2dd635db232bf847a3eeae10d802a715ae8",
+    "identityFingerprint": "6ede83b13188237f113f42222f2fc2dd635db232bf847a3eeae10d802a715ae8",
+    "claimId": "claim_50eed5d7ed0c4f2107e50cca1ffcee82",
+    "sourceAnchor": "unheaded-block-141",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "4746d446f503df656947b8c1b4b27210c2d5c43ef909cd2aacb0d99c93bbe6c3",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-141",
+      "githubAnchor": "unheaded-block-141",
+      "stableAnchor": "unheaded-block-141",
+      "title": "Unheaded block 141",
+      "startLine": 1558,
+      "endLine": 1561,
+      "textDigest": "4746d446f503df656947b8c1b4b27210c2d5c43ef909cd2aacb0d99c93bbe6c3",
+      "sample": "Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape dữ liệu\nbền: work item, state.json), **artifact** (file sinh cho người/agent khác:\nreport, plan, spec-fragment",
+      "identityFingerprint": "6ede83b13188237f113f42222f2fc2dd635db232bf847a3eeae10d802a715ae8",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Quyết định"
+      ],
+      "text": "Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape dữ liệu\nbền: work item, state.json), **artifact** (file sinh cho người/agent khác:\nreport, plan, spec-fragment), và **event** (đã khoá ở 0007) — đều phải khai\nversion tường minh trong định danh của chính nó, theo mẫu `<name>/v<N>`:"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-31",
+    "githubAnchor": "unheaded-block-31",
+    "stableAnchor": "unheaded-block-31",
+    "title": "Unheaded block 31",
+    "startLine": 215,
+    "endLine": 218,
+    "textDigest": "4746d446f503df656947b8c1b4b27210c2d5c43ef909cd2aacb0d99c93bbe6c3",
+    "sample": "Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape dữ liệu\nbền: work item, state.json), **artifact** (file sinh cho người/agent khác:\nreport, plan, spec-fragment",
+    "identityFingerprint": "6ede83b13188237f113f42222f2fc2dd635db232bf847a3eeae10d802a715ae8",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Decision"
+    ],
+    "text": "Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape dữ liệu\nbền: work item, state.json), **artifact** (file sinh cho người/agent khác:\nreport, plan, spec-fragment), và **event** (đã khoá ở 0007) — đều phải khai\nversion tường minh trong định danh của chính nó, theo mẫu `<name>/v<N>`:"
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-31",
+      "githubAnchor": "unheaded-block-31",
+      "stableAnchor": "unheaded-block-31",
+      "title": "Unheaded block 31",
+      "startLine": 215,
+      "endLine": 218,
+      "textDigest": "4746d446f503df656947b8c1b4b27210c2d5c43ef909cd2aacb0d99c93bbe6c3",
+      "sample": "Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape dữ liệu\nbền: work item, state.json), **artifact** (file sinh cho người/agent khác:\nreport, plan, spec-fragment",
+      "identityFingerprint": "6ede83b13188237f113f42222f2fc2dd635db232bf847a3eeae10d802a715ae8",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract",
+        "0011 Decision"
+      ],
+      "text": "Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape dữ liệu\nbền: work item, state.json), **artifact** (file sinh cho người/agent khác:\nreport, plan, spec-fragment), và **event** (đã khoá ở 0007) — đều phải khai\nversion tường minh trong định danh của chính nó, theo mẫu `<name>/v<N>`:"
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_50eed5d7ed0c4f2107e50cca1ffcee82"
+}
+```
+
+## Entry claim_6346dec77f2dff715949806586e100d3
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_6346dec77f2dff715949806586e100d3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_6346dec77f2dff715949806586e100d3",
+    "sourceUnitDigest": "f665548de1acd2a9",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-32",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0011 (source lines 1532-1544, starting \"1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "f665548de1acd2a9a08cd71ec99df897a2876584b3b987c25faf5a40c4ebfaa0",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Decision"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_6346dec77f2dff715949806586e100d3",
+    "sourceUnitDigest": "f665548de1acd2a9",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-32",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0011 (source lines 1563-1575, starting \"1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "f665548de1acd2a9a08cd71ec99df897a2876584b3b987c25faf5a40c4ebfaa0",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "4e3c0d6e2a3e58d5c84817888bc09f3854b1a895f02b2a73ed8ff2e6c8c4002c",
+    "identityFingerprint": "4e3c0d6e2a3e58d5c84817888bc09f3854b1a895f02b2a73ed8ff2e6c8c4002c",
+    "claimId": "claim_6346dec77f2dff715949806586e100d3",
+    "sourceAnchor": "unheaded-block-142",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "f665548de1acd2a9a08cd71ec99df897a2876584b3b987c25faf5a40c4ebfaa0",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-142",
+      "githubAnchor": "unheaded-block-142",
+      "stableAnchor": "unheaded-block-142",
+      "title": "Unheaded block 142",
+      "startLine": 1563,
+      "endLine": 1575,
+      "textDigest": "f665548de1acd2a9a08cd71ec99df897a2876584b3b987c25faf5a40c4ebfaa0",
+      "sample": "1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\n   frontmatter hoặc header của file — không phải một ghi chú rời, mà một\n   field có thể regex/parse được bằng c",
+      "identityFingerprint": "4e3c0d6e2a3e58d5c84817888bc09f3854b1a895f02b2a73ed8ff2e6c8c4002c",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Quyết định"
+      ],
+      "text": "1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\n   frontmatter hoặc header của file — không phải một ghi chú rời, mà một\n   field có thể regex/parse được bằng code lẫn đọc được bằng mắt.\n2. **Schema (work item, state.json) mang version trong chính bản thân dữ\n   liệu** — kế thừa nguyên xi cách 0007 đã làm cho event (field version rời,\n   vì đây là dữ liệu máy đọc liên tục, không phải file người mở ra đọc).\n3. **Tăng `vN` khi shape đổi không tương thích ngược** (field bị xoá/đổi\n   nghĩa); thêm field mới an toàn không bắt buộc tăng version (đã có ở 0007\n   cho event, áp dụng chung).\n4. Không có quy ước version nào là non-goal: nếu một artifact/schema mới\n   sinh ra không có kế hoạch đổi shape trong tương lai gần, nó vẫn khai\n   `v1` — khai version rẻ, thiếu version mới đắt (không dò được ai đang đọc\n   shape nào)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-32",
+    "githubAnchor": "unheaded-block-32",
+    "stableAnchor": "unheaded-block-32",
+    "title": "Unheaded block 32",
+    "startLine": 220,
+    "endLine": 232,
+    "textDigest": "f665548de1acd2a9a08cd71ec99df897a2876584b3b987c25faf5a40c4ebfaa0",
+    "sample": "1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\n   frontmatter hoặc header của file — không phải một ghi chú rời, mà một\n   field có thể regex/parse được bằng c",
+    "identityFingerprint": "4e3c0d6e2a3e58d5c84817888bc09f3854b1a895f02b2a73ed8ff2e6c8c4002c",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Decision"
+    ],
+    "text": "1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\n   frontmatter hoặc header của file — không phải một ghi chú rời, mà một\n   field có thể regex/parse được bằng code lẫn đọc được bằng mắt.\n2. **Schema (work item, state.json) mang version trong chính bản thân dữ\n   liệu** — kế thừa nguyên xi cách 0007 đã làm cho event (field version rời,\n   vì đây là dữ liệu máy đọc liên tục, không phải file người mở ra đọc).\n3. **Tăng `vN` khi shape đổi không tương thích ngược** (field bị xoá/đổi\n   nghĩa); thêm field mới an toàn không bắt buộc tăng version (đã có ở 0007\n   cho event, áp dụng chung).\n4. Không có quy ước version nào là non-goal: nếu một artifact/schema mới\n   sinh ra không có kế hoạch đổi shape trong tương lai gần, nó vẫn khai\n   `v1` — khai version rẻ, thiếu version mới đắt (không dò được ai đang đọc\n   shape nào)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-32",
+      "githubAnchor": "unheaded-block-32",
+      "stableAnchor": "unheaded-block-32",
+      "title": "Unheaded block 32",
+      "startLine": 220,
+      "endLine": 232,
+      "textDigest": "f665548de1acd2a9a08cd71ec99df897a2876584b3b987c25faf5a40c4ebfaa0",
+      "sample": "1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\n   frontmatter hoặc header của file — không phải một ghi chú rời, mà một\n   field có thể regex/parse được bằng c",
+      "identityFingerprint": "4e3c0d6e2a3e58d5c84817888bc09f3854b1a895f02b2a73ed8ff2e6c8c4002c",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract",
+        "0011 Decision"
+      ],
+      "text": "1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\n   frontmatter hoặc header của file — không phải một ghi chú rời, mà một\n   field có thể regex/parse được bằng code lẫn đọc được bằng mắt.\n2. **Schema (work item, state.json) mang version trong chính bản thân dữ\n   liệu** — kế thừa nguyên xi cách 0007 đã làm cho event (field version rời,\n   vì đây là dữ liệu máy đọc liên tục, không phải file người mở ra đọc).\n3. **Tăng `vN` khi shape đổi không tương thích ngược** (field bị xoá/đổi\n   nghĩa); thêm field mới an toàn không bắt buộc tăng version (đã có ở 0007\n   cho event, áp dụng chung).\n4. Không có quy ước version nào là non-goal: nếu một artifact/schema mới\n   sinh ra không có kế hoạch đổi shape trong tương lai gần, nó vẫn khai\n   `v1` — khai version rẻ, thiếu version mới đắt (không dò được ai đang đọc\n   shape nào)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_6346dec77f2dff715949806586e100d3"
+}
+```
+
+## Entry claim_0dd6189a9d8ed1bcdd656127bf71774e
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
+    "sourceUnitDigest": "3bd6300879f149e8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0011-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0011 is represented by the frozen H3 \"0011 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "54a5977501d4d13b842a24d99b66e4591c4b04006f57477f35b248e444d7585c",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
+    "sourceUnitDigest": "3bd6300879f149e8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0011-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0011 is represented by the frozen H3 \"0011 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "54a5977501d4d13b842a24d99b66e4591c4b04006f57477f35b248e444d7585c",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "b64842be4ab0fa77f0fa07d08c2b410dcc1e6b6e49055fce7ab84474a38d3adf",
+    "identityFingerprint": "0ae29cd568896b2209b971ff6ecf8ace47f4b8aa75d29c7bcade054dcd5131d2",
+    "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
+    "sourceAnchor": "hệ-quả-5",
+    "unitKind": "heading",
+    "sourceUnitDigest": "3bd6300879f149e85115d60fc55891e1f240d8e61447c372cda1982ea85ff3fe",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Hệ quả",
+      "anchor": "hệ-quả-5",
+      "githubAnchor": "hệ-quả-5",
+      "stableAnchor": "h-4b42142c2bb0",
+      "startLine": 1577,
+      "endLine": 1577,
+      "textDigest": "3bd6300879f149e85115d60fc55891e1f240d8e61447c372cda1982ea85ff3fe",
+      "sample": "Hệ quả",
+      "sectionPayloadDigest": "e5036e7e7e3ae9822ee29a53524a9dfc6c5e2981c12edd79fa8a55302994b306",
+      "followingBlockDigest": "da125878208e7de6ec45f980e4c8e5bbef2d5e53eadc5474c893b29a4e85beb1",
+      "identityFingerprint": "0ae29cd568896b2209b971ff6ecf8ace47f4b8aa75d29c7bcade054dcd5131d2",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract"
+      ],
+      "text": "#### Hệ quả",
+      "sectionText": "#### Hệ quả\n\n- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\n  +artifact), không đổi luật event đã có.\n- **Artifact fgOS tương lai (report, plan, spec) theo đúng mẫu bee đã dùng\n  sống**: `contract: <ten>/v<N>` — không cần phát minh lại quy ước, port\n  nguyên cái đã chứng minh trong workshop.\n- **Chi phí:** mỗi artifact/schema type mới phải chọn tên contract + version\n  ngay từ v1, không hoãn \"để sau\".\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0011 Consequences",
+    "anchor": "0011-consequences",
+    "githubAnchor": "0011-consequences",
+    "stableAnchor": "h-96542b5ae76b",
+    "startLine": 234,
+    "endLine": 234,
+    "textDigest": "54a5977501d4d13b842a24d99b66e4591c4b04006f57477f35b248e444d7585c",
+    "sample": "0011 Consequences",
+    "sectionPayloadDigest": "e5036e7e7e3ae9822ee29a53524a9dfc6c5e2981c12edd79fa8a55302994b306",
+    "followingBlockDigest": "da125878208e7de6ec45f980e4c8e5bbef2d5e53eadc5474c893b29a4e85beb1",
+    "identityFingerprint": "cacefb55f7c3e5a6ab21ab480b7184e084d1b5efe3fb54968e71bfd1f56cb106",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ],
+    "text": "### 0011 Consequences",
+    "sectionText": "### 0011 Consequences\n\n- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\n  +artifact), không đổi luật event đã có.\n- **Artifact fgOS tương lai (report, plan, spec) theo đúng mẫu bee đã dùng\n  sống**: `contract: <ten>/v<N>` — không cần phát minh lại quy ước, port\n  nguyên cái đã chứng minh trong workshop.\n- **Chi phí:** mỗi artifact/schema type mới phải chọn tên contract + version\n  ngay từ v1, không hoãn \"để sau\".\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_0dd6189a9d8ed1bcdd656127bf71774e"
+}
+```
+
+## Entry claim_9be26c9507109484cc9b1663ca4ca2d9
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_9be26c9507109484cc9b1663ca4ca2d9",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_9be26c9507109484cc9b1663ca4ca2d9",
+    "sourceUnitDigest": "da125878208e7de6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-33",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0011 (source lines 1548-1554, starting \"- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "da125878208e7de6ec45f980e4c8e5bbef2d5e53eadc5474c893b29a4e85beb1",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_9be26c9507109484cc9b1663ca4ca2d9",
+    "sourceUnitDigest": "da125878208e7de6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-33",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0011 (source lines 1579-1585, starting \"- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "da125878208e7de6ec45f980e4c8e5bbef2d5e53eadc5474c893b29a4e85beb1",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "ff2a9911ca86344c06fe0a789c88c5ccc8ce6c96664aeae1a14fe66e99f6d1ac",
+    "identityFingerprint": "ff2a9911ca86344c06fe0a789c88c5ccc8ce6c96664aeae1a14fe66e99f6d1ac",
+    "claimId": "claim_9be26c9507109484cc9b1663ca4ca2d9",
+    "sourceAnchor": "unheaded-block-143",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "da125878208e7de6ec45f980e4c8e5bbef2d5e53eadc5474c893b29a4e85beb1",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-143",
+      "githubAnchor": "unheaded-block-143",
+      "stableAnchor": "unheaded-block-143",
+      "title": "Unheaded block 143",
+      "startLine": 1579,
+      "endLine": 1585,
+      "textDigest": "da125878208e7de6ec45f980e4c8e5bbef2d5e53eadc5474c893b29a4e85beb1",
+      "sample": "- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\n  +artifact), không đổi luật event đã có.\n- **Artifact fgOS tương lai (report, plan, spec) theo đúng mẫu bee ",
+      "identityFingerprint": "ff2a9911ca86344c06fe0a789c88c5ccc8ce6c96664aeae1a14fe66e99f6d1ac",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Hệ quả"
+      ],
+      "text": "- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\n  +artifact), không đổi luật event đã có.\n- **Artifact fgOS tương lai (report, plan, spec) theo đúng mẫu bee đã dùng\n  sống**: `contract: <ten>/v<N>` — không cần phát minh lại quy ước, port\n  nguyên cái đã chứng minh trong workshop.\n- **Chi phí:** mỗi artifact/schema type mới phải chọn tên contract + version\n  ngay từ v1, không hoãn \"để sau\"."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-33",
+    "githubAnchor": "unheaded-block-33",
+    "stableAnchor": "unheaded-block-33",
+    "title": "Unheaded block 33",
+    "startLine": 236,
+    "endLine": 242,
+    "textDigest": "da125878208e7de6ec45f980e4c8e5bbef2d5e53eadc5474c893b29a4e85beb1",
+    "sample": "- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\n  +artifact), không đổi luật event đã có.\n- **Artifact fgOS tương lai (report, plan, spec) theo đúng mẫu bee ",
+    "identityFingerprint": "ff2a9911ca86344c06fe0a789c88c5ccc8ce6c96664aeae1a14fe66e99f6d1ac",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Consequences"
+    ],
+    "text": "- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\n  +artifact), không đổi luật event đã có.\n- **Artifact fgOS tương lai (report, plan, spec) theo đúng mẫu bee đã dùng\n  sống**: `contract: <ten>/v<N>` — không cần phát minh lại quy ước, port\n  nguyên cái đã chứng minh trong workshop.\n- **Chi phí:** mỗi artifact/schema type mới phải chọn tên contract + version\n  ngay từ v1, không hoãn \"để sau\"."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-33",
+      "githubAnchor": "unheaded-block-33",
+      "stableAnchor": "unheaded-block-33",
+      "title": "Unheaded block 33",
+      "startLine": 236,
+      "endLine": 242,
+      "textDigest": "da125878208e7de6ec45f980e4c8e5bbef2d5e53eadc5474c893b29a4e85beb1",
+      "sample": "- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\n  +artifact), không đổi luật event đã có.\n- **Artifact fgOS tương lai (report, plan, spec) theo đúng mẫu bee ",
+      "identityFingerprint": "ff2a9911ca86344c06fe0a789c88c5ccc8ce6c96664aeae1a14fe66e99f6d1ac",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "7. ADR 0011 Explicit Version For Every Contract",
+        "0011 Consequences"
+      ],
+      "text": "- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\n  +artifact), không đổi luật event đã có.\n- **Artifact fgOS tương lai (report, plan, spec) theo đúng mẫu bee đã dùng\n  sống**: `contract: <ten>/v<N>` — không cần phát minh lại quy ước, port\n  nguyên cái đã chứng minh trong workshop.\n- **Chi phí:** mỗi artifact/schema type mới phải chọn tên contract + version\n  ngay từ v1, không hoãn \"để sau\"."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_9be26c9507109484cc9b1663ca4ca2d9"
+}
+```
+
+## Entry claim_08dc68ef23395b8f3f5b095508348e00
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_08dc68ef23395b8f3f5b095508348e00",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_08dc68ef23395b8f3f5b095508348e00",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-34",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0011 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_08dc68ef23395b8f3f5b095508348e00",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-34",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0011 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "claimId": "claim_08dc68ef23395b8f3f5b095508348e00",
+    "sourceAnchor": "unheaded-block-144",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "carried-forward",
+    "pairedByAnchor": true
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-144",
+      "githubAnchor": "unheaded-block-144",
+      "stableAnchor": "unheaded-block-144",
+      "title": "Unheaded block 144",
+      "startLine": 1587,
+      "endLine": 1587,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0011 — Version tường minh cho mọi contract",
+        "Hệ quả"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-34",
+    "githubAnchor": "unheaded-block-34",
+    "stableAnchor": "unheaded-block-34",
+    "title": "Unheaded block 34",
+    "startLine": 244,
+    "endLine": 244,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract",
+      "0011 Consequences"
+    ],
+    "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "target digest repeats; ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-7",
+      "githubAnchor": "unheaded-block-7",
+      "stableAnchor": "unheaded-block-7",
+      "title": "Unheaded block 7",
+      "startLine": 60,
+      "endLine": 60,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Consequences"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_08dc68ef23395b8f3f5b095508348e00"
+}
+```
+
+## Entry claim_e3c928a8fca5c645487d1b574f0c5d36
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
+    "sourceUnitDigest": "9b3ff4bedb1e8747",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "8-adr-0012-unified-typed-edge-graph-model",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0012 title heading is represented by the frozen H2 \"8. ADR 0012 ...\" (8-adr-0012-unified-typed-edge-graph-model); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "e9c5857a60ea685d3aab78eae8e2b44b7d96e10698e4764d4a8b109e54f47f45",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
+    "sourceUnitDigest": "9b3ff4bedb1e8747",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "8-adr-0012-unified-typed-edge-graph-model",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0012 title heading is represented by the frozen H2 \"8. ADR 0012 ...\" (8-adr-0012-unified-typed-edge-graph-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "e9c5857a60ea685d3aab78eae8e2b44b7d96e10698e4764d4a8b109e54f47f45",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "6ae600d8e97827c01eb79ad36d01b1268b303b79b931cd23d9acb2c09e1e9f99",
+    "identityFingerprint": "f1bdcdcfeb497f96194a6bd80c2cd6cfd0ba41a7c83b9264f4a37e4d1599647f",
+    "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
+    "sourceAnchor": "0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời",
+    "unitKind": "heading",
+    "sourceUnitDigest": "9b3ff4bedb1e8747640191bfea313ad3c8e14772aa83430035793053454b84cf",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+      "anchor": "0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời",
+      "githubAnchor": "0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời",
+      "stableAnchor": "h-ebbc05310bd7",
+      "startLine": 1589,
+      "endLine": 1589,
+      "textDigest": "9b3ff4bedb1e8747640191bfea313ad3c8e14772aa83430035793053454b84cf",
+      "sample": "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "f1bdcdcfeb497f96194a6bd80c2cd6cfd0ba41a7c83b9264f4a37e4d1599647f",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng"
+      ],
+      "text": "### 0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+      "sectionText": "### 0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "8. ADR 0012 Unified Typed-Edge Graph Model",
+    "anchor": "8-adr-0012-unified-typed-edge-graph-model",
+    "githubAnchor": "8-adr-0012-unified-typed-edge-graph-model",
+    "stableAnchor": "h-7b99d0783b23",
+    "startLine": 246,
+    "endLine": 246,
+    "textDigest": "e9c5857a60ea685d3aab78eae8e2b44b7d96e10698e4764d4a8b109e54f47f45",
+    "sample": "8. ADR 0012 Unified Typed-Edge Graph Model",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "3fb8ad44ec407fa84608266fcca1dfaed1b1e28327ce5ad7d45af9f6cd580996",
+    "ancestry": [
+      "Retired Decision History: Work State"
+    ],
+    "text": "## 8. ADR 0012 Unified Typed-Edge Graph Model",
+    "sectionText": "## 8. ADR 0012 Unified Typed-Edge Graph Model"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_e3c928a8fca5c645487d1b574f0c5d36"
+}
+```
+
+## Entry claim_386a8c90d7f9d79a52190add7a82f33f
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
+    "sourceUnitDigest": "95bdd9de256a67e0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0012-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0012 is represented by the frozen H3 \"0012 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "0dc5cda4fa7fbd44208f88a810d9e6f77a67e9efa236041735d82bad31cd0158",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
+    "sourceUnitDigest": "95bdd9de256a67e0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0012-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0012 is represented by the frozen H3 \"0012 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "0dc5cda4fa7fbd44208f88a810d9e6f77a67e9efa236041735d82bad31cd0158",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "548e440324dc1dcb14b7e624f3208f9a04e5b4eb3a704ded0acb6b89c2eeb796",
+    "identityFingerprint": "cdded9c80dce06f80d21ea800a86f1cea89dffac911a05279dff79bf64f86758",
+    "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
+    "sourceAnchor": "bối-cảnh-6",
+    "unitKind": "heading",
+    "sourceUnitDigest": "95bdd9de256a67e0fa8dd10401b1d7f0844d1870123518726e598b2c5bae3595",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Bối cảnh",
+      "anchor": "bối-cảnh-6",
+      "githubAnchor": "bối-cảnh-6",
+      "stableAnchor": "h-6f5cd86e972d",
+      "startLine": 1591,
+      "endLine": 1591,
+      "textDigest": "95bdd9de256a67e0fa8dd10401b1d7f0844d1870123518726e598b2c5bae3595",
+      "sample": "Bối cảnh",
+      "sectionPayloadDigest": "748b0f18130a7ee59b7e4110170262f77c2581935d5a9bdcc2ab72e4cbf2a2f0",
+      "followingBlockDigest": "46ed30006ee6e00a1f81320cb86f1e91d79732f033b3345aa8f956c9c1c54961",
+      "identityFingerprint": "cdded9c80dce06f80d21ea800a86f1cea89dffac911a05279dff79bf64f86758",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời"
+      ],
+      "text": "#### Bối cảnh",
+      "sectionText": "#### Bối cảnh\n\n0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps` là cạnh\nphụ thuộc phẳng cho phép fan-out xuyên story; `parent` là quan hệ lineage\n(decompose) mà chỉ frontier dùng riêng để chặn cha cho tới khi mọi con xong\n(`work.mjs:165-166` trước sửa). work-graph-intelligence S1 (decision 896219a7)\nđóng một lỗ hổng sống: `deps` không có cycle-check — `editWork` có thể ghi một\nchu trình A↔B lặng lẽ. Guard của S1 chỉ phủ nhánh `deps`.\n\nViệc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, benign\nnhưng có thật: `parent` **không bao giờ được existence-check**\n(`validateDeps`, `work.mjs:205-213`, chỉ xét `deps`; `store.mjs` trước S2a\nchưa từng đọc `parent`). Hai lệnh `addWork` với một `parent` trỏ tới một id\nchưa tồn tại (dangling forward parent) đóng được một chu trình cha-con A↔B mà\nguard deps-only bỏ sót — vô hại (`frontier.mjs`'s tập `seen` chặn treo máy khi\nduyệt) nhưng thật, không phải giả định lý thuyết.\n\nBeads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management.md:117`)\nmô hình hoá cycle-check hợp nhất trên `blocks`+`parent-child`+`conditional` —\nkhông tách theo trường lưu trữ. fgOS đi theo đúng bằng chứng đó: gộp `deps` và\n`parent` thành MỘT đồ thị cạnh-định-kiểu (typed edges) cho mục đích tính toán\nvà bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách riêng."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0012 Context",
+    "anchor": "0012-context",
+    "githubAnchor": "0012-context",
+    "stableAnchor": "h-62162295c7e0",
+    "startLine": 248,
+    "endLine": 248,
+    "textDigest": "0dc5cda4fa7fbd44208f88a810d9e6f77a67e9efa236041735d82bad31cd0158",
+    "sample": "0012 Context",
+    "sectionPayloadDigest": "748b0f18130a7ee59b7e4110170262f77c2581935d5a9bdcc2ab72e4cbf2a2f0",
+    "followingBlockDigest": "46ed30006ee6e00a1f81320cb86f1e91d79732f033b3345aa8f956c9c1c54961",
+    "identityFingerprint": "438882788247d8e1ebfe542efd6203b6e407a12c3465b2688d85ad68fc3ada97",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ],
+    "text": "### 0012 Context",
+    "sectionText": "### 0012 Context\n\n0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps` là cạnh\nphụ thuộc phẳng cho phép fan-out xuyên story; `parent` là quan hệ lineage\n(decompose) mà chỉ frontier dùng riêng để chặn cha cho tới khi mọi con xong\n(`work.mjs:165-166` trước sửa). work-graph-intelligence S1 (decision 896219a7)\nđóng một lỗ hổng sống: `deps` không có cycle-check — `editWork` có thể ghi một\nchu trình A↔B lặng lẽ. Guard của S1 chỉ phủ nhánh `deps`.\n\nViệc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, benign\nnhưng có thật: `parent` **không bao giờ được existence-check**\n(`validateDeps`, `work.mjs:205-213`, chỉ xét `deps`; `store.mjs` trước S2a\nchưa từng đọc `parent`). Hai lệnh `addWork` với một `parent` trỏ tới một id\nchưa tồn tại (dangling forward parent) đóng được một chu trình cha-con A↔B mà\nguard deps-only bỏ sót — vô hại (`frontier.mjs`'s tập `seen` chặn treo máy khi\nduyệt) nhưng thật, không phải giả định lý thuyết.\n\nBeads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management.md:117`)\nmô hình hoá cycle-check hợp nhất trên `blocks`+`parent-child`+`conditional` —\nkhông tách theo trường lưu trữ. fgOS đi theo đúng bằng chứng đó: gộp `deps` và\n`parent` thành MỘT đồ thị cạnh-định-kiểu (typed edges) cho mục đích tính toán\nvà bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách riêng."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_386a8c90d7f9d79a52190add7a82f33f"
+}
+```
+
+## Entry claim_4806fa4d3041b4b051cddf6a2490730b
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_4806fa4d3041b4b051cddf6a2490730b",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_4806fa4d3041b4b051cddf6a2490730b",
+    "sourceUnitDigest": "46ed30006ee6e00a",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-35",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0012 (source lines 1562-1567, starting \"0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps`\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "46ed30006ee6e00a1f81320cb86f1e91d79732f033b3345aa8f956c9c1c54961",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_4806fa4d3041b4b051cddf6a2490730b",
+    "sourceUnitDigest": "46ed30006ee6e00a",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-35",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0012 (source lines 1593-1598, starting \"0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps`\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "46ed30006ee6e00a1f81320cb86f1e91d79732f033b3345aa8f956c9c1c54961",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "5f0162a07de16caa88b2417610e809a157a03cf6b9caec0f5291d3c706e4eecb",
+    "identityFingerprint": "5f0162a07de16caa88b2417610e809a157a03cf6b9caec0f5291d3c706e4eecb",
+    "claimId": "claim_4806fa4d3041b4b051cddf6a2490730b",
+    "sourceAnchor": "unheaded-block-145",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "46ed30006ee6e00a1f81320cb86f1e91d79732f033b3345aa8f956c9c1c54961",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-145",
+      "githubAnchor": "unheaded-block-145",
+      "stableAnchor": "unheaded-block-145",
+      "title": "Unheaded block 145",
+      "startLine": 1593,
+      "endLine": 1598,
+      "textDigest": "46ed30006ee6e00a1f81320cb86f1e91d79732f033b3345aa8f956c9c1c54961",
+      "sample": "0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps` là cạnh\nphụ thuộc phẳng cho phép fan-out xuyên story; `parent` là quan hệ lineage\n(decompose) mà chỉ frontier",
+      "identityFingerprint": "5f0162a07de16caa88b2417610e809a157a03cf6b9caec0f5291d3c706e4eecb",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Bối cảnh"
+      ],
+      "text": "0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps` là cạnh\nphụ thuộc phẳng cho phép fan-out xuyên story; `parent` là quan hệ lineage\n(decompose) mà chỉ frontier dùng riêng để chặn cha cho tới khi mọi con xong\n(`work.mjs:165-166` trước sửa). work-graph-intelligence S1 (decision 896219a7)\nđóng một lỗ hổng sống: `deps` không có cycle-check — `editWork` có thể ghi một\nchu trình A↔B lặng lẽ. Guard của S1 chỉ phủ nhánh `deps`."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-35",
+    "githubAnchor": "unheaded-block-35",
+    "stableAnchor": "unheaded-block-35",
+    "title": "Unheaded block 35",
+    "startLine": 250,
+    "endLine": 255,
+    "textDigest": "46ed30006ee6e00a1f81320cb86f1e91d79732f033b3345aa8f956c9c1c54961",
+    "sample": "0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps` là cạnh\nphụ thuộc phẳng cho phép fan-out xuyên story; `parent` là quan hệ lineage\n(decompose) mà chỉ frontier",
+    "identityFingerprint": "5f0162a07de16caa88b2417610e809a157a03cf6b9caec0f5291d3c706e4eecb",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Context"
+    ],
+    "text": "0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps` là cạnh\nphụ thuộc phẳng cho phép fan-out xuyên story; `parent` là quan hệ lineage\n(decompose) mà chỉ frontier dùng riêng để chặn cha cho tới khi mọi con xong\n(`work.mjs:165-166` trước sửa). work-graph-intelligence S1 (decision 896219a7)\nđóng một lỗ hổng sống: `deps` không có cycle-check — `editWork` có thể ghi một\nchu trình A↔B lặng lẽ. Guard của S1 chỉ phủ nhánh `deps`."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-35",
+      "githubAnchor": "unheaded-block-35",
+      "stableAnchor": "unheaded-block-35",
+      "title": "Unheaded block 35",
+      "startLine": 250,
+      "endLine": 255,
+      "textDigest": "46ed30006ee6e00a1f81320cb86f1e91d79732f033b3345aa8f956c9c1c54961",
+      "sample": "0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps` là cạnh\nphụ thuộc phẳng cho phép fan-out xuyên story; `parent` là quan hệ lineage\n(decompose) mà chỉ frontier",
+      "identityFingerprint": "5f0162a07de16caa88b2417610e809a157a03cf6b9caec0f5291d3c706e4eecb",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model",
+        "0012 Context"
+      ],
+      "text": "0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps` là cạnh\nphụ thuộc phẳng cho phép fan-out xuyên story; `parent` là quan hệ lineage\n(decompose) mà chỉ frontier dùng riêng để chặn cha cho tới khi mọi con xong\n(`work.mjs:165-166` trước sửa). work-graph-intelligence S1 (decision 896219a7)\nđóng một lỗ hổng sống: `deps` không có cycle-check — `editWork` có thể ghi một\nchu trình A↔B lặng lẽ. Guard của S1 chỉ phủ nhánh `deps`."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_4806fa4d3041b4b051cddf6a2490730b"
+}
+```
+
+## Entry claim_d1d70b955b085baafa10ffcec2702b8d
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_d1d70b955b085baafa10ffcec2702b8d",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_d1d70b955b085baafa10ffcec2702b8d",
+    "sourceUnitDigest": "e4554b1ed9990b0f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-36",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0012 (source lines 1569-1575, starting \"Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, be\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_d1d70b955b085baafa10ffcec2702b8d",
+    "sourceUnitDigest": "e4554b1ed9990b0f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-36",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0012 (source lines 1600-1606, starting \"Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, be\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "7262a692577474e6399d6a2bb0d2a07d937b7c55a81037b12e45def7bc4894de",
+    "identityFingerprint": "7262a692577474e6399d6a2bb0d2a07d937b7c55a81037b12e45def7bc4894de",
+    "claimId": "claim_d1d70b955b085baafa10ffcec2702b8d",
+    "sourceAnchor": "unheaded-block-146",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-146",
+      "githubAnchor": "unheaded-block-146",
+      "stableAnchor": "unheaded-block-146",
+      "title": "Unheaded block 146",
+      "startLine": 1600,
+      "endLine": 1606,
+      "textDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba",
+      "sample": "Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, benign\nnhưng có thật: `parent` **không bao giờ được existence-check**\n(`validateDeps`, `work.mjs:205-213`, chỉ x",
+      "identityFingerprint": "7262a692577474e6399d6a2bb0d2a07d937b7c55a81037b12e45def7bc4894de",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Bối cảnh"
+      ],
+      "text": "Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, benign\nnhưng có thật: `parent` **không bao giờ được existence-check**\n(`validateDeps`, `work.mjs:205-213`, chỉ xét `deps`; `store.mjs` trước S2a\nchưa từng đọc `parent`). Hai lệnh `addWork` với một `parent` trỏ tới một id\nchưa tồn tại (dangling forward parent) đóng được một chu trình cha-con A↔B mà\nguard deps-only bỏ sót — vô hại (`frontier.mjs`'s tập `seen` chặn treo máy khi\nduyệt) nhưng thật, không phải giả định lý thuyết."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-36",
+    "githubAnchor": "unheaded-block-36",
+    "stableAnchor": "unheaded-block-36",
+    "title": "Unheaded block 36",
+    "startLine": 257,
+    "endLine": 263,
+    "textDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba",
+    "sample": "Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, benign\nnhưng có thật: `parent` **không bao giờ được existence-check**\n(`validateDeps`, `work.mjs:205-213`, chỉ x",
+    "identityFingerprint": "7262a692577474e6399d6a2bb0d2a07d937b7c55a81037b12e45def7bc4894de",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Context"
+    ],
+    "text": "Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, benign\nnhưng có thật: `parent` **không bao giờ được existence-check**\n(`validateDeps`, `work.mjs:205-213`, chỉ xét `deps`; `store.mjs` trước S2a\nchưa từng đọc `parent`). Hai lệnh `addWork` với một `parent` trỏ tới một id\nchưa tồn tại (dangling forward parent) đóng được một chu trình cha-con A↔B mà\nguard deps-only bỏ sót — vô hại (`frontier.mjs`'s tập `seen` chặn treo máy khi\nduyệt) nhưng thật, không phải giả định lý thuyết."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-36",
+      "githubAnchor": "unheaded-block-36",
+      "stableAnchor": "unheaded-block-36",
+      "title": "Unheaded block 36",
+      "startLine": 257,
+      "endLine": 263,
+      "textDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba",
+      "sample": "Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, benign\nnhưng có thật: `parent` **không bao giờ được existence-check**\n(`validateDeps`, `work.mjs:205-213`, chỉ x",
+      "identityFingerprint": "7262a692577474e6399d6a2bb0d2a07d937b7c55a81037b12e45def7bc4894de",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model",
+        "0012 Context"
+      ],
+      "text": "Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, benign\nnhưng có thật: `parent` **không bao giờ được existence-check**\n(`validateDeps`, `work.mjs:205-213`, chỉ xét `deps`; `store.mjs` trước S2a\nchưa từng đọc `parent`). Hai lệnh `addWork` với một `parent` trỏ tới một id\nchưa tồn tại (dangling forward parent) đóng được một chu trình cha-con A↔B mà\nguard deps-only bỏ sót — vô hại (`frontier.mjs`'s tập `seen` chặn treo máy khi\nduyệt) nhưng thật, không phải giả định lý thuyết."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_d1d70b955b085baafa10ffcec2702b8d"
+}
+```
+
+## Entry claim_dc663544c2f4766e60ca2ce841c6ffd6
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_dc663544c2f4766e60ca2ce841c6ffd6",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_dc663544c2f4766e60ca2ce841c6ffd6",
+    "sourceUnitDigest": "1186cfa23b3d3a5f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-37",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0012 (source lines 1577-1581, starting \"Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "1186cfa23b3d3a5f227a6f05ceacf581ab841a0bf5100c82d4db735cc5479859",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Context"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_dc663544c2f4766e60ca2ce841c6ffd6",
+    "sourceUnitDigest": "1186cfa23b3d3a5f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-37",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0012 (source lines 1608-1612, starting \"Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "1186cfa23b3d3a5f227a6f05ceacf581ab841a0bf5100c82d4db735cc5479859",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "6b8e6181e50a322ab3f06cb9a482e025c6942ddc54fe1af602d1146b75ed0408",
+    "identityFingerprint": "6b8e6181e50a322ab3f06cb9a482e025c6942ddc54fe1af602d1146b75ed0408",
+    "claimId": "claim_dc663544c2f4766e60ca2ce841c6ffd6",
+    "sourceAnchor": "unheaded-block-147",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "1186cfa23b3d3a5f227a6f05ceacf581ab841a0bf5100c82d4db735cc5479859",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-147",
+      "githubAnchor": "unheaded-block-147",
+      "stableAnchor": "unheaded-block-147",
+      "title": "Unheaded block 147",
+      "startLine": 1608,
+      "endLine": 1612,
+      "textDigest": "1186cfa23b3d3a5f227a6f05ceacf581ab841a0bf5100c82d4db735cc5479859",
+      "sample": "Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management.md:117`)\nmô hình hoá cycle-check hợp nhất trên `blocks`+`parent-child`+`conditional` —\nkhông tách theo trường",
+      "identityFingerprint": "6b8e6181e50a322ab3f06cb9a482e025c6942ddc54fe1af602d1146b75ed0408",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Bối cảnh"
+      ],
+      "text": "Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management.md:117`)\nmô hình hoá cycle-check hợp nhất trên `blocks`+`parent-child`+`conditional` —\nkhông tách theo trường lưu trữ. fgOS đi theo đúng bằng chứng đó: gộp `deps` và\n`parent` thành MỘT đồ thị cạnh-định-kiểu (typed edges) cho mục đích tính toán\nvà bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách riêng."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-37",
+    "githubAnchor": "unheaded-block-37",
+    "stableAnchor": "unheaded-block-37",
+    "title": "Unheaded block 37",
+    "startLine": 265,
+    "endLine": 269,
+    "textDigest": "1186cfa23b3d3a5f227a6f05ceacf581ab841a0bf5100c82d4db735cc5479859",
+    "sample": "Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management.md:117`)\nmô hình hoá cycle-check hợp nhất trên `blocks`+`parent-child`+`conditional` —\nkhông tách theo trường",
+    "identityFingerprint": "6b8e6181e50a322ab3f06cb9a482e025c6942ddc54fe1af602d1146b75ed0408",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Context"
+    ],
+    "text": "Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management.md:117`)\nmô hình hoá cycle-check hợp nhất trên `blocks`+`parent-child`+`conditional` —\nkhông tách theo trường lưu trữ. fgOS đi theo đúng bằng chứng đó: gộp `deps` và\n`parent` thành MỘT đồ thị cạnh-định-kiểu (typed edges) cho mục đích tính toán\nvà bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách riêng."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-37",
+      "githubAnchor": "unheaded-block-37",
+      "stableAnchor": "unheaded-block-37",
+      "title": "Unheaded block 37",
+      "startLine": 265,
+      "endLine": 269,
+      "textDigest": "1186cfa23b3d3a5f227a6f05ceacf581ab841a0bf5100c82d4db735cc5479859",
+      "sample": "Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management.md:117`)\nmô hình hoá cycle-check hợp nhất trên `blocks`+`parent-child`+`conditional` —\nkhông tách theo trường",
+      "identityFingerprint": "6b8e6181e50a322ab3f06cb9a482e025c6942ddc54fe1af602d1146b75ed0408",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model",
+        "0012 Context"
+      ],
+      "text": "Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management.md:117`)\nmô hình hoá cycle-check hợp nhất trên `blocks`+`parent-child`+`conditional` —\nkhông tách theo trường lưu trữ. fgOS đi theo đúng bằng chứng đó: gộp `deps` và\n`parent` thành MỘT đồ thị cạnh-định-kiểu (typed edges) cho mục đích tính toán\nvà bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách riêng."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_dc663544c2f4766e60ca2ce841c6ffd6"
+}
+```
+
+## Entry claim_3b4da5c5b12c6780b24e84b53ca73e49
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
+    "sourceUnitDigest": "24cacb854eb926ac",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0012-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0012 is represented by the frozen H3 \"0012 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "9dee590708c4181b56606cd803fd345edfe4a9db456d03efe6a0d63e7b8ad917",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
+    "sourceUnitDigest": "24cacb854eb926ac",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0012-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0012 is represented by the frozen H3 \"0012 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "9dee590708c4181b56606cd803fd345edfe4a9db456d03efe6a0d63e7b8ad917",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "1a79f792d82e0ce5e682539010cdd722186d409b77e531130c767f117140968f",
+    "identityFingerprint": "621850366e288e5a016063058ec891120418b49bf8121f1a43609d237f8bfa05",
+    "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
+    "sourceAnchor": "quyết-định-6",
+    "unitKind": "heading",
+    "sourceUnitDigest": "24cacb854eb926ac0ca1d2e0857cddeca8ae642c1e412f5f08515826e4b2dcce",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Quyết định",
+      "anchor": "quyết-định-6",
+      "githubAnchor": "quyết-định-6",
+      "stableAnchor": "h-d26958c3e124",
+      "startLine": 1614,
+      "endLine": 1614,
+      "textDigest": "24cacb854eb926ac0ca1d2e0857cddeca8ae642c1e412f5f08515826e4b2dcce",
+      "sample": "Quyết định",
+      "sectionPayloadDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
+      "followingBlockDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
+      "identityFingerprint": "621850366e288e5a016063058ec891120418b49bf8121f1a43609d237f8bfa05",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời"
+      ],
+      "text": "#### Quyết định",
+      "sectionText": "#### Quyết định\n\n- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-định-kiểu\n  DẪN XUẤT** (derived — không phải một trường vật lý mới): `deps` chiếu thành\n  cạnh `blocks` (`I -> d`, nghĩa \"I chờ d\"); `parent` chiếu thành cạnh\n  `parent-child` (`P -> C`, nghĩa \"cha chờ con\" — đúng hướng\n  `hasOpenDescendant` của `frontier.mjs`, không phải hướng con→cha ngây thơ,\n  vì hướng ngây thơ sẽ làm một chu trình hỗn hợp blocks/parent-child không\n  phát hiện được). `waits-for` và `discovered-from` là **từ vựng đã khai báo**\n  — chưa có dạng lưu trữ hay producer nào (hoãn sang S2b).\n- **Quyết định này SUPERSEDE 0002** (và spec Data Dictionary #13,\n  `work.mjs:164-166`) ở đúng một điểm: \"deps và parent tách rời có chủ đích\"\n  giờ đọc là \"tách rời về **lưu trữ và ngữ nghĩa**, nhưng hợp nhất thành\n  **một đồ thị** cho cycle-check và mọi compute slice sau này (S5+)\". 0002\n  không sai về lưu trữ — phần đó giữ nguyên; nó chỉ chưa tính tới việc hai\n  quan hệ cần chung một bảo đảm phi-chu-trình.\n- **Bảo đảm phi-chu-trình tại cửa ghi duy nhất (`store.mjs`) giờ phủ ĐỒ THỊ\n  HỢP NHẤT `blocks`+`parent-child`**, không chỉ `deps` — **đã ship và verify\n  xanh** (work-graph-intelligence cell -3/-4): `src/state/dep-graph.mjs` thêm\n  `buildUnifiedEdges`/`findUnifiedCycle`/`assertNoUnifiedCycle` bên cạnh các\n  hàm `deps`-only của S1 (`findDepCycle`/`assertNoCycle`, giữ nguyên hành vi\n  và chữ ký); `store.mjs` gọi `assertNoUnifiedCycle` cạnh `assertNoCycle` cũ\n  tại cả `addWork` và `editWork`, trước `appendEvent`. Điều này **đóng** lỗ\n  hổng chu trình cha-con sống nói trên (benign nhưng có thật) — làm cho bất\n  biến 896219a7 (\"đồ thị phi chu trình\") đúng cho **toàn bộ** đồ thị hợp\n  nhất, không chỉ nhánh `deps`.\n- **Dẫn xuất, không vật lý (derived-not-physical) — ba căn cứ:**\n  1. **RUL11 (tiến hóa schema)** (log bất khả xâm phạm, `work-state.md:703`): một trường\n     `edges[]` lưu trữ mới sẽ đòi migration cho mọi event cũ; một\n     read-projection thuần Domain thì không.\n  2. **Học thuyết DT2 \"add-through-không-alongside\"**: mở rộng cửa ghi hiện\n     có (`assertNoCycle` cộng thêm `assertNoUnifiedCycle`, cùng một cửa)\n     thay vì mở một đường ghi song song.\n  3. **~10 consumer đọc trực tiếp `.deps`/`.parent`** (frontier, impact,\n     `validateDeps`, v.v.) — giữ nguyên, không cần migrate.\n- Vì thuần dẫn xuất: **không có trường lưu trữ mới; tại thời điểm quyết định\n  này, SCHEMA_VERSION vẫn ở 2** (nay đã lên 3, per str46-io-contract),\n  mọi event cũ replay y hệt (RUL11 (tiến hóa schema))."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0012 Decision",
+    "anchor": "0012-decision",
+    "githubAnchor": "0012-decision",
+    "stableAnchor": "h-97831157c7f6",
+    "startLine": 271,
+    "endLine": 271,
+    "textDigest": "9dee590708c4181b56606cd803fd345edfe4a9db456d03efe6a0d63e7b8ad917",
+    "sample": "0012 Decision",
+    "sectionPayloadDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
+    "followingBlockDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
+    "identityFingerprint": "2ee14861cf09ecc53568645d7b6740cd9f3b446fd6113c205fe1fa8d720532b2",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ],
+    "text": "### 0012 Decision",
+    "sectionText": "### 0012 Decision\n\n- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-định-kiểu\n  DẪN XUẤT** (derived — không phải một trường vật lý mới): `deps` chiếu thành\n  cạnh `blocks` (`I -> d`, nghĩa \"I chờ d\"); `parent` chiếu thành cạnh\n  `parent-child` (`P -> C`, nghĩa \"cha chờ con\" — đúng hướng\n  `hasOpenDescendant` của `frontier.mjs`, không phải hướng con→cha ngây thơ,\n  vì hướng ngây thơ sẽ làm một chu trình hỗn hợp blocks/parent-child không\n  phát hiện được). `waits-for` và `discovered-from` là **từ vựng đã khai báo**\n  — chưa có dạng lưu trữ hay producer nào (hoãn sang S2b).\n- **Quyết định này SUPERSEDE 0002** (và spec Data Dictionary #13,\n  `work.mjs:164-166`) ở đúng một điểm: \"deps và parent tách rời có chủ đích\"\n  giờ đọc là \"tách rời về **lưu trữ và ngữ nghĩa**, nhưng hợp nhất thành\n  **một đồ thị** cho cycle-check và mọi compute slice sau này (S5+)\". 0002\n  không sai về lưu trữ — phần đó giữ nguyên; nó chỉ chưa tính tới việc hai\n  quan hệ cần chung một bảo đảm phi-chu-trình.\n- **Bảo đảm phi-chu-trình tại cửa ghi duy nhất (`store.mjs`) giờ phủ ĐỒ THỊ\n  HỢP NHẤT `blocks`+`parent-child`**, không chỉ `deps` — **đã ship và verify\n  xanh** (work-graph-intelligence cell -3/-4): `src/state/dep-graph.mjs` thêm\n  `buildUnifiedEdges`/`findUnifiedCycle`/`assertNoUnifiedCycle` bên cạnh các\n  hàm `deps`-only của S1 (`findDepCycle`/`assertNoCycle`, giữ nguyên hành vi\n  và chữ ký); `store.mjs` gọi `assertNoUnifiedCycle` cạnh `assertNoCycle` cũ\n  tại cả `addWork` và `editWork`, trước `appendEvent`. Điều này **đóng** lỗ\n  hổng chu trình cha-con sống nói trên (benign nhưng có thật) — làm cho bất\n  biến 896219a7 (\"đồ thị phi chu trình\") đúng cho **toàn bộ** đồ thị hợp\n  nhất, không chỉ nhánh `deps`.\n- **Dẫn xuất, không vật lý (derived-not-physical) — ba căn cứ:**\n  1. **RUL11 (tiến hóa schema)** (log bất khả xâm phạm, `work-state.md:703`): một trường\n     `edges[]` lưu trữ mới sẽ đòi migration cho mọi event cũ; một\n     read-projection thuần Domain thì không.\n  2. **Học thuyết DT2 \"add-through-không-alongside\"**: mở rộng cửa ghi hiện\n     có (`assertNoCycle` cộng thêm `assertNoUnifiedCycle`, cùng một cửa)\n     thay vì mở một đường ghi song song.\n  3. **~10 consumer đọc trực tiếp `.deps`/`.parent`** (frontier, impact,\n     `validateDeps`, v.v.) — giữ nguyên, không cần migrate.\n- Vì thuần dẫn xuất: **không có trường lưu trữ mới; tại thời điểm quyết định\n  này, SCHEMA_VERSION vẫn ở 2** (nay đã lên 3, per str46-io-contract),\n  mọi event cũ replay y hệt (RUL11 (tiến hóa schema))."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_3b4da5c5b12c6780b24e84b53ca73e49"
+}
+```
+
+## Entry claim_f44a3645601fbc48b21a8d73b3ac3426
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_f44a3645601fbc48b21a8d73b3ac3426",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_f44a3645601fbc48b21a8d73b3ac3426",
+    "sourceUnitDigest": "0f8f279453f179f3",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-38",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0012 (source lines 1585-1620, starting \"- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-đ\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Decision"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_f44a3645601fbc48b21a8d73b3ac3426",
+    "sourceUnitDigest": "0f8f279453f179f3",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-38",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0012 (source lines 1616-1651, starting \"- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-đ\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "ea22f4fefd2592d76c443b6a6565bac57568ef078916d36086b581c6e532e464",
+    "identityFingerprint": "ea22f4fefd2592d76c443b6a6565bac57568ef078916d36086b581c6e532e464",
+    "claimId": "claim_f44a3645601fbc48b21a8d73b3ac3426",
+    "sourceAnchor": "unheaded-block-148",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-148",
+      "githubAnchor": "unheaded-block-148",
+      "stableAnchor": "unheaded-block-148",
+      "title": "Unheaded block 148",
+      "startLine": 1616,
+      "endLine": 1651,
+      "textDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
+      "sample": "- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-định-kiểu\n  DẪN XUẤT** (derived — không phải một trường vật lý mới): `deps` chiếu thành\n  cạnh `blocks` (`I -> ",
+      "identityFingerprint": "ea22f4fefd2592d76c443b6a6565bac57568ef078916d36086b581c6e532e464",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Quyết định"
+      ],
+      "text": "- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-định-kiểu\n  DẪN XUẤT** (derived — không phải một trường vật lý mới): `deps` chiếu thành\n  cạnh `blocks` (`I -> d`, nghĩa \"I chờ d\"); `parent` chiếu thành cạnh\n  `parent-child` (`P -> C`, nghĩa \"cha chờ con\" — đúng hướng\n  `hasOpenDescendant` của `frontier.mjs`, không phải hướng con→cha ngây thơ,\n  vì hướng ngây thơ sẽ làm một chu trình hỗn hợp blocks/parent-child không\n  phát hiện được). `waits-for` và `discovered-from` là **từ vựng đã khai báo**\n  — chưa có dạng lưu trữ hay producer nào (hoãn sang S2b).\n- **Quyết định này SUPERSEDE 0002** (và spec Data Dictionary #13,\n  `work.mjs:164-166`) ở đúng một điểm: \"deps và parent tách rời có chủ đích\"\n  giờ đọc là \"tách rời về **lưu trữ và ngữ nghĩa**, nhưng hợp nhất thành\n  **một đồ thị** cho cycle-check và mọi compute slice sau này (S5+)\". 0002\n  không sai về lưu trữ — phần đó giữ nguyên; nó chỉ chưa tính tới việc hai\n  quan hệ cần chung một bảo đảm phi-chu-trình.\n- **Bảo đảm phi-chu-trình tại cửa ghi duy nhất (`store.mjs`) giờ phủ ĐỒ THỊ\n  HỢP NHẤT `blocks`+`parent-child`**, không chỉ `deps` — **đã ship và verify\n  xanh** (work-graph-intelligence cell -3/-4): `src/state/dep-graph.mjs` thêm\n  `buildUnifiedEdges`/`findUnifiedCycle`/`assertNoUnifiedCycle` bên cạnh các\n  hàm `deps`-only của S1 (`findDepCycle`/`assertNoCycle`, giữ nguyên hành vi\n  và chữ ký); `store.mjs` gọi `assertNoUnifiedCycle` cạnh `assertNoCycle` cũ\n  tại cả `addWork` và `editWork`, trước `appendEvent`. Điều này **đóng** lỗ\n  hổng chu trình cha-con sống nói trên (benign nhưng có thật) — làm cho bất\n  biến 896219a7 (\"đồ thị phi chu trình\") đúng cho **toàn bộ** đồ thị hợp\n  nhất, không chỉ nhánh `deps`.\n- **Dẫn xuất, không vật lý (derived-not-physical) — ba căn cứ:**\n  1. **RUL11 (tiến hóa schema)** (log bất khả xâm phạm, `work-state.md:703`): một trường\n     `edges[]` lưu trữ mới sẽ đòi migration cho mọi event cũ; một\n     read-projection thuần Domain thì không.\n  2. **Học thuyết DT2 \"add-through-không-alongside\"**: mở rộng cửa ghi hiện\n     có (`assertNoCycle` cộng thêm `assertNoUnifiedCycle`, cùng một cửa)\n     thay vì mở một đường ghi song song.\n  3. **~10 consumer đọc trực tiếp `.deps`/`.parent`** (frontier, impact,\n     `validateDeps`, v.v.) — giữ nguyên, không cần migrate.\n- Vì thuần dẫn xuất: **không có trường lưu trữ mới; tại thời điểm quyết định\n  này, SCHEMA_VERSION vẫn ở 2** (nay đã lên 3, per str46-io-contract),\n  mọi event cũ replay y hệt (RUL11 (tiến hóa schema))."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-38",
+    "githubAnchor": "unheaded-block-38",
+    "stableAnchor": "unheaded-block-38",
+    "title": "Unheaded block 38",
+    "startLine": 273,
+    "endLine": 308,
+    "textDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
+    "sample": "- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-định-kiểu\n  DẪN XUẤT** (derived — không phải một trường vật lý mới): `deps` chiếu thành\n  cạnh `blocks` (`I -> ",
+    "identityFingerprint": "ea22f4fefd2592d76c443b6a6565bac57568ef078916d36086b581c6e532e464",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Decision"
+    ],
+    "text": "- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-định-kiểu\n  DẪN XUẤT** (derived — không phải một trường vật lý mới): `deps` chiếu thành\n  cạnh `blocks` (`I -> d`, nghĩa \"I chờ d\"); `parent` chiếu thành cạnh\n  `parent-child` (`P -> C`, nghĩa \"cha chờ con\" — đúng hướng\n  `hasOpenDescendant` của `frontier.mjs`, không phải hướng con→cha ngây thơ,\n  vì hướng ngây thơ sẽ làm một chu trình hỗn hợp blocks/parent-child không\n  phát hiện được). `waits-for` và `discovered-from` là **từ vựng đã khai báo**\n  — chưa có dạng lưu trữ hay producer nào (hoãn sang S2b).\n- **Quyết định này SUPERSEDE 0002** (và spec Data Dictionary #13,\n  `work.mjs:164-166`) ở đúng một điểm: \"deps và parent tách rời có chủ đích\"\n  giờ đọc là \"tách rời về **lưu trữ và ngữ nghĩa**, nhưng hợp nhất thành\n  **một đồ thị** cho cycle-check và mọi compute slice sau này (S5+)\". 0002\n  không sai về lưu trữ — phần đó giữ nguyên; nó chỉ chưa tính tới việc hai\n  quan hệ cần chung một bảo đảm phi-chu-trình.\n- **Bảo đảm phi-chu-trình tại cửa ghi duy nhất (`store.mjs`) giờ phủ ĐỒ THỊ\n  HỢP NHẤT `blocks`+`parent-child`**, không chỉ `deps` — **đã ship và verify\n  xanh** (work-graph-intelligence cell -3/-4): `src/state/dep-graph.mjs` thêm\n  `buildUnifiedEdges`/`findUnifiedCycle`/`assertNoUnifiedCycle` bên cạnh các\n  hàm `deps`-only của S1 (`findDepCycle`/`assertNoCycle`, giữ nguyên hành vi\n  và chữ ký); `store.mjs` gọi `assertNoUnifiedCycle` cạnh `assertNoCycle` cũ\n  tại cả `addWork` và `editWork`, trước `appendEvent`. Điều này **đóng** lỗ\n  hổng chu trình cha-con sống nói trên (benign nhưng có thật) — làm cho bất\n  biến 896219a7 (\"đồ thị phi chu trình\") đúng cho **toàn bộ** đồ thị hợp\n  nhất, không chỉ nhánh `deps`.\n- **Dẫn xuất, không vật lý (derived-not-physical) — ba căn cứ:**\n  1. **RUL11 (tiến hóa schema)** (log bất khả xâm phạm, `work-state.md:703`): một trường\n     `edges[]` lưu trữ mới sẽ đòi migration cho mọi event cũ; một\n     read-projection thuần Domain thì không.\n  2. **Học thuyết DT2 \"add-through-không-alongside\"**: mở rộng cửa ghi hiện\n     có (`assertNoCycle` cộng thêm `assertNoUnifiedCycle`, cùng một cửa)\n     thay vì mở một đường ghi song song.\n  3. **~10 consumer đọc trực tiếp `.deps`/`.parent`** (frontier, impact,\n     `validateDeps`, v.v.) — giữ nguyên, không cần migrate.\n- Vì thuần dẫn xuất: **không có trường lưu trữ mới; tại thời điểm quyết định\n  này, SCHEMA_VERSION vẫn ở 2** (nay đã lên 3, per str46-io-contract),\n  mọi event cũ replay y hệt (RUL11 (tiến hóa schema))."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-38",
+      "githubAnchor": "unheaded-block-38",
+      "stableAnchor": "unheaded-block-38",
+      "title": "Unheaded block 38",
+      "startLine": 273,
+      "endLine": 308,
+      "textDigest": "0f8f279453f179f3b8c688e65b42d55ff830d8cae0c7462980c05a4f00c04106",
+      "sample": "- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-định-kiểu\n  DẪN XUẤT** (derived — không phải một trường vật lý mới): `deps` chiếu thành\n  cạnh `blocks` (`I -> ",
+      "identityFingerprint": "ea22f4fefd2592d76c443b6a6565bac57568ef078916d36086b581c6e532e464",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model",
+        "0012 Decision"
+      ],
+      "text": "- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-định-kiểu\n  DẪN XUẤT** (derived — không phải một trường vật lý mới): `deps` chiếu thành\n  cạnh `blocks` (`I -> d`, nghĩa \"I chờ d\"); `parent` chiếu thành cạnh\n  `parent-child` (`P -> C`, nghĩa \"cha chờ con\" — đúng hướng\n  `hasOpenDescendant` của `frontier.mjs`, không phải hướng con→cha ngây thơ,\n  vì hướng ngây thơ sẽ làm một chu trình hỗn hợp blocks/parent-child không\n  phát hiện được). `waits-for` và `discovered-from` là **từ vựng đã khai báo**\n  — chưa có dạng lưu trữ hay producer nào (hoãn sang S2b).\n- **Quyết định này SUPERSEDE 0002** (và spec Data Dictionary #13,\n  `work.mjs:164-166`) ở đúng một điểm: \"deps và parent tách rời có chủ đích\"\n  giờ đọc là \"tách rời về **lưu trữ và ngữ nghĩa**, nhưng hợp nhất thành\n  **một đồ thị** cho cycle-check và mọi compute slice sau này (S5+)\". 0002\n  không sai về lưu trữ — phần đó giữ nguyên; nó chỉ chưa tính tới việc hai\n  quan hệ cần chung một bảo đảm phi-chu-trình.\n- **Bảo đảm phi-chu-trình tại cửa ghi duy nhất (`store.mjs`) giờ phủ ĐỒ THỊ\n  HỢP NHẤT `blocks`+`parent-child`**, không chỉ `deps` — **đã ship và verify\n  xanh** (work-graph-intelligence cell -3/-4): `src/state/dep-graph.mjs` thêm\n  `buildUnifiedEdges`/`findUnifiedCycle`/`assertNoUnifiedCycle` bên cạnh các\n  hàm `deps`-only của S1 (`findDepCycle`/`assertNoCycle`, giữ nguyên hành vi\n  và chữ ký); `store.mjs` gọi `assertNoUnifiedCycle` cạnh `assertNoCycle` cũ\n  tại cả `addWork` và `editWork`, trước `appendEvent`. Điều này **đóng** lỗ\n  hổng chu trình cha-con sống nói trên (benign nhưng có thật) — làm cho bất\n  biến 896219a7 (\"đồ thị phi chu trình\") đúng cho **toàn bộ** đồ thị hợp\n  nhất, không chỉ nhánh `deps`.\n- **Dẫn xuất, không vật lý (derived-not-physical) — ba căn cứ:**\n  1. **RUL11 (tiến hóa schema)** (log bất khả xâm phạm, `work-state.md:703`): một trường\n     `edges[]` lưu trữ mới sẽ đòi migration cho mọi event cũ; một\n     read-projection thuần Domain thì không.\n  2. **Học thuyết DT2 \"add-through-không-alongside\"**: mở rộng cửa ghi hiện\n     có (`assertNoCycle` cộng thêm `assertNoUnifiedCycle`, cùng một cửa)\n     thay vì mở một đường ghi song song.\n  3. **~10 consumer đọc trực tiếp `.deps`/`.parent`** (frontier, impact,\n     `validateDeps`, v.v.) — giữ nguyên, không cần migrate.\n- Vì thuần dẫn xuất: **không có trường lưu trữ mới; tại thời điểm quyết định\n  này, SCHEMA_VERSION vẫn ở 2** (nay đã lên 3, per str46-io-contract),\n  mọi event cũ replay y hệt (RUL11 (tiến hóa schema))."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_f44a3645601fbc48b21a8d73b3ac3426"
+}
+```
+
+## Entry claim_c6a32a1e4ab8c7078b89199236f3d5e0
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
+    "sourceUnitDigest": "f35473b9295a35af",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0012-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0012 is represented by the frozen H3 \"0012 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "764a0029f0ee73f78c522c71e69830fac20871e226b636c7832f1461d0c0c79c",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
+    "sourceUnitDigest": "f35473b9295a35af",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0012-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0012 is represented by the frozen H3 \"0012 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "764a0029f0ee73f78c522c71e69830fac20871e226b636c7832f1461d0c0c79c",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "11714b19aa507bb442f55941f21882b080057e2d17996697be0342675297f8de",
+    "identityFingerprint": "3f1eadb4609c59b658c49e69de5fe364ccedaf8da07584e251a97446e65458dc",
+    "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
+    "sourceAnchor": "hệ-quả-6",
+    "unitKind": "heading",
+    "sourceUnitDigest": "f35473b9295a35aff0204ba97ea33eb6d3e19a99c6f25796258beb4e73e0e9b2",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Hệ quả",
+      "anchor": "hệ-quả-6",
+      "githubAnchor": "hệ-quả-6",
+      "stableAnchor": "h-9cf1fd52e884",
+      "startLine": 1653,
+      "endLine": 1653,
+      "textDigest": "f35473b9295a35aff0204ba97ea33eb6d3e19a99c6f25796258beb4e73e0e9b2",
+      "sample": "Hệ quả",
+      "sectionPayloadDigest": "f858af63d117df046e6932017f3bad6b157ae3bd935b4d387d0dd3cc5d60e879",
+      "followingBlockDigest": "df6252739cffc35e81a7acce610d94cdb17bf12c53d106820a4b567ffbb55038",
+      "identityFingerprint": "3f1eadb4609c59b658c49e69de5fe364ccedaf8da07584e251a97446e65458dc",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời"
+      ],
+      "text": "#### Hệ quả",
+      "sectionText": "#### Hệ quả\n\n- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record 0012,\n  hàng component §6 (`dep-graph.mjs`) và hàng contract **C2** đều cập nhật để\n  phản ánh bảo đảm phi-chu-trình đã mở rộng sang đồ thị hợp nhất.\n- `waits-for`/`discovered-from` vẫn chỉ là từ vựng khai báo — không producer,\n  không dạng lưu trữ — cho tới S2b (dạng lưu trữ thật; chỗ dành SCHEMA_VERSION\n  cho S2b dời sang 4 vì STR46 đã lấy 3 trước, per str46-io-contract — có\n  producer, và quyết định riêng cho tính chất load-bearing/chặn hay không của\n  `waits-for`).\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0012 Consequences",
+    "anchor": "0012-consequences",
+    "githubAnchor": "0012-consequences",
+    "stableAnchor": "h-2c5ed89177d1",
+    "startLine": 310,
+    "endLine": 310,
+    "textDigest": "764a0029f0ee73f78c522c71e69830fac20871e226b636c7832f1461d0c0c79c",
+    "sample": "0012 Consequences",
+    "sectionPayloadDigest": "f858af63d117df046e6932017f3bad6b157ae3bd935b4d387d0dd3cc5d60e879",
+    "followingBlockDigest": "df6252739cffc35e81a7acce610d94cdb17bf12c53d106820a4b567ffbb55038",
+    "identityFingerprint": "850d746b37c8b4fc1078c148703f2543386de9d80c353652f7d3d2a29a6d8898",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ],
+    "text": "### 0012 Consequences",
+    "sectionText": "### 0012 Consequences\n\n- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record 0012,\n  hàng component §6 (`dep-graph.mjs`) và hàng contract **C2** đều cập nhật để\n  phản ánh bảo đảm phi-chu-trình đã mở rộng sang đồ thị hợp nhất.\n- `waits-for`/`discovered-from` vẫn chỉ là từ vựng khai báo — không producer,\n  không dạng lưu trữ — cho tới S2b (dạng lưu trữ thật; chỗ dành SCHEMA_VERSION\n  cho S2b dời sang 4 vì STR46 đã lấy 3 trước, per str46-io-contract — có\n  producer, và quyết định riêng cho tính chất load-bearing/chặn hay không của\n  `waits-for`).\n\nĐổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0"
+}
+```
+
+## Entry claim_4da244a64b6f33711d89feb47331b4f0
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_4da244a64b6f33711d89feb47331b4f0",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_4da244a64b6f33711d89feb47331b4f0",
+    "sourceUnitDigest": "df6252739cffc35e",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-39",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0012 (source lines 1624-1631, starting \"- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "df6252739cffc35e81a7acce610d94cdb17bf12c53d106820a4b567ffbb55038",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Consequences"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_4da244a64b6f33711d89feb47331b4f0",
+    "sourceUnitDigest": "df6252739cffc35e",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-39",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0012 (source lines 1655-1662, starting \"- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "df6252739cffc35e81a7acce610d94cdb17bf12c53d106820a4b567ffbb55038",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "43da01afcbded08a13e85f39590152590e03ad7a69706b16ea6602bd45a3de55",
+    "identityFingerprint": "43da01afcbded08a13e85f39590152590e03ad7a69706b16ea6602bd45a3de55",
+    "claimId": "claim_4da244a64b6f33711d89feb47331b4f0",
+    "sourceAnchor": "unheaded-block-149",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "df6252739cffc35e81a7acce610d94cdb17bf12c53d106820a4b567ffbb55038",
+    "claimKind": "contract",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-149",
+      "githubAnchor": "unheaded-block-149",
+      "stableAnchor": "unheaded-block-149",
+      "title": "Unheaded block 149",
+      "startLine": 1655,
+      "endLine": 1662,
+      "textDigest": "df6252739cffc35e81a7acce610d94cdb17bf12c53d106820a4b567ffbb55038",
+      "sample": "- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record 0012,\n  hàng component §6 (`dep-graph.mjs`) và hàng contract **C2** đều cập nhật để\n  phản ánh bảo đảm phi-ch",
+      "identityFingerprint": "43da01afcbded08a13e85f39590152590e03ad7a69706b16ea6602bd45a3de55",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Hệ quả"
+      ],
+      "text": "- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record 0012,\n  hàng component §6 (`dep-graph.mjs`) và hàng contract **C2** đều cập nhật để\n  phản ánh bảo đảm phi-chu-trình đã mở rộng sang đồ thị hợp nhất.\n- `waits-for`/`discovered-from` vẫn chỉ là từ vựng khai báo — không producer,\n  không dạng lưu trữ — cho tới S2b (dạng lưu trữ thật; chỗ dành SCHEMA_VERSION\n  cho S2b dời sang 4 vì STR46 đã lấy 3 trước, per str46-io-contract — có\n  producer, và quyết định riêng cho tính chất load-bearing/chặn hay không của\n  `waits-for`)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-39",
+    "githubAnchor": "unheaded-block-39",
+    "stableAnchor": "unheaded-block-39",
+    "title": "Unheaded block 39",
+    "startLine": 312,
+    "endLine": 319,
+    "textDigest": "df6252739cffc35e81a7acce610d94cdb17bf12c53d106820a4b567ffbb55038",
+    "sample": "- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record 0012,\n  hàng component §6 (`dep-graph.mjs`) và hàng contract **C2** đều cập nhật để\n  phản ánh bảo đảm phi-ch",
+    "identityFingerprint": "43da01afcbded08a13e85f39590152590e03ad7a69706b16ea6602bd45a3de55",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Consequences"
+    ],
+    "text": "- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record 0012,\n  hàng component §6 (`dep-graph.mjs`) và hàng contract **C2** đều cập nhật để\n  phản ánh bảo đảm phi-chu-trình đã mở rộng sang đồ thị hợp nhất.\n- `waits-for`/`discovered-from` vẫn chỉ là từ vựng khai báo — không producer,\n  không dạng lưu trữ — cho tới S2b (dạng lưu trữ thật; chỗ dành SCHEMA_VERSION\n  cho S2b dời sang 4 vì STR46 đã lấy 3 trước, per str46-io-contract — có\n  producer, và quyết định riêng cho tính chất load-bearing/chặn hay không của\n  `waits-for`)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-39",
+      "githubAnchor": "unheaded-block-39",
+      "stableAnchor": "unheaded-block-39",
+      "title": "Unheaded block 39",
+      "startLine": 312,
+      "endLine": 319,
+      "textDigest": "df6252739cffc35e81a7acce610d94cdb17bf12c53d106820a4b567ffbb55038",
+      "sample": "- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record 0012,\n  hàng component §6 (`dep-graph.mjs`) và hàng contract **C2** đều cập nhật để\n  phản ánh bảo đảm phi-ch",
+      "identityFingerprint": "43da01afcbded08a13e85f39590152590e03ad7a69706b16ea6602bd45a3de55",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "8. ADR 0012 Unified Typed-Edge Graph Model",
+        "0012 Consequences"
+      ],
+      "text": "- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record 0012,\n  hàng component §6 (`dep-graph.mjs`) và hàng contract **C2** đều cập nhật để\n  phản ánh bảo đảm phi-chu-trình đã mở rộng sang đồ thị hợp nhất.\n- `waits-for`/`discovered-from` vẫn chỉ là từ vựng khai báo — không producer,\n  không dạng lưu trữ — cho tới S2b (dạng lưu trữ thật; chỗ dành SCHEMA_VERSION\n  cho S2b dời sang 4 vì STR46 đã lấy 3 trước, per str46-io-contract — có\n  producer, và quyết định riêng cho tính chất load-bearing/chặn hay không của\n  `waits-for`)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_4da244a64b6f33711d89feb47331b4f0"
+}
+```
+
+## Entry claim_a7c2e1310de5bcd152e86f3833e90033
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_a7c2e1310de5bcd152e86f3833e90033",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_a7c2e1310de5bcd152e86f3833e90033",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-40",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0012 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Consequences"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_a7c2e1310de5bcd152e86f3833e90033",
+    "sourceUnitDigest": "95a357e29712c3c0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-40",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Supersession-rule line of ADR 0012 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "claimId": "claim_a7c2e1310de5bcd152e86f3833e90033",
+    "sourceAnchor": "unheaded-block-150",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "claimKind": "specification",
+    "status": "current",
+    "identityStatus": "carried-forward",
+    "pairedByAnchor": true
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-150",
+      "githubAnchor": "unheaded-block-150",
+      "stableAnchor": "unheaded-block-150",
+      "title": "Unheaded block 150",
+      "startLine": 1664,
+      "endLine": 1664,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+        "Hệ quả"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-40",
+    "githubAnchor": "unheaded-block-40",
+    "stableAnchor": "unheaded-block-40",
+    "title": "Unheaded block 40",
+    "startLine": 321,
+    "endLine": 321,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model",
+      "0012 Consequences"
+    ],
+    "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "target digest repeats; ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-7",
+      "githubAnchor": "unheaded-block-7",
+      "stableAnchor": "unheaded-block-7",
+      "title": "Unheaded block 7",
+      "startLine": 60,
+      "endLine": 60,
+      "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+      "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "2. ADR 0002 Flat Work Model",
+        "0002 Consequences"
+      ],
+      "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_a7c2e1310de5bcd152e86f3833e90033"
+}
+```
+
+## Entry claim_2d27908b73621a411fcf708b067b6ba2
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
+    "sourceUnitDigest": "f529cf675d973db5",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "9-adr-0013-report-not-write-channel-for-discovered-from",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0013 title heading is represented by the frozen H2 \"9. ADR 0013 ...\" (9-adr-0013-report-not-write-channel-for-discovered-from); title is renumbered and re-worded in English, text of the record is unchanged. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "bb9207e0916a5823e45378afb7d0247d511cb2bf870386fdefd982d8a17e51cb",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
+    "sourceUnitDigest": "f529cf675d973db5",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "9-adr-0013-report-not-write-channel-for-discovered-from",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0013 title heading is represented by the frozen H2 \"9. ADR 0013 ...\" (9-adr-0013-report-not-write-channel-for-discovered-from); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "bb9207e0916a5823e45378afb7d0247d511cb2bf870386fdefd982d8a17e51cb",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "ba948dddc7e7719aa9db97a29db44b1433a196f484598218e215d494db487548",
+    "identityFingerprint": "f6161fd376114ac97e80e44e65c359c5410590a07b8f7ee71881b37717f69156",
+    "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
+    "sourceAnchor": "0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from",
+    "unitKind": "heading",
+    "sourceUnitDigest": "f529cf675d973db5c441eb564349795365a178af00c24a64574e719574a90d9a",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 3,
+      "title": "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+      "anchor": "0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from",
+      "githubAnchor": "0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from",
+      "stableAnchor": "h-f5598df50e5f",
+      "startLine": 1666,
+      "endLine": 1666,
+      "textDigest": "f529cf675d973db5c441eb564349795365a178af00c24a64574e719574a90d9a",
+      "sample": "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+      "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followingBlockDigest": null,
+      "identityFingerprint": "f6161fd376114ac97e80e44e65c359c5410590a07b8f7ee71881b37717f69156",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng"
+      ],
+      "text": "### 0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+      "sectionText": "### 0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+    "anchor": "9-adr-0013-report-not-write-channel-for-discovered-from",
+    "githubAnchor": "9-adr-0013-report-not-write-channel-for-discovered-from",
+    "stableAnchor": "h-489d09642599",
+    "startLine": 323,
+    "endLine": 323,
+    "textDigest": "bb9207e0916a5823e45378afb7d0247d511cb2bf870386fdefd982d8a17e51cb",
+    "sample": "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "b59a30f8dc890511a3cb31c3e9d9511e8e12e6d7f1a4e635a1b7b2c905d2c446",
+    "ancestry": [
+      "Retired Decision History: Work State"
+    ],
+    "text": "## 9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+    "sectionText": "## 9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_2d27908b73621a411fcf708b067b6ba2"
+}
+```
+
+## Entry claim_e68c14be45a430e3676761d7bdc9e6db
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
+    "sourceUnitDigest": "31a7f48e9cc16169",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0013 is represented by the frozen H3 \"0013 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "39a94a27f6e89fec290ba89590cff97929d9c7625c0ad041e4bb461c53fe5d61",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
+    "sourceUnitDigest": "31a7f48e9cc16169",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0013 is represented by the frozen H3 \"0013 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "39a94a27f6e89fec290ba89590cff97929d9c7625c0ad041e4bb461c53fe5d61",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "c675203e370f7af5b27b1d83fb1802e3a38a6aaea4bafe492bcbeb506c179683",
+    "identityFingerprint": "63157e22bc559394a0ee2d777ace98754d9f1e06afb94d8340061b7198f8e41b",
+    "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
+    "sourceAnchor": "bối-cảnh-7",
+    "unitKind": "heading",
+    "sourceUnitDigest": "31a7f48e9cc16169ae86eca79b0e4f00c8db944f0459f712a74075403989eefe",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Bối cảnh",
+      "anchor": "bối-cảnh-7",
+      "githubAnchor": "bối-cảnh-7",
+      "stableAnchor": "h-1147b40924ad",
+      "startLine": 1668,
+      "endLine": 1668,
+      "textDigest": "31a7f48e9cc16169ae86eca79b0e4f00c8db944f0459f712a74075403989eefe",
+      "sample": "Bối cảnh",
+      "sectionPayloadDigest": "1ba92a4902c06a083fb36e6a83b256ae4a353f1b4c36acf310fabc4f67fc388e",
+      "followingBlockDigest": "a00c0f5592ff571cf91553ec9c8faad0802584c313d21071375ff8d6f8405ece",
+      "identityFingerprint": "63157e22bc559394a0ee2d777ace98754d9f1e06afb94d8340061b7198f8e41b",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`"
+      ],
+      "text": "#### Bối cảnh",
+      "sectionText": "#### Bối cảnh\n\nwork-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage phi-chặn\nghi lại \"việc này lộ ra trong lúc làm việc kia\". Trường đã có hai nhà sản xuất:\n(A) cờ tường minh `fgos add/submit --discovered-from <id>` (người/agent gọi tay,\ncell wgi-7); (B) **tự động từ runner** — khi một worker đang chạy một việc phát\nhiện ra một đơn vị công việc mới đáng tồn tại riêng.\n\nNhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà ghi duy nhất**\ntrong suốt một lượt dispatch (C2). Prompt của worker cấm nó gọi `fgos` hay ghi\n`.fgos/` (`dispatch.mjs`), và lượt spawn không truyền cho worker id của việc đang\nchạy dưới dạng ngữ cảnh ghi được. Nếu để worker tự tạo item, ta phá vỡ\nrunner-một-cửa-ghi và mất luôn tính tái lập của goal-check (chỉ `verify` mới phán\nviệc worker làm, không phải report của nó)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0013 Context",
+    "anchor": "0013-context",
+    "githubAnchor": "0013-context",
+    "stableAnchor": "h-c2b69a3ca5c1",
+    "startLine": 325,
+    "endLine": 325,
+    "textDigest": "39a94a27f6e89fec290ba89590cff97929d9c7625c0ad041e4bb461c53fe5d61",
+    "sample": "0013 Context",
+    "sectionPayloadDigest": "1ba92a4902c06a083fb36e6a83b256ae4a353f1b4c36acf310fabc4f67fc388e",
+    "followingBlockDigest": "a00c0f5592ff571cf91553ec9c8faad0802584c313d21071375ff8d6f8405ece",
+    "identityFingerprint": "fbd5eb86ef120398bc0692017840bc15c9f57c1b4a11cad6689901bbbe28fa7d",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "text": "### 0013 Context",
+    "sectionText": "### 0013 Context\n\nwork-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage phi-chặn\nghi lại \"việc này lộ ra trong lúc làm việc kia\". Trường đã có hai nhà sản xuất:\n(A) cờ tường minh `fgos add/submit --discovered-from <id>` (người/agent gọi tay,\ncell wgi-7); (B) **tự động từ runner** — khi một worker đang chạy một việc phát\nhiện ra một đơn vị công việc mới đáng tồn tại riêng.\n\nNhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà ghi duy nhất**\ntrong suốt một lượt dispatch (C2). Prompt của worker cấm nó gọi `fgos` hay ghi\n`.fgos/` (`dispatch.mjs`), và lượt spawn không truyền cho worker id của việc đang\nchạy dưới dạng ngữ cảnh ghi được. Nếu để worker tự tạo item, ta phá vỡ\nrunner-một-cửa-ghi và mất luôn tính tái lập của goal-check (chỉ `verify` mới phán\nviệc worker làm, không phải report của nó)."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_e68c14be45a430e3676761d7bdc9e6db"
+}
+```
+
+## Entry claim_62c3b825e8cc887ad822b8d1b5316769
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_62c3b825e8cc887ad822b8d1b5316769",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_62c3b825e8cc887ad822b8d1b5316769",
+    "sourceUnitDigest": "a00c0f5592ff571c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-41",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1639-1643, starting \"work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "a00c0f5592ff571cf91553ec9c8faad0802584c313d21071375ff8d6f8405ece",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_62c3b825e8cc887ad822b8d1b5316769",
+    "sourceUnitDigest": "a00c0f5592ff571c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-41",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1670-1674, starting \"work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "a00c0f5592ff571cf91553ec9c8faad0802584c313d21071375ff8d6f8405ece",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "66567780211ca1617e71dace7669aa258fd71e22aa7d48475b1e7c90906108aa",
+    "identityFingerprint": "66567780211ca1617e71dace7669aa258fd71e22aa7d48475b1e7c90906108aa",
+    "claimId": "claim_62c3b825e8cc887ad822b8d1b5316769",
+    "sourceAnchor": "unheaded-block-151",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a00c0f5592ff571cf91553ec9c8faad0802584c313d21071375ff8d6f8405ece",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-151",
+      "githubAnchor": "unheaded-block-151",
+      "stableAnchor": "unheaded-block-151",
+      "title": "Unheaded block 151",
+      "startLine": 1670,
+      "endLine": 1674,
+      "textDigest": "a00c0f5592ff571cf91553ec9c8faad0802584c313d21071375ff8d6f8405ece",
+      "sample": "work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage phi-chặn\nghi lại \"việc này lộ ra trong lúc làm việc kia\". Trường đã có hai nhà sản xuất:\n(A) cờ tường minh `f",
+      "identityFingerprint": "66567780211ca1617e71dace7669aa258fd71e22aa7d48475b1e7c90906108aa",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Bối cảnh"
+      ],
+      "text": "work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage phi-chặn\nghi lại \"việc này lộ ra trong lúc làm việc kia\". Trường đã có hai nhà sản xuất:\n(A) cờ tường minh `fgos add/submit --discovered-from <id>` (người/agent gọi tay,\ncell wgi-7); (B) **tự động từ runner** — khi một worker đang chạy một việc phát\nhiện ra một đơn vị công việc mới đáng tồn tại riêng."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-41",
+    "githubAnchor": "unheaded-block-41",
+    "stableAnchor": "unheaded-block-41",
+    "title": "Unheaded block 41",
+    "startLine": 327,
+    "endLine": 331,
+    "textDigest": "a00c0f5592ff571cf91553ec9c8faad0802584c313d21071375ff8d6f8405ece",
+    "sample": "work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage phi-chặn\nghi lại \"việc này lộ ra trong lúc làm việc kia\". Trường đã có hai nhà sản xuất:\n(A) cờ tường minh `f",
+    "identityFingerprint": "66567780211ca1617e71dace7669aa258fd71e22aa7d48475b1e7c90906108aa",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Context"
+    ],
+    "text": "work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage phi-chặn\nghi lại \"việc này lộ ra trong lúc làm việc kia\". Trường đã có hai nhà sản xuất:\n(A) cờ tường minh `fgos add/submit --discovered-from <id>` (người/agent gọi tay,\ncell wgi-7); (B) **tự động từ runner** — khi một worker đang chạy một việc phát\nhiện ra một đơn vị công việc mới đáng tồn tại riêng."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-41",
+      "githubAnchor": "unheaded-block-41",
+      "stableAnchor": "unheaded-block-41",
+      "title": "Unheaded block 41",
+      "startLine": 327,
+      "endLine": 331,
+      "textDigest": "a00c0f5592ff571cf91553ec9c8faad0802584c313d21071375ff8d6f8405ece",
+      "sample": "work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage phi-chặn\nghi lại \"việc này lộ ra trong lúc làm việc kia\". Trường đã có hai nhà sản xuất:\n(A) cờ tường minh `f",
+      "identityFingerprint": "66567780211ca1617e71dace7669aa258fd71e22aa7d48475b1e7c90906108aa",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Context"
+      ],
+      "text": "work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage phi-chặn\nghi lại \"việc này lộ ra trong lúc làm việc kia\". Trường đã có hai nhà sản xuất:\n(A) cờ tường minh `fgos add/submit --discovered-from <id>` (người/agent gọi tay,\ncell wgi-7); (B) **tự động từ runner** — khi một worker đang chạy một việc phát\nhiện ra một đơn vị công việc mới đáng tồn tại riêng."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_62c3b825e8cc887ad822b8d1b5316769"
+}
+```
+
+## Entry claim_2591914de0c8f3b95488576fb8643dfb
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_2591914de0c8f3b95488576fb8643dfb",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_2591914de0c8f3b95488576fb8643dfb",
+    "sourceUnitDigest": "ad532d04b4ed0695",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-42",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1645-1650, starting \"Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà gh\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "ad532d04b4ed06951112d9fecaf1464867e47d988b18f9cfadf0dc88d059f767",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Context"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_2591914de0c8f3b95488576fb8643dfb",
+    "sourceUnitDigest": "ad532d04b4ed0695",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-42",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1676-1681, starting \"Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà gh\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "ad532d04b4ed06951112d9fecaf1464867e47d988b18f9cfadf0dc88d059f767",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Context"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "bcb661e60e7bebd2791e42642ec4929e6a17b2756015f62093e5b81b1208523f",
+    "identityFingerprint": "bcb661e60e7bebd2791e42642ec4929e6a17b2756015f62093e5b81b1208523f",
+    "claimId": "claim_2591914de0c8f3b95488576fb8643dfb",
+    "sourceAnchor": "unheaded-block-152",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "ad532d04b4ed06951112d9fecaf1464867e47d988b18f9cfadf0dc88d059f767",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-152",
+      "githubAnchor": "unheaded-block-152",
+      "stableAnchor": "unheaded-block-152",
+      "title": "Unheaded block 152",
+      "startLine": 1676,
+      "endLine": 1681,
+      "textDigest": "ad532d04b4ed06951112d9fecaf1464867e47d988b18f9cfadf0dc88d059f767",
+      "sample": "Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà ghi duy nhất**\ntrong suốt một lượt dispatch (C2). Prompt của worker cấm nó gọi `fgos` hay ghi\n`.fgos/` (`dispatc",
+      "identityFingerprint": "bcb661e60e7bebd2791e42642ec4929e6a17b2756015f62093e5b81b1208523f",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Bối cảnh"
+      ],
+      "text": "Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà ghi duy nhất**\ntrong suốt một lượt dispatch (C2). Prompt của worker cấm nó gọi `fgos` hay ghi\n`.fgos/` (`dispatch.mjs`), và lượt spawn không truyền cho worker id của việc đang\nchạy dưới dạng ngữ cảnh ghi được. Nếu để worker tự tạo item, ta phá vỡ\nrunner-một-cửa-ghi và mất luôn tính tái lập của goal-check (chỉ `verify` mới phán\nviệc worker làm, không phải report của nó)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-42",
+    "githubAnchor": "unheaded-block-42",
+    "stableAnchor": "unheaded-block-42",
+    "title": "Unheaded block 42",
+    "startLine": 333,
+    "endLine": 338,
+    "textDigest": "ad532d04b4ed06951112d9fecaf1464867e47d988b18f9cfadf0dc88d059f767",
+    "sample": "Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà ghi duy nhất**\ntrong suốt một lượt dispatch (C2). Prompt của worker cấm nó gọi `fgos` hay ghi\n`.fgos/` (`dispatc",
+    "identityFingerprint": "bcb661e60e7bebd2791e42642ec4929e6a17b2756015f62093e5b81b1208523f",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Context"
+    ],
+    "text": "Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà ghi duy nhất**\ntrong suốt một lượt dispatch (C2). Prompt của worker cấm nó gọi `fgos` hay ghi\n`.fgos/` (`dispatch.mjs`), và lượt spawn không truyền cho worker id của việc đang\nchạy dưới dạng ngữ cảnh ghi được. Nếu để worker tự tạo item, ta phá vỡ\nrunner-một-cửa-ghi và mất luôn tính tái lập của goal-check (chỉ `verify` mới phán\nviệc worker làm, không phải report của nó)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-42",
+      "githubAnchor": "unheaded-block-42",
+      "stableAnchor": "unheaded-block-42",
+      "title": "Unheaded block 42",
+      "startLine": 333,
+      "endLine": 338,
+      "textDigest": "ad532d04b4ed06951112d9fecaf1464867e47d988b18f9cfadf0dc88d059f767",
+      "sample": "Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà ghi duy nhất**\ntrong suốt một lượt dispatch (C2). Prompt của worker cấm nó gọi `fgos` hay ghi\n`.fgos/` (`dispatc",
+      "identityFingerprint": "bcb661e60e7bebd2791e42642ec4929e6a17b2756015f62093e5b81b1208523f",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Context"
+      ],
+      "text": "Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà ghi duy nhất**\ntrong suốt một lượt dispatch (C2). Prompt của worker cấm nó gọi `fgos` hay ghi\n`.fgos/` (`dispatch.mjs`), và lượt spawn không truyền cho worker id của việc đang\nchạy dưới dạng ngữ cảnh ghi được. Nếu để worker tự tạo item, ta phá vỡ\nrunner-một-cửa-ghi và mất luôn tính tái lập của goal-check (chỉ `verify` mới phán\nviệc worker làm, không phải report của nó)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_2591914de0c8f3b95488576fb8643dfb"
+}
+```
+
+## Entry claim_1f9265c6ad8bc4b9e8cf754fb1b8b164
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
+    "sourceUnitDigest": "9b836a5af7fa427d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0013 is represented by the frozen H3 \"0013 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "dc61b855030de6ec8c01fd1fd46215522d2327be9adb6c025724d974f8843b8e",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
+    "sourceUnitDigest": "9b836a5af7fa427d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0013 is represented by the frozen H3 \"0013 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "dc61b855030de6ec8c01fd1fd46215522d2327be9adb6c025724d974f8843b8e",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "2894743c491e49036c822f01fc8854b670f31f99024b9766e6bb437937f028cc",
+    "identityFingerprint": "e7b5f4b75ae6118de1ce78865f874d1a8b42b9dfadacbd2bfc06d82afb1f8650",
+    "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
+    "sourceAnchor": "quyết-định-7",
+    "unitKind": "heading",
+    "sourceUnitDigest": "9b836a5af7fa427d6991eaabe7781f566d664801b58ca1f13b67277ea39ad7f0",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Quyết định",
+      "anchor": "quyết-định-7",
+      "githubAnchor": "quyết-định-7",
+      "stableAnchor": "h-be87f4f2c1d8",
+      "startLine": 1683,
+      "endLine": 1683,
+      "textDigest": "9b836a5af7fa427d6991eaabe7781f566d664801b58ca1f13b67277ea39ad7f0",
+      "sample": "Quyết định",
+      "sectionPayloadDigest": "a3ce0769f7273c842c7ff47c45a2edbb6911935df8cf4bf1a4df905d9028a067",
+      "followingBlockDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c42ef591a0edaee116811a00ba808d373",
+      "identityFingerprint": "e7b5f4b75ae6118de1ce78865f874d1a8b42b9dfadacbd2bfc06d82afb1f8650",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`"
+      ],
+      "text": "#### Quyết định",
+      "sectionText": "#### Quyết định\n\nPhát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worker và runner,\nmở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:\n\n1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kênh: worker\n   CÓ THỂ phát một hay nhiều khối rào `fgos-discovered` trong output của nó\n   (JSON: `title` bắt buộc; `kind`/`risk`/`description` tuỳ chọn) để nêu một việc\n   mới phát hiện. Đây là dữ liệu, KHÔNG phải lệnh ghi — worker vẫn KHÔNG BAO GIỜ\n   gọi `fgos` hay chạm `.fgos/`. Ràng buộc này giữ nguyên từng chữ.\n\n2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse các khối\n   `fgos-discovered` từ output đã bắt của worker **đúng một lần mỗi lượt dispatch,\n   tại kết cục cuối** (không parse trong mỗi lần retry — nếu không một khối lặp\n   lại sẽ đúc ra item trùng qua `generateId`). Parse phủ **cả hai** nguồn output:\n   `worker.stdout` (đường thành-đề-xuất/chấm-trượt) VÀ `err.stdout` (đường\n   quá-giờ/hỏng-spawn — một worker quá giờ vẫn có thể đã nêu việc).\n\n3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không phải object\n   → log rồi bỏ qua; parser KHÔNG BAO GIỜ throw, KHÔNG BAO GIỜ đổi kết cục của\n   worker hay luồng điều khiển của dispatch. Một report méo không bao giờ làm\n   trật một lượt dispatch.\n\n4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(title)` +\n   `classify(title)` cho tier/kind/risk (giá trị trong khối ghi đè), một `verify`\n   placeholder DÙNG CHUNG (`FALLBACK_VERIFY` từ `discovery.mjs` — không nhân bản\n   literal), `status: 'todo'`, `stage: 'clarify'` (để context-discovery sau đó gắn\n   `verify` thật, y như một item submit), `deps: []`, `refs: []`,\n   `discoveredFrom = item.id` của việc đang chạy. Mọi lần ghi đi qua\n   `queue.enqueue` (cửa ghi tuần-tự-hoá), không bao giờ `addWork` thô — an toàn\n   fan-out."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0013 Decision",
+    "anchor": "0013-decision",
+    "githubAnchor": "0013-decision",
+    "stableAnchor": "h-c6502a3be122",
+    "startLine": 340,
+    "endLine": 340,
+    "textDigest": "dc61b855030de6ec8c01fd1fd46215522d2327be9adb6c025724d974f8843b8e",
+    "sample": "0013 Decision",
+    "sectionPayloadDigest": "a3ce0769f7273c842c7ff47c45a2edbb6911935df8cf4bf1a4df905d9028a067",
+    "followingBlockDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c42ef591a0edaee116811a00ba808d373",
+    "identityFingerprint": "d62933e973bef28dc22b9209e0090def41914f36f671e777990e96db5ba8320e",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "text": "### 0013 Decision",
+    "sectionText": "### 0013 Decision\n\nPhát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worker và runner,\nmở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:\n\n1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kênh: worker\n   CÓ THỂ phát một hay nhiều khối rào `fgos-discovered` trong output của nó\n   (JSON: `title` bắt buộc; `kind`/`risk`/`description` tuỳ chọn) để nêu một việc\n   mới phát hiện. Đây là dữ liệu, KHÔNG phải lệnh ghi — worker vẫn KHÔNG BAO GIỜ\n   gọi `fgos` hay chạm `.fgos/`. Ràng buộc này giữ nguyên từng chữ.\n\n2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse các khối\n   `fgos-discovered` từ output đã bắt của worker **đúng một lần mỗi lượt dispatch,\n   tại kết cục cuối** (không parse trong mỗi lần retry — nếu không một khối lặp\n   lại sẽ đúc ra item trùng qua `generateId`). Parse phủ **cả hai** nguồn output:\n   `worker.stdout` (đường thành-đề-xuất/chấm-trượt) VÀ `err.stdout` (đường\n   quá-giờ/hỏng-spawn — một worker quá giờ vẫn có thể đã nêu việc).\n\n3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không phải object\n   → log rồi bỏ qua; parser KHÔNG BAO GIỜ throw, KHÔNG BAO GIỜ đổi kết cục của\n   worker hay luồng điều khiển của dispatch. Một report méo không bao giờ làm\n   trật một lượt dispatch.\n\n4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(title)` +\n   `classify(title)` cho tier/kind/risk (giá trị trong khối ghi đè), một `verify`\n   placeholder DÙNG CHUNG (`FALLBACK_VERIFY` từ `discovery.mjs` — không nhân bản\n   literal), `status: 'todo'`, `stage: 'clarify'` (để context-discovery sau đó gắn\n   `verify` thật, y như một item submit), `deps: []`, `refs: []`,\n   `discoveredFrom = item.id` của việc đang chạy. Mọi lần ghi đi qua\n   `queue.enqueue` (cửa ghi tuần-tự-hoá), không bao giờ `addWork` thô — an toàn\n   fan-out."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164"
+}
+```
+
+## Entry claim_e2589be21644922e0424a20d39bbd6e3
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e2589be21644922e0424a20d39bbd6e3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_e2589be21644922e0424a20d39bbd6e3",
+    "sourceUnitDigest": "c56d7ec3b4f47f64",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-43",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1654-1655, starting \"Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worke\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c42ef591a0edaee116811a00ba808d373",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_e2589be21644922e0424a20d39bbd6e3",
+    "sourceUnitDigest": "c56d7ec3b4f47f64",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-43",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1685-1686, starting \"Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worke\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c42ef591a0edaee116811a00ba808d373",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "7cdcb90c224861fcbcfebd11d904d410fff4ae87d169f1740d242786997b7842",
+    "identityFingerprint": "7cdcb90c224861fcbcfebd11d904d410fff4ae87d169f1740d242786997b7842",
+    "claimId": "claim_e2589be21644922e0424a20d39bbd6e3",
+    "sourceAnchor": "unheaded-block-153",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c42ef591a0edaee116811a00ba808d373",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-153",
+      "githubAnchor": "unheaded-block-153",
+      "stableAnchor": "unheaded-block-153",
+      "title": "Unheaded block 153",
+      "startLine": 1685,
+      "endLine": 1686,
+      "textDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c42ef591a0edaee116811a00ba808d373",
+      "sample": "Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worker và runner,\nmở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:",
+      "identityFingerprint": "7cdcb90c224861fcbcfebd11d904d410fff4ae87d169f1740d242786997b7842",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Quyết định"
+      ],
+      "text": "Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worker và runner,\nmở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:"
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-43",
+    "githubAnchor": "unheaded-block-43",
+    "stableAnchor": "unheaded-block-43",
+    "title": "Unheaded block 43",
+    "startLine": 342,
+    "endLine": 343,
+    "textDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c42ef591a0edaee116811a00ba808d373",
+    "sample": "Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worker và runner,\nmở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:",
+    "identityFingerprint": "7cdcb90c224861fcbcfebd11d904d410fff4ae87d169f1740d242786997b7842",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ],
+    "text": "Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worker và runner,\nmở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:"
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-43",
+      "githubAnchor": "unheaded-block-43",
+      "stableAnchor": "unheaded-block-43",
+      "title": "Unheaded block 43",
+      "startLine": 342,
+      "endLine": 343,
+      "textDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c42ef591a0edaee116811a00ba808d373",
+      "sample": "Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worker và runner,\nmở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:",
+      "identityFingerprint": "7cdcb90c224861fcbcfebd11d904d410fff4ae87d169f1740d242786997b7842",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Decision"
+      ],
+      "text": "Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worker và runner,\nmở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:"
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_e2589be21644922e0424a20d39bbd6e3"
+}
+```
+
+## Entry claim_ebf8d11889aea2db10db3f7d03fb7d50
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_ebf8d11889aea2db10db3f7d03fb7d50",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_ebf8d11889aea2db10db3f7d03fb7d50",
+    "sourceUnitDigest": "f17f548794a78bbc",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-44",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1657-1661, starting \"1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kê\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "f17f548794a78bbc05c2553918d93b56d0f307ea02732dcd113f04c48e8bd0f9",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_ebf8d11889aea2db10db3f7d03fb7d50",
+    "sourceUnitDigest": "f17f548794a78bbc",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-44",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1688-1692, starting \"1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kê\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "f17f548794a78bbc05c2553918d93b56d0f307ea02732dcd113f04c48e8bd0f9",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "37299b6d237ec63f2a45c7d71cb9de991231b9b6f7695baea3cc7e31f8ce5522",
+    "identityFingerprint": "37299b6d237ec63f2a45c7d71cb9de991231b9b6f7695baea3cc7e31f8ce5522",
+    "claimId": "claim_ebf8d11889aea2db10db3f7d03fb7d50",
+    "sourceAnchor": "unheaded-block-154",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "f17f548794a78bbc05c2553918d93b56d0f307ea02732dcd113f04c48e8bd0f9",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-154",
+      "githubAnchor": "unheaded-block-154",
+      "stableAnchor": "unheaded-block-154",
+      "title": "Unheaded block 154",
+      "startLine": 1688,
+      "endLine": 1692,
+      "textDigest": "f17f548794a78bbc05c2553918d93b56d0f307ea02732dcd113f04c48e8bd0f9",
+      "sample": "1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kênh: worker\n   CÓ THỂ phát một hay nhiều khối rào `fgos-discovered` trong output của nó\n   (JSON: `title` bắt b",
+      "identityFingerprint": "37299b6d237ec63f2a45c7d71cb9de991231b9b6f7695baea3cc7e31f8ce5522",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Quyết định"
+      ],
+      "text": "1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kênh: worker\n   CÓ THỂ phát một hay nhiều khối rào `fgos-discovered` trong output của nó\n   (JSON: `title` bắt buộc; `kind`/`risk`/`description` tuỳ chọn) để nêu một việc\n   mới phát hiện. Đây là dữ liệu, KHÔNG phải lệnh ghi — worker vẫn KHÔNG BAO GIỜ\n   gọi `fgos` hay chạm `.fgos/`. Ràng buộc này giữ nguyên từng chữ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-44",
+    "githubAnchor": "unheaded-block-44",
+    "stableAnchor": "unheaded-block-44",
+    "title": "Unheaded block 44",
+    "startLine": 345,
+    "endLine": 349,
+    "textDigest": "f17f548794a78bbc05c2553918d93b56d0f307ea02732dcd113f04c48e8bd0f9",
+    "sample": "1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kênh: worker\n   CÓ THỂ phát một hay nhiều khối rào `fgos-discovered` trong output của nó\n   (JSON: `title` bắt b",
+    "identityFingerprint": "37299b6d237ec63f2a45c7d71cb9de991231b9b6f7695baea3cc7e31f8ce5522",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ],
+    "text": "1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kênh: worker\n   CÓ THỂ phát một hay nhiều khối rào `fgos-discovered` trong output của nó\n   (JSON: `title` bắt buộc; `kind`/`risk`/`description` tuỳ chọn) để nêu một việc\n   mới phát hiện. Đây là dữ liệu, KHÔNG phải lệnh ghi — worker vẫn KHÔNG BAO GIỜ\n   gọi `fgos` hay chạm `.fgos/`. Ràng buộc này giữ nguyên từng chữ."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-44",
+      "githubAnchor": "unheaded-block-44",
+      "stableAnchor": "unheaded-block-44",
+      "title": "Unheaded block 44",
+      "startLine": 345,
+      "endLine": 349,
+      "textDigest": "f17f548794a78bbc05c2553918d93b56d0f307ea02732dcd113f04c48e8bd0f9",
+      "sample": "1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kênh: worker\n   CÓ THỂ phát một hay nhiều khối rào `fgos-discovered` trong output của nó\n   (JSON: `title` bắt b",
+      "identityFingerprint": "37299b6d237ec63f2a45c7d71cb9de991231b9b6f7695baea3cc7e31f8ce5522",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Decision"
+      ],
+      "text": "1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kênh: worker\n   CÓ THỂ phát một hay nhiều khối rào `fgos-discovered` trong output của nó\n   (JSON: `title` bắt buộc; `kind`/`risk`/`description` tuỳ chọn) để nêu một việc\n   mới phát hiện. Đây là dữ liệu, KHÔNG phải lệnh ghi — worker vẫn KHÔNG BAO GIỜ\n   gọi `fgos` hay chạm `.fgos/`. Ràng buộc này giữ nguyên từng chữ."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_ebf8d11889aea2db10db3f7d03fb7d50"
+}
+```
+
+## Entry claim_afaa4b9499e137528bcf889ef6ef93f0
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_afaa4b9499e137528bcf889ef6ef93f0",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_afaa4b9499e137528bcf889ef6ef93f0",
+    "sourceUnitDigest": "fe25484d362341cc",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-45",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1663-1668, starting \"2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse cá\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "fe25484d362341cc389e461a59cba3bbc6a065c6998456273f1a1956c993931d",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_afaa4b9499e137528bcf889ef6ef93f0",
+    "sourceUnitDigest": "fe25484d362341cc",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-45",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1694-1699, starting \"2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse cá\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "fe25484d362341cc389e461a59cba3bbc6a065c6998456273f1a1956c993931d",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "c8fe845ebe1e56fe2483304a05fd8f05bca67598a318124f2842632ff2f31ed7",
+    "identityFingerprint": "c8fe845ebe1e56fe2483304a05fd8f05bca67598a318124f2842632ff2f31ed7",
+    "claimId": "claim_afaa4b9499e137528bcf889ef6ef93f0",
+    "sourceAnchor": "unheaded-block-155",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "fe25484d362341cc389e461a59cba3bbc6a065c6998456273f1a1956c993931d",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-155",
+      "githubAnchor": "unheaded-block-155",
+      "stableAnchor": "unheaded-block-155",
+      "title": "Unheaded block 155",
+      "startLine": 1694,
+      "endLine": 1699,
+      "textDigest": "fe25484d362341cc389e461a59cba3bbc6a065c6998456273f1a1956c993931d",
+      "sample": "2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse các khối\n   `fgos-discovered` từ output đã bắt của worker **đúng một lần mỗi lượt dispatch,\n   tại kết cục cuối*",
+      "identityFingerprint": "c8fe845ebe1e56fe2483304a05fd8f05bca67598a318124f2842632ff2f31ed7",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Quyết định"
+      ],
+      "text": "2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse các khối\n   `fgos-discovered` từ output đã bắt của worker **đúng một lần mỗi lượt dispatch,\n   tại kết cục cuối** (không parse trong mỗi lần retry — nếu không một khối lặp\n   lại sẽ đúc ra item trùng qua `generateId`). Parse phủ **cả hai** nguồn output:\n   `worker.stdout` (đường thành-đề-xuất/chấm-trượt) VÀ `err.stdout` (đường\n   quá-giờ/hỏng-spawn — một worker quá giờ vẫn có thể đã nêu việc)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-45",
+    "githubAnchor": "unheaded-block-45",
+    "stableAnchor": "unheaded-block-45",
+    "title": "Unheaded block 45",
+    "startLine": 351,
+    "endLine": 356,
+    "textDigest": "fe25484d362341cc389e461a59cba3bbc6a065c6998456273f1a1956c993931d",
+    "sample": "2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse các khối\n   `fgos-discovered` từ output đã bắt của worker **đúng một lần mỗi lượt dispatch,\n   tại kết cục cuối*",
+    "identityFingerprint": "c8fe845ebe1e56fe2483304a05fd8f05bca67598a318124f2842632ff2f31ed7",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ],
+    "text": "2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse các khối\n   `fgos-discovered` từ output đã bắt của worker **đúng một lần mỗi lượt dispatch,\n   tại kết cục cuối** (không parse trong mỗi lần retry — nếu không một khối lặp\n   lại sẽ đúc ra item trùng qua `generateId`). Parse phủ **cả hai** nguồn output:\n   `worker.stdout` (đường thành-đề-xuất/chấm-trượt) VÀ `err.stdout` (đường\n   quá-giờ/hỏng-spawn — một worker quá giờ vẫn có thể đã nêu việc)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-45",
+      "githubAnchor": "unheaded-block-45",
+      "stableAnchor": "unheaded-block-45",
+      "title": "Unheaded block 45",
+      "startLine": 351,
+      "endLine": 356,
+      "textDigest": "fe25484d362341cc389e461a59cba3bbc6a065c6998456273f1a1956c993931d",
+      "sample": "2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse các khối\n   `fgos-discovered` từ output đã bắt của worker **đúng một lần mỗi lượt dispatch,\n   tại kết cục cuối*",
+      "identityFingerprint": "c8fe845ebe1e56fe2483304a05fd8f05bca67598a318124f2842632ff2f31ed7",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Decision"
+      ],
+      "text": "2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse các khối\n   `fgos-discovered` từ output đã bắt của worker **đúng một lần mỗi lượt dispatch,\n   tại kết cục cuối** (không parse trong mỗi lần retry — nếu không một khối lặp\n   lại sẽ đúc ra item trùng qua `generateId`). Parse phủ **cả hai** nguồn output:\n   `worker.stdout` (đường thành-đề-xuất/chấm-trượt) VÀ `err.stdout` (đường\n   quá-giờ/hỏng-spawn — một worker quá giờ vẫn có thể đã nêu việc)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_afaa4b9499e137528bcf889ef6ef93f0"
+}
+```
+
+## Entry claim_185e1f6f4d1ef50fead4ce341980898d
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_185e1f6f4d1ef50fead4ce341980898d",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_185e1f6f4d1ef50fead4ce341980898d",
+    "sourceUnitDigest": "a25b933f983753d9",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-46",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1670-1673, starting \"3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "a25b933f983753d92ab77173127f6af159da4cf1b259bcdf6bcb8a8ba0ada695",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_185e1f6f4d1ef50fead4ce341980898d",
+    "sourceUnitDigest": "a25b933f983753d9",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-46",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1701-1704, starting \"3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "a25b933f983753d92ab77173127f6af159da4cf1b259bcdf6bcb8a8ba0ada695",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "84a3c32a6b3d89ad48edbfc9c674b030a4353dd03c7ab191b5864f18a241a703",
+    "identityFingerprint": "84a3c32a6b3d89ad48edbfc9c674b030a4353dd03c7ab191b5864f18a241a703",
+    "claimId": "claim_185e1f6f4d1ef50fead4ce341980898d",
+    "sourceAnchor": "unheaded-block-156",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a25b933f983753d92ab77173127f6af159da4cf1b259bcdf6bcb8a8ba0ada695",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-156",
+      "githubAnchor": "unheaded-block-156",
+      "stableAnchor": "unheaded-block-156",
+      "title": "Unheaded block 156",
+      "startLine": 1701,
+      "endLine": 1704,
+      "textDigest": "a25b933f983753d92ab77173127f6af159da4cf1b259bcdf6bcb8a8ba0ada695",
+      "sample": "3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không phải object\n   → log rồi bỏ qua; parser KHÔNG BAO GIỜ throw, KHÔNG BAO GIỜ đổi kết cục của\n   worker hay luồn",
+      "identityFingerprint": "84a3c32a6b3d89ad48edbfc9c674b030a4353dd03c7ab191b5864f18a241a703",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Quyết định"
+      ],
+      "text": "3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không phải object\n   → log rồi bỏ qua; parser KHÔNG BAO GIỜ throw, KHÔNG BAO GIỜ đổi kết cục của\n   worker hay luồng điều khiển của dispatch. Một report méo không bao giờ làm\n   trật một lượt dispatch."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-46",
+    "githubAnchor": "unheaded-block-46",
+    "stableAnchor": "unheaded-block-46",
+    "title": "Unheaded block 46",
+    "startLine": 358,
+    "endLine": 361,
+    "textDigest": "a25b933f983753d92ab77173127f6af159da4cf1b259bcdf6bcb8a8ba0ada695",
+    "sample": "3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không phải object\n   → log rồi bỏ qua; parser KHÔNG BAO GIỜ throw, KHÔNG BAO GIỜ đổi kết cục của\n   worker hay luồn",
+    "identityFingerprint": "84a3c32a6b3d89ad48edbfc9c674b030a4353dd03c7ab191b5864f18a241a703",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ],
+    "text": "3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không phải object\n   → log rồi bỏ qua; parser KHÔNG BAO GIỜ throw, KHÔNG BAO GIỜ đổi kết cục của\n   worker hay luồng điều khiển của dispatch. Một report méo không bao giờ làm\n   trật một lượt dispatch."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-46",
+      "githubAnchor": "unheaded-block-46",
+      "stableAnchor": "unheaded-block-46",
+      "title": "Unheaded block 46",
+      "startLine": 358,
+      "endLine": 361,
+      "textDigest": "a25b933f983753d92ab77173127f6af159da4cf1b259bcdf6bcb8a8ba0ada695",
+      "sample": "3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không phải object\n   → log rồi bỏ qua; parser KHÔNG BAO GIỜ throw, KHÔNG BAO GIỜ đổi kết cục của\n   worker hay luồn",
+      "identityFingerprint": "84a3c32a6b3d89ad48edbfc9c674b030a4353dd03c7ab191b5864f18a241a703",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Decision"
+      ],
+      "text": "3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không phải object\n   → log rồi bỏ qua; parser KHÔNG BAO GIỜ throw, KHÔNG BAO GIỜ đổi kết cục của\n   worker hay luồng điều khiển của dispatch. Một report méo không bao giờ làm\n   trật một lượt dispatch."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_185e1f6f4d1ef50fead4ce341980898d"
+}
+```
+
+## Entry claim_fc4d5078de5528578407ea0e3715e723
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_fc4d5078de5528578407ea0e3715e723",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_fc4d5078de5528578407ea0e3715e723",
+    "sourceUnitDigest": "2bc3f7c954aa9f74",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-47",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1675-1682, starting \"4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(tit\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "2bc3f7c954aa9f7464b354246e208cbce1ebd91f0bc7679e22771a946b19d7c2",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_fc4d5078de5528578407ea0e3715e723",
+    "sourceUnitDigest": "2bc3f7c954aa9f74",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-47",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1706-1713, starting \"4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(tit\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "2bc3f7c954aa9f7464b354246e208cbce1ebd91f0bc7679e22771a946b19d7c2",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "fe34a9dae93929dd19c831edd5d23198174d87a5fc47950125e98e15fd1ccb32",
+    "identityFingerprint": "fe34a9dae93929dd19c831edd5d23198174d87a5fc47950125e98e15fd1ccb32",
+    "claimId": "claim_fc4d5078de5528578407ea0e3715e723",
+    "sourceAnchor": "unheaded-block-157",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "2bc3f7c954aa9f7464b354246e208cbce1ebd91f0bc7679e22771a946b19d7c2",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-157",
+      "githubAnchor": "unheaded-block-157",
+      "stableAnchor": "unheaded-block-157",
+      "title": "Unheaded block 157",
+      "startLine": 1706,
+      "endLine": 1713,
+      "textDigest": "2bc3f7c954aa9f7464b354246e208cbce1ebd91f0bc7679e22771a946b19d7c2",
+      "sample": "4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(title)` +\n   `classify(title)` cho tier/kind/risk (giá trị trong khối ghi đè), một `verify`\n   placeholder DÙNG C",
+      "identityFingerprint": "fe34a9dae93929dd19c831edd5d23198174d87a5fc47950125e98e15fd1ccb32",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Quyết định"
+      ],
+      "text": "4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(title)` +\n   `classify(title)` cho tier/kind/risk (giá trị trong khối ghi đè), một `verify`\n   placeholder DÙNG CHUNG (`FALLBACK_VERIFY` từ `discovery.mjs` — không nhân bản\n   literal), `status: 'todo'`, `stage: 'clarify'` (để context-discovery sau đó gắn\n   `verify` thật, y như một item submit), `deps: []`, `refs: []`,\n   `discoveredFrom = item.id` của việc đang chạy. Mọi lần ghi đi qua\n   `queue.enqueue` (cửa ghi tuần-tự-hoá), không bao giờ `addWork` thô — an toàn\n   fan-out."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-47",
+    "githubAnchor": "unheaded-block-47",
+    "stableAnchor": "unheaded-block-47",
+    "title": "Unheaded block 47",
+    "startLine": 363,
+    "endLine": 370,
+    "textDigest": "2bc3f7c954aa9f7464b354246e208cbce1ebd91f0bc7679e22771a946b19d7c2",
+    "sample": "4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(title)` +\n   `classify(title)` cho tier/kind/risk (giá trị trong khối ghi đè), một `verify`\n   placeholder DÙNG C",
+    "identityFingerprint": "fe34a9dae93929dd19c831edd5d23198174d87a5fc47950125e98e15fd1ccb32",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Decision"
+    ],
+    "text": "4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(title)` +\n   `classify(title)` cho tier/kind/risk (giá trị trong khối ghi đè), một `verify`\n   placeholder DÙNG CHUNG (`FALLBACK_VERIFY` từ `discovery.mjs` — không nhân bản\n   literal), `status: 'todo'`, `stage: 'clarify'` (để context-discovery sau đó gắn\n   `verify` thật, y như một item submit), `deps: []`, `refs: []`,\n   `discoveredFrom = item.id` của việc đang chạy. Mọi lần ghi đi qua\n   `queue.enqueue` (cửa ghi tuần-tự-hoá), không bao giờ `addWork` thô — an toàn\n   fan-out."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-47",
+      "githubAnchor": "unheaded-block-47",
+      "stableAnchor": "unheaded-block-47",
+      "title": "Unheaded block 47",
+      "startLine": 363,
+      "endLine": 370,
+      "textDigest": "2bc3f7c954aa9f7464b354246e208cbce1ebd91f0bc7679e22771a946b19d7c2",
+      "sample": "4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(title)` +\n   `classify(title)` cho tier/kind/risk (giá trị trong khối ghi đè), một `verify`\n   placeholder DÙNG C",
+      "identityFingerprint": "fe34a9dae93929dd19c831edd5d23198174d87a5fc47950125e98e15fd1ccb32",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Decision"
+      ],
+      "text": "4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(title)` +\n   `classify(title)` cho tier/kind/risk (giá trị trong khối ghi đè), một `verify`\n   placeholder DÙNG CHUNG (`FALLBACK_VERIFY` từ `discovery.mjs` — không nhân bản\n   literal), `status: 'todo'`, `stage: 'clarify'` (để context-discovery sau đó gắn\n   `verify` thật, y như một item submit), `deps: []`, `refs: []`,\n   `discoveredFrom = item.id` của việc đang chạy. Mọi lần ghi đi qua\n   `queue.enqueue` (cửa ghi tuần-tự-hoá), không bao giờ `addWork` thô — an toàn\n   fan-out."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_fc4d5078de5528578407ea0e3715e723"
+}
+```
+
+## Entry claim_df1ec9feeaeb131a98f44cebcd3c8f6c
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
+    "sourceUnitDigest": "261b711fa046562a",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0013 is represented by the frozen H3 \"0013 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "19ae019de9e9e6e87ca9d19d8bb92a18bbefab9ab1579d1010a315477e994782",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
+    "sourceUnitDigest": "261b711fa046562a",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0013 is represented by the frozen H3 \"0013 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "19ae019de9e9e6e87ca9d19d8bb92a18bbefab9ab1579d1010a315477e994782",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "564caded509da5f4f7bb8fd6956fd2f095d4992ee5c5cc74b15e1f30b3232647",
+    "identityFingerprint": "0203f73e35e56942050fadc2e6d611a17f2c421b3e35c9c929203c70fd31d62e",
+    "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
+    "sourceAnchor": "hệ-quả-7",
+    "unitKind": "heading",
+    "sourceUnitDigest": "261b711fa046562a35014f434dbf1d8f6407b07a3ffd954587406a05682d15d4",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Hệ quả",
+      "anchor": "hệ-quả-7",
+      "githubAnchor": "hệ-quả-7",
+      "stableAnchor": "h-aae7eb3e3997",
+      "startLine": 1715,
+      "endLine": 1715,
+      "textDigest": "261b711fa046562a35014f434dbf1d8f6407b07a3ffd954587406a05682d15d4",
+      "sample": "Hệ quả",
+      "sectionPayloadDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
+      "followingBlockDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
+      "identityFingerprint": "0203f73e35e56942050fadc2e6d611a17f2c421b3e35c9c929203c70fd31d62e",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`"
+      ],
+      "text": "#### Hệ quả",
+      "sectionText": "#### Hệ quả\n\n- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không có\n  đường ghi song song mới nào mở ra.\n- **`discoveredFrom` là lineage phi-chặn** — loại khỏi cycle-check theo thiết kế\n  (nó không phải cạnh phụ-thuộc), cưỡi SCHEMA_VERSION lúc bằng 2 tại thời điểm\n  đó (nay đã lên 3, per str46-io-contract) — trường lazy additive.\n- **C3 mở rộng, có tên, không sửa ngầm.** architecture-map v0.3 → v0.4: hàng C3\n  thêm mệnh đề kênh khám-phá; §11 changelog ghi delta. Không module mới, không\n  row §6/manifest mới — `loop.mjs`/`dispatch.mjs` mở rộng tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0013 Consequences",
+    "anchor": "0013-consequences",
+    "githubAnchor": "0013-consequences",
+    "stableAnchor": "h-e44d3e4f566e",
+    "startLine": 372,
+    "endLine": 372,
+    "textDigest": "19ae019de9e9e6e87ca9d19d8bb92a18bbefab9ab1579d1010a315477e994782",
+    "sample": "0013 Consequences",
+    "sectionPayloadDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
+    "followingBlockDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
+    "identityFingerprint": "bd83f18be7dd141d1ede55009b309a8c1abad356fd9bb1e8ed87b2f40474ab4e",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "text": "### 0013 Consequences",
+    "sectionText": "### 0013 Consequences\n\n- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không có\n  đường ghi song song mới nào mở ra.\n- **`discoveredFrom` là lineage phi-chặn** — loại khỏi cycle-check theo thiết kế\n  (nó không phải cạnh phụ-thuộc), cưỡi SCHEMA_VERSION lúc bằng 2 tại thời điểm\n  đó (nay đã lên 3, per str46-io-contract) — trường lazy additive.\n- **C3 mở rộng, có tên, không sửa ngầm.** architecture-map v0.3 → v0.4: hàng C3\n  thêm mệnh đề kênh khám-phá; §11 changelog ghi delta. Không module mới, không\n  row §6/manifest mới — `loop.mjs`/`dispatch.mjs` mở rộng tại chỗ."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c"
+}
+```
+
+## Entry claim_b8d85d30862c55869062b5418f430f69
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_b8d85d30862c55869062b5418f430f69",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_b8d85d30862c55869062b5418f430f69",
+    "sourceUnitDigest": "dd8567cf8f523681",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-48",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1686-1693, starting \"- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không c\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Consequences"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_b8d85d30862c55869062b5418f430f69",
+    "sourceUnitDigest": "dd8567cf8f523681",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-48",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1717-1724, starting \"- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không c\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Consequences"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "64054a10bbb0d76255ee6eb42a2f2cf466a9712be4bb1d22b185b3951abf52bd",
+    "identityFingerprint": "64054a10bbb0d76255ee6eb42a2f2cf466a9712be4bb1d22b185b3951abf52bd",
+    "claimId": "claim_b8d85d30862c55869062b5418f430f69",
+    "sourceAnchor": "unheaded-block-158",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-158",
+      "githubAnchor": "unheaded-block-158",
+      "stableAnchor": "unheaded-block-158",
+      "title": "Unheaded block 158",
+      "startLine": 1717,
+      "endLine": 1724,
+      "textDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
+      "sample": "- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không có\n  đường ghi song song mới nào mở ra.\n- **`discoveredFrom` là lineage phi-chặn** — loại khỏi cycle-check theo",
+      "identityFingerprint": "64054a10bbb0d76255ee6eb42a2f2cf466a9712be4bb1d22b185b3951abf52bd",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Hệ quả"
+      ],
+      "text": "- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không có\n  đường ghi song song mới nào mở ra.\n- **`discoveredFrom` là lineage phi-chặn** — loại khỏi cycle-check theo thiết kế\n  (nó không phải cạnh phụ-thuộc), cưỡi SCHEMA_VERSION lúc bằng 2 tại thời điểm\n  đó (nay đã lên 3, per str46-io-contract) — trường lazy additive.\n- **C3 mở rộng, có tên, không sửa ngầm.** architecture-map v0.3 → v0.4: hàng C3\n  thêm mệnh đề kênh khám-phá; §11 changelog ghi delta. Không module mới, không\n  row §6/manifest mới — `loop.mjs`/`dispatch.mjs` mở rộng tại chỗ."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-48",
+    "githubAnchor": "unheaded-block-48",
+    "stableAnchor": "unheaded-block-48",
+    "title": "Unheaded block 48",
+    "startLine": 374,
+    "endLine": 381,
+    "textDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
+    "sample": "- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không có\n  đường ghi song song mới nào mở ra.\n- **`discoveredFrom` là lineage phi-chặn** — loại khỏi cycle-check theo",
+    "identityFingerprint": "64054a10bbb0d76255ee6eb42a2f2cf466a9712be4bb1d22b185b3951abf52bd",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Consequences"
+    ],
+    "text": "- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không có\n  đường ghi song song mới nào mở ra.\n- **`discoveredFrom` là lineage phi-chặn** — loại khỏi cycle-check theo thiết kế\n  (nó không phải cạnh phụ-thuộc), cưỡi SCHEMA_VERSION lúc bằng 2 tại thời điểm\n  đó (nay đã lên 3, per str46-io-contract) — trường lazy additive.\n- **C3 mở rộng, có tên, không sửa ngầm.** architecture-map v0.3 → v0.4: hàng C3\n  thêm mệnh đề kênh khám-phá; §11 changelog ghi delta. Không module mới, không\n  row §6/manifest mới — `loop.mjs`/`dispatch.mjs` mở rộng tại chỗ."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-48",
+      "githubAnchor": "unheaded-block-48",
+      "stableAnchor": "unheaded-block-48",
+      "title": "Unheaded block 48",
+      "startLine": 374,
+      "endLine": 381,
+      "textDigest": "dd8567cf8f5236817bec1f249d0b21893c5d99f1c4a3d39e95dfe7e68595079c",
+      "sample": "- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không có\n  đường ghi song song mới nào mở ra.\n- **`discoveredFrom` là lineage phi-chặn** — loại khỏi cycle-check theo",
+      "identityFingerprint": "64054a10bbb0d76255ee6eb42a2f2cf466a9712be4bb1d22b185b3951abf52bd",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Consequences"
+      ],
+      "text": "- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không có\n  đường ghi song song mới nào mở ra.\n- **`discoveredFrom` là lineage phi-chặn** — loại khỏi cycle-check theo thiết kế\n  (nó không phải cạnh phụ-thuộc), cưỡi SCHEMA_VERSION lúc bằng 2 tại thời điểm\n  đó (nay đã lên 3, per str46-io-contract) — trường lazy additive.\n- **C3 mở rộng, có tên, không sửa ngầm.** architecture-map v0.3 → v0.4: hàng C3\n  thêm mệnh đề kênh khám-phá; §11 changelog ghi delta. Không module mới, không\n  row §6/manifest mới — `loop.mjs`/`dispatch.mjs` mở rộng tại chỗ."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_b8d85d30862c55869062b5418f430f69"
+}
+```
+
+## Entry claim_9f56719f95c81edecfe6dfda00ca0268
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
+    "sourceUnitDigest": "5c944fd5d5e941cc",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-trust-boundary",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Trust Boundary\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "f4b2987afebaa4bfcb171bf9122acb39d864d4321de4cc1af5bc61afa7f3c58b",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
+    "sourceUnitDigest": "5c944fd5d5e941cc",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-trust-boundary",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Trust Boundary\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "f4b2987afebaa4bfcb171bf9122acb39d864d4321de4cc1af5bc61afa7f3c58b",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "aad960e9ed033b2c357c178dfea54b810132b3b6b14bce0c0efef78891bca7c7",
+    "identityFingerprint": "90cb1e1c128958ad805d6829453973d94f123501d011a3f6f9e0d2341c9a8deb",
+    "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
+    "sourceAnchor": "ranh-giới-tin-cậy-bổ-chú-2026-07-18-review-fix-s11",
+    "unitKind": "heading",
+    "sourceUnitDigest": "5c944fd5d5e941cc4075438f60662e1e33b88846f7042621666b958a0dd8ba53",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)",
+      "anchor": "ranh-giới-tin-cậy-bổ-chú-2026-07-18-review-fix-s11",
+      "githubAnchor": "ranh-giới-tin-cậy-bổ-chú-2026-07-18-review-fix-s11",
+      "stableAnchor": "h-00d895ff7684",
+      "startLine": 1726,
+      "endLine": 1726,
+      "textDigest": "5c944fd5d5e941cc4075438f60662e1e33b88846f7042621666b958a0dd8ba53",
+      "sample": "Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)",
+      "sectionPayloadDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
+      "followingBlockDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
+      "identityFingerprint": "90cb1e1c128958ad805d6829453973d94f123501d011a3f6f9e0d2341c9a8deb",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`"
+      ],
+      "text": "#### Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)",
+      "sectionText": "#### Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)\n\n`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔNG ĐÁNG TIN — do\nchính worker (một trợ lý đang chạy, có thể bị chèn lệnh từ nội dung không đáng tin nó\nđọc phải) tự soạn. Item runner tạo ra từ đó vào thẳng giai đoạn `clarify`, nơi\n`title`/`description` nạp vào prompt của MODEL làm-rõ — đây là mặt tiếp xúc thứ hai\n(sau chính worker) nơi văn bản không đáng tin chạm tới một model sẽ sinh ra lệnh chạy\nđược. Chấp nhận CÓ CHỦ Ý, không phải bỏ sót: giảm nhẹ đã có từ thiết kế gốc giữ nguyên\n— `verify` KHÔNG BAO GIỜ do worker đặt (luôn `FALLBACK_VERIFY` rồi model/người ở bước\nlàm-rõ gán lại), nên văn bản worker không đáng tin không thể trực tiếp trở thành một\nlệnh shell chạy được; item không mang niềm tin đặc biệt nào, đi qua đúng vòng xét-lại\nnhư một item người tự khai. **Phương án đã cân nhắc, CHƯA XÂY:** một cửa xét-duyệt-người\nbắt buộc trước khi một item runner-tự-tạo được dispatch tự động (thay vì vào thẳng\n`clarify` như hôm nay) — đổi thiết kế lớn hơn phạm vi một P3 review-fix, ghi lại đây để\ncân nhắc lại nếu bằng chứng chèn-lệnh thật xuất hiện."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0013 Trust Boundary",
+    "anchor": "0013-trust-boundary",
+    "githubAnchor": "0013-trust-boundary",
+    "stableAnchor": "h-742a2e61076d",
+    "startLine": 383,
+    "endLine": 383,
+    "textDigest": "f4b2987afebaa4bfcb171bf9122acb39d864d4321de4cc1af5bc61afa7f3c58b",
+    "sample": "0013 Trust Boundary",
+    "sectionPayloadDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
+    "followingBlockDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
+    "identityFingerprint": "6ef42bd1cc4ca9d1aeab15b3780ae3064b35bd704310e9280817f4c42d2b2c04",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "text": "### 0013 Trust Boundary",
+    "sectionText": "### 0013 Trust Boundary\n\n`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔNG ĐÁNG TIN — do\nchính worker (một trợ lý đang chạy, có thể bị chèn lệnh từ nội dung không đáng tin nó\nđọc phải) tự soạn. Item runner tạo ra từ đó vào thẳng giai đoạn `clarify`, nơi\n`title`/`description` nạp vào prompt của MODEL làm-rõ — đây là mặt tiếp xúc thứ hai\n(sau chính worker) nơi văn bản không đáng tin chạm tới một model sẽ sinh ra lệnh chạy\nđược. Chấp nhận CÓ CHỦ Ý, không phải bỏ sót: giảm nhẹ đã có từ thiết kế gốc giữ nguyên\n— `verify` KHÔNG BAO GIỜ do worker đặt (luôn `FALLBACK_VERIFY` rồi model/người ở bước\nlàm-rõ gán lại), nên văn bản worker không đáng tin không thể trực tiếp trở thành một\nlệnh shell chạy được; item không mang niềm tin đặc biệt nào, đi qua đúng vòng xét-lại\nnhư một item người tự khai. **Phương án đã cân nhắc, CHƯA XÂY:** một cửa xét-duyệt-người\nbắt buộc trước khi một item runner-tự-tạo được dispatch tự động (thay vì vào thẳng\n`clarify` như hôm nay) — đổi thiết kế lớn hơn phạm vi một P3 review-fix, ghi lại đây để\ncân nhắc lại nếu bằng chứng chèn-lệnh thật xuất hiện."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_9f56719f95c81edecfe6dfda00ca0268"
+}
+```
+
+## Entry claim_a4c7eec1fc96a1ad212a5de75a8942c5
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_a4c7eec1fc96a1ad212a5de75a8942c5",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_a4c7eec1fc96a1ad212a5de75a8942c5",
+    "sourceUnitDigest": "1e83f0bc05ec81d1",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-49",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1697-1709, starting \"`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔN\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Trust Boundary"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_a4c7eec1fc96a1ad212a5de75a8942c5",
+    "sourceUnitDigest": "1e83f0bc05ec81d1",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-49",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1728-1740, starting \"`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔN\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Trust Boundary"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "81b26bac3c1c639d21376584811ace9b41a756a2cb754854a328f671fd289b7f",
+    "identityFingerprint": "81b26bac3c1c639d21376584811ace9b41a756a2cb754854a328f671fd289b7f",
+    "claimId": "claim_a4c7eec1fc96a1ad212a5de75a8942c5",
+    "sourceAnchor": "unheaded-block-159",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-159",
+      "githubAnchor": "unheaded-block-159",
+      "stableAnchor": "unheaded-block-159",
+      "title": "Unheaded block 159",
+      "startLine": 1728,
+      "endLine": 1740,
+      "textDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
+      "sample": "`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔNG ĐÁNG TIN — do\nchính worker (một trợ lý đang chạy, có thể bị chèn lệnh từ nội dung không đáng tin nó\nđọc phải",
+      "identityFingerprint": "81b26bac3c1c639d21376584811ace9b41a756a2cb754854a328f671fd289b7f",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)"
+      ],
+      "text": "`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔNG ĐÁNG TIN — do\nchính worker (một trợ lý đang chạy, có thể bị chèn lệnh từ nội dung không đáng tin nó\nđọc phải) tự soạn. Item runner tạo ra từ đó vào thẳng giai đoạn `clarify`, nơi\n`title`/`description` nạp vào prompt của MODEL làm-rõ — đây là mặt tiếp xúc thứ hai\n(sau chính worker) nơi văn bản không đáng tin chạm tới một model sẽ sinh ra lệnh chạy\nđược. Chấp nhận CÓ CHỦ Ý, không phải bỏ sót: giảm nhẹ đã có từ thiết kế gốc giữ nguyên\n— `verify` KHÔNG BAO GIỜ do worker đặt (luôn `FALLBACK_VERIFY` rồi model/người ở bước\nlàm-rõ gán lại), nên văn bản worker không đáng tin không thể trực tiếp trở thành một\nlệnh shell chạy được; item không mang niềm tin đặc biệt nào, đi qua đúng vòng xét-lại\nnhư một item người tự khai. **Phương án đã cân nhắc, CHƯA XÂY:** một cửa xét-duyệt-người\nbắt buộc trước khi một item runner-tự-tạo được dispatch tự động (thay vì vào thẳng\n`clarify` như hôm nay) — đổi thiết kế lớn hơn phạm vi một P3 review-fix, ghi lại đây để\ncân nhắc lại nếu bằng chứng chèn-lệnh thật xuất hiện."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-49",
+    "githubAnchor": "unheaded-block-49",
+    "stableAnchor": "unheaded-block-49",
+    "title": "Unheaded block 49",
+    "startLine": 385,
+    "endLine": 397,
+    "textDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
+    "sample": "`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔNG ĐÁNG TIN — do\nchính worker (một trợ lý đang chạy, có thể bị chèn lệnh từ nội dung không đáng tin nó\nđọc phải",
+    "identityFingerprint": "81b26bac3c1c639d21376584811ace9b41a756a2cb754854a328f671fd289b7f",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Trust Boundary"
+    ],
+    "text": "`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔNG ĐÁNG TIN — do\nchính worker (một trợ lý đang chạy, có thể bị chèn lệnh từ nội dung không đáng tin nó\nđọc phải) tự soạn. Item runner tạo ra từ đó vào thẳng giai đoạn `clarify`, nơi\n`title`/`description` nạp vào prompt của MODEL làm-rõ — đây là mặt tiếp xúc thứ hai\n(sau chính worker) nơi văn bản không đáng tin chạm tới một model sẽ sinh ra lệnh chạy\nđược. Chấp nhận CÓ CHỦ Ý, không phải bỏ sót: giảm nhẹ đã có từ thiết kế gốc giữ nguyên\n— `verify` KHÔNG BAO GIỜ do worker đặt (luôn `FALLBACK_VERIFY` rồi model/người ở bước\nlàm-rõ gán lại), nên văn bản worker không đáng tin không thể trực tiếp trở thành một\nlệnh shell chạy được; item không mang niềm tin đặc biệt nào, đi qua đúng vòng xét-lại\nnhư một item người tự khai. **Phương án đã cân nhắc, CHƯA XÂY:** một cửa xét-duyệt-người\nbắt buộc trước khi một item runner-tự-tạo được dispatch tự động (thay vì vào thẳng\n`clarify` như hôm nay) — đổi thiết kế lớn hơn phạm vi một P3 review-fix, ghi lại đây để\ncân nhắc lại nếu bằng chứng chèn-lệnh thật xuất hiện."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-49",
+      "githubAnchor": "unheaded-block-49",
+      "stableAnchor": "unheaded-block-49",
+      "title": "Unheaded block 49",
+      "startLine": 385,
+      "endLine": 397,
+      "textDigest": "1e83f0bc05ec81d1fe854887d220e203809ead02d46721a52758b39275350332",
+      "sample": "`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔNG ĐÁNG TIN — do\nchính worker (một trợ lý đang chạy, có thể bị chèn lệnh từ nội dung không đáng tin nó\nđọc phải",
+      "identityFingerprint": "81b26bac3c1c639d21376584811ace9b41a756a2cb754854a328f671fd289b7f",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Trust Boundary"
+      ],
+      "text": "`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔNG ĐÁNG TIN — do\nchính worker (một trợ lý đang chạy, có thể bị chèn lệnh từ nội dung không đáng tin nó\nđọc phải) tự soạn. Item runner tạo ra từ đó vào thẳng giai đoạn `clarify`, nơi\n`title`/`description` nạp vào prompt của MODEL làm-rõ — đây là mặt tiếp xúc thứ hai\n(sau chính worker) nơi văn bản không đáng tin chạm tới một model sẽ sinh ra lệnh chạy\nđược. Chấp nhận CÓ CHỦ Ý, không phải bỏ sót: giảm nhẹ đã có từ thiết kế gốc giữ nguyên\n— `verify` KHÔNG BAO GIỜ do worker đặt (luôn `FALLBACK_VERIFY` rồi model/người ở bước\nlàm-rõ gán lại), nên văn bản worker không đáng tin không thể trực tiếp trở thành một\nlệnh shell chạy được; item không mang niềm tin đặc biệt nào, đi qua đúng vòng xét-lại\nnhư một item người tự khai. **Phương án đã cân nhắc, CHƯA XÂY:** một cửa xét-duyệt-người\nbắt buộc trước khi một item runner-tự-tạo được dispatch tự động (thay vì vào thẳng\n`clarify` như hôm nay) — đổi thiết kế lớn hơn phạm vi một P3 review-fix, ghi lại đây để\ncân nhắc lại nếu bằng chứng chèn-lệnh thật xuất hiện."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_a4c7eec1fc96a1ad212a5de75a8942c5"
+}
+```
+
+## Entry claim_4e04420f3322b42d6a313faa72216ae9
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
+    "sourceUnitDigest": "58646cbd3a8ef4bd",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-delivery-guarantee",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Delivery Guarantee\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "42a5b4fd66d36c0accc5dd7dffd9f8d1fb12d5b002b70a26114cfe538f6c23f1",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
+    "sourceUnitDigest": "58646cbd3a8ef4bd",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-delivery-guarantee",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Delivery Guarantee\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "42a5b4fd66d36c0accc5dd7dffd9f8d1fb12d5b002b70a26114cfe538f6c23f1",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "63288d7c093532fd23396ffd56d3eaaebda7296cfc09488bd8b0227cb86700b3",
+    "identityFingerprint": "7fa06fda12f21417fee0ad6f6a2438ccb0f2e409e5511071d8c6c6e62d88b499",
+    "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
+    "sourceAnchor": "bảo-đảm-giao-nhận-bổ-chú-2026-07-18-review-fix-s11",
+    "unitKind": "heading",
+    "sourceUnitDigest": "58646cbd3a8ef4bdf7509e971395d7242ef08b5f751c3aa1504e628c8104d3c0",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)",
+      "anchor": "bảo-đảm-giao-nhận-bổ-chú-2026-07-18-review-fix-s11",
+      "githubAnchor": "bảo-đảm-giao-nhận-bổ-chú-2026-07-18-review-fix-s11",
+      "stableAnchor": "h-19638a002c01",
+      "startLine": 1742,
+      "endLine": 1742,
+      "textDigest": "58646cbd3a8ef4bdf7509e971395d7242ef08b5f751c3aa1504e628c8104d3c0",
+      "sample": "Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)",
+      "sectionPayloadDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
+      "followingBlockDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
+      "identityFingerprint": "7fa06fda12f21417fee0ad6f6a2438ccb0f2e409e5511071d8c6c6e62d88b499",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`"
+      ],
+      "text": "#### Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)",
+      "sectionText": "#### Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)\n\nKênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-once) — KHÔNG PHẢI\nít-nhất-một-lần. Một report hợp lệ được `runner` phân tích thành công đúng MỘT LẦN, tại\nkết cục cuối của lượt dispatch; nếu tiến trình runner chết giữa lúc phân tích và lúc\n`addWork` ghi xong, report đó mất — không có cơ chế đối-soát-lại nào đọc lại output đã\nlưu để phục hồi report đã mất. Xem spec Runner \"Báo việc-phát-hiện từ trợ lý\" / RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0013 Delivery Guarantee",
+    "anchor": "0013-delivery-guarantee",
+    "githubAnchor": "0013-delivery-guarantee",
+    "stableAnchor": "h-c149e168e9a9",
+    "startLine": 399,
+    "endLine": 399,
+    "textDigest": "42a5b4fd66d36c0accc5dd7dffd9f8d1fb12d5b002b70a26114cfe538f6c23f1",
+    "sample": "0013 Delivery Guarantee",
+    "sectionPayloadDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
+    "followingBlockDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
+    "identityFingerprint": "24ad9455ce619e0a9e78fbf77a29bf741c086f0f216dc93358cb09ab74361c50",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "text": "### 0013 Delivery Guarantee",
+    "sectionText": "### 0013 Delivery Guarantee\n\nKênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-once) — KHÔNG PHẢI\nít-nhất-một-lần. Một report hợp lệ được `runner` phân tích thành công đúng MỘT LẦN, tại\nkết cục cuối của lượt dispatch; nếu tiến trình runner chết giữa lúc phân tích và lúc\n`addWork` ghi xong, report đó mất — không có cơ chế đối-soát-lại nào đọc lại output đã\nlưu để phục hồi report đã mất. Xem spec Runner \"Báo việc-phát-hiện từ trợ lý\" / RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_4e04420f3322b42d6a313faa72216ae9"
+}
+```
+
+## Entry claim_bd1c7b0191b236990a4740f007de2397
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_bd1c7b0191b236990a4740f007de2397",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_bd1c7b0191b236990a4740f007de2397",
+    "sourceUnitDigest": "9a5163f684996577",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-50",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1713-1717, starting \"Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-o\") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Delivery Guarantee"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_bd1c7b0191b236990a4740f007de2397",
+    "sourceUnitDigest": "9a5163f684996577",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-50",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1744-1748, starting \"Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-o\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Delivery Guarantee"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "f825f7f1818206da8bc4639c066fa88684b51c2c57e391ea417c545e70358168",
+    "identityFingerprint": "f825f7f1818206da8bc4639c066fa88684b51c2c57e391ea417c545e70358168",
+    "claimId": "claim_bd1c7b0191b236990a4740f007de2397",
+    "sourceAnchor": "unheaded-block-160",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-160",
+      "githubAnchor": "unheaded-block-160",
+      "stableAnchor": "unheaded-block-160",
+      "title": "Unheaded block 160",
+      "startLine": 1744,
+      "endLine": 1748,
+      "textDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
+      "sample": "Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-once) — KHÔNG PHẢI\nít-nhất-một-lần. Một report hợp lệ được `runner` phân tích thành công đúng MỘT LẦN, tại\nkết ",
+      "identityFingerprint": "f825f7f1818206da8bc4639c066fa88684b51c2c57e391ea417c545e70358168",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)"
+      ],
+      "text": "Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-once) — KHÔNG PHẢI\nít-nhất-một-lần. Một report hợp lệ được `runner` phân tích thành công đúng MỘT LẦN, tại\nkết cục cuối của lượt dispatch; nếu tiến trình runner chết giữa lúc phân tích và lúc\n`addWork` ghi xong, report đó mất — không có cơ chế đối-soát-lại nào đọc lại output đã\nlưu để phục hồi report đã mất. Xem spec Runner \"Báo việc-phát-hiện từ trợ lý\" / RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-50",
+    "githubAnchor": "unheaded-block-50",
+    "stableAnchor": "unheaded-block-50",
+    "title": "Unheaded block 50",
+    "startLine": 401,
+    "endLine": 405,
+    "textDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
+    "sample": "Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-once) — KHÔNG PHẢI\nít-nhất-một-lần. Một report hợp lệ được `runner` phân tích thành công đúng MỘT LẦN, tại\nkết ",
+    "identityFingerprint": "f825f7f1818206da8bc4639c066fa88684b51c2c57e391ea417c545e70358168",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Delivery Guarantee"
+    ],
+    "text": "Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-once) — KHÔNG PHẢI\nít-nhất-một-lần. Một report hợp lệ được `runner` phân tích thành công đúng MỘT LẦN, tại\nkết cục cuối của lượt dispatch; nếu tiến trình runner chết giữa lúc phân tích và lúc\n`addWork` ghi xong, report đó mất — không có cơ chế đối-soát-lại nào đọc lại output đã\nlưu để phục hồi report đã mất. Xem spec Runner \"Báo việc-phát-hiện từ trợ lý\" / RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-50",
+      "githubAnchor": "unheaded-block-50",
+      "stableAnchor": "unheaded-block-50",
+      "title": "Unheaded block 50",
+      "startLine": 401,
+      "endLine": 405,
+      "textDigest": "9a5163f6849965777501890f2c89595562a69b5f7de6fda209b27130d346a77b",
+      "sample": "Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-once) — KHÔNG PHẢI\nít-nhất-một-lần. Một report hợp lệ được `runner` phân tích thành công đúng MỘT LẦN, tại\nkết ",
+      "identityFingerprint": "f825f7f1818206da8bc4639c066fa88684b51c2c57e391ea417c545e70358168",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Delivery Guarantee"
+      ],
+      "text": "Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-once) — KHÔNG PHẢI\nít-nhất-một-lần. Một report hợp lệ được `runner` phân tích thành công đúng MỘT LẦN, tại\nkết cục cuối của lượt dispatch; nếu tiến trình runner chết giữa lúc phân tích và lúc\n`addWork` ghi xong, report đó mất — không có cơ chế đối-soát-lại nào đọc lại output đã\nlưu để phục hồi report đã mất. Xem spec Runner \"Báo việc-phát-hiện từ trợ lý\" / RUL45 (awaitingContext — neo gốc cho cổng chờ-người, dẫn xuất đọc-thời-điểm)."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_bd1c7b0191b236990a4740f007de2397"
+}
+```
+
+## Entry claim_fe29583fb3eaae959e22d8ea42f76e6d
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
+    "sourceUnitDigest": "e702d74cca4d0100",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-alternatives-considered",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Phương án đã cân nhắc và bỏ\" of ADR 0013 is represented by the frozen H3 \"0013 Alternatives Considered\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "dd8d4e0029a8249cf8149298e7a2d77c1497f8922738eb1904e786085c1b7f65",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried.",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "currentDecision": {
+    "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
+    "sourceUnitDigest": "e702d74cca4d0100",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "0013-alternatives-considered",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Phương án đã cân nhắc và bỏ\" of ADR 0013 is represented by the frozen H3 \"0013 Alternatives Considered\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "dd8d4e0029a8249cf8149298e7a2d77c1497f8922738eb1904e786085c1b7f65",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "2955514e89f54d20457b1b917084dec0bb2e6ed46354484fb74412110cd9b92d",
+    "identityFingerprint": "6786bbd294165e6adbafcafa18854472ac0ee35ea132bd335d0e6b3b79475dce",
+    "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
+    "sourceAnchor": "phương-án-đã-cân-nhắc-và-bỏ",
+    "unitKind": "heading",
+    "sourceUnitDigest": "e702d74cca4d01009f5dbc585dfbcf259ab9e39fc77e5b6e9a030296acc4248a",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "heading",
+      "level": 4,
+      "title": "Phương án đã cân nhắc và bỏ",
+      "anchor": "phương-án-đã-cân-nhắc-và-bỏ",
+      "githubAnchor": "phương-án-đã-cân-nhắc-và-bỏ",
+      "stableAnchor": "h-482fe4f9070a",
+      "startLine": 1750,
+      "endLine": 1750,
+      "textDigest": "e702d74cca4d01009f5dbc585dfbcf259ab9e39fc77e5b6e9a030296acc4248a",
+      "sample": "Phương án đã cân nhắc và bỏ",
+      "sectionPayloadDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
+      "followingBlockDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
+      "identityFingerprint": "6786bbd294165e6adbafcafa18854472ac0ee35ea132bd335d0e6b3b79475dce",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`"
+      ],
+      "text": "#### Phương án đã cân nhắc và bỏ",
+      "sectionText": "#### Phương án đã cân nhắc và bỏ\n\n- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm report\n  của worker thành đường ghi không qua goal-check.\n- **Truyền id việc đang chạy vào worker để nó tự stamp `discoveredFrom`.** Bỏ —\n  vẫn là worker ghi; cùng vi phạm.\n- **Parse trong mỗi lần retry.** Bỏ — một khối phát lại qua các lần thử sẽ đúc ra\n  item trùng; parse một lần tại kết cục cuối là điểm đúng."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "0013 Alternatives Considered",
+    "anchor": "0013-alternatives-considered",
+    "githubAnchor": "0013-alternatives-considered",
+    "stableAnchor": "h-35567b98ae36",
+    "startLine": 407,
+    "endLine": 407,
+    "textDigest": "dd8d4e0029a8249cf8149298e7a2d77c1497f8922738eb1904e786085c1b7f65",
+    "sample": "0013 Alternatives Considered",
+    "sectionPayloadDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
+    "followingBlockDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
+    "identityFingerprint": "6eb35369233cb38debb501f34b3408dca19c6e328741f855e16dc5da908b940d",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "text": "### 0013 Alternatives Considered",
+    "sectionText": "### 0013 Alternatives Considered\n\n- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm report\n  của worker thành đường ghi không qua goal-check.\n- **Truyền id việc đang chạy vào worker để nó tự stamp `discoveredFrom`.** Bỏ —\n  vẫn là worker ghi; cùng vi phạm.\n- **Parse trong mỗi lần retry.** Bỏ — một khối phát lại qua các lần thử sẽ đúc ra\n  item trùng; parse một lần tại kết cục cuối là điểm đúng."
+  },
+  "classObservation": {
+    "class": "Judgment",
+    "reason": "no target digest match",
+    "targetUnit": null
+  },
+  "sourceTargetDigestsUnequal": true,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_fe29583fb3eaae959e22d8ea42f76e6d"
+}
+```
+
+## Entry claim_8beebc48272beb4cf5dd32b6ed94d5d0
+
+```json
+{
+  "kind": "pending-manual-decision",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_8beebc48272beb4cf5dd32b6ed94d5d0",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "before": {
+    "claimId": "claim_8beebc48272beb4cf5dd32b6ed94d5d0",
+    "sourceUnitDigest": "61cda065233d2cdb",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-51",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1721-1726, starting \"- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm \") carried line for line into its own block; text identical to the source. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+    "targetUnitDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Alternatives Considered"
+    ],
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "reviewNote": "Independent review pending at corrected current binding; no approval carried."
+  },
+  "currentDecision": {
+    "claimId": "claim_8beebc48272beb4cf5dd32b6ed94d5d0",
+    "sourceUnitDigest": "61cda065233d2cdb",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "pending",
+    "targetAnchor": "unheaded-block-51",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Body of ADR 0013 (source lines 1752-1757, starting \"- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm \") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "targetUnitDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Alternatives Considered"
+    ]
+  },
+  "native": {
+    "kind": "units",
+    "sourcePath": "docs/specs/work-state.md",
+    "unitDigest": "3bbf4aa87a191a15c252defcc1488614454bd173f4eb3be5cced735def2986a6",
+    "identityFingerprint": "3bbf4aa87a191a15c252defcc1488614454bd173f4eb3be5cced735def2986a6",
+    "claimId": "claim_8beebc48272beb4cf5dd32b6ed94d5d0",
+    "sourceAnchor": "unheaded-block-161",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
+    "claimKind": "specification",
+    "status": "current"
+  },
+  "sourceWitness": {
+    "commit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+    "unit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-161",
+      "githubAnchor": "unheaded-block-161",
+      "stableAnchor": "unheaded-block-161",
+      "title": "Unheaded block 161",
+      "startLine": 1752,
+      "endLine": 1757,
+      "textDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
+      "sample": "- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm report\n  của worker thành đường ghi không qua goal-check.\n- **Truyền id việc đang chạy vào worker để nó tự sta",
+      "identityFingerprint": "3bbf4aa87a191a15c252defcc1488614454bd173f4eb3be5cced735def2986a6",
+      "ancestry": [
+        "0002 — Mô hình việc phẳng",
+        "0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
+        "Phương án đã cân nhắc và bỏ"
+      ],
+      "text": "- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm report\n  của worker thành đường ghi không qua goal-check.\n- **Truyền id việc đang chạy vào worker để nó tự stamp `discoveredFrom`.** Bỏ —\n  vẫn là worker ghi; cùng vi phạm.\n- **Parse trong mỗi lần retry.** Bỏ — một khối phát lại qua các lần thử sẽ đúc ra\n  item trùng; parse một lần tại kết cục cuối là điểm đúng."
+    }
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-51",
+    "githubAnchor": "unheaded-block-51",
+    "stableAnchor": "unheaded-block-51",
+    "title": "Unheaded block 51",
+    "startLine": 409,
+    "endLine": 414,
+    "textDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
+    "sample": "- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm report\n  của worker thành đường ghi không qua goal-check.\n- **Truyền id việc đang chạy vào worker để nó tự sta",
+    "identityFingerprint": "3bbf4aa87a191a15c252defcc1488614454bd173f4eb3be5cced735def2986a6",
+    "ancestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+      "0013 Alternatives Considered"
+    ],
+    "text": "- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm report\n  của worker thành đường ghi không qua goal-check.\n- **Truyền id việc đang chạy vào worker để nó tự stamp `discoveredFrom`.** Bỏ —\n  vẫn là worker ghi; cùng vi phạm.\n- **Parse trong mỗi lần retry.** Bỏ — một khối phát lại qua các lần thử sẽ đúc ra\n  item trùng; parse một lần tại kết cục cuối là điểm đúng."
+  },
+  "classObservation": {
+    "class": "Weak-exact",
+    "reason": "ancestor headings differ; document exact share below one half",
+    "targetUnit": {
+      "unitKind": "unheaded-block",
+      "anchor": "unheaded-block-51",
+      "githubAnchor": "unheaded-block-51",
+      "stableAnchor": "unheaded-block-51",
+      "title": "Unheaded block 51",
+      "startLine": 409,
+      "endLine": 414,
+      "textDigest": "61cda065233d2cdb3c74df03865aa0ac7863c547f41f83f6868e8cae003d7d24",
+      "sample": "- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm report\n  của worker thành đường ghi không qua goal-check.\n- **Truyền id việc đang chạy vào worker để nó tự sta",
+      "identityFingerprint": "3bbf4aa87a191a15c252defcc1488614454bd173f4eb3be5cced735def2986a6",
+      "ancestry": [
+        "Retired Decision History: Work State",
+        "9. ADR 0013 Report-Not-Write Channel For Discovered-From",
+        "0013 Alternatives Considered"
+      ],
+      "text": "- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm report\n  của worker thành đường ghi không qua goal-check.\n- **Truyền id việc đang chạy vào worker để nó tự stamp `discoveredFrom`.** Bỏ —\n  vẫn là worker ghi; cùng vi phạm.\n- **Parse trong mỗi lần retry.** Bỏ — một khối phát lại qua các lần thử sẽ đúc ra\n  item trùng; parse một lần tại kết cục cuối là điểm đúng."
+    }
+  },
+  "sourceTargetDigestsUnequal": false,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "reviewScope": "Review current pending binding and rationale; no inherited approval.",
+  "currentContentCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+  "entryId": "claim_8beebc48272beb4cf5dd32b6ed94d5d0"
+}
+```
+

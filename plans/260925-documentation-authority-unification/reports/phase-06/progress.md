@@ -1,3 +1,29 @@
+# Step 10 combined package complete — independent review next
+
+Assignment `unit-run-1792094246578-b2fbe39b/producer/1`; **content/SYNC345f15d95**. Exactly **one background native sync570.490s**, one compact persistence; **4,486 files /91,374 units**, known IDs **99,538→99,549**, zero loss and active tuple equality. **11 predecessor gaps reconciled pending**, full old/current witnesses, no approval carry. **9,202 bindings checked /zero drift /zero rebound /zero --rebind calls**.
+
+**D zero fatal against both priors together/each. Ownership passes:zero native target duplicates /zero new active collision pairs;252 historical/gap reference groups enumerated. Replay366+98 positions:zero findings. 88/88 tests pass. A/B/H pass; frozen I unchanged, reader links equal HEAD.** [Report](step-10-report.md), [native proof](step10-sync345-native-proof.json), [D](step10-sync345-D-summary.json), [audit](step10-sync345-final-audit.json).
+
+**ONE bounded re-review [index](review-request-step10-index-345f15d95.md):1,009 entries /22 files**, counts **120, 80, 14, 120, 120, 14, 11, 1, 7, 39, 9, 120, 120, 14, 11, 2, 3, 9, 34, 10, 120, 31**. All39 content-proven reanchors,9 corrected link positions,265 rationale before/after deltas, L10-22 removals, regenerated accounting030/042, three tool fixes/tests, every changed claim and151 native transitions. Each request names its Author session; A36 deep lists marked, no producer seeds/verdicts.
+
+No execution blocker; inverted citation `4415-4380` in pinned runner carrier flagged for reviewer, docs unchanged. Four historical witness limits and all existing global/A34/holds/group/consumer/cutover/checkpoint obligations remain. **NEXT:independent review of this ONE set**, apply only matching committed verdicts, then global work. Phase6 open. Runner commits; no CLI/git writes, workspace .fgos touch, protected/baseline edits or authority change.
+
+---
+
+# Step 10 package checkpoint — native inventory running
+
+Content pin `345f15d95`. One compact registry persistence complete; sole background inventory process is running with its own log. **9,202 bindings checked / zero drift / zero rebound**;11 new predecessor gaps reconciled pending, no approval carried. **88/88 tests pass. Position-exact replay366+98: zero findings. Ownership: zero duplicate native platform target identities, zero new active source-pair collisions;252 historical/gap conservation collision groups explicitly listed.**
+
+The single request set is being assembled with full39 content-based re-anchor proofs,9 corrected link cells, every final rationale delta, L10-22 removals, regenerated accounting030/042, three tool fixes/test evidence, and all native transitions. No seeds/verdicts selected; final D against both priors awaits the complete inventory. Phase6 remains open.
+
+---
+
+# Step 10 bounded re-review package in progress
+
+Assignment `unit-run-1792094246578-b2fbe39b/producer/1`; content pin `345f15d95663260976200be66d1b9a6c648bcd6d`. One background native sync, compact persistence once, predecessor reconciliation, content-based drift rebindings, D against both priors, ownership/link replay and one bounded request set are in progress. No producer seeds or verdicts. Runner commits; writes limited to this plan.
+
+---
+
 # Step 10 systemic author reworks complete — package next
 
 Assignment `unit-run-1792093168554-f28af963/producer/1`; input `4a18f35ff`, content `19ca8de23`, request `62d147641`. All14 reports’ Notes/Concerns read; A42 L10-18b/L10-20/L10-21/L10-22 executed. **39 rows re-anchored / nine shards**, all reviewer anchors match; eight duplicate-text footer bindings preserve ancestry. **366+98 link positions replayed, zero findings**; source/target cells, vision sentence order and legacy-transition candidate link restored.
