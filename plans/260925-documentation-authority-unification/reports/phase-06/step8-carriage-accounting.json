@@ -678,7 +678,24 @@
         "headBlob": "2e2fe74304bb6732b0307bb822c338d93dbc7569",
         "comparison": "unchanged",
         "checkedImmediatelyBeforeRows": true
-      }
+      },
+      "relativeLinkRebases": [
+        {
+          "from": "../reference/discussion-quality-rubric.md",
+          "to": "../../reference/discussion-quality-rubric.md",
+          "repositoryReferent": "docs/reference/discussion-quality-rubric.md",
+          "sourceLine": 70,
+          "targetLine": 93
+        },
+        {
+          "from": "../how-to/compare-discussion-setups-with-metrics-eval.md",
+          "to": "../../how-to/compare-discussion-setups-with-metrics-eval.md",
+          "repositoryReferent": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+          "sourceLine": 70,
+          "targetLine": 93
+        }
+      ],
+      "carriageNote": "Reverse only the recorded Markdown link destinations to recover source payload; no label or repository referent change. Candidate Added in candidate note is scaffolding."
     },
     {
       "source": "docs/specs/confinement-authority.md",
@@ -1008,8 +1025,8 @@
       "path": "docs/platform/observe/spec.md",
       "kind": "spec",
       "source": "docs/specs/observe.md",
-      "sha256": "f71bf4edd0198ea8379110e7bcebf1bdb4bd66fe51ef0fd2807647e9115a17b8",
-      "bytes": 18300,
+      "sha256": "c99d03215c47682e0de6f33a3fd13f902526126c3aaec8e3a2eba9ae6a369b79",
+      "bytes": 18605,
       "designStatus": "Candidate",
       "canonical": false,
       "units": 24
@@ -6951,11 +6968,12 @@
       "sourceDigest": "53e7d20d4f0fc326b73efbd72dcbb66009bc65ec37e130c0e2178c948161adf8",
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "observe-component-specification",
-      "targetDigest": "ff9cff7275281c657fa87c9fdb4248cc090be18195f5e333eba5b02685785850",
+      "targetDigest": "a24fdb9ba9dc5da2ef380c707571435a37850ee1a527cfccdfdb0dc6ea39251b",
       "class": "Judgment",
-      "classReason": "no target digest match",
+      "classReason": "candidate note or explicit relative-link destination rebase; unequal digest",
       "mandatoryDeep": true,
-      "fullSourceUnitContained": true
+      "fullSourceUnitContained": true,
+      "sourcePayloadRecoverableAfterRecordedLinkReversal": true
     },
     {
       "claimId": "claim_398a2a6235ab1ae2d5264325daf42a5c",
@@ -7291,11 +7309,12 @@
       "sourceDigest": "1524c34dd5cd1df09f8b4a30a383264347263a484824aab9af796fd95f4c9e03",
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "contract-quyết-định-làn-c-f8",
-      "targetDigest": "1524c34dd5cd1df09f8b4a30a383264347263a484824aab9af796fd95f4c9e03",
-      "class": "Unit-exact",
-      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
-      "mandatoryDeep": false,
-      "fullSourceUnitContained": true
+      "targetDigest": "2e58e1822dc58b46b60193348bdfef8dcba3ca8621bbd845c2ed61c95c720917",
+      "class": "Judgment",
+      "classReason": "candidate note or explicit relative-link destination rebase; unequal digest",
+      "mandatoryDeep": true,
+      "fullSourceUnitContained": true,
+      "sourcePayloadRecoverableAfterRecordedLinkReversal": true
     },
     {
       "claimId": "claim_41988cae1fdd914bf7a8a4d1df2aeb82",
@@ -7308,11 +7327,12 @@
       "sourceDigest": "46e05dc484d8e352983b2835fed11fa9ff77e8a16af7387a1423a930a1f6767f",
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "unheaded-block-13",
-      "targetDigest": "46e05dc484d8e352983b2835fed11fa9ff77e8a16af7387a1423a930a1f6767f",
-      "class": "Unit-exact",
-      "classReason": "unique long digest match, equal ancestry, sufficient document exact share",
-      "mandatoryDeep": false,
-      "fullSourceUnitContained": true
+      "targetDigest": "a5d8dd83d3e9fc6729c2fd75300786b9c93aba271363a949245b25a52d760a7a",
+      "class": "Judgment",
+      "classReason": "candidate note or explicit relative-link destination rebase; unequal digest",
+      "mandatoryDeep": true,
+      "fullSourceUnitContained": false,
+      "sourcePayloadRecoverableAfterRecordedLinkReversal": true
     },
     {
       "claimId": "claim_2958b880278b18a7c00bb32287ef35d5",
@@ -10767,10 +10787,41 @@
     }
   ],
   "classCounts": {
-    "Unit-exact": 277,
+    "Unit-exact": 275,
     "Weak-exact": 260,
-    "Judgment": 29
+    "Judgment": 31
   },
   "pendingRows": 566,
-  "reviewedRows": 0
+  "reviewedRows": 0,
+  "linkRebaseFollowup": {
+    "inputCommit": "b4d758676561e36d320792cacd7128645a90bd43",
+    "authorCommit": "ada6e148c",
+    "ownerAnswer": "A39",
+    "sourceFilesChanged": 0,
+    "changedTargetRows": [
+      {
+        "claimId": "claim_c9cc1ff2abdd7adf91641d4c8b240523",
+        "targetAnchor": "observe-component-specification",
+        "before": "ff9cff7275281c657fa87c9fdb4248cc090be18195f5e333eba5b02685785850",
+        "after": "a24fdb9ba9dc5da2ef380c707571435a37850ee1a527cfccdfdb0dc6ea39251b",
+        "previousClass": "Judgment"
+      },
+      {
+        "claimId": "claim_12da781dbd66869bbf765410d887c7f0",
+        "targetAnchor": "contract-quyết-định-làn-c-f8",
+        "before": "1524c34dd5cd1df09f8b4a30a383264347263a484824aab9af796fd95f4c9e03",
+        "after": "2e58e1822dc58b46b60193348bdfef8dcba3ca8621bbd845c2ed61c95c720917",
+        "previousClass": "Unit-exact"
+      },
+      {
+        "claimId": "claim_41988cae1fdd914bf7a8a4d1df2aeb82",
+        "targetAnchor": "unheaded-block-13",
+        "before": "46e05dc484d8e352983b2835fed11fa9ff77e8a16af7387a1423a930a1f6767f",
+        "after": "a5d8dd83d3e9fc6729c2fd75300786b9c93aba271363a949245b25a52d760a7a",
+        "previousClass": "Unit-exact"
+      }
+    ],
+    "unequalCarrierPairs": 22,
+    "pendingRows": 566
+  }
 }

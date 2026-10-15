@@ -2,6 +2,8 @@
   "version": 1,
   "method": "Scoped D/E FAST CHECK ONLY: unchanged applyDecisions, vocabulary validator and checkConservation on working-tree source/candidate overlay; 27 repeated --scope equivalents, both prior registry row-set checks. No native sync, git tree writes, checkInventory committed-tree scan, persisted registry mutation or review pack. Source IDs are actual current native IDs; new candidate local gap IDs are diagnostic and omitted from this report. Full D/E/native identity and reverse-list equality must run once after runner commits.",
   "sourceCommit": "111adc51fd047d99121fd9d076eb4794c87045a4",
+  "followupCommit": "b4d758676561e36d320792cacd7128645a90bd43",
+  "linkRebaseProof": "Only source-payload containment assertions reverse recorded Markdown destinations; gate inputs, actual target digests and unchanged exported D/E rules use actual candidate bytes.",
   "registry": {
     "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
     "sha256": "b5b11092ccd69cf70bda295c50c614fb5d76a9b18440ae2ca6df3aa68ef96e54",
@@ -65,34 +67,8 @@
     "docs/ui-spec/spec.config.yaml"
   ],
   "D": {
-    "fatalFindings": [
-      {
-        "type": "file-class-not-allowed-for-disposition",
-        "path": "docs/ui-spec/generated/action-registry.csv",
-        "message": "docs/ui-spec/generated/action-registry.csv: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
-      },
-      {
-        "type": "file-class-not-allowed-for-disposition",
-        "path": "docs/ui-spec/generated/coverage-report.md",
-        "message": "docs/ui-spec/generated/coverage-report.md: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
-      },
-      {
-        "type": "file-class-not-allowed-for-disposition",
-        "path": "docs/ui-spec/generated/navigation-graph.yaml",
-        "message": "docs/ui-spec/generated/navigation-graph.yaml: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
-      },
-      {
-        "type": "file-class-not-allowed-for-disposition",
-        "path": "docs/ui-spec/generated/surface-registry.yaml",
-        "message": "docs/ui-spec/generated/surface-registry.yaml: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
-      },
-      {
-        "type": "file-class-not-allowed-for-disposition",
-        "path": "docs/ui-spec/generated/wireframe-v2.html",
-        "message": "docs/ui-spec/generated/wireframe-v2.html: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
-      }
-    ],
-    "count": 5,
+    "fatalFindings": [],
+    "count": 0,
     "scope": [
       "docs/specs/confinement-authority.md",
       "docs/specs/decision-citation-drift.md",
@@ -124,33 +100,7 @@
     ]
   },
   "E": {
-    "structuralFatal": [
-      {
-        "type": "file-class-not-allowed-for-disposition",
-        "path": "docs/ui-spec/generated/action-registry.csv",
-        "message": "docs/ui-spec/generated/action-registry.csv: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
-      },
-      {
-        "type": "file-class-not-allowed-for-disposition",
-        "path": "docs/ui-spec/generated/coverage-report.md",
-        "message": "docs/ui-spec/generated/coverage-report.md: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
-      },
-      {
-        "type": "file-class-not-allowed-for-disposition",
-        "path": "docs/ui-spec/generated/navigation-graph.yaml",
-        "message": "docs/ui-spec/generated/navigation-graph.yaml: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
-      },
-      {
-        "type": "file-class-not-allowed-for-disposition",
-        "path": "docs/ui-spec/generated/surface-registry.yaml",
-        "message": "docs/ui-spec/generated/surface-registry.yaml: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
-      },
-      {
-        "type": "file-class-not-allowed-for-disposition",
-        "path": "docs/ui-spec/generated/wireframe-v2.html",
-        "message": "docs/ui-spec/generated/wireframe-v2.html: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
-      }
-    ],
+    "structuralFatal": [],
     "conservationOpen": [
       {
         "type": "claims-not-reviewed",
@@ -207,7 +157,7 @@
     "allScopesMatched": true,
     "allSourceNativeIdentitiesPresent": true,
     "allSourceTextAndTargetBindingsChecked": true,
-    "originalHeadingPayloadContained": true,
+    "originalHeadingPayloadContainedAfterRecordedLinkReversal": true,
     "frontmatterChecks": [
       "docs/specs/decision-citation-drift.md",
       "docs/specs/distillery.md",
@@ -669,7 +619,7 @@
       {
         "path": "docs/platform/observe/spec.md",
         "anchor": "unheaded-block-2",
-        "unitDigest": "5872213e7045308646ea615963c6fb4dd624e2b0dfa8fa445e6a4b0b45351559",
+        "unitDigest": "de673f8911ccc21e0400871a9bdd664f28549e03b580ade6011148e7072c0070",
         "fileStatus": "Candidate",
         "canonical": false,
         "identityState": "missing-source-registry-gap",

@@ -19,7 +19,7 @@ Supersedes: None; candidate only
 Superseded by: None
 ```
 
-> Added in candidate: Candidate metadata and placement scaffolding. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.
+> Added in candidate: Candidate metadata and placement scaffolding. Relative link destinations rebased from ../reference/discussion-quality-rubric.md and ../how-to/compare-discussion-setups-with-metrics-eval.md to ../../reference/discussion-quality-rubric.md and ../../how-to/compare-discussion-setups-with-metrics-eval.md; labels and repository referents unchanged. Split companions are listed in the area portal; original section numbers are retained. Legacy authority remains unchanged; source wording is preserved for conservation, including known stale assertions.
 
 
 Document type: BA-grade area specification
@@ -90,7 +90,7 @@ Dành cho Phase F5: writer Rust duy nhất, migration lười từ `work.frictio
 
 ### § Contract & Quyết định (Làn C / F8)
 Dành cho Phase F8: khoá ranh giới contracts, golden fixtures và decision records.
-- Versioned contracts: `packages/observe/contracts/` (`observe.observation.v1.json`, `observe.friction.v1.json`, `observe.case.v1.json`, `observe.snapshot.v1.json`, `observe.eval.v1.json`). Eval rubric: [`discussion-quality.v1`](../reference/discussion-quality-rubric.md); [blind comparison how-to](../how-to/compare-discussion-setups-with-metrics-eval.md).
+- Versioned contracts: `packages/observe/contracts/` (`observe.observation.v1.json`, `observe.friction.v1.json`, `observe.case.v1.json`, `observe.snapshot.v1.json`, `observe.eval.v1.json`). Eval rubric: [`discussion-quality.v1`](../../reference/discussion-quality-rubric.md); [blind comparison how-to](../../how-to/compare-discussion-setups-with-metrics-eval.md).
 - Source owner read contracts: `packages/run-result/contracts/run-result.read.v1.json`, `packages/run-result/contracts/unit-summary.read.v2.json`, `packages/observe/contracts/coordination-session.read.v1.json` (historic sessions; the coordination engine is retired), `packages/work-state/contracts/work-events.read.v1.json`.
 - Golden fixtures: `test/fixtures/observe/` sinh bằng CLI Rust và Node trong `scripts/regenerate-observe-fixtures.mjs`.
 - Doctor checks: `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `observe-run-coverage` (`src/setup/registrations.mjs`). Coverage check gọi host `metrics coverage` qua helper với main-checkout dir, kiểm tra `v2` + accounting rồi so `runDirsSeen` với Node directory-only `scanAssignmentLayout` (gồm symlink/depth barriers). Tolerance là max(Node recent result files, host `recentRuns`) trong cửa sổ 60 giây. Chỉ positive unknown subcommand hoặc payload thiếu `layoutRule` được degraded/pass vì old host; malformed coverage và các lỗi khác fail.

@@ -1,0 +1,326 @@
+{
+  "inputCommit": "b4d758676561e36d320792cacd7128645a90bd43",
+  "authorCommit": "ada6e148c",
+  "ownerAnswer": "A39",
+  "candidateChecks": [
+    {
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/distillery/spec.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/claude-plugin/spec.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/spec.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/spec.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "links": []
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/spec.config.yaml.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/observe/spec.md",
+      "links": [
+        {
+          "target": "../../reference/discussion-quality-rubric.md",
+          "resolved": "docs/reference/discussion-quality-rubric.md"
+        },
+        {
+          "target": "../../how-to/compare-discussion-setups-with-metrics-eval.md",
+          "resolved": "docs/how-to/compare-discussion-setups-with-metrics-eval.md"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/observe/decisions/observe-component-architecture.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/agent-confinement/spec.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+      "links": []
+    },
+    {
+      "path": "docs/platform/decision-citation-drift/README.md",
+      "links": [
+        {
+          "target": "spec.md",
+          "resolved": "docs/platform/decision-citation-drift/spec.md"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/distillery/README.md",
+      "links": [
+        {
+          "target": "spec.md",
+          "resolved": "docs/platform/distillery/spec.md"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/claude-plugin/README.md",
+      "links": [
+        {
+          "target": "spec.md",
+          "resolved": "docs/platform/claude-plugin/spec.md"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/README.md",
+      "links": [
+        {
+          "target": "spec.md",
+          "resolved": "docs/platform/herdr-web-dashboard/spec.md"
+        },
+        {
+          "target": "operations/operator-runbook.md",
+          "resolved": "docs/platform/herdr-web-dashboard/operations/operator-runbook.md"
+        },
+        {
+          "target": "contracts/fgos-gateway-api-v1.yaml",
+          "resolved": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/ui-spec/README.md",
+      "links": [
+        {
+          "target": "spec.md",
+          "resolved": "docs/platform/ui-spec/spec.md"
+        },
+        {
+          "target": "contracts/15-system-events.md",
+          "resolved": "docs/platform/ui-spec/contracts/15-system-events.md"
+        },
+        {
+          "target": "contracts/20-domain-rules.md",
+          "resolved": "docs/platform/ui-spec/contracts/20-domain-rules.md"
+        },
+        {
+          "target": "contracts/30-states-and-errors.md",
+          "resolved": "docs/platform/ui-spec/contracts/30-states-and-errors.md"
+        },
+        {
+          "target": "architecture/components/C01-item-card.md",
+          "resolved": "docs/platform/ui-spec/architecture/components/C01-item-card.md"
+        },
+        {
+          "target": "operations/F01-answer-a-parked-question.md",
+          "resolved": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md"
+        },
+        {
+          "target": "operations/F02-approve-a-merge.md",
+          "resolved": "docs/platform/ui-spec/operations/F02-approve-a-merge.md"
+        },
+        {
+          "target": "architecture/modals/M01-answer-question.md",
+          "resolved": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md"
+        },
+        {
+          "target": "architecture/modals/M02-approve-merge.md",
+          "resolved": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md"
+        },
+        {
+          "target": "architecture/modals/M03-add-edit-item.md",
+          "resolved": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md"
+        },
+        {
+          "target": "history/schema/surface-contract.schema.json",
+          "resolved": "docs/platform/ui-spec/history/schema/surface-contract.schema.json"
+        },
+        {
+          "target": "history/schema/surface-contract.schema.json.md",
+          "resolved": "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md"
+        },
+        {
+          "target": "architecture/screens/S01-sign-in.md",
+          "resolved": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md"
+        },
+        {
+          "target": "architecture/screens/S02-taskboard.md",
+          "resolved": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md"
+        },
+        {
+          "target": "architecture/screens/S03-task-detail.md",
+          "resolved": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md"
+        },
+        {
+          "target": "architecture/screens/S04-questions-needing-answer.md",
+          "resolved": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md"
+        },
+        {
+          "target": "architecture/spec.config.yaml",
+          "resolved": "docs/platform/ui-spec/architecture/spec.config.yaml"
+        },
+        {
+          "target": "architecture/spec.config.yaml.md",
+          "resolved": "docs/platform/ui-spec/architecture/spec.config.yaml.md"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/observe/README.md",
+      "links": [
+        {
+          "target": "spec.md",
+          "resolved": "docs/platform/observe/spec.md"
+        },
+        {
+          "target": "decisions/observe-component-architecture.md",
+          "resolved": "docs/platform/observe/decisions/observe-component-architecture.md"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-confinement/README.md",
+      "links": [
+        {
+          "target": "spec.md",
+          "resolved": "docs/platform/agent-confinement/spec.md"
+        },
+        {
+          "target": "contracts/confinement-authority-v1.md",
+          "resolved": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md"
+        },
+        {
+          "target": "history/rollout-and-settled-facts.md",
+          "resolved": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md"
+        },
+        {
+          "target": "decisions/confinement-authority-decisions.md",
+          "resolved": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md"
+        }
+      ]
+    }
+  ],
+  "candidateMetadata": {
+    "findings": [],
+    "counts": {
+      "files": 33,
+      "byStatus": {
+        "promoted": 0,
+        "candidate": 33,
+        "legacy-current": 0,
+        "non-authority": 0,
+        "unrouted": 0
+      },
+      "exemptUnrouted": 0,
+      "checked": 33,
+      "findings": 0,
+      "byType": {}
+    }
+  },
+  "globalCandidateStatus": {
+    "counts": {
+      "files": 590,
+      "byStatus": {
+        "promoted": 3,
+        "candidate": 196,
+        "legacy-current": 0,
+        "non-authority": 1,
+        "unrouted": 390
+      },
+      "exemptUnrouted": 302,
+      "checked": 199,
+      "findings": 0,
+      "byType": {}
+    },
+    "findings": []
+  },
+  "fastResults": "plans/260925-documentation-authority-unification/reports/phase-06/step8-fast-check.json",
+  "reproduction": {
+    "correctionSource": "import fs from 'node:fs';\nimport path from 'node:path';\nimport assert from 'node:assert/strict';\nimport {createHash} from 'node:crypto';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/';\nconst {extractMarkdownConservationUnits:extract}=await import(root+'/scripts/generate-doc-inventory.mjs');\nconst read=p=>JSON.parse(fs.readFileSync(p)),write=(p,v)=>fs.writeFileSync(p,JSON.stringify(v,null,2)+'\\n'),sha=v=>createHash('sha256').update(v).digest('hex');\nconst target='docs/platform/observe/spec.md',original=fs.readFileSync(target,'utf8');\nconst rebases=['reference/discussion-quality-rubric.md','how-to/compare-discussion-setups-with-metrics-eval.md'].map(p=>({from:'../'+p,to:'../../'+p,repositoryReferent:'docs/'+p,sourceLine:70,targetLine:93}));\nlet updated=original;for(const r of rebases){assert.equal(path.posix.normalize(path.posix.join('docs/specs',r.from)),r.repositoryReferent);assert.equal(path.posix.normalize(path.posix.join(path.posix.dirname(target),r.to)),r.repositoryReferent);assert(fs.existsSync(r.repositoryReferent));assert(updated.includes(']('+r.from+')'));updated=updated.replace(']('+r.from+')',']('+r.to+')');}\nupdated=updated.replace('> Added in candidate: Candidate metadata and placement scaffolding.', '> Added in candidate: Candidate metadata and placement scaffolding. Relative link destinations rebased from ../reference/discussion-quality-rubric.md and ../how-to/compare-discussion-setups-with-metrics-eval.md to ../../reference/discussion-quality-rubric.md and ../../how-to/compare-discussion-setups-with-metrics-eval.md; labels and repository referents unchanged.');\nfs.writeFileSync(target,updated);\nconst a=read(R+'step8-carriage-accounting.json'),s=read(P+'ledger/decisions/s8-observe-01.json'),before=extract(original),after=extract(updated),changes=[];\nfor(const row of s.claims.filter(r=>r.targetOwner===target)){\n const old=before.find(u=>u.anchor===row.targetAnchor),next=after.find(u=>u.anchor===row.targetAnchor);assert(old&&next);assert.equal(old.textDigest,row.targetUnitDigest);assert.equal(row.reviewStatus,'pending');if(old.textDigest===next.textDigest)continue;\n const pair=a.pairs.find(p=>p.claimId===row.claimId);changes.push({claimId:row.claimId,targetAnchor:row.targetAnchor,before:old.textDigest,after:next.textDigest,previousClass:pair.class});row.targetUnitDigest=next.textDigest;\n row.rationale='Judgment: labelled candidate note and/or explicit relative-link destination rebases; labels, repository referents and source wording otherwise preserved. Source digest is unchanged; target digest is unequal and requires independent deep review. '+row.rationale.replace(/^(Unit-exact|Weak-exact):.*? The whole /,'The whole ').replace('The full native unit digest is equal. ','');\n pair.targetDigest=next.textDigest;pair.class='Judgment';pair.classReason='candidate note or explicit relative-link destination rebase; unequal digest';pair.mandatoryDeep=true;pair.fullSourceUnitContained=pair.sourceAnchor==='unheaded-block-11'?false:pair.fullSourceUnitContained;\n pair.sourcePayloadRecoverableAfterRecordedLinkReversal=true;\n}\nconst f=a.files.find(f=>f.source==='docs/specs/observe.md');f.relativeLinkRebases=rebases;f.carriageNote='Reverse only the recorded Markdown link destinations to recover source payload; no label or repository referent change. Candidate Added in candidate note is scaffolding.';\na.classCounts=Object.fromEntries(['Unit-exact','Weak-exact','Judgment'].map(c=>[c,a.pairs.filter(p=>p.class===c).length]));\nconst cf=a.candidateFiles.find(f=>f.path===target);cf.sha256=sha(updated);cf.bytes=Buffer.byteLength(updated);\na.linkRebaseFollowup={inputCommit:'b4d758676561e36d320792cacd7128645a90bd43',authorCommit:'ada6e148c',ownerAnswer:'A39',sourceFilesChanged:0,changedTargetRows:changes,unequalCarrierPairs:a.pairs.filter(p=>p.targetOwner&&p.sourceDigest!==p.targetDigest).length,pendingRows:566};\nwrite(P+'ledger/decisions/s8-observe-01.json',s);write(R+'step8-carriage-accounting.json',a);console.log(JSON.stringify({changes,classes:a.classCounts,unequal:a.linkRebaseFollowup.unequalCarrierPairs}));\n",
+    "fastCheckSource": "import fs from 'node:fs';\nimport path from 'node:path';\nimport assert from 'node:assert/strict';\nimport crypto from 'node:crypto';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/';\nconst gen=await import(path.join(root,'scripts/generate-doc-inventory.mjs')),g=await import(path.join(root,'scripts/check-doc-inventory-gates.mjs'));\nconst read=f=>JSON.parse(fs.readFileSync(f)),write=(f,o)=>fs.writeFileSync(f,JSON.stringify(o,null,2)+'\\n'),sha=t=>crypto.createHash('sha256').update(t).digest('hex');\nconst scan=read(R+'step8-liveness.json'),ac=read(R+'step8-carriage-accounting.json'),registry=read(R+'working-identity-registry.json'),identity=gen.buildIdentityRegistryIndex(registry),sb=gen.buildSwitchboardIndex(read(P+'transitional-switchboard.json')),vocabulary=read(P+'claim-and-disposition-vocabulary.json');\nconst shards=fs.readdirSync(P+'ledger/decisions').filter(f=>f.startsWith('s8-')).map(f=>read(P+'ledger/decisions/'+f)),scopes=scan.files.map(f=>f.source),items=[],claims=[],cache=new Map();\nconst unitsOf=p=>{if(cache.has(p))return cache.get(p);const text=fs.readFileSync(p,'utf8'),ls=text.split('\\n'),units=p.endsWith('.md')?gen.extractMarkdownConservationUnits(text):gen.extractMixedFileConservationUnit(p,text),heads=[];const us=units.map((u,i)=>{if(u.unitKind==='heading')while(heads.length&&heads.at(-1).level>=u.level)heads.pop();const ancestry=heads.map(h=>h.title);if(u.unitKind==='heading')heads.push(u);const next=units.slice(i+1).find(o=>o.unitKind==='heading');return {...u,ancestry,text:ls.slice(u.startLine-1,u.endLine).join('\\n').trim(),...(u.unitKind==='heading'?{sectionText:ls.slice(u.startLine-1,next?next.startLine-1:ls.length).join('\\n').trim()}:{})};});cache.set(p,us);return us;};\nconst restoreLinks=t=>{for(const f of ac.files)for(const r of f.relativeLinkRebases||[])t=t.replaceAll(']('+r.to+')',']('+r.from+')');return t;};\nconst allTargets=[...new Set([...ac.candidateFiles.map(f=>f.path),'docs/platform/herdr-web-dashboard/operations/operator-runbook.md','docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml'])];\nfor(const p of [...scopes,...allTargets]){const content=fs.readFileSync(p,'utf8'),src=scan.files.find(f=>f.source===p);const item=gen.buildInventoryRow(p,{content,blobSha:src?.sourceBlob||null,blobSize:Buffer.byteLength(content),switchboardIndex:sb,identityIndex:identity});items.push(item);claims.push(...item.claims);if(src){assert.equal(sha(content),src.sourceSHA256);assert(item.claims.every(r=>r.identityStatus==='carried-forward'));}if(allTargets.includes(p)&&p.endsWith('.md')){const required=['Document type','Audience','Purpose','Design status','Implementation','Provenance','Writer type','Canonical for','Use this when','Do not use this for','Last reviewed','Related','Supersedes','Superseded by'];assert(required.every(h=>content.includes(h+':')),p);assert(content.includes('Design status: Candidate'));assert(content.includes('Canonical: No'));}}\nconst inventory={version:3,commit:null,items,claimLedger:claims,consumerEdges:[],scanGaps:[],duplicateContentGroups:[],semanticConflictGroups:[]};\nassert.equal(g.findUnmatchedScope(scopes,inventory),undefined);\nconst applied=g.applyDecisions(inventory,shards,{vocabulary,unitsOf,registry,targetAnchorsOf:p=>new Set(unitsOf(p).map(u=>u.anchor)),targetUnitDigestOf:(p,a)=>unitsOf(p).find(u=>u.anchor===a)?.textDigest});\n// Use the unchanged exported D/E conservation rules on a local working-tree overlay.\n// Native committed-tree coverage/identity and registry carry are explicitly deferred.\nconst priors=[P+'reports/identity-registry.json',P+'reports/phase-02-identity-registry.json'].map(f=>({label:f,registry:read(f)}));\nconst conservation=g.checkConservation({inventory:applied.inventory,registry:applied.registry,previousRegistries:priors,vocabulary,scope:scopes,decisions:shards});\nconst validOwners=new Set(allTargets),sourceOnly={...applied.inventory,items:applied.inventory.items.filter(i=>scopes.includes(i.path)),claimLedger:applied.inventory.claimLedger.filter(r=>scopes.includes(r.sourcePath))};\nconst vocabFindings=g.validateAgainstVocabulary(sourceOnly,vocabulary,validOwners,{targetAnchorsOf:p=>new Set(unitsOf(p).map(u=>u.anchor))});\nconst fatal=[...applied.findings,...vocabFindings,...conservation.invariant];\nconst digestChecks=[];\nfor(const s of shards)for(const d of s.claims){assert.equal(d.reviewStatus,'pending');const row=claims.find(r=>r.claimId===d.claimId);assert(row);assert.equal(row.sourceUnitDigest,d.sourceUnitDigest);if(d.targetOwner){const target=unitsOf(d.targetOwner).find(u=>u.anchor===d.targetAnchor);assert.equal(target.textDigest,d.targetUnitDigest);assert.deepEqual(target.ancestry,d.targetAncestry);const source=unitsOf(row.sourcePath).find(u=>u.anchor===row.sourceAnchor);assert(restoreLinks(target.text).includes(source.text)||target.text===source.text);if(source.unitKind==='heading'){const sourcePayload=source.sectionText.slice(source.text.length).trim();assert(restoreLinks(target.sectionText).includes(sourcePayload),'heading payload containment '+row.sourcePath+'#'+row.sourceAnchor);}digestChecks.push(d.claimId);}}\nconst reverse=conservation.unreferencedCandidateRows.map(r=>{const item=items.find(i=>i.path===r.path);return {path:r.path,anchor:r.anchor,unitDigest:r.unitDigest,fileStatus:'Candidate',canonical:false,identityState:claims.find(c=>c.claimId===r.claimId)?.identityStatus,provisionalLocalIdentity:true};});\nconst duplicateGroups=[];for(const digest of new Set(sourceOnly.claimLedger.map(r=>r.sourceUnitDigest))){const members=sourceOnly.claimLedger.filter(r=>r.sourceUnitDigest===digest&&r.targetOwner);if(new Set(members.map(r=>r.targetOwner)).size>1)duplicateGroups.push({digest,members:members.map(r=>({claimId:r.claimId,sourcePath:r.sourcePath,sourceAnchor:r.sourceAnchor,targetOwner:r.targetOwner,targetAnchor:r.targetAnchor})),status:'pending independent contextual exception review',rationale:'Shared heading-only Behaviors & Operations has different area subjects and different child operations. Preserve contextual owners per the frozen area map; do not treat the plugin behavior section as citation-check behavior or the converse.'});}\nconst stats={sourceRows:566,withCarrier:digestChecks.length,noCandidateGenerated:9,candidates:ac.candidateFiles.length,scopes:scopes.length,allScopesMatched:true,allSourceNativeIdentitiesPresent:true,allSourceTextAndTargetBindingsChecked:true,originalHeadingPayloadContainedAfterRecordedLinkReversal:true,frontmatterChecks:[],machineByteChecks:[],segmentReconstructionChecks:[]};\nfor(const f of ac.files){if(f.override)continue;const source=fs.readFileSync(f.source,'utf8');if(!f.source.endsWith('.md')){assert(fs.readFileSync(f.source).equals(fs.readFileSync(f.targets[0])));stats.machineByteChecks.push(f.source);}else{const fm=source.match(/^---\\n[\\s\\S]*?\\n---\\n/);if(fm){assert(fs.readFileSync(f.targets[0],'utf8').startsWith(fm[0]));stats.frontmatterChecks.push(f.source);}}\n const ls=source.split('\\n');assert.equal(f.segments.map(s=>ls.slice(s.startLine-1,s.endLine).join('\\n')).join('\\n'),source);for(const seg of f.segments){const body=ls.slice(seg.startLine-1,seg.endLine).join('\\n');assert.equal(sha(body),seg.sha256);if(!f.source.endsWith('.md'))continue;const candidate=restoreLinks(fs.readFileSync(seg.target,'utf8'));if(seg.startLine===1&&candidate.includes('```txt\\nDocument type:')){const restored=candidate.replace(/\\n\\n```txt\\nDocument type:[\\s\\S]*?\\n```\\n\\n> Added in candidate:[^\\n]*\\n/,'');assert(restored.includes(body.trim()),'first segment restore '+f.source);}else assert(candidate.includes(body.trim()),'segment missing '+f.source);}stats.segmentReconstructionChecks.push(f.source);\n}\nconst result={version:1,method:'Scoped D/E FAST CHECK ONLY: unchanged applyDecisions, vocabulary validator and checkConservation on working-tree source/candidate overlay; 27 repeated --scope equivalents, both prior registry row-set checks. No native sync, git tree writes, checkInventory committed-tree scan, persisted registry mutation or review pack. Source IDs are actual current native IDs; new candidate local gap IDs are diagnostic and omitted from this report. Full D/E/native identity and reverse-list equality must run once after runner commits.',sourceCommit:scan.sourceCommit,followupCommit:'b4d758676561e36d320792cacd7128645a90bd43',linkRebaseProof:'Only source-payload containment assertions reverse recorded Markdown destinations; gate inputs, actual target digests and unchanged exported D/E rules use actual candidate bytes.',registry:{path:R+'working-identity-registry.json',sha256:sha(fs.readFileSync(R+'working-identity-registry.json')),bytes:fs.statSync(R+'working-identity-registry.json').size,unchanged:true},scopeArguments:scopes.flatMap(p=>['--scope',p]),D:{fatalFindings:fatal,count:fatal.length,scope:scopes},E:{structuralFatal:fatal,conservationOpen:conservation.open,strictGreen:false,pendingSourceRows:566},stats,preliminaryCandidateUnverified:{native:false,count:reverse.length,units:reverse},duplicateGroups};\nwrite(R+'step8-fast-check.json',result);\nconsole.log(JSON.stringify({D:fatal.length,findings:fatal,E:conservation.open,reverseLocal:reverse.length,stats}));\n",
+    "note": "Save each source as a separate .mjs under /tmp/fgos-work; run fastCheckSource from repo root with env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work. Correction is one-shot against input commit, not safe to rerun over corrected rows. Existing fast-check helper, gates, vocabulary, extractor and baselines remain unchanged. Only payload recovery assertions reverse the recorded link destinations; actual D/E data and target digest assertions are unchanged."
+  },
+  "nativeSyncRun": false,
+  "registryWritten": false,
+  "reviewPackagesCreated": false
+}

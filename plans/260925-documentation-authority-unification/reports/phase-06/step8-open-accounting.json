@@ -2,8 +2,10 @@
   "version": 1,
   "sourceCommit": "111adc51fd047d99121fd9d076eb4794c87045a4",
   "generatedClassConflict": {
-    "pending": true,
-    "findings": [
+    "pending": false,
+    "findings": [],
+    "needed": "Resolved by A39. Full committed-tree D/E and native equality still required next turn.",
+    "historicalFindings": [
       {
         "type": "file-class-not-allowed-for-disposition",
         "path": "docs/ui-spec/generated/action-registry.csv",
@@ -30,7 +32,15 @@
         "message": "docs/ui-spec/generated/wireframe-v2.html: fileClass \"maintained-authority\" is not allowed for disposition \"regenerate-from-source\" (allowed: generated)"
       }
     ],
-    "codeEvidence": {
+    "resolution": {
+      "answer": "A39",
+      "commit": "b4d758676561e36d320792cacd7128645a90bd43",
+      "route": "docs/ui-spec/generated/**",
+      "fastDFatal": 0,
+      "fastEStructuralFatal": 0,
+      "note": "Existing deriveFileClassFromAuthority now derives generated from the Lead-added data-only route; original conflict evidence is historical."
+    },
+    "historicalCodeEvidence": {
       "source": "scripts/generate-doc-inventory.mjs",
       "functions": [
         "buildSwitchboardIndex",
@@ -38,8 +48,7 @@
         "classifyDocPath"
       ],
       "facts": "docs/ui-spec/generated/** inherits the ui-spec corpusRoot role, which does not say generated/projection; currentRoutes supplies no more specific generated declaration. Existing unchanged vocabulary allows regenerate-from-source only on fileClass generated. A9/N1 and Lead require that disposition, so no disposition workaround or fake local class overlay is used."
-    },
-    "needed": "Lead must authorize/land a data-only generated-source classification declaration through the switchboard’s existing role contract, preserving area authority status, or give a scoped amendment. The phase allowlist permits additive candidate routes only; this producer leaves the switchboard unchanged. No checker/vocabulary/extractor/baseline change is requested."
+    }
   },
   "inheritedUndisposedGaps": [
     {
@@ -106,5 +115,6 @@
       "rationale": "Shared heading-only Behaviors & Operations has different area subjects and different child operations. Preserve contextual owners per the frozen area map; do not treat the plugin behavior section as citation-check behavior or the converse."
     }
   ],
-  "notes": "All 566 HEAD source rows have real native identities and pending decisions. Three inherited predecessor gaps remain distinct; source decisions do not silently close them. Next native sync must preserve all IDs and account exact predecessors/successors under A22/A34 as applicable, without approval carry."
+  "notes": "All 566 HEAD source rows have real native identities and pending decisions. Three inherited predecessor gaps remain distinct; source decisions do not silently close them. Next native sync must preserve all IDs and account exact predecessors/successors under A22/A34 as applicable, without approval carry.",
+  "followupCommit": "b4d758676561e36d320792cacd7128645a90bd43"
 }
