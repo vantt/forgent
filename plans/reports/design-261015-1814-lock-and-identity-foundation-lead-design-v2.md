@@ -378,6 +378,8 @@ Mỗi lock có một hạng. Một process chỉ được acquire lock có hạn
 | 70 | claims | mutex, đường nóng |
 | 80 | sessions, advance, reconcile, recovery, observe, provider state/account, activation, install, full-suite | lá: giữ lock này thì không acquire gì thêm |
 
+**Lock cho terminal (hoãn).** Research gốc đề xuất `terminal-layout.lock` để tuần tự hoá việc tạo pane/tab và tính layout giữa nhiều process. Hôm nay không cần: các worker cùng nhóm do một process Node bật (giữ tab trong bộ nhớ), process con nhận pane neo qua `FGOS_HERDR_ANCHOR_PANE`. **Anh quyết (2026-10-15): nếu sau này làm, bắt buộc là một loại lock trong holder-lock này**, phạm vi máy/herdr-session (ngoài repo), liveness theo OS, có hạng trong bảng trên — không tự cài riêng. Trigger mở: S5 thấy có process không cùng cha phải chung tab (gateway, hai terminal).
+
 Hai lock cùng hạng (hai merge slot) không được giữ cùng lúc. Một process không được chờ con trong lúc giữ lock mà con có thể cần, trừ khi con là người mượn qua grant (7.1).
 
 ## 11. Đường nóng: events.lock và claims.lock (A10)
