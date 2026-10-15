@@ -41,9 +41,13 @@ pub fn current_caller() -> CallerInfo {
         .ok()
         .and_then(|p| p.parse::<u32>().ok())
         .unwrap_or_else(std::process::id);
-    let session_id = std::env::var("FGOS_SESSION_ID")
-        .ok()
-        .filter(|s| !s.trim().is_empty());
+    let identity = fgos_session_identity::resolve_current(None);
+    let session_id = match identity.source {
+        fgos_session_identity::Source::Env | fgos_session_identity::Source::Registry => {
+            Some(identity.id.to_string())
+        }
+        fgos_session_identity::Source::Pid | fgos_session_identity::Source::Unresolved => None,
+    };
     CallerInfo { pid, session_id }
 }
 

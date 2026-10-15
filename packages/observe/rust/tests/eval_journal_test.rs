@@ -204,6 +204,59 @@ fn cli_stdin_record_list_and_option_errors() {
     assert!(dispatch_eval(&req(&root, &["record"], Some(forged))).is_err());
 }
 
+#[test]
+fn shard_name_child() {
+    if std::env::var("FGOS_SHARD_NAME_CHILD").is_err() {
+        return;
+    }
+    println!("SHARD={}", fgos_observe::shard::writer_shard_name());
+}
+
+fn shard_name_with(env: &[(&str, &str)]) -> String {
+    let mut cmd = Command::new(std::env::current_exe().unwrap());
+    cmd.args(["--exact", "shard_name_child", "--nocapture"])
+        .env("FGOS_SHARD_NAME_CHILD", "1");
+    for key in [
+        "FGOS_SESSION_ID",
+        "CODEX_THREAD_ID",
+        "CLAUDE_CODE_SESSION_ID",
+    ] {
+        cmd.env_remove(key);
+    }
+    for (key, value) in env {
+        cmd.env(key, value);
+    }
+    let out = String::from_utf8(cmd.output().unwrap().stdout).unwrap();
+    out.lines()
+        .find_map(|line| line.strip_prefix("SHARD="))
+        .expect("child printed its shard name")
+        .to_string()
+}
+
+// The shard name comes from the session identity authority: an agent session
+// id names the shard directly (Claude and Codex included), otherwise the
+// terminal/session pid does.
+#[test]
+fn writer_shard_name_follows_the_session_identity_authority() {
+    assert_eq!(shard_name_with(&[("FGOS_SESSION_ID", "fgos-a")]), "fgos-a");
+    assert_eq!(
+        shard_name_with(&[("CLAUDE_CODE_SESSION_ID", "claude-b")]),
+        "claude-b"
+    );
+    assert_eq!(
+        shard_name_with(&[
+            ("CODEX_THREAD_ID", "codex-c"),
+            ("CLAUDE_CODE_SESSION_ID", "claude-b")
+        ]),
+        "codex-c"
+    );
+    let bare = shard_name_with(&[]);
+    let pid = bare
+        .strip_prefix("pid-")
+        .expect("pid-<id> without an env id");
+    assert!(pid.parse::<u32>().unwrap() > 0);
+}
+
 // Real child processes exercise distinct writer shards without mutating the test
 // process environment (which would race the parallel Rust suite).
 #[test]
@@ -306,7 +359,7 @@ fn symlink_writer_shard_never_changes_external_target() {
     fs::write(&target, "original external bytes\n").unwrap();
     let dir = root.0.join(".fgos/observe/evals");
     fs::create_dir_all(&dir).unwrap();
-    let writer = fgos_observe::shard::resolve_writer_id();
+    let writer = fgos_observe::shard::writer_shard_name();
     symlink(&target, dir.join(format!("{}.jsonl", writer))).unwrap();
     assert!(eval_journal::record(&root.0, input("unsafe", "panel", "q")).is_err());
     assert_eq!(
@@ -343,9 +396,25 @@ fn eval_rejected_writer_child() {
     let Ok(root) = std::env::var("FGOS_EVAL_REJECT_TEST_ROOT") else {
         return;
     };
-    let error = eval_journal::record(std::path::Path::new(&root), input("unsafe", "panel", "q"))
-        .unwrap_err();
-    assert!(error.contains("single filename component"), "{}", error);
+    // A traversal-shaped id either fails the identity rule's charset (the
+    // writer then falls back to a `pid-<id>` shard inside the store) or
+    // passes it as "."/".." and is refused here as a filename.
+    let eval_id = format!("unsafe-{}", std::process::id());
+    match eval_journal::record(std::path::Path::new(&root), input(&eval_id, "panel", "q")) {
+        Err(error) => assert!(error.contains("single filename component"), "{}", error),
+        Ok(_) => {
+            let shards: Vec<String> =
+                fs::read_dir(PathBuf::from(&root).join(".fgos/observe/evals"))
+                    .unwrap()
+                    .map(|entry| entry.unwrap().file_name().to_string_lossy().into_owned())
+                    .filter(|name| name.ends_with(".jsonl"))
+                    .collect();
+            assert!(
+                !shards.is_empty() && shards.iter().all(|name| name.starts_with("pid-")),
+                "{shards:?}"
+            );
+        }
+    }
 }
 
 #[test]
@@ -363,12 +432,15 @@ fn writer_identifier_cannot_escape_store() {
         let status = Command::new(&exe)
             .args(["--exact", "eval_rejected_writer_child"])
             .env("FGOS_EVAL_REJECT_TEST_ROOT", &root.0)
+            .env_remove("CODEX_THREAD_ID")
+            .env_remove("CLAUDE_CODE_SESSION_ID")
             .env("FGOS_SESSION_ID", writer)
             .status()
             .unwrap();
         assert!(status.success(), "writer: {}", writer);
     }
-    assert!(!root.0.join(".fgos").exists());
+    assert!(!root.0.join("escape").exists());
+    assert!(!root.0.parent().unwrap().join("escape").exists());
 }
 
 #[test]

@@ -28,10 +28,14 @@ fn test_observe_dependency_boundary() {
         .filter(|name| name.starts_with("fgos-"))
         .collect();
 
-    // Observe should ONLY depend on fgos-host-runtime internally
+    // Observe depends only on the host runtime and on the session identity
+    // foundation (the single writer-identity authority, which sits below it);
+    // never on domain or substrate crates.
+    let mut internal_fgos_deps = internal_fgos_deps;
+    internal_fgos_deps.sort_unstable();
     assert_eq!(
         internal_fgos_deps,
-        vec!["fgos-host-runtime"],
+        vec!["fgos-host-runtime", "fgos-session-identity"],
         "fgos-observe must not depend on domain/substrate crates directly"
     );
 }

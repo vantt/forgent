@@ -4,16 +4,17 @@ use std::fs;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 
-/// Resolves the writer identifier for the current process:
-/// prefers `FGOS_SESSION_ID` if set and non-empty, otherwise falls back to `pid-<pid>`.
-pub fn resolve_writer_id() -> String {
-    if let Ok(val) = std::env::var("FGOS_SESSION_ID") {
-        let trimmed = val.trim();
-        if !trimmed.is_empty() {
-            return trimmed.to_string();
-        }
+use fgos_session_identity::{resolve_current, Source};
+
+/// Shard file stem for the current process's writer, from the session
+/// identity authority: the session id itself for an `env`/`registry`
+/// identity, `pid-<id>` for a `pid`/`unresolved` one.
+pub fn writer_shard_name() -> String {
+    let identity = resolve_current(None);
+    match identity.source {
+        Source::Env | Source::Registry => identity.id.to_string(),
+        Source::Pid | Source::Unresolved => format!("pid-{}", identity.id),
     }
-    format!("pid-{}", std::process::id())
 }
 
 /// Returns the shard path `<root>/.fgos/observe/<store>/<writerId>.jsonl`
@@ -21,7 +22,7 @@ pub fn resolve_writer_id() -> String {
 pub fn shard_path(root: &Path, store: &str) -> Result<PathBuf, std::io::Error> {
     let dir = root.join(".fgos").join("observe").join(store);
     fs::create_dir_all(&dir)?;
-    let writer_id = resolve_writer_id();
+    let writer_id = writer_shard_name();
     Ok(dir.join(format!("{}.jsonl", writer_id)))
 }
 

@@ -259,7 +259,7 @@ fn read_bounded_line(
 
 pub fn record(root: &Path, input: EvalInput) -> Result<EvalRecord, String> {
     validate_input(&input)?;
-    let writer_id = shard::resolve_writer_id();
+    let writer_id = shard::writer_shard_name();
     let mut components = Path::new(&writer_id).components();
     if writer_id.contains(['/', '\\'])
         || !matches!(components.next(), Some(std::path::Component::Normal(_)))
