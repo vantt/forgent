@@ -95,7 +95,7 @@ Mỗi việc trên có test riêng. Trước khi activation: `npm test` đầy �
 | Lock cho terminal (giữ thứ tự khi nhiều process cùng mở pane/tính layout; research đề xuất `terminal-layout.lock`). Hôm nay không cần: các worker cùng nhóm do một process Node bật, giữ tab trong bộ nhớ; process con nhận pane neo qua `FGOS_HERDR_ANCHOR_PANE`. **Anh quyết (2026-10-15): nếu sau này làm, bắt buộc làm như một loại lock trong lock component chung (thiết kế lock + identity), không tự cài riêng**; đặt ngoài repo | Có process không cùng cha phải chung tab (gateway, hai terminal) | S5 |
 | Gom code kiểm `/proc` và dựng launcher giữa hai đường bật worker | Hai bên trùng ≥ 80% | Diffstat (S8, vài phút) |
 | Một supervisor riêng cho mỗi lần chạy (đề xuất của Astra) | Quan sát được herdr-spawn mất deadline/kết quả khi controller crash | Thử crash thật |
-| Danh tính cho pane do người tự mở | Quan sát herdr thật, hoặc thấy va chạm writer gây hại | S7 |
+| Danh tính cho pane do người tự mở | **S7 đã đo (2026-10-15, [report](spike-s7-261015-1859-human-opened-pane-identity-observation.md)):** codex (lệnh chạy dưới daemon `codex app-server` dùng chung) và shell trần (ra 3614 = herdr server) **đụng id**; claude/agy/pi/omp không đụng. Pane id herdr không bị tái dùng; gốc pane (shell zsh) riêng và ổn định. Đề xuất: thứ tự `FGOS_SESSION_ID → CODEX_THREAD_ID → CLAUDE_CODE_SESSION_ID` (đã có ở 2.2) + thay leo 3 bước bằng **leo tới tổ tiên cao nhất còn tty** (P3 tổng quát, `source` vẫn `pid`); không chọn P1 (mỗi lệnh một id → settle lỗi) và P2 (`HERDR_PANE_ID` sai với codex, chỉ chạy trong herdr) | S7 xong; chờ duyệt cách sửa |
 
 Các phép đo S5, S7, S8 rẻ, chạy được ngay để biến "hoãn" thành quyết định có số.
 
